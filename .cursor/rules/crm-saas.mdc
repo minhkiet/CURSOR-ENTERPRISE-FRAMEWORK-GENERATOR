@@ -1,239 +1,961 @@
 ---
-description: Nguyên tắc CRM SaaS cho enterprise applications
+description: Nguyên tắc và best practices cho CRM SaaS Implementation trong Cursor Enterprise Framework
 created: 2026-06-23
 version: 1.0.0
-tags: [crm, saas, sales, enterprise, customer]
+tags: [crm, saas, sales, customer, enterprise]
 ---
 
 # CRM SaaS
 
 ## Mục tiêu
 
-CRM SaaS là hệ thống quản lý quan hệ khách hàng được xây dựng theo mô hình Software-as-a-Service, phục vụ nhiều doanh nghiệp (tenants) trên cùng một infrastructure. Trong Cursor Enterprise Framework, CRM SaaS rule định nghĩa các nguyên tắc và best practices cho việc xây dựng một CRM platform enterprise-grade với các features như contact management, deal tracking, pipeline management, reporting, và automation. Mục tiêu là tạo ra một hệ thống có thể scale, secure, và customizable cho các doanh nghiệp với quy mô và yêu cầu khác nhau.
+CRM (Customer Relationship Management) là hệ thống quản lý tương tác với khách hàng và quản lý sales pipeline. Trong Cursor Enterprise Framework, CRM SaaS là một trong những core business applications được xây dựng, tập trung vào việc quản lý leads, contacts, accounts, opportunities, và customer interactions. Mục tiêu của rule này là hướng dẫn developers trong việc implement một CRM system hiệu quả với các features cần thiết cho sales teams.
 
-CRM là một trong những loại SaaS applications phổ biến nhất, đòi hỏi careful consideration về multi-tenancy, data isolation, customization capabilities, và performance. Rule này cover architecture, data models, features implementation, và operational excellence cho CRM SaaS.
+Một CRM system hiệu quả cần kết hợp giữa data management, workflow automation, reporting, và user experience. Rule này cover từ data modeling, business logic, đến frontend design và integration patterns.
 
 ## Nguyên tắc
 
-**1. Multi-Tenant Architecture**
+**1. Data Model Design**
 
-Shared database với tenant_id column và RLS. Separate schemas cho large tenants nếu cần. Tenant context được set cho mỗi request. All queries phải be scoped to tenant. Tenant identification từ JWT hoặc subdomain. Cross-tenant access phải be prevented at all levels.
+Model leads, contacts, accounts properly. Define relationships clearly. Use appropriate data types. Plan for scalability. Include audit fields.
 
-**2. Contact Management**
+**2. Lead Management**
 
-Store contacts với comprehensive profile data. Support custom fields per tenant. Tag và segment contacts. Handle duplicate detection. Store contact activities và history. Support contact import/export. GDPR compliance for data handling.
+Track lead lifecycle. Define lead sources. Implement lead scoring. Enable lead assignment. Track lead activities.
 
-**3. Deal Pipeline**
+**3. Opportunity Pipeline**
 
-Flexible pipeline stages per tenant. Customizable deal fields. Track deal value và probability. Drag-and-drop interface. Activity tracking on deals. Automated stage transitions. Deal scoring models.
+Design pipeline stages. Track opportunity progress. Calculate win probabilities. Forecast revenue. Measure conversion rates.
 
 **4. Activity Tracking**
 
-Log all customer interactions. Email, calls, meetings, notes. Attachments và file storage. Activity timeline view. Automated activity logging. Calendar integration. Task management.
+Log all interactions. Track emails, calls, meetings. Link to records. Include notes. Enable search.
 
-**5. Reporting và Analytics**
+**5. Workflow Automation**
 
-Real-time dashboards. Custom report builder. Scheduled reports. Export to various formats. Multi-tenant analytics isolation. Performance metrics per tenant. Data retention policies.
+Automate repetitive tasks. Define triggers and actions. Create approval workflows. Enable notifications. Monitor automation.
 
-**6. Workflow Automation**
+**6. Reporting và Analytics**
 
-Visual workflow builder. Trigger-based automation. Email sequences. Task automation. Approval workflows. Webhook integrations. Workflow analytics.
+Track KPIs. Measure performance. Enable custom reports. Create dashboards. Forecast revenue.
 
-**7. Integration Platform**
+**7. Integration Capabilities**
 
-API-first design. Webhook notifications. OAuth integrations. Third-party sync. Data mapping. Integration marketplace. Rate limiting per tenant.
+Integrate with email. Connect telephony. Link to ERP. Sync calendar. Enable API access.
 
-**8. Security và Compliance**
+**8. User Experience**
 
-SOC 2 Type II compliance. GDPR data handling. Data encryption at rest và in transit. Audit logging. Access controls. IP restrictions. Two-factor authentication.
+Intuitive interface. Quick data entry. Easy navigation. Mobile responsive. Accessible design.
 
-**9. Performance**
+**9. Data Security**
 
-Database indexing strategy. Query optimization per tenant. Caching layers. Async processing. Background jobs. Connection pooling. CDN for static assets.
+Role-based access. Field-level security. Record ownership. Audit logging. Data encryption.
 
 **10. Scalability**
 
-Horizontal scaling support. Database sharding option. Queue-based processing. Stateless application servers. Load balancing. Geographic distribution.
+Design for data growth. Use efficient queries. Implement archiving. Enable multi-tenancy. Plan for scale.
 
 ## Checklist
 
-- [ ] Multi-tenant architecture implemented
-- [ ] Contact management module built
-- [ ] Deal pipeline implemented
-- [ ] Activity tracking system built
-- [ ] Reporting module implemented
-- [ ] Workflow automation built
-- [ ] API endpoints created
-- [ ] Webhook system implemented
-- [ ] Security hardening applied
-- [ ] Performance optimized
-- [ ] Compliance requirements met
-- [ ] Documentation complete
+- [ ] Data model designed
+- [ ] Lead management implemented
+- [ ] Opportunity pipeline configured
+- [ ] Activity tracking set up
+- [ ] Workflow automation created
+- [ ] Reporting system built
+- [ ] Integration APIs configured
+- [ ] UI/UX designed
+- [ ] Security measures implemented
+- [ ] Performance tested
 
 ## Anti Pattern
 
-**1. No Tenant Isolation**
+**1. Overly Complex Data Model**
 
-Querying without tenant filter. Data leakage. Security breach. Solution: RLS + application checks.
+Too many custom fields. Complex relationships. Performance issues. Hard to maintain. Simplify design.
 
-**2. Monolithic Customization**
+**2. Ignoring User Adoption**
 
-Hard-coded field names. No extensibility. Limited tenant needs. Solution: Dynamic fields, metadata.
+Complex workflows. Poor UX. Low adoption. Train users. Simplify processes.
 
-**3. Synchronous Processing**
+**3. No Data Validation**
 
-Heavy operations blocking requests. Timeouts. Poor UX. Solution: Async processing with queues.
+Invalid data. Inconsistent records. Poor quality. Validate all inputs.
 
-**4. Ignoring Data Retention**
+**4. Siloed Information**
 
-Keeping all data forever. Storage costs. Compliance issues. Solution: Data retention policies.
+No sharing. Duplicate efforts. Poor collaboration. Enable team sharing.
+
+**5. Manual Data Entry**
+
+Time-consuming. Errors. Poor efficiency. Automate data capture. Integrate systems.
 
 ## Best Practice
 
-**1. Contact Model**
+**1. Data Model**
 
 ```typescript
-interface Contact {
+// entities/Lead.ts
+export interface Lead {
   id: string;
   tenantId: string;
-  email: string;
+  
+  // Basic Info
   firstName: string;
   lastName: string;
+  email: string;
   phone?: string;
   company?: string;
-  jobTitle?: string;
-  status: 'active' | 'inactive' | 'archived';
-  customFields: Record<string, any>;
+  title?: string;
+  
+  // Lead Management
+  status: LeadStatus;
+  source: LeadSource;
+  score?: number;
+  rating?: LeadRating;
+  
+  // Assignment
   ownerId?: string;
+  assignedAt?: Date;
+  
+  // Tracking
+  convertedAt?: Date;
+  convertedAccountId?: string;
+  convertedContactId?: string;
+  
+  // Metadata
   createdAt: Date;
   updatedAt: Date;
+  createdById: string;
 }
 
-// Custom fields stored as JSONB
-// Index on email, company for fast lookup
-// RLS policy for tenant isolation
-```
+export enum LeadStatus {
+  NEW = 'new',
+  CONTACTED = 'contacted',
+  QUALIFIED = 'qualified',
+  UNQUALIFIED = 'unqualified',
+  CONVERTED = 'converted'
+}
 
-**2. Deal Pipeline**
+export enum LeadSource {
+  WEBSITE = 'website',
+  REFERRAL = 'referral',
+  CAMPAIGN = 'campaign',
+  PARTNER = 'partner',
+  OTHER = 'other'
+}
 
-```typescript
-interface Pipeline {
+export enum LeadRating {
+  HOT = 'hot',
+  WARM = 'warm',
+  COLD = 'cold'
+}
+
+// entities/Account.ts
+export interface Account {
   id: string;
   tenantId: string;
+  
+  // Basic Info
   name: string;
-  stages: PipelineStage[];
-  isDefault: boolean;
+  type: AccountType;
+  industry?: string;
+  website?: string;
+  phone?: string;
+  
+  // Address
+  billingAddress?: Address;
+  shippingAddress?: Address;
+  
+  // Financial
+  annualRevenue?: number;
+  employees?: number;
+  
+  // Relationships
+  ownerId: string;
+  parentAccountId?: string;
+  
+  // Metadata
+  createdAt: Date;
+  updatedAt: Date;
+  createdById: string;
 }
 
-interface PipelineStage {
+export enum AccountType {
+  PROSPECT = 'prospect',
+  CUSTOMER = 'customer',
+  PARTNER = 'partner',
+  COMPETITOR = 'competitor'
+}
+
+export interface Address {
+  street: string;
+  city: string;
+  state?: string;
+  country: string;
+  postalCode: string;
+}
+
+// entities/Opportunity.ts
+export interface Opportunity {
+  id: string;
+  tenantId: string;
+  
+  // Basic Info
+  name: string;
+  accountId: string;
+  stage: OpportunityStage;
+  amount: number;
+  closeDate: Date;
+  
+  // Pipeline
+  probability: number;
+  pipelineId: string;
+  stageOrder: number;
+  
+  // Assignment
+  ownerId: string;
+  
+  // Tracking
+  lostReason?: string;
+  closedAt?: Date;
+  
+  // Metadata
+  createdAt: Date;
+  updatedAt: Date;
+  createdById: string;
+}
+
+export enum OpportunityStage {
+  PROSPECTING = 'prospecting',
+  QUALIFICATION = 'qualification',
+  PROPOSAL = 'proposal',
+  NEGOTIATION = 'negotiation',
+  CLOSED_WON = 'closed_won',
+  CLOSED_LOST = 'closed_lost'
+}
+
+// entities/Contact.ts
+export interface Contact {
+  id: string;
+  tenantId: string;
+  
+  // Basic Info
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  mobile?: string;
+  title?: string;
+  
+  // Relationships
+  accountId: string;
+  reportsToId?: string;
+  
+  // Address
+  address?: Address;
+  
+  // Metadata
+  createdAt: Date;
+  updatedAt: Date;
+  createdById: string;
+}
+```
+
+**2. Lead Service**
+
+```typescript
+// services/lead.service.ts
+export class LeadService {
+  constructor(
+    private leadRepository: LeadRepository,
+    private activityService: ActivityService,
+    private scoringService: LeadScoringService,
+    private eventBus: EventBus
+  ) {}
+
+  async createLead(data: CreateLeadDTO): Promise<Lead> {
+    // Validate email uniqueness
+    const existing = await this.leadRepository.findByEmail(data.email);
+    if (existing) {
+      throw new ConflictError('Lead with this email already exists');
+    }
+
+    // Calculate initial score
+    const score = await this.scoringService.calculateScore(data);
+
+    // Create lead
+    const lead = await this.leadRepository.create({
+      ...data,
+      status: LeadStatus.NEW,
+      score,
+      createdAt: new Date()
+    });
+
+    // Log activity
+    await this.activityService.log({
+      type: ActivityType.LEAD_CREATED,
+      entityType: 'lead',
+      entityId: lead.id,
+      details: { source: data.source }
+    });
+
+    // Publish event
+    await this.eventBus.publish(new LeadCreatedEvent(lead));
+
+    return lead;
+  }
+
+  async updateLead(id: string, data: UpdateLeadDTO): Promise<Lead> {
+    const lead = await this.leadRepository.findById(id);
+    if (!lead) {
+      throw new NotFoundError('Lead not found');
+    }
+
+    // Update lead
+    const updated = await this.leadRepository.update(id, data);
+
+    // Recalculate score if relevant fields changed
+    if (this.shouldRescore(data)) {
+      updated.score = await this.scoringService.calculateScore(updated);
+      await this.leadRepository.update(id, { score: updated.score });
+    }
+
+    // Log activity
+    await this.activityService.log({
+      type: ActivityType.LEAD_UPDATED,
+      entityType: 'lead',
+      entityId: id,
+      details: data
+    });
+
+    return updated;
+  }
+
+  async qualifyLead(id: string): Promise<Lead> {
+    const lead = await this.leadRepository.findById(id);
+    if (!lead) {
+      throw new NotFoundError('Lead not found');
+    }
+
+    if (lead.status !== LeadStatus.CONTACTED) {
+      throw new ValidationError('Lead must be contacted before qualification');
+    }
+
+    const updated = await this.leadRepository.update(id, {
+      status: LeadStatus.QUALIFIED,
+      qualifiedAt: new Date()
+    });
+
+    // Publish event
+    await this.eventBus.publish(new LeadQualifiedEvent(updated));
+
+    return updated;
+  }
+
+  async convertLead(id: string, convertData: ConvertLeadDTO): Promise<ConvertResult> {
+    const lead = await this.leadRepository.findById(id);
+    if (!lead) {
+      throw new NotFoundError('Lead not found');
+    }
+
+    if (lead.status === LeadStatus.CONVERTED) {
+      throw new ConflictError('Lead already converted');
+    }
+
+    // Create account
+    const account = await this.accountService.createAccount({
+      tenantId: lead.tenantId,
+      name: convertData.accountName || lead.company || `${lead.firstName} ${lead.lastName}`,
+      type: AccountType.PROSPECT,
+      ownerId: lead.ownerId
+    });
+
+    // Create contact
+    const contact = await this.contactService.createContact({
+      tenantId: lead.tenantId,
+      firstName: lead.firstName,
+      lastName: lead.lastName,
+      email: lead.email,
+      phone: lead.phone,
+      accountId: account.id,
+      ownerId: lead.ownerId
+    });
+
+    // Create opportunity if specified
+    let opportunity: Opportunity | undefined;
+    if (convertData.createOpportunity && convertData.opportunityData) {
+      opportunity = await this.opportunityService.createOpportunity({
+        ...convertData.opportunityData,
+        accountId: account.id,
+        ownerId: lead.ownerId
+      });
+    }
+
+    // Update lead status
+    await this.leadRepository.update(id, {
+      status: LeadStatus.CONVERTED,
+      convertedAt: new Date(),
+      convertedAccountId: account.id,
+      convertedContactId: contact.id
+    });
+
+    return {
+      account,
+      contact,
+      opportunity
+    };
+  }
+
+  async assignLead(id: string, ownerId: string): Promise<Lead> {
+    const lead = await this.leadRepository.findById(id);
+    if (!lead) {
+      throw new NotFoundError('Lead not found');
+    }
+
+    const updated = await this.leadRepository.update(id, {
+      ownerId,
+      assignedAt: new Date()
+    });
+
+    // Notify new owner
+    await this.notificationService.notifyUser(ownerId, {
+      type: NotificationType.LEAD_ASSIGNED,
+      title: 'New Lead Assigned',
+      message: `A new lead has been assigned to you`,
+      entityType: 'lead',
+      entityId: id
+    });
+
+    return updated;
+  }
+
+  private shouldRescore(data: UpdateLeadDTO): boolean {
+    const rescoreFields = ['company', 'title', 'source', 'industry'];
+    return rescoreFields.some(field => field in data);
+  }
+}
+```
+
+**3. Pipeline Management**
+
+```typescript
+// services/pipeline.service.ts
+export interface PipelineStage {
   id: string;
   name: string;
   order: number;
   probability: number;
-  isWon: boolean;
-  isLost: boolean;
-  stageColor: string;
+  color: string;
 }
 
-interface Deal {
+export interface Pipeline {
+  id: string;
+  name: string;
+  stages: PipelineStage[];
+}
+
+export class PipelineService {
+  constructor(
+    private opportunityRepository: OpportunityRepository
+  ) {}
+
+  async getOpportunitiesInStage(
+    pipelineId: string,
+    stageId: string,
+    options: { page?: number; limit?: number } = {}
+  ): Promise<PaginatedResult<Opportunity>> {
+    return this.opportunityRepository.findByStage(pipelineId, stageId, options);
+  }
+
+  async moveOpportunity(
+    opportunityId: string,
+    targetStageId: string
+  ): Promise<Opportunity> {
+    const opportunity = await this.opportunityRepository.findById(opportunityId);
+    if (!opportunity) {
+      throw new NotFoundError('Opportunity not found');
+    }
+
+    const pipeline = await this.getPipeline(opportunity.pipelineId);
+    const targetStage = pipeline.stages.find(s => s.id === targetStageId);
+    
+    if (!targetStage) {
+      throw new NotFoundError('Target stage not found');
+    }
+
+    const updated = await this.opportunityRepository.update(opportunityId, {
+      stage: targetStage.name,
+      probability: targetStage.probability,
+      stageOrder: targetStage.order
+    });
+
+    // Publish event
+    await this.eventBus.publish(new OpportunityStageChangedEvent(
+      opportunityId,
+      opportunity.stage,
+      targetStage.name
+    ));
+
+    return updated;
+  }
+
+  async getPipelineAnalytics(pipelineId: string): Promise<PipelineAnalytics> {
+    const opportunities = await this.opportunityRepository.findByPipeline(pipelineId);
+    const pipeline = await this.getPipeline(pipelineId);
+
+    const stageAnalytics = pipeline.stages.map(stage => {
+      const stageOpps = opportunities.filter(o => o.stage === stage.name);
+      const totalAmount = stageOpps.reduce((sum, o) => sum + o.amount, 0);
+      const weightedAmount = stageOpps.reduce(
+        (sum, o) => sum + o.amount * (stage.probability / 100),
+        0
+      );
+
+      return {
+        stageId: stage.id,
+        stageName: stage.name,
+        count: stageOpps.length,
+        totalAmount,
+        weightedAmount,
+        averageAmount: stageOpps.length > 0 
+          ? totalAmount / stageOpps.length 
+          : 0
+      };
+    });
+
+    return {
+      pipelineId,
+      totalOpportunities: opportunities.length,
+      totalValue: opportunities.reduce((sum, o) => sum + o.amount, 0),
+      weightedValue: opportunities.reduce(
+        (sum, o) => sum + o.amount * (o.probability / 100),
+        0
+      ),
+      stageAnalytics
+    };
+  }
+
+  async forecastRevenue(
+    pipelineId: string,
+    forecastDate: Date
+  ): Promise<RevenueForecast> {
+    const opportunities = await this.opportunityRepository.findByPipeline(pipelineId);
+    
+    // Categorize by expected close date
+    const byMonth = new Map<string, number>();
+    
+    for (const opp of opportunities) {
+      if (opp.stage === OpportunityStage.CLOSED_WON) continue;
+      if (opp.stage === OpportunityStage.CLOSED_LOST) continue;
+      
+      const monthKey = `${opp.closeDate.getFullYear()}-${String(opp.closeDate.getMonth() + 1).padStart(2, '0')}`;
+      const current = byMonth.get(monthKey) || 0;
+      byMonth.set(
+        monthKey, 
+        current + (opp.amount * opp.probability / 100)
+      );
+    }
+
+    return {
+      forecastDate,
+      monthlyForecast: Array.from(byMonth.entries()).map(([month, amount]) => ({
+        month,
+        amount: Math.round(amount)
+      })),
+      totalForecast: Array.from(byMonth.values()).reduce((sum, a) => sum + a, 0)
+    };
+  }
+}
+```
+
+**4. Activity Tracking**
+
+```typescript
+// entities/Activity.ts
+export interface Activity {
   id: string;
   tenantId: string;
-  contactId: string;
-  pipelineId: string;
-  stageId: string;
-  name: string;
-  value: number;
-  currency: string;
-  probability: number;
-  expectedCloseDate?: Date;
-  ownerId?: string;
-  customFields: Record<string, any>;
-  activities: Activity[];
+  
+  type: ActivityType;
+  subject: string;
+  description?: string;
+  
+  // Relationships
+  entityType: 'lead' | 'contact' | 'account' | 'opportunity';
+  entityId: string;
+  userId: string;
+  
+  // Details
+  dueDate?: Date;
+  completedAt?: Date;
+  location?: string;
+  attendees?: string[];
+  
+  // Metadata
   createdAt: Date;
   updatedAt: Date;
 }
-```
 
-**3. Activity Logging**
+export enum ActivityType {
+  CALL = 'call',
+  EMAIL = 'email',
+  MEETING = 'meeting',
+  TASK = 'task',
+  NOTE = 'note',
+  LEAD_CREATED = 'lead_created',
+  LEAD_UPDATED = 'lead_updated',
+  OPPORTUNITY_CREATED = 'opportunity_created',
+  OPPORTUNITY_STAGE_CHANGED = 'opportunity_stage_changed'
+}
 
-```typescript
-async function logActivity(
-  tenantId: string,
-  data: {
-    type: 'email' | 'call' | 'meeting' | 'note' | 'task';
-    contactId: string;
-    dealId?: string;
-    subject: string;
-    description?: string;
-    metadata?: Record<string, any>;
+// services/activity.service.ts
+export class ActivityService {
+  async logActivity(data: CreateActivityDTO): Promise<Activity> {
+    const activity = await this.activityRepository.create({
+      ...data,
+      createdAt: new Date()
+    });
+
+    // Update related entity's last activity
+    await this.updateEntityLastActivity(data.entityType, data.entityId);
+
+    return activity;
   }
-): Promise<Activity> {
-  const activity = await db.activities.create({
-    tenantId,
-    ...data,
-    createdAt: new Date()
-  });
-  
-  // Trigger automations
-  await triggerWorkflows(tenantId, 'activity_created', activity);
-  
-  return activity;
+
+  async getActivitiesForEntity(
+    entityType: string,
+    entityId: string,
+    options: { page?: number; limit?: number; types?: ActivityType[] } = {}
+  ): Promise<PaginatedResult<Activity>> {
+    return this.activityRepository.findByEntity(entityType, entityId, options);
+  }
+
+  async getUpcomingActivities(userId: string): Promise<Activity[]> {
+    const now = new Date();
+    return this.activityRepository.findUpcoming(userId, {
+      dueDate: { $gte: now },
+      completedAt: null
+    });
+  }
+
+  async completeActivity(id: string): Promise<Activity> {
+    const activity = await this.activityRepository.findById(id);
+    if (!activity) {
+      throw new NotFoundError('Activity not found');
+    }
+
+    return this.activityRepository.update(id, {
+      completedAt: new Date()
+    });
+  }
+
+  async getActivityTimeline(
+    entityType: string,
+    entityId: string
+  ): Promise<ActivityTimeline> {
+    const activities = await this.activityRepository.findByEntity(
+      entityType,
+      entityId,
+      { limit: 100, orderBy: 'createdAt', order: 'DESC' }
+    );
+
+    // Group by date
+    const grouped = this.groupActivitiesByDate(activities.items);
+
+    return {
+      entityType,
+      entityId,
+      grouped,
+      total: activities.total
+    };
+  }
+
+  private groupActivitiesByDate(
+    activities: Activity[]
+  ): Map<string, Activity[]> {
+    const grouped = new Map<string, Activity[]>();
+
+    for (const activity of activities) {
+      const dateKey = activity.createdAt.toISOString().split('T')[0];
+      const existing = grouped.get(dateKey) || [];
+      existing.push(activity);
+      grouped.set(dateKey, existing);
+    }
+
+    return grouped;
+  }
 }
 ```
 
-**4. Reporting Query**
+**5. Workflow Automation**
 
 ```typescript
-async function getSalesReport(
-  tenantId: string,
-  options: {
-    startDate: Date;
-    endDate: Date;
-    groupBy: 'day' | 'week' | 'month';
+// services/workflow.service.ts
+export interface Workflow {
+  id: string;
+  name: string;
+  trigger: WorkflowTrigger;
+  conditions?: WorkflowCondition[];
+  actions: WorkflowAction[];
+  isActive: boolean;
+}
+
+export interface WorkflowTrigger {
+  type: 'lead_created' | 'lead_updated' | 'opportunity_stage_changed' | 'schedule' | 'form_submitted';
+  entityType?: string;
+  field?: string;
+}
+
+export interface WorkflowCondition {
+  field: string;
+  operator: 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than';
+  value: any;
+}
+
+export interface WorkflowAction {
+  type: 'update_field' | 'create_task' | 'send_email' | 'notify_user' | 'assign_owner';
+  config: Record<string, any>;
+}
+
+export class WorkflowEngine {
+  constructor(
+    private workflowRepository: WorkflowRepository,
+    private eventBus: EventBus,
+    private actionHandlers: Map<string, ActionHandler>
+  ) {
+    this.setupEventListeners();
   }
-): Promise<SalesReport[]> {
-  const query = `
-    SELECT 
-      DATE_TRUNC($3, deals.created_at) as period,
-      COUNT(*) FILTER (WHERE deals.stage_id = won_stage_id) as won_deals,
-      SUM(value) FILTER (WHERE deals.stage_id = won_stage_id) as revenue,
-      COUNT(*) as total_deals,
-      AVG(value) as avg_deal_value
-    FROM deals
-    JOIN pipelines ON deals.pipeline_id = pipelines.id
-    JOIN pipeline_stages ON pipelines.id = pipeline_stages.pipeline_id
-    WHERE deals.tenant_id = $1
-      AND deals.created_at BETWEEN $2 AND $4
-      AND pipeline_stages.is_won = true
-    GROUP BY DATE_TRUNC($3, deals.created_at)
-    ORDER BY period
-  `;
-  
-  return db.query(query, [tenantId, options.startDate, options.groupBy, options.endDate]);
+
+  private setupEventListeners(): void {
+    this.eventBus.subscribe('lead.*', async (event) => {
+      await this.evaluateWorkflows(event.type, event.data);
+    });
+
+    this.eventBus.subscribe('opportunity.*', async (event) => {
+      await this.evaluateWorkflows(event.type, event.data);
+    });
+  }
+
+  async evaluateWorkflows(triggerType: string, data: any): Promise<void> {
+    const workflows = await this.workflowRepository.findByTrigger(triggerType);
+    const activeWorkflows = workflows.filter(w => w.isActive);
+
+    for (const workflow of activeWorkflows) {
+      if (this.shouldEvaluate(workflow, data)) {
+        await this.executeWorkflow(workflow, data);
+      }
+    }
+  }
+
+  private shouldEvaluate(workflow: Workflow, data: any): boolean {
+    if (!workflow.conditions || workflow.conditions.length === 0) {
+      return true;
+    }
+
+    return workflow.conditions.every(condition => {
+      const fieldValue = this.getFieldValue(data, condition.field);
+      return this.evaluateCondition(fieldValue, condition);
+    });
+  }
+
+  private evaluateCondition(
+    fieldValue: any,
+    condition: WorkflowCondition
+  ): boolean {
+    switch (condition.operator) {
+      case 'equals':
+        return fieldValue === condition.value;
+      case 'not_equals':
+        return fieldValue !== condition.value;
+      case 'contains':
+        return String(fieldValue).includes(condition.value);
+      case 'greater_than':
+        return fieldValue > condition.value;
+      case 'less_than':
+        return fieldValue < condition.value;
+      default:
+        return false;
+    }
+  }
+
+  private async executeWorkflow(workflow: Workflow, data: any): Promise<void> {
+    for (const action of workflow.actions) {
+      const handler = this.actionHandlers.get(action.type);
+      if (handler) {
+        await handler.execute(action.config, data);
+      }
+    }
+  }
+}
+```
+
+**6. Reporting Dashboard**
+
+```typescript
+// services/crm-dashboard.service.ts
+export interface CRMDashboard {
+  overview: DashboardOverview;
+  salesPipeline: PipelineSummary;
+  topPerformers: SalesRepPerformance[];
+  recentActivities: ActivitySummary[];
+  forecasts: ForecastSummary;
+}
+
+export interface DashboardOverview {
+  totalLeads: number;
+  newLeadsThisWeek: number;
+  totalOpportunities: number;
+  pipelineValue: number;
+  closedWonThisMonth: number;
+  closedWonValue: number;
+  conversionRate: number;
+}
+
+export class CRMDashboardService {
+  async getDashboard(tenantId: string, userId: string): Promise<CRMDashboard> {
+    const [
+      overview,
+      salesPipeline,
+      topPerformers,
+      recentActivities,
+      forecasts
+    ] = await Promise.all([
+      this.getOverview(tenantId),
+      this.getSalesPipeline(tenantId),
+      this.getTopPerformers(tenantId),
+      this.getRecentActivities(tenantId),
+      this.getForecasts(tenantId)
+    ]);
+
+    return {
+      overview,
+      salesPipeline,
+      topPerformers,
+      recentActivities,
+      forecasts
+    };
+  }
+
+  private async getOverview(tenantId: string): Promise<DashboardOverview> {
+    const weekAgo = subDays(new Date(), 7);
+    const monthStart = startOfMonth(new Date());
+
+    const [
+      totalLeads,
+      newLeadsThisWeek,
+      totalOpportunities,
+      pipelineValue,
+      closedWon,
+      closedWonValue,
+      totalClosed
+    ] = await Promise.all([
+      this.leadRepository.count({ tenantId }),
+      this.leadRepository.count({ tenantId, createdAt: { gte: weekAgo } }),
+      this.opportunityRepository.count({ 
+        tenantId, 
+        stage: { $nin: ['closed_won', 'closed_lost'] } 
+      }),
+      this.opportunityRepository.sumAmount({ tenantId }),
+      this.opportunityRepository.count({
+        tenantId,
+        stage: 'closed_won',
+        closedAt: { gte: monthStart }
+      }),
+      this.opportunityRepository.sumAmount({
+        tenantId,
+        stage: 'closed_won',
+        closedAt: { gte: monthStart }
+      }),
+      this.leadRepository.count({
+        tenantId,
+        status: 'converted'
+      })
+    ]);
+
+    return {
+      totalLeads,
+      newLeadsThisWeek,
+      totalOpportunities,
+      pipelineValue,
+      closedWonThisMonth: closedWon,
+      closedWonValue,
+      conversionRate: totalLeads > 0 
+        ? (totalClosed / totalLeads) * 100 
+        : 0
+    };
+  }
+
+  async getSalesRepPerformance(
+    tenantId: string,
+    options: { startDate?: Date; endDate?: Date } = {}
+  ): Promise<SalesRepPerformance[]> {
+    const reps = await this.userRepository.findByRole(tenantId, 'sales_rep');
+    
+    const performances = await Promise.all(
+      reps.map(async (rep) => {
+        const [opportunities, closedWon, closedWonValue] = await Promise.all([
+          this.opportunityRepository.countByOwner(rep.id, options),
+          this.opportunityRepository.countByOwner(rep.id, {
+            ...options,
+            stage: 'closed_won'
+          }),
+          this.opportunityRepository.sumAmountByOwner(rep.id, {
+            ...options,
+            stage: 'closed_won'
+          })
+        ]);
+
+        return {
+          userId: rep.id,
+          userName: rep.name,
+          avatar: rep.avatar,
+          totalOpportunities: opportunities,
+          closedWon,
+          closedWonValue,
+          conversionRate: opportunities > 0 
+            ? (closedWon / opportunities) * 100 
+            : 0
+        };
+      })
+    );
+
+    return performances.sort((a, b) => b.closedWonValue - a.closedWonValue);
+  }
 }
 ```
 
 ## Workflow
 
-**Phase 1: Planning**
+**Phase 1: Requirements Analysis**
 
-Define core features. Design data model. Plan multi-tenancy.
+Define CRM scope. Identify user roles. Plan integrations. Define KPIs.
 
-**Phase 2: Development**
+**Phase 2: Data Model Design**
 
-Build core modules. Implement tenant isolation. Add features incrementally.
+Design entities. Define relationships. Plan indexes. Design for multi-tenancy.
 
-**Phase 3: Testing**
+**Phase 3: Core Features**
 
-Test tenant isolation. Performance testing. Security testing.
+Implement leads. Build contacts. Create accounts. Set up opportunities.
 
-**Phase 4: Deployment**
+**Phase 4: Workflow Automation**
 
-Deploy to production. Configure monitoring. Set up backups.
+Define workflows. Implement triggers. Create actions. Test automations.
+
+**Phase 5: Reporting**
+
+Build dashboards. Create reports. Set up analytics. Configure forecasting.
+
+**Phase 6: Integration**
+
+Connect email. Integrate telephony. Link ERP. Enable API.
 
 ## Liên kết
 
-- [[multi-tenant]] - Multi-tenant: Multi-tenant architecture
-- [[billing]] - Billing: Subscription management
-- [[security]] - Security: Security best practices
-- [[performance]] - Performance: Performance optimization
+- [[multi-tenant]] - Multi-tenant architecture
+- [[billing]] - Billing integration
+- [[reporting]] - Reporting systems
+- [[automation]] - Workflow automation
+- [[notifications]] - Notification systems
+- [[api]] - CRM API design

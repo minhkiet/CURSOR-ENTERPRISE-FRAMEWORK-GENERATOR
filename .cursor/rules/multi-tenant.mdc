@@ -1,245 +1,834 @@
 ---
-description: Nguyên tắc Multi-Tenant Architecture cho SaaS applications
+description: Nguyên tắc và best practices cho Multi-Tenant Architecture trong Cursor Enterprise Framework
 created: 2026-06-23
 version: 1.0.0
-tags: [multi-tenant, saas, architecture, isolation, enterprise]
+tags: [multi-tenant, saas, isolation, tenant, architecture]
 ---
 
 # Multi-Tenant
 
 ## Mục tiêu
 
-Multi-Tenant Architecture là mô hình kiến trúc cho phép nhiều tenants (doanh nghiệp/khách hàng) chia sẻ cùng một infrastructure trong khi vẫn đảm bảo data isolation và security. Trong Cursor Enterprise Framework, multi-tenancy là nền tảng cho tất cả SaaS applications, đảm bảo rằng mỗi tenant có thể hoạt động độc lập mà không ảnh hưởng đến các tenants khác. Mục tiêu là hướng dẫn developers implement multi-tenancy một cách hiệu quả về cost và performance trong khi vẫn meet các security và compliance requirements.
+Multi-Tenant Architecture là mô hình cho phép nhiều tenants (khách hàng) chia sẻ cùng một application instance trong khi vẫn đảm bảo data isolation và security. Trong Cursor Enterprise Framework, multi-tenancy là nền tảng cho SaaS applications, cho phép efficient resource utilization và simplified operations. Mục tiêu của rule này là hướng dẫn developers trong việc implement multi-tenant systems đúng cách với các strategies phù hợp cho từng use case.
 
-Việc lựa chọn đúng multi-tenancy model có implications về cost, performance, isolation level, và operational complexity. Rule này cover các models (shared database, separate schemas, separate databases), tenant identification và context management, data isolation strategies, và operational considerations.
+Việc chọn đúng multi-tenancy strategy có implications lớn về performance, security, cost, và maintainability. Rule này cover từ tenant identification, data isolation patterns, đến resource management và compliance considerations.
 
 ## Nguyên tắc
 
 **1. Tenant Identification**
 
-Extract tenant ID từ request context. JWT claims, subdomain, headers. Set tenant context early in request lifecycle. Make tenant ID immutable within transaction. Validate tenant exists và is active. Handle missing tenant gracefully.
+Identify tenant from request. Use tenant context. Validate tenant existence. Handle tenant switching. Secure tenant isolation.
 
-**2. Data Isolation**
+**2. Data Isolation Strategy**
 
-Enforce isolation at multiple layers. Database-level isolation (RLS, schemas). Application-level filtering. Query-level tenant scope. No cross-tenant data access. Audit all data access. Defense in depth.
+Choose isolation level. Shared database vs dedicated. Row-level security. Tenant-scoped queries. Cross-tenant access prevention.
 
-**3. Tenant Provisioning**
+**3. Resource Allocation**
 
-Automated tenant creation. Idempotent provisioning. Resource allocation. Plan for tenant lifecycle. Handle upgrades/downgrades. Data migration support.
+Fair resource distribution. Prevent resource monopolization. Set per-tenant limits. Monitor usage. Implement quotas.
 
-**4. Resource Allocation**
+**4. Security Boundaries**
 
-Fair resource sharing. Per-tenant limits. Rate limiting per tenant. Quota management. Resource quotas enforcement. Priority queuing.
+Enforce tenant isolation. Prevent data leakage. Audit cross-tenant access. Implement RBAC per tenant. Secure shared resources.
 
-**5. Performance Isolation**
+**5. Tenant Provisioning**
 
-Prevent noisy neighbor. Per-tenant caching. Connection pool management. CPU/memory limits. Query timeouts. Background job prioritization.
+Automate tenant creation. Configure tenant settings. Initialize tenant data. Set up billing. Send welcome communications.
 
-**6. Security**
+**6. Tenant Lifecycle**
 
-Tenant-scoped authentication. Role-based access within tenant. Cross-tenant access prevention. Audit logging per tenant. Encryption per tenant. Compliance requirements.
+Track tenant status. Handle upgrades/downgrades. Manage suspensions. Support tenant deletion. Data retention policies.
 
-**7. Cost Optimization**
+**7. Performance Isolation**
 
-Shared infrastructure costs. Efficient resource utilization. Tenant-based billing. Cost allocation. Usage tracking. Budget alerts.
+Prevent noisy neighbor. Set resource limits. Isolate critical tenants. Monitor performance. Implement throttling.
 
-**8. Data Migration**
+**8. Cost Allocation**
 
-Tenant data portability. Export/import capabilities. Data residency compliance. Retention policies. Deletion procedures. Migration tooling.
+Track per-tenant usage. Allocate shared costs. Support billing integration. Enable cost optimization. Report on costs.
 
-**9. Monitoring**
+**9. Compliance**
 
-Per-tenant metrics. Tenant health scores. Usage analytics. Anomaly detection. SLA tracking. Cost tracking.
+Support data residency. Enable GDPR compliance. Implement data retention. Support data export. Audit tenant access.
 
-**10. Disaster Recovery**
+**10. Tenant-Specific Configuration**
 
-Per-tenant backup strategies. Point-in-time recovery. Tenant-level restore. Backup verification. DR testing per tenant.
+Store tenant settings. Support feature flags per tenant. Custom branding. Workflow customization. Theme configuration.
 
 ## Checklist
 
 - [ ] Tenant identification implemented
-- [ ] Data isolation enforced at all levels
+- [ ] Isolation strategy selected
+- [ ] Data access layer implemented
 - [ ] Tenant provisioning automated
-- [ ] Resource allocation configured
-- [ ] Security controls in place
-- [ ] Cost tracking set up
-- [ ] Monitoring per tenant
-- [ ] Backup strategy defined
-- [ ] Migration tools available
-- [ ] Documentation complete
+- [ ] Resource limits configured
+- [ ] Security measures implemented
+- [ ] Monitoring set up
+- [ ] Billing integration configured
+- [ ] Tenant lifecycle managed
+- [ ] Compliance features implemented
 
 ## Anti Pattern
 
-**1. Missing Tenant Filter**
+**1. No Tenant Context**
 
-Queries without tenant_id. Data leakage. Solution: RLS + middleware.
+Missing tenant identification. Cross-tenant data access. Security vulnerabilities. Always inject tenant context.
 
-**2. Shared Admin Account**
+**2. Shared Admin Data**
 
-One admin for all tenants. No isolation. Solution: Tenant-scoped auth.
+Tenant data mixed with admin data. Security risks. Performance issues. Separate concerns.
 
-**3. No Resource Limits**
+**3. Inconsistent Isolation**
 
-Tenant consuming all resources. Solution: Per-tenant quotas.
+Some data isolated, some not. Security gaps. Data leakage. Consistent isolation everywhere.
 
-**4. Ignoring Tenant Lifecycle**
+**4. No Resource Limits**
 
-Orphaned data. Zombie tenants. Solution: Lifecycle management.
+Tenants consuming all resources. Degraded service. Poor UX for others. Implement limits.
+
+**5. Ignoring Tenant Deletion**
+
+Tenants deleted but data remains. Compliance issues. Data privacy risks. Proper deletion handling.
 
 ## Best Practice
 
-**1. Tenant Middleware**
+**1. Tenant Context và Middleware**
 
 ```typescript
-// Tenant context middleware
-app.use(async (req, res, next) => {
-  // Extract tenant from JWT
-  const token = req.headers.authorization?.split(' ')[1];
-  const decoded = jwt.decode(token);
-  
-  req.tenant = {
-    id: decoded.tenant_id,
-    plan: decoded.plan,
-    region: decoded.region
-  };
-  
-  // Set database search path
-  await db.query(`SET app.current_tenant = '${req.tenant.id}'`);
-  
-  next();
-});
-
-// RLS policy example
-create policy tenant_isolation on users
-for all using (tenant_id = current_setting('app.current_tenant')::uuid);
-```
-
-**2. Tenant-Scoped Repository**
-
-```typescript
-class TenantRepository<T> {
-  constructor(
-    private readonly db: Database,
-    private readonly tableName: string
-  ) {}
-  
-  async findAll(tenantId: string): Promise<T[]> {
-    return this.db.query(
-      `SELECT * FROM ${this.tableName} WHERE tenant_id = $1`,
-      [tenantId]
-    );
-  }
-  
-  async create(tenantId: string, data: Partial<T>): Promise<T> {
-    return this.db.query(
-      `INSERT INTO ${this.tableName} (tenant_id, ...) VALUES ($1, ...)`,
-      [tenantId, ...]
-    );
-  }
-  
-  async findById(tenantId: string, id: string): Promise<T | null> {
-    return this.db.query(
-      `SELECT * FROM ${this.tableName} WHERE tenant_id = $1 AND id = $2`,
-      [tenantId, id]
-    );
-  }
+// middleware/tenant.middleware.ts
+export interface TenantContext {
+  tenantId: string;
+  tenantName: string;
+  plan: TenantPlan;
+  features: string[];
+  limits: TenantLimits;
 }
 
-// Usage
-const userRepo = new TenantRepository<User>(db, 'users');
-const user = await userRepo.findById(req.tenant.id, userId);
-```
-
-**3. Per-Tenant Quotas**
-
-```typescript
-interface TenantQuota {
+export interface TenantLimits {
   maxUsers: number;
   maxStorage: number;
   maxApiCalls: number;
-  maxRecords: number;
+  rateLimit: number;
 }
 
-async function checkQuota(tenantId: string, resource: string): Promise<boolean> {
-  const quota = await getTenantQuota(tenantId);
-  const usage = await getCurrentUsage(tenantId, resource);
-  
-  switch (resource) {
-    case 'users':
-      return usage < quota.maxUsers;
-    case 'storage':
-      return usage < quota.maxStorage;
-    case 'apiCalls':
-      return usage < quota.maxApiCalls;
+class TenantMiddleware {
+  constructor(
+    private tenantService: TenantService,
+    private cacheService: CacheService
+  ) {}
+
+  async extractTenant(request: Request): Promise<string | null> {
+    // Try to extract from JWT
+    const user = request.user;
+    if (user?.tenantId) {
+      return user.tenantId;
+    }
+
+    // Try to extract from subdomain
+    const host = request.headers.get('host');
+    const subdomain = this.extractSubdomain(host);
+    if (subdomain) {
+      const tenant = await this.tenantService.getBySubdomain(subdomain);
+      return tenant?.id;
+    }
+
+    // Try to extract from header
+    const tenantHeader = request.headers.get('X-Tenant-ID');
+    if (tenantHeader) {
+      return tenantHeader;
+    }
+
+    return null;
+  }
+
+  async handle(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> {
+    const tenantId = await this.extractTenant(request);
+
+    if (!tenantId) {
+      response.status(401).json({ error: 'Tenant identification required' });
+      return;
+    }
+
+    // Get tenant from cache or database
+    let tenantContext = await this.cacheService.get<TenantContext>(
+      `tenant:${tenantId}`
+    );
+
+    if (!tenantContext) {
+      const tenant = await this.tenantService.getById(tenantId);
+      if (!tenant) {
+        response.status(404).json({ error: 'Tenant not found' });
+        return;
+      }
+
+      tenantContext = this.buildTenantContext(tenant);
+      await this.cacheService.set(
+        `tenant:${tenantId}`,
+        tenantContext,
+        { ttl: 300 } // 5 minutes
+      );
+    }
+
+    // Attach tenant context to request
+    (request as any).tenant = tenantContext;
+
+    // Set tenant context for database queries
+    await this.tenantService.setContext(tenantContext);
+
+    next();
+  }
+
+  private buildTenantContext(tenant: Tenant): TenantContext {
+    return {
+      tenantId: tenant.id,
+      tenantName: tenant.name,
+      plan: tenant.plan,
+      features: this.getFeaturesForPlan(tenant.plan),
+      limits: this.getLimitsForPlan(tenant.plan)
+    };
+  }
+
+  private getFeaturesForPlan(plan: TenantPlan): string[] {
+    const features: Record<TenantPlan, string[]> = {
+      [TenantPlan.FREE]: ['basic_crm', 'email_support'],
+      [TenantPlan.STARTER]: ['basic_crm', 'api_access', 'email_support'],
+      [TenantPlan.PROFESSIONAL]: ['advanced_crm', 'api_access', 'custom_fields', 'priority_support'],
+      [TenantPlan.ENTERPRISE]: ['advanced_crm', 'api_access', 'custom_fields', 'sso', 'dedicated_support', 'sla']
+    };
+    return features[plan];
+  }
+
+  private getLimitsForPlan(plan: TenantPlan): TenantLimits {
+    const limits: Record<TenantPlan, TenantLimits> = {
+      [TenantPlan.FREE]: { maxUsers: 3, maxStorage: 1024, maxApiCalls: 1000, rateLimit: 10 },
+      [TenantPlan.STARTER]: { maxUsers: 10, maxStorage: 10240, maxApiCalls: 10000, rateLimit: 50 },
+      [TenantPlan.PROFESSIONAL]: { maxUsers: 50, maxStorage: 102400, maxApiCalls: 100000, rateLimit: 200 },
+      [TenantPlan.ENTERPRISE]: { maxUsers: -1, maxStorage: -1, maxApiCalls: -1, rateLimit: 1000 }
+    };
+    return limits[plan];
+  }
+}
+```
+
+**2. Database Schema với Tenant Isolation**
+
+```sql
+-- Shared database với tenant_id column
+CREATE TABLE orders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id),
+  customer_id UUID NOT NULL,
+  total DECIMAL(10, 2) NOT NULL,
+  status VARCHAR(50) NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes for tenant-scoped queries
+CREATE INDEX idx_orders_tenant_id ON orders(tenant_id);
+CREATE INDEX idx_orders_tenant_customer ON orders(tenant_id, customer_id);
+
+-- Enable Row Level Security
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policy for tenant isolation
+CREATE POLICY tenant_isolation ON orders
+  FOR ALL
+  USING (tenant_id = current_setting('app.current_tenant_id')::UUID);
+
+-- Function to set tenant context
+CREATE OR REPLACE FUNCTION set_tenant_context(p_tenant_id UUID)
+RETURNS VOID AS $$
+BEGIN
+  PERFORM set_config('app.current_tenant_id', p_tenant_id::TEXT, false);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger to auto-set tenant_id
+CREATE OR REPLACE FUNCTION set_order_tenant()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.tenant_id IS NULL THEN
+    NEW.tenant_id = current_setting('app.current_tenant_id')::UUID;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER set_order_tenant_trigger
+  BEFORE INSERT ON orders
+  FOR EACH ROW EXECUTE FUNCTION set_order_tenant();
+```
+
+**3. Repository Layer với Tenant Scope**
+
+```typescript
+// repositories/base.repository.ts
+export class BaseRepository<T extends HasTenantId> {
+  protected abstract tableName: string;
+
+  constructor(
+    protected db: Database,
+    protected tenantContext: TenantContext
+  ) {}
+
+  protected get tenantId(): string {
+    return this.tenantContext.tenantId;
+  }
+
+  async findById(id: string): Promise<T | null> {
+    return this.db.queryOne<T>(
+      `SELECT * FROM ${this.tableName}
+       WHERE id = $1 AND tenant_id = $2`,
+      [id, this.tenantId]
+    );
+  }
+
+  async findAll(options: {
+    limit?: number;
+    offset?: number;
+    orderBy?: string;
+    order?: 'ASC' | 'DESC';
+    filters?: Record<string, any>;
+  } = {}): Promise<T[]> {
+    let query = `SELECT * FROM ${this.tableName} WHERE tenant_id = $1`;
+    const params: any[] = [this.tenantId];
+    let paramIndex = 2;
+
+    if (options.filters) {
+      for (const [key, value] of Object.entries(options.filters)) {
+        query += ` AND ${key} = $${paramIndex}`;
+        params.push(value);
+        paramIndex++;
+      }
+    }
+
+    query += ` ORDER BY ${options.orderBy || 'created_at'} ${options.order || 'DESC'}`;
+
+    if (options.limit) {
+      query += ` LIMIT $${paramIndex}`;
+      params.push(options.limit);
+      paramIndex++;
+    }
+
+    if (options.offset) {
+      query += ` OFFSET $${paramIndex}`;
+      params.push(options.offset);
+    }
+
+    return this.db.query<T>(query, params);
+  }
+
+  async create(data: Omit<T, 'id' | 'tenant_id' | 'created_at' | 'updated_at'>): Promise<T> {
+    const id = crypto.randomUUID();
+    const now = new Date();
+
+    const columns = ['id', 'tenant_id', ...Object.keys(data), 'created_at', 'updated_at'];
+    const values = [id, this.tenantId, ...Object.values(data), now, now];
+    const placeholders = columns.map((_, i) => `$${i + 1}`).join(', ');
+
+    await this.db.query(
+      `INSERT INTO ${this.tableName} (${columns.join(', ')})
+       VALUES (${placeholders})`,
+      values
+    );
+
+    return this.findById(id);
+  }
+
+  async update(id: string, data: Partial<T>): Promise<T> {
+    const updates = Object.entries(data)
+      .map(([key, _], i) => `${key} = $${i + 2}`)
+      .join(', ');
+
+    await this.db.query(
+      `UPDATE ${this.tableName}
+       SET ${updates}, updated_at = NOW()
+       WHERE id = $1 AND tenant_id = $2`,
+      [id, this.tenantId, ...Object.values(data)]
+    );
+
+    return this.findById(id);
+  }
+
+  async delete(id: string): Promise<boolean> {
+    const result = await this.db.query(
+      `DELETE FROM ${this.tableName}
+       WHERE id = $1 AND tenant_id = $2`,
+      [id, this.tenantId]
+    );
+
+    return result.rowCount > 0;
+  }
+
+  async count(filters: Record<string, any> = {}): Promise<number> {
+    let query = `SELECT COUNT(*) FROM ${this.tableName} WHERE tenant_id = $1`;
+    const params: any[] = [this.tenantId];
+    let paramIndex = 2;
+
+    for (const [key, value] of Object.entries(filters)) {
+      query += ` AND ${key} = $${paramIndex}`;
+      params.push(value);
+      paramIndex++;
+    }
+
+    const result = await this.db.queryOne<{ count: string }>(query, params);
+    return parseInt(result.count);
   }
 }
 
-// Rate limiting per tenant
-const tenantRateLimiter = rateLimit({
-  keyGenerator: (req) => req.tenant.id,
-  windowMs: 15 * 60 * 1000,
-  max: (req) => req.tenant.plan === 'enterprise' ? 10000 : 1000
-});
+// repositories/order.repository.ts
+export class OrderRepository extends BaseRepository<Order> {
+  protected tableName = 'orders';
+
+  async findByCustomer(customerId: string): Promise<Order[]> {
+    return this.db.query<Order>(
+      `SELECT * FROM orders
+       WHERE tenant_id = $1 AND customer_id = $2
+       ORDER BY created_at DESC`,
+      [this.tenantId, customerId]
+    );
+  }
+
+  async findByStatus(status: OrderStatus): Promise<Order[]> {
+    return this.db.query<Order>(
+      `SELECT * FROM orders
+       WHERE tenant_id = $1 AND status = $2
+       ORDER BY created_at DESC`,
+      [this.tenantId, status]
+    );
+  }
+
+  async getTotalAmount(startDate?: Date, endDate?: Date): Promise<number> {
+    let query = `SELECT SUM(total) as amount FROM orders WHERE tenant_id = $1`;
+    const params: any[] = [this.tenantId];
+    let paramIndex = 2;
+
+    if (startDate) {
+      query += ` AND created_at >= $${paramIndex}`;
+      params.push(startDate);
+      paramIndex++;
+    }
+
+    if (endDate) {
+      query += ` AND created_at <= $${paramIndex}`;
+      params.push(endDate);
+    }
+
+    const result = await this.db.queryOne<{ amount: string }>(query, params);
+    return parseFloat(result.amount) || 0;
+  }
+}
 ```
 
 **4. Tenant Provisioning**
 
 ```typescript
-async function provisionTenant(
-  data: {
-    name: string;
-    plan: 'free' | 'pro' | 'enterprise';
-    region: string;
+// services/tenant-provisioning.service.ts
+export interface TenantProvisioningOptions {
+  name: string;
+  subdomain: string;
+  plan: TenantPlan;
+  ownerEmail: string;
+  ownerName: string;
+  settings?: Partial<TenantSettings>;
+}
+
+export class TenantProvisioningService {
+  constructor(
+    private tenantRepository: TenantRepository,
+    private userRepository: UserRepository,
+    private billingService: BillingService,
+    private emailService: EmailService,
+    private storageService: StorageService
+  ) {}
+
+  async provisionTenant(options: TenantProvisioningOptions): Promise<Tenant> {
+    // Validate subdomain availability
+    const existing = await this.tenantRepository.findBySubdomain(options.subdomain);
+    if (existing) {
+      throw new ConflictError('Subdomain already taken');
+    }
+
+    // Create tenant
+    const tenant = await this.tenantRepository.create({
+      name: options.name,
+      subdomain: options.subdomain,
+      plan: options.plan,
+      status: TenantStatus.ACTIVE,
+      settings: {
+        branding: {},
+        features: this.getFeaturesForPlan(options.plan),
+        limits: this.getLimitsForPlan(options.plan),
+        ...options.settings
+      },
+      createdAt: new Date()
+    });
+
+    // Create tenant owner user
+    const owner = await this.userRepository.create({
+      tenantId: tenant.id,
+      email: options.ownerEmail,
+      name: options.ownerName,
+      role: UserRole.OWNER,
+      isOwner: true,
+      status: UserStatus.ACTIVE,
+      createdAt: new Date()
+    });
+
+    // Set up billing (if not free plan)
+    if (options.plan !== TenantPlan.FREE) {
+      await this.billingService.createSubscription(tenant.id, options.plan);
+    }
+
+    // Set up storage
+    await this.storageService.createTenantBucket(tenant.id);
+
+    // Initialize default data
+    await this.initializeDefaultData(tenant.id);
+
+    // Send welcome email
+    await this.emailService.sendWelcomeEmail({
+      to: options.ownerEmail,
+      tenantName: options.name,
+      ownerName: options.ownerName,
+      subdomain: options.subdomain
+    });
+
+    // Publish event
+    await this.eventBus.publish(new TenantProvisionedEvent(tenant));
+
+    return tenant;
   }
-): Promise<Tenant> {
-  const tenantId = generateUUID();
-  
-  // Create tenant record
-  await db.tenants.create({
-    id: tenantId,
-    name: data.name,
-    plan: data.plan,
-    status: 'provisioning'
-  });
-  
-  // Create default data
-  await Promise.all([
-    createDefaultPipeline(tenantId),
-    createDefaultTags(tenantId),
-    createDefaultSettings(tenantId, data.region)
-  ]);
-  
-  // Update status
-  await db.tenants.update(tenantId, { status: 'active' });
-  
-  // Send welcome email
-  await queue.dispatch('send-welcome-email', { tenantId });
-  
-  return getTenant(tenantId);
+
+  private async initializeDefaultData(tenantId: string): Promise<void> {
+    // Create default pipeline stages
+    await this.pipelineStageRepository.bulkCreate([
+      { tenantId, name: 'Prospecting', order: 1, probability: 10 },
+      { tenantId, name: 'Qualification', order: 2, probability: 25 },
+      { tenantId, name: 'Proposal', order: 3, probability: 50 },
+      { tenantId, name: 'Negotiation', order: 4, probability: 75 },
+      { tenantId, name: 'Closed Won', order: 5, probability: 100 },
+      { tenantId, name: 'Closed Lost', order: 6, probability: 0 }
+    ]);
+
+    // Create default lead sources
+    await this.leadSourceRepository.bulkCreate([
+      { tenantId, name: 'Website', isDefault: true },
+      { tenantId, name: 'Referral', isDefault: false },
+      { tenantId, name: 'Campaign', isDefault: false },
+      { tenantId, name: 'Partner', isDefault: false },
+      { tenantId, name: 'Other', isDefault: false }
+    ]);
+
+    // Create default activity types
+    await this.activityTypeRepository.bulkCreate([
+      { tenantId, name: 'Call', icon: 'phone', color: '#4CAF50' },
+      { tenantId, name: 'Email', icon: 'email', color: '#2196F3' },
+      { tenantId, name: 'Meeting', icon: 'calendar', color: '#FF9800' },
+      { tenantId, name: 'Task', icon: 'task', color: '#9C27B0' }
+    ]);
+  }
+
+  async upgradePlan(tenantId: string, newPlan: TenantPlan): Promise<Tenant> {
+    const tenant = await this.tenantRepository.findById(tenantId);
+    if (!tenant) {
+      throw new NotFoundError('Tenant not found');
+    }
+
+    // Update tenant plan
+    const updated = await this.tenantRepository.update(tenantId, {
+      plan: newPlan,
+      settings: {
+        ...tenant.settings,
+        features: this.getFeaturesForPlan(newPlan),
+        limits: this.getLimitsForPlan(newPlan)
+      }
+    });
+
+    // Update billing
+    await this.billingService.updateSubscription(tenantId, newPlan);
+
+    // Publish event
+    await this.eventBus.publish(new TenantPlanUpgradedEvent(tenantId, newPlan));
+
+    return updated;
+  }
+
+  async suspendTenant(tenantId: string, reason: string): Promise<void> {
+    await this.tenantRepository.update(tenantId, {
+      status: TenantStatus.SUSPENDED,
+      suspendedAt: new Date(),
+      suspensionReason: reason
+    });
+
+    // Disable all users
+    await this.userRepository.disableByTenant(tenantId);
+
+    // Publish event
+    await this.eventBus.publish(new TenantSuspendedEvent(tenantId, reason));
+  }
+
+  async deleteTenant(tenantId: string): Promise<void> {
+    const tenant = await this.tenantRepository.findById(tenantId);
+    if (!tenant) {
+      throw new NotFoundError('Tenant not found');
+    }
+
+    // Export data if requested
+    await this.exportTenantData(tenantId);
+
+    // Delete all tenant data
+    await this.deleteAllTenantData(tenantId);
+
+    // Delete tenant
+    await this.tenantRepository.delete(tenantId);
+
+    // Cancel billing
+    await this.billingService.cancelSubscription(tenantId);
+
+    // Publish event
+    await this.eventBus.publish(new TenantDeletedEvent(tenantId));
+  }
+
+  private async exportTenantData(tenantId: string): Promise<void> {
+    // Export all tenant data for compliance
+    const data = await this.dataExportService.exportTenantData(tenantId);
+    await this.storageService.storeExportedData(tenantId, data);
+  }
+
+  private async deleteAllTenantData(tenantId: string): Promise<void> {
+    // Delete in correct order (respecting foreign keys)
+    await this.activityRepository.deleteByTenant(tenantId);
+    await this.opportunityRepository.deleteByTenant(tenantId);
+    await this.contactRepository.deleteByTenant(tenantId);
+    await this.accountRepository.deleteByTenant(tenantId);
+    await this.leadRepository.deleteByTenant(tenantId);
+    await this.userRepository.deleteByTenant(tenantId);
+    await this.storageService.deleteTenantBucket(tenantId);
+  }
+}
+```
+
+**5. Tenant-Specific Configuration**
+
+```typescript
+// services/tenant-settings.service.ts
+export interface TenantSettings {
+  branding: BrandingSettings;
+  features: TenantFeatures;
+  limits: TenantLimits;
+  workflows: WorkflowConfig[];
+  integrations: IntegrationConfig[];
+  notifications: NotificationSettings;
+}
+
+export interface BrandingSettings {
+  logo?: string;
+  favicon?: string;
+  primaryColor: string;
+  secondaryColor: string;
+  companyName?: string;
+}
+
+export interface TenantFeatures {
+  enableCustomFields: boolean;
+  enableApiAccess: boolean;
+  enableWebhooks: boolean;
+  enableSso: boolean;
+  enableAuditLog: boolean;
+  customBranding: boolean;
+}
+
+export class TenantSettingsService {
+  async getSettings(tenantId: string): Promise<TenantSettings> {
+    const tenant = await this.tenantRepository.findById(tenantId);
+    return tenant.settings;
+  }
+
+  async updateSettings(
+    tenantId: string,
+    settings: Partial<TenantSettings>
+  ): Promise<TenantSettings> {
+    const tenant = await this.tenantRepository.findById(tenantId);
+    
+    const updated = await this.tenantRepository.update(tenantId, {
+      settings: {
+        ...tenant.settings,
+        ...settings
+      }
+    });
+
+    // Clear tenant cache
+    await this.cacheService.delete(`tenant:${tenantId}`);
+
+    return updated.settings;
+  }
+
+  async updateBranding(
+    tenantId: string,
+    branding: Partial<BrandingSettings>
+  ): Promise<BrandingSettings> {
+    const tenant = await this.tenantRepository.findById(tenantId);
+    
+    const updated = await this.tenantRepository.update(tenantId, {
+      settings: {
+        ...tenant.settings,
+        branding: {
+          ...tenant.settings.branding,
+          ...branding
+        }
+      }
+    });
+
+    return updated.settings.branding;
+  }
+
+  async getFeatureFlags(tenantId: string): Promise<Record<string, boolean>> {
+    const tenant = await this.tenantRepository.findById(tenantId);
+    return tenant.settings.features;
+  }
+
+  async hasFeature(tenantId: string, feature: string): Promise<boolean> {
+    const features = await this.getFeatureFlags(tenantId);
+    return features[feature] || false;
+  }
+
+  async enableFeature(tenantId: string, feature: string): Promise<void> {
+    const tenant = await this.tenantRepository.findById(tenantId);
+    await this.tenantRepository.update(tenantId, {
+      settings: {
+        ...tenant.settings,
+        features: {
+          ...tenant.settings.features,
+          [feature]: true
+        }
+      }
+    });
+
+    await this.cacheService.delete(`tenant:${tenantId}`);
+  }
+}
+```
+
+**6. Resource Limits và Quotas**
+
+```typescript
+// services/resource-limit.service.ts
+export interface ResourceUsage {
+  users: number;
+  storage: number;
+  apiCalls: number;
+}
+
+export class ResourceLimitService {
+  constructor(
+    private tenantContext: TenantContext,
+    private userRepository: UserRepository,
+    private storageService: StorageService,
+    private apiCallLogRepository: ApiCallLogRepository
+  ) {}
+
+  async checkLimits(): Promise<{ allowed: boolean; violations: string[] }> {
+    const usage = await this.getCurrentUsage();
+    const limits = this.tenantContext.limits;
+    const violations: string[] = [];
+
+    if (limits.maxUsers > 0 && usage.users > limits.maxUsers) {
+      violations.push(`User limit exceeded: ${usage.users}/${limits.maxUsers}`);
+    }
+
+    if (limits.maxStorage > 0 && usage.storage > limits.maxStorage) {
+      violations.push(`Storage limit exceeded: ${this.formatBytes(usage.storage)}/${this.formatBytes(limits.maxStorage)}`);
+    }
+
+    if (limits.maxApiCalls > 0 && usage.apiCalls > limits.maxApiCalls) {
+      violations.push(`API call limit exceeded: ${usage.apiCalls}/${limits.maxApiCalls}`);
+    }
+
+    return {
+      allowed: violations.length === 0,
+      violations
+    };
+  }
+
+  async getCurrentUsage(): Promise<ResourceUsage> {
+    const [users, storage, apiCalls] = await Promise.all([
+      this.userRepository.countByTenant(this.tenantContext.tenantId),
+      this.storageService.getTenantUsage(this.tenantContext.tenantId),
+      this.apiCallLogRepository.countThisMonth(this.tenantContext.tenantId)
+    ]);
+
+    return { users, storage, apiCalls };
+  }
+
+  async recordApiCall(endpoint: string): Promise<void> {
+    await this.apiCallLogRepository.create({
+      tenantId: this.tenantContext.tenantId,
+      endpoint,
+      timestamp: new Date(),
+      userId: this.getCurrentUserId()
+    });
+  }
+
+  async enforceRateLimit(): Promise<{ allowed: boolean; retryAfter?: number }> {
+    const limits = this.tenantContext.limits;
+    if (limits.rateLimit <= 0) {
+      return { allowed: true };
+    }
+
+    const recentCalls = await this.apiCallLogRepository.countRecent(
+      this.tenantContext.tenantId,
+      60000 // Last minute
+    );
+
+    if (recentCalls >= limits.rateLimit) {
+      return {
+        allowed: false,
+        retryAfter: 60
+      };
+    }
+
+    return { allowed: true };
+  }
 }
 ```
 
 ## Workflow
 
-**Phase 1: Design**
+**Phase 1: Strategy Selection**
 
-Choose isolation model. Design data model. Plan tenant lifecycle.
+Evaluate isolation needs. Choose isolation strategy. Plan data model. Design tenant context.
 
 **Phase 2: Implementation**
 
-Implement tenant context. Add RLS policies. Build provisioning.
+Implement tenant middleware. Configure RLS. Build repository layer. Add provisioning.
 
-**Phase 3: Testing**
+**Phase 3: Resource Management**
 
-Test isolation. Test quotas. Test provisioning.
+Implement quotas. Add rate limiting. Configure monitoring. Set up alerts.
 
-**Phase 4: Deployment**
+**Phase 4: Security**
 
-Configure. Monitor. Iterate.
+Audit access. Test isolation. Implement RBAC. Configure encryption.
+
+**Phase 5: Lifecycle**
+
+Build provisioning. Implement upgrades. Handle suspension. Support deletion.
+
+**Phase 6: Compliance**
+
+Implement data residency. Add GDPR features. Configure retention. Enable export.
 
 ## Liên kết
 
-- [[rls]] - RLS: Row Level Security
-- [[supabase]] - Supabase: Supabase multi-tenancy
-- [[security]] - Security: Security patterns
-- [[cost-optimization]] - Cost Optimization: Cost management
+- [[saas]] - SaaS architecture
+- [[security]] - Multi-tenant security
+- [[database]] - Database isolation
+- [[billing]] - Billing integration
+- [[rls]] - Row Level Security
+- [[resource-management]] - Resource limits

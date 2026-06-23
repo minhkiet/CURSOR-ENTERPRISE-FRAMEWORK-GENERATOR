@@ -1,178 +1,636 @@
 ---
-description: Implement Command Query Responsibility Segregation cho scalable applications
-purpose: Implement CQRS pattern để separate read và write operations
-input: Domain model, read/write requirements, event sourcing setup
-output: CQRS implementation, command handlers, query models
+description: Skill implement Command Query Responsibility Segregation (CQRS) pattern để separate read và write operations
+purpose: Cung cấp comprehensive CQRS implementation guide để design scalable, maintainable systems với separate models cho queries và commands
+input:
+  - Domain model
+  - Read/Write requirements
+  - Data synchronization needs
+  - Consistency requirements
+output:
+  - Command models
+  - Query models
+  - Projection definitions
+  - Event handlers
+  - Synchronization logic
 version: 1.0.0
-tags: [cqrs, command, query, event-sourcing, read-model, write-model]
+tags:
+  - cqrs
+  - architecture
+  - patterns
+  - event-sourcing
+  - commands
+  - queries
 ---
 
-# CQRS Implementation Skill - Triển Khai CQRS Pattern
+# CQRS Implementation
 
 ## Tổng quan
 
-CQRS (Command Query Responsibility Segregation) separates read và write models for better scalability và flexibility. Skill này cung cấp framework để implement CQRS pattern effectively.
+CQRS Implementation là skill chuyên biệt để implement Command Query Responsibility Segregation pattern. Skill này cung cấp systematic approach để design separate models for writes và reads, implement projections, handle eventual consistency, và optimize for different access patterns.
 
 ## Purpose (Mục đích)
 
-CQRS Implementation Skill được thiết kế để:
+CQRS helps scale complex systems bằng cách separating concerns:
 
-1. **Architecture Design**: Separate models
-2. **Command Implementation**: Handle writes
-3. **Query Implementation**: Handle reads
-4. **Event Handling**: Sync read models
-5. **Consistency**: Manage eventual consistency
+1. **Different models**: Write model vs read model
+2. **Independent scaling**: Scale reads separately from writes
+3. **Optimized queries**: Denormalized read models
+4. **Performance**: Read-optimized databases for queries
+5. **Flexibility**: Different data models for different views
 
-### Khi nào sử dụng CQRS
+CQRS Implementation tồn tại để:
 
-- Khi scaling read/write differently
-- Khi implementing event sourcing
-- Khi simplifying complex domain
-- Khi optimizing performance
+- **Design effective command models** cho writes
+- **Create optimized query models** cho reads
+- **Implement projections** from write to read side
+- **Handle eventual consistency** properly
+- **Optimize performance** for both sides
 
 ## Input (Đầu vào)
 
-- [ ] Domain model
-- [ ] Read/write patterns
-- [ ] Event definitions
+| Input | Mô tả | Required |
+|-------|-------|----------|
+| `domain_model` | Domain entities | Yes |
+| `read_requirements` | Query requirements | Yes |
+| `write_requirements` | Command requirements | Yes |
+| `consistency_needs` | Consistency requirements | Yes |
 
 ## Output (Đầu ra)
 
-- [ ] Command handlers
-- [ ] Query handlers
-- [ ] Read models
-- [ ] Event projectors
+| Output | Mô tả | Format |
+|--------|-------|--------|
+| `command_model` | Command definitions | Model |
+| `query_model` | Query models | Model |
+| `projections` | Projection definitions | List |
+| `handlers` | Command/Query handlers | List |
+| `synchronization` | Sync logic | Implementation |
 
 ## Workflow (Quy trình)
 
-### Phase 1: Command Side
-
-### Bước 1: Command Definition
+### Bước 1: Command Model Design
 
 ```typescript
-// Command pattern
+// Command side - Write model
 interface Command {
-  commandId: string;
+  id: string;
+  type: string;
+  payload: any;
+  metadata: CommandMetadata;
+}
+
+interface CommandMetadata {
   timestamp: Date;
-  aggregateId: string;
+  userId: string;
+  correlationId: string;
+  causationId: string;
 }
 
-interface CommandHandler<T extends Command> {
-  handle(command: T): Promise<void>;
+interface CommandHandler<TCommand extends Command, TResult> {
+  handle(command: TCommand): Promise<TResult>;
 }
 
-// Commands
-class CreateOrderCommand implements Command {
+// Example: Order Commands
+interface CreateOrderCommand extends Command {
+  type: 'CreateOrder';
+  payload: {
+    customerId: string;
+    shippingAddress: AddressData;
+    items: OrderItemData[];
+  };
+}
+
+interface AddOrderItemCommand extends Command {
+  type: 'AddOrderItem';
+  payload: {
+    orderId: string;
+    productId: string;
+    quantity: number;
+  };
+}
+
+interface CompleteOrderCommand extends Command {
+  type: 'CompleteOrder';
+  payload: {
+    orderId: string;
+  };
+}
+
+// Command Handler Implementation
+class OrderCommandHandler 
+  implements CommandHandler<CreateOrderCommand, OrderId> {
+  
   constructor(
-    public readonly commandId: string = generateUUID(),
-    public readonly timestamp: Date = new Date(),
-    public readonly customerId: string,
-    public readonly items: OrderItemDTO[],
-    public readonly shippingAddress: AddressDTO
-  ) {}
-}
-
-class UpdateOrderStatusCommand implements Command {
-  constructor(
-    public readonly commandId: string = generateUUID(),
-    public readonly timestamp: Date = new Date(),
-    public readonly orderId: string,
-    public readonly newStatus: OrderStatus
-  ) {}
-}
-
-// Command Handler
-class CreateOrderHandler implements CommandHandler<CreateOrderCommand> {
-  constructor(
-    private readonly eventStore: EventStore,
-    private readonly eventBus: EventBus
+    private readonly orderRepository: IOrderRepository,
+    private readonly eventBus: IEventBus
   ) {}
   
-  async handle(command: CreateOrderCommand): Promise<void> {
+  async handle(command: CreateOrderCommand): Promise<OrderId> {
+    // Validate command
+    const validationResult = await this.validate(command);
+    if (!validationResult.isValid) {
+      throw new CommandValidationException(validationResult.errors);
+    }
+    
     // Create aggregate
     const order = Order.create(
-      CustomerId.create(command.customerId),
-      Address.create(command.shippingAddress)
+      CustomerId.fromString(command.payload.customerId),
+      Address.fromData(command.payload.shippingAddress),
+      command.payload.items.map(i => OrderItemData.fromData(i))
     );
     
-    // Add items
-    for (const item of command.items) {
-      order.addItem(
-        ProductId.create(item.productId),
-        Quantity.create(item.quantity),
-        Money.create(item.price, Currency.USD)
-      );
-    }
-    
-    // Persist events
-    await this.eventStore.save(order, order.getDomainEvents());
+    // Persist aggregate
+    await this.orderRepository.save(order);
     
     // Publish events
-    for (const event of order.getDomainEvents()) {
-      await this.eventBus.publish(event);
+    const events = order.getUncommittedEvents();
+    await this.eventBus.publish(events);
+    
+    return order.id;
+  }
+  
+  private async validate(command: CreateOrderCommand): Promise<ValidationResult> {
+    const errors: ValidationError[] = [];
+    
+    // Validate customer exists
+    const customer = await this.customerRepository.findById(
+      command.payload.customerId
+    );
+    if (!customer) {
+      errors.push({
+        field: 'customerId',
+        message: 'Customer not found'
+      });
     }
+    
+    // Validate items exist
+    for (const item of command.payload.items) {
+      const product = await this.productRepository.findById(item.productId);
+      if (!product) {
+        errors.push({
+          field: `items.${item.productId}`,
+          message: `Product ${item.productId} not found`
+        });
+      }
+    }
+    
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
   }
 }
 ```
 
-### Bước 2: Command Bus
+### Bước 2: Query Model Design
 
 ```typescript
-// Command Bus
-class CommandBus {
-  private handlers: Map<string, CommandHandler<any>> = new Map();
-  
-  register<T extends Command>(
-    commandType: new (...args: any[]) => T,
-    handler: CommandHandler<T>
-  ): void {
-    this.handlers.set(commandType.name, handler);
-  }
-  
-  async dispatch<T extends Command>(command: T): Promise<void> {
-    const handler = this.handlers.get(command.constructor.name);
-    
-    if (!handler) {
-      throw new Error(`No handler for command ${command.constructor.name}`);
-    }
-    
-    // Validation
-    await this.validate(command);
-    
-    // Authorization
-    await this.authorize(command);
-    
-    // Execution
-    await handler.handle(command);
-  }
-  
-  private async validate(command: Command): Promise<void> {
-    // Add validation logic
-  }
-  
-  private async authorize(command: Command): Promise<void> {
-    // Add authorization logic
-  }
+// Query side - Read models (Projections)
+interface Query {
+  id: string;
+  type: string;
+  parameters: Record<string, any>;
 }
 
-// Mediator pattern
-class CommandMediator {
-  constructor(private commandBus: CommandBus) {}
-  
-  async send<T extends Command>(command: T): Promise<void> {
-    return this.commandBus.dispatch(command);
-  }
+interface QueryHandler<TQuery extends Query, TResult> {
+  handle(query: TQuery): Promise<TResult>;
 }
-```
 
-### Phase 2: Query Side
-
-### Bước 3: Query Models
-
-```typescript
-// Read Model / DTOs
-interface OrderListDTO {
+// Read Model DTOs
+interface OrderSummaryDto {
   orderId: string;
+  orderNumber: string;
+  customerName: string;
+  customerEmail: string;
+  status: string;
+  statusDisplayName: string;
+  itemCount: number;
+  totalAmount: number;
+  currency: string;
+  createdAt: Date;
+  completedAt?: Date;
+  items: OrderItemSummaryDto[];
+}
+
+interface OrderItemSummaryDto {
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  lineTotal: number;
+}
+
+interface CustomerOrderHistoryDto {
+  customerId: string;
+  customerName: string;
+  totalOrders: number;
+  totalSpent: number;
+  averageOrderValue: number;
+  lastOrderDate: Date;
+  orders: OrderSummaryDto[];
+}
+
+// Query Handlers
+class GetOrderSummaryQueryHandler 
+  implements QueryHandler<GetOrderSummaryQuery, OrderSummaryDto> {
+  
+  constructor(
+    private readonly readDatabase: IReadDatabase
+  ) {}
+  
+  async handle(query: GetOrderSummaryQuery): Promise<OrderSummaryDto> {
+    const result = await this.readDatabase.query(
+      'SELECT * FROM order_summaries WHERE order_id = $1',
+      [query.orderId]
+    );
+    
+    if (result.rows.length === 0) {
+      throw new QueryNotFoundException('Order', query.orderId);
+    }
+    
+    return this.mapToDto(result.rows[0]);
+  }
+}
+
+class GetCustomerOrderHistoryQueryHandler
+  implements QueryHandler<GetCustomerOrderHistoryQuery, CustomerOrderHistoryDto> {
+  
+  constructor(
+    private readonly readDatabase: IReadDatabase
+  ) {}
+  
+  async handle(query: GetCustomerOrderHistoryQuery): Promise<CustomerOrderHistoryDto> {
+    const orders = await this.readDatabase.query(
+      `SELECT * FROM order_summaries 
+       WHERE customer_id = $1 
+       ORDER BY created_at DESC
+       LIMIT 100`,
+      [query.customerId]
+    );
+    
+    const customerInfo = await this.readDatabase.query(
+      'SELECT * FROM customer_info WHERE customer_id = $1',
+      [query.customerId]
+    );
+    
+    return {
+      customerId: query.customerId,
+      customerName: customerInfo.rows[0]?.name || 'Unknown',
+      totalOrders: orders.rows.length,
+      totalSpent: orders.rows.reduce((sum, o) => sum + o.total_amount, 0),
+      averageOrderValue: orders.rows.length > 0 
+        ? orders.rows.reduce((sum, o) => sum + o.total_amount, 0) / orders.rows.length 
+        : 0,
+      lastOrderDate: orders.rows[0]?.created_at,
+      orders: orders.rows.map(this.mapToDto)
+    };
+  }
+}
+```
+
+### Bước 3: Projection Implementation
+
+```typescript
+// Projections - Materialized views
+interface Projection {
+  name: string;
+  version: number;
+  handle(event: DomainEvent): Promise<void>;
+  getState(): any;
+}
+
+interface ProjectionState {
+  [projectionName: string]: {
+    version: number;
+    data: any;
+  };
+}
+
+class OrderSummaryProjection implements Projection {
+  name = 'OrderSummaryProjection';
+  version = 1;
+  
+  private state: Map<string, OrderSummaryDto> = new Map();
+  
+  async handle(event: DomainEvent): Promise<void> {
+    switch (event.constructor.name) {
+      case 'OrderCreated':
+        await this.onOrderCreated(event as OrderCreated);
+        break;
+      case 'OrderItemAdded':
+        await this.onOrderItemAdded(event as OrderItemAdded);
+        break;
+      case 'OrderCompleted':
+        await this.onOrderCompleted(event as OrderCompleted);
+        break;
+      case 'OrderCancelled':
+        await this.onOrderCancelled(event as OrderCancelled);
+        break;
+    }
+  }
+  
+  private async onOrderCreated(event: OrderCreated): Promise<void> {
+    const summary: OrderSummaryDto = {
+      orderId: event.orderId.value,
+      orderNumber: event.orderNumber.value,
+      customerId: event.customerId.value,
+      customerName: event.customerName,
+      customerEmail: event.customerEmail,
+      status: 'CREATED',
+      statusDisplayName: 'Created',
+      itemCount: event.items.length,
+      totalAmount: this.calculateTotal(event.items),
+      currency: event.currency,
+      createdAt: event.occurredAt.toDate(),
+      items: event.items.map(this.mapItem)
+    };
+    
+    this.state.set(event.orderId.value, summary);
+  }
+  
+  private async onOrderItemAdded(event: OrderItemAdded): Promise<void> {
+    const summary = this.state.get(event.orderId.value);
+    if (!summary) return;
+    
+    const existingItem = summary.items.find(
+      i => i.productId === event.productId.value
+    );
+    
+    if (existingItem) {
+      existingItem.quantity += event.quantity;
+      existingItem.lineTotal = existingItem.unitPrice * existingItem.quantity;
+    } else {
+      summary.items.push({
+        productId: event.productId.value,
+        productName: event.productName,
+        quantity: event.quantity,
+        unitPrice: event.unitPrice,
+        lineTotal: event.unitPrice * event.quantity
+      });
+    }
+    
+    summary.itemCount = summary.items.length;
+    summary.totalAmount = summary.items.reduce(
+      (sum, i) => sum + i.lineTotal, 
+      0
+    );
+  }
+  
+  private async onOrderCompleted(event: OrderCompleted): Promise<void> {
+    const summary = this.state.get(event.orderId.value);
+    if (!summary) return;
+    
+    summary.status = 'COMPLETED';
+    summary.statusDisplayName = 'Completed';
+    summary.totalAmount = event.totalAmount;
+    summary.completedAt = event.occurredAt.toDate();
+  }
+  
+  getState(): Map<string, OrderSummaryDto> {
+    return this.state;
+  }
+}
+
+// Projection Manager
+class ProjectionManager {
+  private projections: Map<string, Projection> = new Map();
+  private eventStore: IEventStore;
+  
+  constructor(eventStore: IEventStore) {
+    this.eventStore = eventStore;
+  }
+  
+  registerProjection(projection: Projection): void {
+    this.projections.set(projection.name, projection);
+  }
+  
+  async replayEvents(fromPosition: number): Promise<void> {
+    const events = await this.eventStore.getEvents(fromPosition);
+    
+    for (const event of events) {
+      await this.dispatchToProjections(event);
+    }
+  }
+  
+  private async dispatchToProjections(event: DomainEvent): Promise<void> {
+    const promises = Array.from(this.projections.values())
+      .map(p => p.handle(event));
+    
+    await Promise.all(promises);
+  }
+}
+```
+
+### Bước 4: Event Handlers
+
+```typescript
+// Event handlers for synchronization
+interface EventHandler<TEvent extends DomainEvent> {
+  handle(event: TEvent): Promise<void>;
+  eventType: string;
+  priority: number;
+}
+
+// Multi-database synchronization
+class DatabaseSynchronizer {
+  constructor(
+    private readonly eventStore: IEventStore,
+    private readonly projections: ProjectionManager,
+    private readonly readDatabases: IReadDatabase[]
+  ) {}
+  
+  async synchronize(): Promise<SyncResult> {
+    const lastPosition = await this.getLastProcessedPosition();
+    const events = await this.eventStore.getEvents(lastPosition);
+    
+    const results: EventSyncResult[] = [];
+    
+    for (const event of events) {
+      const result = await this.processEvent(event);
+      results.push(result);
+    }
+    
+    return {
+      processed: results.filter(r => r.success).length,
+      failed: results.filter(r => !r.success).length,
+      lastPosition: events[events.length - 1]?.position || lastPosition
+    };
+  }
+  
+  private async processEvent(event: DomainEvent): Promise<EventSyncResult> {
+    try {
+      // Update projections
+      await this.projections.handle(event);
+      
+      // Persist to all read databases
+      const promises = this.readDatabases.map(db => 
+        this.persistToDatabase(db, event)
+      );
+      
+      await Promise.all(promises);
+      
+      return { success: true, eventType: event.eventType };
+    } catch (error) {
+      return { 
+        success: false, 
+        eventType: event.eventType,
+        error: error.message 
+      };
+    }
+  }
+}
+
+// Read database repositories
+class OrderSummaryRepository {
+  constructor(
+    private readonly db: IReadDatabase
+  ) {}
+  
+  async save(summary: OrderSummaryDto): Promise<void> {
+    await this.db.execute(
+      `INSERT INTO order_summaries (
+        order_id, order_number, customer_id, customer_name,
+        customer_email, status, status_display_name,
+        item_count, total_amount, currency,
+        created_at, completed_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      ON CONFLICT (order_id) DO UPDATE SET
+        status = EXCLUDED.status,
+        status_display_name = EXCLUDED.status_display_name,
+        item_count = EXCLUDED.item_count,
+        total_amount = EXCLUDED.total_amount,
+        completed_at = EXCLUDED.completed_at`,
+      [
+        summary.orderId,
+        summary.orderNumber,
+        summary.customerId,
+        summary.customerName,
+        summary.customerEmail,
+        summary.status,
+        summary.statusDisplayName,
+        summary.itemCount,
+        summary.totalAmount,
+        summary.currency,
+        summary.createdAt,
+        summary.completedAt
+      ]
+    );
+  }
+}
+```
+
+### Bước 5: Consistency Handling
+
+```typescript
+// Consistency patterns in CQRS
+interface ConsistencyConfig {
+  mode: 'immediate' | 'eventual';
+  maxLatencyMs: number;
+  fallbackStrategy: 'cache' | 'default_values';
+}
+
+// Saga for distributed transactions
+class OrderProcessingSaga {
+  private readonly commandBus: ICommandBus;
+  private readonly eventBus: IEventBus;
+  
+  async execute(orderId: OrderId): Promise<SagaResult> {
+    const steps: SagaStep[] = [
+      { command: new ReserveInventoryCommand(orderId), compensate: new ReleaseInventoryCommand(orderId) },
+      { command: new ProcessPaymentCommand(orderId), compensate: new RefundPaymentCommand(orderId) },
+      { command: new ShipOrderCommand(orderId), compensate: new CancelShipmentCommand(orderId) }
+    ];
+    
+    const completedSteps: SagaStep[] = [];
+    
+    for (const step of steps) {
+      try {
+        await this.commandBus.send(step.command);
+        completedSteps.push(step);
+      } catch (error) {
+        // Compensate completed steps
+        await this.compensate(completedSteps.reverse());
+        return { success: false, failedStep: step, error: error.message };
+      }
+    }
+    
+    return { success: true, completedSteps };
+  }
+  
+  private async compensate(steps: SagaStep[]): Promise<void> {
+    for (const step of steps) {
+      try {
+        await this.commandBus.send(step.compensate);
+      } catch (compensationError) {
+        // Log for manual intervention
+        await this.logCompensationFailure(step, compensationError);
+      }
+    }
+  }
+}
+
+// Read-your-writes consistency
+class ReadYourWritesHandler {
+  constructor(
+    private readonly readDatabase: IReadDatabase,
+    private readonly projectionManager: ProjectionManager
+  ) {}
+  
+  async handleReadAfterWrite<T>(
+    query: Query,
+    expectedVersion: number
+  ): Promise<T> {
+    // First try from projection (in-memory)
+    const projectionData = this.projectionManager.getProjectionData(query);
+    if (projectionData && projectionData.version >= expectedVersion) {
+      return projectionData.data as T;
+    }
+    
+    // Fall back to database
+    return this.readDatabase.query(query);
+  }
+}
+```
+
+## Checklist (Danh sách kiểm tra)
+
+- [ ] Command models designed for write operations
+- [ ] Query models optimized for read patterns
+- [ ] Projections handle all relevant events
+- [ ] Eventual consistency handled appropriately
+- [ ] Read-your-writes consistency implemented where needed
+- [ ] Saga pattern for distributed transactions
+- [ ] Projection versioning for rebuilds
+- [ ] Error handling và compensation
+- [ ] Performance optimized for both sides
+- [ ] Testing strategy for both models
+- [ ] Documentation of consistency guarantees
+- [ ] Monitoring of synchronization lag
+
+## Examples (Ví dụ)
+
+### Ví dụ 1: E-commerce CQRS
+
+```typescript
+// Command Model (Write Side)
+class Order extends AggregateRoot {
+  createOrder(customerId: CustomerId, items: OrderItem[]) {
+    const order = new Order();
+    order.apply(new OrderCreated(order.id, customerId, items));
+    return order;
+  }
+  
+  addItem(product: Product, quantity: number) {
+    if (this.status !== OrderStatus.CREATED) {
+      throw new DomainException('Can only add items to created orders');
+    }
+    this.apply(new OrderItemAdded(this.id, product.id, quantity));
+  }
+}
+
+// Query Model (Read Side)
+interface OrderListItem {
+  orderId: string;
+  orderNumber: string;
   customerName: string;
   status: string;
   total: number;
@@ -180,153 +638,101 @@ interface OrderListDTO {
   createdAt: Date;
 }
 
-interface OrderDetailDTO {
-  orderId: string;
-  customer: CustomerDTO;
-  items: OrderItemDTO[];
-  shippingAddress: AddressDTO;
-  status: string;
-  subtotal: number;
-  tax: number;
-  total: number;
-  timeline: TimelineEvent[];
+interface OrderDetail extends OrderListItem {
+  items: {
+    productName: string;
+    quantity: number;
+    price: number;
+  }[];
+  shippingAddress: AddressDto;
+  paymentInfo: PaymentSummaryDto;
 }
 
-// Query Handler
-interface Query<T> {
-  // Marker interface
-}
-
-interface QueryHandler<T extends Query<R>, R> {
-  handle(query: T): Promise<R>;
-}
-
-class GetOrderListQuery implements Query<OrderListDTO[]> {
-  constructor(
-    public readonly customerId?: string,
-    public readonly status?: OrderStatus,
-    public readonly page: number = 1,
-    public readonly pageSize: number = 20
-  ) {}
-}
-
-class GetOrderListHandler implements QueryHandler<GetOrderListQuery, OrderListDTO[]> {
-  constructor(private readonly readDb: ReadDatabase) {}
+// Different endpoints for different needs
+@Controller()
+class OrderController {
+  // Lightweight list query
+  @Get('/orders')
+  async getOrders(@Query() query: GetOrdersQuery): Promise<OrderListItem[]> {
+    return this.queryHandler.handle(query);
+  }
   
-  async handle(query: GetOrderListQuery): Promise<OrderListDTO[]> {
-    return this.readDb.query<OrderListDTO>(`
-      SELECT 
-        o.id as "orderId",
-        c.name as "customerName",
-        o.status,
-        o.total,
-        COUNT(oi.id) as "itemCount",
-        o.created_at as "createdAt"
-      FROM orders o
-      JOIN customers c ON o.customer_id = c.id
-      LEFT JOIN order_items oi ON o.id = oi.order_id
-      WHERE ($1::uuid IS NULL OR o.customer_id = $1)
-        AND ($2::text IS NULL OR o.status = $2)
-      GROUP BY o.id, c.name, o.status, o.total, o.created_at
-      ORDER BY o.created_at DESC
-      LIMIT $3 OFFSET $4
-    `, [query.customerId, query.status, query.pageSize, (query.page - 1) * query.pageSize]);
+  // Detailed query for single order
+  @Get('/orders/:id')
+  async getOrderDetail(@Param('id') id: string): Promise<OrderDetail> {
+    return this.detailQueryHandler.handle(new GetOrderDetailQuery(id));
+  }
+  
+  // Command endpoint
+  @Post('/orders')
+  async createOrder(@Body() command: CreateOrderCommand): Promise<OrderId> {
+    return this.commandHandler.handle(command);
   }
 }
 ```
 
-### Phase 3: Event Handlers
+## Anti Patterns (Các pattern cần tránh)
 
-### Bước 4: Read Model Projection
-
+### 1. CQRS for Everything
 ```typescript
-// Projector / Event Handler
-interface EventHandler<T extends DomainEvent> {
-  handle(event: T): Promise<void>;
+// ❌ BAD: CQRS everywhere, even where not needed
+class SimpleReadService {
+  @Get('/config')
+  getConfig() { return this.db.query('SELECT * FROM config'); }
 }
 
-class OrderProjector implements EventHandler<OrderCreated> {
-  constructor(private readonly readDb: ReadDatabase) {}
-  
-  async handle(event: OrderCreated): Promise<void> {
-    await this.readDb.execute(`
-      INSERT INTO order_read_models (
-        id, customer_id, status, total, created_at, updated_at
-      ) VALUES ($1, $2, $3, $4, $5, $5)
-    `, [
-      event.orderId.value,
-      event.customerId.value,
-      OrderStatus.PENDING,
-      0,
-      event.occurredAt
-    ]);
-  }
-}
-
-class OrderItemProjector implements EventHandler<ItemAddedToOrder> {
-  constructor(private readonly readDb: ReadDatabase) {}
-  
-  async handle(event: ItemAddedToOrder): Promise<void> {
-    await this.readDb.transaction(async (tx) => {
-      // Update total
-      await tx.execute(`
-        UPDATE order_read_models 
-        SET total = total + $1, updated_at = NOW()
-        WHERE id = $2
-      `, [event.price.amount, event.orderId.value]);
-      
-      // Add item
-      await tx.execute(`
-        INSERT INTO order_item_read_models (
-          id, order_id, product_id, quantity, price, created_at
-        ) VALUES ($1, $2, $3, $4, $5, NOW())
-      `, [
-        event.itemId.value,
-        event.orderId.value,
-        event.productId.value,
-        event.quantity.value,
-        event.price.amount
-      ]);
-    });
-  }
-}
+// ✅ GOOD: CQRS where it provides value
+class OrderQueryService { /* CQRS makes sense here */ }
 ```
 
-## Checklist
-
-- [ ] Commands defined
-- [ ] Command handlers implemented
-- [ ] Query models designed
-- [ ] Query handlers implemented
-- [ ] Projectors created
-- [ ] Event bus configured
-
-## Examples (Ví dụ)
-
-### Ví dụ: CQRS Flow
-
+### 2. Synchronous Read-Your-Writes
 ```typescript
-// Write flow
-async function createOrder(dto: CreateOrderDTO) {
-  const command = new CreateOrderCommand(
-    dto.customerId,
-    dto.items,
-    dto.shippingAddress
-  );
-  
-  await commandBus.dispatch(command);
+// ❌ BAD: Block until read reflects write
+async function createAndRead(command: CreateCommand): Promise<Data> {
+  await this.commandHandler.handle(command);
+  await this.waitForProjection(); // Blocks!
+  return this.queryHandler.handle(getQuery);
 }
 
-// Read flow
-async function getOrders(customerId?: string) {
-  const query = new GetOrderListQuery(customerId);
-  return queryBus.execute(query);
+// ✅ GOOD: Return with version, use eventual consistency
+async function createAndRead(command: CreateCommand): Promise<DataWithVersion> {
+  const result = await this.commandHandler.handle(command);
+  return {
+    data: result.immediateView,
+    version: result.version
+  };
 }
 ```
 
-## Liên kết
+### 3. Same Model for Both
+```typescript
+// ❌ BAD: Same entity for command và query
+class Order {
+  // Heavy domain logic
+  // Plus denormalized fields for UI
+}
 
-- [[../skills/ddd-design]] - DDD Design
-- [[../skills/clean-architecture]] - Clean Architecture
-- [[../skills/microservice-design]] - Microservice Design
-- [[../skills/event-sourcing]] - Event Sourcing
+// ✅ GOOD: Separate models
+class OrderAggregate { /* Domain logic only */ }
+class OrderSummaryDto { /* Read-optimized */ }
+class OrderDetailDto { /* Read-optimized */ }
+```
+
+## Best Practices (Thực hành tốt nhất)
+
+1. **Start simple, evolve to CQRS**: Not every system needs it
+2. **Use event sourcing with CQRS**: Natural fit
+3. **Design read models for specific views**: Denormalized is fine
+4. **Handle eventual consistency explicitly**: Document guarantees
+5. **Use sagas for distributed transactions**: Compensation, not rollback
+6. **Monitor synchronization lag**: Catch problems early
+7. **Separate deployment**: Scale reads independently
+8. **Test both sides**: Unit tests for commands, integration for projections
+9. **Version projections**: Enable rebuilds
+10. **Document consistency model**: Help consumers understand guarantees
+
+## Liên kết (Cross-references)
+
+- **Related Skills**: [ddd-design](./ddd-design.mdc), [event-sourcing](./event-sourcing.mdc), [clean-architecture](./clean-architecture.mdc)
+- **Patterns**: Event Sourcing, Saga, Repository, Projector
+- **Resources**: CQRS by Martin Fowler, Event Sourcing by Greg Young
