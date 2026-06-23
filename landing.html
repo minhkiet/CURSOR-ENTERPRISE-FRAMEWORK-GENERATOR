@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cursor Enterprise Framework — AI Coding Agent Framework</title>
+  <meta name="description" content="Enterprise-grade framework maximizing AI coding agent performance. 463 files, 79 rules, 47 skills, 35+ domains." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="landing.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════ NAVBAR ═══════════════════════════════════════════ -->
+  <header class="navbar" id="navbar">
+    <div class="navbar-inner">
+      <a href="#" class="navbar-logo">
+        <div class="navbar-logo-icon">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 1L1 4.5L8 8L15 4.5L8 1Z" fill="white" fill-opacity="0.9"/>
+            <path d="M1 11.5L8 15L15 11.5" stroke="white" stroke-opacity="0.6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M1 7.75L8 11.25L15 7.75" stroke="white" stroke-opacity="0.75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="navbar-logo-text">CEF</span>
+        <span class="navbar-logo-sep">/</span>
+        <span class="navbar-logo-full">Enterprise Framework</span>
+      </a>
+
+      <nav class="navbar-nav">
+        <a href="#explorer" class="nav-link">Rules &amp; Skills</a>
+        <a href="#principles" class="nav-link">Nguyên tắc</a>
+        <a href="#architecture" class="nav-link">Kiến trúc</a>
+        <a href="#components" class="nav-link">Components</a>
+        <a href="#domains" class="nav-link">Domains</a>
+        <a href="#getting-started" class="nav-link">Bắt đầu</a>
+      </nav>
+
+      <div class="navbar-actions">
+        <a href="https://github.com" class="btn-ghost" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          GitHub
+        </a>
+        <a href="#getting-started" class="btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          Bắt đầu ngay
+        </a>
+      </div>
+
+      <button class="navbar-mobile-toggle" id="mobileMenuBtn" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <nav class="mobile-nav">
+        <a href="#explorer" class="mobile-nav-link">Rules &amp; Skills</a>
+        <a href="#principles" class="mobile-nav-link">Nguyên tắc</a>
+        <a href="#architecture" class="mobile-nav-link">Kiến trúc</a>
+        <a href="#components" class="mobile-nav-link">Components</a>
+        <a href="#domains" class="mobile-nav-link">Domains</a>
+        <a href="#getting-started" class="mobile-nav-link">Bắt đầu</a>
+      </nav>
+    </div>
+  </header>
+
+
+  <!-- ═══════════════════════════════════════════ HERO ═══════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        <span>v4.0.0</span>
+        <span class="badge-sep">·</span>
+        <span>463 files</span>
+        <span class="badge-sep">·</span>
+        <span>35+ domains</span>
+      </div>
+
+      <h1 class="hero-title">
+        <span class="hero-title-line">Framework cấp Enterprise</span>
+        <span class="hero-title-accent">cho AI Coding Agents</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        Tối ưu hiệu suất AI coding agents trên mọi IDE — Cursor, Claude Code,
+        Vibe Code, Windsurf, Cline. Memory-First, Retrieval-First, Token-Optimized.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#getting-started" class="hero-btn hero-btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          Bắt đầu nhanh
+        </a>
+        <a href="#architecture" class="hero-btn hero-btn-outline">
+          Xem kiến trúc
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+        </a>
+      </div>
+
+      <!-- Hero cards: left (stats) + right (terminal) -->
+      <div class="hero-cards">
+        <div class="hc-left">
+          <div class="hc-card">
+            <div class="hc-card-header">
+              <div class="hc-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              </div>
+              <span class="hc-card-title">Rules</span>
+              <span class="hc-card-count">79</span>
+            </div>
+            <div class="hc-card-items">
+              <div class="hc-item"><span class="hc-dot"></span>core-architecture, coding-standards</div>
+              <div class="hc-item"><span class="hc-dot"></span>security, performance, api</div>
+              <div class="hc-item"><span class="hc-dot"></span>database, multi-tenant, billing</div>
+              <div class="hc-more">+72 more rules</div>
+            </div>
+          </div>
+
+          <div class="hc-card">
+            <div class="hc-card-header">
+              <div class="hc-card-icon" style="background: rgba(6, 182, 212, 0.08); border-color: rgba(6, 182, 212, 0.2);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="stroke: #06b6d4;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+              </div>
+              <span class="hc-card-title">Skills</span>
+              <span class="hc-card-count" style="color: #06b6d4; background: rgba(6, 182, 212, 0.08);">47</span>
+            </div>
+            <div class="hc-card-items">
+              <div class="hc-item"><span class="hc-dot hc-dot-cyan"></span>aspnet-core, playwright, figma</div>
+              <div class="hc-item"><span class="hc-dot hc-dot-cyan"></span>vercel-deploy, cloudflare-deploy</div>
+              <div class="hc-item"><span class="hc-dot hc-dot-cyan"></span>docker, kubernetes, jupyter</div>
+              <div class="hc-more">+43 more skills</div>
+            </div>
+          </div>
+
+          <div class="hc-card">
+            <div class="hc-card-header">
+              <div class="hc-card-icon" style="background: rgba(52, 211, 153, 0.08); border-color: rgba(52, 211, 153, 0.2);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="stroke: #34d399;"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              </div>
+              <span class="hc-card-title">Knowledge</span>
+              <span class="hc-card-count" style="color: #34d399; background: rgba(52, 211, 153, 0.08);">272</span>
+            </div>
+            <div class="hc-card-items">
+              <div class="hc-item"><span class="hc-dot hc-dot-emerald"></span>architecture, best-practice, anti-pattern</div>
+              <div class="hc-item"><span class="hc-dot hc-dot-emerald"></span>faq, checklist, glossary</div>
+              <div class="hc-item"><span class="hc-dot hc-dot-emerald"></span>decision-tree per domain</div>
+              <div class="hc-more">35+ domains covered</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hc-right">
+          <div class="hc-right-header">
+            <div class="hc-terminal-dots">
+              <span></span><span></span><span></span>
+            </div>
+            <span class="hc-terminal-label">cursor-agent — zsh</span>
+          </div>
+          <div class="hc-terminal-body">
+            <div class="hc-terminal-line">
+              <span class="ht-prompt">$</span>
+              <span class="ht-cmd">Initialize framework for CRM project</span>
+            </div>
+            <div class="hc-terminal-line">
+              <span class="ht-muted">Loading rules...</span>
+              <span class="ht-success">79 rules loaded</span>
+            </div>
+            <div class="hc-terminal-line">
+              <span class="ht-muted">Loading skills...</span>
+              <span class="ht-success">47 skills loaded</span>
+            </div>
+            <div class="hc-terminal-line">
+              <span class="ht-muted">Loading knowledge...</span>
+              <span class="ht-success">272 knowledge files indexed</span>
+            </div>
+            <div class="hc-terminal-line">
+              <span class="ht-muted">Memory check...</span>
+              <span class="ht-muted">No previous decisions found</span>
+            </div>
+            <div class="hc-terminal-line">
+              <span class="ht-prompt">$</span>
+              <span class="ht-cursor">Build Multi-Tenant CRM with Supabase</span>
+            </div>
+            <div class="hc-terminal-line">
+              <span class="ht-success">&#x2713; Context routed: supabase, rls, multi-tenant</span>
+            </div>
+            <div class="hc-terminal-line">
+              <span class="ht-cyan">&#x2713; Token optimized: 12,400 tokens saved</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════ STATS ═══════════════════════════════════════════ -->
+  <section class="stats-bar">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-number" data-target="463">0</span><span class="stat-suffix">+</span>
+          <span class="stat-label">Files</span>
+          <span class="stat-sublabel">463 total (vượt 15.7%)</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" data-target="79">0</span><span class="stat-suffix">+</span>
+          <span class="stat-label">Rules</span>
+          <span class="stat-sublabel">MDC rules &amp; principles</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" data-target="47">0</span><span class="stat-suffix">+</span>
+          <span class="stat-label">Skills</span>
+          <span class="stat-sublabel">Specialized expertise</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" data-target="272">0</span><span class="stat-suffix">+</span>
+          <span class="stat-label">Knowledge</span>
+          <span class="stat-sublabel">Files across 35+ domains</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" data-target="35">0</span><span class="stat-suffix">+</span>
+          <span class="stat-label">Domains</span>
+          <span class="stat-sublabel">Covered tech domains</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════ RULES & SKILLS EXPLORER ═══════════════════════════════════════════ -->
+  <section class="explorer-section" id="explorer">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-label">Documentation</div>
+        <h2 class="section-title">Rules &amp; Skills Explorer</h2>
+        <p class="section-desc">
+          79 MDC rules chuẩn hóa + 47 specialized skills. Mỗi rule định nghĩa tiêu chuẩn,
+          mỗi skill cung cấp expertise chuyên sâu cho AI agent.
+        </p>
+      </div>
+
+      <div class="explorer-layout">
+        <!-- Sidebar nav -->
+        <aside class="explorer-sidebar">
+          <div class="explorer-nav-section">
+            <div class="explorer-nav-label">Framework</div>
+            <button class="explorer-nav-btn active" data-category="all">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              Tất cả
+              <span class="explorer-nav-count">126</span>
+            </button>
+            <button class="explorer-nav-btn" data-category="rules">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              Rules
+              <span class="explorer-nav-count">79</span>
+            </button>
+            <button class="explorer-nav-btn" data-category="skills">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Skills
+              <span class="explorer-nav-count">47</span>
+            </button>
+          </div>
+
+          <div class="explorer-nav-section">
+            <div class="explorer-nav-label">Category</div>
+            <button class="explorer-nav-btn" data-category="frontend">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              Frontend
+              <span class="explorer-nav-count">8</span>
+            </button>
+            <button class="explorer-nav-btn" data-category="backend">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+              Backend
+              <span class="explorer-nav-count">11</span>
+            </button>
+            <button class="explorer-nav-btn" data-category="database">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+              Database
+              <span class="explorer-nav-count">7</span>
+            </button>
+            <button class="explorer-nav-btn" data-category="ai">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a4 4 0 014 4c0 1.1-.9 2-2 2h-4a4 4 0 01-4-4 4 4 0 014-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4z"/></svg>
+              AI &amp; RAG
+              <span class="explorer-nav-count">10</span>
+            </button>
+            <button class="explorer-nav-btn" data-category="devops">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/></svg>
+              Cloud &amp; DevOps
+              <span class="explorer-nav-count">14</span>
+            </button>
+            <button class="explorer-nav-btn" data-category="business">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              Business
+              <span class="explorer-nav-count">9</span>
+            </button>
+          </div>
+        </aside>
+
+        <!-- Main content -->
+        <div class="explorer-main">
+          <div class="explorer-toolbar">
+            <div class="explorer-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              <input type="text" id="explorerSearch" placeholder="Tìm kiếm rule hoặc skill..." />
+              <span class="explorer-search-shortcut">Ctrl+K</span>
+            </div>
+            <div class="explorer-filter-tags">
+              <button class="filter-tag active" data-filter="all">All</button>
+              <button class="filter-tag" data-filter="core">Core</button>
+              <button class="filter-tag" data-filter="frontend">Frontend</button>
+              <button class="filter-tag" data-filter="backend">Backend</button>
+              <button class="filter-tag" data-filter="ai">AI</button>
+              <button class="filter-tag" data-filter="devops">DevOps</button>
+            </div>
+          </div>
+
+          <!-- Rules list (default) -->
+          <div class="rules-list" id="rulesList">
+            <div class="rule-item" data-category="rules,core" data-domain="core" style="transition-delay: 0ms">
+              <div class="rule-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              </div>
+              <div class="rule-info">
+                <div class="rule-item-name">core-architecture.mdc</div>
+                <div class="rule-item-meta">
+                  <span class="rule-domain">core</span>
+                  <div class="rule-tags"><span class="rule-tag">architecture</span><span class="rule-tag">foundation</span></div>
+                </div>
+              </div>
+              <div class="rule-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+              </div>
+            </div>
+
+            <div class="rule-item" data-category="rules,core" data-domain="core" style="transition-delay: 40ms">
+              <div class="rule-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              </div>
+              <div class="rule-info">
+                <div class="rule-item-name">memory-first.mdc</div>
+                <div class="rule-item-meta">
+                  <span class="rule-domain">core</span>
+                  <div class="rule-tags"><span class="rule-tag">memory</span><span class="rule-tag">context</span></div>
+                </div>
+              </div>
+              <div class="rule-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+              </div>
+            </div>
+
+            <div class="rule-item" data-category="rules,core" data-domain="core" style="transition-delay: 80ms">
+              <div class="rule-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              </div>
+              <div class="rule-info">
+                <div class="rule-item-name">context-router.mdc</div>
+                <div class="rule-item-meta">
+                  <span class="rule-domain">core</span>
+                  <div class="rule-tags"><span class="rule-tag">routing</span><span class="rule-tag">intelligence</span></div>
+                </div>
+              </div>
+              <div class="rule-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+              </div>
+            </div>
+
+            <div class="rule-item" data-category="rules,core" data-domain="core" style="transition-delay: 120ms">
+              <div class="rule-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              </div>
+              <div class="rule-info">
+                <div class="rule-item-name">token-optimization.mdc</div>
+                <div class="rule-item-meta">
+                  <span class="rule-domain">core</span>
+                  <div class="rule-tags"><span class="rule-tag">tokens</span><span class="rule-tag">efficiency</span></div>
+                </div>
+              </div>
+              <div class="rule-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+              </div>
+            </div>
+
+            <div class="rule-item" data-category="rules,frontend" data-domain="frontend" style="transition-delay: 160ms">
+              <div class="rule-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              </div>
+              <div class="rule-info">
+                <div class="rule-item-name">nextjs.mdc</div>
+                <div class="rule-item-meta">
+                  <span class="rule-domain">frontend</span>
+                  <div class="rule-tags"><span class="rule-tag">next.js</span><span class="rule-tag">react</span></div>
+                </div>
+              </div>
+              <div class="rule-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+              </div>
+            </div>
+
+            <div class="rule-item" data-category="rules,backend" data-domain="backend" style="transition-delay: 200ms">
+              <div class="rule-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/></svg>
+              </div>
+              <div class="rule-info">
+                <div class="rule-item-name">aspnet-core.mdc</div>
+                <div class="rule-item-meta">
+                  <span class="rule-domain">backend</span>
+                  <div class="rule-tags"><span class="rule-tag">.net</span><span class="rule-tag">api</span></div>
+                </div>
+              </div>
+              <div class="rule-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+              </div>
+            </div>
+
+            <div class="rule-item" data-category="rules,database" data-domain="database" style="transition-delay: 240ms">
+              <div class="rule-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+              </div>
+              <div class="rule-info">
+                <div class="rule-item-name">supabase.mdc</div>
+                <div class="rule-item-meta">
+                  <span class="rule-domain">database</span>
+                  <div class="rule-tags"><span class="rule-tag">postgres</span><span class="rule-tag">rls</span></div>
+                </div>
+              </div>
+              <div class="rule-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+              </div>
+            </div>
+
+            <div class="rule-item" data-category="rules,ai" data-domain="ai" style="transition-delay: 280ms">
+              <div class="rule-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a4 4 0 014 4c0 1.1-.9 2-2 2h-4a4 4 0 01-4-4 4 4 0 014-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4z"/></svg>
+              </div>
+              <div class="rule-info">
+                <div class="rule-item-name">openai.mdc</div>
+                <div class="rule-item-meta">
+                  <span class="rule-domain">ai</span>
+                  <div class="rule-tags"><span class="rule-tag">gpt</span><span class="rule-tag">api</span></div>
+                </div>
+              </div>
+              <div class="rule-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+              </div>
+            </div>
+
+            <div class="rule-item" data-category="rules,ai" data-domain="ai" style="transition-delay: 320ms">
+              <div class="rule-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+              </div>
+              <div class="rule-info">
+                <div class="rule-item-name">pgvector.mdc</div>
+                <div class="rule-item-meta">
+                  <span class="rule-domain">ai</span>
+                  <div class="rule-tags"><span class="rule-tag">vector</span><span class="rule-tag">embedding</span></div>
+                </div>
+              </div>
+              <div class="rule-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+              </div>
+            </div>
+
+            <div class="rule-item" data-category="rules,devops" data-domain="devops" style="transition-delay: 360ms">
+              <div class="rule-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/></svg>
+              </div>
+              <div class="rule-info">
+                <div class="rule-item-name">cloudflare.mdc</div>
+                <div class="rule-item-meta">
+                  <span class="rule-domain">devops</span>
+                  <div class="rule-tags"><span class="rule-tag">workers</span><span class="rule-tag">cdn</span></div>
+                </div>
+              </div>
+              <div class="rule-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+              </div>
+            </div>
+
+            <div class="rule-item" data-category="rules,business" data-domain="business" style="transition-delay: 400ms">
+              <div class="rule-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+              </div>
+              <div class="rule-info">
+                <div class="rule-item-name">multi-tenant.mdc</div>
+                <div class="rule-item-meta">
+                  <span class="rule-domain">business</span>
+                  <div class="rule-tags"><span class="rule-tag">saas</span><span class="rule-tag">isolation</span></div>
+                </div>
+              </div>
+              <div class="rule-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+              </div>
+            </div>
+
+            <div class="rule-item" data-category="rules,business" data-domain="business" style="transition-delay: 440ms">
+              <div class="rule-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+              </div>
+              <div class="rule-info">
+                <div class="rule-item-name">billing.mdc</div>
+                <div class="rule-item-meta">
+                  <span class="rule-domain">business</span>
+                  <div class="rule-tags"><span class="rule-tag">subscription</span><span class="rule-tag">pricing</span></div>
+                </div>
+              </div>
+              <div class="rule-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Skills grid (hidden by default) -->
+          <div class="skills-grid" id="skillsGrid" style="display: none;">
+            <div class="skill-item" style="transition-delay: 0ms">
+              <div class="skill-icon">AS</div>
+              <div>
+                <div class="skill-name">aspnet-core</div>
+                <div class="skill-platform">Cursor · Codex · Claude</div>
+              </div>
+            </div>
+            <div class="skill-item" style="transition-delay: 40ms">
+              <div class="skill-icon">VE</div>
+              <div>
+                <div class="skill-name">vercel-deploy</div>
+                <div class="skill-platform">Cursor · Claude Plugins</div>
+              </div>
+            </div>
+            <div class="skill-item" style="transition-delay: 80ms">
+              <div class="skill-icon">PW</div>
+              <div>
+                <div class="skill-name">playwright</div>
+                <div class="skill-platform">Cursor · Claude Code · Codex</div>
+              </div>
+            </div>
+            <div class="skill-item" style="transition-delay: 120ms">
+              <div class="skill-icon">FG</div>
+              <div>
+                <div class="skill-name">figma</div>
+                <div class="skill-platform">Cursor · Claude Plugins</div>
+              </div>
+            </div>
+            <div class="skill-item" style="transition-delay: 160ms">
+              <div class="skill-icon">CF</div>
+              <div>
+                <div class="skill-name">cloudflare-deploy</div>
+                <div class="skill-platform">Cursor · Claude Code</div>
+              </div>
+            </div>
+            <div class="skill-item" style="transition-delay: 200ms">
+              <div class="skill-icon">DOC</div>
+              <div>
+                <div class="skill-name">docker</div>
+                <div class="skill-platform">Cursor · Claude Code</div>
+              </div>
+            </div>
+            <div class="skill-item" style="transition-delay: 240ms">
+              <div class="skill-icon">K8S</div>
+              <div>
+                <div class="skill-name">kubernetes</div>
+                <div class="skill-platform">Cursor · Claude Code</div>
+              </div>
+            </div>
+            <div class="skill-item" style="transition-delay: 280ms">
+              <div class="skill-icon">JY</div>
+              <div>
+                <div class="skill-name">jupyter-notebook</div>
+                <div class="skill-platform">Claude Code · Claude Plugins</div>
+              </div>
+            </div>
+            <div class="skill-item" style="transition-delay: 320ms">
+              <div class="skill-icon">GHP</div>
+              <div>
+                <div class="skill-name">gh-address-comments</div>
+                <div class="skill-platform">Claude Code · Claude Plugins</div>
+              </div>
+            </div>
+            <div class="skill-item" style="transition-delay: 360ms">
+              <div class="skill-icon">PDF</div>
+              <div>
+                <div class="skill-name">pdf</div>
+                <div class="skill-platform">Cursor · Claude Plugins</div>
+              </div>
+            </div>
+            <div class="skill-item" style="transition-delay: 400ms">
+              <div class="skill-icon">NET</div>
+              <div>
+                <div class="skill-name">netlify-deploy</div>
+                <div class="skill-platform">Cursor · Claude Plugins</div>
+              </div>
+            </div>
+            <div class="skill-item" style="transition-delay: 440ms">
+              <div class="skill-icon">SCR</div>
+              <div>
+                <div class="skill-name">screenshot</div>
+                <div class="skill-platform">Claude Plugins</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty state -->
+          <div id="explorerEmpty" style="display: none; text-align: center; padding: 48px 0;">
+            <div style="font-size: 32px; margin-bottom: 12px; opacity: 0.3;">&#x1F50D;</div>
+            <div style="font-size: 14px; color: var(--text-muted);">Không tìm thấy kết quả phù hợp</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════ PRINCIPLES ═══════════════════════════════════════════ -->
+  <section class="principles-section" id="principles">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-label">Core Philosophy</div>
+        <h2 class="section-title">4 Nguyên tắc cốt lõi</h2>
+        <p class="section-desc">
+          Mọi quyết định thiết kế đều phục vụ cho việc tối ưu hóa hiệu suất AI agent.
+          Mỗi nguyên tắc được implement cụ thể trong framework.
+        </p>
+      </div>
+
+      <div class="principles-grid">
+        <div class="principle-card" data-delay="0">
+          <div class="principle-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+            </svg>
+          </div>
+          <div class="principle-number">01 / 04</div>
+          <h3>Memory First</h3>
+          <p>Luôn tra cứu memory trước khi bắt đầu task. Tránh lặp lại quyết định đã có, tái sử dụng ADRs và bug fixes.</p>
+          <div class="principle-tags">
+            <span class="tag">decisions.sqlite</span>
+            <span class="tag">bug-history</span>
+          </div>
+        </div>
+
+        <div class="principle-card" data-delay="80">
+          <div class="principle-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+            </svg>
+          </div>
+          <div class="principle-number">02 / 04</div>
+          <h3>Retrieval First</h3>
+          <p>Luôn retrieval knowledge trước khi hỏi. Semantic search qua 272 knowledge files thay vì guess.</p>
+          <div class="principle-tags">
+            <span class="tag">knowledge-base</span>
+            <span class="tag">semantic-search</span>
+          </div>
+        </div>
+
+        <div class="principle-card" data-delay="160">
+          <div class="principle-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+            </svg>
+          </div>
+          <div class="principle-number">03 / 04</div>
+          <h3>Token Optimization</h3>
+          <p>Tối ưu token ở mọi bước. Context Router, Auto-Compression, Lazy Loading giảm tiêu thụ đến 40%.</p>
+          <div class="principle-tags">
+            <span class="tag">context-router</span>
+            <span class="tag">lazy-load</span>
+          </div>
+        </div>
+
+        <div class="principle-card" data-delay="240">
+          <div class="principle-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+            </svg>
+          </div>
+          <div class="principle-number">04 / 04</div>
+          <h3>Knowledge Reuse</h3>
+          <p>Tái sử dụng existing decisions và solutions. Không tạo lại những gì đã có — chỉ adapt và extend.</p>
+          <div class="principle-tags">
+            <span class="tag">adr</span>
+            <span class="tag">pattern-reuse</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════ ARCHITECTURE ═══════════════════════════════════════════ -->
+  <section class="architecture-section" id="architecture">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-label">Structure</div>
+        <h2 class="section-title">Kiến trúc hệ thống</h2>
+        <p class="section-desc">
+          `.cursor/` directory chứa toàn bộ framework — được tổ chức theo nguyên tắc
+          separation of concerns, mỗi thành phần có trách nhiệm rõ ràng.
+        </p>
+      </div>
+
+      <div class="arch-hero">
+        <!-- File tree -->
+        <div class="file-tree">
+          <div class="ft-header">
+            <div class="ft-dots"><span></span><span></span><span></span></div>
+            <span class="ft-title">.cursor/</span>
+          </div>
+          <div class="ft-body">
+            <div class="ft-branch">
+              <div class="ft-item ft-folder">
+                <svg class="ft-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                rules
+                <span class="ft-count">79 files</span>
+              </div>
+              <div class="ft-sub">
+                <div class="ft-item ft-file">
+                  <svg class="ft-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  core-architecture.mdc
+                </div>
+                <div class="ft-item ft-file">
+                  <svg class="ft-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  memory-first.mdc
+                </div>
+                <div class="ft-item ft-file">
+                  <svg class="ft-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  context-router.mdc
+                </div>
+                <div class="ft-item ft-file" style="color: var(--text-faint); font-style: italic;">+76 more rules...</div>
+              </div>
+            </div>
+
+            <div class="ft-branch">
+              <div class="ft-item ft-folder" style="color: #06b6d4;">
+                <svg class="ft-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="stroke: #06b6d4;"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                skills
+                <span class="ft-count">47 files</span>
+              </div>
+              <div class="ft-sub">
+                <div class="ft-item ft-file">
+                  <svg class="ft-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  aspnet-core/
+                </div>
+                <div class="ft-item ft-file">
+                  <svg class="ft-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  playwright/
+                </div>
+                <div class="ft-item ft-file">
+                  <svg class="ft-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  figma/
+                </div>
+                <div class="ft-item ft-file" style="color: var(--text-faint); font-style: italic;">+44 more skills...</div>
+              </div>
+            </div>
+
+            <div class="ft-branch">
+              <div class="ft-item ft-folder" style="color: #34d399;">
+                <svg class="ft-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="stroke: #34d399;"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                knowledge
+                <span class="ft-count">272 files</span>
+              </div>
+              <div class="ft-sub">
+                <div class="ft-item ft-folder" style="color: var(--text-secondary);">
+                  <svg class="ft-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                  frontend/
+                </div>
+                <div class="ft-item ft-folder" style="color: var(--text-secondary);">
+                  <svg class="ft-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                  backend/
+                </div>
+                <div class="ft-item ft-folder" style="color: var(--text-secondary);">
+                  <svg class="ft-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                  ai-rag/
+                </div>
+                <div class="ft-item ft-file" style="color: var(--text-faint); font-style: italic;">+8 more domains...</div>
+              </div>
+            </div>
+
+            <div class="ft-branch">
+              <div class="ft-item ft-folder">
+                <svg class="ft-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                memory/
+                <span class="ft-count">schemas</span>
+              </div>
+            </div>
+
+            <div class="ft-branch">
+              <div class="ft-item ft-folder">
+                <svg class="ft-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                scripts/
+                <span class="ft-count">automation</span>
+              </div>
+            </div>
+
+            <div class="ft-branch">
+              <div class="ft-item ft-folder">
+                <svg class="ft-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                prompts/
+                <span class="ft-count">templates</span>
+              </div>
+            </div>
+
+            <div class="ft-branch">
+              <div class="ft-item ft-folder">
+                <svg class="ft-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                workflows/
+                <span class="ft-count">standards</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Architecture description -->
+        <div class="arch-desc">
+          <div class="arch-desc-item">
+            <div class="arch-desc-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <div class="arch-desc-text">
+              <h4>79 MDC Rules</h4>
+              <p>YAML frontmatter với metadata, tags, version. Mỗi rule định nghĩa tiêu chuẩn cho architecture, coding, security, performance.</p>
+            </div>
+          </div>
+
+          <div class="arch-desc-item">
+            <div class="arch-desc-icon" style="background: rgba(6, 182, 212, 0.08); border-color: rgba(6, 182, 212, 0.2);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="stroke: #06b6d4;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="arch-desc-text">
+              <h4>47 Specialized Skills</h4>
+              <p>SKILL.md files cho Cursor, Claude Code, Codex, Claude Plugins. Mỗi skill cung cấp step-by-step expertise.</p>
+            </div>
+          </div>
+
+          <div class="arch-desc-item">
+            <div class="arch-desc-icon" style="background: rgba(52, 211, 153, 0.08); border-color: rgba(52, 211, 153, 0.2);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="stroke: #34d399;"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            </div>
+            <div class="arch-desc-text">
+              <h4>272 Knowledge Files</h4>
+              <p>6 files/domain: architecture, best-practice, anti-pattern, faq, checklist, glossary. Chuẩn hóa, nhất quán.</p>
+            </div>
+          </div>
+
+          <div class="arch-desc-item">
+            <div class="arch-desc-icon" style="background: rgba(251, 191, 36, 0.08); border-color: rgba(251, 191, 36, 0.2);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="stroke: #fbbf24;"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <div class="arch-desc-text">
+              <h4>Context Router &amp; Memory System</h4>
+              <p>Tự động route đúng domain, load đúng rules, ghi nhớ decisions. Giảm 40% token consumption.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tech Stack -->
+      <div class="tech-stack-section">
+        <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Tech Stack Supported</h3>
+        <div class="tech-grid">
+          <div class="tech-category">
+            <span class="tech-cat-label">Frontend</span>
+            <div class="tech-items">
+              <span class="tech-chip">Next.js 15</span>
+              <span class="tech-chip">React 19</span>
+              <span class="tech-chip">Vue 3</span>
+              <span class="tech-chip">Nuxt 4</span>
+              <span class="tech-chip">TypeScript 5</span>
+              <span class="tech-chip">TailwindCSS</span>
+              <span class="tech-chip">Shadcn/UI</span>
+            </div>
+          </div>
+          <div class="tech-category">
+            <span class="tech-cat-label">Backend</span>
+            <div class="tech-items">
+              <span class="tech-chip">Laravel 12</span>
+              <span class="tech-chip">ASP.NET Core 9</span>
+              <span class="tech-chip">NestJS</span>
+              <span class="tech-chip">NodeJS</span>
+            </div>
+          </div>
+          <div class="tech-category">
+            <span class="tech-cat-label">Database</span>
+            <div class="tech-items">
+              <span class="tech-chip">MySQL</span>
+              <span class="tech-chip">PostgreSQL</span>
+              <span class="tech-chip">SQL Server</span>
+              <span class="tech-chip">SQLite</span>
+              <span class="tech-chip">Redis</span>
+              <span class="tech-chip">Supabase</span>
+            </div>
+          </div>
+          <div class="tech-category">
+            <span class="tech-cat-label">AI &amp; RAG</span>
+            <div class="tech-items">
+              <span class="tech-chip">OpenAI</span>
+              <span class="tech-chip">Gemini</span>
+              <span class="tech-chip">Claude</span>
+              <span class="tech-chip">Ollama</span>
+              <span class="tech-chip">PGVector</span>
+              <span class="tech-chip">ChromaDB</span>
+              <span class="tech-chip">Qdrant</span>
+            </div>
+          </div>
+          <div class="tech-category">
+            <span class="tech-cat-label">Cloud &amp; DevOps</span>
+            <div class="tech-items">
+              <span class="tech-chip">Cloudflare</span>
+              <span class="tech-chip">AWS</span>
+              <span class="tech-chip">Azure</span>
+              <span class="tech-chip">GCP</span>
+              <span class="tech-chip">Docker</span>
+              <span class="tech-chip">Kubernetes</span>
+              <span class="tech-chip">Vercel</span>
+            </div>
+          </div>
+          <div class="tech-category">
+            <span class="tech-cat-label">Workflow</span>
+            <div class="tech-items">
+              <span class="tech-chip">n8n</span>
+              <span class="tech-chip">Temporal</span>
+              <span class="tech-chip">Trigger.dev</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════ COMPONENTS ═══════════════════════════════════════════ -->
+  <section class="components-section" id="components">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-label">UI Components</div>
+        <h2 class="section-title">Component Showcase</h2>
+        <p class="section-desc">
+          Preview các UI components được sử dụng trong framework. Mỗi component được
+          thiết kế theo nguyên tắc atomic design, có đầy đủ states và accessibility.
+        </p>
+      </div>
+
+      <!-- Buttons -->
+      <div class="component-group">
+        <h3 class="component-group-title">Buttons</h3>
+        <div class="component-row">
+          <div class="comp-item">
+            <button class="cef-btn cef-btn-primary">Primary Button</button>
+            <span class="comp-label">Primary</span>
+          </div>
+          <div class="comp-item">
+            <button class="cef-btn cef-btn-secondary">Secondary Button</button>
+            <span class="comp-label">Secondary</span>
+          </div>
+          <div class="comp-item">
+            <button class="cef-btn cef-btn-ghost">Ghost Button</button>
+            <span class="comp-label">Ghost</span>
+          </div>
+          <div class="comp-item">
+            <button class="cef-btn cef-btn-danger">Danger Button</button>
+            <span class="comp-label">Danger</span>
+          </div>
+        </div>
+        <div class="component-row">
+          <div class="comp-item">
+            <button class="cef-btn cef-btn-primary cef-btn-sm">Small</button>
+            <span class="comp-label">Size: Small</span>
+          </div>
+          <div class="comp-item">
+            <button class="cef-btn cef-btn-primary">Medium</button>
+            <span class="comp-label">Size: Medium</span>
+          </div>
+          <div class="comp-item">
+            <button class="cef-btn cef-btn-primary cef-btn-lg">Large Button</button>
+            <span class="comp-label">Size: Large</span>
+          </div>
+          <div class="comp-item">
+            <button class="cef-btn cef-btn-primary cef-btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              Icon
+            </button>
+            <span class="comp-label">With Icon</span>
+          </div>
+        </div>
+        <div class="component-row">
+          <div class="comp-item">
+            <button class="cef-btn cef-btn-primary cef-btn-loading">
+              <span class="cef-spinner"></span>
+              Loading...
+            </button>
+            <span class="comp-label">Loading State</span>
+          </div>
+          <div class="comp-item">
+            <button class="cef-btn cef-btn-primary" disabled>Disabled</button>
+            <span class="comp-label">Disabled</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Badges -->
+      <div class="component-group">
+        <h3 class="component-group-title">Badges &amp; Tags</h3>
+        <div class="component-row">
+          <div class="comp-item"><div class="cef-badge cef-badge-success">Success</div><span class="comp-label">Success</span></div>
+          <div class="comp-item"><div class="cef-badge cef-badge-warning">Warning</div><span class="comp-label">Warning</span></div>
+          <div class="comp-item"><div class="cef-badge cef-badge-danger">Danger</div><span class="comp-label">Danger</span></div>
+          <div class="comp-item"><div class="cef-badge cef-badge-info">Info</div><span class="comp-label">Info</span></div>
+          <div class="comp-item"><div class="cef-badge cef-badge-purple">Purple</div><span class="comp-label">Purple</span></div>
+          <div class="comp-item"><div class="cef-badge cef-badge-outline">Outline</div><span class="comp-label">Outline</span></div>
+        </div>
+      </div>
+
+      <!-- Inputs -->
+      <div class="component-group">
+        <h3 class="component-group-title">Form Inputs</h3>
+        <div class="component-row">
+          <div class="comp-item">
+            <div class="cef-input-group">
+              <input type="text" class="cef-input" placeholder="Enter project name..." />
+            </div>
+            <span class="comp-label">Text Input</span>
+          </div>
+          <div class="comp-item">
+            <div class="cef-input-group">
+              <input type="text" class="cef-input cef-input-error" value="Invalid value" />
+              <span class="cef-error-text">This field is required</span>
+            </div>
+            <span class="comp-label">Error State</span>
+          </div>
+          <div class="comp-item">
+            <div class="cef-input-group">
+              <input type="text" class="cef-input cef-input-success" value="Validated input" />
+            </div>
+            <span class="comp-label">Success State</span>
+          </div>
+          <div class="comp-item">
+            <div class="cef-input-group" style="position: relative;">
+              <input type="text" class="cef-input" placeholder="Search..." />
+              <button class="cef-input-action">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              </button>
+            </div>
+            <span class="comp-label">With Action</span>
+          </div>
+        </div>
+        <div class="component-row">
+          <div class="comp-item">
+            <div class="cef-input-group">
+              <label class="cef-label">Select Framework</label>
+              <select class="cef-select">
+                <option>Next.js</option>
+                <option>Vue / Nuxt</option>
+                <option>Laravel</option>
+                <option>ASP.NET Core</option>
+              </select>
+            </div>
+            <span class="comp-label">Select</span>
+          </div>
+          <div class="comp-item">
+            <div class="cef-checkbox-group">
+              <label class="cef-checkbox">
+                <input type="checkbox" checked />
+                <span class="cef-checkbox-box"></span>
+                <span>Enable RLS</span>
+              </label>
+              <label class="cef-checkbox">
+                <input type="checkbox" />
+                <span class="cef-checkbox-box"></span>
+                <span>Multi-tenant mode</span>
+              </label>
+            </div>
+            <span class="comp-label">Checkbox</span>
+          </div>
+          <div class="comp-item">
+            <div class="cef-toggle-group">
+              <span class="cef-label">Dark Mode</span>
+              <label class="cef-toggle">
+                <input type="checkbox" checked />
+                <span class="cef-toggle-track"></span>
+              </label>
+            </div>
+            <span class="comp-label">Toggle</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cards -->
+      <div class="component-group">
+        <h3 class="component-group-title">Cards</h3>
+        <div class="component-row">
+          <div class="comp-item" style="width: 100%;">
+            <div class="cef-card">
+              <div class="cef-card-header">
+                <div class="cef-card-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <div>
+                  <h4>Multi-Tenant CRM</h4>
+                  <span>Last updated 2 hours ago</span>
+                </div>
+                <div class="cef-badge cef-badge-success cef-card-badge">Active</div>
+              </div>
+              <p class="cef-card-desc">Enterprise-grade multi-tenant CRM với Supabase RLS, billing integration và workflow automation.</p>
+              <div class="cef-card-footer">
+                <div class="cef-card-meta">
+                  <span>12 components</span>
+                  <span>8 rules</span>
+                  <span>3 domains</span>
+                </div>
+                <div class="cef-card-actions">
+                  <button class="cef-btn cef-btn-ghost cef-btn-sm">View</button>
+                  <button class="cef-btn cef-btn-primary cef-btn-sm">Edit</button>
+                </div>
+              </div>
+            </div>
+            <span class="comp-label">Project Card</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alerts & Toasts -->
+      <div class="component-group">
+        <h3 class="component-group-title">Alerts &amp; Toasts</h3>
+        <div class="component-row">
+          <div class="comp-item">
+            <div class="cef-alert cef-alert-success">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <div>
+                <strong>Deployment successful</strong>
+                <span>Application deployed to Cloudflare Workers in 12s</span>
+              </div>
+            </div>
+            <span class="comp-label">Success Alert</span>
+          </div>
+          <div class="comp-item">
+            <div class="cef-alert cef-alert-warning">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <div>
+                <strong>Approaching rate limit</strong>
+                <span>API usage at 85% of monthly quota</span>
+              </div>
+            </div>
+            <span class="comp-label">Warning Alert</span>
+          </div>
+          <div class="comp-item">
+            <div class="cef-alert cef-alert-error">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <div>
+                <strong>Connection failed</strong>
+                <span>Unable to reach Supabase instance. Retrying...</span>
+              </div>
+            </div>
+            <span class="comp-label">Error Alert</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress & Loading -->
+      <div class="component-group">
+        <h3 class="component-group-title">Progress &amp; Loading</h3>
+        <div class="component-row">
+          <div class="comp-item">
+            <div class="cef-progress">
+              <div class="cef-progress-label">
+                <span>Knowledge indexed</span>
+                <span>78%</span>
+              </div>
+              <div class="cef-progress-track">
+                <div class="cef-progress-fill" style="width: 78%"></div>
+              </div>
+            </div>
+            <span class="comp-label">Progress Bar</span>
+          </div>
+          <div class="comp-item">
+            <div class="cef-skeleton" style="width: 200px; height: 14px;"></div>
+            <div class="cef-skeleton" style="width: 150px; height: 10px; margin-top: 8px;"></div>
+            <div class="cef-skeleton" style="width: 230px; height: 10px; margin-top: 6px;"></div>
+            <span class="comp-label">Skeleton Loader</span>
+          </div>
+          <div class="comp-item">
+            <div class="cef-spinners">
+              <div class="cef-spinner"></div>
+              <div class="cef-spinner cef-spinner-lg"></div>
+            </div>
+            <span class="comp-label">Spinners</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Code Block -->
+      <div class="component-group">
+        <h3 class="component-group-title">Code Block</h3>
+        <div class="component-row">
+          <div class="comp-item" style="width: 100%;">
+            <div class="cef-code-block">
+              <div class="cef-code-header">
+                <span class="cef-code-lang">typescript</span>
+                <button class="cef-code-copy">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                </button>
+              </div>
+              <pre class="cef-code-pre"><code><span class="tok-keyword">interface</span> <span class="tok-type">User</span> <span class="tok-punct">{</span>
+  <span class="tok-prop">id</span><span class="tok-punct">:</span> <span class="tok-type">string</span><span class="tok-punct">;</span>
+  <span class="tok-prop">name</span><span class="tok-punct">:</span> <span class="tok-type">string</span><span class="tok-punct">;</span>
+  <span class="tok-prop">role</span><span class="tok-punct">:</span> <span class="tok-type">'admin'</span> <span class="tok-op">|</span> <span class="tok-type">'user'</span><span class="tok-punct">;</span>
+  <span class="tok-prop">tenantId</span><span class="tok-punct">:</span> <span class="tok-type">string</span><span class="tok-punct">;</span>
+<span class="tok-punct">}</span>
+
+<span class="tok-keyword">async function</span> <span class="tok-fn">getUser</span><span class="tok-punct">(</span>
+  <span class="tok-prop">id</span><span class="tok-punct">:</span> <span class="tok-type">string</span>
+<span class="tok-punct">):</span> <span class="tok-type">Promise</span><span class="tok-punct">&lt;</span><span class="tok-type">User</span><span class="tok-punct">&gt;</span> <span class="tok-punct">{</span>
+  <span class="tok-keyword">const</span> <span class="tok-var">result</span> <span class="tok-op">=</span> <span class="tok-keyword">await</span> <span class="tok-fn">db</span><span class="tok-punct">.</span><span class="tok-fn">query</span><span class="tok-punct">(</span>
+    <span class="tok-str">'SELECT * FROM users WHERE id = $1'</span><span class="tok-punct">,</span>
+    <span class="tok-punct">[</span><span class="tok-prop">id</span><span class="tok-punct">]</span>
+  <span class="tok-punct">);</span>
+  <span class="tok-keyword">return</span> <span class="tok-prop">result</span><span class="tok-punct">.</span><span class="tok-prop">rows</span><span class="tok-punct">[</span><span class="tok-num">0</span><span class="tok-punct">];</span>
+<span class="tok-punct">}</span></code></pre>
+            </div>
+            <span class="comp-label">Syntax Highlighted Code</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="component-group">
+        <h3 class="component-group-title">Tabs</h3>
+        <div class="component-row">
+          <div class="comp-item" style="width: 100%;">
+            <div class="cef-tabs-nav">
+              <button class="cef-tab-btn active">Overview</button>
+              <button class="cef-tab-btn">Components</button>
+              <button class="cef-tab-btn">Rules</button>
+              <button class="cef-tab-btn">Settings</button>
+            </div>
+            <div class="cef-tabs-panel">
+              <p>This is the overview tab content. It displays the main information about the selected section with a clean, readable layout.</p>
+            </div>
+            <span class="comp-label">Tab Navigation</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal -->
+      <div class="component-group">
+        <h3 class="component-group-title">Modal &amp; Dialog</h3>
+        <div class="component-row">
+          <div class="comp-item" style="width: 100%;">
+            <div class="cef-modal-demo">
+              <div class="cef-modal">
+                <div class="cef-modal-header">
+                  <h4>Create New Project</h4>
+                  <button class="cef-modal-close">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                </div>
+                <div class="cef-modal-body">
+                  <div class="cef-input-group">
+                    <label class="cef-label">Project Name</label>
+                    <input type="text" class="cef-input" placeholder="e.g. My CRM Application" />
+                  </div>
+                  <div class="cef-input-group">
+                    <label class="cef-label">Framework</label>
+                    <select class="cef-select">
+                      <option>Select framework...</option>
+                      <option>Next.js 15 + TypeScript</option>
+                      <option>Nuxt 4 + Vue 3</option>
+                      <option>Laravel 12</option>
+                      <option>ASP.NET Core 9</option>
+                    </select>
+                  </div>
+                  <div class="cef-input-group">
+                    <label class="cef-label">Description</label>
+                    <textarea class="cef-textarea" placeholder="Brief description of your project..."></textarea>
+                  </div>
+                </div>
+                <div class="cef-modal-footer">
+                  <button class="cef-btn cef-btn-ghost">Cancel</button>
+                  <button class="cef-btn cef-btn-primary">Create Project</button>
+                </div>
+              </div>
+            </div>
+            <span class="comp-label">Modal Dialog</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Extras -->
+      <div class="component-group">
+        <h3 class="component-group-title">Extras</h3>
+        <div class="component-row">
+          <div class="comp-item">
+            <div class="cef-avatars">
+              <div class="cef-avatar" style="background: linear-gradient(135deg, #7878e8, #a78bfa);">A</div>
+              <div class="cef-avatar" style="background: linear-gradient(135deg, #06b6d4, #818cf8);">T</div>
+              <div class="cef-avatar cef-avatar-sm">+3</div>
+            </div>
+            <span class="comp-label">Avatar Stack</span>
+          </div>
+          <div class="comp-item">
+            <div class="cef-breadcrumb">
+              <a href="#">Projects</a>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+              <a href="#">CRM</a>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+              <span>Components</span>
+            </div>
+            <span class="comp-label">Breadcrumb</span>
+          </div>
+          <div class="comp-item">
+            <div class="cef-pagination">
+              <button class="cef-page-btn" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <button class="cef-page-btn active">1</button>
+              <button class="cef-page-btn">2</button>
+              <button class="cef-page-btn">3</button>
+              <span class="cef-page-ellipsis">...</span>
+              <button class="cef-page-btn">12</button>
+              <button class="cef-page-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+            <span class="comp-label">Pagination</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════ DOMAINS ═══════════════════════════════════════════ -->
+  <section class="domains-section" id="domains">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-label">Supported</div>
+        <h2 class="section-title">35+ Domains được hỗ trợ</h2>
+        <p class="section-desc">
+          Mỗi domain đi kèm bộ knowledge chuẩn hóa: Architecture, Best Practices,
+          Anti-Patterns, FAQ, Checklist, Glossary. Framework bao phủ toàn bộ stack.
+        </p>
+      </div>
+
+      <div class="domains-grid">
+        <div class="domain-card">
+          <div class="domain-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <h4>Frontend</h4>
+          <p>Next.js, Vue 3, Nuxt 4, React 19 với patterns và performance optimization</p>
+          <div class="domain-tags"><span>Next.js</span><span>Vue</span><span>Nuxt</span><span>React</span></div>
+        </div>
+
+        <div class="domain-card">
+          <div class="domain-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+          </div>
+          <h4>Backend</h4>
+          <p>Laravel, ASP.NET Core, NestJS với clean architecture và patterns chuẩn</p>
+          <div class="domain-tags"><span>Laravel</span><span>ASP.NET</span><span>NestJS</span></div>
+        </div>
+
+        <div class="domain-card">
+          <div class="domain-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          </div>
+          <h4>Database</h4>
+          <p>MySQL, PostgreSQL, SQL Server, Redis với patterns và optimization</p>
+          <div class="domain-tags"><span>MySQL</span><span>PostgreSQL</span><span>Redis</span><span>SQL Server</span></div>
+        </div>
+
+        <div class="domain-card">
+          <div class="domain-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a4 4 0 014 4c0 1.1-.9 2-2 2h-4a4 4 0 01-4-4 4 4 0 014-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4z"/></svg>
+          </div>
+          <h4>AI &amp; RAG</h4>
+          <p>OpenAI, Gemini, Claude, pgvector, ChromaDB cho AI-powered applications</p>
+          <div class="domain-tags"><span>OpenAI</span><span>Claude</span><span>pgvector</span><span>RAG</span></div>
+        </div>
+
+        <div class="domain-card">
+          <div class="domain-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/></svg>
+          </div>
+          <h4>Cloud &amp; DevOps</h4>
+          <p>Cloudflare, AWS, Azure, GCP, Docker, Kubernetes, CI/CD pipelines</p>
+          <div class="domain-tags"><span>Cloudflare</span><span>AWS</span><span>Docker</span><span>K8s</span></div>
+        </div>
+
+        <div class="domain-card">
+          <div class="domain-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <h4>Business Logic</h4>
+          <p>CRM SaaS, Multi-Tenant, Billing, Authentication, Authorization patterns</p>
+          <div class="domain-tags"><span>CRM</span><span>Billing</span><span>Auth</span><span>RLS</span></div>
+        </div>
+
+        <div class="domain-card">
+          <div class="domain-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+          </div>
+          <h4>Workflow &amp; Events</h4>
+          <p>Temporal, Trigger.dev, n8n, Event Sourcing, CQRS patterns</p>
+          <div class="domain-tags"><span>Temporal</span><span>n8n</span><span>CQRS</span><span>Event</span></div>
+        </div>
+
+        <div class="domain-card domain-card-spotlight">
+          <div class="domain-spotlight-badge">Spotlight</div>
+          <div class="domain-icon" style="background: rgba(167, 139, 250, 0.08); border-color: rgba(167, 139, 250, 0.2);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="stroke: #a78bfa;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <h4>Bát Tự &amp; Phong Thủy</h4>
+          <p>Tính Bát Tự, Lá số Tử Vi, Thần Số Học — Domain đặc biệt cho ứng dụng tâm linh</p>
+          <div class="domain-tags"><span>Bazi</span><span>Tử Vi</span><span>Numerology</span><span>PDF</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════ TOKEN OPTIMIZATION ═══════════════════════════════════════════ -->
+  <section class="optimization-section">
+    <div class="container">
+      <div class="optimization-inner">
+        <div class="optimization-text">
+          <div class="section-label">Efficiency</div>
+          <h2 class="section-title">Tiết kiệm đến <span class="text-accent">40%</span> token</h2>
+          <p>
+            10 chiến lược tối ưu token được implement trong framework giúp AI agent
+            hoạt động hiệu quả hơn, giảm chi phí API và tăng tốc độ phản hồi.
+          </p>
+          <ul class="optimization-list">
+            <li>
+              <span class="opt-num">01</span>
+              <div><strong>Context Router</strong> — Chỉ load domain cần thiết, skip 80% knowledge không liên quan</div>
+            </li>
+            <li>
+              <span class="opt-num">02</span>
+              <div><strong>Auto-Compression</strong> — Nén context dài tự động qua session summary</div>
+            </li>
+            <li>
+              <span class="opt-num">03</span>
+              <div><strong>Decision Memory</strong> — Tái sử dụng 3-10 ADRs thay vì tái tạo decision logic</div>
+            </li>
+            <li>
+              <span class="opt-num">04</span>
+              <div><strong>Bug Memory</strong> — Tránh lặp bug patterns đã biết, tiết kiệm 15-30% effort debugging</div>
+            </li>
+          </ul>
+        </div>
+        <div class="optimization-visual">
+          <div class="token-chart">
+            <div class="tc-bar-group">
+              <div class="tc-bar" style="--h: 100%">
+                <span class="tc-bar-label">Without CEF</span>
+                <div class="tc-bar-fill"></div>
+                <span class="tc-bar-val">100%</span>
+              </div>
+            </div>
+            <div class="tc-bar-group">
+              <div class="tc-bar" style="--h: 60%">
+                <span class="tc-bar-label">With CEF</span>
+                <div class="tc-bar-fill"></div>
+                <span class="tc-bar-val">~60%</span>
+              </div>
+            </div>
+            <div class="tc-savings">
+              <span class="tc-savings-num">~40%</span>
+              <span class="tc-savings-label">Token Saved</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════ GETTING STARTED ═══════════════════════════════════════════ -->
+  <section class="getting-started-section" id="getting-started">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-label">Quick Start</div>
+        <h2 class="section-title">Bắt đầu trong 3 bước</h2>
+        <p class="section-desc">
+          Copy framework vào project của bạn, khởi tạo memory system,
+          và bắt đầu sử dụng. Toàn bộ setup tự động qua scripts.
+        </p>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h3>Copy Framework</h3>
+          <p>Copy `.cursor/` directory vào root của project hoặc clone repository chính thức.</p>
+          <div class="step-code">
+            <button class="cef-btn cef-btn-ghost cef-btn-sm step-copy-btn" data-code="git clone https://github.com/your-org/cursor-enterprise-framework.git">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              Copy command
+            </button>
+            <code>git clone https://github.com/.../cursor-enterprise-framework.git</code>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h3>Build Memory</h3>
+          <p>Chạy scripts để khởi tạo SQLite databases, build code index và knowledge embeddings.</p>
+          <div class="step-code">
+            <button class="cef-btn cef-btn-ghost cef-btn-sm step-copy-btn" data-code=". .cursor/scripts/memory-builder/build-memory.ps1">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              Copy command
+            </button>
+            <code>. .cursor/scripts/memory-builder/build-memory.ps1</code>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h3>Start Coding</h3>
+          <p>Mở project trong Cursor, bắt đầu task mới. Framework tự động load context, rules và knowledge.</p>
+          <div class="step-code">
+            <button class="cef-btn cef-btn-ghost cef-btn-sm step-copy-btn" data-code="1. Open project in Cursor&#10;2. Start new chat&#10;3. CEF auto-loads context">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              Copy steps
+            </button>
+            <code>1. Open project in Cursor
+2. Start new chat
+3. CEF auto-loads context</code>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scripts reference table -->
+      <div class="scripts-ref">
+        <h3>Automation Scripts</h3>
+        <div class="scripts-table">
+          <div class="scripts-table-header">
+            <span>Script</span>
+            <span>Description</span>
+            <span>Command</span>
+          </div>
+          <div class="scripts-table-row">
+            <span><span class="tag tag-script">Memory Builder</span></span>
+            <span>Build SQLite memory databases</span>
+            <code>. .cursor/scripts/memory-builder/build-memory.ps1</code>
+          </div>
+          <div class="scripts-table-row">
+            <span><span class="tag tag-script">Knowledge Compiler</span></span>
+            <span>Compile and merge knowledge files</span>
+            <code>. .cursor/scripts/knowledge-compiler/compile-knowledge.ps1</code>
+          </div>
+          <div class="scripts-table-row">
+            <span><span class="tag tag-script">Project Index</span></span>
+            <span>Build semantic code index</span>
+            <code>. .cursor/scripts/project-index-builder/build-index.ps1</code>
+          </div>
+          <div class="scripts-table-row">
+            <span><span class="tag tag-script">Embeddings</span></span>
+            <span>Generate vector embeddings</span>
+            <code>. .cursor/scripts/embedding-builder/build-embeddings.ps1</code>
+          </div>
+          <div class="scripts-table-row">
+            <span><span class="tag tag-script">Packager</span></span>
+            <span>Package framework to ZIP</span>
+            <code>. .cursor/scripts/packager.ps1</code>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════ FOOTER ═══════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <div class="footer-logo-icon">
+              <svg viewBox="0 0 16 16" fill="none">
+                <path d="M8 1L1 4.5L8 8L15 4.5L8 1Z" fill="white" fill-opacity="0.9"/>
+                <path d="M1 11.5L8 15L15 11.5" stroke="white" stroke-opacity="0.6" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M1 7.75L8 11.25L15 7.75" stroke="white" stroke-opacity="0.75" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span>Cursor Enterprise Framework</span>
+          </div>
+          <p>Enterprise-grade framework cho AI coding agents. Tối ưu token, memory, và knowledge reuse.</p>
+          <div class="footer-version">
+            <span class="cef-badge cef-badge-purple">v4.0.0</span>
+            <span class="cef-badge cef-badge-outline">MIT</span>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Framework</h4>
+          <ul>
+            <li><a href="#explorer">Rules &amp; Skills</a></li>
+            <li><a href="#principles">Nguyên tắc</a></li>
+            <li><a href="#architecture">Kiến trúc</a></li>
+            <li><a href="#components">Components</a></li>
+            <li><a href="#domains">Domains</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="#">Documentation</a></li>
+            <li><a href="#">Knowledge Base</a></li>
+            <li><a href="#">Rules Reference</a></li>
+            <li><a href="#">Scripts</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Community</h4>
+          <ul>
+            <li><a href="#">GitHub</a></li>
+            <li><a href="#">Discord</a></li>
+            <li><a href="#">Twitter / X</a></li>
+            <li><a href="#">Changelog</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>MIT License &copy; 2026 Cursor Enterprise Framework</span>
+        <span class="footer-stats">
+          463 files &nbsp;&middot;&nbsp; 79 rules &nbsp;&middot;&nbsp; 47 skills &nbsp;&middot;&nbsp; 272 knowledge &nbsp;&middot;&nbsp; 35+ domains
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="landing.js"></script>
+</body>
+</html>

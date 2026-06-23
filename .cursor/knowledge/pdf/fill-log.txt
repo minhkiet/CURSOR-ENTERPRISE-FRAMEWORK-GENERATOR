@@ -1,0 +1,106 @@
+================================================================================
+PDF KNOWLEDGE FILES - GENERATION LOG
+================================================================================
+Generated: 2026-06-23
+Framework: cursor-enterprise-framework
+================================================================================
+
+FILE SUMMARY
+--------------------------------------------------------------------------------
+| File Name          | Lines   | Size (KB) | Status    |
+|--------------------|---------|-----------|-----------|
+| anti-pattern.md    | 1,131   | 37.78     | COMPLETED |
+| architecture.md    | 1,274   | 39.50     | COMPLETED |
+| best-practice.md   | 1,270   | 39.03     | COMPLETED |
+| checklist.md       | 829     | 22.98     | COMPLETED |
+| decision-tree.md   | 875     | 29.75     | COMPLETED |
+| faq.md            | 1,630   | 39.02     | COMPLETED |
+| glossary.md        | 597     | 25.93     | COMPLETED |
+--------------------------------------------------------------------------------
+TOTAL:             | 7,606   | ~234 KB   |
+
+================================================================================
+FILE DETAILS
+================================================================================
+
+1. anti-pattern.md (1,131 lines / 37.78 KB)
+   - Common anti-patterns in PDF generation
+   - Topics: Full font embedding, ignoring compression, no caching,
+     unsafe file paths, memory leaks, blocking event loop, concurrent issues
+   - Code examples for each anti-pattern and solutions
+
+2. architecture.md (1,274 lines / 39.50 KB)
+   - PDF generation patterns (synchronous, async, pre-rendering, hybrid)
+   - Template engines comparison
+   - Rendering pipelines
+   - Library comparison: Puppeteer, Playwright, pdf-lib, jsPDF,
+     iText, QuestPDF, IronPDF
+   - Architecture diagrams
+
+3. best-practice.md (1,270 lines / 39.03 KB)
+   - Font subsetting implementation
+   - Image compression pipeline
+   - Template caching strategies
+   - Async generation with worker threads
+   - Digital signatures implementation
+   - PDF/UA accessibility
+   - Multi-level caching
+
+4. checklist.md (829 lines / 22.98 KB)
+   - Security verification checklist
+   - Performance verification checklist
+   - Functional verification checklist
+   - Accessibility verification checklist
+   - Monitoring and observability checklist
+   - Compliance and legal checklist
+   - Documentation checklist
+   - Post-deployment verification
+
+5. decision-tree.md (875 lines / 29.75 KB)
+   - Server-side vs client-side decision flowchart
+   - Library selection decision tree
+   - Template approach decision flowchart
+   - Compression strategy decision tree
+   - Additional features decision tree
+   - Quick reference scenarios
+
+6. faq.md (1,630 lines / 39.02 KB)
+   - General questions (PDF/A vs PDF/UA, file size, Unicode)
+   - Performance questions (speed optimization, memory issues, caching)
+   - Security questions (path traversal, sensitive data)
+   - Accessibility questions (PDF/UA, verification)
+   - Library-specific questions (pdf-lib vs Puppeteer, migration)
+   - Integration questions (React/Next.js, serverless)
+   - Troubleshooting questions
+
+7. glossary.md (597 lines / 25.93 KB)
+   - A-Z PDF terminology
+   - PDF standards (PDF/A, PDF/UA, PDF/X)
+   - Technical terms (CMYK, CIDFont, content stream, etc.)
+   - Common acronyms
+   - Industry standards reference
+
+================================================================================
+COMPLIANCE CHECK
+================================================================================
+[✓] All 7 files created
+[✓] Minimum 200 lines per file (minimum: 597, target: 200+)
+[✓] YAML frontmatter included
+[✓] H2 sections implemented
+[✓] Vietnamese prose with English technical terms
+[✓] Code examples included
+[✓] References section included
+
+================================================================================
+CONTENT QUALITY METRICS
+================================================================================
+- Total lines of substantive content: 7,606
+- Average lines per file: 1,086
+- Total estimated words: ~35,000+
+- Code examples: 50+
+- Diagrams/flowcharts: 10+
+- References: 30+
+
+================================================================================
+END OF LOG
+================================================================================
