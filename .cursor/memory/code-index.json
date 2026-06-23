@@ -1,0 +1,149 @@
+# Code Index - Chỉ mục Code
+
+## Frontmatter
+description: Chỉ mục code của toàn bộ dự án trong framework
+created: 2026-06-23
+version: 1.0.0
+
+## Mục đích
+Chỉ mục này giúp AI agent nhanh chóng tra cứu location của các file code quan trọng mà không cần quét toàn bộ codebase.
+
+## Frontend Components
+
+### NextJS
+```json
+{
+  "pattern": "src/app/**/*.{ts,tsx}",
+  "description": "Next.js 15 App Router pages",
+  "tags": ["nextjs", "app-router", "ssr"],
+  "priority": "high"
+}
+```
+
+### React
+```json
+{
+  "pattern": "src/components/**/*.{ts,tsx}",
+  "description": "React 19 components",
+  "tags": ["react", "components", "hooks"],
+  "priority": "high"
+}
+```
+
+### Vue
+```json
+{
+  "pattern": "src/**/*.vue",
+  "description": "Vue 3 components",
+  "tags": ["vue", "components", "composition-api"],
+  "priority": "high"
+}
+```
+
+## Backend Components
+
+### Laravel
+```json
+{
+  "pattern": "app/**/*.php",
+  "description": "Laravel 12 application",
+  "tags": ["laravel", "mvc", "eloquent"],
+  "priority": "high"
+}
+```
+
+### ASP.NET Core
+```json
+{
+  "pattern": "src/**/*.cs",
+  "description": "ASP.NET Core 9 Web API",
+  "tags": ["aspnet", "webapi", "ef-core"],
+  "priority": "high"
+}
+```
+
+### NestJS
+```json
+{
+  "pattern": "src/**/*.ts",
+  "description": "NestJS application",
+  "tags": ["nestjs", "modules", "dependency-injection"],
+  "priority": "high"
+}
+```
+
+## Database Components
+
+### MySQL
+```json
+{
+  "pattern": "migrations/**/*.{sql,php}",
+  "description": "MySQL migrations",
+  "tags": ["mysql", "migrations", "schema"],
+  "priority": "medium"
+}
+```
+
+### PostgreSQL
+```json
+{
+  "pattern": "migrations/**/*.sql",
+  "description": "PostgreSQL migrations",
+  "tags": ["postgres", "migrations", "schema"],
+  "priority": "medium"
+}
+```
+
+## AI/RAG Components
+
+### RAG Pipeline
+```json
+{
+  "pattern": "src/rag/**/*.{ts,py}",
+  "description": "RAG pipeline implementation",
+  "tags": ["rag", "embedding", "vector-search"],
+  "priority": "high"
+}
+```
+
+### Embedding Service
+```json
+{
+  "pattern": "src/embeddings/**/*.{ts,py}",
+  "description": "Embedding generation service",
+  "tags": ["embedding", "openai", "pgvector"],
+  "priority": "high"
+}
+```
+
+## Deployment Components
+
+### Docker
+```json
+{
+  "pattern": "Dockerfile*",
+  "description": "Docker configurations",
+  "tags": ["docker", "containerization"],
+  "priority": "high"
+}
+```
+
+### Kubernetes
+```json
+{
+  "pattern": "k8s/**/*.{yaml,yml}",
+  "description": "Kubernetes manifests",
+  "tags": ["kubernetes", "orchestration"],
+  "priority": "medium"
+}
+```
+
+## Cập nhật index
+- **Last updated**: 2026-06-23
+- **Total entries**: 12
+- **Auto-update**: Enable via script
+
+## Liên kết
+- [[project-index]] - Project Index
+- [[context-router]] - Context Router
+- [[../skills/code-review]] - Code Review

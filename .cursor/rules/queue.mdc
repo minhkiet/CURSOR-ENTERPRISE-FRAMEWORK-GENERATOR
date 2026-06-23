@@ -1,0 +1,420 @@
+---
+description: Nguyên tắc và best practices cho Message Queue Systems
+created: 2026-06-23
+version: 1.0.0
+tags: [queue, messaging, async, rabbitmq, kafka, enterprise]
+---
+
+# Queue
+
+## Mục tiêu
+
+Message Queue là một phần thiết yếu trong kiến trúc của Cursor Enterprise Framework, cho phép xử lý asynchronous, decoupled communication giữa các services, và reliable background job processing. Mục tiêu của rule này là định nghĩa các nguyên tắc và best practices cho việc thiết kế, implement, và vận hành message queue systems. Các hệ thống queue phổ biến được cover bao gồm RabbitMQ, Apache Kafka, AWS SQS, và Azure Service Bus.
+
+Message queues cho phép microservices communicate một cách loosely coupled, xử lý heavy workloads asynchronously, và maintain reliability thông qua message persistence và retry mechanisms. Việc sử dụng đúng patterns và tránh các anti-patterns là quan trọng để xây dựng một hệ thống có thể scale và maintain được trong dài hạn.
+
+## Nguyên tắc
+
+**1. Message Design Principles**
+
+Messages phải be self-contained và carry all necessary context. Message schema được versioned và documented. Payload size được kept reasonable (avoid large messages). Use message types/categories for routing. Include correlation IDs for tracing. Timestamps for ordering và debugging. Acknowledge message ID for idempotency.
+
+**2. Queue Topology Design**
+
+Organize queues by domain/functionality. Use exchanges/Topics for pub-sub patterns. Dead letter queues for failed messages. Separate queues for different priority levels. Consider consumer groups for scalability. Limit queue depth to prevent memory issues. Design for eventual consistency.
+
+**3. Producer Patterns**
+
+Publish messages reliably với confirmation. Implement retry logic with backoff. Use transactions for related publishes. Idempotent publishing where possible. Batch messages for throughput. Close producers cleanly. Monitor publish failures.
+
+**4. Consumer Patterns**
+
+Process messages reliably with acknowledgment. Implement idempotent processing. Handle exceptions và route to DLQ. One message type per consumer (if possible). Concurrency limits per consumer. Graceful shutdown handling. Manual acknowledgment preferred.
+
+**5. Error Handling Strategy**
+
+Distinguish between retryable và permanent errors. Implement exponential backoff for retries. Dead letter queue for exhausted retries. Alert on DLQ accumulation. Log errors with full context. Circuit breaker for downstream failures. Idempotent retry handlers.
+
+**6. Ordering Guarantees**
+
+Understand ordering guarantees of your queue. Single partition/queue for strict ordering. Accept eventual consistency for most cases. Timestamp và sequence for ordering reconstruction. Avoid depending on ordering when not guaranteed.
+
+**7. Message Durability**
+
+Configure message persistence appropriately. Use transactions for critical messages. Acknowledge only after successful processing. Implement store-and-forward patterns. Monitor disk/memory usage. Plan for disaster recovery.
+
+**8. Scalability Patterns**
+
+Horizontal scaling through consumer groups. Partition/queue sharding for parallelism. Backpressure mechanisms. Auto-scaling based on queue depth. Batch processing for efficiency. Throughput vs latency trade-offs.
+
+**9. Security Configuration**
+
+Encrypt messages in transit (TLS). Encrypt sensitive payload at application layer. Authentication và authorization. Network isolation. Audit logging. Rotate credentials regularly. Least privilege access.
+
+**10. Monitoring và Observability**
+
+Monitor queue depth và growth rate. Track processing latency. Monitor consumer lag. Alert on DLQ accumulation. Track throughput metrics. Dashboard for operations. Distributed tracing integration.
+
+## Checklist
+
+- [ ] Message schema documented và versioned
+- [ ] Queue topology designed
+- [ ] Producer implementation reviewed
+- [ ] Consumer patterns implemented
+- [ ] Error handling strategy defined
+- [ ] Dead letter queue configured
+- [ ] Monitoring setup
+- [ ] Security configured
+- [ ] Capacity planning done
+- [ ] Disaster recovery tested
+- [ ] Documentation complete
+
+## Anti Pattern
+
+**1. Fire and Forget**
+
+Publishing messages without confirmation. No retry on failure. Lost messages. Solution: Implement publisher confirms.
+
+**2. Synchronous Response in Async System**
+
+Waiting for message processing synchronously. Defeats purpose of queue. Solution: Use callbacks/webhooks.
+
+**3. Large Payloads**
+
+Storing large data in messages. Slow processing. Memory pressure. Solution: Store data in DB, send reference.
+
+**4. No Idempotency**
+
+Assuming messages arrive exactly once. Duplicate processing. Solution: Implement idempotent handlers.
+
+**5. Infinite Retry**
+
+Retrying forever without limit. Message backlog. Resource exhaustion. Solution: Implement max retry + DLQ.
+
+## Best Practice
+
+**1. Outbox Pattern**
+
+-- Database outbox pattern for reliability
+BEGIN TRANSACTION;
+INSERT INTO orders (...);
+INSERT INTO outbox (type, payload) VALUES ('order_created', ...);
+COMMIT;
+
+Separate process polls outbox và publishes to queue.
+
+**2. Saga Pattern**
+
+Distributed transactions across services. Compensating transactions for rollback. State machine for saga coordination. Implement as choreography or orchestration.
+
+**3. Claim Check**
+
+Store large payload separately, send reference. Reduces queue overhead. Separate retrieval required. Useful for file processing.
+
+**4. Priority Queue**
+
+Multiple queues with different priorities. High priority processed first. Ensure priority inversion doesn't occur. Not supported by all queue systems.
+
+**5. Scheduled Messages**
+
+Delay message delivery. Built-in delay (RabbitMQ). External scheduler pattern. Use for delayed retries.
+
+**6. Message Enrichment**
+
+Add context before publishing. Enrich in consumer if needed. External lookup pattern. Consider caching for enrichment data.
+
+**7. Competing Consumers**
+
+Multiple consumers on same queue. Automatic load distribution. Different processing times. Idempotent processing essential.
+
+**8. Circuit Breaker on Consumers**
+
+Stop processing when downstream fails. Prevent cascade failures. Half-open state to test recovery. Automatic recovery.
+
+## Workflow
+
+**Phase 1: Design**
+
+Identify async boundaries. Define message schemas. Design queue topology. Plan error handling.
+
+**Phase 2: Implementation**
+
+Implement producer with confirms. Build consumer with ack. Add retry/DLQ handling. Configure monitoring.
+
+**Phase 3: Testing**
+
+Test failure scenarios. Verify retry behavior. Test DLQ processing. Load test.
+
+**Phase 4: Deployment**
+
+Deploy queue infrastructure. Configure security. Set up monitoring. Document configuration.
+
+**Phase 5: Operations**
+
+Monitor queue metrics. Respond to alerts. Tune configuration. Plan capacity.
+
+## Ví dụ
+
+**Ví dụ 1: RabbitMQ Producer**
+
+```typescript
+import amqplib from 'amqplib';
+
+interface OrderCreatedEvent {
+  eventType: 'order_created';
+  version: '1.0';
+  orderId: string;
+  customerId: string;
+  totalAmount: number;
+  items: Array<{ productId: string; quantity: number; price: number }>;
+  timestamp: string;
+}
+
+class OrderEventPublisher {
+  private connection: amqplib.Connection;
+  private channel: amqplib.Channel;
+  private readonly exchange = 'orders';
+  private readonly exchangeType = 'topic';
+
+  async connect(url: string): Promise<void> {
+    this.connection = await amqplib.connect(url);
+    this.channel = await this.connection.createConfirmChannel();
+    
+    await this.channel.assertExchange(this.exchange, this.exchangeType, {
+      durable: true
+    });
+  }
+
+  async publishOrderCreated(order: OrderCreatedEvent): Promise<void> {
+    const routingKey = `order.${order.eventType}`;
+    const message = Buffer.from(JSON.stringify(order));
+    
+    await new Promise<void>((resolve, reject) => {
+      this.channel.publish(
+        this.exchange,
+        routingKey,
+        message,
+        {
+          persistent: true,
+          contentType: 'application/json',
+          messageId: order.orderId,
+          timestamp: Date.now(),
+          headers: {
+            version: order.version
+          }
+        },
+        (err) => {
+          if (err) reject(err);
+          else resolve();
+        }
+      );
+    });
+    
+    console.log(`Published ${routingKey} for order ${order.orderId}`);
+  }
+
+  async close(): Promise<void> {
+    await this.channel.close();
+    await this.connection.close();
+  }
+}
+```
+
+**Ví dụ 2: RabbitMQ Consumer with DLQ**
+
+```typescript
+class OrderEventConsumer {
+  private channel: amqplib.Channel;
+  private readonly queue = 'order_processing';
+  private readonly dlq = 'order_processing_dlq';
+  private readonly maxRetries = 3;
+
+  async connect(url: string): Promise<void> {
+    const connection = await amqplib.connect(url);
+    this.channel = await connection.createChannel();
+    
+    await this.channel.prefetch(10);
+    
+    // Setup DLQ
+    await this.channel.assertQueue(this.dlq, { durable: true });
+    
+    // Setup main queue with DLQ
+    await this.channel.assertQueue(this.queue, {
+      durable: true,
+      arguments: {
+        'x-dead-letter-exchange': '',
+        'x-dead-letter-routing-key': this.dlq
+      }
+    });
+  }
+
+  async startConsuming(): Promise<void> {
+    await this.channel.consume(this.queue, async (msg) => {
+      if (!msg) return;
+      
+      const retryCount = (msg.properties.headers?.['x-retry-count'] as number) || 0;
+      
+      try {
+        const event = JSON.parse(msg.content.toString()) as OrderCreatedEvent;
+        await this.processOrder(event);
+        
+        this.channel.ack(msg);
+      } catch (error) {
+        console.error(`Error processing message: ${error.message}`);
+        
+        if (retryCount < this.maxRetries) {
+          // Requeue with retry count
+          await this.channel.reject(msg, false);
+          await this.requeueWithRetry(msg, retryCount + 1);
+        } else {
+          // Send to DLQ
+          console.error(`Max retries exceeded, sending to DLQ`);
+          this.channel.reject(msg, false);
+        }
+      }
+    });
+  }
+
+  private async processOrder(event: OrderCreatedEvent): Promise<void> {
+    // Process order logic
+    console.log(`Processing order ${event.orderId}`);
+    // ... business logic
+  }
+
+  private async requeueWithRetry(originalMsg: amqplib.ConsumeMessage, retryCount: number): Promise<void> {
+    setTimeout(async () => {
+      await this.channel.sendToQueue(
+        this.queue,
+        originalMsg.content,
+        {
+          ...originalMsg.properties,
+          headers: {
+            ...originalMsg.properties.headers,
+            'x-retry-count': retryCount
+          }
+        }
+      );
+    }, Math.pow(2, retryCount) * 1000); // Exponential backoff
+  }
+}
+```
+
+**Ví dụ 3: Kafka Producer/Consumer**
+
+```typescript
+import { Kafka, Producer, Consumer, EachMessagePayload } from 'kafkajs';
+
+interface UserEvent {
+  eventType: string;
+  userId: string;
+  email: string;
+  timestamp: string;
+}
+
+class KafkaEventProcessor {
+  private kafka: Kafka;
+  private producer: Producer;
+  private consumer: Consumer;
+  private readonly topic = 'user-events';
+
+  constructor() {
+    this.kafka = new Kafka({
+      clientId: 'user-service',
+      brokers: ['kafka:9092'],
+      retry: {
+        initialRetryTime: 100,
+        retries: 8
+      }
+    });
+    
+    this.producer = this.kafka.producer({
+      allowAutoTopicCreation: true,
+      transactionTimeout: 30000
+    });
+    
+    this.consumer = this.kafka.consumer({ 
+      groupId: 'user-event-processors',
+      sessionTimeout: 30000
+    });
+  }
+
+  async start(): Promise<void> {
+    await this.producer.connect();
+    await this.consumer.connect();
+    await this.consumer.subscribe({ topic: this.topic, fromBeginning: false });
+    
+    await this.consumer.run({
+      eachMessage: async (payload: EachMessagePayload) => {
+        const { topic, partition, message } = payload;
+        const event = JSON.parse(message.value!.toString()) as UserEvent;
+        
+        console.log({
+          topic,
+          partition,
+          offset: message.offset,
+          key: message.key?.toString(),
+          event
+        });
+        
+        await this.processEvent(event);
+      }
+    });
+  }
+
+  async publishUserCreated(user: UserEvent): Promise<void> {
+    await this.producer.send({
+      topic: this.topic,
+      messages: [
+        {
+          key: user.userId,
+          value: JSON.stringify(user),
+          headers: {
+            'event-type': user.eventType,
+            'source': 'user-service'
+          }
+        }
+      ]
+    });
+  }
+
+  private async processEvent(event: UserEvent): Promise<void> {
+    // Process based on event type
+    switch (event.eventType) {
+      case 'user.created':
+        await this.handleUserCreated(event);
+        break;
+      case 'user.updated':
+        await this.handleUserUpdated(event);
+        break;
+      case 'user.deleted':
+        await this.handleUserDeleted(event);
+        break;
+    }
+  }
+
+  private async handleUserCreated(event: UserEvent): Promise<void> {
+    // Send welcome email, create analytics profile, etc.
+  }
+
+  private async handleUserUpdated(event: UserEvent): Promise<void> {
+    // Update external systems
+  }
+
+  private async handleUserDeleted(event: UserEvent): Promise<void> {
+    // Cleanup user data
+  }
+
+  async stop(): Promise<void> {
+    await this.producer.disconnect();
+    await this.consumer.disconnect();
+  }
+}
+```
+
+## Liên kết
+
+- [[database]] - Database: Database design principles
+- [[redis]] - Redis: Redis pub/sub patterns
+- [[performance]] - Performance: Performance optimization
+- [[microservice]] - Microservice: Microservices architecture
+- [[temporal]] - Temporal: Workflow orchestration

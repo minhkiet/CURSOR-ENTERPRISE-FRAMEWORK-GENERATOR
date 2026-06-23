@@ -1,0 +1,268 @@
+---
+description: Nguyên tắc và best practices cho API Design và Development
+created: 2026-06-23
+version: 1.0.0
+tags: [api, rest, graphql, grpc, web, enterprise]
+---
+
+# API
+
+## Mục tiêu
+
+API (Application Programming Interface) là cổng giao tiếp giữa các thành phần trong hệ thống và với external clients. Trong Cursor Enterprise Framework, API design principles đảm bảo rằng tất cả APIs được thiết kế nhất quán, dễ sử dụng, có tính mở rộng, và bảo mật. Mục tiêu chính là tạo ra các APIs không chỉ hoạt động đúng mà còn intuitive cho developers sử dụng, maintainable cho team phát triển, và scalable cho business growth.
+
+API không chỉ là technical contract mà còn là developer experience. Một API được thiết kế tốt giúp reduce friction cho consumers, minimize support requests, và enable rapid integration. Ngược lại, một poorly designed API có thể gây ra integration difficulties, bugs, và long-term maintenance burden. Rule này cover REST, GraphQL, và gRPC patterns với focus vào HTTP APIs là primary transport.
+
+## Nguyên tắc
+
+**1. Resource-Based URL Design**
+
+URLs represent resources, not actions. Use nouns, not verbs: `/users` not `/getUsers`. Use plural forms consistently: `/users`, `/orders`, `/products`. Nest resources logically: `/users/{id}/orders`. Limit nesting depth (max 3 levels). Use kebab-case for multi-word paths: `/user-profiles`. Query parameters for filtering, sorting, pagination.
+
+**2. HTTP Method Usage**
+
+GET for reading resources (safe, idempotent). POST for creating resources. PUT for full resource replacement (idempotent). PATCH for partial updates (idempotent). DELETE for removing resources (idempotent). HEAD for checking resource existence. OPTIONS for CORS preflight. Match semantics to operation type.
+
+**3. Status Codes**
+
+200 OK for successful GET, PUT, PATCH. 201 Created for POST creating resources. 204 No Content for successful DELETE. 400 Bad Request for client errors. 401 Unauthorized for missing auth. 403 Forbidden for insufficient permissions. 404 Not Found for missing resources. 409 Conflict for state conflicts. 422 Unprocessable Entity for validation errors. 429 Too Many Requests for rate limiting. 500 Internal Server Error for server errors.
+
+**4. Request/Response Format**
+
+Use JSON as default format. Set Content-Type: application/json. Use camelCase for JSON property names. Include request ID for tracing: X-Request-ID. Include timestamps in ISO 8601 format. Use snake_case for query parameters. Consistent date format across API.
+
+**5. Pagination và Filtering**
+
+Use cursor-based pagination for large datasets: `?cursor=xxx&limit=50`. Include pagination metadata: total, page, limit. Default page size limits (e.g., max 100). Support filtering via query params: `?status=active&role=admin`. Support sorting: `?sort=-created_at,name`. Support field selection: `?fields=id,name,email`.
+
+**6. Error Response Format**
+
+Standardized error envelope. Include error code, message, details. Include request ID for debugging. Include field-level errors for validation. Include documentation link if applicable. Consistent error format across all endpoints.
+
+**7. Versioning Strategy**
+
+Version in URL path: `/api/v1/users`. Version in header: Accept: application/vnd.api+json; version=1. Deprecate old versions gracefully. Maintain backward compatibility. Communicate deprecation via headers. Sunset old versions after transition period.
+
+**8. Rate Limiting**
+
+Implement rate limiting for all public APIs. Return X-RateLimit-* headers. Return 429 when limit exceeded. Include Retry-After header. Different limits for different tiers. Consider burst limits. Document rate limits clearly.
+
+**9. CORS Configuration**
+
+Configure CORS appropriately. Whitelist specific origins. Support credentials with proper config. Preflight caching for efficiency. Don't use wildcard (*) in production. Consider security vs. usability trade-offs.
+
+**10. Documentation**
+
+OpenAPI/Swagger specification required. Include request/response examples. Document error codes. Document authentication. Keep docs in sync with implementation. Interactive documentation preferred.
+
+## Checklist
+
+- [ ] REST conventions được followed
+- [ ] HTTP methods used correctly
+- [ ] Proper status codes returned
+- [ ] JSON format consistent
+- [ ] Error format standardized
+- [ ] Pagination implemented
+- [ ] Rate limiting configured
+- [ ] CORS configured
+- [ ] OpenAPI spec documented
+- [ ] Authentication implemented
+- [ ] Security reviewed
+- [ ] Load tested
+
+## Anti Pattern
+
+**1. Verb-Based URLs**
+
+`/getUser`, `/createOrder`, `/updateProduct`. Not RESTful. Mixes resource with action. Solution: Use nouns and HTTP methods.
+
+**2. Inconsistent Naming**
+
+`user_id` in one endpoint, `userId` in another. Different date formats. Different error structures. Solution: Establish and enforce standards.
+
+**3. Missing Pagination**
+
+Returning all records without limits. Large responses. Memory issues. Performance degradation. Solution: Implement pagination always.
+
+**4. Generic Error Messages**
+
+"Error occurred" for all errors. No actionable information. Difficult to debug. Solution: Specific, actionable error messages.
+
+**5. No Versioning**
+
+Breaking changes without version bump. Client integrations break. Solution: Version from day one.
+
+## Best Practice
+
+**1. API Gateway Pattern**
+
+Centralize cross-cutting concerns. Authentication, rate limiting, logging. Single entry point. Route to backend services.
+
+**2. HATEOAS**
+
+Hypermedia as the Engine of Application State. Include links in responses. Guide clients through API. Decouple client from URL structure.
+
+**3. Conditional Requests**
+
+ETag for optimistic concurrency. If-Match for updates. If-None-Match for reads. 304 Not Modified responses.
+
+**4. Field Selection**
+
+`?fields=id,name,email` for partial responses. Reduce payload size. Improve performance. Client gets what it needs.
+
+**5. Batch Operations**
+
+POST /batch for multiple operations. Reduce round trips. Handle failures gracefully. Idempotent batch operations.
+
+**6. Async Operations**
+
+Return 202 Accepted for long operations. Include status endpoint. Include polling URL. Webhook for completion.
+
+**7. Content Negotiation**
+
+Support multiple formats. Accept header for request. Content-Type for response. application/json, application/xml, etc.
+
+**8. Idempotency Keys**
+
+POST requests with idempotency key header. Prevent duplicate processing. Retry-safe operations. Store and deduplicate.
+
+## Workflow
+
+**Phase 1: Design**
+
+Define resources and relationships. Design URL structure. Define request/response schemas. Document error cases.
+
+**Phase 2: Implementation**
+
+Implement routing and handlers. Validate inputs. Apply security. Handle errors. Log requests.
+
+**Phase 3: Testing**
+
+Unit test handlers. Integration test with clients. Contract testing. Load testing.
+
+**Phase 4: Documentation**
+
+Generate OpenAPI spec. Write usage examples. Document error codes. Publish interactive docs.
+
+**Phase 5: Deployment**
+
+Deploy with versioning. Monitor metrics. Enable rate limiting. Set up alerts.
+
+## Ví dụ
+
+**Ví dụ 1: RESTful API Endpoint**
+
+```typescript
+// GET /api/v1/users?page=1&limit=20&status=active&sort=-created_at
+// Response
+{
+  "data": [
+    {
+      "id": "user_abc123",
+      "type": "user",
+      "attributes": {
+        "email": "user@example.com",
+        "name": "John Doe",
+        "status": "active",
+        "createdAt": "2024-01-15T10:30:00Z",
+        "updatedAt": "2024-06-20T14:45:00Z"
+      },
+      "relationships": {
+        "organization": {
+          "id": "org_xyz789",
+          "type": "organization"
+        }
+      }
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "limit": 20,
+    "total": 150,
+    "totalPages": 8
+  },
+  "links": {
+    "self": "/api/v1/users?page=1&limit=20&status=active",
+    "first": "/api/v1/users?page=1&limit=20&status=active",
+    "prev": null,
+    "next": "/api/v1/users?page=2&limit=20&status=active",
+    "last": "/api/v1/users?page=8&limit=20&status=active"
+  }
+}
+```
+
+**Ví dụ 2: Error Response**
+
+```typescript
+// Error response format
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Invalid request parameters",
+    "requestId": "req_abc123xyz",
+    "timestamp": "2024-06-23T14:30:00Z",
+    "details": [
+      {
+        "field": "email",
+        "code": "INVALID_FORMAT",
+        "message": "Invalid email format"
+      },
+      {
+        "field": "age",
+        "code": "OUT_OF_RANGE",
+        "message": "Age must be between 18 and 120"
+      }
+    ],
+    "documentation": "https://api.example.com/docs/errors/VALIDATION_ERROR"
+  }
+}
+
+// HTTP Status: 422 Unprocessable Entity
+```
+
+**Ví dụ 3: Async Operation Response**
+
+```typescript
+// POST /api/v1/reports/generate
+// Request body
+{
+  "type": "monthly_sales",
+  "startDate": "2024-01-01",
+  "endDate": "2024-01-31",
+  "format": "pdf"
+}
+
+// Response: 202 Accepted
+{
+  "data": {
+    "jobId": "job_xyz789",
+    "status": "processing",
+    "estimatedCompletion": "2024-06-23T14:35:00Z"
+  },
+  "links": {
+    "status": "/api/v1/jobs/job_xyz789"
+  }
+}
+
+// GET /api/v1/jobs/job_xyz789
+// Response when complete
+{
+  "data": {
+    "jobId": "job_xyz789",
+    "status": "completed",
+    "completedAt": "2024-06-23T14:34:22Z",
+    "result": {
+      "downloadUrl": "/api/v1/reports/report_abc123/download",
+      "expiresAt": "2024-06-24T14:34:22Z"
+    }
+  }
+}
+```
+
+## Liên kết
+
+- [[security]] - Security: API security best practices
+- [[monitoring]] - Monitoring: API monitoring and observability
+- [[rest-api-design]] - REST API Design: Detailed REST patterns
+- [[performance]] - Performance: API performance optimization
+- [[clean-architecture]] - Clean Architecture: Architecture patterns

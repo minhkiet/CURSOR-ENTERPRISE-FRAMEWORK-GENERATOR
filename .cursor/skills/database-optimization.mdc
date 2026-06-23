@@ -1,0 +1,440 @@
+---
+description: Tối ưu hóa database performance bao gồm query optimization, indexing strategy, và schema design
+purpose: Optimize database performance và resource utilization
+input: Slow query logs, database schema, query patterns, performance metrics
+output: Optimization plan, index recommendations, query rewrites
+version: 1.0.0
+tags: [database, optimization, indexing, query-performance, PostgreSQL]
+---
+
+# Database Optimization Skill - Tối Ưu Hóa Database Toàn Diện
+
+## Tổng quan
+
+Database optimization là quá trình improve database performance thông qua query optimization, proper indexing, schema design, và configuration tuning. Skill này cung cấp comprehensive methodology để identify và resolve database bottlenecks.
+
+## Purpose (Mục đích)
+
+Database Optimization Skill được thiết kế để:
+
+1. **Query Optimization**: Improve slow queries performance
+2. **Index Strategy**: Design effective indexing strategy
+3. **Schema Design**: Normalize/denormalize appropriately
+4. **Configuration Tuning**: Optimize database settings
+5. **Connection Management**: Efficient connection pooling
+
+### Khi nào sử dụng Database Optimization
+
+- Khi slow query logs show issues
+- Khi application response time degraded
+- Khi database CPU/disk usage high
+- Khi scaling challenges emerge
+- Khi designing new features with DB impact
+- Khi conducting performance review
+
+## Input (Đầu vào)
+
+- [ ] Slow query log files
+- [ ] Database schema (DDL)
+- [ ] Query patterns và frequency
+- [ ] Performance metrics
+- [ ] Application code (queries)
+- [ ] Data volume statistics
+- [ ] Connection pool metrics
+
+## Output (Đầu ra)
+
+- [ ] Query optimization recommendations
+- [ ] Index creation/removal plan
+- [ ] Schema modification suggestions
+- [ ] Configuration changes
+- [ ] Migration scripts
+- [ ] Performance benchmarks
+
+## Workflow (Quy trình)
+
+### Phase 1: Analysis
+
+### Bước 1: Query Analysis
+
+```sql
+-- Enable query statistics
+ALTER SYSTEM SET shared_preload_libraries = 'pg_stat_statements';
+
+-- Find top slow queries
+SELECT 
+  query,
+  calls,
+  mean_time,
+  total_time,
+  rows,
+  (total_time / calls) as avg_time_ms,
+  stddev_time
+FROM pg_stat_statements
+WHERE calls > 100
+ORDER BY mean_time DESC
+LIMIT 20;
+
+-- Analyze query execution plan
+EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT)
+SELECT o.id, o.total, u.name
+FROM orders o
+JOIN users u ON o.user_id = u.id
+WHERE o.status = 'pending'
+  AND o.created_at > NOW() - INTERVAL '7 days'
+ORDER BY o.created_at DESC
+LIMIT 100;
+```
+
+### Bước 2: Index Analysis
+
+```sql
+-- Check index usage
+SELECT 
+  schemaname,
+  relname,
+  indexrelname,
+  idx_scan,
+  idx_tup_read,
+  idx_tup_fetch,
+  pg_size_pretty(pg_relation_size(indexrelid)) as index_size
+FROM pg_stat_user_indexes
+WHERE idx_scan = 0
+  AND schemaname = 'public'
+ORDER BY pg_relation_size(indexrelid) DESC;
+
+-- Find missing indexes from slow queries
+SELECT 
+  query,
+  calls,
+  mean_time
+FROM pg_stat_statements
+WHERE mean_time > 100
+  AND query NOT LIKE '%index%'
+  AND query LIKE '%WHERE%';
+
+-- Index recommendation query
+SELECT 
+  'CREATE INDEX idx_' || table_name || '_' || column_name || 
+  ' ON ' || table_name || ' (' || column_name || ');' as recommendation,
+  seq_scan,
+  n_tup_ins as inserts,
+  n_tup_upd as updates,
+  n_tup_del as deletes
+FROM pg_stat_user_tables
+JOIN information_schema.columns USING (table_name, table_schema)
+WHERE table_schema = 'public'
+  AND column_name IN ('user_id', 'status', 'created_at', 'updated_at')
+ORDER BY seq_scan DESC;
+```
+
+### Phase 2: Optimization
+
+### Bước 3: Query Rewriting
+
+```typescript
+// BEFORE: Implicit type conversion causing index scan failure
+// Query: SELECT * FROM orders WHERE user_id = '123' (string)
+// user_id is INTEGER, causes implicit cast
+
+// AFTER: Proper type matching
+const orders = await db.query(
+  'SELECT * FROM orders WHERE user_id = $1',
+  [123]  // Integer, not string
+);
+
+// BEFORE: LIKE with leading wildcard
+const results = await db.query(
+  "SELECT * FROM users WHERE email LIKE '%@gmail.com'"
+);
+// Full table scan!
+
+// AFTER: Using functional index or trigram index
+// Create index: CREATE INDEX idx_users_email_domain ON users (substring(email from position('@' in email)));
+
+const results = await db.query(
+  "SELECT * FROM users WHERE substring(email from position('@' in email)) = '@gmail.com'"
+);
+
+// BEFORE: Multiple OR conditions
+const results = await db.query(`
+  SELECT * FROM orders 
+  WHERE status = 'pending' 
+     OR status = 'processing' 
+     OR status = 'shipped'
+`);
+
+// AFTER: IN clause
+const results = await db.query(`
+  SELECT * FROM orders 
+  WHERE status IN ('pending', 'processing', 'shipped')
+`);
+```
+
+### Bước 4: Index Implementation
+
+```sql
+-- Single column index
+CREATE INDEX idx_orders_user_id ON orders(user_id);
+
+-- Composite index (column order matters!)
+-- For queries: WHERE status = ? AND created_at > ?
+CREATE INDEX idx_orders_status_created ON orders(status, created_at DESC);
+
+-- Partial index (for specific conditions)
+CREATE INDEX idx_orders_pending ON orders(created_at)
+WHERE status = 'pending';
+
+-- Covering index (includes all needed columns)
+CREATE INDEX idx_orders_covering ON orders(user_id, created_at DESC)
+INCLUDE (id, total, status);
+
+-- JSONB index
+CREATE INDEX idx_products_attrs_brand ON products USING GIN((attributes -> 'brand'));
+CREATE INDEX idx_products_attrs_color ON products USING GIN((attributes -> 'color'));
+
+-- Text search index
+CREATE INDEX idx_products_search ON products 
+USING GIN(to_tsvector('english', name || ' ' || description));
+
+-- Unique index with conditional
+CREATE UNIQUE INDEX idx_users_email_active ON users(email) 
+WHERE deleted_at IS NULL;
+```
+
+### Bước 5: Query Optimization Patterns
+
+```typescript
+// Pattern 1: Batch Operations
+// BEFORE: Individual inserts
+async function createUsers(users: User[]) {
+  for (const user of users) {
+    await db.query(
+      'INSERT INTO users (name, email) VALUES ($1, $2)',
+      [user.name, user.email]
+    );
+  }
+}
+
+// AFTER: Batch insert
+async function createUsers(users: User[]) {
+  const values = users.flatMap(u => [u.name, u.email]);
+  const placeholders = users.map((_, i) => 
+    `($${i * 2 + 1}, $${i * 2 + 2})`
+  ).join(',');
+  
+  await db.query(
+    `INSERT INTO users (name, email) VALUES ${placeholders}`,
+    values
+  );
+}
+
+// Pattern 2: Window Functions (avoid N+1)
+// BEFORE: Multiple queries with aggregation
+const orders = await db.query('SELECT * FROM orders WHERE user_id = $1', [userId]);
+const total = orders.reduce((sum, o) => sum + o.total, 0);
+const count = orders.length;
+
+// AFTER: Single query with window function
+const result = await db.query(`
+  SELECT *, 
+    SUM(total) OVER () as total_amount,
+    COUNT(*) OVER () as order_count
+  FROM orders
+  WHERE user_id = $1
+`, [userId]);
+
+// Pattern 3: Common Table Expression (CTE)
+const result = await db.query(`
+  WITH active_users AS (
+    SELECT id FROM users WHERE last_login > NOW() - INTERVAL '30 days'
+  ),
+  recent_orders AS (
+    SELECT user_id, SUM(total) as total_spent
+    FROM orders
+    WHERE user_id IN (SELECT id FROM active_users)
+      AND created_at > NOW() - INTERVAL '30 days'
+    GROUP BY user_id
+  )
+  SELECT u.id, u.name, u.email, COALESCE(r.total_spent, 0) as total_spent
+  FROM users u
+  LEFT JOIN recent_orders r ON u.id = r.user_id
+  WHERE u.id IN (SELECT id FROM active_users)
+  ORDER BY total_spent DESC
+`);
+```
+
+### Bước 6: Connection Pool Optimization
+
+```typescript
+// Connection pool configuration
+import { Pool } from 'pg';
+
+const pool = new Pool({
+  // Sizing based on application needs
+  min: 5,           // Always maintain 5 connections
+  max: 20,          // Maximum connections
+  idleTimeoutMillis: 30000,  // Close idle after 30s
+  connectionTimeoutMillis: 5000, // Timeout after 5s
+  
+  // Statement timeout
+  statement_timeout: 30000, // 30 second query timeout
+});
+
+// Connection usage best practices
+async function executeQuery<T>(sql: string, params: any[]): Promise<T> {
+  const start = Date.now();
+  
+  const client = await pool.connect();
+  try {
+    const result = await client.query(sql, params);
+    const duration = Date.now() - start;
+    
+    // Log slow queries
+    if (duration > 1000) {
+      logger.warn('Slow query detected', { sql, duration, params });
+    }
+    
+    return result.rows as T;
+  } finally {
+    client.release(); // Always release!
+  }
+}
+
+// Query queuing for high load
+class QueryQueue {
+  private queue: Array<() => Promise<any>> = [];
+  private running = 0;
+  
+  async enqueue<T>(fn: () => Promise<T>): Promise<T> {
+    return new Promise((resolve, reject) => {
+      this.queue.push(async () => {
+        try {
+          resolve(await fn());
+        } catch (err) {
+          reject(err);
+        }
+      });
+      this.process();
+    });
+  }
+  
+  private async process() {
+    if (this.running >= pool.max) return;
+    
+    const fn = this.queue.shift();
+    if (!fn) return;
+    
+    this.running++;
+    await fn();
+    this.running--;
+    
+    this.process();
+  }
+}
+```
+
+## Checklist
+
+- [ ] Slow queries identified
+- [ ] Query execution plans analyzed
+- [ ] Missing indexes identified
+- [ ] Unused indexes found
+- [ ] N+1 queries resolved
+- [ ] Connection pool configured
+- [ ] Query timeouts set
+- [ ] Benchmarking performed
+- [ ] Migration scripts tested
+- [ ] Monitoring established
+
+## Examples (Ví dụ)
+
+### Ví dụ: E-commerce Order Processing Optimization
+
+**Problem:** Order listing page takes 5+ seconds
+
+**Before Analysis:**
+
+```sql
+-- Execution plan shows:
+-- Seq Scan on orders (cost=0..500000, rows=1000000)
+-- Nested Loop on users (cost=0..200, rows=1000)
+-- Total runtime: 5234ms
+```
+
+**Optimization Steps:**
+
+```sql
+-- 1. Add covering index for common query pattern
+CREATE INDEX idx_orders_listing 
+ON orders(status, created_at DESC, user_id)
+INCLUDE (id, total, items_count);
+
+-- 2. Materialized view for aggregated data
+CREATE MATERIALIZED VIEW order_stats AS
+SELECT 
+  user_id,
+  COUNT(*) as order_count,
+  SUM(total) as total_spent,
+  MAX(created_at) as last_order
+FROM orders
+GROUP BY user_id;
+
+CREATE UNIQUE INDEX ON order_stats(user_id);
+
+-- 3. Refresh strategy
+-- Add to scheduled job:
+-- REFRESH MATERIALIZED VIEW CONCURRENTLY order_stats;
+
+-- 4. Optimize user lookup
+CREATE INDEX idx_users_email ON users(email);
+```
+
+**After:**
+
+```sql
+-- Query rewritten
+SELECT o.id, o.total, o.status, o.created_at,
+       u.name as user_name, u.email as user_email
+FROM orders o
+JOIN users u ON o.user_id = u.id
+WHERE o.status = 'pending'
+  AND o.created_at > NOW() - INTERVAL '7 days'
+ORDER BY o.created_at DESC
+LIMIT 50;
+
+-- Execution plan shows:
+-- Index Scan using idx_orders_listing (cost=0..50, rows=50)
+-- Index Scan using idx_users_email (cost=0..1, rows=1)
+-- Total runtime: 12ms
+```
+
+## Anti Pattern
+
+- [ ] **Index Everything**: Creating indexes without analysis
+- [ ] **Missing Indexes**: No indexes for frequent queries
+- [ ] **N+1 Queries**: Multiple round trips for related data
+- [ ] **SELECT***: Fetching unnecessary columns
+- [ ] **No Pagination**: Loading entire result sets
+- [ ] **Implicit Type Cast**: Causing index scan failures
+- [ ] **Functions on Columns**: Preventing index usage
+- [ ] **Deadlocks**: Locking conflicts in concurrent operations
+
+## Best Practice
+
+- [ ] **Measure First**: Profile before optimizing
+- [ ] **Index Strategy**: Index WHERE, JOIN, ORDER BY columns
+- [ ] **Covering Indexes**: Include all needed columns
+- [ ] **Partial Indexes**: Index only needed rows
+- [ ] **Query Review**: Analyze execution plans
+- [ ] **Connection Pooling**: Efficient resource usage
+- [ ] **Query Timeouts**: Prevent runaway queries
+- [ ] **Regular Maintenance**: Vacuum, reindex, analyze
+
+## Liên kết
+
+- [[../rules/core-architecture]] - Core Architecture
+- [[../skills/performance-audit]] - Performance Audit
+- [[../skills/postgres-optimization]] - PostgreSQL Optimization
+- [[../skills/debug]] - Debug Skill
+- [[../skills/supabase-review]] - Supabase Review

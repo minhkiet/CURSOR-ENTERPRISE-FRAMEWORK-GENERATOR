@@ -1,0 +1,573 @@
+---
+description: Kiểm toán Redis performance bao gồm caching strategy, memory optimization, và high availability
+purpose: Audit và optimize Redis deployment cho application caching và data storage
+input: Redis configuration, memory usage, cache hit rates, application code
+output: Redis audit report, optimization recommendations, cache strategy
+version: 1.0.0
+tags: [redis, cache, memory-optimization, performance, high-availability]
+---
+
+# Redis Audit Skill - Kiểm Toán Redis Toàn Diện
+
+## Tổng quan
+
+Redis là một trong những công cụ quan trọng nhất cho caching, session storage, và real-time data. Skill này cung cấp comprehensive framework để audit Redis deployment, identify performance issues, và optimize caching strategy.
+
+## Purpose (Mục đích)
+
+Redis Audit Skill được thiết kế để:
+
+1. **Memory Optimization**: Analyze memory usage và optimize data structures
+2. **Cache Strategy**: Design effective caching patterns
+3. **Performance Tuning**: Optimize Redis configuration
+4. **High Availability**: Ensure Redis reliability
+5. **Monitoring Setup**: Establish Redis observability
+
+### Khi nào sử dụng Redis Audit
+
+- Khi application slow và nghi ngờ cache issues
+- Khi Redis memory usage high
+- Khi cache hit rate low
+- Khi investigating Redis connection issues
+- Khi planning cache invalidation strategy
+- Khi setting up Redis monitoring
+
+## Input (Đầu vào)
+
+- [ ] Redis configuration file
+- [ ] Memory usage statistics
+- [ ] Cache hit/miss ratios
+- [ ] Slow log entries
+- [ ] Connected clients
+- [ ] Persistence settings
+- [ ] Replication configuration
+
+## Output (Đầu ra)
+
+- [ ] Redis audit report
+- [ ] Memory analysis
+- [ ] Cache strategy recommendations
+- [ ] Configuration improvements
+- [ ] Key pattern analysis
+- [ ] Performance optimizations
+- [ ] Monitoring setup guide
+
+## Workflow (Quy trình)
+
+### Phase 1: Current State Analysis
+
+### Bước 1: Memory Analysis
+
+```bash
+# Get memory info
+redis-cli INFO memory
+
+# Sample output:
+# used_memory: 10485760
+# used_memory_human: 10.00M
+# used_memory_rss: 12582912
+# used_memory_rss_human: 12.00M
+# used_memory_peak: 20971520
+# used_memory_peak_human: 20.00M
+# mem_fragmentation_ratio: 1.20
+# maxmemory: 1073741824
+# maxmemory_human: 1.00G
+```
+
+```typescript
+// Memory Analysis Script
+interface MemoryAnalysis {
+  usedMemoryMB: number;
+  peakMemoryMB: number;
+  fragmentationRatio: number;
+  memoryPerKey: number;
+  topKeysByMemory: Array<{ key: string; memoryBytes: number }>;
+}
+
+async function analyzeRedisMemory(): Promise<MemoryAnalysis> {
+  const info = await redis.info('memory');
+  
+  // Get top memory consuming keys
+  const topKeys = await redis.execute(['MEMORY', 'USAGE', '*'], {
+    pipeline: true
+  });
+  
+  return {
+    usedMemoryMB: info.used_memory / 1024 / 1024,
+    peakMemoryMB: info.used_memory_peak / 1024 / 1024,
+    fragmentationRatio: info.mem_fragmentation_ratio,
+    memoryPerKey: calculateMemoryPerKey(info),
+    topKeysByMemory: topKeys.slice(0, 10)
+  };
+}
+
+// Key sampling for pattern analysis
+async function sampleKeys(pattern: string = '*', count: number = 1000) {
+  const keys = await redis.sampleKeys(pattern, count);
+  
+  const analysis = {
+    strings: 0,
+    lists: 0,
+    sets: 0,
+    hashes: 0,
+    sortedSets: 0,
+    streams: 0,
+    totalKeys: 0,
+    avgTTL: 0
+  };
+  
+  for (const key of keys) {
+    const type = await redis.type(key);
+    analysis[`${type}s`]++;
+    analysis.totalKeys++;
+    
+    const ttl = await redis.ttl(key);
+    if (ttl > 0) analysis.avgTTL += ttl;
+  }
+  
+  analysis.avgTTL /= count;
+  return analysis;
+}
+```
+
+### Bước 2: Cache Efficiency Analysis
+
+```typescript
+interface CacheMetrics {
+  hits: number;
+  misses: number;
+  hitRate: number;
+  evictions: number;
+  expiredKeys: number;
+  keyspace: {
+    keys: number;
+    expires: number;
+    avgTTL: number;
+  };
+}
+
+async function getCacheMetrics(): Promise<CacheMetrics> {
+  const info = await redis.info('stats');
+  const keyspace = await redis.info('keyspace');
+  
+  return {
+    hits: info.keyspace_hits,
+    misses: info.keyspace_misses,
+    hitRate: info.keyspace_hits / (info.keyspace_hits + info.keyspace_misses) * 100,
+    evictions: info.evicted_keys,
+    expiredKeys: keyspace.keys - keyspace.expires,
+    keyspace: {
+      keys: keyspace.keys,
+      expires: keyspace.expires,
+      avgTTL: keyspace.avgttl || 0
+    }
+  };
+}
+
+// Cache hit rate by pattern
+async function analyzeCachePatterns() {
+  const patterns = [
+    'user:*',
+    'product:*',
+    'session:*',
+    'cart:*',
+    'order:*'
+  ];
+  
+  const analysis = [];
+  
+  for (const pattern of patterns) {
+    const keys = await redis.keys(pattern);
+    const sample = keys.slice(0, 100);
+    
+    let hits = 0;
+    for (const key of sample) {
+      const exists = await redis.exists(key);
+      if (exists) hits++;
+    }
+    
+    analysis.push({
+      pattern,
+      keyCount: keys.length,
+      sampleHitRate: (hits / sample.length) * 100
+    });
+  }
+  
+  return analysis;
+}
+```
+
+### Phase 2: Configuration Review
+
+### Bước 3: Configuration Analysis
+
+```bash
+# Get all configuration
+redis-cli CONFIG GET *
+
+# Check specific settings
+redis-cli CONFIG GET maxmemory
+redis-cli CONFIG GET maxmemory-policy
+redis-cli CONFIG GET save
+redis-cli CONFIG GET appendonly
+```
+
+```typescript
+interface RedisConfig {
+  maxmemory: string;
+  maxmemoryPolicy: string;
+  persistence: 'rdb' | 'aof' | 'both' | 'no';
+  savePoints: Array<{ seconds: number; changes: number }>;
+  tcpBacklog: number;
+  timeout: number;
+  tcpKeepalive: number;
+  replicaReadOnly: boolean;
+}
+
+async function analyzeConfiguration(): Promise<{
+  issues: string[];
+  recommendations: string[];
+}> {
+  const config = await redis.configGet('*');
+  
+  const issues: string[] = [];
+  const recommendations: string[] = [];
+  
+  // Memory policy
+  if (config.maxmemory_policy === 'noeviction') {
+    issues.push('Using noeviction policy - may cause errors under memory pressure');
+    recommendations.push('Consider volatile-lru for cached data');
+  }
+  
+  // Persistence
+  if (config.appendonly === 'no') {
+    recommendations.push('Enable AOF for better durability');
+    recommendations.push('Use appendfsync everysec for balance of safety and performance');
+  }
+  
+  // Save points
+  if (config.save === '') {
+    issues.push('No RDB snapshots configured - risk of data loss');
+    recommendations.push('Add save points: save 900 1 save 300 10 save 60 10000');
+  }
+  
+  // Connection settings
+  if (parseInt(config.timeout) === 0) {
+    recommendations.push('Consider setting client timeout for production');
+  }
+  
+  return { issues, recommendations };
+}
+```
+
+### Phase 3: Optimization Implementation
+
+### Bước 4: Data Structure Optimization
+
+```typescript
+// BEFORE: Multiple strings for user profile
+await redis.set(`user:${id}:name`, user.name);
+await redis.set(`user:${id}:email`, user.email);
+await redis.set(`user:${id}:avatar`, user.avatar);
+// 3 separate key lookups!
+
+// AFTER: Hash for related data
+await redis.hset(`user:${id}`, {
+  name: user.name,
+  email: user.email,
+  avatar: user.avatar
+});
+// Single lookup for all fields
+
+// Get specific field
+const name = await redis.hget(`user:${id}`, 'name');
+
+// Get multiple fields
+const profile = await redis.hmget(`user:${id}`, 'name', 'email');
+
+// BEFORE: List for recent items (unbounded growth)
+await redis.lpush('recent:items', itemId);
+await redis.ltrim('recent:items', 0, 99); // Manual trim needed
+
+// AFTER: Sorted Set with timestamp score
+await redis.zadd('recent:items', Date.now(), itemId);
+await redis.zremrangebyrank('recent:items', 0, -101); // Keep top 100
+
+// Get recent items
+const recentItems = await redis.zrevrange('recent:items', 0, 9);
+```
+
+### Bước 5: Caching Strategy Implementation
+
+```typescript
+// Multi-layer Cache Implementation
+interface CacheLayer {
+  name: string;
+  ttl: number;
+  get: (key: string) => Promise<any>;
+  set: (key: string, value: any, ttl?: number) => Promise<void>;
+  invalidate: (key: string) => Promise<void>;
+}
+
+class RedisCache implements CacheLayer {
+  name = 'redis';
+  ttl: number;
+  
+  constructor(ttl: number = 300) {
+    this.ttl = ttl;
+  }
+  
+  async get(key: string): Promise<any> {
+    const data = await redis.get(key);
+    return data ? JSON.parse(data) : null;
+  }
+  
+  async set(key: string, value: any, ttl?: number): Promise<void> {
+    await redis.setex(key, ttl || this.ttl, JSON.stringify(value));
+  }
+  
+  async invalidate(key: string): Promise<void> {
+    await redis.del(key);
+  }
+}
+
+// Cache-aside pattern
+async function getWithCache<T>(
+  key: string,
+  fetcher: () => Promise<T>,
+  ttl: number = 300
+): Promise<T> {
+  // L1: Local cache (in-memory)
+  const local = localCache.get(key);
+  if (local) return local;
+  
+  // L2: Redis cache
+  const cached = await redisCache.get(key);
+  if (cached) {
+    localCache.set(key, cached, ttl / 2); // Half TTL for local
+    return cached;
+  }
+  
+  // Fetch from source
+  const data = await fetcher();
+  
+  // Store in both layers
+  await redisCache.set(key, data, ttl);
+  localCache.set(key, data, ttl / 2);
+  
+  return data;
+}
+
+// Cache invalidation patterns
+async function invalidateCache(pattern: string) {
+  const keys = await redis.keys(pattern);
+  
+  // Use SCAN for production (non-blocking)
+  let cursor = '0';
+  const keysToDelete: string[] = [];
+  
+  do {
+    const [newCursor, keys] = await redis.scan(cursor, {
+      MATCH: pattern,
+      COUNT: 100
+    });
+    cursor = newCursor;
+    keysToDelete.push(...keys);
+  } while (cursor !== '0');
+  
+  if (keysToDelete.length > 0) {
+    await redis.del(...keysToDelete);
+  }
+  
+  return keysToDelete.length;
+}
+```
+
+### Bước 6: Connection Pool Optimization
+
+```typescript
+// Redis connection pool configuration
+import IORedis from 'ioredis';
+
+const redis = new IORedis.Cluster([
+  { host: 'redis-1.example.com', port: 6379 },
+  { host: 'redis-2.example.com', port: 6379 },
+  { host: 'redis-3.example.com', port: 6379 }
+], {
+  // Connection pool settings
+  maxRetriesPerRequest: 3,
+  enableReadyCheck: true,
+  retryStrategy: (times) => {
+    if (times > 3) return null; // Stop retrying
+    return Math.min(times * 200, 2000);
+  },
+  
+  // Lua scripts for atomic operations
+  scripts: {
+    // Atomic get-or-set
+    getOrSet: `
+      local val = redis.call('GET', KEYS[1])
+      if val then
+        return val
+      end
+      local newVal = ARGV[1]
+      local ttl = ARGV[2]
+      redis.call('SETEX', KEYS[1], ttl, newVal)
+      return nil
+    `
+  }
+});
+
+// Pipeline for batch operations
+async function batchOperations() {
+  const pipeline = redis.pipeline();
+  
+  for (const userId of userIds) {
+    pipeline.hgetall(`user:${userId}`);
+  }
+  
+  const results = await pipeline.exec();
+  return results.map(([err, data]) => {
+    if (err) return null;
+    return data;
+  });
+}
+
+// Pub/Sub for cache invalidation
+const subscriber = new IORedis();
+const publisher = new IORedis();
+
+async function subscribeToInvalidation() {
+  await subscriber.psubscribe('cache:invalidate:*');
+  
+  subscriber.on('pmessage', (pattern, channel, message) => {
+    const key = channel.replace('cache:invalidate:', '');
+    redis.del(key);
+  });
+}
+
+async function publishInvalidation(key: string) {
+  await publisher.publish(`cache:invalidate:${key}`, 'invalidate');
+}
+```
+
+## Checklist
+
+- [ ] Memory usage analyzed
+- [ ] Cache hit rate measured
+- [ ] Key patterns identified
+- [ ] Configuration reviewed
+- [ ] Data structures optimized
+- [ ] TTL strategy implemented
+- [ ] Connection pool configured
+- [ ] Monitoring established
+- [ ] Failover tested
+- [ ] Backup verified
+
+## Examples (Ví dụ)
+
+### Ví dụ: Session Store Optimization
+
+**Before:**
+
+```typescript
+// Storing sessions as separate keys
+async function createSession(sessionId: string, data: SessionData) {
+  await redis.set(`session:${sessionId}`, JSON.stringify(data));
+  // TTL set separately (race condition possible)
+}
+
+async function getSession(sessionId: string) {
+  const data = await redis.get(`session:${sessionId}`);
+  return data ? JSON.parse(data) : null;
+}
+```
+
+**After:**
+
+```typescript
+// Optimized session management
+class SessionStore {
+  private readonly prefix = 'session:';
+  private readonly defaultTTL = 86400; // 24 hours
+  
+  async create(sessionId: string, data: SessionData): Promise<void> {
+    const key = `${this.prefix}${sessionId}`;
+    
+    // Store with TTL atomically
+    await redis.setex(key, this.defaultTTL, JSON.stringify({
+      ...data,
+      createdAt: Date.now()
+    }));
+    
+    // Track session for user
+    await redis.sadd(`user:${data.userId}:sessions`, sessionId);
+  }
+  
+  async get(sessionId: string): Promise<SessionData | null> {
+    const key = `${this.prefix}${sessionId}`;
+    const data = await redis.get(key);
+    
+    if (data) {
+      // Refresh TTL on access
+      await redis.expire(key, this.defaultTTL);
+      return JSON.parse(data);
+    }
+    
+    return null;
+  }
+  
+  async invalidate(sessionId: string): Promise<void> {
+    const key = `${this.prefix}${sessionId}`;
+    const data = await redis.get(key);
+    
+    if (data) {
+      const session = JSON.parse(data);
+      await redis.srem(`user:${session.userId}:sessions`, sessionId);
+    }
+    
+    await redis.del(key);
+  }
+  
+  async invalidateUserSessions(userId: string): Promise<number> {
+    const sessionIds = await redis.smembers(`user:${userId}:sessions`);
+    
+    if (sessionIds.length === 0) return 0;
+    
+    const keys = sessionIds.map(id => `${this.prefix}${id}`);
+    keys.push(`user:${userId}:sessions`);
+    
+    return await redis.del(...keys);
+  }
+}
+```
+
+## Anti Pattern
+
+- [ ] **Key Proliferation**: Too many small keys
+- [ ] **No TTL**: Keys never expire
+- [ ] **SET vs HSET**: Wrong data structure choice
+- [ ] **Blocking Operations**: Long-running commands
+- [ ] **No Connection Pooling**: Creating connections per request
+- [ ] **SCAN abuse**: Using KEYS in production
+- [ ] **Big Values**: Storing large objects without compression
+- [ ] **Hot Keys**: Single keys receiving too many requests
+
+## Best Practice
+
+- [ ] **Use appropriate data structures**: Hash vs String
+- [ ] **Set TTL**: Always set expiration
+- [ ] **Pipeline commands**: Batch operations
+- [ ] **Monitor memory**: Keep fragmentation low
+- [ ] **Use connection pooling**: Reuse connections
+- [ ] **SCAN not KEYS**: Use SCAN in production
+- [ ] **Key naming convention**: Consistent naming
+- [ ] **Cache invalidation**: Strategic invalidation
+
+## Liên kết
+
+- [[../rules/core-architecture]] - Core Architecture
+- [[../skills/performance-audit]] - Performance Audit
+- [[../skills/database-optimization]] - Database Optimization
+- [[../skills/monitoring-review]] - Monitoring Review
+- [[../skills/queue-audit]] - Queue Audit

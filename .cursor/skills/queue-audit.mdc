@@ -1,0 +1,504 @@
+---
+description: Kiểm toán message queue bao gồm RabbitMQ, Kafka, BullMQ với patterns và best practices
+purpose: Audit message queue architecture, reliability, và performance
+input: Queue configuration, message patterns, consumer implementation, dead letter setup
+output: Queue audit report, reliability improvements, scaling recommendations
+version: 1.0.0
+tags: [queue, rabbitmq, kafka, bullmq, message-queue, async-processing]
+---
+
+# Queue Audit Skill - Kiểm Toán Message Queue Toàn Diện
+
+## Tổng quan
+
+Message queue là critical infrastructure cho asynchronous processing, event-driven architecture, và microservices communication. Skill này cung cấp framework để audit queue implementation, ensure reliability, và optimize performance.
+
+## Purpose (Mục đích)
+
+Queue Audit Skill được thiết kế để:
+
+1. **Architecture Review**: Evaluate queue design và patterns
+2. **Reliability Assessment**: Ensure message delivery guarantees
+3. **Performance Analysis**: Identify bottlenecks và optimization opportunities
+4. **Error Handling**: Review dead letter và retry mechanisms
+5. **Monitoring Setup**: Establish queue observability
+
+### Khi nào sử dụng Queue Audit
+
+- Khi investigating message loss
+- Khi processing delays observed
+- Khi consumer backlog growing
+- Khi planning new queue implementation
+- Khi scaling considerations
+- Khi debugging intermittent failures
+
+## Input (Đầu vào)
+
+- [ ] Queue configuration (exchanges, queues, bindings)
+- [ ] Message schemas
+- [ ] Consumer implementations
+- [ ] Dead letter queue setup
+- [ ] Monitoring metrics
+- [ ] Error logs
+- [ ] Retry configurations
+
+## Output (Đầu ra)
+
+- [ ] Queue architecture diagram
+- [ ] Reliability assessment
+- [ ] Performance bottlenecks
+- [ ] Recommended improvements
+- [ ] Monitoring setup
+- [ ] Migration plan (nếu cần)
+
+## Workflow (Quy trình)
+
+### Phase 1: Architecture Analysis
+
+### Bước 1: Queue Topology Review
+
+```typescript
+// RabbitMQ Topology Analysis
+interface QueueTopology {
+  exchanges: Exchange[];
+  queues: Queue[];
+  bindings: Binding[];
+  deadLetterExchange?: string;
+}
+
+interface Exchange {
+  name: string;
+  type: 'direct' | 'fanout' | 'topic' | 'headers';
+  durable: boolean;
+  bindings: string[];
+}
+
+interface Queue {
+  name: string;
+  durable: boolean;
+  autoDelete: boolean;
+  arguments: {
+    xDeadLetterExchange?: string;
+    xDeadLetterRoutingKey?: string;
+    xMessageTTL?: number;
+    xMaxLength?: number;
+  };
+  consumers: number;
+  messages: number;
+}
+
+async function analyzeQueueTopology(): Promise<QueueTopology> {
+  const connections = await getRabbitMQConnections();
+  
+  return {
+    exchanges: await listExchanges(),
+    queues: await listQueues(),
+    bindings: await listBindings(),
+    deadLetterExchange: 'dlx.exchange'
+  };
+}
+```
+
+### Bước 2: Message Flow Analysis
+
+```typescript
+// Message Flow Tracking
+interface MessageFlow {
+  exchange: string;
+  routingKey: string;
+  queue: string;
+  consumer: string;
+  avgProcessingTime: number;
+  errorRate: number;
+  throughput: number;
+}
+
+async function analyzeMessageFlows(): Promise<MessageFlow[]> {
+  const flows: MessageFlow[] = [];
+  const queues = await listQueues();
+  
+  for (const queue of queues) {
+    const stats = await getQueueStats(queue.name);
+    
+    flows.push({
+      exchange: queue.exchange,
+      routingKey: queue.routingKey,
+      queue: queue.name,
+      consumer: queue.consumerTag,
+      avgProcessingTime: stats.ack_time - stats.delivery_time,
+      errorRate: stats.error_count / stats.total_count,
+      throughput: stats.total_count / stats.window_seconds
+    });
+  }
+  
+  return flows;
+}
+```
+
+### Phase 2: Reliability Assessment
+
+### Bước 3: Delivery Guarantee Analysis
+
+```typescript
+// RabbitMQ: Publisher confirms
+async function publishWithConfirms(channel: Channel, msg: Message): Promise<void> {
+  const confirm = await channel.publish(
+    'exchange.name',
+    'routing.key',
+    Buffer.from(JSON.stringify(msg)),
+    {
+      persistent: true,  // Message survives broker restart
+      deliveryMode: 2,
+      contentType: 'application/json',
+      messageId: generateUUID(),
+      timestamp: Date.now()
+    }
+  );
+  
+  if (!confirm) {
+    throw new Error('Message was not confirmed by broker');
+  }
+}
+
+// Kafka: Exactly-once semantics
+const producer = kafka.producer({
+  enableIdempotence: true,
+  acks: 'all',
+  retries: 3,
+  maxInFlightRequests: 5
+});
+
+await producer.send({
+  topic: 'orders',
+  messages: [{
+    key: orderId,
+    value: JSON.stringify(orderEvent),
+    headers: {
+      'correlation-id': correlationId
+    }
+  }]
+});
+```
+
+### Bước 4: Consumer Implementation Review
+
+```typescript
+// Reliable Consumer Pattern
+class ReliableConsumer {
+  private readonly maxRetries = 3;
+  private readonly retryDelay = 5000;
+  
+  async processMessage(msg: Message): Promise<void> {
+    const attempt = msg.headers['x-retry-count'] || 0;
+    
+    try {
+      await this.executeHandler(msg);
+      await this.acknowledge(msg);
+    } catch (error) {
+      if (attempt < this.maxRetries) {
+        await this.retry(msg, attempt + 1);
+      } else {
+        await this.sendToDeadLetter(msg, error);
+      }
+    }
+  }
+  
+  private async retry(msg: Message, attempt: number): Promise<void> {
+    // Reject and requeue with delay
+    await this.channel.nack(msg, false, false);
+    
+    // Wait before retry
+    await sleep(this.retryDelay * attempt);
+    
+    // Republish with retry count
+    await this.channel.publish(
+      'retry.exchange',
+      msg.fields.routingKey,
+      msg.content,
+      {
+        headers: { 'x-retry-count': attempt }
+      }
+    );
+  }
+  
+  private async sendToDeadLetter(msg: Message, error: Error): Promise<void> {
+    await this.channel.publish(
+      'dlx.exchange',
+      'dlq.routing',
+      msg.content,
+      {
+        headers: {
+          'x-original-routing-key': msg.fields.routingKey,
+          'x-death-reason': error.message,
+          'x-failed-at': new Date().toISOString()
+        }
+      }
+    );
+    
+    await this.acknowledge(msg);
+  }
+}
+
+// BullMQ: Job processing with retries
+const orderProcessor = new Worker('orders', async (job) => {
+  if (job.attemptsMade < job.opts.retries) {
+    throw new Error('Temporary failure');
+  }
+  
+  return processOrder(job.data);
+}, {
+  connection: redisConnection,
+  limiter: {
+    max: 10,
+    duration: 1000
+  },
+  defaultJobOptions: {
+    attempts: 3,
+    backoff: {
+      type: 'exponential',
+      delay: 2000
+    },
+    removeOnComplete: 100,
+    removeOnFail: 1000
+  }
+});
+
+orderProcessor.on('failed', (job, err) => {
+  logger.error('Order processing failed', {
+    jobId: job.id,
+    attempts: job.attemptsMade,
+    error: err.message
+  });
+});
+```
+
+### Phase 3: Performance Optimization
+
+### Bước 5: Consumer Scaling
+
+```typescript
+// Auto-scaling consumers based on queue depth
+class ScalingConsumerManager {
+  private consumers: Map<string, number> = new Map();
+  private readonly minConsumers = 1;
+  private readonly maxConsumers = 10;
+  private readonly scaleUpThreshold = 100;
+  private readonly scaleDownThreshold = 10;
+  
+  async monitorAndScale() {
+    const queues = await this.getMonitoredQueues();
+    
+    for (const queue of queues) {
+      const depth = await this.getQueueDepth(queue.name);
+      const currentConsumers = this.consumers.get(queue.name) || this.minConsumers;
+      
+      if (depth > this.scaleUpThreshold && currentConsumers < this.maxConsumers) {
+        await this.scaleUp(queue.name);
+      } else if (depth < this.scaleDownThreshold && currentConsumers > this.minConsumers) {
+        await this.scaleDown(queue.name);
+      }
+    }
+  }
+  
+  private async scaleUp(queueName: string) {
+    const current = this.consumers.get(queueName) || 0;
+    this.consumers.set(queueName, current + 1);
+    
+    await this.createConsumer(queueName, `consumer-${Date.now()}`);
+    logger.info('Scaled up consumer', { queue: queueName, count: current + 1 });
+  }
+}
+```
+
+### Bước 6: Batch Processing
+
+```typescript
+// Kafka: Batch consumer
+const consumer = kafka.consumer({
+  groupId: 'order-processor',
+  maxBytes: 1048576, // 1MB per batch
+  maxWaitTimeInMs: 5000
+});
+
+await consumer.subscribe({ topic: 'orders', fromBeginning: false });
+
+await consumer.run({
+  eachBatchAutoResolve: false,
+  eachBatch: async ({ batch, heartbeat, resolveOffset, commitOffsetsIfNecessary }) => {
+    const messages = batch.messages;
+    
+    // Batch process
+    const orders = messages.map(m => JSON.parse(m.value.toString()));
+    const results = await processOrdersBatch(orders);
+    
+    // Mark progress
+    for (const result of results) {
+      resolveOffset(result.offset);
+      await heartbeat();
+    }
+    
+    // Commit offsets
+    await commitOffsetsIfNecessary();
+  }
+});
+
+// RabbitMQ: Consumer with prefetch
+await channel.prefetch(10); // Process 10 messages at a time
+
+channel.consume('orders', async (msg) => {
+  if (msg) {
+    try {
+      await processOrder(JSON.parse(msg.content.toString()));
+      channel.ack(msg);
+    } catch (error) {
+      channel.nack(msg, false, true); // Requeue
+    }
+  }
+});
+```
+
+## Checklist
+
+- [ ] Queue topology documented
+- [ ] Message schemas validated
+- [ ] Publisher confirms enabled
+- [ ] Consumer acknowledgments verified
+- [ ] Dead letter queues configured
+- [ ] Retry mechanisms implemented
+- [ ] Monitoring established
+- [ ] Alerting configured
+- [ ] Failover tested
+- [ ] Backpressure handling reviewed
+
+## Examples (Ví dụ)
+
+### Ví dụ: Order Processing Event-Driven Architecture
+
+**Architecture:**
+
+```
+User Service → Order Created Event → [Exchange: orders]
+                                              ↓
+                    ┌─────────────────────────┼─────────────────────────┐
+                    ↓                         ↓                         ↓
+           [Queue: email-notify]     [Queue: inventory-reserve]  [Queue: payment-process]
+                    ↓                         ↓                         ↓
+           Email Consumer            Inventory Consumer           Payment Consumer
+```
+
+**Implementation:**
+
+```typescript
+// Publisher: Order Service
+class OrderEventPublisher {
+  async publishOrderCreated(order: Order): Promise<void> {
+    const event = {
+      type: 'ORDER_CREATED',
+      orderId: order.id,
+      userId: order.userId,
+      items: order.items,
+      total: order.total,
+      timestamp: new Date().toISOString()
+    };
+    
+    await this.channel.publish(
+      'orders.exchange',
+      'order.created',
+      Buffer.from(JSON.stringify(event)),
+      {
+        persistent: true,
+        contentType: 'application/json',
+        messageId: generateUUID(),
+        headers: {
+          'x-event-type': 'ORDER_CREATED',
+          'x-schema-version': '1.0'
+        }
+      }
+    );
+  }
+}
+
+// Consumer: Email Notification
+class EmailNotificationConsumer {
+  async handle(event: OrderCreatedEvent): Promise<void> {
+    const emailJob = await this.scheduler.add('send-order-email', {
+      to: event.userId,
+      template: 'order-confirmation',
+      data: {
+        orderId: event.orderId,
+        items: event.items,
+        total: event.total
+      }
+    });
+    
+    logger.info('Email job scheduled', { 
+      jobId: emailJob.id, 
+      orderId: event.orderId 
+    });
+  }
+}
+
+// Consumer: Inventory Reservation
+class InventoryConsumer {
+  async handle(event: OrderCreatedEvent): Promise<void> {
+    for (const item of event.items) {
+      await this.inventoryService.reserve({
+        productId: item.productId,
+        quantity: item.quantity,
+        orderId: event.orderId
+      });
+    }
+  }
+}
+
+// Dead Letter Handler
+class DeadLetterConsumer {
+  async handle(message: DeadLetteredMessage): Promise<void> {
+    logger.error('Message sent to DLQ', {
+      originalQueue: message.headers['x-original-queue'],
+      reason: message.headers['x-death-reason'],
+      message: JSON.parse(message.content.toString())
+    });
+    
+    // Alert operations
+    await this.alertService.notify({
+      severity: 'high',
+      title: 'Message processing failed',
+      details: message.headers
+    });
+    
+    // Store for manual retry
+    await this.deadLetterStore.save(message);
+  }
+}
+```
+
+## Anti Pattern
+
+- [ ] **No Acknowledgment**: Messages never acked
+- [ ] **Synchronous Publishing**: Blocking on confirm
+- [ ] **No Dead Letter**: Failed messages lost
+- [ ] **Unbounded Queue**: Memory exhaustion
+- [ ] **Single Consumer**: No parallelism
+- [ ] **No Idempotency**: Duplicate processing
+- [ ] **Tight Coupling**: Direct dependencies
+- [ ] **No Backpressure**: Overwhelmed consumers
+
+## Best Practice
+
+- [ ] **Always ack/nack**: Never leave messages unacknowledged
+- [ ] **Use dead letter queues**: Capture failed messages
+- [ ] **Implement retries**: With exponential backoff
+- [ ] **Idempotent consumers**: Handle duplicates safely
+- [ ] **Batch processing**: Improve throughput
+- [ ] **Monitor queue depth**: Alert on backlog
+- [ ] **Connection pooling**: Reuse connections
+- [ ] **Graceful shutdown**: Finish processing
+
+## Liên kết
+
+- [[../rules/core-architecture]] - Core Architecture
+- [[../skills/performance-audit]] - Performance Audit
+- [[../skills/redis-audit]] - Redis Audit
+- [[../skills/monitoring-review]] - Monitoring Review
+- [[../skills/temporal-workflow]] - Temporal Workflow

@@ -1,0 +1,466 @@
+---
+description: Kiểm toán performance toàn diện bao gồm profiling, benchmarking, và optimization recommendations
+purpose: Identify và resolve performance bottlenecks trong application
+input: Performance metrics, logs, profiling data, codebase
+output: Performance report, bottleneck analysis, optimization plan
+version: 1.0.0
+tags: [performance, profiling, optimization, benchmarking, APM]
+---
+
+# Performance Audit Skill - Kiểm Toán Performance Toàn Diện
+
+## Tổng quan
+
+Performance audit là quá trình systematic để identify, analyze, và resolve performance bottlenecks. Skill này cung cấp methodology toàn diện từ data collection đến optimization implementation, sử dụng industry-standard tools và practices.
+
+## Purpose (Mục đích)
+
+Performance Audit Skill được thiết kế để:
+
+1. **Bottleneck Identification**: Find performance issues từ application đến database
+2. **Metric Analysis**: Analyze performance data để understand system behavior
+3. **Optimization Planning**: Develop targeted optimization strategies
+4. **Impact Assessment**: Measure impact của changes
+5. **Continuous Monitoring**: Establish ongoing performance surveillance
+
+### Khi nào sử dụng Performance Audit
+
+- Khi application slow hoặc unresponsive
+- Khi user complaints về performance
+- Khi preparing for scale increase
+- Khi conducting regular performance review
+- Khi deploying major changes
+- Khi investigating timeout issues
+
+## Input (Đầu vào)
+
+- [ ] Performance metrics (APM data)
+- [ ] Application logs
+- [ ] Database slow query logs
+- [ ] Infrastructure metrics
+- [ ] Code profiling data
+- [ ] Load testing results
+- [ ] Architecture documentation
+
+## Output (Đầu ra)
+
+- [ ] Performance audit report
+- [ ] Bottleneck analysis
+- [ ] Optimization recommendations
+- [ ] Implementation roadmap
+- [ ] Performance baselines
+- [ ] Monitoring recommendations
+- [ ] SLA compliance assessment
+
+## Workflow (Quy trình)
+
+### Phase 1: Data Collection
+
+### Bước 1: Metrics Gathering
+
+```typescript
+// APM Integration Example
+interface PerformanceMetrics {
+  // Request Metrics
+  requestCount: number;
+  responseTime: {
+    p50: number;
+    p95: number;
+    p99: number;
+  };
+  errorRate: number;
+  
+  // Database Metrics
+  queryCount: number;
+  slowQueries: SlowQuery[];
+  connectionPoolUsage: number;
+  
+  // Infrastructure Metrics
+  cpuUsage: number;
+  memoryUsage: number;
+  networkLatency: number;
+  
+  // Custom Business Metrics
+  checkoutConversionRate: number;
+  searchLatency: number;
+}
+
+// Data Collection Script
+async function collectMetrics(): Promise<PerformanceMetrics> {
+  const [apmData, dbMetrics, infraMetrics] = await Promise.all([
+    fetchAPMData(),
+    fetchDatabaseMetrics(),
+    fetchInfraMetrics()
+  ]);
+  
+  return mergeMetrics(apmData, dbMetrics, infraMetrics);
+}
+```
+
+### Bước 2: Profiling Setup
+
+```typescript
+// Node.js Profiling
+// Enable CPU profiling
+import { profiler } from 'v8';
+
+// Start profiling
+profiler.startProfiling('performance-audit');
+
+// Run representative load
+await simulateUserTraffic(1000);
+
+// Stop and save profile
+const profile = profiler.stopProfiling();
+await writeFile('profile.cpuprofile', JSON.stringify(profile));
+
+// Memory profiling
+const heapBefore = process.memoryUsage();
+await runWorkload();
+const heapAfter = process.memoryUsage();
+
+console.log({
+  heapDelta: heapAfter.heapUsed - heapBefore.heapUsed,
+  externalDelta: heapAfter.external - heapBefore.external
+});
+```
+
+### Phase 2: Analysis
+
+### Bước 3: Bottleneck Identification
+
+```
+Performance Bottleneck Categories:
+
+1. CPU Bound
+   - Inefficient algorithms
+   - Heavy computation
+   - Crypto operations
+   - Image processing
+
+2. I/O Bound
+   - Database queries
+   - Network calls
+   - File operations
+   - External API calls
+
+3. Memory Bound
+   - Memory leaks
+   - Large data structures
+   - Memory allocation patterns
+   - Garbage collection pressure
+
+4. Concurrency Bound
+   - Lock contention
+   - Thread pool exhaustion
+   - Connection pool limits
+   - Rate limiting
+```
+
+### Bước 4: Database Analysis
+
+```sql
+-- Slow Query Analysis
+SELECT 
+  query,
+  calls,
+  mean_time,
+  total_time,
+  rows
+FROM pg_stat_statements
+WHERE mean_time > 100  -- Queries taking > 100ms on average
+ORDER BY total_time DESC
+LIMIT 20;
+
+-- Query Execution Plan Analysis
+EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)
+SELECT o.*, u.name 
+FROM orders o
+JOIN users u ON o.user_id = u.id
+WHERE o.created_at > NOW() - INTERVAL '7 days'
+ORDER BY o.total DESC;
+
+-- Index Usage Analysis
+SELECT 
+  schemaname,
+  tablename,
+  indexname,
+  idx_tup_read,
+  idx_tup_fetch,
+  idx_scan
+FROM pg_stat_user_indexes
+ORDER BY idx_tup_read DESC;
+```
+
+### Phase 3: Optimization
+
+### Bước 5: Optimization Implementation
+
+```typescript
+// Example: Optimizing N+1 Query Problem
+
+// BEFORE: N+1 Query
+async function getOrdersWithUsers(orderIds: string[]) {
+  const orders = await db.query(
+    'SELECT * FROM orders WHERE id = ANY($1)',
+    [orderIds]
+  );
+  
+  // N+1 Problem: Separate query for each order's user
+  for (const order of orders) {
+    order.user = await db.query(
+      'SELECT * FROM users WHERE id = $1',
+      [order.userId]
+    );
+  }
+  
+  return orders;
+}
+
+// AFTER: Single JOIN Query
+async function getOrdersWithUsers(orderIds: string[]) {
+  const result = await db.query(`
+    SELECT 
+      o.*,
+      u.id as user_id,
+      u.name as user_name,
+      u.email as user_email
+    FROM orders o
+    JOIN users u ON o.user_id = u.id
+    WHERE o.id = ANY($1)
+  `, [orderIds]);
+  
+  // Group results back into orders
+  return groupByOrderId(result);
+}
+
+// AFTER: Batch Query with IN clause
+async function getOrdersWithUsersBatch(orderIds: string[]) {
+  const orders = await db.query(
+    'SELECT * FROM orders WHERE id = ANY($1)',
+    [orderIds]
+  );
+  
+  // Single batch query for all users
+  const userIds = [...new Set(orders.map(o => o.userId))];
+  const users = await db.query(
+    'SELECT * FROM users WHERE id = ANY($1)',
+    [userIds]
+  );
+  
+  // Map users to orders in memory
+  const userMap = new Map(users.map(u => [u.id, u]));
+  orders.forEach(o => o.user = userMap.get(o.userId));
+  
+  return orders;
+}
+```
+
+### Bước 6: Caching Strategy
+
+```typescript
+// Multi-layer Caching Implementation
+
+// Layer 1: Application Cache
+const productCache = new NodeCache({ 
+  stdTTL: 300,  // 5 minutes
+  checkperiod: 60 
+});
+
+async function getProduct(productId: string) {
+  // Check cache first
+  const cached = productCache.get<Product>(productId);
+  if (cached) return cached;
+  
+  // Fetch from database
+  const product = await db.products.findById(productId);
+  
+  // Cache result
+  productCache.set(productId, product);
+  
+  return product;
+}
+
+// Layer 2: Redis Distributed Cache
+async function getProductRedis(productId: string) {
+  const cacheKey = `product:${productId}`;
+  
+  // Try Redis first
+  const cached = await redis.get(cacheKey);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+  
+  // Fetch from database
+  const product = await db.products.findById(productId);
+  
+  // Store in Redis with TTL
+  await redis.setex(cacheKey, 300, JSON.stringify(product));
+  
+  return product;
+}
+
+// Cache Invalidation
+async function invalidateProductCache(productId: string) {
+  productCache.del(productId);
+  await redis.del(`product:${productId}`);
+}
+
+// Event-driven cache invalidation
+eventBus.subscribe('product.updated', async (event) => {
+  await invalidateProductCache(event.productId);
+});
+```
+
+### Bước 7: Benchmarking
+
+```typescript
+// Benchmark Suite
+import Benchmark from 'benchmark';
+
+const suite = new Benchmark.Suite('Database Query Optimization');
+
+// Original implementation
+suite.add('N+1 Query', async () => {
+  const orders = await getOrdersNPlusOne(userId);
+});
+
+// Optimized with JOIN
+suite.add('JOIN Query', async () => {
+  const orders = await getOrdersWithJoin(userId);
+});
+
+// Optimized with batch query
+suite.add('Batch Query', async () => {
+  const orders = await getOrdersBatch(userId);
+});
+
+suite
+  .on('cycle', (event) => {
+    console.log(String(event.target));
+  })
+  .on('complete', function() {
+    console.log('Fastest: ' + this.filter('fastest').map('name'));
+  })
+  .run({ async: true });
+
+// Results:
+// N+1 Query:    245 ms  (± 5.2%)
+// JOIN Query:   45 ms   (± 1.1%)
+// Batch Query:  38 ms   (± 0.8%)
+```
+
+## Checklist
+
+- [ ] Performance baseline established
+- [ ] APM integration configured
+- [ ] Slow queries identified
+- [ ] Bottlenecks prioritized by impact
+- [ ] Optimization implemented
+- [ ] Benchmarking performed
+- [ ] Load testing completed
+- [ ] Monitoring established
+- [ ] Documentation updated
+- [ ] Performance regression tests added
+
+## Examples (Ví dụ)
+
+### Ví dụ: E-commerce Search Optimization
+
+**Problem:** Product search takes 3+ seconds
+
+**Investigation:**
+
+```typescript
+// Original Search Implementation
+async function searchProducts(query: string, filters: Filters) {
+  let sql = 'SELECT * FROM products WHERE 1=1';
+  const params: any[] = [];
+  
+  if (query) {
+    params.push(`%${query}%`);
+    sql += ` AND (name ILIKE $${params.length} OR description ILIKE $${params.length})`;
+  }
+  
+  if (filters.category) {
+    params.push(filters.category);
+    sql += ` AND category_id = $${params.length}`;
+  }
+  
+  // Problem: No pagination, full table scan
+  const products = await db.query(sql, params);
+  return products;
+}
+
+// Solution 1: Pagination
+async function searchProductsPaginated(query: string, filters: Filters, page: number, limit: number) {
+  const offset = (page - 1) * limit;
+  
+  const [products, total] = await Promise.all([
+    db.query(sql + ` LIMIT ${limit} OFFSET ${offset}`, params),
+    db.query(`SELECT COUNT(*) FROM (${sql}) as count`, params)
+  ]);
+  
+  return {
+    data: products,
+    pagination: {
+      page,
+      limit,
+      total: total[0].count,
+      pages: Math.ceil(total[0].count / limit)
+    }
+  };
+}
+
+// Solution 2: Full-text Search
+await db.query(`
+  CREATE INDEX idx_products_search 
+  ON products USING GIN(to_tsvector('english', name || ' ' || description))
+`);
+
+async function searchProductsFullText(query: string, filters: Filters) {
+  const searchQuery = query.split(' ')
+    .map(term => `${term}:*`)
+    .join(' & ');
+  
+  const result = await db.query(`
+    SELECT *, ts_rank(search_vector, to_tsquery('english', $1)) as rank
+    FROM products
+    WHERE search_vector @@ to_tsquery('english', $1)
+    ORDER BY rank DESC
+    LIMIT 50
+  `, [searchQuery]);
+  
+  return result;
+}
+```
+
+## Anti Pattern
+
+- [ ] **Premature Optimization**: Optimizing before profiling
+- [ ] **Guessing Bottlenecks**: Without data-driven evidence
+- [ ] **Ignoring Scalability**: Optimizing for current load only
+- [ ] **Caching Everything**: Without invalidation strategy
+- [ ] **Micro-optimizations**: Focusing on small wins while missing big issues
+- [ ] **No Baseline**: Not measuring before optimizing
+- [ ] **Single-point Focus**: Only looking at one layer
+- [ ] **No Monitoring**: Not tracking after optimization
+
+## Best Practice
+
+- [ ] **Measure First**: Always profile before optimizing
+- [ ] **Focus on Big Wins**: Target highest-impact areas
+- [ ] **Follow 80/20 Rule**: 20% of changes give 80% of improvements
+- [ ] **Establish Baselines**: Know your starting point
+- [ ] **Test Under Load**: Performance testing with realistic load
+- [ ] **Monitor Continuously**: Set up ongoing performance monitoring
+- [ ] **Document Changes**: Record what was optimized và why
+- [ ] **Automate Tests**: Include performance tests in CI/CD
+
+## Liên kết
+
+- [[../rules/core-architecture]] - Core Architecture
+- [[../skills/database-optimization]] - Database Optimization
+- [[../skills/redis-audit]] - Redis Audit
+- [[../skills/debug]] - Debug Skill
+- [[../skills/performance-audit]] - Performance Audit (this file)

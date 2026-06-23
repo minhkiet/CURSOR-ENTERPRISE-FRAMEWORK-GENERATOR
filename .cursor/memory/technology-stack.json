@@ -1,0 +1,75 @@
+{
+  "metadata": {
+    "description": "Technology Stack Index",
+    "created": "2026-06-23",
+    "version": "1.0.0"
+  },
+  "stack": {
+    "frontend": {
+      "nextjs": {"version": "15", "status": "primary", "pattern": "src/app/**"},
+      "react": {"version": "19", "status": "supported", "pattern": "src/components/**"},
+      "vue": {"version": "3", "status": "supported", "pattern": "src/**/*.vue"},
+      "nuxt": {"version": "4", "status": "supported", "pattern": "pages/**/*"},
+      "typescript": {"version": "5", "status": "required"},
+      "tailwindcss": {"version": "latest", "status": "primary"},
+      "shadcn-ui": {"status": "primary"},
+      "vuetify": {"version": "3", "status": "supported"},
+      "ant-design": {"version": "5", "status": "supported"}
+    },
+    "backend": {
+      "laravel": {"version": "12", "status": "supported"},
+      "aspnet-core": {"version": "9", "status": "supported"},
+      "nestjs": {"version": "latest", "status": "supported"},
+      "nodejs": {"version": "latest", "status": "supported"}
+    },
+    "database": {
+      "mysql": {"version": "8.0", "status": "supported"},
+      "postgresql": {"version": "16", "status": "primary"},
+      "sql-server": {"version": "2022", "status": "supported"},
+      "sqlite": {"version": "3", "status": "local-dev"},
+      "redis": {"version": "7", "status": "cache"}
+    },
+    "baas": {
+      "supabase": {"version": "latest", "status": "primary", "features": ["auth", "database", "storage", "edge-functions", "pgvector"]}
+    },
+    "ai": {
+      "openai": {"status": "primary", "models": ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo"]},
+      "gemini": {"status": "supported", "models": ["gemini-2.0-flash", "gemini-2.5-pro"]},
+      "claude": {"status": "supported", "models": ["claude-opus-4", "claude-sonnet-4", "claude-haiku-4"]},
+      "ollama": {"status": "local-dev"},
+      "openrouter": {"status": "aggregator"}
+    },
+    "rag": {
+      "pgvector": {"status": "primary", "type": "vector-store"},
+      "chromadb": {"status": "supported", "type": "vector-store"},
+      "qdrant": {"status": "supported", "type": "vector-store"},
+      "weaviate": {"status": "supported", "type": "vector-store"}
+    },
+    "workflow": {
+      "n8n": {"status": "supported"},
+      "temporal": {"status": "supported"},
+      "trigger-dev": {"status": "supported"}
+    },
+    "cloud": {
+      "cloudflare": {"status": "primary", "services": ["workers", "pages", "r2", "d1", "kv"]},
+      "aws": {"status": "supported", "services": ["ec2", "rds", "s3", "lambda", "ecs"]},
+      "azure": {"status": "supported", "services": ["app-service", "sql-database", "blob-storage", "functions"]},
+      "gcp": {"status": "supported", "services": ["compute", "cloud-sql", "cloud-storage", "cloud-functions"]}
+    },
+    "deployment": {
+      "docker": {"status": "required"},
+      "kubernetes": {"status": "supported"},
+      "coolify": {"status": "self-hosted"},
+      "vercel": {"status": "frontend-primary"},
+      "railway": {"status": "supported"}
+    }
+  },
+  "compatibility": {
+    "cursor": {"status": "primary"},
+    "claude-code": {"status": "supported"},
+    "vibe-code": {"status": "supported"},
+    "windsurf": {"status": "supported"},
+    "cline": {"status": "supported"},
+    "roo-code": {"status": "supported"}
+  }
+}

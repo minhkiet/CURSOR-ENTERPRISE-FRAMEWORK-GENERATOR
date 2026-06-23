@@ -1,0 +1,215 @@
+---
+description: Nguyên tắc và best practices cho MySQL Database
+created: 2026-06-23
+version: 1.0.0
+tags: [mysql, database, sql, performance, enterprise]
+---
+
+# MySQL
+
+## Mục tiêu
+
+MySQL là một trong những relational database được sử dụng rộng rãi nhất trên thế giới, và trong Cursor Enterprise Framework, nó đóng vai trò là lựa chọn chính cho các ứng dụng cần reliability, performance tốt, và ecosystem phong phú. Mục tiêu của MySQL rule này là cung cấp hướng dẫn chi tiết cho việc thiết kế, implement, và vận hành MySQL databases trong môi trường enterprise. Các nguyên tắc được đề ra áp dụng cho cả MySQL Community Edition lẫn MySQL Enterprise, với các optimizations cụ thể cho MySQL 8.0+.
+
+MySQL rule tập trung vào các khía cạnh đặc thù của MySQL như InnoDB storage engine, MySQL特有的 SQL syntax và extensions, configuration tuning, và operational best practices. Những người làm việc với MySQL trong framework này cần tuân thủ các guidelines để đảm bảo rằng applications đạt được performance và reliability tối ưu.
+
+## Nguyên tắc
+
+**1. InnoDB as Default Storage Engine**
+
+InnoDB phải là storage engine mặc định cho tất cả tables trong production. InnoDB cung cấp ACID compliance, row-level locking, và superior performance cho most workloads. MyISAM chỉ được sử dụng cho specialized read-heavy tables với specific requirements và documented justification. Tables được explicit define với ENGINE=InnoDB trong CREATE TABLE statements. Partitioned tables phải sử dụng InnoDB engine. Memory storage engine có thể được used cho temporary tables với appropriate understanding of volatility.
+
+**2. Primary Key Design**
+
+Mỗi table phải có một primary key được defined rõ ràng. UUID primary keys có hậu quả về performance và storage. Sử dụng BIGINT AUTO_INCREMENT cho most tables với high insert volume. Composite primary keys được limit to 2-3 columns để avoid performance issues. Primary key nên be monotonic (always increasing) để optimize InnoDB insert performance. Clustered index on primary key impacts all other indexes size.
+
+**3. VARCHAR vs CHAR**
+
+Sử dụng VARCHAR cho variable-length data với reasonable maximum length. VARCHAR(255) phù hợp cho most string data như emails, usernames. Avoid VARCHAR without length limit. CHAR(n) chỉ for truly fixed-length data như country codes, postal codes. Full-text search sử dụng dedicated indexes, not LIKE patterns on large text fields. TEXT columns được stored off-page, impacting performance.
+
+**4. Index Strategy for MySQL**
+
+Primary key columns đã được indexed automatically. Too many indexes slow down writes và increase storage. Composite indexes có ordering implications - put most selective column first. Covering indexes có thể eliminate table lookups. Index prefix lengths (LIMIT n) được calculated based on data distribution. Unused indexes được identified và dropped. Index cardinality được monitored.
+
+**5. Query Patterns và Optimization**
+
+EXPLAIN ANALYZE được used để analyze query execution plans. Queries được optimized for range scans over full table scans. OR conditions được restructured to UNION or IN for better index usage. JOINs được limited in complexity và number of tables. Subqueries được considered for rewriting as JOINs in older MySQL versions. Batch operations được used for bulk inserts/updates. Prepared statements được used for repeated queries.
+
+**6. Transaction Management**
+
+Transactions được kept short to reduce lock contention. Long transactions prevent purge of undo logs. Explicit LOCK TABLES được avoided in favor of row-level locking. Deadlocks được handled gracefully với retry logic. Isolation levels được set appropriately per operation (READ COMMITTED for most, SERIALIZABLE rarely needed). Autocommit mode được understood và configured properly.
+
+**7. Connection Management**
+
+Max_connections được set based on available memory và expected load. Connection pooling được implemented at application layer. Persistent connections được used carefully due to connection overhead. Connection timeout values được configured appropriately. Max_connect_errors được set to prevent brute force attacks. DNS blacklists được used cautiously.
+
+**8. Configuration Tuning**
+
+InnoDB buffer pool size được set to 70-80% of available memory. innodb_log_file_size được sized for reasonable crash recovery time. innodb_flush_log_at_trx_commit được configured based on durability requirements. innodb_flush_method=O_DIRECT được used on Linux for better I/O performance. Query cache được DISABLED in MySQL 8.0+ (removed feature). Performance schema được enabled cho monitoring.
+
+**9. Backup và Point-in-Time Recovery**
+
+mysqldump cho logical backups của small-medium databases. Percona XtraBackup cho large databases với minimal downtime. Point-in-time recovery enabled through binary logs. Binary log format ROW recommended for data integrity. Backup schedule: full daily, incremental hourly. Backup validation được tested regularly.
+
+**10. Replication Configuration**
+
+Binlog format ROW hoặc MIXED for data integrity. GTID-based replication được preferred over position-based. Semi-synchronous replication cho critical data. Replication filters được used carefully to avoid inconsistencies. Lag monitoring được set up for replicas. Automatic failover với Orchestrator hoặc similar tools.
+
+## Checklist
+
+- [ ] InnoDB engine được set as default
+- [ ] Primary keys được designed appropriately
+- [ ] Index strategy được documented
+- [ ] Slow query log được enabled
+- [ ] Buffer pool sizing được configured
+- [ ] Connection limits được set
+- [ ] Binary logging được configured
+- [ ] Backup strategy được implemented
+- [ ] Replication được set up nếu cần
+- [ ] Monitoring dashboards được created
+- [ ] Security hardening được applied
+- [ ] Documentation được updated
+
+## Anti Pattern
+
+**1. VARCHAR(255) Everywhere**
+
+Not every string is 255 characters. This wastes space and may confuse schema readers. Country codes should be CHAR(2). Status fields should be ENUM or shorter VARCHAR. Phone numbers vary by country. Solution: Choose appropriate lengths based on actual data.
+
+**2. SELECT *
+
+Avoid SELECT * in application code. It fetches unnecessary data. Column order changes break code. It prevents covering index usage. Solution: Explicitly list needed columns.
+
+**3. No Primary Key**
+
+Tables without primary keys cause issues with replication và data integrity. Duplicates can occur unnoticed. Row identification becomes ambiguous. Solution: Always define primary key.
+
+**4. Ignoring NULL**
+
+Treating NULL same as empty string or zero. NULL has special meaning in SQL. Mixing NULLs and empty values creates confusion. Solution: Understand NULL semantics and use appropriately.
+
+**5. Timestamp Mismanagement**
+
+Using DATETIME without timezone awareness. Mixing CURRENT_TIMESTAMP và NOW() inconsistently. TIMESTAMP limited to 1970-2038. Solution: Use TIMESTAMP WITH TIME ZONE or store UTC values explicitly.
+
+## Best Practice
+
+**1. Use Generated Columns**
+
+Generated columns for computed values ensure consistency. CREATE TABLE users (..., age INT GENERATED ALWAYS AS (DATEDIFF...) STORED). Indexes can be created on generated columns. Simplifies application code.
+
+**2. Optimize for Bulk Operations**
+
+LOAD DATA INFILE for bulk imports. Batch INSERT with multiple VALUES. Disable indexes before bulk load, re-enable after. Use INSERT DELAYED sparingly.
+
+**3. Partitioning for Large Tables**
+
+Partition by date/range for time-series data. Partition by hash for even distribution. Partition pruning eliminates irrelevant partitions. Partition maintenance required.
+
+**4. JSON Data Type Usage**
+
+MySQL 8.0 JSON functions are powerful. Use JSON_TABLE for extracting data. Add virtual columns indexed for JSON paths. Validate JSON structure.
+
+**5. Window Functions**
+
+MySQL 8.0+ supports window functions. Use ROW_NUMBER() for deduplication. Running totals with SUM() OVER(). Rankings with RANK() OVER().
+
+**6. CTEs for Readability**
+
+Common Table Expressions improve query readability. Recursive CTEs for hierarchical data. CTEs can replace complex subqueries.
+
+**7. Optimizer Hints**
+
+Use hints sparingly when you know better than optimizer. STRAIGHT_JOIN for controlling join order. USE INDEX, FORCE INDEX for index selection.
+
+**8. Connection Pooling**
+
+Use mysql2 with connection pooling. Pool size based on: (max_connections + 2) / 3. Monitor connection pool metrics.
+
+## Workflow
+
+**Phase 1: Schema Design**
+
+Design normalized schema. Define primary keys và indexes. Choose appropriate data types. Document relationships.
+
+**Phase 2: Query Development**
+
+Write queries with EXPLAIN analysis. Optimize based on execution plans. Test with realistic data volumes.
+
+**Phase 3: Configuration**
+
+Configure MySQL for workload. Tune buffer pool size. Set appropriate timeouts. Enable required logging.
+
+**Phase 4: Deployment**
+
+Run migrations in staging. Validate performance. Deploy to production. Monitor key metrics.
+
+**Phase 5: Operations**
+
+Monitor slow queries. Review index usage. Adjust configuration as needed. Plan capacity.
+
+## Ví dụ
+
+**Ví dụ 1: Proper Table Creation**
+
+```sql
+CREATE TABLE orders (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  customer_id BIGINT UNSIGNED NOT NULL,
+  order_number VARCHAR(50) NOT NULL,
+  status ENUM('pending', 'processing', 'shipped', 'delivered', 'cancelled') NOT NULL DEFAULT 'pending',
+  total_amount DECIMAL(12,2) NOT NULL,
+  currency_code CHAR(3) NOT NULL DEFAULT 'USD',
+  shipping_address JSON,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_order_number (order_number),
+  KEY idx_customer_id (customer_id),
+  KEY idx_status_created (status, created_at),
+  CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES customers(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+**Ví dụ 2: Query Optimization**
+
+```sql
+-- Bad: SELECT * with implicit join
+SELECT * FROM orders o, customers c 
+WHERE o.customer_id = c.id AND c.email = 'test@example.com';
+
+-- Good: Explicit columns, proper join
+SELECT o.id, o.order_number, o.total_amount, o.status, o.created_at
+FROM orders o
+INNER JOIN customers c ON o.customer_id = c.id
+WHERE c.email = 'test@example.com';
+
+-- EXPLAIN shows: Using index condition; Using where
+```
+
+**Ví dụ 3: Connection Pool Configuration**
+
+```typescript
+import mysql from 'mysql2/promise';
+
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT || '3306'),
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0,
+});
+```
+
+## Liên kết
+
+- [[database]] - Database: General database principles
+- [[postgres]] - PostgreSQL: For comparison và multi-database strategies
+- [[performance]] - Performance: General performance guidelines
+- [[security]] - Security: Database security practices
+- [[backup]] - Backup: Backup strategies

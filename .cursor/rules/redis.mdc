@@ -1,0 +1,323 @@
+---
+description: Nguyên tắc và best practices cho Redis Cache và Data Store
+created: 2026-06-23
+version: 1.0.0
+tags: [redis, cache, session, performance, nosql]
+---
+
+# Redis
+
+## Mục tiêu
+
+Redis là một in-memory data structure store được sử dụng như database, cache, message broker, và session store. Trong Cursor Enterprise Framework, Redis đóng vai trò quan trọng trong việc cải thiện performance thông qua caching, quản lý sessions, rate limiting, và real-time features như pub/sub. Mục tiêu của rule này là hướng dẫn developers trong việc sử dụng Redis một cách hiệu quả và an toàn, tận dụng các data structures phù hợp cho từng use case.
+
+Redis cung cấp nhiều data types khác nhau như strings, lists, sets, sorted sets, hashes, bitmaps, hyperloglogs, và geospatial indexes. Việc chọn đúng data structure và áp dụng đúng patterns là chìa khóa để đạt được performance tối ưu. Rule này cover các best practices cho data modeling, connection management, security, clustering, và operational excellence.
+
+## Nguyên tắc
+
+**1. Data Type Selection**
+
+Strings cho simple key-value và counters. Hashes cho objects với multiple fields. Lists cho ordered collections và queues. Sets cho unordered unique collections. Sorted Sets cho leaderboards, rankings, rate limiting. Streams cho event sourcing, messaging. Bitmaps cho space-efficient flags. Choose based on actual access patterns.
+
+**2. Key Naming Convention**
+
+Use descriptive, namespaced keys. Pattern: `<application>:<entity>:<identifier>:<field>`. Examples: `auth:session:abc123`, `cache:user:42:profile`. Colons as separators (standard convention). Avoid overly long keys. Keep key names consistent across application. Use same pattern for related keys.
+
+**3. TTL Management**
+
+Always set TTL on cached data. Prevent unbounded growth. Default TTL patterns by data type: sessions (24h), cache (1h), rate limits (varies). Use EXPIRE for absolute expiry. Use EXPIREAT for absolute timestamp. Refresh TTL on access if needed. Monitor keys without TTL.
+
+**4. Connection Pooling**
+
+Always use connection pooling. Jedis/Lettuce/ioredis with pool config. Pool size: CPU cores * 2 to * 4. Configure connection timeout và command timeout. Enable TCP keepalive. Monitor pool utilization. Close connections properly on shutdown.
+
+**5. Serialization Strategy**
+
+Use efficient serializers. JSON for generic objects. MessagePack/Protobuf for efficiency. Avoid Java serialization (security). Consider compression for large values. Match serializer to use case. Validate serialized data.
+
+**6. Cache Patterns**
+
+Cache-Aside: Read through cache, update on miss. Write-Through: Update cache and DB together. Write-Behind: Update cache, async DB write. Refresh-Ahead: Proactively refresh expiring cache. Choose pattern based on consistency needs. Implement cache invalidation carefully.
+
+**7. Rate Limiting**
+
+Use sliding window with sorted sets. Lua scripts for atomic operations. Key: `ratelimit:<user>:<endpoint>`. Store timestamps as scores. Remove old entries on each check. Combine with IP-based limits. Consider distributed rate limiting.
+
+**8. Session Management**
+
+Store sessions as hashes. Include user data, permissions, metadata. TTL based on session timeout. Refresh TTL on activity. Invalidate on logout explicitly. Separate session store from other Redis usage. Consider Redis Cluster for session HA.
+
+**9. Pub/Sub Usage**
+
+For real-time notifications. Channels: application-specific naming. Pattern matching for subscriptions. Consider Redis Streams for durability. Monitor subscriber counts. Handle reconnection gracefully. Not for message persistence.
+
+**10. Security Configuration**
+
+Bind to internal interfaces only. Use AUTH password. Enable TLS in production. Disable dangerous commands (FLUSHDB, CONFIG). Use Redis ACL for fine-grained access. Monitor command statistics. Regular security audits.
+
+## Checklist
+
+- [ ] Key naming convention documented
+- [ ] Data types selected appropriately
+- [ ] TTL strategy defined
+- [ ] Connection pooling configured
+- [ ] Serialization strategy chosen
+- [ ] Cache patterns implemented
+- [ ] Rate limiting configured
+- [ ] Security hardening applied
+- [ ] Monitoring setup
+- [ ] Backup strategy defined
+- [ ] Cluster/sentinel configured if needed
+- [ ] Documentation complete
+
+## Anti Pattern
+
+**1. Storing Large Values**
+
+Large values consume memory và network bandwidth. Use compression or chunking. Consider alternative storage for large objects. Solution: Store references, not data.
+
+**2. KEYS Command in Production**
+
+KEYS blocks Redis server. O(N) scan of all keys. Use SCAN instead. KEYS only for debugging. Solution: Use SCAN or maintain key index.
+
+**3. No TTL on Keys**
+
+Keys grow unbounded. Memory exhaustion. Solution: Always set TTL or implement eviction policies.
+
+**4. Using Redis as Primary Database**
+
+Redis is not durable by default. Data loss on restart. Solution: Use Redis as cache, primary DB separately.
+
+**5. Ignoring Memory Management**
+
+No eviction policy configured. Memory fragmentation. Solution: Configure maxmemory-policy appropriately.
+
+## Best Practice
+
+**1. Lua Scripts for Atomicity**
+
+-- Rate limit example
+local key = KEYS[1]
+local limit = tonumber(ARGV[1])
+local window = tonumber(ARGV[2])
+
+local current = redis.call('ZCARD', key)
+if current >= limit then
+  return 0
+end
+
+redis.call('ZADD', key, ARGV[3], ARGV[3])
+redis.call('EXPIRE', key, window)
+return redis.call('ZCARD', key)
+
+**2. Redis Sentinel for HA**
+
+Sentinel monitors master/slave. Automatic failover. Client connection updates. Multiple sentinels for quorum. Proper configuration required.
+
+**3. Redis Cluster for Sharding**
+
+Automatic sharding. 16384 hash slots. Multiple masters. Client redirects. Key hash tags for multi-key operations.
+
+**4. Pipeline for Batch Operations**
+
+Use pipelines to batch commands. Reduces round trips. All commands atomic individually. Non-atomic across pipeline.
+
+**5. Memory Optimization**
+
+Use INT encoding for small numbers. Useziplist for small lists/hashes. Maxmemory-policy for eviction. Monitor fragmentation.
+
+**6. Streams for Messaging**
+
+Consumer groups for load distribution. Message acknowledgment. Pending entries list. Dead letter handling.
+
+**7. Bloom Filters**
+
+Space-efficient set membership. Probabilistic data structure. Configurable false positive rate. Use for cache filtering.
+
+**8. HyperLogLog**
+
+Approximate unique counting. 0.81% standard error. Very memory efficient. PFADD/PFCOUNT/PFMERGE commands.
+
+## Workflow
+
+**Phase 1: Design**
+
+Identify use cases for Redis. Select appropriate data structures. Plan key naming scheme. Define TTL policies.
+
+**Phase 2: Implementation**
+
+Implement connection pooling. Apply serialization. Code cache patterns. Add error handling.
+
+**Phase 3: Testing**
+
+Test with realistic load. Verify TTL behavior. Check cache invalidation. Measure latency impact.
+
+**Phase 4: Deployment**
+
+Configure security settings. Set up Sentinel/Cluster if needed. Implement monitoring. Document configuration.
+
+**Phase 5: Operations**
+
+Monitor memory usage. Review key patterns. Tune configuration. Plan capacity.
+
+## Ví dụ
+
+**Ví dụ 1: Cache-Aside Pattern**
+
+```typescript
+async function getUserProfile(userId: string): Promise<UserProfile> {
+  const cacheKey = `user:profile:${userId}`;
+  
+  // Try cache first
+  const cached = await redis.get(cacheKey);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+  
+  // Cache miss - fetch from database
+  const user = await database.users.findById(userId);
+  if (!user) {
+    throw new NotFoundError('User not found');
+  }
+  
+  // Store in cache with TTL
+  await redis.setex(
+    cacheKey,
+    3600, // 1 hour TTL
+    JSON.stringify(user)
+  );
+  
+  return user;
+}
+
+async function updateUserProfile(userId: string, data: Partial<UserProfile>): Promise<void> {
+  await database.users.update(userId, data);
+  
+  // Invalidate cache
+  const cacheKey = `user:profile:${userId}`;
+  await redis.del(cacheKey);
+}
+```
+
+**Ví dụ 2: Distributed Rate Limiting**
+
+```typescript
+// Lua script for sliding window rate limiting
+const RATE_LIMIT_SCRIPT = `
+local key = KEYS[1]
+local limit = tonumber(ARGV[1])
+local window_seconds = tonumber(ARGV[2])
+local current_time = tonumber(ARGV[3])
+
+-- Remove old entries outside the window
+redis.call('ZREMRANGEBYSCORE', key, 0, current_time - window_seconds * 1000)
+
+-- Count current requests in window
+local count = redis.call('ZCARD', key)
+
+if count >= limit then
+  return {0, count, count - limit}
+end
+
+-- Add current request
+redis.call('ZADD', key, current_time, current_time)
+
+-- Set expiry on the key
+redis.call('EXPIRE', key, window_seconds)
+
+return {1, count + 1, 0}
+`;
+
+async function checkRateLimit(
+  userId: string,
+  endpoint: string,
+  limit: number,
+  windowSeconds: number
+): Promise<{ allowed: boolean; current: number; remaining: number }> {
+  const key = `ratelimit:${endpoint}:${userId}`;
+  const now = Date.now();
+  
+  const result = await redis.eval(
+    RATE_LIMIT_SCRIPT,
+    1,
+    key,
+    limit,
+    windowSeconds,
+    now
+  );
+  
+  return {
+    allowed: result[0] === 1,
+    current: result[1],
+    remaining: Math.max(0, limit - result[1])
+  };
+}
+```
+
+**Ví dụ 3: Session Management**
+
+```typescript
+interface SessionData {
+  userId: string;
+  email: string;
+  roles: string[];
+  createdAt: number;
+  lastActivity: number;
+}
+
+const SESSION_TTL = 86400; // 24 hours
+
+async function createSession(userId: string, email: string, roles: string[]): Promise<string> {
+  const sessionId = crypto.randomUUID();
+  const key = `session:${sessionId}`;
+  
+  const sessionData: SessionData = {
+    userId,
+    email,
+    roles,
+    createdAt: Date.now(),
+    lastActivity: Date.now()
+  };
+  
+  await redis.hset(key, sessionData);
+  await redis.expire(key, SESSION_TTL);
+  
+  return sessionId;
+}
+
+async function getSession(sessionId: string): Promise<SessionData | null> {
+  const key = `session:${sessionId}`;
+  const data = await redis.hgetall(key);
+  
+  if (!data || Object.keys(data).length === 0) {
+    return null;
+  }
+  
+  // Refresh TTL on activity
+  await redis.expire(key, SESSION_TTL);
+  
+  // Update last activity
+  await redis.hset(key, 'lastActivity', Date.now().toString());
+  
+  return {
+    userId: data.userId,
+    email: data.email,
+    roles: JSON.parse(data.roles),
+    createdAt: parseInt(data.createdAt),
+    lastActivity: Date.now()
+  };
+}
+
+async function invalidateSession(sessionId: string): Promise<void> {
+  const key = `session:${sessionId}`;
+  await redis.del(key);
+}
+```
+
+## Liên kết
+
+- [[database]] - Database: General database principles
+- [[cache]] - Cache: General caching strategies
+- [[performance]] - Performance: Performance optimization
+- [[security]] - Security: Security best practices
+- [[queue]] - Queue: Message queue patterns

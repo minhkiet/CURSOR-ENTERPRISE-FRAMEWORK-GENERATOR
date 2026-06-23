@@ -1,0 +1,320 @@
+---
+description: Quy trình debug hệ thống từ cơ bản đến nâng cao, bao gồm multi-layer debugging và cross-service tracing
+purpose: Debug application khi gặp lỗi hoặc behavior không mong muốn
+input: Error logs, stack traces, behavior descriptions, relevant source code
+output: Root cause analysis, fix recommendations, preventive measures
+version: 1.0.0
+tags: [debug, troubleshooting, diagnostics, root-cause]
+---
+
+# Debug Skill - Quy Trình Debug Hệ Thống Chuyên Nghiệp
+
+## Tổng quan
+
+Debug là kỹ năng cốt lõi của mọi software engineer. Skill này cung cấp framework debug có cấu trúc, giúp identify root cause một cách systematic thay vì guessing. Debug không chỉ là fix bug mà còn là hiểu system behavior, identify technical debt, và improve overall code quality.
+
+## Purpose (Mục đích)
+
+Skill debug này được thiết kế để:
+
+1. **Systematic Problem Solving**: Thay vì random testing, debug có cấu trúc giúp narrow down problem nhanh hơn 10x
+2. **Root Cause Analysis**: Không chỉ fix symptom mà identify underlying cause
+3. **Cross-layer Investigation**: Trace problem qua multiple layers (frontend → API → database → cache)
+4. **Knowledge Transfer**: Document findings để team members có thể learn và reproduce
+
+### Khi nào sử dụng Debug Skill
+
+- Khi user report bug hoặc unexpected behavior
+- Khi application crash hoặc throw exceptions
+- Khi performance degraded đột ngột
+- Khi data inconsistency được phát hiện
+- Khi integration tests fail
+- Khi production incidents xảy ra
+
+## Input (Đầu vào)
+
+- [ ] Error message hoặc exception stack trace
+- [ ] Expected behavior vs actual behavior
+- [ ] Steps to reproduce (nếu có)
+- [ ] Relevant logs (application, system, database)
+- [ ] Code context (file paths, function names)
+- [ ] Environment information (dev/staging/prod)
+- [ ] Recent changes (commits, deployments)
+
+## Output (Đầu ra)
+
+- [ ] Root cause identification
+- [ ] Fix recommendations với code changes
+- [ ] Regression test cases để prevent future occurrences
+- [ ] Monitoring/alerting improvements
+- [ ] Documentation updates nếu cần thiết
+
+## Workflow (Quy trình)
+
+### Bước 1: Problem Definition - Xác định rõ vấn đề
+
+```
+1. Xác định exact error message hoặc behavior
+2. Xác định boundary conditions (when does it happen?)
+3. Xác định affected scope (who/what is impacted?)
+4. Xác định reproducibility (consistent hay intermittent?)
+5. Xác định timeline (when did it start?)
+```
+
+**Questions để ask user:**
+
+- Error này xuất hiện từ khi nào?
+- Có gì thay đổi gần đây không (code, config, infrastructure)?
+- Problem này xảy ra 100% hay chỉ sometimes?
+- Có pattern nào liên quan đến time, user, data size không?
+
+### Bước 2: Data Collection - Thu thập thông tin
+
+```
+1. Application Logs:
+   - Filter by timestamp của incident
+   - Filter by request ID/user ID nếu có
+   - Look for ERROR, WARN levels
+   - Check correlation IDs
+
+2. Database Logs:
+   - Slow query logs
+   - Connection pool metrics
+   - Locking/blocking issues
+   - Deadlock detection
+
+3. System Metrics:
+   - CPU, Memory, Disk I/O
+   - Network latency
+   - Service dependencies health
+
+4. Code Review:
+   - Read relevant source files
+   - Check git history cho recent changes
+   - Identify code paths executed
+```
+
+### Bước 3: Hypothesis Formation - Đề xuất giả thuyết
+
+Dựa trên collected data, form multiple hypotheses:
+
+```
+Hypothesis 1: [Primary hypothesis]
+  - Evidence supporting: [list]
+  - Evidence against: [list]
+  - Confidence: High/Medium/Low
+
+Hypothesis 2: [Alternative hypothesis]
+  - Evidence supporting: [list]
+  - Evidence against: [list]
+  - Confidence: High/Medium/Low
+```
+
+### Bước 4: Testing & Verification - Kiểm tra và xác minh
+
+```
+1. Reproduce in local environment nếu possible
+2. Add diagnostic logging để test hypothesis
+3. Use debugger để step through code
+4. Check configuration values at runtime
+5. Validate assumptions với data samples
+```
+
+### Bước 5: Fix Implementation - Triển khai fix
+
+```
+1. Implement fix với minimal changes
+2. Write unit tests cho fix
+3. Update integration tests nếu cần
+4. Document fix và root cause
+5. Add monitoring cho early detection
+```
+
+### Bước 6: Verification & Rollback Plan - Xác minh và kế hoạch rollback
+
+```
+1. Test fix thoroughly
+2. Prepare rollback procedure
+3. Plan gradual rollout
+4. Monitor post-fix metrics
+```
+
+## Checklist
+
+- [ ] Problem được xác định rõ ràng với boundary conditions
+- [ ] Logs được thu thập từ tất cả relevant sources
+- [ ] Root cause được identify chứ không phải symptom
+- [ ] Fix được tested trong isolated environment
+- [ ] Rollback plan được prepared
+- [ ] Monitoring/alerting được enhanced
+- [ ] Documentation được updated
+- [ ] Knowledge được shared với team
+
+## Examples (Ví dụ)
+
+### Ví dụ 1: Debugging API Timeout
+
+**Problem:** API endpoint `/api/reports/generate` timeout after 30 seconds
+
+**Investigation:**
+
+```typescript
+// Step 1: Identify the slow operation
+// Check controller code
+async function generateReport(req: Request, res: Response) {
+  const reportData = await fetchAllData(); // potential bottleneck
+  const pdf = await generatePDF(reportData);
+  return res.json(pdf);
+}
+
+// Step 2: Add timing logs
+async function fetchAllData() {
+  const start = Date.now();
+  console.log('[DEBUG] Starting fetchAllData');
+  
+  const users = await User.findAll(); // 2s
+  const orders = await Order.findAll(); // 5s
+  const products = await Product.findAll(); // 3s
+  
+  console.log(`[DEBUG] fetchAllData took ${Date.now() - start}ms`);
+  return { users, orders, products };
+}
+
+// Step 3: Identify root cause
+// Found: Order.findAll() doing full table scan without index
+// Solution: Add composite index on (status, created_at)
+
+// Step 4: Implement fix
+// migration/xxxx_add_order_index.js
+export async function up(schema) {
+  await schema.raw(`
+    CREATE INDEX CONCURRENTLY idx_orders_status_created 
+    ON orders(status, created_at DESC)
+  `);
+}
+
+// Step 5: Verify
+// Query time: 5000ms → 150ms
+```
+
+### Ví dụ 2: Debugging Memory Leak
+
+**Problem:** Node.js application memory grows continuously until OOM crash
+
+**Investigation:**
+
+```typescript
+// Step 1: Generate heap snapshot
+// Add to application code:
+const v8 = require('v8');
+const fs = require('fs');
+
+app.get('/debug/heap-snapshot', (req, res) => {
+  const filename = `heap-${Date.now()}.heapsnapshot`;
+  const snapshotStream = v8.writeHeapSnapshot(filename);
+  res.json({ file: filename, path: snapshotStream });
+});
+
+// Step 2: Analyze in Chrome DevTools
+// Found: EventEmitter listeners accumulating
+// Root cause: Database connection event handlers not removed
+
+// Step 3: Fix
+class DataService {
+  private connection: Connection;
+  private listeners: Map<string, Function[]> = new Map();
+  
+  subscribe(event: string, handler: Function) {
+    if (!this.listeners.has(event)) {
+      this.listeners.set(event, []);
+    }
+    this.listeners.get(event)!.push(handler);
+    this.connection.on(event, handler);
+  }
+  
+  cleanup() {
+    for (const [event, handlers] of this.listeners) {
+      handlers.forEach(handler => this.connection.removeListener(event, handler));
+    }
+    this.listeners.clear();
+  }
+}
+```
+
+### Ví dụ 3: Debugging Race Condition
+
+**Problem:** Concurrent requests cause double-charging for same order
+
+**Investigation:**
+
+```typescript
+// Step 1: Identify race condition pattern
+// Original code:
+async function processPayment(orderId: string) {
+  const order = await Order.findById(orderId);
+  if (order.status === 'pending') {
+    // Race window here - another request can also pass this check
+    await chargeCustomer(order);
+    order.status = 'paid';
+    await order.save();
+  }
+}
+
+// Step 2: Add distributed lock
+async function processPayment(orderId: string) {
+  const lockKey = `payment:${orderId}`;
+  const lock = await redis.lock(lockKey, { ttl: 30000 });
+  
+  try {
+    const order = await Order.findById(orderId);
+    if (order.status === 'pending') {
+      await chargeCustomer(order);
+      order.status = 'paid';
+      await order.save();
+    }
+  } finally {
+    await lock.release();
+  }
+}
+
+// Step 3: Add idempotency
+const idempotencyKey = req.headers['idempotency-key'];
+const cacheKey = `idempotency:${idempotencyKey}`;
+
+const existing = await redis.get(cacheKey);
+if (existing) {
+  return JSON.parse(existing);
+}
+
+const result = await processPayment(orderId);
+await redis.setex(cacheKey, 86400, JSON.stringify(result));
+```
+
+## Anti Pattern
+
+- [ ] **Guessing Fix**: Không analyze mà apply random changes
+- [ ] **Fixing Symptom**: Fix error message thay vì underlying cause
+- [ ] **Ignoring Logs**: Không check logs hoặc bỏ qua important clues
+- [ ] **Breaking Changes**: Fix gây ra side effects không được test
+- [ ] **No Documentation**: Không document findings cho team
+- [ ] **One-time Fix**: Fix nhưng không prevent recurrence
+- [ ] **Delayed Testing**: Không reproduce và test fix trước deploy
+- [ ] **Single Point of View**: Chỉ look từ một layer thay vì full stack
+
+## Best Practice
+
+- [ ] **Systematic Approach**: Luôn follow structured debugging process
+- [ ] **Evidence-based**: Make decisions dựa trên data, không assumptions
+- [ ] **Reproduce First**: Always try to reproduce issue before fixing
+- [ ] **Minimal Fix**: Keep changes small và focused
+- [ ] **Test Thoroughly**: Write regression tests để prevent future occurrences
+- [ ] **Document Everything**: Document root cause và fix cho future reference
+- [ ] **Learn Continuously**: Extract lessons từ every debugging session
+- [ ] **Share Knowledge**: Share findings với team qua blameless postmortems
+
+## Liên kết
+
+- [[../rules/core-architecture]] - Core Architecture
+- [[../rules/memory-first]] - Memory First
+- [[../skills/root-cause-analysis]] - Root Cause Analysis
+- [[../skills/performance-audit]] - Performance Audit

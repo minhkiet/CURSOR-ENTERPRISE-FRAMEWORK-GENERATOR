@@ -1,0 +1,616 @@
+---
+description: Kiểm toán security toàn diện bao gồm OWASP Top 10, vulnerability assessment, và secure coding practices
+purpose: Identify và mitigate security vulnerabilities trong application
+input: Codebase, dependencies, configuration, API endpoints
+output: Security report, vulnerability assessment, remediation plan
+version: 1.0.0
+tags: [security, OWASP, vulnerability, audit, secure-coding]
+---
+
+# Security Audit Skill - Kiểm Toán Bảo Mật Toàn Diện
+
+## Tổng quan
+
+Security audit là quá trình systematic để identify, assess, và mitigate security vulnerabilities. Skill này cung cấp framework toàn diện dựa trên OWASP guidelines, industry best practices, và proven security methodologies.
+
+## Purpose (Mục đích)
+
+Security Audit Skill được thiết kế để:
+
+1. **Vulnerability Identification**: Find security weaknesses in application
+2. **Risk Assessment**: Evaluate severity và impact của vulnerabilities
+3. **Compliance Verification**: Ensure compliance với security standards
+4. **Secure Coding Validation**: Verify adherence to secure coding practices
+5. **Remediation Planning**: Develop actionable fix recommendations
+
+### Khi nào sử dụng Security Audit
+
+- Khi conducting regular security review
+- Khi deploying major feature
+- Khi responding to security incident
+- Khi preparing for compliance audit
+- Khi onboarding new system
+- Khi third-party security assessment
+
+## Input (Đầu vào)
+
+- [ ] Codebase (full hoặc specific modules)
+- [ ] Dependency manifest (package.json, requirements.txt)
+- [ ] Configuration files
+- [ ] API specifications
+- [ ] Authentication/authorization mechanisms
+- [ ] Data flow diagrams
+- [ ] Previous security reports
+
+## Output (Đầu ra)
+
+- [ ] Security audit report
+- [ ] Vulnerability list với severity ratings
+- [ ] Risk assessment matrix
+- [ ] Remediation recommendations
+- [ ] Secure coding checklist
+- [ ] Compliance gap analysis
+- [ ] Security testing results
+
+## Workflow (Quy trình)
+
+### Phase 1: Information Gathering
+
+### Bước 1: Attack Surface Analysis
+
+```typescript
+// Attack Surface Inventory
+interface AttackSurfaceEntry {
+  endpoint: string;
+  method: string;
+  authRequired: boolean;
+  inputPoints: string[];
+  dataSensitivity: 'low' | 'medium' | 'high' | 'critical';
+  lastSecurityReview: Date;
+}
+
+async function mapAttackSurface(): Promise<AttackSurfaceEntry[]> {
+  const routes = await getAllRoutes();
+  const surface: AttackSurfaceEntry[] = [];
+  
+  for (const route of routes) {
+    surface.push({
+      endpoint: route.path,
+      method: route.method,
+      authRequired: route.middleware.includes('auth'),
+      inputPoints: identifyInputPoints(route),
+      dataSensitivity: assessDataSensitivity(route),
+      lastSecurityReview: route.lastSecurityReview || new Date('2020-01-01')
+    });
+  }
+  
+  return surface;
+}
+```
+
+### Bước 2: Dependency Analysis
+
+```bash
+# Check for vulnerable dependencies
+npm audit
+# or
+yarn audit
+
+# Check for outdated dependencies
+npm outdated
+
+# Check for license issues
+npm audit --production | grep -i license
+
+# Use Snyk for comprehensive scanning
+snyk test
+
+# Use OWASP Dependency-Check
+owasp-dependency-check -p ./package-lock.json
+```
+
+### Phase 2: OWASP Top 10 Assessment
+
+### Bước 3: A01 - Broken Access Control
+
+```typescript
+// Vulnerability: Missing authorization checks
+// BEFORE (VULNERABLE)
+async function getUserProfile(req, res) {
+  const userId = req.params.userId;
+  const user = await db.users.findById(userId);
+  res.json(user); // No check if req.user can access this
+}
+
+// SECURE (FIXED)
+async function getUserProfile(req, res) {
+  const userId = req.params.userId;
+  
+  // Authorization check
+  if (req.user.id !== userId && !req.user.roles.includes('admin')) {
+    return res.status(403).json({ 
+      error: 'Forbidden', 
+      message: 'You can only access your own profile' 
+    });
+  }
+  
+  const user = await db.users.findById(userId);
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+  
+  res.json(user);
+}
+
+// Policy-based Access Control
+class AccessControlService {
+  canAccess(user: User, resource: Resource, action: Action): boolean {
+    const policies = this.getPolicies(user, resource);
+    return policies.some(p => p.action === action && p.granted);
+  }
+}
+```
+
+### Bước 4: A02 - Cryptographic Failures
+
+```typescript
+// Vulnerability: Weak password hashing
+// BEFORE (VULNERABLE)
+function hashPassword(password: string): string {
+  return crypto.createHash('md5').update(password).digest('hex');
+}
+
+// SECURE (FIXED)
+async function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, 12); // Cost factor 12
+}
+
+// Vulnerability: Hardcoded secrets
+// BEFORE (VULNERABLE)
+const config = {
+  apiKey: 'sk-1234567890abcdef',
+  dbPassword: 'secret123'
+};
+
+// SECURE (FIXED)
+const config = {
+  apiKey: process.env.API_KEY,
+  dbPassword: process.env.DB_PASSWORD
+};
+
+// Environment validation
+function validateSecrets() {
+  const required = ['API_KEY', 'DB_PASSWORD', 'JWT_SECRET'];
+  for (const secret of required) {
+    if (!process.env[secret]) {
+      throw new Error(`Missing required secret: ${secret}`);
+    }
+  }
+}
+```
+
+### Bước 5: A03 - Injection
+
+```typescript
+// SQL Injection Prevention
+// BEFORE (VULNERABLE)
+async function searchUsers(query: string) {
+  const result = await db.query(
+    `SELECT * FROM users WHERE name = '${query}'`
+  );
+  return result;
+}
+
+// SECURE (FIXED)
+async function searchUsers(query: string) {
+  // Whitelist validation
+  const sanitizedQuery = query.replace(/[^a-zA-Z0-9\s]/g, '');
+  
+  const result = await db.query(
+    'SELECT * FROM users WHERE name ILIKE $1',
+    [`%${sanitizedQuery}%`]
+  );
+  return result;
+}
+
+// NoSQL Injection Prevention
+async function findByEmail(email: string) {
+  // Strict email validation
+  if (!isValidEmail(email)) {
+    throw new ValidationError('Invalid email format');
+  }
+  
+  // Query with strict type
+  const result = await db.collection('users').findOne({ 
+    email: { $eq: email } 
+  });
+  return result;
+}
+
+// Command Injection Prevention
+async function processFile(filename: string) {
+  // Whitelist approach
+  const allowedExtensions = ['.pdf', '.docx', '.txt'];
+  const ext = path.extname(filename).toLowerCase();
+  
+  if (!allowedExtensions.includes(ext)) {
+    throw new ValidationError('File type not allowed');
+  }
+  
+  // Use path.join to prevent directory traversal
+  const safePath = path.join(ALLOWED_DIR, filename);
+  
+  // Validate resolved path
+  if (!safePath.startsWith(ALLOWED_DIR)) {
+    throw new ValidationError('Invalid file path');
+  }
+  
+  return fs.readFile(safePath);
+}
+```
+
+### Bước 6: A04 - Insecure Design
+
+```typescript
+// Rate Limiting Implementation
+import rateLimit from 'express-rate-limit';
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // 100 requests per window
+  message: 'Too many requests from this IP',
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.user?.id || req.ip,
+});
+
+// Stricter limit for sensitive endpoints
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5, // Only 5 attempts
+  skipSuccessfulRequests: true,
+});
+
+// Input Validation with Zod
+import { z } from 'zod';
+
+const userSchema = z.object({
+  email: z.string().email().max(255),
+  password: z.string().min(8).max(128)
+    .regex(/[A-Z]/)
+    .regex(/[a-z]/)
+    .regex(/[0-9]/)
+    .regex(/[^A-Za-z0-9]/),
+  age: z.number().int().min(13).max(120)
+});
+
+function validateInput<T>(schema: z.ZodSchema<T>, data: unknown): T {
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    throw new ValidationError(result.error.message);
+  }
+  return result.data;
+}
+```
+
+### Bước 7: A05 - Security Misconfiguration
+
+```typescript
+// Security Headers Middleware
+import helmet from 'helmet';
+
+app.use(helmet());
+
+// CORS Configuration
+app.use(cors({
+  origin: process.env.ALLOWED_ORIGINS?.split(',') || [],
+  credentials: true,
+  maxAge: 86400,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Error Handling - Don't leak information
+app.use((err, req, res, next) => {
+  // Log full error internally
+  logger.error({
+    error: err.message,
+    stack: err.stack,
+    path: req.path,
+    method: req.method
+  });
+  
+  // Return generic message to client
+  res.status(500).json({
+    error: 'Internal Server Error',
+    requestId: req.id // For support reference
+  });
+});
+
+// Disable unnecessary features
+app.disable('x-powered-by');
+app.disable('etag');
+```
+
+### Bước 8: A06 - Vulnerable Components
+
+```typescript
+// Dependency Auditing Script
+import { execSync } from 'child_process';
+import { readFileSync } from 'fs';
+
+interface Vulnerability {
+  package: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  description: string;
+  fixVersion?: string;
+}
+
+function auditDependencies(): Vulnerability[] {
+  // Run npm audit
+  const auditOutput = execSync('npm audit --json').toString();
+  const auditResult = JSON.parse(auditOutput);
+  
+  const vulnerabilities: Vulnerability[] = [];
+  
+  for (const [id, vuln] of Object.entries(auditResult.vulnerabilities)) {
+    vulnerabilities.push({
+      package: id,
+      severity: vuln.severity,
+      description: vuln.title,
+      fixVersion: vuln.fixAvailable
+    });
+  }
+  
+  return vulnerabilities;
+}
+
+// Automated Update Check
+async function checkForUpdates() {
+  const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
+  
+  for (const [name, version] of Object.entries(packageJson.dependencies)) {
+    const latest = await getLatestVersion(name);
+    if (version !== latest) {
+      console.log(`${name}: ${version} -> ${latest}`);
+    }
+  }
+}
+```
+
+### Bước 9: A07 - Authentication Failures
+
+```typescript
+// Secure Authentication Implementation
+class AuthService {
+  async login(email: string, password: string) {
+    // Rate limiting
+    await this.rateLimiter.check(email);
+    
+    // Account lockout
+    const account = await this.getAccount(email);
+    if (account.lockedUntil > Date.now()) {
+      throw new AccountLockedError();
+    }
+    
+    // Verify password
+    const valid = await bcrypt.compare(password, account.passwordHash);
+    if (!valid) {
+      await this.handleFailedLogin(account);
+      throw new InvalidCredentialsError();
+    }
+    
+    // Reset on successful login
+    await this.resetFailedLogins(account.id);
+    
+    // Generate tokens
+    return this.generateTokens(account);
+  }
+  
+  generateTokens(account: Account) {
+    const accessToken = jwt.sign(
+      { sub: account.id, email: account.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '15m' }
+    );
+    
+    const refreshToken = crypto.randomBytes(64).toString('hex');
+    
+    // Store refresh token hash
+    const refreshTokenHash = crypto
+      .createHash('sha256')
+      .update(refreshToken)
+      .digest('hex');
+    
+    return { accessToken, refreshToken, refreshTokenHash };
+  }
+}
+
+// Multi-factor Authentication
+async function verifyMFA(userId: string, code: string) {
+  const mfaSecret = await getMFASecret(userId);
+  
+  const totp = new TOTP({
+    secret: mfaSecret,
+    window: 1 // Allow 1 step tolerance
+  });
+  
+  return totp.verify(code);
+}
+```
+
+### Bước 10: A08 - Software Integrity Failures
+
+```typescript
+// Verify integrity of external resources
+import crypto from 'crypto';
+
+interface SignedResource {
+  url: string;
+  expectedHash: string;
+}
+
+async function fetchSecurely(resource: SignedResource) {
+  const response = await fetch(resource.url);
+  const content = await response.arrayBuffer();
+  
+  const hash = crypto
+    .createHash('sha256')
+    .update(Buffer.from(content))
+    .digest('hex');
+  
+  if (hash !== resource.expectedHash) {
+    throw new SecurityError('Resource integrity check failed');
+  }
+  
+  return Buffer.from(content);
+}
+
+// Subresource Integrity (SRI)
+const scriptTag = `
+<script 
+  src="https://example.com/lib.js"
+  integrity="sha384-abc123..."
+  crossorigin="anonymous"
+></script>
+`;
+```
+
+### Bước 11: A09 - Logging & Monitoring Failures
+
+```typescript
+// Security Logging
+class SecurityLogger {
+  logAuthAttempt(data: {
+    userId?: string;
+    email?: string;
+    ip: string;
+    success: boolean;
+    failureReason?: string;
+  }) {
+    this.log('auth.attempt', {
+      ...data,
+      timestamp: new Date().toISOString(),
+      userAgent: this.getUserAgent()
+    });
+  }
+  
+  logAccessDenied(data: {
+    userId: string;
+    resource: string;
+    action: string;
+    reason: string;
+  }) {
+    this.log('access.denied', {
+      ...data,
+      timestamp: new Date().toISOString()
+    });
+  }
+  
+  logDataAccess(data: {
+    userId: string;
+    resource: string;
+    resourceId: string;
+    action: 'read' | 'write' | 'delete';
+  }) {
+    this.log('data.access', {
+      ...data,
+      timestamp: new Date().toISOString()
+    });
+  }
+}
+
+// Alerting for suspicious activity
+const suspiciousPatterns = [
+  { name: 'brute_force', pattern: /auth.*failed.*> 5/, threshold: 5 },
+  { name: 'data_exfiltration', pattern: /SELECT.*FROM.*users/, volume: 1000 },
+  { name: 'privilege_escalation', pattern: /role.*changed/, count: 1 }
+];
+```
+
+### Bước 12: A10 - Server-Side Request Forgery (SSRF)
+
+```typescript
+// SSRF Prevention
+async function fetchWebhook(url: string) {
+  // URL validation
+  const parsedUrl = new URL(url);
+  
+  // Block private IPs
+  const blockedRanges = [
+    '127.0.0.0/8',
+    '10.0.0.0/8',
+    '172.16.0.0/12',
+    '192.168.0.0/16',
+    '169.254.0.0/16'
+  ];
+  
+  const ip = await dns.lookup(parsedUrl.hostname);
+  if (isIPInRanges(ip, blockedRanges)) {
+    throw new SecurityError('URL points to internal resource');
+  }
+  
+  // Allowlist validation
+  const allowedDomains = process.env.ALLOWED_WEBHOOK_DOMAINS?.split(',');
+  if (allowedDomains && !allowedDomains.includes(parsedUrl.hostname)) {
+    throw new SecurityError('Domain not in allowlist');
+  }
+  
+  // Make request
+  return fetch(url);
+}
+
+function isIPInRanges(ip: string, ranges: string[]): boolean {
+  const ipNum = ipToNumber(ip);
+  return ranges.some(range => {
+    const [network, prefixLen] = range.split('/');
+    const mask = ~(2 ** (32 - parseInt(prefixLen)) - 1);
+    return (ipNum & mask) === (ipToNumber(network) & mask);
+  });
+}
+```
+
+## Checklist
+
+- [ ] OWASP Top 10 assessment completed
+- [ ] Dependency audit performed
+- [ ] Access control review completed
+- [ ] Input validation verified
+- [ ] Authentication mechanisms audited
+- [ ] Session management reviewed
+- [ ] Cryptographic practices verified
+- [ ] Security headers configured
+- [ ] Logging và monitoring reviewed
+- [ ] SSRF protections implemented
+- [ ] CSRF protections implemented
+- [ ] SQL/NoSQL injection prevented
+
+## Anti Pattern
+
+- [ ] **Security as Afterthought**: Add security at the end
+- [ ] **Trusting User Input**: Without validation
+- [ ] **Rolling Own Crypto**: Don't implement custom encryption
+- [ ] **Hardcoded Secrets**: Store in code
+- [ ] **Verbose Errors**: Leak internal details
+- [ ] **Weak Passwords**: Allow simple passwords
+- [ ] **No Logging**: Can't detect attacks
+- [ ] **Single Layer Defense**: Rely on one security control
+
+## Best Practice
+
+- [ ] **Defense in Depth**: Multiple security layers
+- [ ] **Principle of Least Privilege**: Minimal permissions
+- [ ] **Fail Securely**: Default to deny
+- [ ] **Input Validation**: Validate all inputs
+- [ ] **Secure Defaults**: Start secure, relax intentionally
+- [ ] **Regular Audits**: Continuous security review
+- [ ] **Security Training**: Team awareness
+- [ ] **Incident Response**: Plan for breaches
+
+## Liên kết
+
+- [[../rules/core-architecture]] - Core Architecture
+- [[../skills/code-review]] - Code Review
+- [[../skills/api-review]] - API Review
+- [[../skills/database-optimization]] - Database Optimization
+- [[../skills/security-audit]] - Security Audit (this file)
