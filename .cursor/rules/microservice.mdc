@@ -1,55 +1,530 @@
 ---
-description: Nguyên tắc Microservices cho distributed systems
+description: Nguyên tắc và best practices cho Microservices Architecture trong Cursor Enterprise Framework
 created: 2026-06-23
 version: 1.0.0
-tags: [microservices, distributed, api-gateway, service-mesh, enterprise]
+tags: [microservices, distributed-systems, service-mesh, api-gateway, service-discovery]
 ---
 
-# Microservice
+# Microservices
 
 ## Mục tiêu
 
-Microservices là một architectural style tổ chức application thành các services nhỏ, độc lập, có thể deploy được. Trong Cursor Enterprise Framework, microservices được sử dụng cho các ứng dụng cần independent scaling, technology diversity, và team autonomy. Mục tiêu là hướng dẫn developers decompose systems appropriately và manage microservices complexity.
+Microservices architecture là approach chia nhỏ application thành các services nhỏ, độc lập, mỗi service handle một business capability. Trong Cursor Enterprise Framework, microservices được sử dụng khi cần scale independently, deploy independently, hoặc use different technology stacks cho different capabilities. Mục tiêu của rule này là hướng dẫn developers trong việc apply microservices patterns một cách effective và tránh common pitfalls.
 
-Microservices mang lại nhiều benefits nhưng cũng introduce complexity về distributed systems. Rule này cover service decomposition, inter-service communication, data management, và operational patterns.
+Microservices mang lại nhiều benefits nhưng cũng tăng complexity đáng kể. Rule này giúp identify khi nào nên sử dụng microservices và how to do it right.
 
 ## Nguyên tắc
 
+**1. Single Responsibility per Service**
+
+Mỗi service handle một business capability. Loose coupling. High cohesion. Clear boundaries. Team ownership.
+
+**2. Smart Endpoints, Dumb Pipes**
+
+Services contain business logic. Pipes are simple transport. Async messaging for decoupling. REST/GraphQL for synchronous.
+
+**3. Decentralized Data Management**
+
+Mỗi service quản lý database riêng. No shared databases. Eventual consistency. Data ownership clear.
+
+**4. Design for Failure**
+
+Services will fail. Circuit breakers. Bulkheads. Retry logic. Graceful degradation.
+
+**5. Infrastructure Automation**
+
+CI/CD for each service. Automated testing. Infrastructure as code. Monitoring và alerting.
+
+**6. Evolutionary Design**
+
+Design for change. Strangler pattern. Feature flags. Incremental migration.
+
+**7. Service Discovery**
+
+Services need to find each other. Service registry. DNS-based discovery. Health checks.
+
+**8. API Gateway**
+
+Single entry point. Request routing. Authentication. Rate limiting. Protocol translation.
+
+**9. Observability**
+
+Distributed tracing. Log aggregation. Metrics collection. Health endpoints.
+
+**10. Team Organization**
+
+Team size: two-pizza rule. Business capability ownership. DevOps culture. Clear ownership.
+
+## Checklist
+
+- [ ] Service boundaries defined
+- [ ] API contracts established
+- [ ] Service discovery configured
+- [ ] Circuit breakers implemented
+- [ ] Distributed tracing set up
+- [ ] CI/CD pipelines created
+- [ ] Monitoring configured
+- [ ] Health endpoints implemented
+- [ ] Service mesh configured
+- [ ] Team ownership assigned
+
+## Anti Pattern
+
+**1. Microservices Monolith**
+
+Distributed monolith. All services tightly coupled. Synchronous everywhere. Shared database. No benefits, all complexity.
+
+**2. Nanoservices**
+
+Too many tiny services. Overhead exceeds benefits. Complexity explosion. Keep services appropriately sized.
+
+**3. Shared Database**
+
+Services share database. Coupling reintroduced. Changes affect multiple services. Separate databases.
+
+**4. Ignoring Fallacies**
+
+Ignoring network issues. Not handling latency. Assuming reliability. Design for failure.
+
+**5. No Observability**
+
+No distributed tracing. Logs not correlated. No metrics. Impossible to debug.
+
+## Best Practice
+
 **1. Service Boundaries**
 
-Define bounded contexts clearly. Single responsibility per service. Loose coupling, high cohesion. Team owns service. Database per service.
+```
+services/
+├── user-service/          # User management & authentication
+│   ├── src/
+│   ├── Dockerfile
+│   ├── k8s/
+│   └── package.json
+│
+├── order-service/          # Order processing
+│   ├── src/
+│   ├── Dockerfile
+│   ├── k8s/
+│   └── package.json
+│
+├── product-service/        # Product catalog
+│   ├── src/
+│   ├── Dockerfile
+│   ├── k8s/
+│   └── package.json
+│
+├── payment-service/        # Payment processing
+│   ├── src/
+│   ├── Dockerfile
+│   ├── k8s/
+│   └── package.json
+│
+├── notification-service/   # Notifications
+│   ├── src/
+│   ├── Dockerfile
+│   ├── k8s/
+│   └── package.json
+│
+├── inventory-service/       # Inventory management
+│   ├── src/
+│   ├── Dockerfile
+│   ├── k8s/
+│   └── package.json
+│
+└── api-gateway/           # API Gateway
+    ├── src/
+    ├── Dockerfile
+    └── package.json
+```
 
-**2. API Design**
+**2. Service Communication**
 
-Well-defined APIs per service. Versioning strategy. Contract testing. Documentation. Backward compatibility.
+```typescript
+// services/order-service/src/communication/ServiceClient.ts
+export class UserServiceClient {
+  constructor(
+    private httpClient: HttpClient,
+    private serviceDiscovery: ServiceDiscovery
+  ) {}
 
-**3. Communication Patterns**
+  async getUser(userId: string): Promise<User> {
+    const url = await this.serviceDiscovery.resolve('user-service');
+    
+    const response = await this.httpClient.get(`${url}/users/${userId}`, {
+      timeout: 3000,
+      retries: 3,
+      circuitBreaker: {
+        failureThreshold: 5,
+        resetTimeout: 60000
+      }
+    });
 
-Synchronous: REST, gRPC. Asynchronous: Events, messaging. Choose based on use case. Don't share databases.
+    return response.data;
+  }
 
-**4. Data Management**
+  async getUserEmail(userId: string): Promise<string> {
+    const user = await this.getUser(userId);
+    return user.email;
+  }
+}
+```
 
-Database per service. Eventual consistency. Saga pattern for distributed transactions. CQRS where appropriate.
+```typescript
+// services/order-service/src/communication/EventBus.ts
+export class EventBus {
+  private subscribers: Map<string, EventHandler[]> = new Map();
 
-**5. Service Discovery**
+  constructor(
+    private messageBroker: MessageBroker,
+    private logger: Logger
+  ) {
+    this.setupSubscriptions();
+  }
 
-Dynamic service registration. Discovery mechanisms. Load balancing. Health checks.
+  async publish<T extends DomainEvent>(event: T): Promise<void> {
+    await this.messageBroker.publish({
+      topic: `order.${event.eventType}`,
+      payload: event.toPayload(),
+      headers: {
+        'correlation-id': event.correlationId,
+        'timestamp': event.occurredAt.toISOString()
+      }
+    });
+  }
 
-**6. Resilience**
+  async subscribe<T extends DomainEvent>(
+    eventType: string,
+    handler: EventHandler<T>
+  ): Promise<void> {
+    const existing = this.subscribers.get(eventType) || [];
+    existing.push(handler);
+    this.subscribers.set(eventType, existing);
+  }
 
-Circuit breakers. Bulkheads. Retry policies. Fallbacks. Timeouts.
+  private async setupSubscriptions(): Promise<void> {
+    await this.messageBroker.subscribe(
+      'user.UserCreated',
+      async (message) => {
+        const handlers = this.subscribers.get('user.UserCreated');
+        if (handlers) {
+          await Promise.all(
+            handlers.map(h => h.handle(message))
+          );
+        }
+      }
+    );
+  }
+}
+```
 
-**7. Observability**
+**3. API Gateway Configuration**
 
-Distributed tracing. Correlation IDs. Centralized logging. Metrics per service.
+```yaml
+# api-gateway/config/routes.yaml
+routes:
+  - path: /api/users/*
+    service: user-service
+    timeout: 5000
+    
+  - path: /api/products/*
+    service: product-service
+    timeout: 3000
+    
+  - path: /api/orders/*
+    service: order-service
+    timeout: 10000
 
-**8. Deployment**
+  - path: /api/payments/*
+    service: payment-service
+    timeout: 15000
 
-Containerization. CI/CD per service. Independent deployment. Blue-green deployments.
+middleware:
+  - cors:
+      origins:
+        - https://app.example.com
+      methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+      headers:
+        - Content-Type
+        - Authorization
+        
+  - authentication:
+      provider: jwt
+      jwksUri: https://auth.example.com/.well-known/jwks.json
+      
+  - rateLimit:
+      global: true
+      limits:
+        - path: /api/*
+          requests: 1000
+          window: 1m
+        - path: /api/auth/*
+          requests: 10
+          window: 1m
+
+healthCheck:
+  path: /health
+  interval: 30s
+  timeout: 5s
+```
+
+**4. Circuit Breaker**
+
+```typescript
+// infrastructure/circuit-breaker/CircuitBreaker.ts
+export class CircuitBreaker {
+  private state: CircuitState = 'CLOSED';
+  private failureCount = 0;
+  private lastFailureTime: Date | null = null;
+
+  constructor(
+    private name: string,
+    private options: {
+      failureThreshold: number;
+      resetTimeout: number;
+      halfOpenRequests: number;
+    }
+  ) {}
+
+  async execute<T>(operation: () => Promise<T>): Promise<T> {
+    if (this.state === 'OPEN') {
+      if (this.shouldAttemptReset()) {
+        this.state = 'HALF_OPEN';
+      } else {
+        throw new CircuitOpenError(this.name);
+      }
+    }
+
+    try {
+      const result = await operation();
+      this.onSuccess();
+      return result;
+    } catch (error) {
+      this.onFailure(error);
+      throw error;
+    }
+  }
+
+  private onSuccess(): void {
+    this.failureCount = 0;
+    this.state = 'CLOSED';
+  }
+
+  private onFailure(error: Error): void {
+    this.failureCount++;
+    this.lastFailureTime = new Date();
+
+    if (this.failureCount >= this.options.failureThreshold) {
+      this.state = 'OPEN';
+    }
+  }
+
+  private shouldAttemptReset(): boolean {
+    if (!this.lastFailureTime) return false;
+    const elapsed = Date.now() - this.lastFailureTime.getTime();
+    return elapsed >= this.options.resetTimeout;
+  }
+
+  getState(): CircuitState {
+    return this.state;
+  }
+}
+```
+
+**5. Service Mesh Configuration**
+
+```yaml
+# kubernetes/istio/service-mesh.yaml
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: order-service
+spec:
+  hosts:
+    - order-service
+  http:
+    - route:
+        - destination:
+            host: order-service
+            subset: v1
+          weight: 90
+        - destination:
+            host: order-service
+            subset: v2
+          weight: 10
+      retries:
+        attempts: 3
+        perTryTimeout: 2s
+        retryOn: gateway-error,connect-error,reset
+      timeout: 10s
+      fault:
+        delay:
+          percentage:
+            value: 0.1
+          fixedDelay: 5s
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: order-service
+spec:
+  host: order-service
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 100
+      http:
+        h2UpgradePolicy: UPGRADE
+        http1MaxPendingRequests: 100
+        http2MaxRequests: 1000
+    loadBalancer:
+      simple: LEAST_REQUEST
+    outlierDetection:
+      consecutive5xxErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+```
+
+**6. Health Checks**
+
+```typescript
+// services/order-service/src/health/HealthController.ts
+export class HealthController {
+  constructor(
+    private dependencies: {
+      database: Database;
+      messageBroker: MessageBroker;
+      userService: UserServiceClient;
+    }
+  ) {}
+
+  @Get('/health/live')
+  liveness(): HealthResponse {
+    return { status: 'healthy' };
+  }
+
+  @Get('/health/ready')
+  async readiness(): Promise<HealthResponse> {
+    const checks = await Promise.allSettled([
+      this.checkDatabase(),
+      this.checkMessageBroker(),
+      this.checkDependencies()
+    ]);
+
+    const results = checks.map((result, index) => ({
+      name: ['database', 'messageBroker', 'dependencies'][index],
+      status: result.status === 'fulfilled' ? 'healthy' : 'unhealthy',
+      error: result.status === 'rejected' ? result.reason?.message : null
+    }));
+
+    const allHealthy = results.every(r => r.status === 'healthy');
+
+    return {
+      status: allHealthy ? 'healthy' : 'unhealthy',
+      checks: results
+    };
+  }
+
+  private async checkDatabase(): Promise<void> {
+    await this.dependencies.database.query('SELECT 1');
+  }
+
+  private async checkMessageBroker(): Promise<void> {
+    await this.dependencies.messageBroker.ping();
+  }
+
+  private async checkDependencies(): Promise<void> {
+    await this.dependencies.userService.healthCheck();
+  }
+}
+```
+
+**7. Distributed Tracing**
+
+```typescript
+// services/order-service/src/observability/tracing.ts
+import { NodeSDK } from '@opentelemetry/sdk-node';
+import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
+import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
+
+const sdk = new NodeSDK({
+  serviceName: 'order-service',
+  traceExporter: new JaegerExporter({
+    endpoint: 'http://jaeger:14268/api/traces'
+  }),
+  instrumentations: [
+    new HttpInstrumentation({
+      ignoreIncomingPaths: ['/health']
+    })
+  ]
+});
+
+sdk.start();
+
+// Usage in service
+async function createOrder(orderData: OrderDTO): Promise<Order> {
+  return tracer.startActiveSpan('createOrder', async (span) => {
+    try {
+      span.setAttributes({
+        'customer.id': orderData.customerId,
+        'order.items': orderData.items.length
+      });
+
+      const order = await orderService.create(orderData);
+      
+      span.setAttributes({
+        'order.id': order.id,
+        'order.total': order.total
+      });
+
+      return order;
+    } catch (error) {
+      span.recordException(error as Error);
+      throw error;
+    } finally {
+      span.end();
+    }
+  });
+}
+```
+
+## Workflow
+
+**Phase 1: Decomposition**
+
+Identify business capabilities. Define service boundaries. Plan data ownership. Assign team ownership.
+
+**Phase 2: Service Design**
+
+Define APIs. Design events. Plan security. Set up contracts.
+
+**Phase 3: Infrastructure**
+
+Set up service discovery. Configure API gateway. Set up message broker. Configure service mesh.
+
+**Phase 4: Implementation**
+
+Implement services. Add health checks. Configure tracing. Implement circuit breakers.
+
+**Phase 5: Deployment**
+
+Set up CI/CD. Configure Kubernetes. Deploy services. Set up monitoring.
+
+**Phase 6: Operations**
+
+Monitor services. Handle incidents. Optimize performance. Evolve services.
 
 ## Liên kết
 
 - [[clean-architecture]] - Clean Architecture
-- [[docker]] - Docker
-- [[kubernetes]] - Kubernetes
-- [[queue]] - Message Queue
+- [[api-gateway]] - API Gateway
+- [[event-driven]] - Event-Driven Architecture
+- [[docker]] - Containerization
+- [[kubernetes]] - Kubernetes deployment
+- [[observability]] - Observability
+- [[circuit-breaker]] - Circuit Breaker Pattern

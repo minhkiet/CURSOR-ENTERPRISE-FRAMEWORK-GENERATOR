@@ -1,0 +1,862 @@
+---
+description: Nguyên tắc và best practices cho Backend Architecture trong Cursor Enterprise Framework
+created: 2026-06-23
+version: 1.0.0
+tags: [backend, api, microservices, rest, graphql, grpc]
+---
+
+# Backend Architecture
+
+## Mục tiêu
+
+Backend Architecture là cách tổ chức và design backend systems để đảm bảo scalability, reliability, và maintainability. Trong Cursor Enterprise Framework, backend architecture được hướng dẫn với focus trên API design, service architecture, data access, và business logic organization. Mục tiêu của rule này là cung cấp framework cho việc build robust backend systems.
+
+Backend applications handle business logic, data processing, và integration với external systems. Good architecture ensures these systems are reliable, scalable, và maintainable.
+
+## Nguyên tắc
+
+**1. API Design**
+
+RESTful conventions. Consistent naming. Version management. Proper error handling.
+
+**2. Service Layer**
+
+Clear separation. Business logic encapsulation. Transaction management. Service composition.
+
+**3. Data Access**
+
+Repository pattern. Query optimization. Connection pooling. Caching strategy.
+
+**4. Error Handling**
+
+Consistent error format. Appropriate HTTP status. Error logging. User-friendly messages.
+
+**5. Security**
+
+Authentication. Authorization. Input validation. Rate limiting. Security headers.
+
+**6. Scalability**
+
+Stateless design. Horizontal scaling. Load balancing. Caching layers.
+
+**7. Performance**
+
+Async processing. Batch operations. Query optimization. Resource limits.
+
+**8. Observability**
+
+Structured logging. Metrics collection. Distributed tracing. Health checks.
+
+**9. Reliability**
+
+Circuit breakers. Retry policies. Dead letter queues. Graceful degradation.
+
+**10. Documentation**
+
+OpenAPI specs. API documentation. Schema documentation. Change log.
+
+## Checklist
+
+- [ ] API design complete
+- [ ] Service layer implemented
+- [ ] Data access patterns defined
+- [ ] Error handling standardized
+- [ ] Security measures implemented
+- [ ] Monitoring configured
+- [ ] Caching strategy defined
+- [ ] Documentation created
+- [ ] Testing strategy defined
+- [ ] Deployment process configured
+
+## Anti Pattern
+
+**1. God Services**
+
+Massive services. Too many responsibilities. Hard to test. Break into smaller.
+
+**2. Anemic Domain**
+
+Just CRUD operations. No business logic. Weak entities. Rich domain.
+
+**3. Shared Database**
+
+Services sharing databases. Tight coupling. Change conflicts. Data ownership.
+
+**4. Synchronous Everything**
+
+No async processing. Blocking operations. Poor scalability. Use async.
+
+## Best Practice
+
+**1. Clean Architecture Structure**
+
+```
+src/
+├── api/                           # API layer
+│   ├── controllers/               # HTTP handlers
+│   │   ├── UserController.ts
+│   │   ├── OrderController.ts
+│   │   └── ProductController.ts
+│   ├── middleware/                # Express middleware
+│   │   ├── auth.ts
+│   │   ├── validation.ts
+│   │   ├── errorHandler.ts
+│   │   └── rateLimiter.ts
+│   ├── routes/                   # Route definitions
+│   │   ├── index.ts
+│   │   ├── users.ts
+│   │   ├── orders.ts
+│   │   └── products.ts
+│   ├── dto/                      # Data transfer objects
+│   │   ├── requests/
+│   │   └── responses/
+│   └── docs/                     # OpenAPI docs
+│       ├── openapi.yaml
+│       └── schemas/
+│
+├── application/                   # Application layer
+│   ├── commands/                 # Command handlers
+│   │   ├── CreateOrder/
+│   │   ├── UpdateOrder/
+│   │   └── CancelOrder/
+│   ├── queries/                  # Query handlers
+│   │   ├── GetOrder/
+│   │   ├── ListOrders/
+│   │   └── GetOrderStatistics/
+│   ├── services/                 # Application services
+│   │   ├── OrderService.ts
+│   │   ├── PaymentService.ts
+│   │   └── NotificationService.ts
+│   └── interfaces/               # Port interfaces
+│       ├── IOrderRepository.ts
+│       ├── IPaymentGateway.ts
+│       └── INotificationService.ts
+│
+├── domain/                       # Domain layer
+│   ├── entities/                 # Domain entities
+│   │   ├── Order.ts
+│   │   ├── Customer.ts
+│   │   └── Product.ts
+│   ├── value-objects/            # Value objects
+│   │   ├── Money.ts
+│   │   ├── Address.ts
+│   │   └── OrderStatus.ts
+│   ├── events/                   # Domain events
+│   │   ├── OrderCreatedEvent.ts
+│   │   └── OrderCancelledEvent.ts
+│   ├── exceptions/               # Domain exceptions
+│   │   └── DomainExceptions.ts
+│   └── services/                 # Domain services
+│       └── OrderDomainService.ts
+│
+├── infrastructure/               # Infrastructure layer
+│   ├── persistence/              # Database
+│   │   ├── repositories/
+│   │   ├── migrations/
+│   │   └── Database.ts
+│   ├── external/                 # External services
+│   │   ├── payment/
+│   │   ├── email/
+│   │   └── shipping/
+│   ├── cache/                    # Caching
+│   │   └── RedisCache.ts
+│   ├── messaging/                # Message queues
+│   │   ├── EventBus.ts
+│   │   └── consumers/
+│   └── logging/                 # Logging
+│       └── Logger.ts
+│
+└── shared/                       # Shared utilities
+    ├── types/
+    ├── utils/
+    ├── constants/
+    └── errors/
+```
+
+**2. API Controller Pattern**
+
+```typescript
+// api/controllers/OrderController.ts
+import { Request, Response, NextFunction } from 'express';
+import { CreateOrderCommand } from '@/application/commands/CreateOrder';
+import { UpdateOrderCommand } from '@/application/commands/UpdateOrder';
+import { GetOrderQuery } from '@/application/queries/GetOrder';
+import { CommandBus } from '@/application/commands/CommandBus';
+import { QueryBus } from '@/application/queries/QueryBus';
+import { validateRequest } from '@/api/middleware/validation';
+import { CreateOrderDTO, UpdateOrderDTO } from '@/api/dto/requests';
+import { ApiError } from '@/shared/errors';
+
+export class OrderController {
+  constructor(
+    private commandBus: CommandBus,
+    private queryBus: QueryBus
+  ) {}
+
+  async create(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const dto = req.body as CreateOrderDTO;
+      
+      // Additional validation if needed
+      if (!dto.items || dto.items.length === 0) {
+        throw ApiError.badRequest('Order must have at least one item');
+      }
+
+      const command = new CreateOrderCommand({
+        customerId: dto.customerId,
+        items: dto.items.map(item => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          price: item.price
+        })),
+        shippingAddress: dto.shippingAddress,
+        requestedBy: req.user!.id
+      });
+
+      const result = await this.commandBus.execute(command);
+
+      res.status(201).json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async update(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const dto = req.body as UpdateOrderDTO;
+
+      const command = new UpdateOrderCommand({
+        orderId: id,
+        ...dto,
+        requestedBy: req.user!.id
+      });
+
+      const result = await this.commandBus.execute(command);
+
+      res.json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+
+      const query = new GetOrderQuery({
+        orderId: id,
+        includeItems: true,
+        includeCustomer: true
+      });
+
+      const result = await this.queryBus.execute(query);
+
+      if (!result) {
+        throw ApiError.notFound('Order not found');
+      }
+
+      res.json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async list(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { page = 1, limit = 20, status, customerId } = req.query;
+
+      const query = new ListOrdersQuery({
+        page: parseInt(page as string),
+        limit: Math.min(parseInt(limit as string), 100),
+        filters: {
+          status: status as string,
+          customerId: customerId as string
+        }
+      });
+
+      const result = await this.queryBus.execute(query);
+
+      res.json({
+        success: true,
+        data: result.data,
+        pagination: {
+          page: result.page,
+          limit: result.limit,
+          total: result.total,
+          totalPages: Math.ceil(result.total / result.limit)
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+}
+```
+
+**3. Command Handler Pattern**
+
+```typescript
+// application/commands/CreateOrder/CreateOrderCommand.ts
+export interface CreateOrderCommandDTO {
+  customerId: string;
+  items: Array<{
+    productId: string;
+    quantity: number;
+    price: number;
+  }>;
+  shippingAddress: {
+    street: string;
+    city: string;
+    country: string;
+    postalCode: string;
+  };
+  requestedBy: string;
+}
+
+export class CreateOrderCommand {
+  constructor(public readonly data: CreateOrderCommandDTO) {}
+}
+
+// application/commands/CreateOrder/CreateOrderCommandHandler.ts
+export class CreateOrderCommandHandler {
+  constructor(
+    private orderRepository: IOrderRepository,
+    private customerRepository: ICustomerRepository,
+    private productRepository: IProductRepository,
+    private eventBus: IEventBus,
+    private unitOfWork: IUnitOfWork
+  ) {}
+
+  async handle(command: CreateOrderCommand): Promise<OrderDTO> {
+    const { customerId, items, shippingAddress, requestedBy } = command.data;
+
+    // Validate customer exists
+    const customer = await this.customerRepository.findById(customerId);
+    if (!customer) {
+      throw new CustomerNotFoundException(customerId);
+    }
+
+    // Validate products and calculate totals
+    let totalAmount = 0;
+    const orderItems: OrderItem[] = [];
+
+    await this.unitOfWork.transaction(async () => {
+      for (const item of items) {
+        const product = await this.productRepository.findById(item.productId);
+        if (!product) {
+          throw new ProductNotFoundException(item.productId);
+        }
+        if (product.stock < item.quantity) {
+          throw new InsufficientStockException(item.productId, product.stock, item.quantity);
+        }
+
+        // Reserve stock
+        await this.productRepository.reserveStock(item.productId, item.quantity);
+
+        orderItems.push(OrderItem.create({
+          productId: product.id,
+          productName: product.name,
+          quantity: item.quantity,
+          unitPrice: item.price,
+          subtotal: item.price * item.quantity
+        }));
+
+        totalAmount += item.price * item.quantity;
+      }
+
+      // Create order
+      const order = Order.create({
+        customerId,
+        items: orderItems,
+        shippingAddress: Address.create(shippingAddress),
+        totalAmount: Money.create(totalAmount, 'USD'),
+        status: OrderStatus.PENDING,
+        createdBy: requestedBy
+      });
+
+      await this.orderRepository.save(order);
+
+      // Publish event
+      await this.eventBus.publish(new OrderCreatedEvent({
+        orderId: order.id,
+        customerId,
+        totalAmount,
+        itemCount: items.length
+      }));
+
+      return order;
+    });
+
+    return OrderDTOMapper.toDTO(order);
+  }
+}
+```
+
+**4. Error Handling**
+
+```typescript
+// shared/errors/ApiError.ts
+export class ApiError extends Error {
+  constructor(
+    public statusCode: number,
+    public code: string,
+    message: string,
+    public details?: Record<string, any>
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+
+  static badRequest(message: string, details?: Record<string, any>): ApiError {
+    return new ApiError(400, 'BAD_REQUEST', message, details);
+  }
+
+  static unauthorized(message = 'Unauthorized'): ApiError {
+    return new ApiError(401, 'UNAUTHORIZED', message);
+  }
+
+  static forbidden(message = 'Forbidden'): ApiError {
+    return new ApiError(403, 'FORBIDDEN', message);
+  }
+
+  static notFound(resource: string): ApiError {
+    return new ApiError(404, 'NOT_FOUND', `${resource} not found`);
+  }
+
+  static conflict(message: string, details?: Record<string, any>): ApiError {
+    return new ApiError(409, 'CONFLICT', message, details);
+  }
+
+  static tooManyRequests(message = 'Too many requests'): ApiError {
+    return new ApiError(429, 'TOO_MANY_REQUESTS', message);
+  }
+
+  static internal(message = 'Internal server error'): ApiError {
+    return new ApiError(500, 'INTERNAL_ERROR', message);
+  }
+
+  toJSON() {
+    return {
+      success: false,
+      error: {
+        code: this.code,
+        message: this.message,
+        details: this.details,
+        requestId: getRequestId()
+      }
+    };
+  }
+}
+
+// middleware/errorHandler.ts
+export function errorHandler(
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
+  const requestId = getRequestId();
+  
+  if (err instanceof ApiError) {
+    logger.warn('API Error', {
+      requestId,
+      statusCode: err.statusCode,
+      code: err.code,
+      message: err.message,
+      path: req.path,
+      method: req.method
+    });
+
+    res.status(err.statusCode).json({
+      success: false,
+      error: {
+        code: err.code,
+        message: err.message,
+        details: err.details,
+        requestId
+      }
+    });
+    return;
+  }
+
+  // Unexpected error
+  logger.error('Unexpected error', {
+    requestId,
+    error: err.message,
+    stack: err.stack,
+    path: req.path,
+    method: req.method
+  });
+
+  res.status(500).json({
+    success: false,
+    error: {
+      code: 'INTERNAL_ERROR',
+      message: process.env.NODE_ENV === 'production' 
+        ? 'An unexpected error occurred' 
+        : err.message,
+      requestId
+    }
+  });
+}
+```
+
+**5. Repository Pattern**
+
+```typescript
+// application/interfaces/IOrderRepository.ts
+export interface IOrderRepository {
+  findById(id: string): Promise<Order | null>;
+  findByIdWithRelations(id: string): Promise<Order | null>;
+  findByCustomer(customerId: string, options?: PaginationOptions): Promise<Order[]>;
+  findByStatus(status: OrderStatus, options?: PaginationOptions): Promise<Order[]>;
+  findByDateRange(startDate: Date, endDate: Date): Promise<Order[]>;
+  save(order: Order): Promise<void>;
+  update(order: Order): Promise<void>;
+  delete(id: string): Promise<void>;
+  count(filters?: OrderFilters): Promise<number>;
+}
+
+// infrastructure/persistence/repositories/PostgresOrderRepository.ts
+export class PostgresOrderRepository implements IOrderRepository {
+  constructor(
+    private db: Database,
+    private eventEmitter: EventEmitter
+  ) {}
+
+  async findById(id: string): Promise<Order | null> {
+    const row = await this.db.queryOne(
+      `SELECT * FROM orders WHERE id = $1`,
+      [id]
+    );
+
+    if (!row) return null;
+
+    return this.mapToEntity(row);
+  }
+
+  async findByIdWithRelations(id: string): Promise<Order | null> {
+    const orderRow = await this.db.queryOne(
+      `SELECT * FROM orders WHERE id = $1`,
+      [id]
+    );
+
+    if (!orderRow) return null;
+
+    const itemRows = await this.db.query(
+      `SELECT * FROM order_items WHERE order_id = $1`,
+      [id]
+    );
+
+    const customerRow = await this.db.queryOne(
+      `SELECT * FROM customers WHERE id = $1`,
+      [orderRow.customer_id]
+    );
+
+    return this.mapToEntityWithRelations(orderRow, itemRows, customerRow);
+  }
+
+  async findByCustomer(
+    customerId: string,
+    options?: PaginationOptions
+  ): Promise<Order[]> {
+    const { page = 1, limit = 20 } = options || {};
+    const offset = (page - 1) * limit;
+
+    const rows = await this.db.query(
+      `SELECT * FROM orders 
+       WHERE customer_id = $1 
+       ORDER BY created_at DESC 
+       LIMIT $2 OFFSET $3`,
+      [customerId, limit, offset]
+    );
+
+    return rows.map(row => this.mapToEntity(row));
+  }
+
+  async save(order: Order): Promise<void> {
+    await this.db.transaction(async (tx) => {
+      await tx.query(
+        `INSERT INTO orders (id, customer_id, status, total_amount, shipping_address, created_by, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [
+          order.id,
+          order.customerId,
+          order.status.value,
+          order.totalAmount.amount,
+          JSON.stringify(order.shippingAddress),
+          order.createdBy,
+          order.createdAt
+        ]
+      );
+
+      for (const item of order.items) {
+        await tx.query(
+          `INSERT INTO order_items (id, order_id, product_id, product_name, quantity, unit_price, subtotal)
+           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+          [
+            item.id,
+            order.id,
+            item.productId,
+            item.productName,
+            item.quantity,
+            item.unitPrice.amount,
+            item.subtotal.amount
+          ]
+        );
+      }
+
+      // Update outbox for eventual consistency
+      await tx.query(
+        `INSERT INTO outbox (id, aggregate_type, aggregate_id, event_type, payload, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [
+          uuid(),
+          'Order',
+          order.id,
+          'OrderCreated',
+          JSON.stringify(order.toEvent()),
+          new Date()
+        ]
+      );
+    });
+  }
+
+  private mapToEntity(row: any): Order {
+    return Order.restore(
+      OrderId.from(row.id),
+      CustomerId.from(row.customer_id),
+      [],
+      OrderStatus.from(row.status),
+      Money.from(row.total_amount, 'USD'),
+      row.shipping_address ? JSON.parse(row.shipping_address) : null,
+      row.created_by,
+      row.created_at
+    );
+  }
+}
+```
+
+**6. Unit of Work Pattern**
+
+```typescript
+// application/unit-of-work/UnitOfWork.ts
+export interface IUnitOfWork {
+  transaction<T>(fn: (ctx: TransactionContext) => Promise<T>): Promise<T>;
+  commit(): Promise<void>;
+  rollback(): Promise<void>;
+}
+
+export class UnitOfWork implements IUnitOfWork {
+  private transactionContext: TransactionContext | null = null;
+  private isCommitted = false;
+
+  constructor(
+    private db: Database,
+    private repositories: Map<string, any>
+  ) {}
+
+  async transaction<T>(fn: (ctx: TransactionContext) => Promise<T>): Promise<T> {
+    if (this.transactionContext) {
+      // Already in a transaction, execute within it
+      return fn(this.transactionContext);
+    }
+
+    return this.db.transaction(async (tx) => {
+      const ctx: TransactionContext = {
+        getRepository: <T>(repoClass: new (...args: any[]) => T): T => {
+          // Get or create repository with transaction
+          const repo = this.repositories.get(repoClass.name);
+          if (repo) {
+            return repo.withTransaction(tx);
+          }
+          return null as T;
+        },
+        publish: async (event: DomainEvent) => {
+          // Store event for later publishing
+          ctx.events.push(event);
+        },
+        events: []
+      };
+
+      this.transactionContext = ctx;
+      try {
+        const result = await fn(ctx);
+        await this.commit();
+        return result;
+      } catch (error) {
+        await this.rollback();
+        throw error;
+      } finally {
+        this.transactionContext = null;
+        this.isCommitted = false;
+      }
+    });
+  }
+
+  async commit(): Promise<void> {
+    if (!this.transactionContext || this.isCommitted) return;
+    
+    // Publish domain events
+    for (const event of this.transactionContext.events) {
+      await eventBus.publish(event);
+    }
+    
+    this.isCommitted = true;
+  }
+
+  async rollback(): Promise<void> {
+    this.transactionContext = null;
+    this.isCommitted = false;
+  }
+}
+```
+
+**7. API Documentation**
+
+```yaml
+# api/docs/openapi.yaml
+openapi: 3.0.3
+info:
+  title: E-Commerce API
+  version: 1.0.0
+  description: API for E-Commerce Platform
+  
+servers:
+  - url: https://api.example.com/v1
+    description: Production
+  - url: https://staging-api.example.com/v1
+    description: Staging
+
+paths:
+  /orders:
+    get:
+      summary: List orders
+      tags: [Orders]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/OrderStatus'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+          
+    post:
+      summary: Create order
+      tags: [Orders]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+  schemas:
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        customerId:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        totalAmount:
+          $ref: '#/components/schemas/Money'
+        createdAt:
+          type: string
+          format: date-time
+```
+
+## Workflow
+
+**Phase 1: Requirements Analysis**
+
+Define requirements. Identify domain. Map workflows. Plan API.
+
+**Phase 2: Architecture Design**
+
+Choose patterns. Define layers. Plan services. Set up structure.
+
+**Phase 3: Implementation**
+
+Implement domain. Build application layer. Create API. Add infrastructure.
+
+**Phase 4: Integration**
+
+Connect external services. Add messaging. Configure caching. Set up monitoring.
+
+**Phase 5: Testing**
+
+Unit tests. Integration tests. API tests. Performance tests.
+
+**Phase 6: Deployment**
+
+Configure CI/CD. Deploy to staging. Test production. Monitor launch.
+
+## Liên kết
+
+- [[clean-architecture]] - Clean Architecture
+- [[cqrs]] - CQRS pattern
+- [[ddd]] - Domain-Driven Design
+- [[api]] - API design
+- [[rest]] - REST best practices
+- [[graphql]] - GraphQL best practices

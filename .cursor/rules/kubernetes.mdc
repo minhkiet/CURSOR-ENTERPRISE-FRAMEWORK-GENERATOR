@@ -1,50 +1,623 @@
 ---
-description: Nguyên tắc và best practices cho Kubernetes Orchestration
+description: Nguyên tắc và best practices cho Kubernetes Deployment trong Cursor Enterprise Framework
 created: 2026-06-23
 version: 1.0.0
-tags: [kubernetes, k8s, orchestration, containers, enterprise]
+tags: [kubernetes, k8s, container-orchestration, deployment, helm]
 ---
 
 # Kubernetes
 
 ## Mục tiêu
 
-Kubernetes là container orchestration platform cho phép deployment, scaling, và management của containerized applications. Trong Cursor Enterprise Framework, Kubernetes được sử dụng cho production deployments đòi hỏi high availability, auto-scaling, và advanced deployment strategies. Mục tiêu là hướng dẫn developers configure và operate Kubernetes clusters hiệu quả.
+Kubernetes là nền tảng container orchestration giúp tự động hóa deployment, scaling, và quản lý containerized applications. Trong Cursor Enterprise Framework, Kubernetes là lựa chọn chính cho production deployments. Mục tiêu của rule này là hướng dẫn developers trong việc configure và operate Kubernetes một cách hiệu quả và secure.
 
-Kubernetes cung cấp powerful capabilities nhưng cũng introduce complexity. Rule này cover resource management, deployment strategies, networking, và operational best practices.
+Kubernetes cung cấp powerful capabilities nhưng cũng complex. Understanding best practices là essential cho reliable deployments.
 
 ## Nguyên tắc
 
 **1. Resource Management**
 
-Define resource requests và limits. Horizontal pod autoscaling. Memory và CPU optimization. Resource quotas.
+Set resource requests and limits. Prevent resource starvation. Enable autoscaling. Monitor resource usage.
 
-**2. Deployment Strategies**
+**2. Health Checks**
 
-Rolling deployments. Blue-green deployments. Canary releases. Progress deadlines.
+Configure liveness probes. Configure readiness probes. Configure startup probes. Proper failure handling.
 
-**3. Health Probes**
+**3. Security Contexts**
 
-Liveness probes. Readiness probes. Startup probes. Proper configuration.
+Run as non-root. Disable privilege escalation. Use read-only root filesystem. Drop capabilities.
 
-**4. Service Networking**
+**4. Network Policies**
 
-Services và endpoints. Ingress configuration. Network policies. DNS resolution.
+Define network policies. Isolate namespaces. Restrict ingress/egress. Zero trust networking.
 
-**5. Storage**
+**5. Pod Disruption Budgets**
 
-Persistent volumes. Storage classes. Volume snapshots. Data persistence.
+Define PDBs for availability. Control pod eviction. Ensure minimum availability.
 
-**6. Security**
+**6. Rolling Deployments**
 
-RBAC configuration. Pod security policies. Secrets management. Network policies.
+Use rolling update strategy. Configure update parameters. Test deployments. Rollback capability.
 
-**7. Monitoring**
+**7. Service Mesh Integration**
 
-Metrics collection. Log aggregation. Distributed tracing. Alert configuration.
+Use service mesh for observability. Configure mTLS. Implement circuit breakers. Traffic management.
+
+**8. Secret Management**
+
+Use Kubernetes secrets. External secrets management. Encrypt secrets at rest. RBAC for secrets.
+
+**9. Monitoring và Logging**
+
+Centralized logging. Metrics collection. Distributed tracing. Alert management.
+
+**10. GitOps Deployment**
+
+Use GitOps workflow. ArgoCD hoặc Flux. Declarative configurations. Drift detection.
+
+## Checklist
+
+- [ ] Resource limits configured
+- [ ] Health checks implemented
+- [ ] Security contexts set
+- [ ] Network policies defined
+- [ ] PDBs configured
+- [ ] Rolling deployment strategy
+- [ ] Secrets management set up
+- [ ] Monitoring configured
+- [ ] GitOps workflow established
+- [ ] Disaster recovery planned
+
+## Anti Pattern
+
+**1. Running as Root**
+
+Containers running as root. Security vulnerability. Use security contexts.
+
+**2. No Resource Limits**
+
+No resource requests/limits. Resource contention. Unpredictable performance.
+
+**3. Bare Pods**
+
+Pods without Deployments. No restarts. No scaling. Use workload resources.
+
+**4. Default Namespaces**
+
+Using default namespaces. No isolation. Security risks. Use custom namespaces.
+
+**5. Long Running Jobs**
+
+Jobs not completing. Resource leaks. Use CronJobs or batch processing.
+
+## Best Practice
+
+**1. Deployment Configuration**
+
+```yaml
+# kubernetes/deployments/api-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+  namespace: production
+  labels:
+    app: api
+    version: v1
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+        version: v1
+    spec:
+      serviceAccountName: api-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: api
+          image: api-service:v1.0.0
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: api-config
+            - secretRef:
+                name: api-secrets
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 10"]
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: api
+                topologyKey: kubernetes.io/hostname
+      tolerations:
+        - key: "node-type"
+          operator: "Equal"
+          value: "application"
+          effect: "NoSchedule"
+```
+
+**2. Service Configuration**
+
+```yaml
+# kubernetes/services/api-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+  namespace: production
+  labels:
+    app: api
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
+    prometheus.io/path: "/metrics"
+spec:
+  type: ClusterIP
+  selector:
+    app: api
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      protocol: TCP
+    - name: grpc
+      port: 50051
+      targetPort: 50051
+      protocol: TCP
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+```
+
+**3. Network Policies**
+
+```yaml
+# kubernetes/network-policies/allow-rules.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api-network-policy
+  namespace: production
+spec:
+  podSelector:
+    matchLabels:
+      app: api
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+        - podSelector:
+            matchLabels:
+              app: ingress
+      ports:
+        - protocol: TCP
+          port: 8080
+    - from:
+        - podSelector:
+            matchLabels:
+              app: api
+      ports:
+        - protocol: TCP
+          port: 8080
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: postgres
+      ports:
+        - protocol: TCP
+          port: 5432
+    - to:
+        - podSelector:
+            matchLabels:
+              app: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+```
+
+**4. Pod Disruption Budget**
+
+```yaml
+# kubernetes/pdb/api-pdb.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: api-pdb
+  namespace: production
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: api
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: critical-pdb
+  namespace: production
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      tier: critical
+```
+
+**5. Horizontal Pod Autoscaler**
+
+```yaml
+# kubernetes/hpa/api-hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api-hpa
+  namespace: production
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api-deployment
+  minReplicas: 3
+  maxReplicas: 20
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60
+        - type: Percent
+          value: 10
+          periodSeconds: 60
+      selectPolicy: Min
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        - type: Pods
+          value: 4
+          periodSeconds: 15
+        - type: Percent
+          value: 100
+          periodSeconds: 15
+```
+
+**6. Helm Chart Structure**
+
+```yaml
+# api-service/Chart.yaml
+apiVersion: v2
+name: api-service
+description: API Service Helm Chart
+type: application
+version: 1.0.0
+appVersion: "v1.0.0"
+keywords:
+  - api
+  - microservice
+maintainers:
+  - name: Platform Team
+    email: platform@example.com
+
+# api-service/values.yaml
+replicaCount: 3
+
+image:
+  repository: registry.example.com/api-service
+  tag: v1.0.0
+  pullPolicy: IfNotPresent
+  pullSecrets:
+    - name: registry-secret
+
+service:
+  type: ClusterIP
+  ports:
+    http: 80
+    grpc: 50051
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: api.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: api-tls
+      hosts:
+        - api.example.com
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 70
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  fsGroup: 1001
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+nodeSelector:
+  node-type: application
+
+tolerations:
+  - key: "node-type"
+    operator: "Equal"
+    value: "application"
+    effect: "NoSchedule"
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app: api
+          topologyKey: kubernetes.io/hostname
+
+# api-service/templates/deployment.yaml
+{{- define "api-service.image" -}}
+{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+{{- end }}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "api-service.fullname" . }}
+  labels:
+    {{- include "api-service.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "api-service.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "api-service.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+          image: {{ include "api-service.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            {{- range $name, $port := .Values.service.ports }}
+            - name: {{ $name }}
+              containerPort: {{ $port }}
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: {{ .Values.service.ports.http }}
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: {{ .Values.service.ports.http }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+```
+
+**7. ArgoCD Application**
+
+```yaml
+# argocd/api-service-app.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: api-service
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: production
+  source:
+    repoURL: https://github.com/example/k8s-config
+    targetRevision: HEAD
+    path: api-service
+    helm:
+      valueFiles:
+        - values-production.yaml
+      parameters:
+        - name: image.tag
+          value: v1.0.0
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: production
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+```
+
+**8. RBAC Configuration**
+
+```yaml
+# kubernetes/rbac/service-account.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: api-sa
+  namespace: production
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: api-role
+  namespace: production
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: api-role-binding
+  namespace: production
+subjects:
+  - kind: ServiceAccount
+    name: api-sa
+    namespace: production
+roleRef:
+  kind: Role
+  name: api-role
+  apiGroup: rbac.authorization.k8s.io
+```
+
+## Workflow
+
+**Phase 1: Cluster Setup**
+
+Set up cluster. Configure networking. Set up RBAC. Configure storage.
+
+**Phase 2: Application Configuration**
+
+Create manifests. Configure resources. Set up health checks. Add security contexts.
+
+**Phase 3: Deployment**
+
+Deploy applications. Verify health. Configure autoscaling. Set up PDBs.
+
+**Phase 4: Monitoring**
+
+Set up metrics. Configure logging. Set up tracing. Configure alerts.
+
+**Phase 5: GitOps**
+
+Set up ArgoCD/Flux. Configure repositories. Set up sync policies.
+
+**Phase 6: Operations**
+
+Monitor deployments. Handle incidents. Optimize resources. Update regularly.
 
 ## Liên kết
 
-- [[docker]] - Docker
-- [[monitoring]] - Monitoring
-- [[deployment]] - Deployment
+- [[docker]] - Docker best practices
+- [[deployment]] - Deployment strategies
+- [[microservice]] - Microservices deployment
+- [[helm]] - Helm charts
+- [[observability]] - Kubernetes observability
+- [[security]] - Kubernetes security

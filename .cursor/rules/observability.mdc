@@ -1,60 +1,632 @@
 ---
-description: Nguyên tắc Observability toàn diện cho distributed systems
+description: Nguyên tắc và best practices cho Observability trong Cursor Enterprise Framework
 created: 2026-06-23
 version: 1.0.0
-tags: [observability, monitoring, logging, tracing, enterprise]
+tags: [observability, monitoring, logging, tracing, metrics, opentelemetry]
 ---
 
 # Observability
 
 ## Mục tiêu
 
-Observability là khả năng understand internal system state từ external outputs, bao gồm metrics, logs, và traces. Trong Cursor Enterprise Framework, Observability rule định nghĩa các nguyên tắc và best practices cho việc implement comprehensive observability trong complex distributed systems. Mục tiêu là đảm bảo teams có thể understand, debug, và optimize systems effectively.
+Observability là khả năng hiểu internal system state từ external outputs, bao gồm logs, metrics, và traces. Trong Cursor Enterprise Framework, observability được implement để enable proactive troubleshooting, performance optimization, và system understanding. Mục tiêu của rule này là hướng dẫn developers trong việc build observable systems với comprehensive telemetry.
+
+Observability goes beyond traditional monitoring bằng cách cung cấp context và correlation giữa different data sources, cho phép understand system behavior deeply.
 
 ## Nguyên tắc
 
 **1. Three Pillars**
 
-Metrics: Quantitative measurements. Logs: Discrete events. Traces: Request flows. All three essential. Correlate across pillars.
+Logs: Discrete events. Metrics: Aggregated measurements. Traces: Request flows. All three needed.
 
 **2. Structured Logging**
 
-JSON format. Consistent fields. Correlation IDs. Log levels. No sensitive data. Searchable fields.
+Machine-readable logs. Consistent format. Include context. Correlate with traces.
 
-**3. Distributed Tracing**
+**3. Metrics-Driven Culture**
 
-Trace requests across services. Context propagation. Sampling strategy. Trace correlation. End-to-end visibility.
+RED method for services. USE method for resources. Business metrics. Alert on symptoms.
 
-**4. Metrics**
+**4. Distributed Tracing**
 
-Golden signals. RED method. USE method. SLOs và SLIs. Alerts thresholds. Dashboards.
+Trace requests across services. Include span context. Measure latency. Identify bottlenecks.
 
-**5. Alerting Philosophy**
+**5. Service Level Objectives**
 
-Alert on symptoms. Minimize noise. Every alert actionable. Severity levels. Runbooks.
+Define SLOs. Track SLIs. Create error budgets. Alert on budget burn.
 
-**6. Service Level Objectives**
+**6. Dashboards**
 
-Define SLOs. Measure SLIs. Track SLO status. Error budgets. Alerts on budget burn.
+Customer-facing dashboards. Operational dashboards. Executive dashboards. Self-service.
 
-**7. Dashboards**
+**7. Alerting Strategy**
 
-Purpose-built. Right granularity. Meaningful visualizations. Link related metrics. Update regularly.
+Alert on symptoms. Avoid alert fatigue. Create runbooks. Escalation paths.
 
-**8. Debugging**
+**8. Continuous Profiling**
 
-Trace exploration. Log aggregation. Metrics correlation. Debug UIs. Root cause analysis.
+CPU profiling. Memory profiling. I/O profiling. Continuous optimization.
 
-**9. Chaos Engineering**
+**9. Cost of Observability**
 
-Test resilience intentionally. Inject failures. Measure recovery. Improve confidence.
+Balance fidelity vs cost. Sample when needed. Tier storage. Optimize queries.
 
-**10. Cost**
+**10. Documentation**
 
-Observability costs money. Balance coverage vs cost. Sample appropriately. Retention policies.
+Document metrics. Document alerts. Document runbooks. Keep updated.
+
+## Checklist
+
+- [ ] Logging infrastructure set up
+- [ ] Metrics collection configured
+- [ ] Distributed tracing enabled
+- [ ] SLOs defined
+- [ ] Dashboards created
+- [ ] Alerts configured
+- [ ] Runbooks written
+- [ ] On-call rotation established
+- [ ] Cost monitoring set up
+- [ ] Team training completed
+
+## Anti Pattern
+
+**1. Logging Everything**
+
+Too many logs. Noisy logs. Cost issues. Log meaningful events only.
+
+**2. No Context**
+
+Logs without correlation. No trace IDs. Hard to debug. Include context.
+
+**3. Alert on Causes**
+
+Alert on internal states. Alert fatigue. Alert on symptoms.
+
+**4. Undefined SLOs**
+
+No clear expectations. No error budgets. No burn alerts.
+
+**5. Dashboard Sprawl**
+
+Too many dashboards. Outdated. Not actionable. Focus on important.
+
+## Best Practice
+
+**1. OpenTelemetry Setup**
+
+```typescript
+// observability/otel.ts
+import { NodeSDK } from '@opentelemetry/sdk-node';
+import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
+import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
+import { Resource } from '@opentelemetry/resources';
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+
+const resource = new Resource({
+  [SemanticResourceAttributes.SERVICE_NAME]: 'api-service',
+  [SemanticResourceAttributes.SERVICE_VERSION]: process.env.VERSION || '1.0.0',
+  [SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: process.env.NODE_ENV,
+  'service.namespace': 'production',
+  'service.instance.id': process.env.HOSTNAME
+});
+
+const sdk = new NodeSDK({
+  resource,
+  traceExporter: new OTLPTraceExporter({
+    url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT
+  }),
+  metricReader: new PeriodicExportingMetricReader({
+    exporter: new OTLPMetricExporter({
+      url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT
+    }),
+    exportIntervalMillis: 10000
+  }),
+  instrumentations: [
+    getNodeAutoInstrumentations({
+      '@opentelemetry/instrumentation-fs': { enabled: false },
+      '@opentelemetry/instrumentation-http': { enabled: true },
+      '@opentelemetry/instrumentation-express': { enabled: true },
+      '@opentelemetry/instrumentation-pg': { enabled: true }
+    })
+  ]
+});
+
+sdk.start();
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  sdk.shutdown()
+    .then(() => console.log('SDK shut down successfully'))
+    .catch((error) => console.error('Error shutting down SDK', error))
+    .finally(() => process.exit(0));
+});
+```
+
+**2. Structured Logging**
+
+```typescript
+// observability/logger.ts
+import pino from 'pino';
+import { trace, context } from '@opentelemetry/api';
+
+const log = pino({
+  level: process.env.LOG_LEVEL || 'info',
+  formatters: {
+    level: (label) => ({ level: label }),
+    bindings: (bindings) => ({
+      pid: bindings.pid,
+      hostname: bindings.hostname,
+      service: 'api-service',
+      version: process.env.VERSION
+    })
+  },
+  timestamp: () => `,"timestamp":"${new Date().toISOString()}"`,
+  mixin: () => {
+    const span = trace.getSpan(context.active());
+    if (span) {
+      const spanContext = span.spanContext();
+      return {
+        traceId: spanContext.traceId,
+        spanId: spanContext.spanId,
+        traceFlags: spanContext.traceFlags
+      };
+    }
+    return {};
+  },
+  serializers: {
+    err: pino.stdSerializers.err,
+    req: (req) => ({
+      method: req.method,
+      url: req.url,
+      headers: {
+        'content-type': req.headers['content-type'],
+        'user-agent': req.headers['user-agent']
+      }
+    }),
+    res: (res) => ({
+      statusCode: res.statusCode
+    })
+  }
+});
+
+export const logger = {
+  info: (msg: string, data?: object) => log.info(data, msg),
+  error: (msg: string, data?: object) => log.error(data, msg),
+  warn: (msg: string, data?: object) => log.warn(data, msg),
+  debug: (msg: string, data?: object) => log.debug(data, msg),
+  
+  child: (bindings: object) => logger.child(bindings),
+  
+  withRequest: (req: Request) => log.child({ requestId: req.id }),
+  withUser: (userId: string) => log.child({ userId }),
+  withOrder: (orderId: string) => log.child({ orderId })
+};
+
+export default log;
+```
+
+**3. Custom Metrics**
+
+```typescript
+// observability/metrics.ts
+import { metrics, Counter, Histogram, Gauge } from '@opentelemetry/api';
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
+
+const meter = metrics.getMeter('api-service');
+
+// Request metrics (RED method)
+export const httpRequestsTotal = meter.createCounter('http_requests_total', {
+  description: 'Total number of HTTP requests',
+  unit: '1'
+});
+
+export const httpRequestDuration = meter.createHistogram('http_request_duration_ms', {
+  description: 'HTTP request duration in milliseconds',
+  unit: 'ms',
+  advice: {
+    explicitBucketBoundaries: [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]
+  }
+});
+
+// Business metrics
+export const ordersCreated = meter.createCounter('orders_created_total', {
+  description: 'Total number of orders created'
+});
+
+export const orderValue = meter.createHistogram('order_value_dollars', {
+  description: 'Order value in dollars',
+  unit: '$'
+});
+
+// Resource metrics (USE method)
+export const activeConnections = meter.createUpDownCounter('active_connections', {
+  description: 'Number of active connections'
+});
+
+export const queueDepth = meter.createObservableGauge('queue_depth', {
+  description: 'Number of items in queue'
+});
+
+// Custom metrics for specific operations
+export const dbQueryDuration = meter.createHistogram('db_query_duration_ms', {
+  description: 'Database query duration',
+  unit: 'ms'
+});
+
+export const externalApiDuration = meter.createHistogram('external_api_duration_ms', {
+  description: 'External API call duration',
+  unit: 'ms'
+});
+
+// Usage
+export function recordHttpRequest(method: string, path: string, statusCode: number, durationMs: number) {
+  httpRequestsTotal.add(1, {
+    method,
+    path,
+    status_code: statusCode.toString()
+  });
+  
+  httpRequestDuration.record(durationMs, {
+    method,
+    path,
+    status_code: statusCode.toString()
+  });
+}
+
+export function recordOrder(orderId: string, value: number, itemCount: number) {
+  ordersCreated.add(1, { status: 'success' });
+  orderValue.record(value, { currency: 'USD' });
+}
+```
+
+**4. Distributed Tracing**
+
+```typescript
+// observability/tracing.ts
+import { trace, Span, SpanStatusCode, context, propagation } from '@opentelemetry/api';
+
+const tracer = trace.getTracer('api-service');
+
+export async function tracedOperation<T>(
+  name: string,
+  operation: (span: Span) => Promise<T>,
+  attributes?: Record<string, string | number | boolean>
+): Promise<T> {
+  return tracer.startActiveSpan(name, async (span) => {
+    if (attributes) {
+      span.setAttributes(attributes);
+    }
+    
+    try {
+      const result = await operation(span);
+      span.setStatus({ code: SpanStatusCode.OK });
+      return result;
+    } catch (error) {
+      span.recordException(error as Error);
+      span.setStatus({
+        code: SpanStatusCode.ERROR,
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+      throw error;
+    } finally {
+      span.end();
+    }
+  });
+}
+
+// Example usage
+export async function createOrder(orderData: OrderDTO): Promise<Order> {
+  return tracedOperation('order.create', async (span) => {
+    span.setAttributes({
+      'order.customer_id': orderData.customerId,
+      'order.item_count': orderData.items.length
+    });
+    
+    // Validate
+    await validateOrder(orderData);
+    span.addEvent('validation_completed');
+    
+    // Create order
+    const order = await db.orders.create(orderData);
+    span.setAttribute('order.id', order.id);
+    
+    // Process payment
+    const payment = await processPayment(order);
+    span.addEvent('payment_processed', { payment_id: payment.id });
+    
+    return order;
+  });
+}
+
+// HTTP middleware
+export function tracingMiddleware(req: Request, res: Response, next: NextFunction) {
+  const span = tracer.startSpan('http.request', {
+    attributes: {
+      'http.method': req.method,
+      'http.url': req.url,
+      'http.host': req.hostname
+    }
+  });
+  
+  const startTime = Date.now();
+  
+  res.on('finish', () => {
+    span.setAttributes({
+      'http.status_code': res.statusCode,
+      'http.response_time_ms': Date.now() - startTime
+    });
+    
+    if (res.statusCode >= 400) {
+      span.setStatus({
+        code: SpanStatusCode.ERROR,
+        message: `HTTP ${res.statusCode}`
+      });
+    }
+    
+    span.end();
+  });
+  
+  next();
+}
+```
+
+**5. SLO Definition và Alerting**
+
+```yaml
+# slo.yaml - SLO definitions
+slos:
+  - name: api-availability
+    target: 99.9
+    window: 30d
+    indicator:
+      type: availability
+      good:
+        total: http_requests_total
+        filter: 'status_code < 500'
+      total:
+        total: http_requests_total
+    alerting:
+      burnRateAlert:
+        shortWindow: 1h
+        longWindow: 6h
+        threshold: 5  # 5x burn rate
+        severity: critical
+      multiWindowAlert:
+        windows:
+          - window: 1h
+            threshold: 14.4  # 10% of 1h budget in 1h = 14.4%
+          - window: 6h
+            threshold: 6.67  # 10% of 6h budget in 6h
+
+  - name: api-latency-p99
+    target: 99.0
+    window: 30d
+    indicator:
+      type: latency
+      metadata:
+        total: http_request_duration_ms
+        filter: 'status_code < 500'
+      success:
+        total: http_request_duration_ms
+        filter: 'status_code < 500 AND duration_ms < 1000'
+      total:
+        total: http_request_duration_ms
+    alerting:
+      burnRateAlert:
+        shortWindow: 10m
+        longWindow: 1h
+        threshold: 10
+
+  - name: payment-success-rate
+    target: 99.5
+    window: 7d
+    indicator:
+      type: availability
+      good:
+        total: payment_attempts_total
+        filter: 'status = "success"'
+      total:
+        total: payment_attempts_total
+```
+
+```yaml
+# Prometheus alerting rules
+groups:
+  - name: slo-alerts
+    rules:
+      - alert: APISLOErrorBudgetBurn
+        expr: |
+          (
+            sum(rate(http_requests_total{status_code=~"5.."}[1h]))
+            /
+            sum(rate(http_requests_total[1h]))
+          ) > 0.01
+        for: 5m
+        labels:
+          severity: warning
+          slo: api-availability
+        annotations:
+          summary: "High error rate burning SLO budget"
+          description: "Error rate is {{ $value | humanizePercentage }} over the last 5 minutes"
+          runbook_url: "https://runbooks.example.com/high-error-rate"
+
+      - alert: APISLOErrorBudgetExhausted
+        expr: |
+          (
+            sum(rate(http_requests_total{status_code=~"5.."}[1h]))
+            /
+            sum(rate(http_requests_total[1h]))
+          ) > 0.05
+        for: 1m
+        labels:
+          severity: critical
+          slo: api-availability
+        annotations:
+          summary: "SLO error budget critical"
+          description: "Error rate is {{ $value | humanizePercentage }}, budget burning fast"
+```
+
+**6. Dashboards**
+
+```yaml
+# Grafana dashboard - Service Overview
+apiVersion: 1
+
+providers:
+  - name: 'default'
+    orgId: 1
+    folder: ''
+    type: file
+    options:
+      path: /etc/grafana/provisioning/dashboards
+
+dashboards:
+  - name: 'api-service-overview'
+    panels:
+      - title: 'Request Rate'
+        type: graph
+        targets:
+          - expr: sum(rate(http_requests_total[5m])) by (service)
+            legendFormat: '{{service}}'
+        gridPos: { x: 0, y: 0, w: 12, h: 8 }
+      
+      - title: 'Error Rate'
+        type: graph
+        targets:
+          - expr: |
+              sum(rate(http_requests_total{status_code=~"5.."}[5m])) by (service)
+              /
+              sum(rate(http_requests_total[5m])) by (service)
+            legendFormat: '{{service}}'
+        gridPos: { x: 12, y: 0, w: 12, h: 8 }
+      
+      - title: 'Latency P50'
+        type: graph
+        targets:
+          - expr: histogram_quantile(0.50, sum(rate(http_request_duration_ms_bucket[5m])) by (le))
+            legendFormat: 'P50'
+        gridPos: { x: 0, y: 8, w: 8, h: 8 }
+      
+      - title: 'Latency P99'
+        type: graph
+        targets:
+          - expr: histogram_quantile(0.99, sum(rate(http_request_duration_ms_bucket[5m])) by (le))
+            legendFormat: 'P99'
+        gridPos: { x: 8, y: 8, w: 8, h: 8 }
+      
+      - title: 'SLO Error Budget'
+        type: gauge
+        targets:
+          - expr: |
+              1 - (
+                sum(rate(http_requests_total{status_code=~"5.."}[30d]))
+                /
+                sum(rate(http_requests_total[30d]))
+              )
+        gridPos: { x: 16, y: 8, w: 8, h: 8 }
+```
+
+**7. Runbook Template**
+
+```markdown
+# Runbook: High Error Rate
+
+## Symptoms
+- Error rate > 1% for 5 minutes
+- HTTP 5xx errors increasing
+- User complaints about API failures
+
+## Investigation Steps
+
+1. **Check recent deployments**
+   ```bash
+   kubectl rollout history deployment/api -n production
+   ```
+   
+2. **Check pod health**
+   ```bash
+   kubectl get pods -n production -l app=api
+   kubectl describe pods -n production -l app=api
+   ```
+
+3. **Check logs**
+   ```bash
+   kubectl logs -n production -l app=api --tail=100 | grep ERROR
+   ```
+
+4. **Check database**
+   ```bash
+   # Check connection pool
+   # Check slow queries
+   # Check locks
+   ```
+
+5. **Check external dependencies**
+   ```bash
+   # Check payment gateway
+   # Check external APIs
+   # Check queue depth
+   ```
+
+## Resolution
+
+### If caused by deployment
+1. Rollback to previous version:
+   ```bash
+   kubectl rollout undo deployment/api -n production
+   ```
+
+### If database issue
+1. Scale up database if needed
+2. Kill long-running queries if necessary
+
+### If external dependency
+1. Check status pages
+2. Implement circuit breaker if not present
+
+## Prevention
+- [ ] Add more robust error handling
+- [ ] Add retry logic
+- [ ] Implement circuit breaker
+- [ ] Add integration tests
+
+## Escalation
+- Escalate to Platform Team if not resolved in 30 minutes
+- Escalate to Engineering Manager if not resolved in 1 hour
+```
+
+## Workflow
+
+**Phase 1: Design**
+
+Define telemetry requirements. Plan instrumentation. Select tools.
+
+**Phase 2: Implementation**
+
+Add logging. Add metrics. Add tracing. Test in staging.
+
+**Phase 3: SLO Definition**
+
+Define SLOs. Set targets. Create error budgets.
+
+**Phase 4: Alerting**
+
+Create alerts. Define severity. Create runbooks.
+
+**Phase 5: Dashboards**
+
+Create dashboards. Define views. Share with stakeholders.
+
+**Phase 6: Operations**
+
+Monitor alerts. Update dashboards. Refine SLOs. Train team.
 
 ## Liên kết
 
-- [[monitoring]] - Monitoring
-- [[performance]] - Performance
-- [[incident-response]] - Incident Response
+- [[monitoring]] - Monitoring practices
+- [[logging]] - Logging best practices
+- [[tracing]] - Distributed tracing
+- [[alerting]] - Alert management
+- [[incident-response]] - Incident response

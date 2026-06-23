@@ -1,50 +1,460 @@
 ---
-description: Nguyên tắc Monolith Architecture cho simpler applications
+description: Nguyên tắc và best practices cho Monolith Architecture trong Cursor Enterprise Framework
 created: 2026-06-23
 version: 1.0.0
-tags: [monolith, architecture, simplicity, modular, enterprise]
+tags: [monolith, modular-monolith, architecture, simplification]
 ---
 
 # Monolith
 
 ## Mục tiêu
 
-Monolith Architecture là traditional approach nơi mà toàn bộ application được build như một single unit. Trong Cursor Enterprise Framework, monolith được coi là valid choice cho nhiều applications, đặc biệt khi simplicity và speed of development là priorities. Mục tiêu là hướng dẫn developers build well-structured monoliths có thể evolve thành microservices khi needed.
+Monolith architecture là approach đặt tất cả components trong một đơn vị deployment duy nhất. Trong Cursor Enterprise Framework, monolith không phải là anti-pattern mà là valid choice cho nhiều scenarios. Mục tiêu của rule này là hướng dẫn developers trong việc build maintainable monoliths và understand khi nào nó là đúng lựa chọn.
 
-Monolith không phải là antipattern - nó có advantages về simplicity, development speed, và operational simplicity. Rule này cover when to choose monolith, how to structure monoliths, và patterns cho maintainability.
+Nhiều successful systems bắt đầu như monolith và scale well với proper design. Modularity và boundaries quan trọng hơn deployment model.
 
 ## Nguyên tắc
 
-**1. When Monolith Makes Sense**
+**1. Modular Monolith**
 
-Small to medium teams. Rapid prototyping. Simple domains. Limited scaling needs. Single technology stack. Startup speed priority.
+Tổ chức code thành modules. Clear boundaries. Loose coupling within monolith. Independent development. Can extract later if needed.
 
-**2. Modular Structure**
+**2. Clear Module Boundaries**
 
-Organize by modules/features. Clear boundaries. Dependency rules. Prevent spaghetti. Modules as first-class citizens.
+Modules đại diện cho bounded contexts. Minimize cross-module dependencies. Module-first thinking. Team ownership per module.
 
-**3. Layered Architecture**
+**3. Internal APIs**
 
-Presentation layer. Business logic layer. Data access layer. Dependency inversion. Clean interfaces.
+Module interfaces rõ ràng. No direct database access across modules. Service layer per module. Dependency injection.
 
-**4. Shared Database**
+**4. Transaction Boundaries**
 
-Single database, shared schema. Clear table ownership. Module-specific tables. Cross-module relationships. Transactional integrity.
+Single transaction across modules. Can span multiple modules. Clear failure handling. Compensating transactions.
 
-**5. Deployment**
+**5. Deployment Simplicity**
 
-Single deployment unit. Simple CI/CD. Blue-green deployments. Easy rollback.
+Single deployment unit. Simple CI/CD. No distributed complexity. Easy debugging. Full system testing.
 
-**6. Scaling**
+**6. Performance Benefits**
 
-Scale entire application. Vertical scaling. Horizontal scaling with load balancer.
+No network overhead. Shared memory. Database joins across entities. Faster initial development.
 
-**7. Operational Simplicity**
+**7. Operational Benefits**
 
-Single deployment artifact. Unified monitoring. Simple debugging. Less infrastructure.
+Single dashboard. Single logging. Simple deployment. Rollback entire system. Easier incident management.
+
+**8. When to Stay Monolith**
+
+Small to medium teams. Fast iteration needed. Limited budget. Simple requirements. Startup mode.
+
+**9. When to Consider Extraction**
+
+Team growing beyond 10-15. Different scaling needs. Different technology requirements. Regulatory isolation.
+
+**10. Evolutionary Architecture**
+
+Start simple. Add modules. Define boundaries. Extract when needed. Don't over-engineer.
+
+## Checklist
+
+- [ ] Module structure defined
+- [ ] Clear boundaries established
+- [ ] Internal APIs designed
+- [ ] Dependency rules documented
+- [ ] Testing strategy defined
+- [ ] CI/CD configured
+- [ ] Monitoring set up
+- [ ] Module ownership assigned
+
+## Anti Pattern
+
+**1. Big Ball of Mud**
+
+No clear structure. Everything depends on everything. No boundaries. Hard to maintain. Add structure.
+
+**2. God Classes**
+
+Classes doing too much. Business logic scattered. Hard to test. Break into smaller pieces.
+
+**3. Shared Database**
+
+All modules share database. Coupling reintroduced. Schema changes affect multiple modules.
+
+**4. Circular Dependencies**
+
+Modules depend on each other. Hard to test. Hard to maintain. Break cycles.
+
+**5. No Testing Strategy**
+
+Monolith becomes untested. Fear of changes. Add automated tests.
+
+## Best Practice
+
+**1. Module Structure**
+
+```
+src/
+├── modules/
+│   ├── user/                    # User Module
+│   │   ├── domain/
+│   │   │   ├── User.ts
+│   │   │   ├── UserRepository.ts
+│   │   │   └── UserService.ts
+│   │   ├── application/
+│   │   │   ├── CreateUserUseCase.ts
+│   │   │   └── GetUserUseCase.ts
+│   │   ├── infrastructure/
+│   │   │   ├── PostgresUserRepository.ts
+│   │   │   └── UserMapper.ts
+│   │   └── UserModule.ts         # Module definition
+│   │
+│   ├── order/                   # Order Module
+│   │   ├── domain/
+│   │   │   ├── Order.ts
+│   │   │   ├── OrderRepository.ts
+│   │   │   └── OrderService.ts
+│   │   ├── application/
+│   │   │   ├── CreateOrderUseCase.ts
+│   │   │   └── GetOrderUseCase.ts
+│   │   ├── infrastructure/
+│   │   │   ├── PostgresOrderRepository.ts
+│   │   │   └── OrderMapper.ts
+│   │   └── OrderModule.ts
+│   │
+│   └── product/                  # Product Module
+│       ├── domain/
+│       ├── application/
+│       ├── infrastructure/
+│       └── ProductModule.ts
+│
+├── shared/                        # Shared kernel
+│   ├── events/
+│   │   └── DomainEvent.ts
+│   ├── exceptions/
+│   │   └── DomainException.ts
+│   └── utils/
+│       └── Result.ts
+│
+├── infrastructure/               # Cross-cutting
+│   ├── database/
+│   │   └── Database.ts
+│   ├── messaging/
+│   │   └── EventBus.ts
+│   ├── caching/
+│   │   └── CacheService.ts
+│   └── web/
+│       └── HttpServer.ts
+│
+└── app.ts                        # Application entry
+```
+
+**2. Module Definition**
+
+```typescript
+// modules/user/UserModule.ts
+export class UserModule {
+  static readonly services = [UserService];
+  static readonly repositories = [UserRepository];
+  static readonly controllers = [UserController];
+  
+  static readonly dependencies: ModuleDependency[] = [];
+  
+  static readonly migrations = [
+    Migration001CreateUsers,
+    Migration002AddUserIndexes
+  ];
+
+  static configure(container: Container): void {
+    // Bind interfaces to implementations
+    container.bindSingleton(UserRepository, PostgresUserRepository);
+    container.bindTransient(UserService, UserService);
+  }
+}
+
+// modules/BaseModule.ts
+export abstract class BaseModule {
+  abstract readonly services: ServiceConstructor[];
+  abstract readonly repositories: RepositoryConstructor[];
+  abstract readonly controllers: ControllerConstructor[];
+  abstract readonly dependencies: ModuleDependency[];
+  
+  static configure(container: Container): void {
+    // Override in child classes
+  }
+}
+```
+
+**3. Inter-Module Communication**
+
+```typescript
+// modules/order/application/PlaceOrderUseCase.ts
+export class PlaceOrderUseCase {
+  constructor(
+    private orderService: OrderService,
+    private userModule: UserModuleFacade  // Facade to other module
+  ) {}
+
+  async execute(command: PlaceOrderCommand): Promise<Order> {
+    // Validate customer exists via facade
+    const customer = await this.userModule.findCustomer(command.customerId);
+    if (!customer) {
+      throw new CustomerNotFoundError(command.customerId);
+    }
+
+    // Create order
+    const order = await this.orderService.create({
+      customerId: customer.id,
+      items: command.items
+    });
+
+    // Publish domain event
+    EventBus.publish(new OrderPlacedEvent(order));
+
+    return order;
+  }
+}
+
+// modules/user/UserModuleFacade.ts
+export class UserModuleFacade {
+  constructor(
+    private userRepository: UserRepository
+  ) {}
+
+  async findCustomer(customerId: CustomerId): Promise<Customer | null> {
+    return this.userRepository.findCustomer(customerId);
+  }
+
+  async getCustomerEmail(customerId: CustomerId): Promise<string> {
+    const customer = await this.findCustomer(customerId);
+    return customer?.email;
+  }
+}
+```
+
+**4. Shared Database with Clear Schemas**
+
+```sql
+-- Each module has its own schema
+CREATE SCHEMA user_module;
+CREATE SCHEMA order_module;
+CREATE SCHEMA product_module;
+
+-- User module tables
+CREATE TABLE user_module.users (
+  id UUID PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Order module tables
+CREATE TABLE order_module.orders (
+  id UUID PRIMARY KEY,
+  customer_id UUID NOT NULL REFERENCES user_module.users(id),
+  status VARCHAR(50) NOT NULL,
+  total DECIMAL(10,2) NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Clear ownership: order module can reference user_module.users
+-- But user_module cannot reference order_module tables
+-- Enforce via application code and conventions
+```
+
+```typescript
+// infrastructure/database/QueryBuilder.ts
+export class QueryBuilder {
+  private schema: string;
+  
+  constructor(schema: string) {
+    this.schema = schema;
+  }
+
+  // Enforce schema in queries
+  select(table: string, columns: string[]): this {
+    this.query = `SELECT ${columns.join(', ')} FROM ${this.schema}.${table}`;
+    return this;
+  }
+
+  // Prevent cross-schema queries except for reads
+  async execute(): Promise<any[]> {
+    if (this.isCrossSchemaRead()) {
+      // Allow SELECT only
+      return this.db.query(this.query, this.params);
+    }
+    throw new Error('Cross-schema writes are not allowed');
+  }
+}
+```
+
+**5. Transaction Management**
+
+```typescript
+// infrastructure/database/TransactionManager.ts
+export class TransactionManager {
+  constructor(private db: Database) {}
+
+  async executeInTransaction<T>(
+    operation: (tx: Transaction) => Promise<T>
+  ): Promise<T> {
+    return this.db.transaction(async (tx) => {
+      return operation(tx);
+    });
+  }
+
+  // Example: Place order spans user and order modules
+  async placeOrder(command: PlaceOrderCommand): Promise<Order> {
+    return this.executeInTransaction(async (tx) => {
+      // Within same transaction:
+      // 1. Validate customer
+      const customer = await this.userRepository.findById(
+        command.customerId, 
+        tx  // Pass transaction
+      );
+      
+      // 2. Create order
+      const order = await this.orderRepository.create(
+        {
+          customerId: customer.id,
+          items: command.items
+        },
+        tx  // Pass transaction
+      );
+
+      // 3. Both succeed or both fail
+      return order;
+    });
+  }
+}
+```
+
+**6. Event Handling Within Monolith**
+
+```typescript
+// infrastructure/messaging/EventBus.ts
+export class EventBus {
+  private handlers: Map<string, EventHandler[]> = new Map();
+
+  constructor(private container: Container) {
+    this.registerHandlers();
+  }
+
+  private registerHandlers(): void {
+    // Register event handlers
+    this.subscribe(OrderPlacedEvent.name, NotifyCustomerHandler);
+    this.subscribe(OrderPlacedEvent.name, UpdateInventoryHandler);
+    this.subscribe(OrderPlacedEvent.name, SendAnalyticsHandler);
+  }
+
+  async publish<T extends DomainEvent>(event: T): Promise<void> {
+    const handlers = this.handlers.get(event.constructor.name) || [];
+    
+    for (const handler of handlers) {
+      const instance = this.container.resolve(handler);
+      await instance.handle(event);
+    }
+  }
+}
+
+// Handler definition
+@EventHandler(OrderPlacedEvent.name)
+export class NotifyCustomerHandler {
+  constructor(
+    private emailService: EmailService,
+    private userRepository: UserRepository
+  ) {}
+
+  async handle(event: OrderPlacedEvent): Promise<void> {
+    const customer = await this.userRepository.findById(event.customerId);
+    await this.emailService.sendOrderConfirmation(customer, event.order);
+  }
+}
+```
+
+**7. Application Entry Point**
+
+```typescript
+// app.ts
+import { Container } from './infrastructure/di/Container';
+import { Database } from './infrastructure/database/Database';
+import { EventBus } from './infrastructure/messaging/EventBus';
+
+// Import all modules
+import { UserModule } from './modules/user/UserModule';
+import { OrderModule } from './modules/order/OrderModule';
+import { ProductModule } from './modules/product/ProductModule';
+
+class Application {
+  private container: Container;
+  private db: Database;
+
+  constructor() {
+    this.container = new Container();
+    this.db = new Database();
+    
+    this.configureModules();
+    this.setupInfrastructure();
+    this.startServer();
+  }
+
+  private configureModules(): void {
+    // Configure shared infrastructure
+    this.container.bindSingleton(Database, this.db);
+    
+    // Configure each module
+    UserModule.configure(this.container);
+    OrderModule.configure(this.container);
+    ProductModule.configure(this.container);
+  }
+
+  private setupInfrastructure(): void {
+    // Setup event bus with handlers
+    this.container.bindSingleton(EventBus, new EventBus(this.container));
+    
+    // Setup middleware
+    this.setupErrorHandling();
+    this.setupRequestLogging();
+    this.setupAuthentication();
+  }
+
+  private startServer(): void {
+    const server = new ExpressServer(this.container);
+    server.listen(3000);
+  }
+}
+
+new Application();
+```
+
+## Workflow
+
+**Phase 1: Module Design**
+
+Define modules. Establish boundaries. Plan dependencies. Assign ownership.
+
+**Phase 2: Structure Setup**
+
+Create module directories. Set up shared kernel. Configure DI. Establish conventions.
+
+**Phase 3: Implementation**
+
+Implement modules. Add inter-module communication. Configure events. Set up transactions.
+
+**Phase 4: Infrastructure**
+
+Configure database. Setup messaging. Add caching. Configure monitoring.
+
+**Phase 5: Testing**
+
+Unit tests per module. Integration tests. Full system tests.
+
+**Phase 6: Deployment**
+
+CI/CD pipeline. Monitoring. Deployment strategy.
 
 ## Liên kết
 
+- [[microservice]] - Microservices (when to extract)
 - [[clean-architecture]] - Clean Architecture
-- [[microservice]] - Microservices
-- [[docker]] - Docker
+- [[ddd]] - Domain-Driven Design
+- [[modular-design]] - Modular Design Principles

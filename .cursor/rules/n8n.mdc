@@ -1,52 +1,570 @@
 ---
-description: Nguyên tắc và best practices cho n8n workflow automation
+description: Nguyên tắc và best practices cho n8n Workflow Automation trong Cursor Enterprise Framework
 created: 2026-06-23
 version: 1.0.0
-tags: [n8n, workflow, automation, integration, low-code]
+tags: [n8n, workflow-automation, low-code, integration, business-automation]
 ---
 
 # n8n
 
 ## Mục tiêu
 
-n8n là một workflow automation platform mã nguồn mở cho phép kết nối các ứng dụng và tự động hóa các quy trình công việc. Trong Cursor Enterprise Framework, n8n được sử dụng cho việc tạo các automation workflows giữa các services, business process automation, và no-code/low-code integration solutions. Mục tiêu là hướng dẫn developers sử dụng n8n một cách hiệu quả cho enterprise automation.
+n8n là workflow automation platform cho phép connect apps và automate tasks mà không cần code. Trong Cursor Enterprise Framework, n8n được sử dụng cho business process automation, integration workflows, và data synchronization. Mục tiêu của rule này là hướng dẫn developers trong việc implement và manage n8n workflows một cách hiệu quả và maintainable.
+
+n8n bridges gap giữa no-code tools và custom code, cho phép business users create workflows trong khi developers can extend capabilities when needed.
 
 ## Nguyên tắc
 
 **1. Workflow Design**
 
-Break into logical steps. Error handling at each step. Idempotent operations. Retry logic. Clear workflow naming.
+Clear objectives. Simple flow. Error handling. Idempotent operations.
 
-**2. Node Selection**
+**2. Node Organization**
 
-Use official nodes when available. HTTP Request node for custom APIs. Code node for complex logic. Function node sparingly.
+Group related nodes. Use sub-nodes for reusability. Clear naming. Proper documentation.
 
-**3. Data Transformation**
+**3. Error Handling**
 
-Transform data between nodes. JSON operations. Field mapping clearly. Avoid data loss.
+Try-catch blocks. Retry on failure. Dead letter queues. Alert on errors.
 
-**4. Error Handling**
+**4. Data Transformation**
 
-Error triggers và catch nodes. Alert on failures. Retry with backoff. Dead letter handling.
+Use expressions. Map fields clearly. Validate data. Handle nulls.
 
-**5. Security**
+**5. Authentication**
 
-Credential management. OAuth securely stored. Webhook authentication. IP restrictions.
+Store credentials securely. Rotate tokens. Use OAuth when possible. Avoid hardcoding.
 
-**6. Performance**
+**6. Trigger Design**
 
-Parallel execution where possible. Limit API calls. Batch operations. Avoid nested loops.
+Choose appropriate triggers. Webhook for sync. Cron for schedule. Event for async.
 
-**7. Version Control**
+**7. Scalability**
 
-Export workflows to JSON. Version control exports. Document changes. Test before production.
+Heavy workflows in queue. Batch processing. Avoid long-running workflows. Use pagination.
 
-**8. Monitoring**
+**8. Version Control**
 
-Execution history. Error tracking. Performance metrics. Alert configuration.
+Export workflows as JSON. Version in Git. Document changes. Use environments.
+
+**9. Monitoring**
+
+Set up execution logs. Monitor success rate. Track metrics. Alert on failures.
+
+**10. Security**
+
+Webhook secrets. Input validation. Rate limiting. Audit logging.
+
+## Checklist
+
+- [ ] Workflow requirements defined
+- [ ] Node structure designed
+- [ ] Error handling implemented
+- [ ] Credentials configured
+- [ ] Testing completed
+- [ ] Monitoring set up
+- [ ] Documentation created
+- [ ] Version control established
+- [ ] Rollback plan defined
+- [ ] Security reviewed
+
+## Anti Pattern
+
+**1. Monolithic Workflows**
+
+Everything in one workflow. Hard to debug. Hard to maintain. Split into smaller.
+
+**2. No Error Handling**
+
+Ignoring errors. Silent failures. Data loss. Proper error handling.
+
+**3. Hardcoded Values**
+
+Values in workflow. Environment changes break. Use variables. Externalize.
+
+**4. Over-Complex Logic**
+
+Complex expressions. Nested conditions. Hard to read. Simplify or use Code nodes.
+
+## Best Practice
+
+**1. Workflow Structure**
+
+```json
+{
+  "name": "Order Processing Workflow",
+  "nodes": [
+    {
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "order-webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "orders",
+        "responseMode": "onReceived",
+        "options": {
+          "rawBody": false
+        }
+      }
+    },
+    {
+      "name": "Validate Order",
+      "type": "n8n-nodes-base.code",
+      "position": [500, 300],
+      "parameters": {
+        "jsCode": "const order = $json;\n\nif (!order.items || order.items.length === 0) {\n  throw new Error('Order must have at least one item');\n}\n\nif (!order.customerId) {\n  throw new Error('Customer ID is required');\n}\n\nreturn { json: { valid: true, order } };"
+      }
+    },
+    {
+      "name": "Create Database Record",
+      "type": "n8n-nodes-base.postgres",
+      "position": [750, 300],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO orders (id, customer_id, status, data) VALUES ($1, $2, $3, $4)",
+        "options": {
+          "values": {
+            "values": [
+              { "name": "id", "value": "={{ $json.order.id }}" },
+              { "name": "customer_id", "value": "={{ $json.order.customerId }}" },
+              { "name": "status", "value": "pending" },
+              { "name": "data", "value": "={{ JSON.stringify($json.order) }}" }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "Notify Customer",
+      "type": "n8n-nodes-base.email",
+      "position": [1000, 200],
+      "parameters": {
+        "to": "={{ $json.customer.email }}",
+        "subject": "Order Confirmation",
+        "body": "Your order {{ $json.order.id }} has been received.",
+        "options": {}
+      }
+    },
+    {
+      "name": "Update Inventory",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1000, 400],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.INVENTORY_API_URL }}/reserve",
+        "bodyParameters": {
+          "items": "={{ $json.order.items }}"
+        },
+        "options": {}
+      }
+    },
+    {
+      "name": "Handle Error",
+      "type": "n8n-nodes-base.errorTrigger",
+      "position": [1250, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [[{ "node": "Validate Order", "type": "main", "index": 0 }]]
+    },
+    "Validate Order": {
+      "main": [[{ "node": "Create Database Record", "type": "main", "index": 0 }]]
+    },
+    "Create Database Record": {
+      "main": [
+        [{ "node": "Notify Customer", "type": "main", "index": 0 }],
+        [{ "node": "Update Inventory", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
+```
+
+**2. Reusable Sub-Workflows**
+
+```json
+{
+  "name": "Send Email Template",
+  "nodes": [
+    {
+      "name": "Workflow Input",
+      "type": "n8n-nodes-base.workflowTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "name": "Load Template",
+      "type": "n8n-nodes-base.code",
+      "position": [500, 300],
+      "parameters": {
+        "jsCode": "const templates = {\n  welcome: {\n    subject: 'Welcome to {{ company }}!',\n    body: 'Hello {{ name }},\\n\\nWelcome to our platform.'\n  },\n  orderConfirmation: {\n    subject: 'Order {{ orderId }} Confirmed',\n    body: 'Your order is confirmed. Order ID: {{ orderId }}'\n  }\n};\n\nconst template = templates[$input.first().json.template];\nif (!template) {\n  throw new Error(`Template ${$input.first().json.template} not found`);\n}\n\nreturn { json: { ...template, data: $input.first().json } };"
+      }
+    },
+    {
+      "name": "Render Template",
+      "type": "n8n-nodes-base.handlebars",
+      "position": [750, 300],
+      "parameters": {
+        "operation": "renderTemplate",
+        "template": "={{ $json.subject }}",
+        "data": "={{ $json.data }}"
+      }
+    }
+  ]
+}
+```
+
+**3. Batch Processing Workflow**
+
+```json
+{
+  "name": "Batch Customer Sync",
+  "nodes": [
+    {
+      "name": "Cron Trigger",
+      "type": "n8n-nodes-base.cron",
+      "position": [250, 300],
+      "parameters": {
+        "rule": {
+          "interval": [
+            { "triggerAtHour": 2 }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Fetch Customers",
+      "type": "n8n-nodes-base.postgres",
+      "position": [500, 300],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, email, name, updated_at FROM customers WHERE updated_at > NOW() - INTERVAL '24 hours'"
+      }
+    },
+    {
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [750, 300],
+      "parameters": {
+        "batchSize": 100
+      }
+    },
+    {
+      "name": "Process Batch",
+      "type": "n8n-nodes-base.code",
+      "position": [1000, 300],
+      "parameters": {
+        "jsCode": "// Process batch of customers\nconst customers = $input.all().map(i => i.json);\n\n// Transform for external system\nreturn customers.map(customer => ({\n  json: {\n    external_id: customer.id,\n    email: customer.email,\n    full_name: customer.name,\n    last_updated: customer.updated_at\n  }\n}));"
+      }
+    },
+    {
+      "name": "Sync to CRM",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1250, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CRM_API_URL }}/contacts/batch",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer {{ $env.CRM_API_KEY }}" }
+          ]
+        },
+        "bodyParameters": {
+          "contacts": "={{ $json }}"
+        }
+      }
+    },
+    {
+      "name": "Log Results",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [1500, 300],
+      "parameters": {
+        "operation": "append",
+        "sheetId": "={{ $env.SHEET_ID }}",
+        "range": "A1",
+        "options": {
+          "valueInputMode": "USER_ENTERED"
+        }
+      }
+    }
+  ]
+}
+```
+
+**4. Error Handling Pattern**
+
+```json
+{
+  "name": "API Integration with Error Handling",
+  "nodes": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 300]
+    },
+    {
+      "name": "Try Block",
+      "type": "n8n-nodes-base.wait",
+      "position": [500, 300],
+      "parameters": {
+        "amount": 1,
+        "unit": "seconds"
+      }
+    },
+    {
+      "name": "API Call",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [750, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.API_URL }}/process",
+        "options": {
+          "timeout": 30000,
+          "retry": {
+            "maxRetries": 3,
+            "retryWaitMax": 10000
+          }
+        }
+      }
+    },
+    {
+      "name": "Success Path",
+      "type": "n8n-nodes-base.noOp",
+      "position": [1000, 200],
+      "parameters": {}
+    },
+    {
+      "name": "Retry Handler",
+      "type": "n8n-nodes-base.errorTrigger",
+      "position": [1000, 400],
+      "parameters": {}
+    },
+    {
+      "name": "Send Alert",
+      "type": "n8n-nodes-base.slack",
+      "position": [1250, 400],
+      "parameters": {
+        "channel": "#alerts",
+        "text": "=: Execution failed: {{ $json.execution.id }}"
+      }
+    },
+    {
+      "name": "Queue for Retry",
+      "type": "n8n-nodes-base.redis",
+      "position": [1250, 600],
+      "parameters": {
+        "operation": "lpush",
+        "key": "retry-queue",
+        "value": "={{ JSON.stringify($json.execution) }}"
+      }
+    }
+  ]
+}
+```
+
+**5. Environment-Specific Configuration**
+
+```json
+{
+  "nodes": [
+    {
+      "name": "Get Environment Config",
+      "type": "n8n-nodes-base.code",
+      "position": [250, 300],
+      "parameters": {
+        "jsCode": "const env = $env.NODE_ENV || 'development';\n\nconst configs = {\n  development: {\n    dbHost: 'localhost',\n    apiUrl: 'http://localhost:3000',\n    logLevel: 'debug'\n  },\n  staging: {\n    dbHost: 'staging-db.internal',\n    apiUrl: 'https://staging.api.example.com',\n    logLevel: 'info'\n  },\n  production: {\n    dbHost: 'prod-db.internal',\n    apiUrl: 'https://api.example.com',\n    logLevel: 'warn'\n  }\n};\n\nreturn { json: configs[env] || configs.development };"
+      }
+    }
+  ]
+}
+```
+
+**6. n8n Docker Setup**
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=${N8N_USER}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
+      - N8N_HOST=${N8N_HOST}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - NODE_ENV=production
+      - EXECUTIONS_DATA_SAVE_ON_ERROR=all
+      - EXECUTIONS_DATA_SAVE_ON_SUCCESS=all
+      - EXECUTIONS_DATA_SAVE_ON_PROGRESS=true
+      - EXECUTIONS_DATA_TIMEOUT=600
+      - GENERIC_TIMEZONE=Asia/Ho_Chi_Minh
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - N8N_LOG_LEVEL=info
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./workflows:/home/node/workflow-folder
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - n8n-network
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: n8n-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=n8n
+      - POSTGRES_MAX_CONNECTIONS=200
+    volumes:
+      - postgres_n8n:/var/lib/postgresql/data
+    networks:
+      - n8n-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: n8n-redis
+    restart: unless-stopped
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_n8n:/data
+    networks:
+      - n8n-network
+
+volumes:
+  n8n_data:
+  postgres_n8n:
+  redis_n8n:
+
+networks:
+  n8n-network:
+    driver: bridge
+```
+
+**7. Production Configuration**
+
+```yaml
+# n8n/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: n8n-config
+data:
+  N8N_LOG_LEVEL: "info"
+  N8N_METRICS: "true"
+  N8N_QUEUE_BULL_MESSAGES_TIMEOUT: "300"
+  N8N_EXECUTIONS_TIMEOUT: "600"
+  N8N_EXECUTIONS_TIMEOUT_MAX: "3600"
+  N8N_DEFAULT_BINARY_DATA_MODE: "filesystem"
+  N8N_ENCRYPTION_KEY: "${N8N_ENCRYPTION_KEY}"
+  N8N_PAYLOAD_SIZE_MAX: "16"
+  N8N_DISABLE_PRODUCTION_MAIN_PROCESS: "false"
+  WEBHOOK_URL: "https://n8n.example.com"
+  N8N_USER_FOLDERS: "/home/node/workflow-folder"
+
+---
+# n8n/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: n8n
+  template:
+    metadata:
+      labels:
+        app: n8n
+    spec:
+      containers:
+        - name: n8n
+          image: n8nio/n8n:1.0.0
+          ports:
+            - containerPort: 5678
+          envFrom:
+            - configMapRef:
+                name: n8n-config
+            - secretRef:
+                name: n8n-secrets
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 2Gi
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5678
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 5678
+          volumeMounts:
+            - name: n8n-data
+              mountPath: /home/node/.n8n
+            - name: workflows
+              mountPath: /home/node/workflow-folder
+      volumes:
+        - name: n8n-data
+          persistentVolumeClaim:
+            claimName: n8n-pvc
+        - name: workflows
+          persistentVolumeClaim:
+            claimName: workflows-pvc
+```
+
+## Workflow
+
+**Phase 1: Requirements Gathering**
+
+Identify automation needs. Map current process. Define success criteria. Estimate impact.
+
+**Phase 2: Workflow Design**
+
+Design flow. Identify triggers. Map data transformations. Plan error handling.
+
+**Phase 3: Implementation**
+
+Create workflow. Add nodes. Configure credentials. Test thoroughly.
+
+**Phase 4: Testing**
+
+Unit test nodes. Integration test. Error scenarios. Load test.
+
+**Phase 5: Deployment**
+
+Deploy to production. Monitor executions. Set up alerts. Train users.
+
+**Phase 6: Maintenance**
+
+Monitor performance. Optimize. Update. Document changes.
 
 ## Liên kết
 
-- [[automation]] - Automation
-- [[queue]] - Queue
-- [[api]] - API
+- [[temporal]] - Temporal workflow engine
+- [[queue]] - Message queues
+- [[automation]] - Business automation
+- [[integration]] - System integration

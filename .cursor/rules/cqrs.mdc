@@ -2,1352 +2,775 @@
 description: Nguyên tắc và best practices cho CQRS Pattern trong Cursor Enterprise Framework
 created: 2026-06-23
 version: 1.0.0
-tags:
-  - cqrs
-  - architecture
-  - event-sourcing
-  - patterns
-  - separation-of-concerns
+tags: [cqrs, command, query, separation, event-sourcing]
 ---
 
-# CQRS (Command Query Responsibility Segregation) Guidelines
+# CQRS
 
 ## Mục tiêu
 
-Tài liệu này định nghĩa các nguyên tắc và best practices cho việc implement CQRS (Command Query Responsibility Segregation) pattern trong Cursor Enterprise Framework. Mục tiêu là đảm bảo clear separation giữa read và write operations, optimized performance cho cả hai sides, và maintainable codebase.
+Command Query Responsibility Segregation (CQRS) là pattern tách biệt read và write operations thành các models riêng biệt. Trong Cursor Enterprise Framework, CQRS được sử dụng khi read và write có các yêu cầu khác nhau đáng kể về data model, performance, hoặc scalability. Mục tiêu của rule này là hướng dẫn developers trong việc apply CQRS một cách effective khi nó mang lại giá trị.
 
-CQRS là pattern tách biệt read và write operations thành các models riêng biệt. Điều này cho phép optimize read queries mà không ảnh hưởng đến write operations và ngược lại.
+CQRS không phải lúc nào cũng cần thiết. Áp dụng khi có clear benefits như different read/write patterns, performance optimization, hoặc complex domain models.
 
-## Nguyên tắc cơ bản
+## Nguyên tắc
 
-### 1. CQRS Overview
+**1. Separate Models**
 
-Understanding CQRS architecture.
+Different models for reads and writes. Write model for commands. Read model for queries. Each optimized for its purpose. Independent evolution.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     CQRS Architecture                             │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│   Commands (Write)                    Queries (Read)           │
-│   ┌──────────────┐                   ┌──────────────┐          │
-│   │   Command    │                   │    Query     │          │
-│   │   Handler    │                   │   Handler    │          │
-│   └──────┬───────┘                   └──────┬───────┘          │
-│          │                                    │                 │
-│          ▼                                    ▼                 │
-│   ┌──────────────┐                   ┌──────────────┐          │
-│   │   Domain     │                   │    Read      │          │
-│   │   Model      │                   │    Model     │          │
-│   └──────┬───────┘                   └──────┬───────┘          │
-│          │                                    │                 │
-│          ▼                                    ▼                 │
-│   ┌──────────────┐                   ┌──────────────┐          │
-│   │   Event      │                   │   Database  │          │
-│   │   Store      │                   │   (Denorm.) │          │
-│   └──────────────┘                   └──────────────┘          │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
-```
+**2. Command Model**
 
-### 2. Command Design
+Focus on business logic. Enforce invariants. Maintain consistency. Contains domain logic. Should be clean and simple.
 
-Design commands for write operations.
+**3. Query Model**
 
-```typescript
-// Base command interface
-interface Command {
-    id: string;              // Unique command ID
-    type: string;           // Command type name
-    timestamp: Date;         // When command was created
-    metadata: CommandMetadata;
-}
+Optimized for queries. Denormalized data. Projections from events. Fast reads. Can be eventually consistent.
 
-interface CommandMetadata {
-    userId?: string;
-    correlationId?: string;
-    causationId?: string;
-}
+**4. Synchronization**
 
-// Command definitions
-type OrderCommand =
-    | CreateOrderCommand
-    | AddItemCommand
-    | RemoveItemCommand
-    | ConfirmOrderCommand
-    | CancelOrderCommand
-    | ShipOrderCommand;
+Keep read models in sync. Event-driven updates. Projection services. Handle failures. Eventually consistent.
 
-interface CreateOrderCommand extends Command {
-    type: 'CREATE_ORDER';
-    payload: {
-        customerId: string;
-        shippingAddress: Address;
-        billingAddress: Address;
-        items: OrderItemInput[];
-        paymentMethod: PaymentMethod;
-    };
-}
+**5. Event Sourcing Integration**
 
-interface AddItemCommand extends Command {
-    type: 'ADD_ITEM';
-    payload: {
-        orderId: string;
-        productId: string;
-        quantity: number;
-    };
-}
+Commands create events. Events update read models. Full audit trail. Event replay. Time-travel debugging.
 
-interface ConfirmOrderCommand extends Command {
-    type: 'CONFIRM_ORDER';
-    payload: {
-        orderId: string;
-        paymentId: string;
-    };
-}
+**6. Scalability**
 
-// Command validation
-class CommandValidator {
-    validate(command: Command): ValidationResult {
-        const errors: ValidationError[] = [];
+Scale reads independently. Scale writes independently. Optimize each side. Match to access patterns.
 
-        switch (command.type) {
-            case 'CREATE_ORDER':
-                errors.push(...this.validateCreateOrder(command));
-                break;
-            case 'ADD_ITEM':
-                errors.push(...this.validateAddItem(command));
-                break;
-            // ... other commands
-        }
+**7. Complexity Management**
 
-        return {
-            valid: errors.length === 0,
-            errors
-        };
-    }
+CQRS adds complexity. Only use when needed. Clear boundaries. Good documentation. Team understanding.
 
-    private validateCreateOrder(cmd: CreateOrderCommand): ValidationError[] {
-        const errors: ValidationError[] = [];
+**8. Consistency Considerations**
 
-        if (!cmd.payload.customerId) {
-            errors.push({ field: 'customerId', message: 'Customer ID is required' });
-        }
+Commands may be strongly consistent. Queries may be eventually consistent. Accept inconsistency. Handle race conditions.
 
-        if (!cmd.payload.shippingAddress) {
-            errors.push({ field: 'shippingAddress', message: 'Shipping address is required' });
-        }
+**9. Testing Strategy**
 
-        if (!cmd.payload.items || cmd.payload.items.length === 0) {
-            errors.push({ field: 'items', message: 'At least one item is required' });
-        }
+Test command side. Test query side. Test synchronization. Integration tests. Performance tests.
 
-        return errors;
-    }
-}
-```
+**10. Eventual Consistency**
 
-### 3. Query Design
-
-Design queries for read operations.
-
-```typescript
-// Base query interface
-interface Query {
-    id: string;
-    type: string;
-    parameters: QueryParameters;
-}
-
-interface QueryParameters {
-    pagination?: PaginationParams;
-    sorting?: SortParams[];
-    filtering?: FilterParams;
-}
-
-// Query definitions
-type OrderQuery =
-    | GetOrderByIdQuery
-    | GetOrdersQuery
-    | GetCustomerOrdersQuery
-    | GetOrderSummaryQuery
-    | SearchOrdersQuery;
-
-interface GetOrderByIdQuery extends Query {
-    type: 'GET_ORDER_BY_ID';
-    parameters: {
-        orderId: string;
-        includeItems?: boolean;
-        includeCustomer?: boolean;
-    };
-}
-
-interface GetOrdersQuery extends Query {
-    type: 'GET_ORDERS';
-    parameters: {
-        pagination: { page: number; limit: number };
-        sorting: { field: string; direction: 'asc' | 'desc' }[];
-        filtering?: {
-            status?: OrderStatus[];
-            customerId?: string;
-            dateFrom?: Date;
-            dateTo?: Date;
-        };
-    };
-}
-
-interface GetOrderSummaryQuery extends Query {
-    type: 'GET_ORDER_SUMMARY';
-    parameters: {
-        orderId: string;
-    };
-}
-
-// Query result DTOs
-interface OrderDTO {
-    id: string;
-    orderNumber: string;
-    customer: CustomerSummaryDTO;
-    status: OrderStatus;
-    items: OrderItemDTO[];
-    totalAmount: MoneyDTO;
-    shippingAddress: AddressDTO;
-    createdAt: Date;
-    confirmedAt?: Date;
-    shippedAt?: Date;
-}
-
-interface OrderSummaryDTO {
-    id: string;
-    orderNumber: string;
-    status: OrderStatus;
-    totalAmount: MoneyDTO;
-    itemCount: number;
-    createdAt: Date;
-}
-
-interface OrderListDTO {
-    orders: OrderSummaryDTO[];
-    pagination: PaginationMeta;
-    totalCount: number;
-}
-```
-
-### 4. Command Handler
-
-Implement command handlers.
-
-```typescript
-// Command handler interface
-interface CommandHandler<TCommand extends Command, TResult = void> {
-    handle(command: TCommand): Promise<TResult>;
-}
-
-// Command handler implementation
-class CreateOrderCommandHandler
-    implements CommandHandler<CreateOrderCommand, CreateOrderResult> {
-
-    constructor(
-        private orderRepository: OrderRepository,
-        private eventStore: EventStore,
-        private eventBus: EventBus,
-        private validator: CommandValidator
-    ) {}
-
-    async handle(command: CreateOrderCommand): Promise<CreateOrderResult> {
-        // 1. Validate command
-        const validation = this.validator.validate(command);
-        if (!validation.valid) {
-            return {
-                success: false,
-                errors: validation.errors
-            };
-        }
-
-        // 2. Create aggregate
-        const orderId = generateUUID();
-        const order = new OrderAggregate(orderId);
-
-        // 3. Execute business logic
-        order.createOrder(
-            command.payload.customerId,
-            command.payload.shippingAddress,
-            command.payload.billingAddress
-        );
-
-        for (const item of command.payload.items) {
-            const product = await this.productService.getProduct(item.productId);
-            order.addItem(product, item.quantity);
-        }
-
-        // 4. Persist events
-        const events = order.getUncommittedEvents();
-        await this.eventStore.save(events);
-
-        // 5. Publish events
-        await this.eventBus.publishBatch(events);
-
-        // 6. Mark as committed
-        order.markEventsAsCommitted();
-
-        return {
-            success: true,
-            orderId: order.id,
-            events: events
-        };
-    }
-}
-
-interface CreateOrderResult {
-    success: boolean;
-    orderId?: string;
-    errors?: ValidationError[];
-    events?: DomainEvent[];
-}
-```
-
-### 5. Query Handler
-
-Implement query handlers.
-
-```typescript
-// Query handler interface
-interface QueryHandler<TQuery extends Query, TResult> {
-    handle(query: TQuery): Promise<TResult>;
-}
-
-// Query handler implementation
-class GetOrderByIdQueryHandler
-    implements QueryHandler<GetOrderByIdQuery, OrderDTO | null> {
-
-    constructor(
-        private readDb: ReadDatabase,
-        private cache: Cache
-    ) {}
-
-    async handle(query: GetOrderByIdQuery): Promise<OrderDTO | null> {
-        // Check cache first
-        const cacheKey = `order:${query.parameters.orderId}`;
-        const cached = await this.cache.get<OrderDTO>(cacheKey);
-
-        if (cached) {
-            return cached;
-        }
-
-        // Query read database
-        const order = await this.readDb.orderRepository.findById(
-            query.parameters.orderId,
-            {
-                includeItems: query.parameters.includeItems ?? true,
-                includeCustomer: query.parameters.includeCustomer ?? true
-            }
-        );
-
-        if (!order) {
-            return null;
-        }
-
-        // Cache result
-        await this.cache.setex(cacheKey, 300, order);
-
-        return order;
-    }
-}
-
-class GetOrdersQueryHandler
-    implements QueryHandler<GetOrdersQuery, OrderListDTO> {
-
-    constructor(
-        private readDb: ReadDatabase,
-        private queryOptimizer: QueryOptimizer
-    ) {}
-
-    async handle(query: GetOrdersQuery): Promise<OrderListDTO> {
-        // Build optimized query
-        const queryBuilder = this.readDb.orderRepository
-            .createQueryBuilder('order')
-            .select(this.queryOptimizer.selectOnlyNeededFields(query));
-
-        // Apply filters
-        if (query.parameters.filtering) {
-            const filter = query.parameters.filtering;
-
-            if (filter.status) {
-                queryBuilder.andWhere('order.status IN (:...status)', {
-                    status: filter.status
-                });
-            }
-
-            if (filter.customerId) {
-                queryBuilder.andWhere('order.customerId = :customerId', {
-                    customerId: filter.customerId
-                });
-            }
-
-            if (filter.dateFrom) {
-                queryBuilder.andWhere('order.createdAt >= :dateFrom', {
-                    dateFrom: filter.dateFrom
-                });
-            }
-
-            if (filter.dateTo) {
-                queryBuilder.andWhere('order.createdAt <= :dateTo', {
-                    dateTo: filter.dateTo
-                });
-            }
-        }
-
-        // Apply sorting
-        for (const sort of query.parameters.sorting) {
-            queryBuilder.addOrderBy(`order.${sort.field}`, sort.direction);
-        }
-
-        // Apply pagination
-        const { page, limit } = query.parameters.pagination;
-        queryBuilder.skip((page - 1) * limit).take(limit);
-
-        // Execute query
-        const [orders, totalCount] = await queryBuilder.getManyAndCount();
-
-        return {
-            orders: orders.map(this.mapToSummaryDTO),
-            pagination: {
-                page,
-                limit,
-                totalCount,
-                totalPages: Math.ceil(totalCount / limit)
-            },
-            totalCount
-        };
-    }
-}
-```
-
-### 6. Mediator Pattern
-
-Implement mediator for command/query dispatching.
-
-```typescript
-// Mediator for CQRS
-class CQRSMediator {
-    private commandHandlers: Map<string, CommandHandler<any, any>> = new Map();
-    private queryHandlers: Map<string, QueryHandler<any, any>> = new Map();
-    private pipeline: CommandQueryPipeline;
-
-    constructor(pipeline: CommandQueryPipeline) {
-        this.pipeline = pipeline;
-    }
-
-    registerCommand<TCommand extends Command>(
-        commandType: string,
-        handler: CommandHandler<TCommand, any>
-    ): void {
-        this.commandHandlers.set(commandType, handler);
-    }
-
-    registerQuery<TQuery extends Query, TResult>(
-        queryType: string,
-        handler: QueryHandler<TQuery, TResult>
-    ): void {
-        this.queryHandlers.set(queryType, handler);
-    }
-
-    async send<TCommand extends Command, TResult>(
-        command: TCommand
-    ): Promise<TResult> {
-        const handler = this.commandHandlers.get(command.type);
-        if (!handler) {
-            throw new HandlerNotFoundError(command.type);
-        }
-
-        return this.pipeline.execute(command, handler as CommandHandler<any, any>);
-    }
-
-    async query<TQuery extends Query, TResult>(
-        query: TQuery
-    ): Promise<TResult> {
-        const handler = this.queryHandlers.get(query.type);
-        if (!handler) {
-            throw new HandlerNotFoundError(query.type);
-        }
-
-        return this.pipeline.execute(query, handler as QueryHandler<any, any>);
-    }
-}
-
-// Pipeline behaviors
-class CommandQueryPipeline {
-    constructor(private behaviors: PipelineBehavior[]) {}
-
-    async execute<T extends Command | Query, TResult>(
-        message: T,
-        handler: CommandHandler<T, TResult> | QueryHandler<T, TResult>
-    ): Promise<TResult> {
-        const context = new PipelineContext();
-
-        for (const behavior of this.behaviors) {
-            await behavior.beforeExecute(message, context);
-        }
-
-        let result: TResult;
-        try {
-            result = await (handler as any).handle(message);
-        } catch (error) {
-            for (const behavior of this.behaviors) {
-                await behavior.onError(error, message, context);
-            }
-            throw error;
-        }
-
-        for (const behavior of this.behaviors) {
-            await behavior.afterExecute(message, result, context);
-        }
-
-        return result;
-    }
-}
-
-// Pipeline behaviors
-interface PipelineBehavior {
-    beforeExecute(message: Command | Query, context: PipelineContext): Promise<void>;
-    afterExecute(message: Command | Query, result: any, context: PipelineContext): Promise<void>;
-    onError(error: Error, message: Command | Query, context: PipelineContext): Promise<void>;
-}
-
-// Logging behavior
-class LoggingBehavior implements PipelineBehavior {
-    async beforeExecute(message: Command | Query, context: PipelineContext): Promise<void> {
-        context.logger.info('Executing', {
-            type: message.type,
-            id: message.id
-        });
-    }
-
-    async afterExecute(message: Command | Query, result: any, context: PipelineContext): Promise<void> {
-        context.logger.info('Executed', {
-            type: message.type,
-            id: message.id
-        });
-    }
-
-    async onError(error: Error, message: Command | Query, context: PipelineContext): Promise<void> {
-        context.logger.error('Command failed', {
-            type: message.type,
-            id: message.id,
-            error: error.message
-        });
-    }
-}
-
-// Validation behavior
-class ValidationBehavior implements PipelineBehavior {
-    constructor(private validator: CommandValidator) {}
-
-    async beforeExecute(message: Command | Query, context: PipelineContext): Promise<void> {
-        if ('type' in message && message.type.startsWith('CREATE_')) {
-            const result = this.validator.validate(message);
-            if (!result.valid) {
-                throw new ValidationException(result.errors);
-            }
-        }
-    }
-}
-```
-
-### 7. Read Model Synchronization
-
-Keep read models in sync with write side.
-
-```typescript
-// Event handler for read model updates
-class OrderReadModelUpdater {
-    constructor(
-        private readDb: ReadDatabase,
-        private cache: Cache
-    ) {}
-
-    async handle(event: DomainEvent): Promise<void> {
-        switch (event.eventType) {
-            case 'ORDER_CREATED':
-                await this.onOrderCreated(event);
-                break;
-            case 'ORDER_ITEM_ADDED':
-                await this.onItemAdded(event);
-                break;
-            case 'ORDER_CONFIRMED':
-                await this.onOrderConfirmed(event);
-                break;
-            case 'ORDER_SHIPPED':
-                await this.onOrderShipped(event);
-                break;
-        }
-
-        // Invalidate cache
-        await this.cache.delete(`order:${event.aggregateId}`);
-    }
-
-    private async onOrderCreated(event: OrderCreatedEvent): Promise<void> {
-        await this.readDb.orderRepository.insert({
-            id: event.payload.orderId,
-            orderNumber: await this.generateOrderNumber(),
-            customerId: event.payload.customerId,
-            status: 'DRAFT',
-            items: [],
-            totalAmount: { amount: 0, currency: 'USD' },
-            shippingAddress: event.payload.shippingAddress,
-            billingAddress: event.payload.billingAddress,
-            createdAt: event.timestamp,
-            updatedAt: event.timestamp
-        });
-    }
-
-    private async onItemAdded(event: OrderItemAddedEvent): Promise<void> {
-        const order = await this.readDb.orderRepository.findById(event.aggregateId);
-
-        if (order) {
-            const existingItemIndex = order.items.findIndex(
-                i => i.productId === event.payload.productId
-            );
-
-            if (existingItemIndex >= 0) {
-                order.items[existingItemIndex] = {
-                    productId: event.payload.productId,
-                    productName: event.payload.productName,
-                    quantity: event.payload.quantity,
-                    unitPrice: event.payload.unitPrice,
-                    totalPrice: event.payload.totalPrice
-                };
-            } else {
-                order.items.push({
-                    productId: event.payload.productId,
-                    productName: event.payload.productName,
-                    quantity: event.payload.quantity,
-                    unitPrice: event.payload.unitPrice,
-                    totalPrice: event.payload.totalPrice
-                });
-            }
-
-            order.totalAmount = this.calculateTotal(order.items);
-            order.updatedAt = event.timestamp;
-
-            await this.readDb.orderRepository.update(order.id, order);
-        }
-    }
-
-    private async onOrderConfirmed(event: OrderConfirmedEvent): Promise<void> {
-        await this.readDb.orderRepository.update(event.aggregateId, {
-            status: 'CONFIRMED',
-            confirmedAt: event.payload.confirmedAt,
-            updatedAt: event.timestamp
-        });
-    }
-
-    private calculateTotal(items: OrderItemDTO[]): MoneyDTO {
-        const total = items.reduce(
-            (sum, item) => sum + item.totalPrice.amount,
-            0
-        );
-        return { amount: total, currency: 'USD' };
-    }
-}
-
-// Projection-based synchronization
-class OrderProjectionBasedSynchronizer {
-    private projection: OrderReadModelProjection;
-
-    constructor(projection: OrderReadModelProjection) {
-        this.projection = projection;
-    }
-
-    async synchronize(event: DomainEvent): Promise<void> {
-        await this.projection.handle(event);
-    }
-
-    async rebuild(projectionName: string): Promise<void> {
-        // Full rebuild of projection
-        const events = await this.eventStore.getAll();
-        const projection = this.createProjection(projectionName);
-
-        for (const event of events) {
-            await projection.handle(event);
-        }
-    }
-}
-```
-
-### 8. Separate Databases
-
-Maintain separate databases for reads and writes.
-
-```typescript
-// Database configuration
-interface DatabaseConfig {
-    writeDb: ConnectionConfig;
-    readDb: ConnectionConfig;
-}
-
-// Write database (Normalized)
-const writeDbConfig: ConnectionConfig = {
-    host: 'write-db.example.com',
-    port: 5432,
-    database: 'orders_write',
-    pool: {
-        min: 10,
-        max: 100
-    }
-};
-
-// Read database (Denormalized)
-const readDbConfig: ConnectionConfig = {
-    host: 'read-db-1.example.com',
-    port: 5432,
-    database: 'orders_read',
-    pool: {
-        min: 20,
-        max: 200
-    },
-    replicaSet: 'rs0' // Read from replica
-};
-
-// Multi-database context
-class MultiDatabaseContext {
-    writeDb: WriteDatabase;
-    readDb: ReadDatabase;
-
-    constructor(config: DatabaseConfig) {
-        this.writeDb = new WriteDatabase(config.writeDb);
-        this.readDb = new ReadDatabase(config.readDb);
-    }
-
-    async transaction<T>(fn: () => Promise<T>): Promise<T> {
-        // Transactions only on write DB
-        return this.writeDb.transaction(fn);
-    }
-}
-
-// Repository implementations
-class OrderWriteRepository {
-    constructor(private db: WriteDatabase) {}
-
-    async findById(id: string): Promise<OrderAggregate> {
-        // Load from event store
-        return this.eventStore.getById(id);
-    }
-}
-
-class OrderReadRepository {
-    constructor(private db: ReadDatabase) {}
-
-    async findById(id: string): Promise<OrderDTO> {
-        return this.db.query(
-            `SELECT * FROM order_read_model WHERE id = $1`,
-            [id]
-        );
-    }
-
-    async findAll(query: GetOrdersQuery): Promise<OrderListDTO> {
-        // Optimized read query
-        return this.db.queryWithPagination(
-            'order_read_model',
-            query.parameters
-        );
-    }
-}
-```
-
-### 9. API Controllers
-
-Expose CQRS through API layer.
-
-```typescript
-// Command controller
-class OrderCommandController {
-    constructor(
-        private mediator: CQRSMediator,
-        private logger: Logger
-    ) {}
-
-    async createOrder(req: Request, res: Response): Promise<void> {
-        try {
-            const command: CreateOrderCommand = {
-                id: generateUUID(),
-                type: 'CREATE_ORDER',
-                timestamp: new Date(),
-                metadata: {
-                    userId: req.user.id,
-                    correlationId: req.headers['x-correlation-id']
-                },
-                payload: {
-                    customerId: req.user.customerId,
-                    shippingAddress: req.body.shippingAddress,
-                    billingAddress: req.body.billingAddress,
-                    items: req.body.items,
-                    paymentMethod: req.body.paymentMethod
-                }
-            };
-
-            const result = await this.mediator.send(command);
-
-            if (!result.success) {
-                res.status(400).json({
-                    success: false,
-                    errors: result.errors
-                });
-                return;
-            }
-
-            res.status(201).json({
-                success: true,
-                orderId: result.orderId
-            });
-        } catch (error) {
-            this.logger.error('Create order failed', { error });
-            res.status(500).json({
-                success: false,
-                error: 'Failed to create order'
-            });
-        }
-    }
-
-    async addItem(req: Request, res: Response): Promise<void> {
-        try {
-            const command: AddItemCommand = {
-                id: generateUUID(),
-                type: 'ADD_ITEM',
-                timestamp: new Date(),
-                metadata: {
-                    userId: req.user.id
-                },
-                payload: {
-                    orderId: req.params.orderId,
-                    productId: req.body.productId,
-                    quantity: req.body.quantity
-                }
-            };
-
-            const result = await this.mediator.send(command);
-
-            if (!result.success) {
-                res.status(400).json(result);
-                return;
-            }
-
-            res.json({ success: true });
-        } catch (error) {
-            this.handleError(res, error);
-        }
-    }
-}
-
-// Query controller
-class OrderQueryController {
-    constructor(
-        private mediator: CQRSMediator,
-        private logger: Logger
-    ) {}
-
-    async getOrder(req: Request, res: Response): Promise<void> {
-        try {
-            const query: GetOrderByIdQuery = {
-                id: generateUUID(),
-                type: 'GET_ORDER_BY_ID',
-                parameters: {
-                    orderId: req.params.id,
-                    includeItems: true,
-                    includeCustomer: true
-                }
-            };
-
-            const order = await this.mediator.query(query);
-
-            if (!order) {
-                res.status(404).json({ error: 'Order not found' });
-                return;
-            }
-
-            res.json(order);
-        } catch (error) {
-            this.handleError(res, error);
-        }
-    }
-
-    async searchOrders(req: Request, res: Response): Promise<void> {
-        try {
-            const query: GetOrdersQuery = {
-                id: generateUUID(),
-                type: 'GET_ORDERS',
-                parameters: {
-                    pagination: {
-                        page: parseInt(req.query.page) || 1,
-                        limit: Math.min(parseInt(req.query.limit) || 20, 100)
-                    },
-                    sorting: this.parseSorting(req.query.sort as string),
-                    filtering: {
-                        status: req.query.status as OrderStatus[],
-                        customerId: req.query.customerId as string,
-                        dateFrom: req.query.dateFrom ? new Date(req.query.dateFrom) : undefined,
-                        dateTo: req.query.dateTo ? new Date(req.query.dateTo) : undefined
-                    }
-                }
-            };
-
-            const result = await this.mediator.query(query);
-
-            res.json(result);
-        } catch (error) {
-            this.handleError(res, error);
-        }
-    }
-}
-```
-
-### 10. Testing CQRS
-
-Testing strategies for CQRS.
-
-```typescript
-// Testing command handlers
-describe('CreateOrderCommandHandler', () => {
-    let handler: CreateOrderCommandHandler;
-    let mockEventStore: MockEventStore;
-    let mockEventBus: MockEventBus;
-
-    beforeEach(() => {
-        mockEventStore = new MockEventStore();
-        mockEventBus = new MockEventBus();
-        handler = new CreateOrderCommandHandler(
-            mockEventStore,
-            mockEventBus
-        );
-    });
-
-    it('should create order successfully', async () => {
-        const command: CreateOrderCommand = {
-            id: 'cmd-1',
-            type: 'CREATE_ORDER',
-            timestamp: new Date(),
-            metadata: {},
-            payload: {
-                customerId: 'cust-1',
-                shippingAddress: testAddress(),
-                billingAddress: testAddress(),
-                items: [{
-                    productId: 'prod-1',
-                    quantity: 2
-                }]
-            }
-        };
-
-        const result = await handler.handle(command);
-
-        expect(result.success).toBe(true);
-        expect(result.orderId).toBeDefined();
-        expect(mockEventStore.savedEvents).toHaveLength(1);
-        expect(mockEventBus.publishedEvents).toHaveLength(1);
-    });
-
-    it('should reject empty items', async () => {
-        const command: CreateOrderCommand = {
-            id: 'cmd-1',
-            type: 'CREATE_ORDER',
-            timestamp: new Date(),
-            metadata: {},
-            payload: {
-                customerId: 'cust-1',
-                shippingAddress: testAddress(),
-                billingAddress: testAddress(),
-                items: [] // Empty
-            }
-        };
-
-        const result = await handler.handle(command);
-
-        expect(result.success).toBe(false);
-        expect(result.errors).toContainEqual(
-            expect.objectContaining({ field: 'items' })
-        );
-    });
-});
-
-// Testing query handlers
-describe('GetOrdersQueryHandler', () => {
-    let handler: GetOrdersQueryHandler;
-    let mockReadDb: MockReadDatabase;
-
-    beforeEach(() => {
-        mockReadDb = new MockReadDatabase();
-        handler = new GetOrdersQueryHandler(mockReadDb);
-    });
-
-    it('should return paginated orders', async () => {
-        mockReadDb.orders = [
-            createTestOrder('order-1'),
-            createTestOrder('order-2'),
-            createTestOrder('order-3')
-        ];
-
-        const query: GetOrdersQuery = {
-            id: 'q-1',
-            type: 'GET_ORDERS',
-            parameters: {
-                pagination: { page: 1, limit: 2 },
-                sorting: [{ field: 'createdAt', direction: 'desc' }]
-            }
-        };
-
-        const result = await handler.handle(query);
-
-        expect(result.orders).toHaveLength(2);
-        expect(result.pagination.totalCount).toBe(3);
-        expect(result.pagination.totalPages).toBe(2);
-    });
-});
-```
+Design for eventual consistency. Don't assume immediate reads. Show loading states. Handle stale data. Accept trade-offs.
 
 ## Checklist
 
-- [ ] Design command models
-- [ ] Design query models
-- [ ] Implement command handlers
-- [ ] Implement query handlers
-- [ ] Set up separate read/write databases
-- [ ] Implement event synchronization
-- [ ] Configure pipeline behaviors
-- [ ] Add caching for read operations
-- [ ] Implement error handling
-- [ ] Write tests for commands
-- [ ] Write tests for queries
-- [ ] Document command types
-- [ ] Document query types
-- [ ] Plan for eventual consistency
-- [ ] Monitor sync delays
+- [ ] Read/write boundaries identified
+- [ ] Command model designed
+- [ ] Query models designed
+- [ ] Event definitions created
+- [ ] Projection services implemented
+- [ ] Synchronization strategy defined
+- [ ] Consistency model documented
+- [ ] Testing approach defined
+- [ ] Performance testing done
+- [ ] Documentation complete
 
-## Anti Patterns
+## Anti Pattern
 
-### 1. Same Model for Commands and Queries
+**1. CQRS Everywhere**
 
-```typescript
-// Không nên - using same model
-class User {
-    id: string;
-    name: string;
-    email: string;
+Applying CQRS to everything. Unnecessary complexity. Over-engineering. Use when benefits outweigh costs.
 
-    // Used for both commands and queries
-    // Too much data for reads, too complex for writes
-}
+**2. Different Teams for Reads and Writes**
 
-// Nên - separate models
-interface UserCommand {
-    email: string;
-    passwordHash: string;
-    // Only write-needed fields
-}
+Artificial separation. Integration challenges. Coordination overhead. Work together.
 
-interface UserQuery {
-    id: string;
-    name: string;
-    email: string;
-    profilePicture: string;
-    lastLogin: Date;
-    // Optimized for read queries
-}
-```
+**3. Forgetting about Consistency**
 
-### 2. Synchronous Read/Write
+Assuming eventual consistency. Not handling it. Race conditions. Design for it.
+
+**4. Complex Synchronization**
+
+Overly complex projections. Difficult to debug. Hard to maintain. Keep simple.
+
+**5. Ignoring the Complexity**
+
+Underestimating complexity. Poor implementation. Hard to debug. Train team first.
+
+## Best Practice
+
+**1. CQRS Architecture**
 
 ```typescript
-// Không nên - blocking read after write
-async createOrder(data) {
-    await writeDb.save(order);
-    await syncToReadDb(); // Blocking!
-    return order; // User waits
+// Command Side - Models and Handlers
+
+// Commands
+interface CreateOrderCommand {
+  type: 'CREATE_ORDER';
+  payload: {
+    customerId: string;
+    items: OrderItemDTO[];
+    shippingAddress: AddressDTO;
+  };
 }
 
-// Nên - async synchronization
-async createOrder(data) {
-    await writeDb.save(order);
-    await eventBus.publish(event); // Async
-    return { orderId: order.id, status: 'CREATED' };
-}
-```
-
-### 3. Overly Complex Commands
-
-```typescript
-// Không nên - too many fields
-interface UpdateEverythingCommand {
+interface AddOrderItemCommand {
+  type: 'ADD_ORDER_ITEM';
+  payload: {
     orderId: string;
-    customerId?: string;
-    shippingAddress?: Address;
-    billingAddress?: Address;
-    items?: OrderItem[];
-    discountCode?: string;
-    shippingMethod?: string;
-    notes?: string;
-    // Too many optional fields!
+    productId: string;
+    quantity: number;
+  };
 }
 
-// Nên - focused commands
-interface UpdateShippingAddressCommand { ... }
-interface AddOrderItemCommand { ... }
-interface ApplyDiscountCommand { ... }
-```
-
-### 4. Missing Idempotency
-
-```typescript
-// Không nên - no idempotency
-async handle(command) {
-    await processCommand(command);
-    // If fails midway, can't retry safely
+interface ConfirmOrderCommand {
+  type: 'CONFIRM_ORDER';
+  payload: {
+    orderId: string;
+  };
 }
 
-// Nên - idempotent commands
-async handle(command) {
-    if (await isProcessed(command.id)) {
-        return getCachedResult(command.id);
+// Command Handler
+class OrderCommandHandler {
+  constructor(
+    private eventStore: EventStore,
+    private aggregateStore: AggregateStore
+  ) {}
+
+  async handle(command: CreateOrderCommand): Promise<CommandResult> {
+    const orderId = OrderId.create();
+    
+    const order = Order.create({
+      customerId: CustomerId.from(command.payload.customerId),
+      items: command.payload.items.map(this.mapItem),
+      shippingAddress: Address.from(command.payload.shippingAddress)
+    });
+
+    const events = order.domainEvents;
+    
+    // Persist events
+    await this.eventStore.append(orderId, events);
+    
+    // Update aggregate snapshot
+    await this.aggregateStore.save(order);
+
+    return {
+      success: true,
+      orderId: orderId.value
+    };
+  }
+}
+
+// Query Side - Read Models and Projections
+
+interface OrderReadModel {
+  orderId: string;
+  customerId: string;
+  customerName: string;
+  customerEmail: string;
+  status: string;
+  statusLabel: string;
+  items: OrderItemReadModel[];
+  itemCount: number;
+  subtotal: number;
+  tax: number;
+  total: number;
+  shippingAddress: AddressDTO;
+  createdAt: Date;
+  updatedAt: Date;
+  confirmedAt?: Date;
+  shippedAt?: Date;
+}
+
+interface OrderListView {
+  orders: OrderListItem[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+interface OrderListItem {
+  orderId: string;
+  customerName: string;
+  status: string;
+  total: number;
+  itemCount: number;
+  createdAt: Date;
+}
+
+// Query Handlers
+class OrderQueryHandler {
+  constructor(
+    private readDb: ReadDatabase,
+    private cache: Cache
+  ) {}
+
+  async getOrderById(orderId: string): Promise<OrderReadModel | null> {
+    // Check cache first
+    const cacheKey = `order:${orderId}`;
+    const cached = await this.cache.get<OrderReadModel>(cacheKey);
+    if (cached) return cached;
+
+    const order = await this.readDb.queryOne<OrderReadModel>(
+      `SELECT * FROM order_read_model WHERE order_id = $1`,
+      [orderId]
+    );
+
+    if (order) {
+      await this.cache.set(cacheKey, order, { ttl: 300 });
     }
-    await processCommand(command);
-    await markProcessed(command.id);
-}
-```
 
-### 5. N+1 Queries in Read Models
+    return order;
+  }
 
-```typescript
-// Không nên - N+1 query problem
-async getOrders() {
-    const orders = await db.query('SELECT * FROM orders');
-    for (const order of orders) {
-        order.customer = await db.query('SELECT * FROM customers WHERE id = ?', order.customerId);
-        order.items = await db.query('SELECT * FROM order_items WHERE orderId = ?', order.id);
+  async getOrderList(filters: OrderListFilters): Promise<OrderListView> {
+    let query = `SELECT * FROM order_read_model WHERE 1=1`;
+    const params: any[] = [];
+
+    if (filters.status) {
+      params.push(filters.status);
+      query += ` AND status = $${params.length}`;
     }
-}
 
-// Nên - optimized single query or join
-async getOrders() {
-    return await db.query(`
-        SELECT o.*, c.name as customer_name, json_agg(oi.*) as items
-        FROM orders o
-        JOIN customers c ON o.customer_id = c.id
-        LEFT JOIN order_items oi ON o.id = oi.order_id
-        GROUP BY o.id, c.name
-    `);
-}
-```
-
-## Best Practices
-
-### 1. Command Naming
-
-```typescript
-// Consistent command naming
-const commandNaming = {
-    create: 'Create{Entity}Command',
-    update: 'Update{Entity}Command',
-    delete: 'Delete{Entity}Command',
-    add: 'Add{ChildEntity}Command',
-    remove: 'Remove{ChildEntity}Command',
-    change: 'Change{Field}Command',
-    apply: 'Apply{Action}Command'
-};
-
-// Examples
-'CreateOrderCommand'
-'UpdateOrderCommand'
-'DeleteOrderCommand'
-'AddOrderItemCommand'
-'RemoveOrderItemCommand'
-'ConfirmOrderCommand'
-'CancelOrderCommand'
-'ShipOrderCommand'
-```
-
-### 2. Query Optimization
-
-```typescript
-// Indexed query parameters
-const optimizedQueries = {
-    // Composite index for common filters
-    'GET_ORDERS_BY_STATUS_AND_DATE':
-        'CREATE INDEX idx_orders_status_created ON orders(status, created_at DESC)',
-
-    // Covering index for list queries
-    'GET_ORDER_LIST':
-        'CREATE INDEX idx_orders_list ON orders(status, created_at) INCLUDE (customer_id, total_amount)',
-
-    // Denormalized read model
-    'GET_CUSTOMER_ORDER_SUMMARY':
-        'CREATE TABLE customer_order_summary AS
-         SELECT customer_id, COUNT(*) as order_count, SUM(total) as total_spent
-         FROM orders GROUP BY customer_id'
-};
-```
-
-### 3. Consistency Levels
-
-```typescript
-// Consistency configuration
-const consistencyConfig = {
-    // Strong consistency for critical operations
-    paymentProcessing: 'STRONG',
-
-    // Eventual consistency for read models
-    orderListView: 'EVENTUAL',
-    analytics: 'EVENTUAL',
-
-    // Read-your-writes consistency
-    ownOrderDetails: 'READ_YOUR_WRITES'
-};
-
-// Implementation
-async queryWithConsistency<T>(
-    query: Query,
-    consistency: ConsistencyLevel
-): Promise<T> {
-    switch (consistency) {
-        case 'STRONG':
-            return this.strongConsistencyQuery(query);
-        case 'EVENTUAL':
-            return this.eventualConsistencyQuery(query);
-        case 'READ_YOUR_WRITES':
-            return this.readYourWritesQuery(query);
+    if (filters.customerId) {
+      params.push(filters.customerId);
+      query += ` AND customer_id = $${params.length}`;
     }
+
+    if (filters.dateFrom) {
+      params.push(filters.dateFrom);
+      query += ` AND created_at >= $${params.length}`;
+    }
+
+    query += ` ORDER BY created_at DESC`;
+
+    // Count total
+    const countQuery = query.replace('SELECT *', 'SELECT COUNT(*)');
+    const { count } = await this.readDb.queryOne<{ count: number }>(
+      countQuery,
+      params
+    );
+
+    // Add pagination
+    params.push(filters.page * filters.pageSize);
+    query += ` LIMIT $${params.length}`;
+    params.push(filters.page * filters.pageSize);
+    query += ` OFFSET $${params.length}`;
+
+    const orders = await this.readDb.query<OrderListItem>(query, params);
+
+    return {
+      orders,
+      totalCount: count,
+      page: filters.page,
+      pageSize: filters.pageSize
+    };
+  }
+}
+```
+
+**2. Event Definitions**
+
+```typescript
+// domain/order/events/OrderEvents.ts
+
+export interface OrderEvent extends DomainEvent {
+  aggregateId: OrderId;
+  occurredAt: Date;
+}
+
+export class OrderCreatedEvent implements OrderEvent {
+  constructor(
+    public readonly orderId: OrderId,
+    public readonly customerId: CustomerId,
+    public readonly items: OrderItem[],
+    public readonly shippingAddress: Address,
+    public readonly occurredAt: Date = new Date()
+  ) {
+    super(orderId, 'OrderCreated');
+  }
+
+  toPayload(): OrderCreatedPayload {
+    return {
+      orderId: this.orderId.value,
+      customerId: this.customerId.value,
+      customerName: this.customerId.name,
+      items: this.items.map(i => i.toSnapshot()),
+      shippingAddress: this.shippingAddress.toSnapshot(),
+      occurredAt: this.occurredAt
+    };
+  }
+}
+
+export class OrderItemAddedEvent implements OrderEvent {
+  constructor(
+    public readonly orderId: OrderId,
+    public readonly item: OrderItem,
+    public readonly occurredAt: Date = new Date()
+  ) {
+    super(orderId, 'OrderItemAdded');
+  }
+
+  toPayload(): OrderItemAddedPayload {
+    return {
+      orderId: this.orderId.value,
+      item: this.item.toSnapshot(),
+      occurredAt: this.occurredAt
+    };
+  }
+}
+
+export class OrderConfirmedEvent implements OrderEvent {
+  constructor(
+    public readonly orderId: OrderId,
+    public readonly occurredAt: Date = new Date()
+  ) {
+    super(orderId, 'OrderConfirmed');
+  }
+
+  toPayload(): OrderConfirmedPayload {
+    return {
+      orderId: this.orderId.value,
+      occurredAt: this.occurredAt
+    };
+  }
+}
+
+// Event serialization
+export abstract class DomainEvent {
+  abstract readonly eventType: string;
+  abstract toPayload(): Record<string, any>;
+  
+  toEventRecord(): EventRecord {
+    return {
+      eventId: EventId.create().value,
+      aggregateType: 'Order',
+      aggregateId: this.aggregateId.value,
+      eventType: this.eventType,
+      occurredAt: this.occurredAt,
+      payload: this.toPayload(),
+      version: 1
+    };
+  }
+}
+```
+
+**3. Projection Services**
+
+```typescript
+// infrastructure/projections/OrderProjectionService.ts
+
+export class OrderProjectionService {
+  constructor(
+    private eventStore: EventStore,
+    private readDb: WriteDatabase
+  ) {}
+
+  async projectOrder(event: OrderEvent): Promise<void> {
+    switch (event.eventType) {
+      case 'OrderCreated':
+        await this.projectOrderCreated(event as OrderCreatedEvent);
+        break;
+      case 'OrderItemAdded':
+        await this.projectOrderItemAdded(event as OrderItemAddedEvent);
+        break;
+      case 'OrderConfirmed':
+        await this.projectOrderConfirmed(event as OrderConfirmedEvent);
+        break;
+      // ... other events
+    }
+  }
+
+  private async projectOrderCreated(event: OrderCreatedEvent): Promise<void> {
+    const payload = event.toPayload();
+    
+    await this.readDb.execute(`
+      INSERT INTO order_read_model (
+        order_id, customer_id, customer_name, customer_email,
+        status, items, item_count, subtotal, tax, total,
+        shipping_address, created_at, updated_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+      ON CONFLICT (order_id) DO UPDATE SET
+        status = EXCLUDED.status,
+        items = EXCLUDED.items,
+        item_count = EXCLUDED.item_count,
+        subtotal = EXCLUDED.subtotal,
+        tax = EXCLUDED.tax,
+        total = EXCLUDED.total,
+        updated_at = EXCLUDED.updated_at
+    `, [
+      payload.orderId,
+      payload.customerId,
+      payload.customerName,
+      payload.customerEmail,
+      'pending',
+      JSON.stringify(payload.items),
+      payload.items.length,
+      this.calculateSubtotal(payload.items),
+      this.calculateTax(payload.items),
+      this.calculateTotal(payload.items),
+      JSON.stringify(payload.shippingAddress),
+      payload.occurredAt,
+      payload.occurredAt
+    ]);
+  }
+
+  private async projectOrderItemAdded(event: OrderItemAddedEvent): Promise<void> {
+    const payload = event.toPayload();
+    
+    // Get current order
+    const order = await this.readDb.queryOne<any>(
+      `SELECT * FROM order_read_model WHERE order_id = $1`,
+      [payload.orderId]
+    );
+
+    // Add new item
+    const items = [...order.items, payload.item];
+    
+    await this.readDb.execute(`
+      UPDATE order_read_model SET
+        items = $2,
+        item_count = $3,
+        subtotal = $4,
+        tax = $5,
+        total = $6,
+        updated_at = NOW()
+      WHERE order_id = $1
+    `, [
+      payload.orderId,
+      JSON.stringify(items),
+      items.length,
+      this.calculateSubtotal(items),
+      this.calculateTax(items),
+      this.calculateTotal(items)
+    ]);
+  }
+
+  private async projectOrderConfirmed(event: OrderConfirmedEvent): Promise<void> {
+    const payload = event.toPayload();
+    
+    await this.readDb.execute(`
+      UPDATE order_read_model SET
+        status = 'confirmed',
+        status_label = 'Confirmed',
+        confirmed_at = $2,
+        updated_at = NOW()
+      WHERE order_id = $1
+    `, [
+      payload.orderId,
+      payload.occurredAt
+    ]);
+  }
+}
+
+// Projector that listens to events
+export class OrderProjector {
+  constructor(
+    private eventStore: EventStore,
+    private projectionService: OrderProjectionService
+  ) {}
+
+  async start(projectFrom: Date = new Date(0)): Promise<void> {
+    const events = await this.eventStore.getEventsSince(projectFrom);
+    
+    for (const eventRecord of events) {
+      const event = this.deserializeEvent(eventRecord);
+      await this.projectionService.projectOrder(event);
+    }
+  }
+
+  async processEvent(eventRecord: EventRecord): Promise<void> {
+    const event = this.deserializeEvent(eventRecord);
+    await this.projectionService.projectOrder(event);
+  }
+}
+```
+
+**4. Event Store Implementation**
+
+```typescript
+// infrastructure/persistence/EventStore.ts
+
+export interface EventRecord {
+  eventId: string;
+  aggregateType: string;
+  aggregateId: string;
+  eventType: string;
+  occurredAt: Date;
+  payload: Record<string, any>;
+  version: number;
+}
+
+export class EventStore {
+  constructor(private db: Database) {}
+
+  async append<T extends DomainEvent>(
+    aggregateId: string,
+    events: T[]
+  ): Promise<void> {
+    if (events.length === 0) return;
+
+    const records = events.map(event => ({
+      ...event.toEventRecord(),
+      aggregateId
+    }));
+
+    await this.db.transaction(async (tx) => {
+      for (const record of records) {
+        await tx.execute(`
+          INSERT INTO events (
+            event_id, aggregate_type, aggregate_id, event_type,
+            occurred_at, payload, version
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+        `, [
+          record.eventId,
+          record.aggregateType,
+          record.aggregateId,
+          record.eventType,
+          record.occurredAt,
+          JSON.stringify(record.payload),
+          record.version
+        ]);
+      }
+    });
+  }
+
+  async getEventsForAggregate(aggregateId: string): Promise<EventRecord[]> {
+    return this.db.query<EventRecord>(
+      `SELECT * FROM events
+       WHERE aggregate_id = $1
+       ORDER BY occurred_at ASC`,
+      [aggregateId]
+    );
+  }
+
+  async getEventsSince(since: Date): Promise<EventRecord[]> {
+    return this.db.query<EventRecord>(
+      `SELECT * FROM events
+       WHERE occurred_at >= $1
+       ORDER BY occurred_at ASC`,
+      [since]
+    );
+  }
+
+  async getEventsByType(eventType: string): Promise<EventRecord[]> {
+    return this.db.query<EventRecord>(
+      `SELECT * FROM events
+       WHERE event_type = $1
+       ORDER BY occurred_at ASC`,
+      [eventType]
+    );
+  }
+}
+```
+
+**5. API Implementation**
+
+```typescript
+// api/commands/OrderCommandsController.ts
+
+export class OrderCommandsController {
+  constructor(
+    private commandBus: CommandBus
+  ) {}
+
+  @Post('/orders')
+  async createOrder(@Body() dto: CreateOrderDTO): Promise<CreateOrderResponse> {
+    const command: CreateOrderCommand = {
+      type: 'CREATE_ORDER',
+      payload: {
+        customerId: dto.customerId,
+        items: dto.items,
+        shippingAddress: dto.shippingAddress
+      }
+    };
+
+    const result = await this.commandBus.execute(command);
+
+    return {
+      success: true,
+      orderId: result.orderId
+    };
+  }
+
+  @Post('/orders/{orderId}/items')
+  async addOrderItem(
+    @PathParam('orderId') orderId: string,
+    @Body() dto: AddOrderItemDTO
+  ): Promise<CommandResponse> {
+    const command: AddOrderItemCommand = {
+      type: 'ADD_ORDER_ITEM',
+      payload: {
+        orderId,
+        productId: dto.productId,
+        quantity: dto.quantity
+      }
+    };
+
+    return this.commandBus.execute(command);
+  }
+
+  @Post('/orders/{orderId}/confirm')
+  async confirmOrder(
+    @PathParam('orderId') orderId: string
+  ): Promise<CommandResponse> {
+    const command: ConfirmOrderCommand = {
+      type: 'CONFIRM_ORDER',
+      payload: { orderId }
+    };
+
+    return this.commandBus.execute(command);
+  }
+}
+
+// api/queries/OrderQueriesController.ts
+
+export class OrderQueriesController {
+  constructor(
+    private queryBus: QueryBus
+  ) {}
+
+  @Get('/orders/{orderId}')
+  async getOrder(
+    @PathParam('orderId') orderId: string
+  ): Promise<OrderReadModel> {
+    const query = new GetOrderByIdQuery(orderId);
+    return this.queryBus.execute(query);
+  }
+
+  @Get('/orders')
+  async getOrders(
+    @QueryParam('status') status?: string,
+    @QueryParam('customerId') customerId?: string,
+    @QueryParam('page') page: number = 1,
+    @QueryParam('pageSize') pageSize: number = 20
+  ): Promise<OrderListView> {
+    const query = new GetOrderListQuery({
+      status,
+      customerId,
+      page,
+      pageSize
+    });
+    return this.queryBus.execute(query);
+  }
+}
+
+// Command and Query Buses
+export class CommandBus {
+  constructor(
+    private handlers: Map<string, CommandHandler>,
+    private eventBus: EventBus
+  ) {}
+
+  async execute<T extends Command>(command: T): Promise<CommandResult> {
+    const handler = this.handlers.get(command.type);
+    if (!handler) {
+      throw new HandlerNotFoundError(command.type);
+    }
+
+    return handler.handle(command);
+  }
+}
+
+export class QueryBus {
+  constructor(
+    private handlers: Map<string, QueryHandler>
+  ) {}
+
+  async execute<T>(query: Query<T>): Promise<T> {
+    const handler = this.handlers.get(query.type);
+    if (!handler) {
+      throw new HandlerNotFoundError(query.type);
+    }
+
+    return handler.handle(query);
+  }
+}
+```
+
+**6. Handling Consistency**
+
+```typescript
+// frontend/OrderPage.tsx
+
+export function OrderPage({ orderId }: { orderId: string }) {
+  const [order, setOrder] = useState<OrderReadModel | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Initial load
+    fetchOrder(orderId)
+      .then(setOrder)
+      .catch(err => setError(err.message))
+      .finally(() => setLoading(false));
+
+    // Subscribe to updates via WebSocket
+    const ws = connectToOrderUpdates(orderId);
+    
+    ws.onmessage = (event) => {
+      const update = JSON.parse(event.data);
+      setOrder(prev => ({ ...prev, ...update }));
+    };
+
+    return () => ws.close();
+  }, [orderId]);
+
+  if (loading) return <OrderSkeleton />;
+  if (error) return <OrderError message={error} onRetry={() => fetchOrder(orderId)} />;
+  if (!order) return <OrderNotFound />;
+
+  return <OrderDetails order={order} />;
+}
+
+// Real-time updates
+class OrderWebSocketService {
+  constructor(private eventBus: EventBus) {}
+
+  connect(orderId: string): WebSocket {
+    const ws = new WebSocket(`wss://api.example.com/orders/${orderId}/ws`);
+
+    ws.onmessage = async (event) => {
+      const data = JSON.parse(event.data);
+      
+      if (data.type === 'order_updated') {
+        const eventRecord: EventRecord = {
+          eventId: data.eventId,
+          aggregateType: 'Order',
+          aggregateId: orderId,
+          eventType: data.eventType,
+          occurredAt: new Date(data.occurredAt),
+          payload: data.payload,
+          version: data.version
+        };
+
+        await this.eventBus.publish(deserializeEvent(eventRecord));
+      }
+    };
+
+    return ws;
+  }
 }
 ```
 
 ## Workflow
 
-### 1. CQRS Design
+**Phase 1: Analysis**
 
-1. Identify bounded contexts
-2. Separate commands from queries
-3. Design command models
-4. Design query/read models
-5. Plan synchronization strategy
+Identify read/write differences. Analyze access patterns. Estimate complexity. Decide if CQRS is needed.
 
-### 2. Implementation
+**Phase 2: Design**
 
-1. Implement command handlers
-2. Implement query handlers
-3. Set up read/write databases
-4. Implement event handlers
-5. Configure mediator and pipeline
+Design command model. Design query models. Define events. Plan projections. Document consistency model.
 
-### 3. Testing
+**Phase 3: Implementation**
 
-1. Test command handlers
-2. Test query handlers
-3. Test synchronization
-4. Test consistency scenarios
+Implement command side. Implement query side. Build projections. Set up event store. Configure buses.
 
-## Ví dụ
+**Phase 4: Testing**
 
-### Ví dụ 1: Complete CQRS Setup
+Test commands. Test queries. Test projections. Integration tests. Performance tests.
 
-```typescript
-// Main CQRS configuration
-class CQRSConfiguration {
-    static setup(): CQRSMediator {
-        // Create mediator
-        const mediator = new CQRSMediator(
-            new CommandQueryPipeline([
-                new LoggingBehavior(),
-                new ValidationBehavior(new CommandValidator()),
-                new PerformanceLoggingBehavior(),
-                new ErrorHandlingBehavior()
-            ])
-        );
+**Phase 5: Deployment**
 
-        // Register command handlers
-        mediator.registerCommand(
-            'CREATE_ORDER',
-            new CreateOrderCommandHandler(
-                new OrderRepository(),
-                new EventStore(),
-                new EventBus()
-            )
-        );
-
-        // Register query handlers
-        mediator.registerQuery(
-            'GET_ORDERS',
-            new GetOrdersQueryHandler(new ReadDatabase())
-        );
-
-        return mediator;
-    }
-}
-
-// Usage in Express
-const mediator = CQRSConfiguration.setup();
-
-app.post('/orders', async (req, res) => {
-    const command = createCommand(req.body);
-    const result = await mediator.send(command);
-    res.json(result);
-});
-
-app.get('/orders', async (req, res) => {
-    const query = createQuery(req.query);
-    const result = await mediator.query(query);
-    res.json(result);
-});
-```
-
-### Ví dụ 2: Event Synchronization
-
-```typescript
-// Projector for read model
-class OrderReadModelProjector {
-    constructor(
-        private eventStore: EventStore,
-        private readDb: ReadDatabase,
-        private cache: Cache
-    ) {}
-
-    async project(events: DomainEvent[]): Promise<void> {
-        for (const event of events) {
-            await this.handleEvent(event);
-        }
-    }
-
-    private async handleEvent(event: DomainEvent): Promise<void> {
-        switch (event.eventType) {
-            case 'ORDER_CREATED':
-                await this.projectOrderCreated(event);
-                break;
-            case 'ORDER_ITEM_ADDED':
-                await this.projectItemAdded(event);
-                break;
-            case 'ORDER_CONFIRMED':
-                await this.projectOrderConfirmed(event);
-                break;
-        }
-
-        // Invalidate related caches
-        await this.invalidateRelatedCaches(event);
-    }
-
-    private async invalidateRelatedCaches(event: DomainEvent): Promise<void> {
-        const cacheKeys = [
-            `order:${event.aggregateId}`,
-            'orders:list',
-            `customer:${event.payload.customerId}:orders`
-        ];
-
-        await Promise.all(
-            cacheKeys.map(key => this.cache.delete(key))
-        );
-    }
-}
-```
+Deploy components. Monitor consistency. Set up alerts. Document patterns.
 
 ## Liên kết
 
-- [CQRS - Martin Fowler](https://martinfowler.com/bliki/CQRS.html)
-- [CQRS Journey](https://docs.microsoft.com/en-us/mslearn/implement-crud-microservice-pattern)
-- Event Sourcing: `.cursor/rules/event-sourcing.mdc`
-- DDD: `.cursor/rules/ddd.mdc`
-- Microservices: `.cursor/rules/microservices.mdc`
+- [[ddd]] - Domain-Driven Design
+- [[event-sourcing]] - Event Sourcing
+- [[clean-architecture]] - Clean Architecture
+- [[microservice]] - Microservices patterns

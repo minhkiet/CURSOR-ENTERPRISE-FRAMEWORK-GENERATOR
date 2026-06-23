@@ -1,0 +1,556 @@
+---
+description: Skill design comprehensive testing strategies để ensure code quality, coverage, và reliability across the application
+purpose: Cung cấp comprehensive testing strategy framework để design test pyramids, implement various test types, và establish quality gates
+input:
+  - Application code
+  - Risk areas
+  - Quality requirements
+  - CI/CD pipeline
+output:
+  - Testing strategy
+  - Test types coverage
+  - Test automation plan
+  - Quality metrics
+version: 1.0.0
+tags:
+  - testing
+  - quality
+  - test-automation
+  - unit-testing
+  - integration-testing
+---
+
+# Testing Strategy
+
+## Tổng quan
+
+Testing Strategy là skill chuyên biệt để design comprehensive testing approaches. Skill này cung cấp systematic approach để design test pyramids, define test types, implement automation, và establish quality metrics. Essential cho maintainable, reliable software.
+
+## Purpose (Mục đích)
+
+Proper testing ensures:
+
+1. **Code quality**: Bugs caught early
+2. **Confidence**: Safe to deploy
+3. **Documentation**: Tests as specs
+4. **Refactoring**: Tests prevent regression
+5. **Performance**: Automated regression
+
+Testing Strategy tồn tại để:
+
+- **Design effective test pyramids**
+- **Choose right test types**
+- **Implement automation**
+- **Establish quality gates**
+- **Measure test effectiveness**
+
+## Input (Đầu vào)
+
+| Input | Mô tả | Required |
+|-------|-------|----------|
+| `application` | Application codebase | Yes |
+| `risks` | Risk areas | Yes |
+| `quality_reqs` | Quality requirements | Yes |
+| `pipeline` | CI/CD setup | No |
+
+## Output (Đầu ra)
+
+| Output | Mô tả | Format |
+|--------|-------|--------|
+| `test_strategy` | Overall strategy | Strategy |
+| `test_pyramid` | Test type distribution | Pyramid |
+| `coverage_targets` | Coverage goals | Targets |
+| `automation_plan` | Automation roadmap | Plan |
+
+## Workflow (Quy trình)
+
+### Bước 1: Risk Analysis
+
+```typescript
+// Analyze application risks
+interface RiskAnalysis {
+  areas: RiskArea[];
+  priority_order: string[];
+  testing_focus: TestingFocus;
+}
+
+interface RiskArea {
+  name: string;
+  risk_level: 'critical' | 'high' | 'medium' | 'low';
+  components: string[];
+  failure_impact: string;
+  mitigation_required: string[];
+}
+
+function analyzeRisks(application: Application): RiskAnalysis {
+  const areas: RiskArea[] = [];
+  
+  // Identify high-risk areas
+  for (const component of application.components) {
+    const risk = assessComponentRisk(component);
+    areas.push(risk);
+  }
+  
+  return {
+    areas,
+    priority_order: areas
+      .sort((a, b) => riskOrder(a.risk_level) - riskOrder(b.risk_level))
+      .map(a => a.name),
+    testing_focus: determineTestingFocus(areas)
+  };
+}
+
+function assessComponentRisk(component: Component): RiskArea {
+  let riskLevel: 'critical' | 'high' | 'medium' | 'low' = 'medium';
+  
+  if (component.type === 'payment') riskLevel = 'critical';
+  if (component.type === 'auth') riskLevel = 'high';
+  if (component.type === 'reporting') riskLevel = 'low';
+  
+  return {
+    name: component.name,
+    risk_level: riskLevel,
+    components: [component.name],
+    failure_impact: describeImpact(component),
+    mitigation_required: determineMitigations(component, riskLevel)
+  };
+}
+```
+
+### Bước 2: Test Pyramid Design
+
+```typescript
+// Design test pyramid
+interface TestPyramid {
+  layers: PyramidLayer[];
+  distribution: Distribution;
+  coverage_targets: CoverageTarget[];
+}
+
+interface PyramidLayer {
+  name: string;
+  test_types: TestType[];
+  percentage: number;
+  count_target: number;
+  automation_level: number;
+}
+
+function designTestPyramid(
+  risks: RiskAnalysis,
+  qualityReqs: QualityRequirements
+): TestPyramid {
+  // Standard pyramid distribution
+  const layers: PyramidLayer[] = [
+    {
+      name: 'Unit',
+      test_types: ['unit', 'mutation'],
+      percentage: 70,
+      count_target: calculateUnitTarget(risks),
+      automation_level: 100
+    },
+    {
+      name: 'Integration',
+      test_types: ['api', 'database', 'service'],
+      percentage: 20,
+      count_target: calculateIntegrationTarget(risks),
+      automation_level: 95
+    },
+    {
+      name: 'E2E',
+      test_types: ['e2e', 'smoke', 'regression'],
+      percentage: 10,
+      count_target: calculateE2ETarget(risks),
+      automation_level: 80
+    }
+  ];
+  
+  return {
+    layers,
+    distribution: calculateDistribution(layers),
+    coverage_targets: defineCoverageTargets(layers, qualityReqs)
+  };
+}
+
+function defineCoverageTargets(
+  layers: PyramidLayer[],
+  qualityReqs: QualityRequirements
+): CoverageTarget[] {
+  return [
+    {
+      metric: 'line_coverage',
+      layer: 'unit',
+      target: qualityReqs.minLineCoverage || 80,
+      critical: true
+    },
+    {
+      metric: 'branch_coverage',
+      layer: 'unit',
+      target: qualityReqs.minBranchCoverage || 70,
+      critical: false
+    },
+    {
+      metric: 'api_coverage',
+      layer: 'integration',
+      target: 100,
+      critical: true
+    },
+    {
+      metric: 'critical_path_coverage',
+      layer: 'e2e',
+      target: 100,
+      critical: true
+    }
+  ];
+}
+```
+
+### Bước 3: Test Type Definition
+
+```typescript
+// Define test types and implementation
+interface TestTypeDefinition {
+  type: string;
+  purpose: string;
+  scope: string;
+  implementation: ImplementationGuide;
+  examples: Example[];
+}
+
+const testTypeDefinitions: TestTypeDefinition[] = [
+  {
+    type: 'Unit',
+    purpose: 'Test individual functions/methods in isolation',
+    scope: 'Single function or class',
+    implementation: {
+      framework: 'Jest|Vitest|Mocha',
+      mocking: 'Required for external dependencies',
+      assertions: 'Multiple per test',
+      naming: 'describe method behavior'
+    },
+    examples: [
+      {
+        scenario: 'Calculate order total',
+        test: `
+describe('OrderCalculator', () => {
+  it('calculates total with tax', () => {
+    const calc = new OrderCalculator(taxRate = 0.1);
+    const total = calc.calculateTotal(100);
+    expect(total).toBe(110);
+  });
+});`
+      }
+    ]
+  },
+  {
+    type: 'Integration',
+    purpose: 'Test component interactions',
+    scope: 'Multiple components/services',
+    implementation: {
+      framework: 'Supertest|Playwright|Postman',
+      mocking: 'External services mocked',
+      database: 'Test database or transaction rollback',
+      assertions: 'Verifies contracts'
+    },
+    examples: [
+      {
+        scenario: 'API endpoint with database',
+        test: `
+it('creates user and returns 201', async () => {
+  const res = await request(app)
+    .post('/api/users')
+    .send({ email: 'test@example.com' });
+  
+  expect(res.status).toBe(201);
+  expect(await db.users.findByEmail('test@example.com')).toBeDefined();
+});`
+      }
+    ]
+  },
+  {
+    type: 'E2E',
+    purpose: 'Test complete user flows',
+    scope: 'Full application',
+    implementation: {
+      framework: 'Cypress|Playwright|Selenium',
+      environment: 'Staging or production-like',
+      users: 'Real users or automated',
+      assertions: 'Business outcomes'
+    },
+    examples: [
+      {
+        scenario: 'User checkout flow',
+        test: `
+it('completes checkout successfully', () => {
+  cy.login('user@test.com', 'password');
+  cy.addToCart('Product A');
+  cy.checkout();
+  cy.assertOrderConfirmation();
+});`
+      }
+    ]
+  }
+];
+```
+
+### Bước 4: Automation Planning
+
+```typescript
+// Plan test automation
+interface AutomationPlan {
+  phases: Phase[];
+  ci_integration: CIConfig;
+  reporting: ReportConfig;
+  quality_gates: QualityGate[];
+}
+
+interface Phase {
+  name: string;
+  duration_weeks: number;
+  activities: string[];
+  deliverables: string[];
+}
+
+function createAutomationPlan(
+  currentState: TestState,
+  targetPyramid: TestPyramid
+): AutomationPlan {
+  const phases: Phase[] = [];
+  
+  // Phase 1: Foundation
+  phases.push({
+    name: 'Test Infrastructure',
+    duration_weeks: 2,
+    activities: [
+      'Setup test frameworks',
+      'Configure CI pipeline',
+      'Create test database',
+      'Establish test utilities'
+    ],
+    deliverables: [
+      'Working test framework',
+      'CI integration',
+      'Test database scripts'
+    ]
+  });
+  
+  // Phase 2: Unit Tests
+  phases.push({
+    name: 'Unit Test Automation',
+    duration_weeks: 4,
+    activities: [
+      'Train team on TDD',
+      'Write unit tests for core modules',
+      'Set up mutation testing',
+      'Achieve coverage targets'
+    ],
+    deliverables: [
+      'Unit tests for critical paths',
+      'Coverage reports',
+      'Mutation testing results'
+    ]
+  });
+  
+  return {
+    phases,
+    ci_integration: defineCIIntegration(targetPyramid),
+    reporting: defineReporting(),
+    quality_gates: defineQualityGates(targetPyramid)
+  };
+}
+
+function defineQualityGates(pyramid: TestPyramid): QualityGate[] {
+  return [
+    {
+      name: 'Unit Coverage Gate',
+      check: 'line_coverage >= 80',
+      failOnError: true,
+      blocking: true
+    },
+    {
+      name: 'All Tests Pass',
+      check: 'failed_tests == 0',
+      failOnError: true,
+      blocking: true
+    },
+    {
+      name: 'No Critical Bugs',
+      check: 'critical_bugs == 0',
+      failOnError: true,
+      blocking: true
+    },
+    {
+      name: 'Performance Baseline',
+      check: 'regression_score >= 95',
+      failOnError: false,
+      blocking: false
+    }
+  ];
+}
+```
+
+## Checklist (Danh sách kiểm tra)
+
+- [ ] Test pyramid designed for project
+- [ ] Unit tests for all business logic
+- [ ] Integration tests for API contracts
+- [ ] E2E tests for critical flows
+- [ ] Test coverage targets defined
+- [ ] Quality gates in CI/CD
+- [ ] Test data management strategy
+- [ ] Mock/stub strategy documented
+- [ ] Test reporting configured
+- [ ] Flaky test handling process
+- [ ] Test maintenance plan
+- [ ] Performance testing scheduled
+- [ ] Security testing integrated
+- [ ] Accessibility testing planned
+- [ ] Regression test suite maintained
+
+## Examples (Ví dụ)
+
+### Ví dụ 1: React Component Testing
+
+```typescript
+// ✅ GOOD: React component test
+describe('UserProfile', () => {
+  it('displays user name and avatar', () => {
+    const user = { name: 'John Doe', avatar: '/john.jpg' };
+    render(<UserProfile user={user} />);
+    
+    expect(screen.getByText('John Doe')).toBeInTheDocument();
+    expect(screen.getByAltText('John Doe')).toHaveAttribute('src', '/john.jpg');
+  });
+  
+  it('shows loading state', () => {
+    render(<UserProfile loading={true} />);
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+  });
+  
+  it('shows error state', () => {
+    render(<UserProfile error="Failed to load" />);
+    expect(screen.getByText('Failed to load')).toBeInTheDocument();
+  });
+});
+```
+
+### Ví dụ 2: API Integration Test
+
+```typescript
+// ✅ GOOD: API integration test
+describe('Orders API', () => {
+  let authToken: string;
+  
+  beforeAll(async () => {
+    const login = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'test@example.com', password: 'password' });
+    authToken = login.body.token;
+  });
+  
+  describe('POST /api/orders', () => {
+    it('creates order with valid data', async () => {
+      const res = await request(app)
+        .post('/api/orders')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          items: [{ productId: 'prod_123', quantity: 2 }],
+          shippingAddress: { street: '123 Main St' }
+        });
+      
+      expect(res.status).toBe(201);
+      expect(res.body).toMatchObject({
+        id: expect.any(String),
+        status: 'pending',
+        total: expect.any(Number)
+      });
+    });
+    
+    it('returns 400 for invalid data', async () => {
+      const res = await request(app)
+        .post('/api/orders')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ items: [] }); // Empty items
+      
+      expect(res.status).toBe(400);
+      expect(res.body.errors).toContainEqual(
+        expect.objectContaining({ field: 'items' })
+      );
+    });
+  });
+});
+```
+
+## Anti Patterns (Các pattern cần tránh)
+
+### 1. No Mocks - Brittle Tests
+```typescript
+// ❌ BAD: Testing with real external service
+it('gets user data', async () => {
+  const user = await RealExternalService.getUser('123'); // Real call!
+});
+
+// ✅ GOOD: Mock external dependencies
+it('gets user data', async () => {
+  mockExternalService.getUser.mockResolvedValue({ id: '123', name: 'John' });
+  const user = await userService.getUser('123');
+  expect(user.name).toBe('John');
+});
+```
+
+### 2. Testing Implementation Details
+```typescript
+// ❌ BAD: Testing private methods
+it('sorts items correctly', () => {
+  const service = new ItemService();
+  const sorted = service.privateSortMethod(items); // Bad!
+});
+
+// ✅ GOOD: Test observable behavior
+it('items sorted by date', () => {
+  const service = new ItemService();
+  const result = service.getItems({ sortBy: 'date' });
+  expect(result[0].date).toBeBefore(result[1].date);
+});
+```
+
+### 3. Flaky E2E Tests
+```typescript
+// ❌ BAD: No wait strategy
+it('user logs in', () => {
+  cy.visit('/login');
+  cy.get('#username').type('user');
+  cy.get('#password').type('pass');
+  cy.get('button[type="submit"]').click();
+  cy.contains('Welcome'); // Flaky!
+});
+
+// ✅ GOOD: Explicit waits
+it('user logs in', () => {
+  cy.visit('/login');
+  cy.get('#username').type('user');
+  cy.get('#password').type('pass');
+  cy.get('button[type="submit"]').click();
+  cy.get('[data-testid="welcome-message"]')
+    .should('be.visible')
+    .and('contain.text', 'Welcome');
+});
+```
+
+## Best Practices (Thực hành tốt nhất)
+
+1. **Follow test pyramid**: More unit, less E2E
+2. **Test behavior, not implementation**: Focus on outcomes
+3. **Keep tests independent**: No shared state
+4. **Use meaningful names**: Test purpose clear
+5. **Follow FIRST principles**: Fast, Independent, Repeatable, Self-validating, Timely
+6. **Mock external dependencies**: Tests should be reliable
+7. **Arrange-Act-Assert**: Clear test structure
+8. **One assertion focus**: Multiple small tests vs one big test
+9. **Maintain test code**: As important as production code
+10. **Review test coverage**: Regular analysis
+
+## Liên kết (Cross-references)
+
+- **Related Skills**: [code-review](./code-review.mdc), [performance-audit](./performance-audit.mdc)
+- **Frameworks**: Jest, Vitest, Cypress, Playwright, Mocha
+- **Tools**: Test coverage tools, Mutation testing, Fuzzing

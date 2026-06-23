@@ -1,0 +1,554 @@
+---
+description: Nguyên tắc và best practices cho Serverless Architecture trong Cursor Enterprise Framework
+created: 2026-06-23
+version: 1.0.0
+tags:
+  - serverless
+  - lambda
+  - functions
+  - faas
+  - cloud
+---
+
+# Serverless Architecture Guidelines
+
+## Mục tiêu
+
+Tài liệu này định nghĩa các nguyên tắc và best practices cho việc implement Serverless Architecture trong Cursor Enterprise Framework. Mục tiêu là đảm bảo cost-efficient, scalable, và maintainable serverless applications.
+
+Serverless architecture loại bỏ việc quản lý servers, cho phép teams focus vào business logic. Việc tuân thủ best practices giúp optimize performance và reduce costs.
+
+## Nguyên tắc cơ bản
+
+### 1. Serverless Patterns
+
+Common serverless patterns.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                 Serverless Architecture Patterns                    │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Event-Driven                                                  │
+│  ┌──────────┐    ┌──────────┐    ┌──────────┐            │
+│  │  Event   │───▶│ Function │───▶│  Event   │            │
+│  │  Source  │    │          │    │  Store   │            │
+│  └──────────┘    └──────────┘    └──────────┘            │
+│                                                                  │
+│  API-Driven                                                   │
+│  ┌──────────┐    ┌──────────┐    ┌──────────┐            │
+│  │  API     │───▶│ Function │───▶│ Database │            │
+│  │  Gateway │    │          │    │          │            │
+│  └──────────┘    └──────────┘    └──────────┘            │
+│                                                                  │
+│  Queue-Based                                                  │
+│  ┌──────────┐    ┌──────────┐    ┌──────────┐            │
+│  │ Producer │───▶│  Queue   │───▶│ Consumer │            │
+│  └──────────┘    └──────────┘    └──────────┘            │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 2. Function Design
+
+Design functions properly.
+
+```typescript
+// Well-designed Lambda function
+export const handler = async (
+    event: APIGatewayProxyEvent,
+    context: Context
+): Promise<APIGatewayProxyResult> => {
+    const startTime = Date.now();
+
+    try {
+        // 1. Parse input
+        const userId = event.pathParameters?.userId;
+        if (!userId) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: 'User ID required' })
+            };
+        }
+
+        // 2. Validate
+        if (!isValidUUID(userId)) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: 'Invalid user ID' })
+            };
+        }
+
+        // 3. Business logic
+        const user = await getUser(userId);
+        if (!user) {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({ error: 'User not found' })
+            };
+        }
+
+        // 4. Return response
+        return {
+            statusCode: 200,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Request-ID': context.requestId
+            },
+            body: JSON.stringify(user)
+        };
+
+    } catch (error) {
+        console.error('Error:', error);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Internal server error' })
+        };
+    }
+};
+
+// Helper functions
+async function getUser(userId: string): Promise<User | null> {
+    return await db.users.findById(userId);
+}
+
+function isValidUUID(str: string): boolean {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
+}
+```
+
+### 3. Cold Start Optimization
+
+Reduce cold start latency.
+
+```typescript
+// Optimization techniques
+
+// 1. Use appropriate memory size
+const config = {
+    memorySize: 1024,  // More memory = faster CPU
+    timeout: 30
+};
+
+// 2. Provisioned concurrency for critical functions
+// (AWS Lambda)
+const provisionedConfig = {
+    provisionedConcurrentExecutions: 5,
+    functionName: 'critical-api'
+};
+
+// 3. Keep connections warm
+let dbConnection: DBConnection;
+
+async function getConnection() {
+    if (!dbConnection) {
+        dbConnection = await createConnection();
+    }
+    return dbConnection;
+}
+
+// 4. Use AWS Lambda SnapStart (Java)
+@LambdaScope
+public class Handler implements RequestHandler<Input, Output> {
+    // SnapStart enabled - faster cold starts
+}
+
+// 5. Optimize bundle size
+// webpack.config.js
+const config = {
+    optimization: {
+        minimize: true,
+        splitChunks: {
+            chunks: 'all'
+        }
+    }
+};
+```
+
+### 4. Scaling Configuration
+
+Configure scaling properly.
+
+```yaml
+# Serverless scaling configuration
+# serverless.yml (Serverless Framework)
+
+service: api-service
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  memorySize: 512
+  timeout: 30
+
+functions:
+  api:
+    handler: handler.handler
+    events:
+      - http:
+          path: /api/{proxy+}
+          method: ANY
+    provisionedConcurrency: 5  # Pre-warm instances
+    reservedConcurrency: 100   # Max concurrent executions
+
+# Auto-scaling
+resources:
+  Resources:
+    GetUsersFunction:
+      Type: AWS::Lambda::Function
+      Properties:
+        Runtime: nodejs18.x
+        MemorySize: 512
+        Timeout: 30
+
+# CloudWatch Events for scheduled warming
+WarmUpScheduler:
+  Type: AWS::Events::Rule
+  Properties:
+    ScheduleExpression: rate(5 minutes)
+    Targets:
+      - Id: WarmUpTarget
+        Arn: !GetAtt GetUsersFunction.Arn
+```
+
+### 5. Error Handling
+
+Robust error handling.
+
+```typescript
+// Custom error class
+class FunctionError extends Error {
+    constructor(
+        message: string,
+        public statusCode: number = 500,
+        public code?: string
+    ) {
+        super(message);
+        this.name = 'FunctionError';
+    }
+}
+
+// Error types
+class ValidationError extends FunctionError {
+    constructor(message: string) {
+        super(message, 400, 'VALIDATION_ERROR');
+    }
+}
+
+class NotFoundError extends FunctionError {
+    constructor(resource: string) {
+        super(`${resource} not found`, 404, 'NOT_FOUND');
+    }
+}
+
+class UnauthorizedError extends FunctionError {
+    constructor(message: string = 'Unauthorized') {
+        super(message, 401, 'UNAUTHORIZED');
+    }
+}
+
+// Error handling wrapper
+export const withErrorHandling = (
+    handler: Handler
+): Handler => {
+    return async (event, context) => {
+        try {
+            return await handler(event, context);
+        } catch (error) {
+            if (error instanceof FunctionError) {
+                return {
+                    statusCode: error.statusCode,
+                    body: JSON.stringify({
+                        error: {
+                            code: error.code,
+                            message: error.message
+                        }
+                    })
+                };
+            }
+
+            console.error('Unhandled error:', error);
+            return {
+                statusCode: 500,
+                body: JSON.stringify({
+                    error: {
+                        code: 'INTERNAL_ERROR',
+                        message: 'An unexpected error occurred'
+                    }
+                })
+            };
+        }
+    };
+};
+
+// Usage
+export const handler = withErrorHandling(async (event, context) => {
+    // Function logic
+});
+```
+
+### 6. Stateless Design
+
+Design functions as stateless.
+
+```typescript
+// Stateless function design
+export const handler = async (event, context) => {
+    // Get data from external sources (not stored in memory)
+    const userId = event.pathParameters.userId;
+
+    // Fetch user from database
+    const user = await userRepository.findById(userId);
+
+    // Return user data
+    return user;
+};
+
+// Don't do this - storing state between invocations
+let cachedUser: User | null = null;
+
+export const badHandler = async (event, context) => {
+    if (!cachedUser) {
+        cachedUser = await userRepository.findById(event.userId);
+    }
+    // Bad: state leaks between invocations!
+    return cachedUser;
+};
+```
+
+### 7. Observability
+
+Monitor serverless applications.
+
+```typescript
+// Structured logging
+export const handler = async (event, context) => {
+    const startTime = Date.now();
+
+    // Structured log
+    logger.info({
+        event: 'function_invoked',
+        requestId: context.requestId,
+        functionName: context.functionName,
+        remainingTime: context.getRemainingTimeInMillis()
+    });
+
+    try {
+        const result = await processEvent(event);
+
+        logger.info({
+            event: 'function_completed',
+            duration: Date.now() - startTime,
+            statusCode: 200
+        });
+
+        return result;
+
+    } catch (error) {
+        logger.error({
+            event: 'function_error',
+            error: error.message,
+            stack: error.stack,
+            duration: Date.now() - startTime
+        });
+
+        throw error;
+    }
+};
+
+// Distributed tracing
+import { trace, context, propagation } from '@opentelemetry/api';
+
+export const handler = async (event, context) => {
+    const tracer = trace.getTracer('lambda-service');
+
+    return tracer.startActiveSpan('lambda-handler', async (span) => {
+        try {
+            // Extract trace context from event
+            const parentContext = propagation.extract(context.active(), event.headers);
+
+            span.setAttributes({
+                'function.name': context.functionName,
+                'request.id': context.requestId
+            });
+
+            const result = await processEvent(event);
+
+            span.setStatus({ code: SpanStatusCode.OK });
+            return result;
+
+        } catch (error) {
+            span.recordException(error);
+            throw error;
+        } finally {
+            span.end();
+        }
+    });
+};
+```
+
+### 8. Cost Optimization
+
+Optimize serverless costs.
+
+```yaml
+# Cost optimization strategies
+
+# 1. Right-size memory
+functions:
+  api:
+    handler: handler.handler
+    memorySize: 512  # Test different sizes for optimal cost/perf
+
+# 2. Use appropriate timeouts
+    timeout: 10  # Don't over-allocate
+
+# 3. Batch processing
+functions:
+  batchProcessor:
+    handler: batch.handler
+    events:
+      - s3:
+          bucket: my-bucket
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: input/
+            - suffix: .json
+    batchSize: 100  # Process 100 records per invocation
+    maxBatchingWindow: 60
+
+# 4. Reserved concurrency
+    reservedConcurrency: 10  # Pay for guaranteed capacity
+
+# 5. Provisioned concurrency for predictable workloads
+    provisionedConcurrency: 5  # Pay for always-on instances
+```
+
+### 9. Security
+
+Secure serverless applications.
+
+```typescript
+// Security best practices
+
+// 1. Use environment variables for secrets
+const config = {
+    // DON'T: hardcode secrets
+    // secret: 'my-api-key'
+
+    // DO: use AWS Secrets Manager
+    dbPassword: process.env.DB_PASSWORD
+};
+
+// 2. Validate all input
+export const handler = async (event) => {
+    const schema = z.object({
+        email: z.string().email(),
+        name: z.string().min(1).max(100)
+    });
+
+    const validated = schema.safeParse(JSON.parse(event.body));
+    if (!validated.success) {
+        return { statusCode: 400, body: 'Invalid input' };
+    }
+
+    return validated.data;
+};
+
+// 3. Use IAM roles properly
+const iamPolicy = {
+    Version: "2012-10-17",
+    Statement: [{
+        Effect: "Allow",
+        Action: [
+            "dynamodb:Query",
+            "dynamodb:Scan"
+        ],
+        Resource: "arn:aws:dynamodb:table/Users/table/*"
+    }]
+};
+
+// 4. Enable CORS properly
+const corsHeaders = {
+    'Access-Control-Allow-Origin': 'https://example.com',
+    'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+    'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE'
+};
+```
+
+### 10. Testing
+
+Test serverless functions.
+
+```typescript
+// Unit testing
+describe('Lambda Handler', () => {
+    it('should return user by ID', async () => {
+        // Mock dependencies
+        const mockUser = { id: '123', name: 'Test' };
+        jest.spyOn(userRepository, 'findById')
+            .mockResolvedValue(mockUser);
+
+        // Invoke handler
+        const result = await handler(
+            { pathParameters: { userId: '123' } },
+            createMockContext()
+        );
+
+        expect(result.statusCode).toBe(200);
+        expect(JSON.parse(result.body)).toEqual(mockUser);
+    });
+
+    it('should return 404 for non-existent user', async () => {
+        jest.spyOn(userRepository, 'findById')
+            .mockResolvedValue(null);
+
+        const result = await handler(
+            { pathParameters: { userId: 'non-existent' } },
+            createMockContext()
+        );
+
+        expect(result.statusCode).toBe(404);
+    });
+});
+
+// Integration testing
+describe('Lambda Integration Tests', () => {
+    beforeAll(async () => {
+        // Deploy test stack
+        await deployTestStack();
+    });
+
+    afterAll(async () => {
+        await destroyTestStack();
+    });
+
+    it('should process S3 event', async () => {
+        const event = createS3Event('input/test.json');
+        const result = await invokeFunction('batchProcessor', event);
+
+        expect(result.statusCode).toBe(200);
+    });
+});
+```
+
+## Checklist
+
+- [ ] Design functions to be stateless
+- [ ] Handle errors properly
+- [ ] Optimize cold starts
+- [ ] Configure scaling correctly
+- [ ] Monitor function execution
+- [ ] Implement security best practices
+- [ ] Use appropriate timeouts
+- [ ] Test functions thoroughly
+- [ ] Optimize for cost
+- [ ] Use environment variables for secrets
+
+## Liên kết
+
+- [AWS Lambda Best Practices](https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html)
+- [Azure Functions Best Practices](https://docs.microsoft.com/en-us/azure/azure-functions/functions-best-practices)
+- [Serverless Framework](https://www.serverless.com/framework/docs/)
+- Cloud Architecture: `.cursor/rules/cloud-architecture.mdc`
+- Observability: `.cursor/rules/observability.mdc`

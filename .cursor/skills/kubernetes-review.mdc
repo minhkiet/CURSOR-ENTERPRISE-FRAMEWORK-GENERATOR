@@ -1,239 +1,546 @@
 ---
-description: Review Kubernetes deployment bao gồm pods, services, deployments, và security
-purpose: Audit Kubernetes configurations cho reliability, security, và performance
-input: Kubernetes manifests, Helm charts, kubectl configurations
-output: Kubernetes review report, recommendations, security findings
+description: Skill review Kubernetes deployments để ensure security, scalability, và production readiness
+purpose: Cung cấp comprehensive Kubernetes review framework để audit deployments, services, RBAC configurations, và cluster security
+input:
+  - Kubernetes manifests
+  - Helm charts
+  - Cluster configuration
+  - Service configurations
+output:
+  - Security assessment
+  - Resource analysis
+  - Networking review
+  - Recommendations
 version: 1.0.0
-tags: [kubernetes, k8s, pods, services, deployments, security, helm]
+tags:
+  - kubernetes
+  - k8s
+  - review
+  - deployment
+  - security
 ---
 
-# Kubernetes Review Skill - Kiểm Toán Kubernetes Deployment
+# Kubernetes Review
 
 ## Tổng quan
 
-Kubernetes là orchestration platform cho containerized applications. Skill này cung cấp framework để review Kubernetes configurations.
+Kubernetes Review là skill chuyên biệt để review và assess Kubernetes configurations. Skill này cung cấp systematic approach để evaluate deployments, services, RBAC, network policies, resource limits, và security contexts. Essential cho production Kubernetes clusters.
 
 ## Purpose (Mục đích)
 
-Kubernetes Review Skill được thiết kế để:
+Kubernetes misconfigurations can lead to:
 
-1. **Deployment Review**: Verify configurations
-2. **Security Audit**: Check security settings
-3. **Performance Check**: Optimize resources
-4. **Networking Review**: Verify networking
-5. **Best Practices**: Ensure standards
+1. **Security breaches**: Privilege escalation, unauthorized access
+2. **Resource exhaustion**: No limits = runaway pods
+3. **Network exposure**: Improper network policies
+4. **Compliance failures**: Missing security controls
+5. **Availability issues**: No high availability setup
 
-### Khi nào sử dụng Kubernetes Review
+Kubernetes Review tồn tại để:
 
-- Khi auditing Kubernetes setup
-- Khi optimizing deployments
-- Khi investigating issues
-- Khi hardening security
+- **Identify security vulnerabilities** in manifests
+- **Ensure resource efficiency** với proper limits
+- **Validate networking** configurations
+- **Check RBAC** permissions
+- **Improve production readiness**
 
 ## Input (Đầu vào)
 
-- [ ] Kubernetes manifests
-- [ ] Helm charts
-- [ ] kubectl configs
+| Input | Mô tả | Required |
+|-------|-------|----------|
+| `manifests` | K8s manifest files | Yes |
+| `helm_charts` | Helm chart configurations | No |
+| `cluster_config` | Cluster-level configs | No |
 
 ## Output (Đầu ra)
 
-- [ ] Security findings
-- [ ] Performance recommendations
-- [ ] Best practice checklist
+| Output | Mô tả | Format |
+|--------|-------|--------|
+| `security_review` | Security findings | Report |
+| `resource_analysis` | Resource analysis | Analysis |
+| `networking_review` | Network review | Review |
+| `rbac_review` | RBAC analysis | Review |
+| `recommendations` | Improvements | List |
 
 ## Workflow (Quy trình)
 
-### Phase 1: Deployment Review
+### Bước 1: Deployment Analysis
 
-### Bước 1: Pod Security
+```typescript
+// Analyze Kubernetes deployments
+interface DeploymentAnalysis {
+  deployments: DeploymentInfo[];
+  security_contexts: SecurityContextInfo[];
+  resource_configs: ResourceConfigInfo[];
+  issues: DeploymentIssue[];
+}
 
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: app-pod
-spec:
-  securityContext:
-    runAsNonRoot: true
-    runAsUser: 1000
-    fsGroup: 1000
-    seccompProfile:
-      type: RuntimeDefault
+async function analyzeDeployments(
+  manifests: Manifest[]
+): Promise<DeploymentAnalysis> {
+  const deployments: DeploymentInfo[] = [];
+  const issues: DeploymentIssue[] = [];
   
-  containers:
-    - name: app
-      image: app:1.0.0
-      imagePullPolicy: Always
-      
-      securityContext:
-        allowPrivilegeEscalation: false
-        readOnlyRootFilesystem: true
-        capabilities:
-          drop:
-            - ALL
-          add:
-            - NET_BIND_SERVICE
-      
-      resources:
-        requests:
-          memory: "128Mi"
-          cpu: "100m"
-        limits:
-          memory: "256Mi"
-          cpu: "500m"
-      
-      env:
-        - name: SECRET
-          valueFrom:
-            secretKeyRef:
-              name: app-secrets
-              key: secret
-      
-      volumeMounts:
-        - name: tmp
-          mountPath: /tmp
-        - name: config
-          mountPath: /config
-          readOnly: true
-      
-      ports:
-        - name: http
-          containerPort: 8080
-          protocol: TCP
-      
-      livenessProbe:
-        httpGet:
-          path: /health/live
-          port: http
-        initialDelaySeconds: 10
-        periodSeconds: 10
-        failureThreshold: 3
-      
-      readinessProbe:
-        httpGet:
-          path: /health/ready
-          port: http
-        initialDelaySeconds: 5
-        periodSeconds: 5
-      
-      startupProbe:
-        httpGet:
-          path: /health/startup
-          port: http
-        failureThreshold: 30
-        periodSeconds: 10
+  for (const manifest of manifests) {
+    if (manifest.kind === 'Deployment') {
+      const analysis = analyzeDeployment(manifest);
+      deployments.push(analysis);
+      issues.push(...analysis.issues);
+    }
+  }
   
-  volumes:
-    - name: tmp
-      emptyDir:
-        medium: Memory
-        sizeLimit: 100Mi
-    - name: config
-      configMap:
-        name: app-config
+  return {
+    deployments,
+    security_contexts: extractSecurityContexts(deployments),
+    resource_configs: extractResourceConfigs(deployments),
+    issues
+  };
+}
+
+function analyzeDeployment(deployment: Deployment): DeploymentInfo {
+  const issues: DeploymentIssue[] = [];
+  const spec = deployment.spec;
+  
+  // Check for security context
+  if (!spec.template.spec.securityContext) {
+    issues.push({
+      type: 'missing_security_context',
+      severity: 'medium',
+      message: 'Deployment should define securityContext',
+      resource: deployment.metadata.name
+    });
+  }
+  
+  // Check for resource limits
+  const containers = spec.template.spec.containers;
+  for (const container of containers) {
+    if (!container.resources?.limits) {
+      issues.push({
+        type: 'missing_resource_limits',
+        severity: 'high',
+        message: `Container ${container.name} should have resource limits`,
+        resource: deployment.metadata.name
+      });
+    }
+    
+    if (!container.resources?.requests) {
+      issues.push({
+        type: 'missing_resource_requests',
+        severity: 'medium',
+        message: `Container ${container.name} should have resource requests`,
+        resource: deployment.metadata.name
+      });
+    }
+  }
+  
+  // Check for replica count
+  if ((spec.replicas || 1) === 1) {
+    issues.push({
+      type: 'single_replica',
+      severity: 'medium',
+      message: 'Deployment has only 1 replica - consider high availability',
+      resource: deployment.metadata.name
+    });
+  }
+  
+  // Check for pod disruption budget
+  // (would need PDB manifest analysis)
+  
+  return {
+    name: deployment.metadata.name,
+    namespace: deployment.metadata.namespace,
+    replicas: spec.replicas,
+    containers: containers.map(c => c.name),
+    issues
+  };
+}
 ```
 
-### Bước 2: Network Policies
+### Bước 2: Security Context Review
+
+```typescript
+// Review security contexts
+interface SecurityContextReview {
+  pod_security_contexts: PodSecurityContext[];
+  container_security_contexts: ContainerSecurityContext[];
+  issues: SecurityContextIssue[];
+}
+
+function reviewSecurityContexts(
+  deployments: Deployment[]
+): SecurityContextReview {
+  const podContexts: PodSecurityContext[] = [];
+  const containerContexts: ContainerSecurityContext[] = [];
+  const issues: SecurityContextIssue[] = [];
+  
+  for (const deployment of deployments) {
+    const podSpec = deployment.spec.template.spec;
+    
+    // Pod-level security context
+    if (podSpec.securityContext) {
+      const ctx = podSpec.securityContext;
+      podContexts.push({
+        deployment: deployment.metadata.name,
+        ...ctx
+      });
+      
+      // Check for privilege escalation
+      if (ctx.allowPrivilegeEscalation === true) {
+        issues.push({
+          type: 'privilege_escalation',
+          severity: 'critical',
+          message: 'allowPrivilegeEscalation should be false',
+          resource: deployment.metadata.name
+        });
+      }
+      
+      // Check for running as root
+      if (!ctx.runAsNonRoot) {
+        issues.push({
+          type: 'run_as_root',
+          severity: 'high',
+          message: 'runAsNonRoot should be true',
+          resource: deployment.metadata.name
+        });
+      }
+      
+      // Check for seccomp profile
+      if (!ctx.seccompProfile) {
+        issues.push({
+          type: 'missing_seccomp',
+          severity: 'low',
+          message: 'Consider using seccomp profile',
+          resource: deployment.metadata.name
+        });
+      }
+    }
+    
+    // Container-level security context
+    for (const container of podSpec.containers) {
+      if (container.securityContext) {
+        const ctx = container.securityContext;
+        containerContexts.push({
+          deployment: deployment.metadata.name,
+          container: container.name,
+          ...ctx
+        });
+        
+        // Check for privileged container
+        if (ctx.privileged) {
+          issues.push({
+            type: 'privileged_container',
+            severity: 'critical',
+            message: `Container ${container.name} is privileged`,
+            resource: deployment.metadata.name
+          });
+        }
+        
+        // Check for capabilities
+        if (ctx.capabilities?.add?.length > 0) {
+          const dangerous = ctx.capabilities.add.filter(
+            c => ['SYS_ADMIN', 'NET_ADMIN', 'SYS_MODULE'].includes(c)
+          );
+          if (dangerous.length > 0) {
+            issues.push({
+              type: 'dangerous_capabilities',
+              severity: 'high',
+              message: `Container has dangerous capabilities: ${dangerous.join(', ')}`,
+              resource: deployment.metadata.name
+            });
+          }
+        }
+        
+        // Check for read-only root filesystem
+        if (ctx.readOnlyRootFilesystem !== true) {
+          issues.push({
+            type: 'writable_filesystem',
+            severity: 'medium',
+            message: `Container ${container.name} should have readOnlyRootFilesystem`,
+            resource: deployment.metadata.name
+          });
+        }
+      }
+    }
+  }
+  
+  return { pod_security_contexts: podContexts, container_security_contexts: containerContexts, issues };
+}
+```
+
+### Bước 3: Network Policy Review
+
+```typescript
+// Review network policies
+interface NetworkPolicyReview {
+  policies: NetworkPolicy[];
+  exposure_analysis: ExposureAnalysis;
+  issues: NetworkIssue[];
+}
+
+async function reviewNetworkPolicies(
+  manifests: Manifest[]
+): Promise<NetworkPolicyReview> {
+  const policies = manifests.filter(m => m.kind === 'NetworkPolicy');
+  const issues: NetworkIssue[] = [];
+  
+  // Check for default deny all
+  const hasDefaultDeny = policies.some(p => 
+    p.spec?.podSelector?.matchLabels === {} &&
+    p.spec?.policyTypes?.includes('Ingress')
+  );
+  
+  if (!hasDefaultDeny) {
+    issues.push({
+      type: 'missing_default_deny',
+      severity: 'high',
+      message: 'Consider adding default deny NetworkPolicy'
+    });
+  }
+  
+  // Analyze service exposure
+  const services = manifests.filter(m => m.kind === 'Service');
+  const exposureAnalysis = analyzeServiceExposure(services);
+  
+  for (const service of services) {
+    // Check for NodePort or LoadBalancer without restrictions
+    if (service.spec?.type === 'LoadBalancer') {
+      if (!service.spec?.loadBalancerSourceRanges) {
+        issues.push({
+          type: 'unrestricted_loadbalancer',
+          severity: 'medium',
+          message: `Service ${service.metadata.name} should restrict source ranges`,
+          resource: service.metadata.name
+        });
+      }
+    }
+    
+    // Check for ClusterIP with public endpoints
+    // (would need cloud provider analysis)
+  }
+  
+  return { policies, exposure_analysis: exposureAnalysis, issues };
+}
+```
+
+### Bước 4: RBAC Review
+
+```typescript
+// Review RBAC configurations
+interface RBACReview {
+  cluster_roles: Role[];
+  roles: Role[];
+  cluster_role_bindings: RoleBinding[];
+  role_bindings: RoleBinding[];
+  issues: RBACIssue[];
+  permissions_matrix: PermissionsMatrix;
+}
+
+async function reviewRBAC(
+  manifests: Manifest[]
+): Promise<RBACReview> {
+  const issues: RBACIssue[] = [];
+  
+  const clusterRoles = manifests.filter(m => m.kind === 'ClusterRole');
+  const roles = manifests.filter(m => m.kind === 'Role');
+  const clusterRoleBindings = manifests.filter(m => m.kind === 'ClusterRoleBinding');
+  const roleBindings = manifests.filter(m => m.kind === 'RoleBinding');
+  
+  // Check for wildcard permissions
+  for (const role of [...clusterRoles, ...roles]) {
+    for (const rule of role.rules || []) {
+      // Check for '*' in resources or verbs
+      if (rule.resources?.includes('*') && rule.verbs?.includes('*')) {
+        issues.push({
+          type: 'wildcard_permissions',
+          severity: 'critical',
+          message: `Role ${role.metadata.name} has wildcard permissions`,
+          role: role.metadata.name,
+          subjects: rule.resources
+        });
+      }
+    }
+  }
+  
+  // Check for default service accounts
+  for (const binding of [...clusterRoleBindings, ...roleBindings]) {
+    for (const subject of binding.subjects || []) {
+      if (subject.kind === 'ServiceAccount' && subject.name === 'default') {
+        issues.push({
+          type: 'default_sa_binding',
+          severity: 'medium',
+          message: `Binding uses default service account`,
+          binding: binding.metadata.name
+        });
+      }
+    }
+  }
+  
+  // Build permissions matrix
+  const permissionsMatrix = buildPermissionsMatrix(
+    [...clusterRoles, ...roles],
+    [...clusterRoleBindings, ...roleBindings]
+  );
+  
+  return {
+    cluster_roles: clusterRoles,
+    roles,
+    cluster_role_bindings: clusterRoleBindings,
+    role_bindings: roleBindings,
+    issues,
+    permissions_matrix: permissionsMatrix
+  };
+}
+```
+
+## Checklist (Danh sách kiểm tra)
+
+- [ ] Pods run as non-root
+- [ ] No privileged containers
+- [ ] readOnlyRootFilesystem: true
+- [ ] Dropped capabilities
+- [ ] Resource limits and requests set
+- [ ] Health probes configured
+- [ ] Replica count >= 2 for HA
+- [ ] Pod Disruption Budget configured
+- [ ] Network policies defined
+- [ ] Default deny all network policy
+- [ ] Service accounts limited
+- [ ] RBAC properly scoped
+- [ ] No wildcard permissions
+- [ ] Secrets encrypted at rest
+- [ ] Pod priority classes set
+
+## Examples (Ví dụ)
+
+### Ví dụ 1: Secure Deployment
 
 ```yaml
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
+# ✅ GOOD: Secure Kubernetes Deployment
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: app-network-policy
+  name: secure-app
+  namespace: production
 spec:
-  podSelector:
+  replicas: 3
+  selector:
     matchLabels:
-      app: app
-      tier: frontend
-  
-  policyTypes:
-    - Ingress
-    - Egress
-  
-  ingress:
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              name: ingress-nginx
-        - podSelector:
-            matchLabels:
-              app: nginx-ingress
-      ports:
-        - protocol: TCP
-          port: 8080
-  
-  egress:
-    - to:
-        - podSelector:
-            matchLabels:
-              app: api
-              tier: backend
-      ports:
-        - protocol: TCP
-          port: 8080
-    - to:
-        - namespaceSelector: {}
-      ports:
-        - protocol: TCP
-          port: 53
-        - protocol: UDP
-          port: 53
+      app: secure-app
+  template:
+    metadata:
+      labels:
+        app: secure-app
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 2000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: app
+        image: myapp:v1.0.0
+        ports:
+        - containerPort: 8080
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: secure-app
+              topologyKey: topology.kubernetes.io/zone
+      tolerations:
+      - key: "node.kubernetes.io/not-ready"
+        operator: "Exists"
+        effect: "NoSchedule"
 ```
 
-### Phase 2: Resource Management
+## Anti Patterns (Các pattern cần tránh)
 
-### Bước 3: Resource Quotas
-
+### 1. Privileged Containers
 ```yaml
-apiVersion: v1
-kind: ResourceQuota
-metadata:
-  name: production-quota
-spec:
-  hard:
-    requests.cpu: "20"
-    requests.memory: 40Gi
-    limits.cpu: "40"
-    limits.memory: 80Gi
-    pods: "100"
-    services: "10"
-    secrets: "20"
+# ❌ BAD
+securityContext:
+  privileged: true
 
----
-apiVersion: v1
-kind: LimitRange
-metadata:
-  name: production-limits
-spec:
-  limits:
-    - max:
-        memory: 1Gi
-        cpu: "1"
-      min:
-        memory: 64Mi
-        cpu: 50m
-      default:
-        memory: 256Mi
-        cpu: 200m
-      defaultRequest:
-        memory: 128Mi
-        cpu: 100m
-      type: Container
+# ✅ GOOD
+securityContext:
+  privileged: false
 ```
 
-## Checklist
+### 2. No Resource Limits
+```yaml
+# ❌ BAD
+containers:
+- name: app
+  resources: {}  # No limits!
 
-- [ ] Non-root containers
-- [ ] Read-only root filesystem
-- [ ] Resource limits
-- [ ] Health probes
-- [ ] Network policies
-- [ ] Secrets management
+# ✅ GOOD
+containers:
+- name: app
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+```
 
-## Liên kết
+### 3. Running as Root
+```yaml
+# ❌ BAD
+securityContext:
+  runAsUser: 0  # Root!
 
-- [[../rules/core-architecture]] - Core Architecture
-- [[../skills/docker-review]] - Docker Review
-- [[../skills/security-audit]] - Security Audit
-- [[../skills/deployment-review]] - Deployment Review
+# ✅ GOOD
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+```
+
+## Best Practices (Thực hành tốt nhất)
+
+1. **Defense in depth**: Multiple security layers
+2. **Principle of least privilege**: Minimal permissions
+3. **Immutable infrastructure**: Don't modify running pods
+4. **Resource quotas**: Prevent resource exhaustion
+5. **Network policies**: Restrict traffic flow
+6. **Pod Security Standards**: Use restricted profile
+7. **Secrets management**: Use external secrets
+8. **Regular audits**: Review RBAC and configs
+9. **Use namespaces**: Separate concerns
+10. **Monitor everything**: Logs, metrics, traces
+
+## Liên kết (Cross-references)
+
+- **Related Skills**: [docker-review](./docker-review.mdc), [deployment-review](./deployment-review.mdc), [security-audit](./security-audit.mdc)
+- **Standards**: CIS Kubernetes Benchmark, NSA Kubernetes Hardening Guide
+- **Tools**: kube-bench, kube-hunter, Kyverno

@@ -1,0 +1,1046 @@
+---
+description: Nguyên tắc và best practices cho CI/CD Pipeline trong Cursor Enterprise Framework
+created: 2026-06-23
+version: 1.0.0
+tags:
+  - ci-cd
+  - continuous-integration
+  - continuous-delivery
+  - devops
+  - automation
+---
+
+# CI/CD Pipeline Guidelines
+
+## Mục tiêu
+
+Tài liệu này định nghĩa các nguyên tắc và best practices cho việc implement CI/CD pipelines trong Cursor Enterprise Framework. Mục tiêu là đảm bảo automated testing, reliable deployments, và fast feedback loops cho development teams.
+
+CI/CD là backbone của modern DevOps practices, cho phép teams deliver code changes frequently với high quality thông qua automated build, test, và deployment processes.
+
+## Nguyên tắc cơ bản
+
+### 1. CI/CD Pipeline Stages
+
+Understanding the pipeline stages.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    CI/CD Pipeline Stages                           │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐          │
+│  │  Code   │─▶│  Build  │─▶│  Test   │─▶│ Security│          │
+│  │ Commit  │  │         │  │         │  │ Scan    │          │
+│  └─────────┘  └─────────┘  └─────────┘  └─────────┘          │
+│                                                  │              │
+│                                                  ▼              │
+│  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐        │
+│  │ Deploy  │◀─│ Staging │◀─│ Publish │◀─│ Package │        │
+│  │  Prod   │  │   Test  │  │  Artif. │  │   Build │        │
+│  └─────────┘  └─────────┘  └─────────┘  └─────────┘        │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 2. Pipeline Configuration
+
+CI/CD pipeline structure.
+
+```yaml
+# .github/workflows/ci-cd.yml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '18'
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  lint:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run TypeScript
+        run: npm run type-check
+
+  test:
+    name: Unit & Integration Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Tests
+        run: npm run test:ci
+        env:
+          DATABASE_URL: postgres://test:test@localhost:5432/test
+          REDIS_URL: redis://localhost:6379
+          NODE_ENV: test
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/lcov.info
+          flags: unittests
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: lint
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: [test, security]
+    if: github.ref == 'refs/heads/main'
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=sha,prefix=
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: staging
+      url: https://staging.example.com
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Kubernetes
+        uses: azure/k8s-deploy@v4
+        with:
+          namespace: 'staging'
+          manifests: |
+            k8s/staging/
+          images: |
+            ${{ needs.build.outputs.image-tag }}
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: https://example.com
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Production
+        uses: azure/k8s-deploy@v4
+        with:
+          namespace: 'production'
+          manifests: |
+            k8s/production/
+          images: |
+            ${{ needs.build.outputs.image-tag }}
+```
+
+### 3. Docker Build Configuration
+
+Optimized Docker builds.
+
+```dockerfile
+# Multi-stage Dockerfile
+# syntax=docker/dockerfile:1
+
+# Build stage
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# Install dependencies first for better caching
+COPY package*.json ./
+RUN npm ci --only=production
+
+COPY . .
+
+RUN npm run build
+
+# Production stage
+FROM node:18-alpine AS production
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+
+WORKDIR /app
+
+ENV NODE_ENV=production \
+    PORT=3000
+
+# Copy dependencies
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
+
+USER nodejs
+
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD node healthcheck.js || exit 1
+
+CMD ["node", "dist/main.js"]
+```
+
+### 4. Testing in Pipeline
+
+Comprehensive testing strategy.
+
+```yaml
+# Test stages
+test:
+  stages:
+    - unit
+    - integration
+    - e2e
+
+  unit_tests:
+    stage: unit
+    script:
+      - npm ci
+      - npm run test:unit -- --coverage
+    coverage: '/Coverage: \d+\.\d+%/'
+    artifacts:
+      reports:
+        junit: junit.xml
+        coverage_report:
+          coverage_format: cobertura
+          path: coverage/cobertura-coverage.xml
+
+  integration_tests:
+    stage: integration
+    services:
+      - postgres:15-alpine
+      - redis:7-alpine
+    script:
+      - npm ci
+      - npm run test:integration
+    artifacts:
+      reports:
+        junit: junit-integration.xml
+
+  e2e_tests:
+    stage: e2e
+    before_script:
+      - npm ci
+      - npm run build
+      - docker-compose up -d
+    script:
+      - npm run test:e2e
+    after_script:
+      - docker-compose down
+```
+
+```typescript
+// Test configuration
+const testConfig = {
+    unit: {
+        pattern: '**/*.test.ts',
+        coverage: true,
+        timeout: 10000
+    },
+    integration: {
+        pattern: '**/*.integration.test.ts',
+        db: true,
+        redis: true,
+        timeout: 30000
+    },
+    e2e: {
+        pattern: '**/*.e2e.test.ts',
+        headless: true,
+        timeout: 60000
+    }
+};
+```
+
+### 5. Deployment Strategies
+
+Different deployment approaches.
+
+```yaml
+# Rolling deployment
+deployment:
+  strategy: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+  minReadySeconds: 10
+
+# Blue-green deployment
+blue-green:
+  - name: blue
+    replicas: 3
+    label: color=blue
+  - name: green
+    replicas: 3
+    label: color=green
+
+# Canary deployment
+canary:
+  weight: 10  # 10% traffic to canary
+  steps:
+    - weight: 10
+      pause: { duration: 10m }
+    - weight: 25
+      pause: { duration: 10m }
+    - weight: 50
+      pause: { duration: 10m }
+    - weight: 100
+```
+
+```yaml
+# Argo Rollouts canary configuration
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: api-rollout
+spec:
+  strategy:
+    canary:
+      steps:
+      - setWeight: 10
+      - pause: { duration: 10m }
+      - analysis:
+          templates:
+          - templateName: success-rate
+          - setWeight: 25
+      - pause: { duration: 10m }
+      - setWeight: 50
+      - pause: { duration: 10m }
+      - setWeight: 100
+  analysis:
+    templates:
+    - templateName: success-rate
+    args:
+    - name: service-name
+      value: api-rollout
+```
+
+### 6. Environment Configuration
+
+Environment-specific settings.
+
+```yaml
+# GitOps structure
+├── environments/
+│   ├── development/
+│   │   ├── kustomization.yaml
+│   │   ├── deployment.yaml
+│   │   └── configmap.yaml
+│   ├── staging/
+│   │   ├── kustomization.yaml
+│   │   ├── deployment.yaml
+│   │   └── configmap.yaml
+│   └── production/
+│       ├── kustomization.yaml
+│       ├── deployment.yaml
+│       └── configmap.yaml
+```
+
+```yaml
+# kustomization.yaml for production
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - deployment.yaml
+  - service.yaml
+  - configmap.yaml
+
+namespace: production
+
+replicas:
+  - name: api
+    count: 5
+
+commonLabels:
+  environment: production
+
+configMapGenerator:
+  - name: app-config
+    literals:
+      - NODE_ENV=production
+      - LOG_LEVEL=info
+      - CACHE_TTL=3600
+
+images:
+  - name: api
+    newName: ghcr.io/example/api
+    newTag: v1.2.3
+```
+
+### 7. Rollback Procedures
+
+Safe rollback strategies.
+
+```bash
+# Kubernetes rollback
+kubectl rollout undo deployment/api -n production
+kubectl rollout undo deployment/api -n production --to-revision=3
+
+# Argo Rollouts rollback
+kubectl argo rollouts abort api-rollout
+kubectl argo rollouts undo api-rollout
+
+# Verify rollback
+kubectl rollout status deployment/api -n production
+kubectl argo rollouts status api-rollout
+```
+
+```yaml
+# Automatic rollback on failure
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+spec:
+  strategy:
+    canary:
+      analysis:
+        templates:
+        - templateName: success-rate
+        args:
+        - name: service-name
+          value: api-rollout
+        startingStep: 1
+        limit: 2
+```
+
+### 8. Artifact Management
+
+Manage build artifacts.
+
+```yaml
+# GitHub Actions artifact upload
+- name: Upload build artifact
+  uses: actions/upload-artifact@v4
+  with:
+    name: build-artifact
+    path: dist/
+    retention-days: 30
+
+# Download artifact
+- name: Download build artifact
+  uses: actions/download-artifact@v4
+  with:
+    name: build-artifact
+
+# Docker image tagging and pushing
+- name: Tag and push image
+  run: |
+    docker tag api:latest ${{ env.REGISTRY }}/api:${{ github.sha }}
+    docker push ${{ env.REGISTRY }}/api:${{ github.sha }}
+    docker tag ${{ env.REGISTRY }}/api:${{ github.sha }} ${{ env.REGISTRY }}/api:latest
+    docker push ${{ env.REGISTRY }}/api:latest
+```
+
+### 9. Notification Integration
+
+Notify on pipeline events.
+
+```yaml
+# Slack notification
+notify:
+  stages:
+    - failure
+    - success
+    - recovery
+  channels:
+    slack:
+      webhook: ${{ secrets.SLACK_WEBHOOK }}
+      channel: '#deployments'
+    teams:
+      webhook: ${{ secrets.TEAMS_WEBHOOK }}
+```
+
+```yaml
+# GitHub Actions notification step
+- name: Notify Slack
+  if: always()
+  uses: slackapi/slack-github-action@v1
+  with:
+    channel-id: 'C0123456789'
+    slack-message: |
+      ${{ job.status == 'success' && '✅' || '❌' }} Build ${{ job.status }}
+      <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View details>
+  env:
+    SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+```
+
+### 10. Pipeline Metrics
+
+Track pipeline performance.
+
+```yaml
+# Pipeline metrics
+metrics:
+  - name: pipeline_duration
+    type: gauge
+    help: "Duration of pipeline in seconds"
+    
+  - name: deployment_frequency
+    type: counter
+    help: "Number of deployments"
+    
+  - name: change_failure_rate
+    type: gauge
+    help: "Percentage of deployments causing failures"
+    
+  - name: mean_time_to_recovery
+    type: gauge
+    help: "Average time to recover from failures"
+```
+
+## Checklist
+
+- [ ] Configure automated build triggers
+- [ ] Set up linting và type checking
+- [ ] Implement unit tests
+- [ ] Implement integration tests
+- [ ] Add security scanning
+- [ ] Configure container builds
+- [ ] Set up environment promotion
+- [ ] Configure rollback procedures
+- [ ] Add notification integration
+- [ ] Monitor pipeline metrics
+- [ ] Document deployment process
+- [ ] Test rollback procedures
+- [ ] Set up approval gates
+- [ ] Configure artifact retention
+
+## Anti Patterns
+
+### 1. Long-Running Pipelines
+
+```yaml
+# Không nên - slow pipeline
+jobs:
+  long-task:
+    runs-on: ubuntu-latest
+    steps:
+      - run: sleep 300  # 5 minutes!
+      - run: build
+      - run: another-slow-task
+```
+
+### 2. No Caching
+
+```yaml
+# Không nên - no caching
+steps:
+  - uses: actions/checkout@v4
+  - run: npm ci  # Downloads everything every time
+
+# Nên - with caching
+steps:
+  - uses: actions/checkout@v4
+  - uses: actions/setup-node@v4
+    with:
+      cache: 'npm'
+  - run: npm ci  # Uses cache
+```
+
+### 3. Manual Steps in Pipeline
+
+```yaml
+# Không nên - manual intervention
+deploy:
+  steps:
+    - run: ./deploy.sh
+    - name: "Manual approval required"
+      type: manual  # Manual step!
+```
+
+### 4. No Rollback Strategy
+
+```yaml
+# Không nên - no rollback
+deploy:
+  steps:
+    - kubectl apply -f deployment.yaml
+    # No way to rollback if something goes wrong
+```
+
+### 5. Secrets in Code
+
+```yaml
+# Không nên - secrets in pipeline
+env:
+  DATABASE_PASSWORD: supersecretpassword  # In code!
+
+# Nên - use secrets
+env:
+  DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+```
+
+## Best Practices
+
+### 1. Fast Feedback
+
+```yaml
+# Quick feedback pipeline
+jobs:
+  # Fast checks run first
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: npm run lint --max-warnings=0
+
+  # Parallel execution
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - run: npm run test:unit --coverage --maxWorkers=4
+```
+
+### 2. Progressive Deployment
+
+```yaml
+# Progressive rollout
+deployment:
+  strategy: canary
+  canary:
+    traffic:
+      percentage: 10
+      steps:
+        - setWeight: 10
+        - pause: { duration: 5m }
+        - setWeight: 50
+        - pause: { duration: 10m }
+        - setWeight: 100
+```
+
+### 3. Feature Flags
+
+```yaml
+# Deploy with feature flags
+deployment:
+  env:
+    FEATURE_NEW_CHECKOUT: "false"
+    FEATURE_RECOMMENDATION_ENGINE: "true"
+```
+
+## Workflow
+
+### 1. Pipeline Setup
+
+1. Create repository structure
+2. Configure CI configuration
+3. Set up test infrastructure
+4. Configure build process
+5. Add security scanning
+
+### 2. Deployment Configuration
+
+1. Define environments
+2. Configure deployment targets
+3. Set up rollback procedures
+4. Add monitoring
+5. Configure notifications
+
+### 3. Operations
+
+1. Monitor pipeline runs
+2. Handle failures
+3. Perform rollbacks
+4. Optimize performance
+
+## Ví dụ
+
+### Ví dụ 1: GitLab CI Pipeline
+
+```yaml
+# .gitlab-ci.yml
+stages:
+  - lint
+  - test
+  - build
+  - deploy
+
+variables:
+  DOCKER_DRIVER: overlay2
+
+lint:
+  stage: lint
+  image: node:18-alpine
+  script:
+    - npm ci
+    - npm run lint
+    - npm run type-check
+
+unit-test:
+  stage: test
+  image: node:18-alpine
+  services:
+    - postgres:15-alpine
+  script:
+    - npm ci
+    - npm run test:unit -- --coverage
+  coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
+  artifacts:
+    reports:
+      junit: junit.xml
+      coverage_report: cobertura:coverage/cobertura-coverage.xml
+
+build:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  only:
+    - main
+
+deploy-staging:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    - kubectl apply -f k8s/staging/
+    - kubectl rollout status deployment/api -n staging
+  environment:
+    name: staging
+    url: https://staging.example.com
+  only:
+    - main
+
+deploy-production:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    - kubectl apply -f k8s/production/
+    - kubectl rollout status deployment/api -n production
+  environment:
+    name: production
+    url: https://example.com
+  when: manual
+  only:
+    - main
+```
+
+### Ví dụ 2: Azure DevOps Pipeline
+
+```yaml
+# azure-pipelines.yml
+trigger:
+  - main
+  - develop
+
+pr:
+  - main
+
+variables:
+  nodeVersion: '18.x'
+  dockerRegistryServiceConnection: 'docker-registry'
+  imageRepository: 'api'
+  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
+  tag: '$(Build.BuildId)'
+
+stages:
+  - stage: Build
+    displayName: Build and Test
+    jobs:
+      - job: Build
+        displayName: Build
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: $(nodeVersion)
+            displayName: 'Install Node.js'
+
+          - script: |
+              npm ci
+              npm run lint
+              npm run type-check
+            displayName: 'Lint and Type Check'
+
+          - script: |
+              npm test -- --coverage --ci
+            displayName: 'Run Tests'
+            env:
+              DATABASE_URL: $(DATABASE_URL)
+
+          - task: PublishCodeCoverageResults@1
+            inputs:
+              codeCoverageTool: 'Cobertura'
+              summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
+
+          - task: Docker@2
+            displayName: 'Build and push'
+            inputs:
+              command: buildAndPush
+              repository: $(imageRepository)
+              dockerfile: $(dockerfilePath)
+              containerRegistry: $(dockerRegistryServiceConnection)
+              tags: |
+                $(tag)
+                latest
+
+  - stage: DeployStaging
+    displayName: Deploy to Staging
+    jobs:
+      - deployment: DeployStaging
+        environment: 'staging'
+        pool:
+          vmImage: 'ubuntu-latest'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: KubernetesManifest@0
+                  inputs:
+                    action: deploy
+                    namespace: staging
+                    manifests: |
+                      $(Pipeline.Workspace)/manifests/staging/*.yaml
+
+  - stage: DeployProduction
+    displayName: Deploy to Production
+    dependsOn: DeployStaging
+    condition: succeeded()
+    jobs:
+      - deployment: DeployProduction
+        environment: 'production'
+        pool:
+          vmImage: 'ubuntu-latest'
+        strategy:
+          canary:
+            increment: 10
+            gates:
+              - successRate:
+                  percentage: 95
+```
+
+### Ví dụ 3: Jenkins Pipeline
+
+```groovy
+// Jenkinsfile
+pipeline {
+    agent any
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        timeout(time: 1, unit: 'HOURS')
+        disableConcurrentBuilds()
+    }
+
+    environment {
+        NODE_VERSION = '18'
+        REGISTRY = 'ghcr.io'
+        IMAGE_NAME = 'example/api'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Lint & Type Check') {
+            steps {
+                sh 'npm ci'
+                sh 'npm run lint'
+                sh 'npm run type-check'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                parallel(
+                    "Unit Tests": {
+                        sh 'npm run test:unit -- --coverage'
+                    },
+                    "Integration Tests": {
+                        sh 'npm run test:integration'
+                    }
+                )
+            }
+            post {
+                always {
+                    junit 'junit.xml'
+                    cobertura coberturaReportFile: 'coverage/cobertura-coverage.xml'
+                }
+            }
+        }
+
+        stage('Build Docker') {
+            when {
+                branch 'main'
+            }
+            steps {
+                script {
+                    def imageTag = sh(
+                        script: "git rev-parse --short HEAD",
+                        returnStdout: true
+                    ).trim()
+
+                    env.IMAGE_TAG = imageTag
+
+                    sh """
+                        docker build -t ${REGISTRY}/${IMAGE_NAME}:${imageTag} .
+                        docker push ${REGISTRY}/${IMAGE_NAME}:${imageTag}
+                    """
+                }
+            }
+        }
+
+        stage('Deploy to Staging') {
+            when {
+                branch 'main'
+            }
+            steps {
+                sh """
+                    kubectl config use-context staging
+                    kubectl set image deployment/api api=${REGISTRY}/${IMAGE_NAME}:${env.IMAGE_TAG}
+                    kubectl rollout status deployment/api -n staging
+                """
+            }
+        }
+
+        stage('Deploy to Production') {
+            when {
+                branch 'main'
+            }
+            steps {
+                input message: 'Deploy to production?', ok: 'Deploy'
+                sh """
+                    kubectl config use-context production
+                    kubectl set image deployment/api api=${REGISTRY}/${IMAGE_NAME}:${env.IMAGE_TAG}
+                    kubectl rollout status deployment/api -n production
+                """
+            }
+        }
+    }
+
+    post {
+        failure {
+            slackSend channel: '#deployments',
+                     message: "Pipeline failed: ${env.JOB_NAME} [${env.BUILD_NUMBER}]"
+        }
+        success {
+            slackSend channel: '#deployments',
+                     message: "Pipeline succeeded: ${env.JOB_NAME} [${env.BUILD_NUMBER}]"
+        }
+    }
+}
+```
+
+## Liên kết
+
+- [GitHub Actions Documentation](https://docs.github.com/actions)
+- [GitLab CI/CD Documentation](https://docs.gitlab.com/ee/ci/)
+- [Azure Pipelines Documentation](https://docs.microsoft.com/en-us/azure/devops/pipelines/)
+- [Argo Rollouts](https://argoproj.github.io/argo-rollouts/)
+- Kubernetes: `.cursor/rules/kubernetes.mdc`
+- Docker: `.cursor/rules/docker.mdc`
+- Deployment: `.cursor/rules/deployment.mdc`

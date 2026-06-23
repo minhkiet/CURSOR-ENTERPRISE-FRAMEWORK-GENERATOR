@@ -1,0 +1,647 @@
+---
+description: Nguyên tắc và best practices cho Alerting Patterns trong Cursor Enterprise Framework
+created: 2026-06-23
+version: 1.0.0
+tags:
+  - alerting
+  - monitoring
+  - on-call
+  - incident-response
+  - sre
+---
+
+# Alerting Patterns Guidelines
+
+## Mục tiêu
+
+Tài liệu này định nghĩa các nguyên tắc và best practices cho việc implement alerting systems trong Cursor Enterprise Framework. Mục tiêu là đảm bảo proactive issue detection, appropriate alerting thresholds, và effective incident response.
+
+Alerting là phần critical của operational excellence, cho phép teams respond to issues trước khi customers notice. Việc implement alerting đúng cách reduce alert fatigue và ensures attention on real problems.
+
+## Nguyên tắc cơ bản
+
+### 1. Alert Severity Levels
+
+Define clear severity levels.
+
+```yaml
+# Alert severity levels
+severity_levels:
+  P1_CRITICAL:
+    description: "Complete service outage or data loss"
+    response_time: 15 minutes
+    notification: Phone call + SMS + Slack
+    escalation: Immediate
+
+  P2_HIGH:
+    description: "Major functionality impaired"
+    response_time: 30 minutes
+    notification: SMS + Slack
+    escalation: 30 minutes
+
+  P3_MEDIUM:
+    description: "Minor functionality affected"
+    response_time: 4 hours
+    notification: Slack
+    escalation: 4 hours
+
+  P4_LOW:
+    description: "Cosmetic or non-urgent issue"
+    response_time: Next business day
+    notification: Email + ticket
+```
+
+### 2. Alerting Rules
+
+Prometheus-style alerting rules.
+
+```yaml
+# prometheus/alerts.yml
+groups:
+  - name: api-service-alerts
+    interval: 30s
+    rules:
+      # Critical alerts
+      - alert: ServiceDown
+        expr: up{job="api-service"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "API service is down"
+          description: "Instance {{ $labels.instance }} has been down for more than 1 minute"
+          runbook_url: "https://wiki.example.com/runbooks/service-down"
+
+      - alert: HighErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{status_code=~"5.."}[5m]))
+            / sum(rate(http_requests_total[5m]))
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High HTTP 5xx error rate"
+          description: "Error rate is {{ $value | humanizePercentage }} (threshold: 5%)"
+          runbook_url: "https://wiki.example.com/runbooks/high-error-rate"
+
+      # Warning alerts
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(http_request_duration_seconds_bucket[5m])) by (le)
+          ) > 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High API latency detected"
+          description: "95th percentile latency is {{ $value }}s (threshold: 1s)"
+
+      - alert: HighMemoryUsage
+        expr: |
+          (container_memory_usage_bytes / container_memory_limit_bytes) > 0.85
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage at {{ $value | humanizePercentage }}"
+
+      # Database alerts
+      - alert: DatabaseConnectionsHigh
+        expr: |
+          pg_stat_activity_count / pg_settings_max_connections > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High database connection usage"
+          description: "Connection usage at {{ $value | humanizePercentage }}"
+
+      - alert: DatabaseSlowQueries
+        expr: |
+          rate(pg_stat_statements_mean_exec_time[5m]) > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow database queries detected"
+          description: "Average query execution time is {{ $value }}ms"
+```
+
+### 3. SLO-Based Alerts
+
+Alert based on service level objectives.
+
+```yaml
+# SLO-based alerting
+slo_alerts:
+  availability:
+    name: "API Availability SLO"
+    target: 99.9  # 99.9% availability
+    window: 30d
+    alert_on_budget_consumption: true
+    budget:
+      total: 100
+      thresholds:
+        - percent: 50
+          severity: warning
+          message: "Availability budget 50% consumed"
+        - percent: 75
+          severity: critical
+          message: "Availability budget 75% consumed - taking action required"
+        - percent: 90
+          severity: p1
+          message: "Availability budget exhausted - immediate action required"
+
+  latency:
+    name: "API Latency SLO"
+    target: 99  # 99% of requests under 500ms
+    window: 30d
+    alert_on_budget_consumption: true
+
+# Burn rate alerts
+burn_rate_alerts:
+  - alert: FastburnAlert
+    expr: |
+      sum(slo:error-budget-remaining:ratio{slo="api-availability"} < 1)
+      and
+      (sum(rate(slo:errors-total:slo="api-availability"[1h]))
+      / sum(rate(slo:total:slo="api-availability"[1h]))) > 0.1
+    for: 15m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Fast burn rate detected"
+      description: "Error budget is burning fast - 10% of budget in 1 hour"
+
+  - alert: SlowburnAlert
+    expr: |
+      sum(slo:error-budget-remaining:ratio{slo="api-availability"} < 1)
+      and
+      (sum(rate(slo:errors-total:slo="api-availability"[6h]))
+      / sum(rate(slo:total:slo="api-availability"[6h]))) > 0.01
+    for: 1h
+    labels:
+      severity: warning
+```
+
+### 4. Alert Routing
+
+Route alerts to appropriate channels.
+
+```yaml
+# AlertManager configuration
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ['alertname', 'severity', 'service']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  receiver: 'default-receiver'
+  routes:
+    # Critical alerts - immediate phone call
+    - match:
+        severity: critical
+      receiver: 'pagerduty-critical'
+      group_wait: 0s
+      repeat_interval: 1h
+
+    # Database alerts
+    - match:
+        component: database
+      receiver: 'database-team'
+      routes:
+        - match:
+            severity: critical
+          receiver: 'database-oncall'
+
+    # API alerts
+    - match:
+        component: api
+      receiver: 'api-team'
+      routes:
+        - match:
+            alertname: 'ServiceDown'
+          receiver: 'pagerduty-critical'
+
+    # Security alerts - dedicated channel
+    - match:
+        category: security
+      receiver: 'security-team'
+      routes:
+        - match:
+            severity: critical
+          receiver: 'security-oncall'
+
+receivers:
+  - name: 'default-receiver'
+    slack_configs:
+      - channel: '#alerts-default'
+        send_resolved: true
+
+  - name: 'pagerduty-critical'
+    pagerduty_configs:
+      - service_key: '${PAGERDUTY_SERVICE_KEY}'
+        severity: critical
+        send_resolved: true
+        client: 'Prometheus'
+        client_url: '{{ .CommonLabels.alertmanagerUrl }}'
+
+  - name: 'database-team'
+    slack_configs:
+      - channel: '#alerts-database'
+        send_resolved: true
+
+  - name: 'security-oncall'
+    slack_configs:
+      - channel: '#alerts-security-critical'
+    pagerduty_configs:
+      - service_key: '${SECURITY_PAGERDUTY_KEY}'
+        severity: critical
+```
+
+### 5. Alert Suppression
+
+Prevent alert storms và noise.
+
+```yaml
+# Alert suppression rules
+suppression:
+  # Suppress during maintenance window
+  - name: "maintenance-window"
+    condition: |
+      maintenance_mode == true
+    affected_alerts:
+      - "HighMemoryUsage"
+      - "HighCPUUsage"
+      - "HighLatency"
+
+  # Suppress after auto-scaling
+  - name: "auto-scaling-in-progress"
+    condition: |
+      kube_deployment_spec_replicas > kube_deployment_status_replicas
+    affected_alerts:
+      - "HighCPUUsage"
+      - "HighMemoryUsage"
+    duration: 10m
+
+  # Acknowledgement based suppression
+  - name: "acknowledged-alerts"
+    condition: |
+      alert_state == "acknowledged"
+    affected_alerts:
+      - all
+    duration: 1h
+
+# Mute schedules
+mute_schedules:
+  - name: "weekly-maintenance"
+    time_intervals:
+      - time_range: "saturday 22:00 - sunday 06:00"
+        weekdays: ['saturday']
+      - time_range: "sunday 00:00 - sunday 06:00"
+        weekdays: ['sunday']
+
+  - name: "holiday-mode"
+    time_intervals:
+      - dates: ['2024-12-25', '2024-12-26', '2024-01-01']
+```
+
+### 6. Incident Response
+
+Structured incident handling.
+
+```typescript
+// Incident management
+interface Incident {
+    id: string;
+    title: string;
+    severity: 'P1' | 'P2' | 'P3' | 'P4';
+    status: 'triggered' | 'acknowledged' | 'resolved';
+    createdAt: Date;
+    acknowledgedAt?: Date;
+    resolvedAt?: Date;
+    assignee?: string;
+    alerts: string[];
+    runbook?: string;
+    timeline: IncidentEvent[];
+}
+
+class IncidentManager {
+    async createIncident(alert: Alert): Promise<Incident> {
+        const incident: Incident = {
+            id: generateIncidentId(),
+            title: alert.annotations.summary,
+            severity: this.mapSeverity(alert.labels.severity),
+            status: 'triggered',
+            createdAt: new Date(),
+            alerts: [alert.fingerprint],
+            runbook: alert.annotations.runbook_url,
+            timeline: [{
+                timestamp: new Date(),
+                event: 'incident_created',
+                details: alert
+            }]
+        };
+
+        await this.incidentStore.save(incident);
+
+        // Auto-assign based on routing
+        await this.autoAssign(incident);
+
+        // Send notifications
+        await this.notify(incident);
+
+        return incident;
+    }
+
+    async acknowledge(incidentId: string, user: string): Promise<void> {
+        const incident = await this.incidentStore.findById(incidentId);
+        incident.status = 'acknowledged';
+        incident.acknowledgedAt = new Date();
+        incident.assignee = user;
+        incident.timeline.push({
+            timestamp: new Date(),
+            event: 'incident_acknowledged',
+            details: { user }
+        });
+
+        await this.incidentStore.save(incident);
+
+        // Update PagerDuty
+        await this.pagerduty.acknowledge(incidentId);
+    }
+
+    async resolve(incidentId: string, user: string, resolution: string): Promise<void> {
+        const incident = await this.incidentStore.findById(incidentId);
+        incident.status = 'resolved';
+        incident.resolvedAt = new Date();
+        incident.timeline.push({
+            timestamp: new Date(),
+            event: 'incident_resolved',
+            details: { user, resolution }
+        });
+
+        await this.incidentStore.save(incident);
+
+        // Send resolution notification
+        await this.notifyResolution(incident);
+
+        // Close PagerDuty
+        await this.pagerduty.resolve(incidentId);
+    }
+}
+```
+
+### 7. Alert Tuning
+
+Reduce noise và improve signal.
+
+```yaml
+# Alert tuning process
+tuning_guidelines:
+  # Too many alerts?
+  - check: "Alert frequency > 10/day"
+    action: "Review if alerts are actionable"
+    possible_issues:
+      - "Thresholds too sensitive"
+      - "Missing for: clause"
+      - "No aggregation"
+
+  # Too few alerts?
+  - check: "No alerts for days"
+    action: "Review coverage"
+    possible_gaps:
+      - "Missing SLO-based alerts"
+      - "No capacity alerts"
+      - "Missing dependency alerts"
+
+# Common tuning adjustments
+tuning_examples:
+  # Add for clause to prevent flapping
+  - before: "alert: HighErrorRate\n  expr: error_rate > 0.01"
+    after: "alert: HighErrorRate\n  expr: error_rate > 0.01\n  for: 5m"
+
+  # Aggregate to reduce noise
+  - before: "alert: HighErrorRate\n  expr: error_rate{instance=~'.+'}"
+    after: "alert: HighErrorRate\n  expr: avg(error_rate) by (service) > 0.01"
+
+  # Add severity-appropriate thresholds
+  - before: "alert: HighLatency\n  expr: latency > 500"
+    after: |
+      alert: HighLatencyWarning
+        expr: latency > 500
+        for: 5m
+        labels: { severity: warning }
+      alert: HighLatencyCritical
+        expr: latency > 2000
+        for: 2m
+        labels: { severity: critical }
+```
+
+### 8. Runbooks
+
+Documentation for alert response.
+
+```yaml
+# Runbook structure
+runbook_template: |
+  # {{ .AlertName }}
+
+  ## Summary
+  {{ .AlertDescription }}
+
+  ## Severity
+  {{ .Severity }}
+
+  ## Impact
+  - What is affected?
+  - Who is impacted?
+  - What is the user-visible symptom?
+
+  ## Immediate Actions
+  1. Check dashboards: [link]
+  2. Verify if this is a real issue
+  3. Check recent deployments
+  4. Identify affected components
+
+  ## Troubleshooting Steps
+  ```bash
+  # Check pod status
+  kubectl get pods -n {{ .Namespace }}
+
+  # Check pod logs
+  kubectl logs -n {{ .Namespace }} {{ .PodName }}
+
+  # Check recent events
+  kubectl describe pod -n {{ .Namespace }} {{ .PodName }}
+  ```
+
+  ## Possible Causes
+  - High traffic
+  - Memory leak
+  - Database slow queries
+  - External dependency failure
+
+  ## Remediation Steps
+  1. Scale up if capacity issue
+  2. Restart pods if transient issue
+  3. Rollback if deployment-related
+  4. Engage relevant team
+
+  ## Escalation
+  - Primary: {{ .TeamSlack }}
+  - Secondary: {{ .OnCall }}
+```
+
+### 9. On-Call Rotation
+
+Effective on-call practices.
+
+```yaml
+# On-call schedule
+oncall:
+  schedule:
+    rotation_type: weekly
+    handoff_time: "09:00 UTC"
+    participants:
+      - name: Alice
+        email: alice@example.com
+      - name: Bob
+        email: bob@example.com
+      - name: Charlie
+        email: charlie@example.com
+
+  rotations:
+    - name: primary
+      current: alice
+      schedule: weekly
+      escalation_delay: 30m
+
+    - name: secondary
+      current: bob
+      schedule: weekly
+      escalation_delay: 1h
+
+  escalation:
+    - level: 1
+      timeout: 30m
+      contacts: [primary_oncall]
+    - level: 2
+      timeout: 1h
+      contacts: [secondary_oncall, team_lead]
+    - level: 3
+      contacts: [engineering_manager, vp_engineering]
+
+  policies:
+    max_hours_per_week: 40
+    min_days_between_shifts: 7
+    compensation:
+      on_call_stipend: $100/day
+      incident_response: $50/incident
+```
+
+### 10. Alert Metrics
+
+Track alerting health.
+
+```yaml
+# Alert effectiveness metrics
+alert_metrics:
+  # Volume metrics
+  - name: "alerts_total"
+    query: sum(rate(alerts_total[5m]))
+    description: "Rate of alerts firing"
+
+  - name: "alerts_by_severity"
+    query: sum by (severity) (rate(alerts_total[5m]))
+    description: "Alerts by severity level"
+
+  # Quality metrics
+  - name: "alert_noise_ratio"
+    query: |
+      sum(rate(alerts_resolved_without_action[5m]))
+      / sum(rate(alerts_total[5m]))
+    description: "Ratio of noise alerts"
+
+  - name: "mean_time_to_acknowledge"
+    query: |
+      avg by (alertname) (
+        rate(alert_acknowledge_duration_seconds_sum[1h])
+        / rate(alert_acknowledge_duration_seconds_count[1h])
+      )
+    description: "Average time to acknowledge"
+
+  - name: "mean_time_to_resolve"
+    query: |
+      avg by (alertname) (
+        rate(incident_duration_seconds_sum[1h])
+        / rate(incident_duration_seconds_count[1h])
+      )
+    description: "Average time to resolve"
+
+  # SLO metrics
+  - name: "error_budget_remaining"
+    query: slo:error-budget-remaining:ratio
+    description: "Remaining error budget"
+
+  - name: "burn_rate"
+    query: slo:current-burn-rate:ratio
+    description: "Current error budget burn rate"
+```
+
+## Checklist
+
+- [ ] Define alert severity levels
+- [ ] Create alerting rules
+- [ ] Set up SLO-based alerts
+- [ ] Configure alert routing
+- [ ] Implement alert suppression
+- [ ] Create runbooks
+- [ ] Set up on-call rotation
+- [ ] Define escalation policies
+- [ ] Track alert metrics
+- [ ] Tune alerts regularly
+- [ ] Document incident procedures
+- [ ] Train on-call engineers
+
+## Anti Patterns
+
+### 1. Alerting Everything
+
+```yaml
+# Không nên - too many alerts
+alert: EverythingIsAnAlert
+  expr: up == 1  # Fires constantly!
+```
+
+### 2. No Thresholds
+
+```yaml
+# Không nên - no context
+alert: HighCPU
+  expr: node_cpu_usage > 0
+```
+
+### 3. No Severity
+
+```yaml
+# Không nên - all alerts same severity
+alert: SomeAlert
+  expr: some_metric > threshold
+# No labels for severity!
+```
+
+## Liên kết
+
+- [Alertmanager Documentation](https://prometheus.io/docs/alerting/latest/alertmanager/)
+- [PagerDuty Best Practices](https://www.pagerduty.com/resources/learn/alert-management/)
+- [SRE Alerting Practices](https://sre.google/sre-book/monitoring-distributed-systems/)
+- Observability: `.cursor/rules/observability.mdc`
+- Monitoring: `.cursor/rules/monitoring.mdc`

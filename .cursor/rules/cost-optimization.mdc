@@ -1,256 +1,809 @@
 ---
-description: Nguyên tắc Cost Optimization cho cloud resources và infrastructure
+description: Nguyên tắc và best practices cho Cost Optimization trong Cursor Enterprise Framework
 created: 2026-06-23
 version: 1.0.0
-tags: [cost, optimization, cloud, aws, azure, gcp, enterprise]
+tags: [cost, optimization, cloud, aws, gcp, azure]
 ---
 
 # Cost Optimization
 
 ## Mục tiêu
 
-Cost Optimization là quá trình liên tục giám sát, phân tích, và cải thiện việc sử dụng cloud resources để đạt được hiệu quả chi phí tối đa mà không ảnh hưởng đến performance và reliability. Trong Cursor Enterprise Framework, Cost Optimization rule định nghĩa các nguyên tắc và best practices cho việc quản lý chi phí cloud một cách chủ động, từ architecture design đến day-to-day operations. Mục tiêu là giúp teams reduce costs mà vẫn maintain required service levels.
+Cost Optimization là quá trình reduce chi phí infrastructure và operations trong khi vẫn maintain performance và reliability. Trong Cursor Enterprise Framework, cost optimization không phải là cutting corners mà là làm cho systems efficient hơn và sử dụng resources một cách thông minh hơn. Mục tiêu của rule này là hướng dẫn developers và operators trong việc identify opportunities cho cost savings, implement optimizations, và maintain visibility vào chi phí.
 
-Cloud costs có thể spiral out of control nếu không được quản lý chủ động. Một application có thể chạy được nhưng với chi phí cao hơn mức cần thiết. Rule này cover cost visibility, resource optimization, pricing models, và governance processes.
+Cloud costs có thể spiral out of control nếu không được monitor và optimize. Tuy nhiên, cost optimization không nên compromise reliability hoặc performance. Rule này cover strategies cho compute, storage, networking, và data costs.
 
 ## Nguyên tắc
 
 **1. Cost Visibility**
 
-Tag all resources for attribution. Cost allocation by team, project, environment. Budget alerts và notifications. Regular cost reviews. Cost dashboards. Trend analysis. Anomaly detection.
+Track costs by service. Monitor by tenant if multi-tenant. Use cost allocation tags. Set up budget alerts. Regular cost reviews.
 
 **2. Right-Sizing**
 
-Right-size compute resources. Analyze utilization metrics. Scale down over-provisioned. Use burstable instances appropriately. Review regularly. Automate recommendations.
+Use appropriate instance sizes. Don't over-provision. Monitor utilization. Right-size regularly. Use auto-scaling.
 
-**3. Reserved Capacity**
+**3. Resource Optimization**
 
-Purchase reserved instances for steady-state. Convertible vs standard. 1-year vs 3-year terms. Analyze utilization before purchase. Savings plans options. Balance commitment vs flexibility.
+Delete unused resources. Stop idle resources. Use spot/preemptible instances. Schedule non-production. Use serverless when appropriate.
 
-**4. Auto-Scaling**
+**4. Storage Optimization**
 
-Implement auto-scaling policies. Scale based on metrics. Use predictive scaling. Scale down during low traffic. Avoid scaling thrashing. Test scaling policies.
+Use appropriate storage classes. Implement lifecycle policies. Compress data. Delete old data. Use caching.
 
-**5. Resource Scheduling**
+**5. Data Transfer Optimization**
 
-Schedule non-production resources. Dev/test environments. Batch processing jobs. Spot/preemptible for fault-tolerant. Scheduled start/stop. Cost allocation.
+Minimize data transfer. Use CDN. Compress in transit. Cache responses. Optimize API calls.
 
-**6. Storage Optimization**
+**6. Pricing Model Selection**
 
-Choose appropriate storage classes. Lifecycle policies. Delete unused data. Archive old data. Compression. Data transfer costs.
+Use reserved instances for steady loads. Use spot for fault-tolerant. Use on-demand for spikes. Consider savings plans. Evaluate pricing models.
 
-**7. Networking Optimization**
+**7. Architecture Optimization**
 
-Minimize data transfer. Use VPC endpoints. CDN for static assets. Cache aggressively. Data compression. Regional affinity.
+Design for cost. Use managed services. Implement caching. Use event-driven. Microservices vs monolith cost.
 
-**8. Serverless Efficiency**
+**8. Automation**
 
-Use serverless for variable workloads. Pay per invocation. Optimize function memory. Cold start optimization. Batch invocations. Architecture for cost.
+Automate resource management. Implement schedules. Auto-scale based on demand. Delete old resources. Cost-aware CI/CD.
 
-**9. Database Optimization**
+**9. FinOps Practices**
 
-Right-size database instances. Connection pooling. Read replicas for read-heavy. Auto-scaling databases. Reserved capacity. Query optimization.
+Involve finance in cost decisions. Chargeback/showback to teams. Set cost targets. Regular optimization reviews. Cost as a feature.
 
-**10. FinOps Practices**
+**10. Continuous Improvement**
 
-Embed cost in design decisions. Cost-aware architecture. Showback/chargeback. Cost optimization culture. Regular optimization reviews. Engineer accountability.
+Monitor cost trends. Identify anomalies. Test optimization strategies. Iterate improvements. Share learnings.
 
 ## Checklist
 
-- [ ] Tagging strategy implemented
 - [ ] Cost monitoring set up
 - [ ] Budget alerts configured
-- [ ] Rightsizing recommendations reviewed
-- [ ] Reserved capacity planned
+- [ ] Resources right-sized
+- [ ] Unused resources cleaned up
+- [ ] Storage lifecycle policies configured
+- [ ] Reserved/savings plans evaluated
 - [ ] Auto-scaling implemented
-- [ ] Resource scheduling configured
-- [ ] Storage lifecycle policies set
-- [ ] Networking costs optimized
-- [ ] FinOps process established
-- [ ] Regular reviews scheduled
-- [ ] Documentation complete
+- [ ] Cost allocation tags added
+- [ ] Regular cost reviews scheduled
+- [ ] Cost optimization automation in place
 
 ## Anti Pattern
 
-**1. No Resource Tagging**
+**1. Over-Provisioning**
 
-Untagged resources. Can't attribute costs. Wasted spend. Solution: Enforce tagging policy.
+Provisioning more than needed. Wasted resources. High costs. Right-size based on actual usage.
 
-**2. Over-Provisioning**
+**2. Ignoring Idle Resources**
 
-Always using largest instances. Paying for unused capacity. Solution: Monitor utilization, right-size.
+Resources running 24/7 unnecessarily. Development environments running when not in use. Test environments not cleaned up.
 
-**3. Ignoring Data Transfer**
+**3. Not Using Reserved Capacity**
 
-Data egress costs. Cross-region traffic. CDN not used. Solution: Architect for minimal transfer.
+Using all on-demand. Missing savings. Commit to steady workloads. Use reserved instances.
 
-**4. No Budget Alerts**
+**4. Inefficient Data Transfer**
 
-Costs spike without awareness. Budget overruns. Solution: Set budget alerts.
+Large data transfers. No compression. Multiple unnecessary API calls. Minimize transfer costs.
+
+**5. No Cost Accountability**
+
+No visibility into cost by team. No cost targets. No accountability. Implement chargeback.
 
 ## Best Practice
 
-**1. Cost Allocation**
+**1. Cost Monitoring Dashboard**
 
 ```typescript
-// Cost tagging for AWS resources
-const tagSpecification = {
-  ResourceType: 'instance',
-  Tags: [
-    { Key: 'Environment', Value: process.env.ENV },
-    { Key: 'Team', Value: 'platform' },
-    { Key: 'Project', Value: 'backend-api' },
-    { Key: 'CostCenter', Value: 'engineering' }
-  ]
-};
-
-// Azure tags
-const azureTags = {
-  environment: process.env.ENV,
-  team: 'platform',
-  project: 'backend-api',
-  costCenter: 'engineering'
-};
-
-// GCP labels
-const gcpLabels = {
-  environment: process.env.ENV,
-  team: 'platform',
-  project: 'backend-api',
-  cost_center: 'engineering'
-};
-```
-
-**2. Budget Alerts**
-
-```typescript
-// AWS Budget setup
-async function setupBudgetAlerts(tenantId: string) {
-  const budgetAmount = getTenantBudget(tenantId);
-  
-  await aws.budgets.createBudget({
-    AccountId: process.env.AWS_ACCOUNT_ID,
-    Budget: {
-      BudgetName: `${tenantId}-monthly`,
-      BudgetType: 'COST',
-      TimeUnit: 'MONTHLY',
-      BudgetLimit: {
-        Amount: budgetAmount.toString(),
-        Unit: 'USD'
-      },
-      CostFilters: {
-        TagKeyValue: [
-          `$${tenants:${tenantId}}`
-        ]
-      }
-    },
-    NotificationsWithSubscribers: [
-      {
-        Notification: {
-          NotificationType: 'ACTUAL',
-          ComparisonOperator: 'GREATER_THAN',
-          Threshold: 80
-        },
-        Subscribers: [
-          {
-            SubscriptionType: 'EMAIL',
-            Address: getTenantBillingEmail(tenantId)
-          }
-        ]
-      }
-    ]
-  });
+// services/cost-monitoring.service.ts
+interface CostBreakdown {
+  service: string;
+  cost: number;
+  trend: 'up' | 'down' | 'stable';
+  percentageOfTotal: number;
 }
-```
 
-**3. Cost Dashboard Query**
-
-```typescript
-async function getCostBreakdown(
-  startDate: Date,
-  endDate: Date
-): Promise<CostReport> {
-  const query = `
-    SELECT 
-      service,
-      SUM(cost) as total_cost,
-      SUM(usage_quantity) as total_usage,
-      AVG(unit_cost) as avg_unit_cost
-    FROM costs
-    WHERE date BETWEEN $1 AND $2
-      AND tag_team = $3
-    GROUP BY service
-    ORDER BY total_cost DESC
-  `;
-  
-  const results = await db.query(query, [startDate, endDate, currentTeam]);
-  
-  // Calculate trends
-  const previousPeriod = calculatePreviousPeriod(startDate, endDate);
-  const previousCosts = await getCosts(previousPeriod.start, previousPeriod.end);
-  
-  return {
-    period: { start: startDate, end: endDate },
-    breakdown: results.rows,
-    trends: calculateTrends(results.rows, previousCosts),
-    budget: await getBudgetStatus()
-  };
+interface BudgetAlert {
+  id: string;
+  name: string;
+  threshold: number;
+  currentSpend: number;
+  percentage: number;
 }
-```
 
-**4. Reserved Capacity Calculator**
+class CostMonitoringService {
+  constructor(
+    private cloudCostProvider: CloudCostProvider,
+    private alertService: AlertService
+  ) {}
 
-```typescript
-async function analyzeReservedCapacity(): Promise<ReservedRecommendation[]> {
-  const onDemandInstances = await getRunningInstances();
-  const utilization = await analyzeUtilization(onDemandInstances);
-  
-  const recommendations: ReservedRecommendation[] = [];
-  
-  for (const instance of utilization) {
-    if (instance.utilizationPercent > 70 && instance.uptimePercent > 90) {
-      // Good candidate for reservation
-      const onDemandCost = calculateOnDemandCost(instance);
-      const reservedCost = calculateReservedCost(instance);
-      const savings = onDemandCost - reservedCost;
-      
-      recommendations.push({
-        instanceType: instance.type,
-        quantity: instance.count,
-        currentUtilization: instance.utilizationPercent,
-        estimatedMonthlySavings: savings / 12,
-        reservationTerm: '1y',
-        paymentOption: 'No Upfront'
+  async getCostBreakdown(
+    startDate: Date,
+    endDate: Date,
+    granularity: 'daily' | 'monthly' = 'daily'
+  ): Promise<CostBreakdown[]> {
+    const costs = await this.cloudCostProvider.getCosts(startDate, endDate, granularity);
+    
+    // Group by service
+    const grouped = new Map<string, number>();
+    for (const cost of costs) {
+      const current = grouped.get(cost.service) || 0;
+      grouped.set(cost.service, current + cost.amount);
+    }
+
+    const totalCost = Array.from(grouped.values()).reduce((sum, c) => sum + c, 0);
+
+    // Calculate percentages and trends
+    const breakdown: CostBreakdown[] = [];
+    for (const [service, cost] of grouped) {
+      breakdown.push({
+        service,
+        cost,
+        trend: await this.calculateTrend(service, startDate, endDate),
+        percentageOfTotal: (cost / totalCost) * 100
       });
     }
+
+    return breakdown.sort((a, b) => b.cost - a.cost);
   }
-  
-  return recommendations.sort((a, b) => b.estimatedMonthlySavings - a.estimatedMonthlySavings);
+
+  async getBudgetStatus(): Promise<BudgetAlert[]> {
+    const budgets = await this.getActiveBudgets();
+    const currentSpend = await this.getCurrentMonthSpend();
+
+    return budgets.map(budget => {
+      const percentage = (currentSpend / budget.threshold) * 100;
+      
+      return {
+        id: budget.id,
+        name: budget.name,
+        threshold: budget.threshold,
+        currentSpend,
+        percentage
+      };
+    });
+  }
+
+  async checkBudgetAlerts(): Promise<void> {
+    const statuses = await this.getBudgetStatus();
+
+    for (const status of statuses) {
+      if (status.percentage >= 80) {
+        await this.alertService.sendAlert({
+          type: 'cost_warning',
+          severity: status.percentage >= 100 ? 'critical' : 'warning',
+          message: `${status.name} is at ${status.percentage.toFixed(1)}% of budget`,
+          metadata: status
+        });
+      }
+    }
+  }
+
+  async getCostByTenant(tenantId: string): Promise<TenantCost> {
+    const tags = await this.cloudCostProvider.getResourceTags(tenantId);
+    const costs = await this.cloudCostProvider.getCostsByTags(tags);
+
+    return {
+      tenantId,
+      totalCost: costs.reduce((sum, c) => sum + c.amount, 0),
+      byService: this.groupCostsByService(costs),
+      byResource: this.groupCostsByResource(costs)
+    };
+  }
+
+  async getCostAnomalies(): Promise<Anomaly[]> {
+    const baseline = await this.calculateBaseline();
+    const current = await this.getCurrentCosts();
+
+    const anomalies: Anomaly[] = [];
+    
+    for (const [service, amount] of Object.entries(current)) {
+      const baselineAmount = baseline[service] || 0;
+      const change = ((amount - baselineAmount) / baselineAmount) * 100;
+      
+      if (Math.abs(change) > 20) { // 20% deviation threshold
+        anomalies.push({
+          service,
+          expected: baselineAmount,
+          actual: amount,
+          change,
+          direction: change > 0 ? 'increase' : 'decrease'
+        });
+      }
+    }
+
+    return anomalies;
+  }
+}
+```
+
+**2. Resource Right-Sizing Analysis**
+
+```typescript
+// services/right-sizing.service.ts
+interface RightSizingRecommendation {
+  resourceId: string;
+  resourceType: string;
+  currentSize: string;
+  recommendedSize: string;
+  estimatedSavings: number;
+  confidence: 'high' | 'medium' | 'low';
+  reason: string;
+}
+
+class RightSizingService {
+  constructor(
+    private cloudProvider: CloudProvider,
+    private metricsProvider: MetricsProvider
+  ) {}
+
+  async analyzeRecommendations(): Promise<RightSizingRecommendation[]> {
+    const resources = await this.cloudProvider.getComputResources();
+    const recommendations: RightSizingRecommendation[] = [];
+
+    for (const resource of resources) {
+      const utilization = await this.getResourceUtilization(resource.id);
+      const recommendation = this.evaluateResource(resource, utilization);
+      
+      if (recommendation) {
+        recommendations.push(recommendation);
+      }
+    }
+
+    return recommendations.sort((a, b) => b.estimatedSavings - a.estimatedSavings);
+  }
+
+  private async getResourceUtilization(resourceId: string): Promise<ResourceUtilization> {
+    const metrics = await this.metricsProvider.getMetrics(resourceId, {
+      period: '7d',
+      interval: '1h'
+    });
+
+    return {
+      cpu: this.calculatePercentile(metrics.cpu, 95),
+      memory: this.calculatePercentile(metrics.memory, 95),
+      networkIn: this.calculateAverage(metrics.networkIn),
+      networkOut: this.calculateAverage(metrics.networkOut)
+    };
+  }
+
+  private evaluateResource(
+    resource: ComputeResource,
+    utilization: ResourceUtilization
+  ): RightSizingRecommendation | null {
+    const currentSpec = this.getInstanceSpec(resource.type);
+    
+    // Check if under-utilized
+    if (utilization.cpu < 20 && utilization.memory < 40) {
+      const smallerInstance = this.findSmallerInstance(resource.type);
+      
+      if (smallerInstance && this.estimateSavings(resource.type, smallerInstance) > 10) {
+        return {
+          resourceId: resource.id,
+          resourceType: resource.type,
+          currentSize: currentSpec.vcpu + ' vCPU, ' + currentSpec.memory + ' GB',
+          recommendedSize: smallerInstance.vcpu + ' vCPU, ' + smallerInstance.memory + ' GB',
+          estimatedSavings: this.estimateSavings(resource.type, smallerInstance),
+          confidence: utilization.cpu < 10 ? 'high' : 'medium',
+          reason: 'CPU utilization under 20% for past 7 days'
+        };
+      }
+    }
+
+    // Check if over-provisioned in memory
+    if (utilization.memory < 30 && currentSpec.memory > 8) {
+      const optimizedInstance = this.findMemoryOptimizedInstance(resource.type);
+      
+      if (optimizedInstance) {
+        return {
+          resourceId: resource.id,
+          resourceType: resource.type,
+          currentSize: currentSpec.vcpu + ' vCPU, ' + currentSpec.memory + ' GB',
+          recommendedSize: optimizedInstance.vcpu + ' vCPU, ' + optimizedInstance.memory + ' GB',
+          estimatedSavings: this.estimateSavings(resource.type, optimizedInstance),
+          confidence: 'medium',
+          reason: 'Memory utilization under 30%'
+        };
+      }
+    }
+
+    return null;
+  }
+
+  async applyRecommendation(recommendation: RightSizingRecommendation): Promise<void> {
+    // Validate recommendation
+    if (recommendation.confidence !== 'high') {
+      throw new ValidationError('Cannot apply medium/low confidence recommendations without review');
+    }
+
+    // Create backup/snapshot
+    await this.createBackup(recommendation.resourceId);
+
+    // Resize instance
+    await this.cloudProvider.resizeInstance(
+      recommendation.resourceId,
+      recommendation.recommendedSize
+    );
+
+    // Monitor after resize
+    await this.schedulePostResizeMonitoring(recommendation.resourceId);
+  }
+}
+```
+
+**3. Scheduled Resource Management**
+
+```typescript
+// services/scheduled-resource.service.ts
+interface Schedule {
+  id: string;
+  resourcePattern: string;
+  schedule: {
+    timezone: string;
+    stopTime: string; // e.g., "20:00"
+    startTime: string; // e.g., "08:00"
+    daysOfWeek: number[]; // 0-6, Sunday = 0
+  };
+  excludeDates?: Date[];
+}
+
+class ScheduledResourceService {
+  constructor(
+    private cloudProvider: CloudProvider,
+    private scheduler: CronService
+  ) {}
+
+  async createSchedule(schedule: Schedule): Promise<void> {
+    // Validate schedule
+    this.validateSchedule(schedule);
+
+    // Find matching resources
+    const resources = await this.findResourcesByPattern(schedule.resourcePattern);
+    
+    // Create scheduler job
+    await this.scheduler.createJob({
+      name: `schedule-${schedule.id}`,
+      cron: this.buildCronExpression(schedule.schedule),
+      handler: async () => {
+        await this.executeSchedule(schedule);
+      }
+    });
+
+    // Store schedule
+    await this.scheduleRepository.create(schedule);
+  }
+
+  private async executeSchedule(schedule: Schedule): Promise<void> {
+    const now = new Date();
+    
+    // Check if should be running
+    const shouldRun = this.shouldResourceBeRunning(now, schedule);
+    const resources = await this.findResourcesByPattern(schedule.resourcePattern);
+
+    for (const resource of resources) {
+      const isRunning = await this.isResourceRunning(resource.id);
+      
+      if (shouldRun && !isRunning) {
+        await this.startResource(resource);
+        await this.logAction('start', resource.id);
+      } else if (!shouldRun && isRunning) {
+        await this.stopResource(resource);
+        await this.logAction('stop', resource.id);
+      }
+    }
+  }
+
+  private shouldResourceBeRunning(time: Date, schedule: Schedule): boolean {
+    const dayOfWeek = time.getDay();
+    const timeStr = time.toTimeString().slice(0, 5); // HH:mm
+    
+    // Check if today is in schedule
+    if (!schedule.schedule.daysOfWeek.includes(dayOfWeek)) {
+      return false;
+    }
+
+    // Check if within active hours
+    const currentMinutes = this.timeToMinutes(timeStr);
+    const startMinutes = this.timeToMinutes(schedule.schedule.startTime);
+    const stopMinutes = this.timeToMinutes(schedule.schedule.stopTime);
+
+    return currentMinutes >= startMinutes && currentMinutes < stopMinutes;
+  }
+
+  async estimateSavings(): Promise<{
+    currentMonthlyCost: number;
+    scheduledMonthlyCost: number;
+    estimatedSavings: number;
+    percentageSaved: number;
+  }> {
+    const schedules = await this.scheduleRepository.findAll();
+    let currentCost = 0;
+    let scheduledCost = 0;
+
+    for (const schedule of schedules) {
+      const resources = await this.findResourcesByPattern(schedule.resourcePattern);
+      
+      for (const resource of resources) {
+        const hourlyCost = await this.getHourlyCost(resource);
+        const hoursPerWeek = this.calculateScheduledHours(schedule.schedule);
+        
+        currentCost += hourlyCost * 24 * 7; // 24/7
+        scheduledCost += hourlyCost * hoursPerWeek;
+      }
+    }
+
+    const monthlyMultiplier = 4.33; // Average weeks per month
+
+    return {
+      currentMonthlyCost: currentCost * monthlyMultiplier,
+      scheduledMonthlyCost: scheduledCost * monthlyMultiplier,
+      estimatedSavings: (currentCost - scheduledCost) * monthlyMultiplier,
+      percentageSaved: ((currentCost - scheduledCost) / currentCost) * 100
+    };
+  }
+}
+```
+
+**4. Reserved Instance Planning**
+
+```typescript
+// services/reserved-capacity.service.ts
+interface ReservedCapacityRecommendation {
+  resourceType: string;
+  currentOnDemand: number;
+  recommendedReserved: number;
+  recommendedTerm: '1year' | '3year';
+  paymentOption: 'all_upfront' | 'partial_upfront' | 'no_upfront';
+  estimatedMonthlySavings: number;
+  estimatedAnnualSavings: number;
+}
+
+class ReservedCapacityPlanningService {
+  constructor(
+    private cloudProvider: CloudProvider,
+    private costProvider: CloudCostProvider
+  ) {}
+
+  async analyzeReservedCapacity(): Promise<ReservedCapacityRecommendation[]> {
+    const usage = await this.getResourceUsage();
+    const recommendations: ReservedCapacityRecommendation[] = [];
+
+    for (const [instanceType, usageData] of Object.entries(usage)) {
+      const utilizationHours = usageData.hoursPerMonth;
+      const maxInstances = usageData.maxConcurrent;
+      
+      // Only recommend if consistently high usage
+      if (utilizationHours < 600) { // Less than ~80% of month
+        continue;
+      }
+
+      // Find optimal reserved quantity
+      const recommendedQuantity = this.calculateOptimalReserved(
+        maxInstances,
+        utilizationHours,
+        730 // hours per month
+      );
+
+      if (recommendedQuantity > 0) {
+        const pricing = await this.getReservedPricing(instanceType);
+        const onDemandPricing = await this.getOnDemandPricing(instanceType);
+        
+        const monthlyOnDemandCost = maxInstances * onDemandPricing.hourlyRate * 730;
+        const monthlyReservedCost = recommendedQuantity * pricing.hourlyRate * 730 +
+          (pricing.upfrontCost / 12); // For partial upfront
+
+        recommendations.push({
+          resourceType: instanceType,
+          currentOnDemand: maxInstances,
+          recommendedReserved: recommendedQuantity,
+          recommendedTerm: pricing.oneYearRate < pricing.threeYearRate * 0.7 ? '1year' : '3year',
+          paymentOption: 'partial_upfront',
+          estimatedMonthlySavings: monthlyOnDemandCost - monthlyReservedCost,
+          estimatedAnnualSavings: (monthlyOnDemandCost - monthlyReservedCost) * 12
+        });
+      }
+    }
+
+    return recommendations.sort(
+      (a, b) => b.estimatedAnnualSavings - a.estimatedAnnualSavings
+    );
+  }
+
+  private calculateOptimalReserved(
+    maxConcurrent: number,
+    hoursUsed: number,
+    totalHours: number
+  ): number {
+    // Calculate utilization percentage
+    const utilizationRate = hoursUsed / totalHours;
+    
+    // Determine reserved capacity based on utilization
+    // If consistently at 70%+, reserve that amount
+    if (utilizationRate >= 0.7) {
+      return Math.ceil(maxConcurrent * utilizationRate);
+    }
+    
+    // If variable, reserve a portion
+    if (utilizationRate >= 0.4) {
+      return Math.ceil(maxConcurrent * 0.5);
+    }
+    
+    return 0;
+  }
+
+  async purchaseReservedCapacity(recommendation: ReservedCapacityRecommendation): Promise<void> {
+    const purchase = await this.cloudProvider.purchaseReservedInstances({
+      instanceType: recommendation.resourceType,
+      quantity: recommendation.recommendedReserved,
+      term: recommendation.recommendedTerm,
+      paymentOption: recommendation.paymentOption
+    });
+
+    await this.logReservedPurchase(purchase);
+  }
+}
+```
+
+**5. Storage Cost Optimization**
+
+```typescript
+// services/storage-optimization.service.ts
+interface StorageLifecycle {
+  bucket: string;
+  currentTier: string;
+  recommendedTier: string;
+  estimatedSavings: number;
+  objectsToMove: number;
+}
+
+class StorageOptimizationService {
+  constructor(
+    private cloudProvider: CloudProvider,
+    private storageProvider: StorageProvider
+  ) {}
+
+  async analyzeStorageLifecycle(): Promise<StorageLifecycle[]> {
+    const buckets = await this.storageProvider.listBuckets();
+    const recommendations: StorageLifecycle[] = [];
+
+    for (const bucket of buckets) {
+      const objects = await this.analyzeBucketObjects(bucket.name);
+      
+      for (const [tier, stats] of Object.entries(objects.byTier)) {
+        const recommendedTier = this.calculateOptimalTier(stats);
+        
+        if (recommendedTier !== tier) {
+          recommendations.push({
+            bucket: bucket.name,
+            currentTier: tier,
+            recommendedTier,
+            estimatedSavings: this.estimateTierSavings(tier, recommendedTier, stats.size),
+            objectsToMove: stats.count
+          });
+        }
+      }
+    }
+
+    return recommendations.sort((a, b) => b.estimatedSavings - a.estimatedSavings);
+  }
+
+  async configureLifecyclePolicies(bucket: string): Promise<void> {
+    await this.storageProvider.putLifecyclePolicy(bucket, {
+      rules: [
+        {
+          name: 'standard-to-infrequent',
+          prefix: '',
+          status: 'Enabled',
+          transition: {
+            days: 30,
+            storageClass: 'STANDARD_IA' // Infrequent Access
+          }
+        },
+        {
+          name: 'infrequent-to-glacier',
+          prefix: '',
+          status: 'Enabled',
+          transition: {
+            days: 90,
+            storageClass: 'GLACIER'
+          }
+        },
+        {
+          name: 'glacier-to-vault',
+          prefix: '',
+          status: 'Enabled',
+          transition: {
+            days: 365,
+            storageClass: 'DEEP_ARCHIVE'
+          }
+        },
+        {
+          name: 'abort-incomplete-uploads',
+          prefix: '',
+          status: 'Enabled',
+          abortIncompleteMultipartUpload: {
+            daysAfterInitiation: 7
+          }
+        },
+        {
+          name: 'delete-old-versions',
+          prefix: '',
+          status: 'Enabled',
+          noncurrentVersionTransition: {
+            days: 30,
+            storageClass: 'GLACIER'
+          },
+          noncurrentVersionExpiration: {
+            days: 365
+          }
+        }
+      ]
+    });
+  }
+
+  async deleteOrphanedResources(): Promise<{
+    snapshotsDeleted: number;
+    volumesDeleted: number;
+    estimatedSavings: number;
+  }> {
+    const orphanedSnapshots = await this.findOrphanedSnapshots();
+    const orphanedVolumes = await this.findOrphanedVolumes();
+
+    let savings = 0;
+
+    for (const snapshot of orphanedSnapshots) {
+      await this.storageProvider.deleteSnapshot(snapshot.id);
+      savings += snapshot.size * this.pricing.snapshotPerGB;
+    }
+
+    for (const volume of orphanedVolumes) {
+      await this.storageProvider.deleteVolume(volume.id);
+      savings += volume.size * this.pricing.volumePerGB;
+    }
+
+    return {
+      snapshotsDeleted: orphanedSnapshots.length,
+      volumesDeleted: orphanedVolumes.length,
+      estimatedSavings: savings
+    };
+  }
+}
+```
+
+**6. Data Transfer Optimization**
+
+```typescript
+// services/data-transfer-optimization.service.ts
+class DataTransferOptimizationService {
+  async analyzeTransferPatterns(): Promise<TransferAnalysis> {
+    const transfers = await this.getTransferMetrics();
+    
+    const byService = new Map<string, TransferStats>();
+    
+    for (const transfer of transfers) {
+      const current = byService.get(transfer.service) || {
+        totalGB: 0,
+        estimatedCost: 0,
+        patterns: []
+      };
+      
+      current.totalGB += transfer.bytes / (1024 * 1024 * 1024);
+      current.estimatedCost += this.estimateTransferCost(transfer);
+      current.patterns.push(transfer);
+      
+      byService.set(transfer.service, current);
+    }
+
+    return {
+      totalGB: Array.from(byService.values()).reduce((sum, s) => sum + s.totalGB, 0),
+      totalCost: Array.from(byService.values()).reduce((sum, s) => sum + s.estimatedCost, 0),
+      byService: Object.fromEntries(byService)
+    };
+  }
+
+  async optimizeAPICalls(): Promise<{
+    optimization: string;
+    estimatedSavings: number;
+  }[]> {
+    const apiCalls = await this.getAPICallPatterns();
+    const optimizations: Optimization[] = [];
+
+    // Identify batching opportunities
+    const batchingOpportunity = this.findBatchingOpportunities(apiCalls);
+    if (batchingOpportunity) {
+      optimizations.push({
+        optimization: `Batch ${batchingOpportunity.count} similar calls`,
+        estimatedSavings: batchingOpportunity.savings
+      });
+    }
+
+    // Identify caching opportunities
+    const cachingOpportunity = this.findCachingOpportunities(apiCalls);
+    if (cachingOpportunity) {
+      optimizations.push({
+        optimization: `Cache ${cachingOpportunity.count} responses`,
+        estimatedSavings: cachingOpportunity.savings
+      });
+    }
+
+    // Identify compression opportunities
+    const compressionOpportunity = await this.findCompressionOpportunities();
+    if (compressionOpportunity) {
+      optimizations.push({
+        optimization: 'Enable compression for large responses',
+        estimatedSavings: compressionOpportunity.savings
+      });
+    }
+
+    return optimizations;
+  }
+
+  async implementCDN(origin: string, paths: string[]): Promise<void> {
+    const cdn = await this.cloudProvider.createCDN({
+      origin,
+      paths,
+      cachingRules: [
+        {
+          path: '*.html',
+          ttl: 300,
+          behavior: 'cache'
+        },
+        {
+          path: '*.css',
+          ttl: 86400,
+          behavior: 'cache'
+        },
+        {
+          path: '*.js',
+          ttl: 86400,
+          behavior: 'cache'
+        },
+        {
+          path: '*.png',
+          ttl: 604800,
+          behavior: 'cache'
+        },
+        {
+          path: '*.json',
+          ttl: 3600,
+          behavior: 'cache'
+        }
+      ],
+      compression: true
+    });
+
+    await this.updateDNS(cdn.domain);
+  }
 }
 ```
 
 ## Workflow
 
-**Phase 1: Assessment**
+**Phase 1: Cost Visibility**
 
-Tag resources. Set up cost tracking. Identify current spend. Baseline metrics.
+Set up cost monitoring. Configure alerts. Tag resources. Establish baselines.
 
 **Phase 2: Analysis**
 
-Analyze utilization. Identify waste. Review pricing models. Get recommendations.
+Analyze current costs. Identify high-cost areas. Review utilization. Find patterns.
 
-**Phase 3: Implementation**
+**Phase 3: Optimization**
 
-Right-size resources. Implement scheduling. Purchase reservations. Optimize storage.
+Implement right-sizing. Configure lifecycle policies. Set up scheduling. Move to reserved capacity.
 
-**Phase 4: Monitoring**
+**Phase 4: Automation**
 
-Set up alerts. Regular reviews. Track savings. Continuous optimization.
+Automate cost controls. Set up auto-scaling. Implement cleanup jobs. Configure budgets.
+
+**Phase 5: Monitoring**
+
+Track savings. Monitor trends. Review alerts. Iterate improvements.
 
 ## Liên kết
 
-- [[aws]] - AWS: AWS cost optimization
-- [[azure]] - Azure: Azure cost optimization
-- [[gcp]] - GCP: GCP cost optimization
-- [[cloudflare]] - Cloudflare: CDN optimization
-- [[performance]] - Performance: Performance optimization
+- [[aws]] - AWS cost optimization
+- [[azure]] - Azure cost optimization
+- [[gcp]] - GCP cost optimization
+- [[cloudflare]] - CDN costs
+- [[database]] - Database cost optimization
+- [[monitoring]] - Cost monitoring

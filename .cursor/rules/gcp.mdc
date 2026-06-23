@@ -1,52 +1,624 @@
 ---
-description: Nguyên tắc và best practices cho Google Cloud Platform
+description: Nguyên tắc và best practices cho Google Cloud Platform trong Cursor Enterprise Framework
 created: 2026-06-23
 version: 1.0.0
-tags: [gcp, google, cloud, enterprise, deployment]
+tags: [gcp, google-cloud, cloud-run, gke, cloud-functions, bigquery]
 ---
 
 # GCP
 
 ## Mục tiêu
 
-Google Cloud Platform (GCP) là cloud platform cung cấp services cho computing, data, AI, và enterprise applications với focus trên data analytics, machine learning, và container-native development. Trong Cursor Enterprise Framework, GCP được sử dụng cho organizations cần strong data/ML capabilities, Kubernetes-native development (GKE), hoặc BigQuery cho data warehousing.
+Google Cloud Platform (GCP) là cloud platform với strengths đặc biệt trong data analytics, machine learning, và container-native workloads. Trong Cursor Enterprise Framework, GCP được sử dụng như một option với advantages trong BigQuery, Kubernetes (GKE), và serverless computing. Mục tiêu của rule này là hướng dẫn developers trong việc leverage GCP services hiệu quả.
+
+GCP's infrastructure built on Google's own global network cung cấp performance advantages cho many workloads. Understanding GCP-specific tools và best practices giúp maximize these benefits.
 
 ## Nguyên tắc
 
-**1. Resource Organization**
+**1. Project Organization**
 
-Projects. Folders. Organizations. Resource hierarchy. Naming conventions.
+Use projects for isolation. Folder hierarchy. Resource labels. Quota management.
 
-**2. Networking**
+**2. Identity and Access**
 
-VPC networks. Subnets. Firewall rules. Cloud Router. VPN. Private Google Access.
+Use Workload Identity. Service accounts carefully. Cloud IAM. Organization policies.
 
-**3. Compute**
+**3. Network Architecture**
 
-Compute Engine. GKE. Cloud Run. App Engine. Kubernetes Engine.
+Use VPC. Private Google Access. Cloud NAT. Shared VPCs. Firewall rules.
 
-**4. Storage**
+**4. Cloud Run for Serverless**
 
-Cloud Storage. Filestore. Persistent Disk. Bigtable.
+Prefer Cloud Run for containers. Fast scaling. Pay per use. No cluster management.
 
-**5. Data & Analytics**
+**5. GKE for Containers**
 
-BigQuery. Dataflow. Dataproc. Pub/Sub. BigQuery ML.
+Use GKE for complex workloads. Autopilot for managed. Standard for control. Anthos for hybrid.
 
-**6. AI & ML**
+**6. Data Services**
 
-Vertex AI. AutoML. TensorFlow on GCP. AI Platform.
+BigQuery for analytics. Cloud SQL for transactional. Firestore for NoSQL. Spanner for global.
 
-**7. Security**
+**7. Serverless Options**
 
-IAM. Cloud KMS. Security Command Center. Binary Authorization.
+Cloud Functions for simple tasks. Cloud Run for containers. App Engine for apps.
 
-**8. Monitoring**
+**8. Machine Learning**
 
-Cloud Monitoring. Cloud Logging. Cloud Trace. Cloud Profiler.
+Vertex AI for ML. AutoML for no-code. AI Platform for custom. Pre-trained APIs.
+
+**9. Operations Suite**
+
+Cloud Monitoring. Cloud Logging. Cloud Trace. Error Reporting. Debugger.
+
+**10. Cost Management**
+
+Committed use discounts. Sustained use discounts. Budget alerts. Labels for tracking.
+
+## Checklist
+
+- [ ] Project structure defined
+- [ ] VPC configured
+- [ ] IAM policies set
+- [ ] Cloud Run/GKE deployed
+- [ ] Database selected
+- [ ] Monitoring configured
+- [ ] Logging set up
+- [ ] Cost management enabled
+- [ ] Security controls implemented
+- [ ] Backup strategy planned
+
+## Anti Pattern
+
+**1. Default Project Usage**
+
+Using default project. No isolation. Security risks. Use dedicated projects.
+
+**2. Overly Permissive IAM**
+
+Editor or owner roles. Least privilege violated. Use specific roles.
+
+**3. No VPC**
+
+Resources in default VPC. Network security weak. Create custom VPC.
+
+**4. Manual Deployments**
+
+Manual infrastructure. Not repeatable. Use Infrastructure as Code.
+
+## Best Practice
+
+**1. Project Structure**
+
+```bash
+# Project naming: {env}-{product}-{number}
+# Example: prod-app-001, staging-app-001
+
+# Folder structure
+# organization/
+#   ├── departments/
+#   │   ├── engineering/
+#   │   │   ├── projects/
+#   │   │   │   ├── prod-app-001/
+#   │   │   │   └── staging-app-001/
+#   │   │   └── folders/
+#   │   └── data/
+#   │       └── projects/
+#   │           └── data-warehouse/
+```
+
+```yaml
+# terraform/project/main.tf
+resource "google_project" "app" {
+  project_id = "prod-app-001"
+  name       = "Production App"
+  org_id     = var.organization_id
+  
+  labels = {
+    environment = "production"
+    team        = "engineering"
+    cost-center = "app"
+  }
+}
+
+resource "google_project_iam_member" "devops" {
+  project = google_project.app.project_id
+  role    = "roles/owner"
+  member  = "user:devops@example.com"
+}
+
+resource "google_project_iam_binding" "compute_sa" {
+  project = google_project.app.project_id
+  role    = "roles/compute.admin"
+  members = [
+    "serviceAccount:${google_service_account.compute.email}"
+  ]
+}
+```
+
+**2. Cloud Run Configuration**
+
+```yaml
+# cloudrun/service.yaml
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: api-service
+  namespace: production
+  annotations:
+    run.googleapis.com/ingress: all
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
+        autoscaling.knative.dev/maxScale: "100"
+        run.googleapis.com/execution-environment: gen2
+        run.googleapis.com/launch-stage: GA
+    spec:
+      serviceAccountName: api-sa@project.iam.gserviceaccount.com
+      containerConcurrency: 80
+      timeoutSeconds: 300
+      containers:
+        - image: gcr.io/project-id/api-service:v1.0.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: DATABASE_URL
+              value: secret:projects/project-id/secrets/db-url:latest
+          resources:
+            limits:
+              cpu: "2"
+              memory: 1Gi
+            requests:
+              cpu: "1"
+              memory: 512Mi
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 30
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8080
+            periodSeconds: 10
+            failureThreshold: 3
+```
+
+```typescript
+// cloudrun/deploy.ts
+import { CloudRunClient } from '@google-cloud/run';
+
+const runClient = new CloudRunClient();
+
+async function deployService() {
+  const parent = `projects/${projectId}/locations/${region}`;
+  
+  await runClient.updateService({
+    service: {
+      name: `${parent}/services/api-service`,
+      template: {
+        containers: [
+          {
+            image: `gcr.io/${projectId}/api-service:${version}`,
+            ports: [{ containerPort: 8080 }],
+            env: [
+              { name: 'NODE_ENV', value: 'production' }
+            ],
+            resources: {
+              limits: {
+                cpu: '2',
+                memory: '1Gi'
+              }
+            }
+          }
+        ],
+        scaling: {
+          minInstanceCount: 1,
+          maxInstanceCount: 100
+        },
+        annotations: {
+          'autoscaling.knative.dev/minScale': '1',
+          'autoscaling.knative.dev/maxScale': '100'
+        }
+      },
+      traffic: [
+        { percent: 100, latestRevision: true }
+      ]
+    }
+  });
+}
+```
+
+**3. GKE Configuration**
+
+```yaml
+# gke/cluster.yaml
+apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerCluster
+metadata:
+  name: production-cluster
+  namespace: config-management-system
+spec:
+  location: us-central1
+  defaultMaxPodsConstraint:
+    maxPodsPerNode: "64"
+  loggingConfig:
+    componentConfig:
+      enableComponents:
+        - SYSTEM_COMPONENTS
+        - WORKLOADS
+  monitoringConfig:
+    componentConfig:
+      enableComponents:
+        - SYSTEM_COMPONENTS
+        - WORKLOADS
+  networkPolicy:
+    enabled: true
+    provider: CALICO
+  podDistributionPolicy:
+    type: Balanced
+    namespaceDrawerState:
+      enabled: true
+  releaseChannel:
+    channel: REGULAR
+  workloadIdentityConfig:
+    workloadPool: ${projectId}.svc.id.goog
+  addonsConfig:
+    gcePersistentDiskCsiDriverConfig:
+      enabled: true
+    configConnectorConfig:
+      enabled: true
+    gcpFilestoreCsiDriverConfig:
+      enabled: true
+    httpLoadBalancing:
+      disabled: false
+    networkPolicyConfig:
+      disabled: false
+  nodeConfig:
+    machineType: n2-standard-4
+    diskSizeGb: 100
+    diskType: pd-ssd
+    imageType: COS_CONTAINERD
+    shieldedInstanceConfig:
+      enableSecureBoot: true
+      enableIntegrityMonitoring: true
+    workloadMetadataConfig:
+      mode: GKE_METADATA
+  nodePools:
+    - name: general
+      config:
+        machineType: n2-standard-4
+        nodeCount: 3
+      autoscaling:
+        minNodeCount: 3
+        maxNodeCount: 10
+```
+
+**4. Cloud SQL Configuration**
+
+```yaml
+# gcp/cloudsql/instance.yaml
+apiVersion: sqladmin.cnrm.cloud.google.com/v1beta1
+kind: SQLInstance
+metadata:
+  name: production-db
+  namespace: production
+spec:
+  region: us-central1
+  databaseVersion: POSTGRES_15
+  tier: db-n1-standard-4
+  diskType: PD_SSD
+  diskSize: 100
+  dataDiskType: PD_SSD
+  storageAutoResize: true
+  storageAutoResizeLimit: 500
+  ipConfiguration:
+    ipv4Enabled: false
+    privateNetworkRef:
+      external: projects/project-id/global/networks/vpc
+    requireSsl: true
+    authorizedNetworks: []
+  backupConfiguration:
+    enabled: true
+    startTime: "03:00"
+    backupRetentionSettings:
+      retainedBackups: 7
+      retentionUnit: COUNT
+  maintenanceWindow:
+    day: SUNDAY
+    hour: 04
+    updateTrack: stable
+  insightsConfig:
+    queryInsightsEnabled: true
+    queryStringLength: 1024
+    recordApplicationTags: true
+    recordClientAddress: false
+  credentials:
+    Ref: cloudsql-credentials
+```
+
+**5. BigQuery Configuration**
+
+```typescript
+// gcp/bigquery/query.ts
+import { BigQuery } from '@google-cloud/bigquery';
+
+const bq = new BigQuery({
+  projectId: 'project-id',
+  location: 'US'
+});
+
+async function queryAnalytics() {
+  const query = `
+    SELECT
+      DATE_TRUNC(event_date, WEEK) as week,
+      COUNT(DISTINCT user_pseudo_id) as users,
+      COUNT(*) as events,
+      AVG(event_value) as avg_value
+    FROM
+      \`project.dataset.events_*\`
+    WHERE
+      _TABLE_SUFFIX BETWEEN
+        FORMAT_DATE('%Y%m%d', DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY))
+        AND FORMAT_DATE('%Y%m%d', DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY))
+    GROUP BY
+      week
+    ORDER BY
+      week
+  `;
+
+  const options = {
+    query,
+    location: 'US',
+    params: { threshold: 100 }
+  };
+
+  const [job] = await bq.createQueryJob(options);
+  const [rows] = await job.getQueryResults();
+  
+  return rows;
+}
+
+// Streaming insert
+async function streamEvents(events: AnalyticsEvent[]) {
+  const dataset = bq.dataset('events');
+  const table = dataset.table('realtime');
+
+  const rows = events.map(event => ({
+    user_id: event.userId,
+    event_type: event.type,
+    event_value: event.value,
+    timestamp: new Date().toISOString(),
+    properties: JSON.stringify(event.properties)
+  }));
+
+  await table.insert(rows);
+}
+
+// Scheduled query
+async function createScheduledQuery() {
+  await bq.createQueryJob({
+    query: `
+      CREATE OR REPLACE TABLE \`project.dataset.daily_aggregates\`
+      AS
+      SELECT
+        DATE(event_timestamp) as date,
+        COUNT(DISTINCT user_id) as users,
+        COUNT(*) as events
+      FROM \`project.dataset.events\`
+      GROUP BY date
+    `,
+    destinationTable: {
+      projectId: 'project-id',
+      datasetId: 'dataset',
+      tableId: 'daily_aggregates'
+    },
+    writeDisposition: 'WRITE_TRUNCATE',
+    schedule: '0 2 * * *', // Daily at 2 AM
+    location: 'US'
+  });
+}
+```
+
+**6. Cloud Monitoring Configuration**
+
+```typescript
+// gcp/monitoring/alerts.ts
+import { Monitoring } from '@google-cloud/monitoring';
+
+const monitoring = new Monitoring();
+
+async function createAlertPolicy() {
+  const projectId = 'project-id';
+  
+  const policy = {
+    displayName: 'High Error Rate Alert',
+    conditions: [
+      {
+        displayName: 'API Error Rate',
+        conditionThreshold: {
+          filter: `
+            resource.type="cloud_run_revision"
+            resource.labels.service_name="api-service"
+            metric.type="run.googleapis.com/request_count"
+          `,
+          comparison: 'COMPARISON_GT',
+          thresholdValue: 100,
+          duration: '300s',
+          aggregations: [
+            {
+              alignmentPeriod: '60s',
+              perSeriesAligner: 'ALIGN_RATE'
+            }
+          ]
+        }
+      }
+    ],
+    combiner: 'OR',
+    enabled: true,
+    notificationChannels: ['projects/project-id/notificationChannels/123456'],
+    documentation: {
+      content: 'High error rate detected on api-service',
+      mimeType: 'text/markdown'
+    }
+  };
+
+  const [createdPolicy] = await monitoring.createAlertPolicy({
+    name: `projects/${projectId}/alertPolicies`,
+    alertPolicy: policy
+  });
+  
+  return createdPolicy;
+}
+
+// Create Dashboard
+async function createDashboard() {
+  const dashboard = {
+    displayName: 'Production Overview',
+    mosaicLayout: {
+      columns: 12,
+      tiles: [
+        {
+          width: 6,
+          height: 4,
+          widget: {
+            title: 'Request Latency',
+            xyChart: {
+              dataSets: [
+                {
+                  timeSeriesQuery: {
+                    timeSeriesFilter: {
+                      filter: `
+                        resource.type="cloud_run_revision"
+                        metric.type="run.googleapis.com/request_latencies"
+                      `
+                    }
+                  },
+                  legendTemplate: 'Latency P50',
+                  plotType: 'LINE'
+                }
+              ],
+              yAxis: {
+                label: 'milliseconds',
+                scale: 'LINEAR'
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+
+  const [dash] = await monitoring.createDashboard({
+    name: `projects/${projectId}/dashboards`,
+    dashboard
+  });
+}
+```
+
+**7. VPC Network Configuration**
+
+```yaml
+# gcp/vpc/network.tf
+resource "google_compute_network" "main" {
+  name                    = "production-vpc"
+  auto_create_subnetworks = false
+  description             = "Production VPC"
+}
+
+resource "google_compute_subnetwork" "public" {
+  name          = "public-subnet"
+  network       = google_compute_network.main.id
+  ip_cidr_range = "10.0.1.0/24"
+  region        = "us-central1"
+  
+  private_ip_google_access = true
+  
+  log_config {
+    aggregation_interval = "INTERVAL_10_MIN"
+    flow_sampling        = 0.5
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
+}
+
+resource "google_compute_subnetwork" "private" {
+  name          = "private-subnet"
+  network       = google_compute_network.main.id
+  ip_cidr_range = "10.0.2.0/24"
+  region        = "us-central1"
+  
+  private_ip_google_access = true
+  
+  secondary_ip_range = [
+    {
+      range_name    = "pods"
+      ip_cidr_range = "10.1.0.0/16"
+    },
+    {
+      range_name    = "services"
+      ip_cidr_range = "10.2.0.0/16"
+    }
+  ]
+}
+
+resource "google_compute_router" "router" {
+  name    = "router"
+  network = google_compute_network.main.id
+  region  = "us-central1"
+  
+  bgp {
+    asn = 64514
+  }
+}
+
+resource "google_compute_router_nat" "nat" {
+  name                               = "nat"
+  router                             = google_compute_router.router.name
+  region                             = "us-central1"
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+  
+  minInboundPorts = 64
+}
+```
+
+## Workflow
+
+**Phase 1: Project Setup**
+
+Set up organization. Create projects. Configure folders. Set up billing.
+
+**Phase 2: Network Configuration**
+
+Create VPC. Configure subnets. Set up NAT. Configure firewall rules.
+
+**Phase 3: Identity Configuration**
+
+Configure service accounts. Set up Workload Identity. Configure IAM.
+
+**Phase 4: Deployment**
+
+Select compute service. Deploy applications. Configure scaling. Set up CI/CD.
+
+**Phase 5: Data Layer**
+
+Select data services. Configure storage. Set up databases. Enable backup.
+
+**Phase 6: Operations**
+
+Enable monitoring. Configure logging. Set up alerts. Monitor costs.
 
 ## Liên kết
 
-- [[azure]] - Azure
-- [[aws]] - AWS
-- [[kubernetes]] - Kubernetes
+- [[aws]] - AWS comparison
+- [[azure]] - Azure comparison
+- [[cloud-run]] - Cloud Run deployment
+- [[gke]] - GKE deployment
+- [[bigquery]] - BigQuery analytics
+- [[vertex-ai]] - Vertex AI ML

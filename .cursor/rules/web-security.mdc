@@ -1,0 +1,501 @@
+---
+description: Nguyên tắc và best practices cho Web Security trong Cursor Enterprise Framework
+created: 2026-06-23
+version: 1.0.0
+tags:
+  - web-security
+  - security
+  - owasp
+  - https
+  - cors
+---
+
+# Web Security Guidelines
+
+## Mục tiêu
+
+Tài liệu này định nghĩa các nguyên tắc và best practices cho việc implement web security trong Cursor Enterprise Framework. Mục tiêu là đảm bảo applications được bảo vệ chống lại common web vulnerabilities và attacks.
+
+Web security là critical cho protecting users và data. Việc tuân thủ OWASP guidelines và security best practices giúp prevent attacks và maintain user trust.
+
+## Nguyên tắc cơ bản
+
+### 1. OWASP Top 10
+
+Common web vulnerabilities.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    OWASP Top 10 (2021)                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  1. Broken Access Control                                        │
+│  2. Cryptographic Failures                                      │
+│  3. Injection                                                   │
+│  4. Insecure Design                                             │
+│  5. Security Misconfiguration                                    │
+│  6. Vulnerable Components                                         │
+│  7. Auth Failures                                               │
+│  8. Data Integrity Failures                                       │
+│  9. Logging Failures                                             │
+│  10. SSRF (Server-Side Request Forgery)                          │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 2. HTTPS Configuration
+
+Secure communication.
+
+```typescript
+// Express HTTPS configuration
+import express from 'express';
+import helmet from 'helmet';
+
+const app = express();
+
+// Security headers
+app.use(helmet());
+
+// HSTS (HTTP Strict Transport Security)
+app.use(helmet.hsts({
+    maxAge: 31536000,        // 1 year
+    includeSubDomains: true,
+    preload: true
+}));
+
+// Content Security Policy
+app.use(helmet.contentSecurityPolicy({
+    directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'nonce-{generated-nonce}'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "https:"],
+        connectSrc: ["'self'", "https://api.example.com"],
+        frameAncestors: ["'none'"],
+        upgradeInsecureRequests: []
+    }
+}));
+
+// X-Frame Options
+app.use(helmet.frameguard({ action: 'deny' }));
+
+// X-Content-Type-Options
+app.use(helmet.noSniff());
+
+// Referrer Policy
+app.use(helmet.referrerPolicy({ policy: 'strict-origin-when-cross-origin' }));
+```
+
+### 3. Input Validation
+
+Validate all user input.
+
+```typescript
+import { z } from 'zod';
+
+// Validation schemas
+const userSchema = z.object({
+    email: z.string().email('Invalid email format'),
+    password: z.string()
+        .min(8, 'Password must be at least 8 characters')
+        .regex(/[A-Z]/, 'Password must contain uppercase')
+        .regex(/[a-z]/, 'Password must contain lowercase')
+        .regex(/[0-9]/, 'Password must contain number'),
+    username: z.string()
+        .min(3)
+        .max(20)
+        .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
+    age: z.number().int().min(13).max(150)
+});
+
+// Sanitization
+import DOMPurify from 'isomorphic-dompurify';
+
+function sanitizeInput(input: string): string {
+    return DOMPurify.sanitize(input, {
+        ALLOWED_TAGS: [],
+        ALLOWED_ATTR: []
+    });
+}
+
+// Express middleware
+function validateInput(schema: z.ZodSchema) {
+    return (req: Request, res: Response, next: NextFunction) => {
+        const result = schema.safeParse(req.body);
+
+        if (!result.success) {
+            return res.status(400).json({
+                error: {
+                    code: 'VALIDATION_ERROR',
+                    message: 'Invalid input',
+                    details: result.error.issues
+                }
+            });
+        }
+
+        req.body = result.data;
+        next();
+    };
+}
+
+app.post('/users',
+    validateInput(userSchema),
+    userController.create
+);
+```
+
+### 4. SQL Injection Prevention
+
+Prevent SQL injection attacks.
+
+```typescript
+// Parameterized queries (safe)
+async function getUserById(id: string) {
+    // Safe - using parameterized query
+    const result = await db.query(
+        'SELECT * FROM users WHERE id = $1',
+        [id]
+    );
+    return result.rows[0];
+}
+
+// ORM usage (safe by default)
+const user = await prisma.user.findUnique({
+    where: { id: userId }
+});
+
+// Avoid this - string concatenation (dangerous!)
+const query = `SELECT * FROM users WHERE id = '${id}'`; // SQL INJECTION!
+
+// Input sanitization for NoSQL
+import mongoose from 'mongoose';
+
+function sanitizeMongoQuery(input: any): any {
+    // Prevent NoSQL injection
+    if (typeof input === 'string') {
+        // Escape special characters
+        return input.replace(/[$]/g, '\\$');
+    }
+    return input;
+}
+```
+
+### 5. XSS Prevention
+
+Prevent cross-site scripting.
+
+```typescript
+// Content Security Policy
+const csp = `
+    default-src 'self';
+    script-src 'self' 'nonce-{nonce}';
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' data: https://images.example.com;
+    font-src 'self';
+    connect-src 'self' https://api.example.com;
+    frame-ancestors 'none';
+    form-action 'self';
+`;
+
+// HTTPOnly cookies
+app.use((req: Request, res: Response, next: NextFunction) => {
+    res.cookie('sessionId', sessionId, {
+        httpOnly: true,      // Prevent XSS access
+        secure: true,        // HTTPS only
+        sameSite: 'strict',  // CSRF protection
+        maxAge: 86400000     // 1 day
+    });
+    next();
+});
+
+// React automatically escapes output
+// function UserProfile({ user }) {
+//     <div>{user.name}</div>  // Automatically escaped!
+// }
+
+// For dangerouslySetInnerHTML, sanitize first
+import DOMPurify from 'isomorphic-dompurify';
+
+function renderMarkdown(content: string): string {
+    const html = marked.parse(content);
+    return DOMPurify.sanitize(html);
+}
+```
+
+### 6. CSRF Protection
+
+Prevent cross-site request forgery.
+
+```typescript
+// CSRF token middleware
+import csrf from 'csurf';
+
+const csrfProtection = csrf({
+    cookie: {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict'
+    }
+});
+
+// Generate token for forms
+app.get('/form', csrfProtection, (req, res) => {
+    res.json({
+        csrfToken: req.csrfToken()
+    });
+});
+
+// Validate token
+app.post('/form', csrfProtection, (req, res) => {
+    // CSRF token validated automatically
+    res.json({ success: true });
+});
+
+// Double Submit Cookie Pattern
+function csrfMiddleware(req: Request, res: Response, next: NextFunction) {
+    const cookieToken = req.cookies['csrf-token'];
+    const headerToken = req.headers['x-csrf-token'];
+
+    if (!cookieToken || !headerToken) {
+        return res.status(403).json({ error: 'CSRF token missing' });
+    }
+
+    if (cookieToken !== headerToken) {
+        return res.status(403).json({ error: 'CSRF token mismatch' });
+    }
+
+    next();
+}
+
+// SameSite cookies (modern approach)
+res.cookie('session', sessionId, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'strict'  // CSRF protection
+});
+```
+
+### 7. Authentication Security
+
+Secure authentication.
+
+```typescript
+// Secure password storage
+import bcrypt from 'bcrypt';
+
+const SALT_ROUNDS = 12;
+
+async function hashPassword(password: string): Promise<string> {
+    return bcrypt.hash(password, SALT_ROUNDS);
+}
+
+async function verifyPassword(password: string, hash: string): Promise<boolean> {
+    return bcrypt.compare(password, hash);
+}
+
+// Account lockout
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutes
+
+async function authenticate(email: string, password: string) {
+    const user = await getUserByEmail(email);
+
+    if (!user) {
+        // Deliberate delay to prevent user enumeration
+        await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 100));
+        throw new Error('Invalid credentials');
+    }
+
+    // Check lockout
+    if (user.lockedUntil && user.lockedUntil > Date.now()) {
+        throw new Error('Account locked');
+    }
+
+    const isValid = await verifyPassword(password, user.passwordHash);
+
+    if (!isValid) {
+        await incrementLoginAttempts(user);
+        throw new Error('Invalid credentials');
+    }
+
+    // Reset on success
+    await resetLoginAttempts(user);
+
+    return generateSession(user);
+}
+
+// Rate limiting
+import rateLimit from 'express-rate-limit';
+
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,  // 15 minutes
+    max: 5,                      // 5 attempts
+    message: { error: 'Too many login attempts' }
+});
+
+app.post('/login', authLimiter, loginHandler);
+```
+
+### 8. Security Headers
+
+Comprehensive security headers.
+
+```yaml
+# Security headers configuration
+security_headers:
+  # Prevent clickjacking
+  X-Frame-Options: DENY
+
+  # Prevent MIME type sniffing
+  X-Content-Type-Options: nosniff
+
+  # XSS Protection
+  X-XSS-Protection: "1; mode=block"
+
+  # Referrer Policy
+  Referrer-Policy: strict-origin-when-cross-origin
+
+  # Permissions Policy
+  Permissions-Policy: |
+    geolocation=(),
+    microphone=(),
+    camera=(),
+    payment=(self "https://payments.example.com")
+
+  # CSP
+  Content-Security-Policy: |
+    default-src 'self';
+    script-src 'self';
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'none';
+
+  # HSTS
+  Strict-Transport-Security: |
+    max-age=31536000;
+    includeSubDomains;
+    preload
+```
+
+### 9. File Upload Security
+
+Secure file handling.
+
+```typescript
+import multer from 'multer';
+import path from 'path';
+
+// Configure storage
+const storage = multer.diskStorage({
+    destination: '/tmp/uploads',
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+// File filter
+const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+    const allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+
+    if (allowedMimes.includes(file.mimetype)) {
+        cb(null, true);
+    } else {
+        cb(new Error('Invalid file type'));
+    }
+};
+
+const upload = multer({
+    storage,
+    fileFilter,
+    limits: {
+        fileSize: 5 * 1024 * 1024,  // 5MB max
+        files: 1
+    }
+});
+
+// Sanitize filename
+import sanitize from 'sanitize-filename';
+
+function sanitizeFilename(filename: string): string {
+    return sanitize(filename, { replacement: '_' });
+}
+
+// Store files outside web root
+// Use cloud storage (S3, GCS) instead of local storage
+```
+
+### 10. Security Monitoring
+
+Monitor for attacks.
+
+```typescript
+// Security event logging
+interface SecurityEvent {
+    type: 'INTRUSION' | 'BRUTE_FORCE' | 'XSS' | 'SQL_INJECTION';
+    severity: 'low' | 'medium' | 'high' | 'critical';
+    ip: string;
+    userAgent: string;
+    timestamp: Date;
+    details: Record<string, any>;
+}
+
+function logSecurityEvent(event: SecurityEvent) {
+    logger.warn({
+        ...event,
+        eventType: 'security_event'
+    });
+
+    if (event.severity === 'critical') {
+        alertSecurityTeam(event);
+    }
+}
+
+// Detect common attacks
+function detectSQLInjection(input: string): boolean {
+    const sqlPatterns = [
+        /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION)\b/i,
+        /(--|;|'|\/\*|\*\/|xp_|sp_)/,
+        /(OR|AND)\s+\d+\s*=\s*\d+/
+    ];
+
+    return sqlPatterns.some(pattern => pattern.test(input));
+}
+
+function detectXSS(input: string): boolean {
+    const xssPatterns = [
+        /<script/i,
+        /javascript:/i,
+        /on\w+\s*=/i,
+        /<iframe/i,
+        /<object/i
+    ];
+
+    return xssPatterns.some(pattern => pattern.test(input));
+}
+```
+
+## Checklist
+
+- [ ] Use HTTPS everywhere
+- [ ] Implement security headers
+- [ ] Validate all input
+- [ ] Use parameterized queries
+- [ ] Prevent XSS attacks
+- [ ] Implement CSRF protection
+- [ ] Secure authentication
+- [ ] Protect file uploads
+- [ ] Log security events
+- [ ] Regular security audits
+- [ ] Use dependency scanning
+- [ ] Implement rate limiting
+
+## Liên kết
+
+- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
+- [OWASP Cheat Sheets](https://cheatsheetseries.owasp.org/)
+- [Security Headers](https://securityheaders.com/)
+- Security: `.cursor/rules/security.mdc`
+- Authentication: `.cursor/rules/authentication.mdc`

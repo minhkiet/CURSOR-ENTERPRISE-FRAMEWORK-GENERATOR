@@ -1,52 +1,488 @@
 ---
-description: Nguyên tắc Version Control cho team collaboration
+description: Nguyên tắc và best practices cho Version Control trong Cursor Enterprise Framework
 created: 2026-06-23
 version: 1.0.0
-tags: [git, version-control, branching, collaboration, enterprise]
+tags: [git, version-control, branching-strategy, commit-messages, code-review]
 ---
 
 # Version Control
 
 ## Mục tiêu
 
-Version Control là hệ thống quản lý source code changes và collaboration giữa các developers. Trong Cursor Enterprise Framework, Version Control rule định nghĩa các nguyên tắc và best practices cho việc sử dụng Git hiệu quả trong team environment, đảm bảo code quality, traceability, và smooth collaboration. Mục tiêu là hướng dẫn teams establish và maintain healthy version control practices.
+Version Control là nền tảng cho software development collaboration, tracking changes, và maintaining code history. Trong Cursor Enterprise Framework, Git là primary version control system với practices đảm bảo code quality, traceability, và efficient team collaboration. Mục tiêu của rule này là hướng dẫn developers trong việc use version control một cách hiệu quả và maintainable.
+
+Good version control practices enable parallel development, facilitate code review, support rollback capabilities, và maintain clear audit trail của mọi thay đổi.
 
 ## Nguyên tắc
 
-**1. Branch Strategy**
+**1. Atomic Commits**
 
-Choose appropriate branching model. GitFlow, Trunk-Based, or custom. Consistent naming conventions. Branch protection rules. Short-lived branches preferred.
+Một commit nên chứa một logical change. Small, focused commits. Easy to revert. Clear history.
 
-**2. Commit Practices**
+**2. Clear Commit Messages**
 
-Atomic commits. Clear commit messages. Reference issues. Small, focused changes. One logical change per commit.
+Descriptive messages. Follow convention. Reference issues. Explain why, not what.
 
-**3. Code Review**
+**3. Branching Strategy**
 
-Required reviews for all changes. Constructive feedback. Timely reviews. Small PRs preferred. Review checklist.
+Use consistent strategy. Feature branches. Release branches. Hotfix branches.
 
-**4. Merging Strategy**
+**4. Protected Main Branch**
 
-Merge vs rebase decisions. Squash merging options. Conflict resolution. Fast-forward when possible.
+main/master không directly committed. All changes via PR. Required reviews. Passing tests.
 
-**5. Release Management**
+**5. Frequent Integration**
 
-Version tagging. Release branches. Hotfix procedures. Release notes.
+Merge frequently. Small changes. Reduce conflicts. Continuous integration.
 
-**6. Access Control**
+**6. Code Review**
 
-Branch permissions. Protected branches. Team access levels. Audit trail.
+All changes reviewed. Meaningful reviews. Timely reviews. Constructive feedback.
 
-**7. CI/CD Integration**
+**7. Tagging Releases**
 
-Pipeline on commits. Quality gates. Automated testing. Deployment triggers.
+Semantic versioning. Annotated tags. Release notes. Traceability.
 
-**8. Documentation**
+**8. .gitignore**
 
-Repository README. Contributing guidelines. Code standards. Architecture docs.
+Ignore build artifacts. Ignore dependencies. Ignore IDE configs. Keep repo clean.
+
+**9. Submodules/Libraries**
+
+Manage dependencies carefully. Keep updated. Document usage. Consider monorepo.
+
+**10. Backup và Safety**
+
+Remote backups. Never force push to main. Recoverable history. Branch protection.
+
+## Checklist
+
+- [ ] Branching strategy defined
+- [ ] Commit convention documented
+- [ ] PR template created
+- [ ] Branch protection rules set
+- [ ] Code review process established
+- [ ] Release process defined
+- [ ] .gitignore configured
+- [ ] CI/CD integrated
+- [ ] Branch naming convention set
+- [ ] Team training completed
+
+## Anti Pattern
+
+**1. Large Commits**
+
+Everything in one commit. Hard to review. Hard to revert. Atomic commits.
+
+**2. Poor Messages**
+
+"Fixed stuff". "Updates". "WIP". Descriptive messages.
+
+**3. Long-Lived Branches**
+
+Branches diverge for weeks. Merge conflicts. Stale code. Frequent merges.
+
+**4. Force Push to Main**
+
+Rewriting shared history. Lost commits. Security risk. Never force push.
+
+**5. Committed Secrets**
+
+API keys in commits. Exposed credentials. Use environment variables.
+
+## Best Practice
+
+**1. Git Configuration**
+
+```bash
+# Global gitignore
+git config --global core.excludesFile '~/.gitignore'
+
+# Editor
+git config --global core.editor 'code --wait'
+
+# Aliases
+git config --global alias.st 'status -sb'
+git config --global alias.co 'checkout'
+git config --global alias.br 'branch'
+git config --global alias.ci 'commit'
+git config --global alias.lg "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+
+# Rebasing instead of merging
+git config --global pull.rebase true
+
+# Rebase when pulling
+git config --global rebase.autostash true
+
+# Stash pop choices
+git config --global rerere.autoUpdate true
+git config --global rerere.enabled true
+
+# Signing
+git config --global commit.gpgsign true
+git config --global tag.gpgsign true
+```
+
+**2. .gitignore**
+
+```gitignore
+# Dependencies
+node_modules/
+vendor/
+bower_components/
+
+# Build outputs
+dist/
+build/
+out/
+*.pyc
+__pycache__/
+*.o
+*.so
+*.class
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.env
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+*.lcov
+
+# OS
+.DS_Store
+Thumbs.db
+*.bak
+*~
+
+# Secrets
+*.pem
+*.key
+credentials.json
+service-account.json
+
+# Database
+*.sqlite
+*.db
+*.sqlite3
+
+# Cache
+.cache/
+.parcel-cache/
+.vuepress/dist/
+
+# Framework specific
+.next/
+.nuxt/
+.svelte-kit/
+```
+
+**3. Branching Strategy (GitFlow)**
+
+```bash
+# Branch naming
+# feature/TICKET-description
+# bugfix/TICKET-description
+# hotfix/TICKET-description
+# release/v1.2.3
+
+# Start feature
+git checkout develop
+git pull origin develop
+git checkout -b feature/ABC-123-user-authentication
+
+# Work on feature
+git add .
+git commit -m "feat(auth): add login endpoint"
+
+# Update from develop
+git fetch origin
+git rebase origin/develop
+
+# Finish feature
+git checkout develop
+git pull origin develop
+git merge --no-ff feature/ABC-123-user-authentication
+git branch -d feature/ABC-123-user-authentication
+git push origin develop
+
+# Create release
+git checkout -b release/v1.2.0 develop
+# ... prepare release ...
+git checkout main
+git merge --no-ff release/v1.2.0
+git tag -a v1.2.0 -m "Release v1.2.0"
+git push origin main --tags
+
+# Hotfix
+git checkout -b hotfix/ABC-456-fix-bug main
+# ... fix ...
+git checkout main
+git merge --no-ff hotfix/ABC-456-fix-bug
+git tag -a v1.2.1 -m "Hotfix v1.2.1"
+git push origin main --tags
+```
+
+**4. Commit Convention**
+
+```bash
+# Format
+# <type>(<scope>): <description>
+#
+# [optional body]
+#
+# [optional footer(s)]
+
+# Types
+# feat:     New feature
+# fix:      Bug fix
+# docs:     Documentation
+# style:    Formatting, missing semicolons, etc
+# refactor: Code refactoring
+# test:     Adding tests
+# chore:    Maintenance tasks
+# perf:     Performance improvements
+# ci:       CI/CD changes
+# build:    Build system changes
+# revert:   Revert commits
+
+# Examples
+git commit -m "feat(auth): add JWT token validation"
+git commit -m "fix(api): handle null pointer in user endpoint"
+git commit -m "docs(readme): update installation instructions"
+git commit -m "refactor(users): extract user validation to service"
+git commit -m "test(checkout): add integration tests for payment flow"
+git commit -m "perf(api): optimize database queries for user list"
+
+# With body
+git commit -m "feat(payments): add Stripe integration
+- Add Stripe SDK for payment processing
+- Implement webhook handling for payment events
+- Add retry logic for failed payments"
+
+# Breaking changes
+git commit -m "feat(api): change response format for /users
+BREAKING CHANGE: /users now returns array instead of object"
+```
+
+**5. Pull Request Template**
+
+```markdown
+# Pull Request
+
+## Description
+<!-- Describe what this PR does and why -->
+
+## Type of Change
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Breaking change
+- [ ] Documentation update
+
+## Related Issues
+<!-- Link to related issues: Fixes #123 -->
+
+## Testing
+<!-- Describe how this was tested -->
+
+- [ ] Unit tests added/updated
+- [ ] Integration tests added/updated
+- [ ] Manual testing performed
+
+## Checklist
+- [ ] Code follows the project's style guidelines
+- [ ] Self-review completed
+- [ ] Comments added for complex code
+- [ ] Documentation updated
+- [ ] No new warnings or errors
+- [ ] Dependent changes merged
+
+## Screenshots (if applicable)
+<!-- Add screenshots for UI changes -->
+
+## Additional Notes
+<!-- Any additional context -->
+```
+
+**6. Git Hooks**
+
+```bash
+# .husky/pre-commit
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+npx lint-staged
+```
+
+```json
+// package.json
+{
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-push": "npm test"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write",
+      "git add"
+    ],
+    "*.{json,md}": [
+      "prettier --write",
+      "git add"
+    ]
+  }
+}
+```
+
+```bash
+# commitlint.config.js
+module.exports = {
+  extends: ['@commitlint/config-conventional'],
+  rules: {
+    'type-enum': [
+      2,
+      'always',
+      [
+        'feat',
+        'fix',
+        'docs',
+        'style',
+        'refactor',
+        'perf',
+        'test',
+        'build',
+        'ci',
+        'chore',
+        'revert'
+      ]
+    ]
+  }
+};
+```
+
+**7. GitHub Actions Workflow**
+
+```yaml
+# .github/workflows/git.yml
+name: Git Actions
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  commit-lint:
+    name: Commit Message Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: wagoid/commitlint-github-action@v5
+
+  branch-check:
+    name: Branch Name Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check branch naming
+        run: |
+          if [[ ! "${{ github.head_ref }}" =~ ^(feature|bugfix|hotfix|release)/[A-Z]+-[0-9]+-.+$ ]]; then
+            echo "Branch name must follow: type/TICKET-description"
+            exit 1
+          fi
+
+  changes-protection:
+    name: Protect Main Branch
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Check if force pushed
+        run: |
+          if git log --oneline origin/main..HEAD | grep -q .; then
+            echo "Direct commits to main are not allowed"
+            exit 1
+          fi
+```
+
+**8. Release Process**
+
+```bash
+# Create release branch
+git checkout develop
+git pull
+git checkout -b release/v1.2.0
+
+# Update version
+echo "1.2.0" > VERSION
+git add VERSION
+git commit -m "chore: bump version to 1.2.0"
+
+# Test and fix
+# ... testing ...
+
+# Merge to main
+git checkout main
+git merge --no-ff release/v1.2.0 -m "Merge release v1.2.0"
+git tag -a v1.2.0 -m "Release v1.2.0"
+git push origin main --tags
+
+# Merge back to develop
+git checkout develop
+git merge --no-ff release/v1.2.0 -m "Merge release v1.2.0"
+git push origin develop
+
+# Clean up
+git branch -d release/v1.2.0
+```
+
+## Workflow
+
+**Phase 1: Branch Creation**
+
+Create branch from correct source. Follow naming convention. Update from base.
+
+**Phase 2: Development**
+
+Make atomic commits. Follow commit convention. Update documentation.
+
+**Phase 3: Code Review**
+
+Open PR. Request reviews. Address feedback. Get approvals.
+
+**Phase 4: Merge**
+
+Merge using squash or regular. Delete branch. Verify CI/CD.
+
+**Phase 5: Release**
+
+Create release branch. Test thoroughly. Tag release. Deploy.
 
 ## Liên kết
 
-- [[coding-standards]] - Coding Standards
-- [[deployment]] - Deployment
-- [[security]] - Security
+- [[git-flow]] - GitFlow strategy
+- [[ci-cd]] - CI/CD integration
+- [[code-review]] - Code review practices
+- [[deployment]] - Deployment process

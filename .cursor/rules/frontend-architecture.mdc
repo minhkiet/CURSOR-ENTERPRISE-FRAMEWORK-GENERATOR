@@ -1,0 +1,767 @@
+---
+description: Nguyên tắc và best practices cho Frontend Architecture trong Cursor Enterprise Framework
+created: 2026-06-23
+version: 1.0.0
+tags: [frontend, react, vue, angular, ui-architecture, state-management]
+---
+
+# Frontend Architecture
+
+## Mục tiêu
+
+Frontend Architecture là cách tổ chức và design frontend applications để đảm bảo scalability, maintainability, và performance. Trong Cursor Enterprise Framework, frontend architecture được hướng dẫn với focus trên component design, state management, routing, và user experience. Mục tiêu của rule này là cung cấp framework cho việc build robust frontend applications.
+
+Frontend applications ngày càng phức tạp với business logic moved client-side. Good architecture giúp manage complexity và improve developer productivity.
+
+## Nguyên tắc
+
+**1. Component Architecture**
+
+Atomic design principles. Reusable components. Composable patterns. Clear component hierarchy.
+
+**2. State Management**
+
+Single source of truth. Predictable state updates. Separation of concerns. State vs UI state.
+
+**3. Routing**
+
+Client-side routing. Lazy loading. Nested routes. Route guards.
+
+**4. Data Fetching**
+
+Server state vs client state. Caching strategies. Optimistic updates. Error handling.
+
+**5. Performance**
+
+Code splitting. Lazy loading. Memoization. Virtual scrolling. Image optimization.
+
+**6. Accessibility**
+
+Semantic HTML. ARIA attributes. Keyboard navigation. Screen reader support.
+
+**7. Testing**
+
+Component testing. Integration testing. E2E testing. Visual regression.
+
+**8. Error Handling**
+
+Error boundaries. Graceful degradation. User feedback. Recovery strategies.
+
+**9. Security**
+
+XSS prevention. CSRF protection. Content Security Policy. Input validation.
+
+**10. Documentation**
+
+Component documentation. Design tokens. Style guides. API documentation.
+
+## Checklist
+
+- [ ] Project structure defined
+- [ ] Component library established
+- [ ] State management configured
+- [ ] Routing implemented
+- [ ] Data fetching strategy defined
+- [ ] Error handling implemented
+- [ ] Testing strategy defined
+- [ ] Accessibility reviewed
+- [ ] Performance optimized
+- [ ] Documentation created
+
+## Anti Pattern
+
+**1. God Components**
+
+Large components doing everything. Hard to test. Hard to maintain. Break into smaller.
+
+**2. Prop Drilling**
+
+Passing props through many levels. Complex dependencies. Use context or state.
+
+**3. State Duplication**
+
+Same data in multiple places. Inconsistent state. Single source of truth.
+
+**4. Premature Optimization**
+
+Over-engineering simple features. Complexity without benefit. YAGNI.
+
+## Best Practice
+
+**1. Project Structure**
+
+```
+src/
+├── app/                          # App root
+│   ├── App.tsx
+│   ├── App.css
+│   └── providers/
+│       ├── QueryProvider.tsx
+│       ├── AuthProvider.tsx
+│       └── I18nProvider.tsx
+│
+├── components/                   # Shared components
+│   ├── ui/                       # Base UI components
+│   │   ├── Button/
+│   │   │   ├── Button.tsx
+│   │   │   ├── Button.css
+│   │   │   └── Button.stories.tsx
+│   │   ├── Input/
+│   │   ├── Modal/
+│   │   └── Card/
+│   │
+│   ├── forms/                    # Form components
+│   │   ├── Form/
+│   │   ├── FormField/
+│   │   └── FormError/
+│   │
+│   └── layout/                   # Layout components
+│       ├── Header/
+│       ├── Footer/
+│       ├── Sidebar/
+│       └── PageLayout/
+│
+├── features/                     # Feature modules
+│   ├── auth/
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   ├── services/
+│   │   ├── types/
+│   │   └── auth.ts              # Feature barrel
+│   │
+│   ├── orders/
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   ├── services/
+│   │   ├── types/
+│   │   └── orders.ts
+│   │
+│   └── products/
+│       └── ...
+│
+├── hooks/                         # Shared hooks
+│   ├── useAuth.ts
+│   ├── useToast.ts
+│   └── useMediaQuery.ts
+│
+├── services/                     # API services
+│   ├── api/
+│   │   ├── client.ts
+│   │   ├── endpoints.ts
+│   │   └── types.ts
+│   ├── auth.service.ts
+│   ├── order.service.ts
+│   └── product.service.ts
+│
+├── stores/                        # State stores
+│   ├── auth.store.ts
+│   ├── cart.store.ts
+│   └── ui.store.ts
+│
+├── utils/                         # Utilities
+│   ├── formatters.ts
+│   ├── validators.ts
+│   └── constants.ts
+│
+├── types/                         # Shared types
+│   ├── api.ts
+│   ├── user.ts
+│   └── order.ts
+│
+├── i18n/                          # Internationalization
+│   ├── en.json
+│   ├── vi.json
+│   └── index.ts
+│
+└── styles/                        # Global styles
+    ├── variables.css
+    ├── reset.css
+    └── global.css
+```
+
+**2. Component Patterns**
+
+```tsx
+// components/ui/Button/Button.tsx
+import React, { forwardRef, ButtonHTMLAttributes } from 'react';
+import styles from './Button.module.css';
+
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
+  size?: 'sm' | 'md' | 'lg';
+  isLoading?: boolean;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
+}
+
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    {
+      children,
+      variant = 'primary',
+      size = 'md',
+      isLoading = false,
+      leftIcon,
+      rightIcon,
+      disabled,
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    const classNames = [
+      styles.button,
+      styles[variant],
+      styles[size],
+      isLoading && styles.loading,
+      disabled && styles.disabled,
+      className
+    ]
+      .filter(Boolean)
+      .join(' ');
+
+    return (
+      <button
+        ref={ref}
+        className={classNames}
+        disabled={disabled || isLoading}
+        aria-busy={isLoading}
+        {...props}
+      >
+        {isLoading && (
+          <span className={styles.spinner} aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeDasharray="31.4 31.4"
+              />
+            </svg>
+          </span>
+        )}
+        {leftIcon && <span className={styles.icon}>{leftIcon}</span>}
+        <span className={styles.label}>{children}</span>
+        {rightIcon && <span className={styles.icon}>{rightIcon}</span>}
+      </button>
+    );
+  }
+);
+
+Button.displayName = 'Button';
+```
+
+```tsx
+// features/orders/components/OrderList.tsx
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Button } from '@/components/ui/Button';
+import { OrderCard } from './OrderCard';
+import { OrderFilters } from './OrderFilters';
+import { useToast } from '@/hooks/useToast';
+import { orderService } from '@/services/order.service';
+
+export interface OrderListProps {
+  customerId?: string;
+  status?: OrderStatus;
+  onOrderClick?: (order: Order) => void;
+}
+
+export const OrderList: React.FC<OrderListProps> = ({
+  customerId,
+  status,
+  onOrderClick
+}) => {
+  const [filters, setFilters] = useState<OrderFilters>({
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
+    page: 1,
+    limit: 20
+  });
+
+  const queryClient = useQueryClient();
+  const { showToast } = useToast();
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['orders', { customerId, status, ...filters }],
+    queryFn: () => orderService.getOrders({ customerId, status, ...filters }),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  const cancelMutation = useMutation({
+    mutationFn: (orderId: string) => orderService.cancelOrder(orderId),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['orders']);
+      showToast('Order cancelled successfully', 'success');
+    },
+    onError: (error: Error) => {
+      showToast(error.message, 'error');
+    },
+  });
+
+  const handleCancel = (orderId: string) => {
+    if (confirm('Are you sure you want to cancel this order?')) {
+      cancelMutation.mutate(orderId);
+    }
+  };
+
+  if (error) {
+    return (
+      <ErrorState
+        message="Failed to load orders"
+        onRetry={() => queryClient.invalidateQueries(['orders'])}
+      />
+    );
+  }
+
+  return (
+    <div className={styles.container}>
+      <OrderFilters
+        filters={filters}
+        onChange={setFilters}
+        totalResults={data?.total || 0}
+      />
+
+      {isLoading ? (
+        <LoadingSkeleton count={5} />
+      ) : (
+        <>
+          <div className={styles.list}>
+            {data?.orders.map((order) => (
+              <OrderCard
+                key={order.id}
+                order={order}
+                onCancel={() => handleCancel(order.id)}
+                onClick={() => onOrderClick?.(order)}
+              />
+            ))}
+          </div>
+
+          <Pagination
+            page={filters.page}
+            totalPages={data?.totalPages || 1}
+            onPageChange={(page) => setFilters({ ...filters, page })}
+          />
+        </>
+      )}
+    </div>
+  );
+};
+```
+
+**3. State Management with Zustand**
+
+```typescript
+// stores/cart.store.ts
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { produce } from 'immer';
+
+interface CartItem {
+  id: string;
+  productId: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+}
+
+interface CartState {
+  items: CartItem[];
+  isLoading: boolean;
+  error: string | null;
+  
+  // Actions
+  addItem: (item: Omit<CartItem, 'id'>) => void;
+  removeItem: (id: string) => void;
+  updateQuantity: (id: string, quantity: number) => void;
+  clearCart: () => void;
+  
+  // Computed
+  totalItems: () => number;
+  subtotal: () => number;
+}
+
+export const useCartStore = create<CartState>()(
+  persist(
+    (set, get) => ({
+      items: [],
+      isLoading: false,
+      error: null,
+
+      addItem: (item) => {
+        set(
+          produce((state: CartState) => {
+            const existing = state.items.find(
+              (i) => i.productId === item.productId
+            );
+            if (existing) {
+              existing.quantity += item.quantity;
+            } else {
+              state.items.push({
+                ...item,
+                id: crypto.randomUUID(),
+              });
+            }
+          })
+        );
+      },
+
+      removeItem: (id) => {
+        set(
+          produce((state: CartState) => {
+            state.items = state.items.filter((i) => i.id !== id);
+          })
+        );
+      },
+
+      updateQuantity: (id, quantity) => {
+        if (quantity <= 0) {
+          get().removeItem(id);
+          return;
+        }
+        set(
+          produce((state: CartState) => {
+            const item = state.items.find((i) => i.id === id);
+            if (item) {
+              item.quantity = quantity;
+            }
+          })
+        );
+      },
+
+      clearCart: () => {
+        set({ items: [] });
+      },
+
+      totalItems: () => {
+        return get().items.reduce((sum, item) => sum + item.quantity, 0);
+      },
+
+      subtotal: () => {
+        return get().items.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
+      },
+    }),
+    {
+      name: 'cart-storage',
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({ items: state.items }),
+    }
+  )
+);
+```
+
+**4. React Query for Data Fetching**
+
+```typescript
+// lib/api/queryClient.ts
+import { QueryClient } from '@tanstack/react-query';
+
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+      retry: 3,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+    },
+    mutations: {
+      retry: 1,
+    },
+  },
+});
+
+// lib/api/queryKeys.ts
+export const queryKeys = {
+  users: {
+    all: ['users'] as const,
+    lists: () => [...queryKeys.users.all, 'list'] as const,
+    list: (filters: UserFilters) => [...queryKeys.users.lists(), filters] as const,
+    details: () => [...queryKeys.users.all, 'detail'] as const,
+    detail: (id: string) => [...queryKeys.users.details(), id] as const,
+  },
+  orders: {
+    all: ['orders'] as const,
+    lists: () => [...queryKeys.orders.all, 'list'] as const,
+    list: (filters: OrderFilters) => [...queryKeys.orders.lists(), filters] as const,
+    detail: (id: string) => [...queryKeys.orders.all, 'detail', id] as const,
+  },
+  products: {
+    all: ['products'] as const,
+    lists: () => [...queryKeys.products.all, 'list'] as const,
+    list: (filters: ProductFilters) => [...queryKeys.products.lists(), filters] as const,
+    detail: (id: string) => [...queryKeys.products.all, 'detail', id] as const,
+  },
+};
+```
+
+```typescript
+// hooks/useOrders.ts
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { orderService } from '@/services/order.service';
+import { queryKeys } from '@/lib/api/queryKeys';
+import type { CreateOrderRequest, OrderFilters } from '@/types/order';
+
+export function useOrders(filters: OrderFilters) {
+  return useQuery({
+    queryKey: queryKeys.orders.list(filters),
+    queryFn: () => orderService.getOrders(filters),
+    placeholderData: (previousData) => previousData,
+  });
+}
+
+export function useOrder(orderId: string) {
+  return useQuery({
+    queryKey: queryKeys.orders.detail(orderId),
+    queryFn: () => orderService.getOrder(orderId),
+    enabled: !!orderId,
+  });
+}
+
+export function useCreateOrder() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (data: CreateOrderRequest) => orderService.createOrder(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.orders.all });
+    },
+  });
+}
+
+export function useCancelOrder() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (orderId: string) => orderService.cancelOrder(orderId),
+    onMutate: async (orderId) => {
+      // Optimistic update
+      await queryClient.cancelQueries({ queryKey: queryKeys.orders.detail(orderId) });
+      
+      const previousOrder = queryClient.getQueryData(queryKeys.orders.detail(orderId));
+      
+      queryClient.setQueryData(queryKeys.orders.detail(orderId), {
+        ...previousOrder,
+        status: 'cancelled',
+      });
+      
+      return { previousOrder };
+    },
+    onError: (err, orderId, context) => {
+      // Rollback on error
+      if (context?.previousOrder) {
+        queryClient.setQueryData(
+          queryKeys.orders.detail(orderId),
+          context.previousOrder
+        );
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.orders.all });
+    },
+  });
+}
+```
+
+**5. Error Boundary Pattern**
+
+```tsx
+// components/ErrorBoundary/ErrorBoundary.tsx
+import React, { Component, ReactNode, ErrorInfo } from 'react';
+
+interface Props {
+  children: ReactNode;
+  fallback?: ReactNode;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+}
+
+interface State {
+  hasError: boolean;
+  error: Error | null;
+}
+
+export class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // Log error to monitoring service
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    this.props.onError?.(error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
+
+      return (
+        <div className="error-boundary">
+          <h1>Something went wrong</h1>
+          <p>We're sorry for the inconvenience.</p>
+          <button onClick={() => window.location.reload()}>
+            Reload page
+          </button>
+          {process.env.NODE_ENV === 'development' && this.state.error && (
+            <pre>{this.state.error.toString()}</pre>
+          )}
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+// Usage in app
+<ErrorBoundary
+  onError={(error, info) => {
+    // Send to error tracking
+    Sentry.captureException(error, { extra: info });
+  }}
+>
+  <App />
+</ErrorBoundary>
+```
+
+**6. Performance Optimization**
+
+```typescript
+// hooks/useVirtualList.ts
+import { useState, useEffect, useRef, useCallback } from 'react';
+
+interface VirtualListOptions {
+  itemCount: number;
+  itemHeight: number | ((index: number) => number);
+  overscan?: number;
+}
+
+export function useVirtualList<T>({
+  itemCount,
+  itemHeight,
+  overscan = 3,
+}: VirtualListOptions) {
+  const [scrollTop, setScrollTop] = useState(0);
+  const [containerHeight, setContainerHeight] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      setContainerHeight(entries[0].contentRect.height);
+    });
+
+    resizeObserver.observe(container);
+    setContainerHeight(container.clientHeight);
+
+    return () => resizeObserver.disconnect();
+  }, []);
+
+  const getItemHeight = useCallback(
+    (index: number) => {
+      return typeof itemHeight === 'function' ? itemHeight(index) : itemHeight;
+    },
+    [itemHeight]
+  );
+
+  const totalHeight = useCallback(() => {
+    return Array.from({ length: itemCount }, (_, i) => getItemHeight(i)).reduce(
+      (sum, height) => sum + height,
+      0
+    );
+  }, [itemCount, getItemHeight]);
+
+  const getVisibleRange = useCallback(() => {
+    let startIndex = 0;
+    let height = 0;
+
+    for (let i = 0; i < itemCount; i++) {
+      height += getItemHeight(i);
+      if (height > scrollTop) {
+        startIndex = Math.max(0, i - overscan);
+        break;
+      }
+    }
+
+    let endIndex = itemCount - 1;
+    height = 0;
+
+    for (let i = startIndex; i < itemCount; i++) {
+      height += getItemHeight(i);
+      if (height > scrollTop + containerHeight) {
+        endIndex = Math.min(itemCount - 1, i + overscan);
+        break;
+      }
+    }
+
+    return { startIndex, endIndex };
+  }, [scrollTop, containerHeight, itemCount, getItemHeight, overscan]);
+
+  const visibleRange = getVisibleRange();
+  const offsetY = Array.from(
+    { length: visibleRange.startIndex },
+    (_, i) => getItemHeight(i)
+  ).reduce((sum, height) => sum + height, 0);
+
+  return {
+    containerRef,
+    scrollTop,
+    setScrollTop,
+    visibleRange,
+    offsetY,
+    totalHeight: totalHeight(),
+  };
+}
+```
+
+## Workflow
+
+**Phase 1: Architecture Design**
+
+Define project structure. Choose tech stack. Set up tooling. Define patterns.
+
+**Phase 2: Component Library**
+
+Build UI components. Create documentation. Set up design tokens. Ensure accessibility.
+
+**Phase 3: Feature Development**
+
+Implement features. Use feature modules. Follow patterns. Test thoroughly.
+
+**Phase 4: Integration**
+
+Connect to APIs. Implement state. Add routing. Handle errors.
+
+**Phase 5: Optimization**
+
+Performance audit. Optimize rendering. Add lazy loading. Test performance.
+
+**Phase 6: Polish**
+
+Accessibility audit. Cross-browser testing. Mobile optimization. Documentation.
+
+## Liên kết
+
+- [[nextjs]] - Next.js framework
+- [[vue]] - Vue.js framework
+- [[nuxt]] - Nuxt.js framework
+- [[react]] - React patterns
+- [[state-management]] - State management
+- [[performance]] - Frontend performance

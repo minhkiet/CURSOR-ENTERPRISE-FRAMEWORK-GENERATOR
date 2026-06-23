@@ -1,685 +1,701 @@
 ---
-description: Thiết kế và implement n8n workflows cho business automation với triggers, nodes, và integrations
-purpose: Create enterprise automation workflows với n8n cho process automation và system integration
-input: Business processes, integration requirements, trigger events
-output: n8n workflow definitions, automation patterns, error handling strategies
+description: Skill xây dựng và quản lý n8n workflows để automate business processes và system integrations
+purpose: Cung cấp comprehensive n8n workflow design framework để create automated processes, integrate systems, và build business automation solutions
+input:
+  - Business process requirements
+  - System integrations
+  - Data transformation needs
+  - Trigger conditions
+output:
+  - Workflow definitions
+  - Node configurations
+  - Error handling
+  - Monitoring setup
 version: 1.0.0
-tags: [n8n, workflow, automation, integration, business-process, low-code, triggers]
+tags:
+  - n8n
+  - workflow
+  - automation
+  - integration
+  - business-process
 ---
 
-# N8N Workflow Skill - Thiết Kế N8N Workflows Cho Enterprise Automation
+# n8n Workflow
 
 ## Tổng quan
 
-N8N là một powerful workflow automation platform cho phép kết nối các services và tự động hóa business processes. Skill này cung cấp framework để thiết kế và implement n8n workflows trong enterprise environments.
+n8n Workflow là skill chuyên biệt để design và implement n8n workflows cho business automation. Skill này cung cấp systematic approach để identify automation opportunities, design efficient workflows, implement error handling, và monitor workflow execution. Essential cho business process automation.
 
 ## Purpose (Mục đích)
 
-N8N Workflow Skill được thiết kế để:
+n8n helps automate business processes bằng cách connecting systems:
 
-1. **Process Automation**: Automate repetitive business tasks
-2. **System Integration**: Connect different services
-3. **Data Processing**: Transform và route data
-4. **Error Handling**: Implement robust error recovery
-5. **Monitoring**: Track workflow execution
+1. **Integration**: Connect different applications
+2. **Automation**: Eliminate manual tasks
+3. **Efficiency**: Speed up processes
+4. **Reliability**: Consistent execution
+5. **Visibility**: Track process execution
 
-### Khi nào sử dụng N8N Workflow
+n8n Workflow tồn tại để:
 
-- Khi automating business processes
-- Khi integrating multiple services
-- Khi building no-code/low-code solutions
-- Khi creating webhook handlers
-- Khi implementing event-driven workflows
-- Khi setting up scheduled tasks
+- **Identify automation opportunities** in business processes
+- **Design efficient workflow structures**
+- **Implement robust error handling**
+- **Configure proper logging và monitoring**
+- **Scale workflows** for production
 
 ## Input (Đầu vào)
 
-- [ ] Business process documentation
-- [ ] System integration requirements
-- [ ] Data flow specifications
-- [ ] Error handling requirements
-- [ ] Monitoring needs
+| Input | Mô tả | Required |
+|-------|-------|----------|
+| `process_spec` | Business process specification | Yes |
+| `systems` | Systems to integrate | Yes |
+| `triggers` | Trigger conditions | Yes |
+| `data_flows` | Data transformation requirements | No |
 
 ## Output (Đầu ra)
 
-- [ ] n8n workflow JSON definitions
-- [ ] Node configurations
-- [ ] Error workflow designs
-- [ ] Monitoring setup
-- [ ] Testing strategies
+| Output | Mô tả | Format |
+|--------|-------|--------|
+| `workflow_definition` | n8n workflow JSON | JSON |
+| `node_configs` | Node configurations | Config |
+| `error_handling` | Error handling strategy | Plan |
+| `monitoring` | Monitoring setup | Dashboard |
 
 ## Workflow (Quy trình)
 
-### Phase 1: Workflow Design Principles
+### Bước 1: Process Analysis
 
-### Bước 1: Workflow Structure Best Practices
+```typescript
+// Analyze business process for automation
+interface ProcessAnalysis {
+  process_name: string;
+  steps: ProcessStep[];
+  integrations: SystemIntegration[];
+  automation_opportunities: Opportunity[];
+  complexity: 'simple' | 'moderate' | 'complex';
+}
 
-```json
-{
-  "name": "Order Processing Workflow",
-  "nodes": [
-    {
-      "name": "Webhook Trigger",
-      "type": "n8n-nodes-base.webhook",
-      "position": [250, 300],
-      "parameters": {
-        "httpMethod": "POST",
-        "path": "order-created",
-        "responseMode": "responseNode",
-        "options": {
-          "rawBody": false
-        }
-      },
-      "webhookId": "order-created-webhook"
-    },
-    {
-      "name": "Validate Order Data",
-      "type": "n8n-nodes-base.code",
-      "position": [500, 300],
-      "parameters": {
-        "jsCode": "// Validate order data\nconst order = $input.first().json;\n\nconst errors = [];\n\nif (!order.customerId) {\n  errors.push('Missing customerId');\n}\n\nif (!order.items || order.items.length === 0) {\n  errors.push('Order must have at least one item');\n}\n\nif (errors.length > 0) {\n  throw new Error(`Validation failed: ${errors.join(', ')}`);\n}\n\nreturn [{ json: { ...order, validated: true } }];"
-      }
-    },
-    {
-      "name": "Check Inventory",
-      "type": "n8n-nodes-base.httpRequest",
-      "position": [750, 300],
-      "parameters": {
-        "method": "POST",
-        "url": "={{$env.INVENTORY_SERVICE_URL}}/check",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Authorization",
-              "value": "Bearer {{$env.INVENTORY_API_KEY}}"
-            }
-          ]
-        },
-        "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "items",
-              "value": "={{ $json.items }}"
-            }
-          ]
-        },
-        "options": {}
-      }
-    },
-    {
-      "name": "Inventory Available?",
-      "type": "n8n-nodes-base.switch",
-      "position": [1000, 300],
-      "parameters": {
-        "dataType": "boolean",
-        "value1": "={{ $json.available }}",
-        "rules": {
-          "rules": [
-            {
-              "operation": "equals",
-              "value2": true
-            }
-          ]
-        },
-        "fallbackOutput": "default"
-      }
-    }
-  ],
-  "connections": {
-    "Webhook Trigger": {
-      "main": [
-        [{ "node": "Validate Order Data", "type": "main", "index": 0 }]
-      ]
-    },
-    "Validate Order Data": {
-      "main": [
-        [{ "node": "Check Inventory", "type": "main", "index": 0 }]
-      ]
-    },
-    "Check Inventory": {
-      "main": [
-        [{ "node": "Inventory Available?", "type": "main", "index": 0 }]
-      ]
-    }
-  },
-  "active": true,
-  "settings": {
-    "executionOrder": "v1"
+interface ProcessStep {
+  name: string;
+  type: 'manual' | 'automated' | 'decision' | 'approval';
+  duration_minutes: number;
+  frequency: 'hourly' | 'daily' | 'weekly' | 'monthly' | 'on_demand';
+  responsible: string;
+  automation_feasibility: 'easy' | 'moderate' | 'difficult' | 'not_possible';
+}
+
+async function analyzeProcess(
+  processSpec: ProcessSpec
+): Promise<ProcessAnalysis> {
+  const steps = decomposeProcess(processSpec);
+  const integrations = identifyIntegrations(steps);
+  
+  return {
+    process_name: processSpec.name,
+    steps,
+    integrations,
+    automation_opportunities: identifyOpportunities(steps),
+    complexity: calculateComplexity(steps)
+  };
+}
+
+function identifyOpportunities(steps: ProcessStep[]): Opportunity[] {
+  return steps
+    .filter(step => 
+      step.type === 'manual' && 
+      step.automation_feasibility !== 'not_possible'
+    )
+    .map(step => ({
+      step: step.name,
+      feasibility: step.automation_feasibility,
+      estimated_savings: estimateTimeSavings(step),
+      approach: determineApproach(step)
+    }))
+    .sort((a, b) => {
+      const savingsOrder = ['high', 'medium', 'low'];
+      return savingsOrder.indexOf(b.estimated_savings) - 
+             savingsOrder.indexOf(a.estimated_savings);
+    });
+}
+```
+
+### Bước 2: Workflow Design
+
+```typescript
+// Design n8n workflow
+interface WorkflowDesign {
+  name: string;
+  description: string;
+  nodes: Node[];
+  connections: Connection[];
+  settings: WorkflowSettings;
+  errorWorkflow?: string;
+}
+
+interface Node {
+  id: string;
+  name: string;
+  type: string;
+  parameters: Record<string, any>;
+  position: { x: number; y: number };
+}
+
+interface Connection {
+  source: string;
+  target: string;
+  data?: Record<string, any>;
+}
+
+function designWorkflow(
+  analysis: ProcessAnalysis
+): WorkflowDesign {
+  const nodes: Node[] = [];
+  const connections: Connection[] = [];
+  
+  // Add trigger node
+  const trigger = createTriggerNode(analysis.triggers);
+  nodes.push(trigger);
+  
+  // Build workflow steps
+  let previousNode = trigger.id;
+  
+  for (const step of analysis.steps) {
+    if (step.type === 'manual') continue;
+    
+    const stepNodes = createStepNodes(step);
+    nodes.push(...stepNodes);
+    
+    // Connect to previous node
+    connections.push({
+      source: previousNode,
+      target: stepNodes[0].id
+    });
+    
+    previousNode = stepNodes[stepNodes.length - 1].id;
   }
+  
+  // Add error handling
+  const errorHandler = createErrorHandler(analysis);
+  nodes.push(errorHandler);
+  
+  return {
+    name: analysis.process_name.replace(/\s+/g, '_').toLowerCase(),
+    description: analysis.process_name,
+    nodes,
+    connections,
+    settings: createWorkflowSettings(analysis),
+    errorWorkflow: createErrorWorkflow(analysis)
+  };
 }
-```
 
-### Bước 2: Error Handling Workflows
-
-```json
-{
-  "name": "Error Handler Workflow",
-  "nodes": [
-    {
-      "name": "Error Trigger",
-      "type": "n8n-nodes-base.errorTrigger",
-      "position": [250, 300]
-    },
-    {
-      "name": "Parse Error",
-      "type": "n8n-nodes-base.code",
-      "position": [500, 300],
-      "parameters": {
-        "jsCode": "// Extract error information\nconst error = $input.first().json;\n\nconst errorInfo = {\n  workflowId: error.workflow?.id,\n  workflowName: error.workflow?.name,\n  nodeName: error.node?.name,\n  errorMessage: error.execution?.error?.message,\n  errorStack: error.execution?.error?.stack,\n  timestamp: new Date().toISOString(),\n  executionId: error.execution?.id\n};\n\n// Categorize error\nlet severity = 'low';\nlet category = 'unknown';\n\nconst errorMessage = errorInfo.errorMessage?.toLowerCase() || '';\n\nif (errorMessage.includes('timeout') || errorMessage.includes('unavailable')) {\n  severity = 'high';\n  category = 'infrastructure';\n} else if (errorMessage.includes('validation')) {\n  severity = 'medium';\n  category = 'data_quality';\n} else if (errorMessage.includes('authentication') || errorMessage.includes('unauthorized')) {\n  severity = 'high';\n  category = 'security';\n}\n\nreturn [{\n  json: { ...errorInfo, severity, category }\n}];"
-      }
-    },
-    {
-      "name": "Classify Error",
-      "type": "n8n-nodes-base.switch",
-      "position": [750, 300],
-      "parameters": {
-        "dataType": "string",
-        "value1": "={{ $json.severity }}",
-        "rules": {
-          "rules": [
-            {
-              "operation": "equals",
-              "value2": "high"
-            },
-            {
-              "operation": "equals",
-              "value2": "medium"
-            }
-          ]
-        },
-        "fallbackOutput": "default"
-      }
-    },
-    {
-      "name": "Alert On-Call (High Severity)",
-      "type": "n8n-nodes-base.pagerDuty",
-      "position": [1000, 150],
-      "parameters": {
-        "operation": "create",
-        "title": "={{ 'Error in workflow: ' + $json.workflowName }}",
-        "severity": 2,
-        "source": "={{ $json.workflowName }}",
-        "customDetails": "={{ JSON.stringify($json) }}"
-      }
-    },
-    {
-      "name": "Send Slack Alert (Medium Severity)",
-      "type": "n8n-nodes-base.slack",
-      "position": [1000, 300],
-      "parameters": {
-        "resource": "message",
-        "channel": "={{ $env.SLACK_ERROR_CHANNEL }}",
-        "text": "=:warning: *Workflow Error*\n*Workflow:* {{ $json.workflowName }}\n*Error:* {{ $json.errorMessage }}\n*Node:* {{ $json.nodeName }}"
-      }
-    },
-    {
-      "name": "Log to Database (All)",
-      "type": "n8n-nodes-base.postgres",
-      "position": [1000, 450],
-      "parameters": {
-        "operation": "insert",
-        "table": "workflow_errors",
-        "columns": "workflow_id, workflow_name, node_name, error_message, severity, category, timestamp",
-        "values": "={{ $json.workflowId }}, {{ $json.workflowName }}, {{ $json.nodeName }}, {{ $json.errorMessage }}, {{ $json.severity }}, {{ $json.category }}, {{ $json.timestamp }}"
-      }
-    }
-  ],
-  "connections": {
-    "Error Trigger": {
-      "main": [[{ "node": "Parse Error", "type": "main", "index": 0 }]]
-    },
-    "Parse Error": {
-      "main": [[{ "node": "Classify Error", "type": "main", "index": 0 }]]
-    },
-    "Classify Error": {
-      "main": [
-        [{ "node": "Alert On-Call (High Severity)", "type": "main", "index": 0 }],
-        [{ "node": "Send Slack Alert (Medium Severity)", "type": "main", "index": 0 }],
-        [{ "node": "Log to Database (All)", "type": "main", "index": 0 }]
-      ]
-    }
-  }
-}
-```
-
-### Phase 2: Common Patterns
-
-### Bước 3: Data Transformation Patterns
-
-```json
-{
-  "name": "Data Transformation Workflow",
-  "nodes": [
-    {
-      "name": "CRM Webhook",
-      "type": "n8n-nodes-base.webhook",
-      "position": [250, 300],
-      "parameters": {
-        "path": "crm-contact"
-      }
-    },
-    {
-      "name": "Transform to Standard Format",
-      "type": "n8n-nodes-base.code",
-      "position": [500, 300],
-      "parameters": {
-        "jsCode": "// Transform CRM data to standard format\nconst crmData = $input.first().json;\n\n// Map CRM fields to standard schema\nconst standardContact = {\n  id: crmData.ContactID,\n  firstName: crmData.FirstName,\n  lastName: crmData.LastName,\n  email: crmData.EmailAddress,\n  phone: crmData.Phone,\n  company: crmData.AccountName,\n  title: crmData.JobTitle,\n  source: 'crm',\n  sourceId: crmData.ContactID,\n  createdAt: crmData.CreatedDate,\n  updatedAt: crmData.ModifiedDate,\n  metadata: {\n    crmType: 'salesforce',\n    ownerId: crmData.OwnerId,\n    leadSource: crmData.LeadSource\n  }\n};\n\nreturn [{ json: standardContact }];"
-      }
-    },
-    {
-      "name": "Validate Required Fields",
-      "type": "n8n-nodes-base.code",
-      "position": [750, 300],
-      "parameters": {
-        "jsCode": "// Validate required fields\nconst contact = $input.first().json;\n\nconst requiredFields = ['firstName', 'lastName', 'email'];\nconst missingFields = requiredFields.filter(field => !contact[field]);\n\nif (missingFields.length > 0) {\n  throw new Error(`Missing required fields: ${missingFields.join(', ')}`);\n}\n\n// Validate email format\nconst emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\nif (!emailRegex.test(contact.email)) {\n  throw new Error('Invalid email format');\n}\n\nreturn [{ json: contact }];"
-      }
-    },
-    {
-      "name": "Enrich with External Data",
-      "type": "n8n-nodes-base.httpRequest",
-      "position": [1000, 300],
-      "parameters": {
-        "method": "GET",
-        "url": "=https://company-enrichment.api/{{ $json.company }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [{ "name": "Authorization", "value": "Bearer {{$env.ENRICHMENT_API_KEY}}" }]
-        },
-        "options": {
-          "timeout": 5000
-        }
-      }
-    },
-    {
-      "name": "Merge Enrichment Data",
-      "type": "n8n-nodes-base.code",
-      "position": [1250, 300],
-      "parameters": {
-        "jsCode": "// Merge original contact with enrichment data\nconst original = $input.first().json;\nconst enrichment = $input.last().json;\n\nconst enrichedContact = {\n  ...original,\n  companyData: {\n    industry: enrichment.industry,\n    size: enrichment.employeeCount,\n    revenue: enrichment.annualRevenue,\n    website: enrichment.domain\n  }\n};\n\nreturn [{ json: enrichedContact }];"
-      }
-    },
-    {
-      "name": "Save to Database",
-      "type": "n8n-nodes-base.postgres",
-      "position": [1500, 300],
-      "parameters": {
-        "operation": "upsert",
-        "table": "contacts",
-        "primaryKeyColumn": "id",
-        "columns": "id, first_name, last_name, email, phone, company, title, source, source_id, created_at, updated_at, metadata",
-        "values": "={{ $json.id }}, '{{ $json.firstName }}', '{{ $json.lastName }}', '{{ $json.email }}', '{{ $json.phone }}', '{{ $json.company }}', '{{ $json.title }}', '{{ $json.source }}', '{{ $json.sourceId }}', '{{ $json.createdAt }}', '{{ $json.updatedAt }}', '{{ JSON.stringify($json.metadata) }}'"
-      }
-    }
-  ]
-}
-```
-
-### Bước 4: Scheduled Processing Patterns
-
-```json
-{
-  "name": "Daily Report Generation",
-  "nodes": [
-    {
-      "name": "Schedule Trigger",
-      "type": "n8n-nodes-base.schedule",
-      "position": [250, 300],
-      "parameters": {
-        "rule": {
-          "interval": [
-            {
-              "field": "dayOfMonth",
-              "value": "1"
-            }
-          ]
-        }
-      },
-      "triggerTimes": {
-        "item": [{ "mode": "everyMinute", "value": 1, "unit": "day" }]
-      }
-    },
-    {
-      "name": "Fetch Data from Database",
-      "type": "n8n-nodes-base.postgres",
-      "position": [500, 300],
-      "parameters": {
-        "operation": "executeQuery",
-        "query": "SELECT \n  DATE(created_at) as date,\n  COUNT(*) as total_orders,\n  SUM(total_amount) as revenue,\n  COUNT(DISTINCT customer_id) as unique_customers\nFROM orders\nWHERE created_at >= CURRENT_DATE - INTERVAL '30 days'\nGROUP BY DATE(created_at)\nORDER BY date DESC;"
-      }
-    },
-    {
-      "name": "Calculate Metrics",
-      "type": "n8n-nodes-base.code",
-      "position": [750, 300],
-      "parameters": {
-        "jsCode": "// Calculate summary metrics\nconst dailyData = $input.all().map(item => item.json);\n\nconst summary = dailyData.reduce((acc, day) => ({\n  totalRevenue: acc.totalRevenue + day.revenue,\n  totalOrders: acc.totalOrders + day.total_orders,\n  avgOrderValue: (acc.totalRevenue + day.revenue) / (acc.totalOrders + day.total_orders),\n  uniqueCustomers: new Set([...acc.customers, day.unique_customers]).size,\n  customers: [...acc.customers, day.unique_customers]\n}), { totalRevenue: 0, totalOrders: 0, customers: [] });\n\nreturn [{\n  json: {\n    reportDate: new Date().toISOString(),\n    period: 'Last 30 days',\n    metrics: {\n      totalRevenue: summary.totalRevenue,\n      totalOrders: summary.totalOrders,\n      averageOrderValue: summary.avgOrderValue,\n      uniqueCustomers: summary.uniqueCustomers\n    },\n    dailyData\n  }\n}];"
-      }
-    },
-    {
-      "name": "Generate PDF Report",
-      "type": "n8n-nodes-base.html",
-      "position": [1000, 300],
-      "parameters": {
-        "html": "<!DOCTYPE html>\n<html>\n<head>\n  <title>Monthly Report</title>\n  <style>\n    body { font-family: Arial, sans-serif; }\n    .metric { margin: 20px 0; }\n    .metric-value { font-size: 24px; font-weight: bold; }\n  </style>\n</head>\n<body>\n  <h1>Monthly Business Report</h1>\n  <p>Report Date: {{ $json.reportDate }}</p>\n  \n  <div class=\"metric\">\n    <div>Total Revenue</div>\n    <div class=\"metric-value\">${{ $json.metrics.totalRevenue }}</div>\n  </div>\n  \n  <div class=\"metric\">\n    <div>Total Orders</div>\n    <div class=\"metric-value\">{{ $json.metrics.totalOrders }}</div>\n  </div>\n</body>\n</html>"
-      }
-    },
-    {
-      "name": "Send Email Report",
-      "type": "n8n-nodes-base.gmail",
-      "position": [1250, 300],
-      "parameters": {
-        "action": "send",
-        "to": "={{ $env.REPORT_RECIPIENTS }}",
-        "subject": "=Monthly Business Report - {{ $json.reportDate }}",
-        "emailHtml": "={{ $json.data }}",
-        "attachments": [
-          {
-            "name": "={{ 'report-' + $json.reportDate.split('T')[0] + '.html' }}",
-            "data": "={{ $json.data }}"
+function createTriggerNode(triggers: Trigger[]): Node {
+  const triggerType = determineTriggerType(triggers);
+  
+  switch (triggerType) {
+    case 'schedule':
+      return {
+        id: 'trigger-1',
+        name: 'Schedule Trigger',
+        type: 'n8n-nodes-base.scheduleTrigger',
+        parameters: {
+          rule: {
+            interval: [
+              {
+                field: triggers[0].schedule || 'daily',
+                triggerAtHour: 9,
+                triggerAtMinute: 0
+              }
+            ]
           }
+        },
+        position: { x: 0, y: 0 }
+      };
+      
+    case 'webhook':
+      return {
+        id: 'trigger-1',
+        name: 'Webhook',
+        type: 'n8n-nodes-base.webhook',
+        parameters: {
+          httpMethod: triggers[0].method || 'POST',
+          path: triggers[0].path,
+          responseMode: 'onReceived'
+        },
+        position: { x: 0, y: 0 }
+      };
+      
+    case 'event':
+      return {
+        id: 'trigger-1',
+        name: 'Event Trigger',
+        type: 'n8n-nodes-base.manualTrigger',
+        parameters: {},
+        position: { x: 0, y: 0 }
+      };
+  }
+}
+```
+
+### Bước 3: Node Implementation
+
+```typescript
+// Create workflow nodes
+function createStepNodes(step: ProcessStep): Node[] {
+  const nodes: Node[] = [];
+  
+  switch (step.type) {
+    case 'automated':
+      nodes.push(...createAutomatedNodes(step));
+      break;
+    case 'decision':
+      nodes.push(createDecisionNode(step));
+      break;
+    case 'approval':
+      nodes.push(createApprovalNode(step));
+      break;
+  }
+  
+  return nodes;
+}
+
+function createAutomatedNodes(step: ProcessStep): Node[] {
+  const nodes: Node[] = [];
+  
+  // Create HTTP Request node for API calls
+  if (step.integration?.type === 'api') {
+    nodes.push({
+      id: `http-${step.name}`,
+      name: `Call ${step.integration.system}`,
+      type: 'n8n-nodes-base.httpRequest',
+      parameters: {
+        url: step.integration.endpoint,
+        method: step.integration.method,
+        authentication: step.integration.auth,
+        sendHeaders: true,
+        headerParameters: {
+          parameters: [
+            { name: 'Authorization', value: '={{$env.API_TOKEN}}' }
+          ]
+        },
+        sendBody: {
+          martial: 'raw',
+          jsonObject: true,
+          body: '={{$json}}'
+        }
+      },
+      position: { x: 200, y: nodes.length * 100 }
+    });
+  }
+  
+  // Create database node
+  if (step.integration?.type === 'database') {
+    nodes.push({
+      id: `db-${step.name}`,
+      name: `Query ${step.integration.database}`,
+      type: 'n8n-nodes-base.postgres',
+      parameters: {
+        operation: 'executeQuery',
+        query: step.integration.query,
+        options: {
+          timeout: 30000
+        }
+      },
+      position: { x: 200, y: nodes.length * 100 }
+    });
+  }
+  
+  // Create transform node
+  if (step.dataTransform) {
+    nodes.push({
+      id: `transform-${step.name}`,
+      name: 'Transform Data',
+      type: 'n8n-nodes-base.set',
+      parameters: {
+        mode: 'manual',
+        assignments: {
+          assignments: step.dataTransform.fields.map(field => ({
+            name: field.target,
+            value: field.expression
+          }))
+        },
+        options: {}
+      },
+      position: { x: 400, y: nodes.length * 100 }
+    });
+  }
+  
+  return nodes;
+}
+
+function createDecisionNode(step: ProcessStep): Node {
+  return {
+    id: `decision-${step.name}`,
+    name: step.name,
+    type: 'n8n-nodes-base.switch',
+    parameters: {
+      dataType: 'string',
+      value1: '={{$json.status}}',
+      rules: {
+        rules: [
+          { operation: 'equals', value2: step.decision?.condition }
+        ]
+      },
+      fallbackOutput: 'default'
+    },
+    position: { x: 300, y: 200 }
+  };
+}
+
+function createApprovalNode(step: ProcessStep): Node {
+  return {
+    id: `approval-${step.name}`,
+    name: `Request Approval for ${step.name}`,
+    type: 'n8n-nodes-base.slack',
+    parameters: {
+      resource: 'message',
+      channel: step.approval?.slackChannel || '#approvals',
+      text: `Approval needed for ${step.name}`,
+      additionalFields: {
+        attachments: {
+          attachments: [
+            {
+              color: '#FFA500',
+              title: 'Approval Required',
+              fields: [
+                {
+                  title: 'Requested By',
+                  value: '={{$json.requestedBy}}',
+                  short: true
+                },
+                {
+                  title: 'Details',
+                  value: '={{$json.details}}',
+                  short: true
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    position: { x: 300, y: 300 }
+  };
+}
+```
+
+### Bước 4: Error Handling
+
+```typescript
+// Design error handling
+interface ErrorHandling {
+  retry_policy: RetryPolicy;
+  fallback_actions: FallbackAction[];
+  alerting: AlertConfig;
+}
+
+function designErrorHandling(
+  workflow: WorkflowDesign
+): ErrorHandling {
+  return {
+    retry_policy: {
+      max_retries: 3,
+      retry_wait_time: 1000 * 60 * 5, // 5 minutes
+      exponential_backoff: true
+    },
+    fallback_actions: [
+      {
+        node: 'critical-api-call',
+        onFailure: 'use_cache',
+        cache_source: 'previous_successful_call'
+      },
+      {
+        node: 'notification',
+        onFailure: 'log_and_continue'
+      }
+    ],
+    alerting: {
+      on_retry_exhausted: {
+        channels: ['email', 'slack'],
+        message: 'Workflow {{workflow.name}} failed after retries'
+      },
+      on_critical_error: {
+        channels: ['pagerduty'],
+        escalation: true
+      }
+    }
+  };
+}
+
+function createErrorWorkflow(analysis: ProcessAnalysis): string {
+  return JSON.stringify({
+    name: `${analysis.process_name}_error_handler`,
+    nodes: [
+      {
+        id: 'error-trigger',
+        name: 'Error Trigger',
+        type: 'n8n-nodes-base.errorTrigger',
+        parameters: {},
+        position: { x: 0, y: 0 }
+      },
+      {
+        id: 'log-error',
+        name: 'Log Error',
+        type: 'n8n-nodes-base.writeBinaryFile',
+        parameters: {
+          fileName: '/logs/error-{{$json.timestamp}}.json',
+          data: '={{ JSON.stringify($json) }}'
+        },
+        position: { x: 200, y: 0 }
+      },
+      {
+        id: 'notify-team',
+        name: 'Notify Team',
+        type: 'n8n-nodes-base.slack',
+        parameters: {
+          channel: '#workflow-errors',
+          text: `Workflow Error: {{ $json.workflow.name }}\nError: {{ $json.execution.error.message }}`
+        },
+        position: { x: 400, y: 0 }
+      }
+    ],
+    connections: {
+      'Error Trigger': {
+        main: [[{ node: 'Log Error', type: 'main', index: 0 }]]
+      },
+      'Log Error': {
+        main: [[{ node: 'Notify Team', type: 'main', index: 0 }]]
+      }
+    }
+  });
+}
+```
+
+### Bước 5: Monitoring Setup
+
+```typescript
+// Design monitoring và analytics
+interface MonitoringSetup {
+  execution_tracking: boolean;
+  metrics: Metric[];
+  dashboards: Dashboard[];
+  alerts: Alert[];
+}
+
+interface Metric {
+  name: string;
+  type: 'count' | 'duration' | 'success_rate';
+  node_id?: string;
+}
+
+function designMonitoring(workflow: WorkflowDesign): MonitoringSetup {
+  return {
+    execution_tracking: true,
+    metrics: [
+      { name: 'total_executions', type: 'count' },
+      { name: 'successful_executions', type: 'count' },
+      { name: 'failed_executions', type: 'count' },
+      { name: 'avg_duration_seconds', type: 'duration' },
+      { name: 'api_call_success_rate', type: 'success_rate', node_id: 'http-node' }
+    ],
+    dashboards: [
+      {
+        name: `${workflow.name} Overview`,
+        panels: [
+          { metric: 'total_executions', visualization: 'stat' },
+          { metric: 'success_rate', visualization: 'gauge' },
+          { metric: 'avg_duration_seconds', visualization: 'time_series' }
         ]
       }
-    },
-    {
-      "name": "Archive Report",
-      "type": "n8n-nodes-base.googleCloudStorage",
-      "position": [1500, 300],
-      "parameters": {
-        "operation": "upload",
-        "bucket": "={{ $env.REPORTS_BUCKET }}",
-        "fileName": "=reports/{{ new Date().toISOString().split('T')[0] }}.html",
-        "data": "={{ $json.data }}"
+    ],
+    alerts: [
+      {
+        name: 'High Failure Rate',
+        condition: 'failed_executions / total_executions > 0.1',
+        severity: 'warning',
+        channels: ['slack']
+      },
+      {
+        name: 'Execution Timeout',
+        condition: 'duration > 300000', // 5 minutes
+        severity: 'critical',
+        channels: ['pagerduty']
       }
-    }
-  ]
+    ]
+  };
 }
 ```
 
-### Phase 3: Advanced Patterns
+## Checklist (Danh sách kiểm tra)
 
-### Bước 5: Sub-nodes và Reusable Workflows
-
-```json
-{
-  "name": "Send Notification Template",
-  "type": "workflow",
-  "nodes": [
-    {
-      "name": "Webhook Trigger",
-      "type": "n8n-nodes-base.webhook",
-      "position": [250, 300],
-      "parameters": {
-        "path": "send-notification"
-      }
-    },
-    {
-      "name": "Render Template",
-      "type": "n8n-nodes-base.code",
-      "position": [500, 300],
-      "parameters": {
-        "jsCode": "// Template rendering function\nconst { template, data, channel } = $input.first().json;\n\nfunction renderTemplate(template, data) {\n  return template.replace(/\\{\\{(\\w+(?:\\.\\w+)*)\\}\\}/g, (match, path) => {\n    return path.split('.').reduce((obj, key) => obj?.[key], data) ?? match;\n  });\n}\n\nconst rendered = {\n  channel,\n  subject: renderTemplate(template.subject || '', data),\n  body: renderTemplate(template.body, data),\n  metadata: { templateId: template.id, ...data.metadata }\n};\n\nreturn [{ json: rendered }];"
-      }
-    },
-    {
-      "name": "Route by Channel",
-      "type": "n8n-nodes-base.switch",
-      "position": [750, 300],
-      "parameters": {
-        "dataType": "string",
-        "value1": "={{ $json.channel }}",
-        "rules": {
-          "rules": [
-            { "operation": "equals", "value2": "email" },
-            { "operation": "equals", "value2": "slack" },
-            { "operation": "equals", "value2": "sms" }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Send Email",
-      "type": "n8n-nodes-base.gmail",
-      "position": [1000, 150],
-      "parameters": {
-        "action": "send",
-        "to": "={{ $json.metadata.recipientEmail }}",
-        "subject": "={{ $json.subject }}",
-        "emailHtml": "={{ $json.body }}"
-      }
-    },
-    {
-      "name": "Send Slack Message",
-      "type": "n8n-nodes-base.slack",
-      "position": [1000, 300],
-      "parameters": {
-        "resource": "message",
-        "channel": "={{ $json.metadata.slackChannel || '#general' }}",
-        "text": "={{ $json.body }}"
-      }
-    },
-    {
-      "name": "Send SMS",
-      "type": "n8n-nodes-base.twilio",
-      "position": [1000, 450],
-      "parameters": {
-        "action": "send",
-        "from": "={{ $env.TWILIO_PHONE_NUMBER }}",
-        "to": "={{ $json.metadata.phoneNumber }}",
-        "message": "={{ $json.body }}"
-      }
-    }
-  ],
-  "connections": {
-    "Webhook Trigger": { "main": [[{ "node": "Render Template", "type": "main", "index": 0 }]] },
-    "Render Template": { "main": [[{ "node": "Route by Channel", "type": "main", "index": 0 }]] },
-    "Route by Channel": {
-      "main": [
-        [{ "node": "Send Email", "type": "main", "index": 0 }],
-        [{ "node": "Send Slack Message", "type": "main", "index": 0 }],
-        [{ "node": "Send SMS", "type": "main", "index": 0 }]
-      ]
-    }
-  }
-}
-```
-
-### Bước 6: Loop và Batch Processing
-
-```json
-{
-  "name": "Batch Processing Workflow",
-  "nodes": [
-    {
-      "name": "Schedule Trigger",
-      "type": "n8n-nodes-base.schedule",
-      "position": [250, 300],
-      "parameters": {
-        "rule": {
-          "interval": [{ "field": "hour", "value": 1 }]
-        }
-      }
-    },
-    {
-      "name": "Fetch Pending Items",
-      "type": "n8n-nodes-base.postgres",
-      "position": [500, 300],
-      "parameters": {
-        "operation": "executeQuery",
-        "query": "SELECT * FROM pending_notifications WHERE status = 'pending' LIMIT 100;"
-      }
-    },
-    {
-      "name": "Split In Batches",
-      "type": "n8n-nodes-base.splitInBatches",
-      "position": [750, 300],
-      "parameters": {
-        "batchSize": 10,
-        "options": {
-          "reset": true
-        }
-      }
-    },
-    {
-      "name": "Process Item",
-      "type": "n8n-nodes-base.httpRequest",
-      "position": [1000, 300],
-      "parameters": {
-        "method": "POST",
-        "url": "={{ $json.webhookUrl }}",
-        "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            { "name": "id", "value": "={{ $json.id }}" },
-            { "name": "message", "value": "={{ $json.message }}" }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Update Status",
-      "type": "n8n-nodes-base.postgres",
-      "position": [1250, 300],
-      "parameters": {
-        "operation": "update",
-        "table": "pending_notifications",
-        "columns": "status, processed_at",
-        "values": "='processed', NOW()",
-        "where": "id = {{ $('Process Item').item.json.id }}"
-      }
-    },
-    {
-      "name": "Wait for Completion",
-      "type": "n8n-nodes-base.wait",
-      "position": [1500, 300],
-      "parameters": {
-        "amount": 1,
-        "unit": "seconds"
-      }
-    }
-  ]
-}
-```
-
-## Checklist
-
-- [ ] Workflow has proper trigger configuration
-- [ ] Error handling workflow is attached
-- [ ] Credentials are securely stored
-- [ ] Environment variables are used
-- [ ] Nodes are properly connected
-- [ ] Data validation is implemented
-- [ ] Logging is configured
-- [ ] Workflow is documented
-- [ ] Testing is performed
-- [ ] Monitoring is set up
+- [ ] Process thoroughly analyzed
+- [ ] All integrations identified
+- [ ] Trigger conditions properly configured
+- [ ] Data transformations validated
+- [ ] Error handling implemented
+- [ ] Retry policies configured
+- [ ] Monitoring setup complete
+- [ ] Documentation written
+- [ ] Test cases created
+- [ ] Error workflow tested
+- [ ] Permissions properly set
+- [ ] Credentials securely stored
+- [ ] Rate limits considered
+- [ ] Timeout values set appropriately
+- [ ] Logging configured
 
 ## Examples (Ví dụ)
 
-### Ví dụ: Complete E-commerce Order Flow
+### Ví dụ 1: Customer Onboarding Workflow
 
-```json
-{
-  "name": "E-commerce Order Processing",
-  "nodes": [
+```typescript
+// Customer onboarding automation workflow
+const customerOnboardingWorkflow = {
+  name: 'customer_onboarding',
+  description: 'Automate customer onboarding process',
+  nodes: [
     {
-      "name": "Order Webhook",
-      "type": "n8n-nodes-base.webhook",
-      "position": [250, 300]
+      id: 'trigger',
+      name: 'New Signup Webhook',
+      type: 'n8n-nodes-base.webhook',
+      parameters: {
+        httpMethod: 'POST',
+        path: 'customer-signup',
+        responseMode: 'lastNode'
+      },
+      position: { x: 0, y: 0 }
     },
     {
-      "name": "Validate Order",
-      "type": "n8n-nodes-base.code",
-      "position": [500, 300]
+      id: 'validate',
+      name: 'Validate Input',
+      type: 'n8n-nodes-base.code',
+      parameters: {
+        jsCode: `
+          const data = $input.item.json;
+          const errors = [];
+          
+          if (!data.email || !data.email.includes('@')) {
+            errors.push('Invalid email');
+          }
+          if (!data.company) {
+            errors.push('Company name required');
+          }
+          
+          if (errors.length > 0) {
+            throw new Error(errors.join(', '));
+          }
+          
+          return { json: data };
+        `
+      },
+      position: { x: 250, y: 0 }
     },
     {
-      "name": "Check Inventory",
-      "type": "n8n-nodes-base.httpRequest",
-      "position": [750, 300]
+      id: 'create-crm',
+      name: 'Create CRM Contact',
+      type: 'n8n-nodes-base.hubspot',
+      parameters: {
+        operation: 'create',
+        email: '={{$json.email}}',
+        additionalFields: {
+          company: '={{$json.company}}',
+          firstname: '={{$json.firstName}}'
+        }
+      },
+      position: { x: 500, y: 0 }
     },
     {
-      "name": "Process Payment",
-      "type": "n8n-nodes-base.stripe",
-      "position": [1000, 300]
+      id: 'send-welcome',
+      name: 'Send Welcome Email',
+      type: 'n8n-nodes-base.emailSend',
+      parameters: {
+        to: '={{$json.email}}',
+        subject: 'Welcome to our platform!',
+        body: '={{ $templateLib.welcomeEmail($json) }}'
+      },
+      position: { x: 750, y: 0 }
     },
     {
-      "name": "Create Order in DB",
-      "type": "n8n-nodes-base.postgres",
-      "position": [1250, 300]
-    },
-    {
-      "name": "Send Confirmation Email",
-      "type": "n8n-nodes-base.gmail",
-      "position": [1500, 300]
-    },
-    {
-      "name": "Notify Fulfillment",
-      "type": "n8n-nodes-base.slack",
-      "position": [1750, 300]
+      id: 'notify-sales',
+      name: 'Notify Sales Team',
+      type: 'n8n-nodes-base.slack',
+      parameters: {
+        channel: '#new-customers',
+        text: 'New customer: {{$json.company}}'
+      },
+      position: { x: 750, y: 200 }
     }
-  ]
+  ],
+  connections: {
+    'New Signup Webhook': {
+      main: [[{ node: 'Validate Input', type: 'main', index: 0 }]]
+    },
+    'Validate Input': {
+      main: [[{ node: 'Create CRM Contact', type: 'main', index: 0 }]]
+    },
+    'Create CRM Contact': {
+      main: [
+        [{ node: 'Send Welcome Email', type: 'main', index: 0 }],
+        [{ node: 'Notify Sales Team', type: 'main', index: 0 }]
+      ]
+    }
+  }
+};
+```
+
+## Anti Patterns (Các pattern cần tránh)
+
+### 1. Monolithic Workflow
+```typescript
+// ❌ BAD: One huge workflow
+// 50 nodes all in one workflow
+// Impossible to test or debug
+
+// ✅ GOOD: Modular workflows
+// Split into sub-workflows
+// Each handles one concern
+```
+
+### 2. No Error Handling
+```typescript
+// ❌ BAD: No error handling
+// Nodes just fail silently
+// No retries, no alerts
+
+// ✅ GOOD: Comprehensive error handling
+// Retry policies
+// Error workflows
+// Alert notifications
+```
+
+### 3. Hardcoded Values
+```typescript
+// ❌ BAD: Hardcoded credentials
+parameters: {
+  password: 'secret123'
+}
+
+// ✅ GOOD: Environment variables
+parameters: {
+  password: '={{$env.DB_PASSWORD}}'
 }
 ```
 
-### Ví dụ: Monitoring Dashboard Query
+## Best Practices (Thực hành tốt nhất)
 
-```json
-{
-  "name": "Workflow Analytics",
-  "nodes": [
-    {
-      "name": "Manual Trigger",
-      "type": "n8n-nodes-base.manualTrigger",
-      "position": [250, 300]
-    },
-    {
-      "name": "Query Execution Logs",
-      "type": "n8n-nodes-base.postgres",
-      "position": [500, 300],
-      "parameters": {
-        "operation": "executeQuery",
-        "query": "SELECT \n  workflow_id,\n  workflow_name,\n  status,\n  COUNT(*) as count,\n  AVG(duration_ms) as avg_duration\nFROM workflow_executions\nWHERE started_at >= NOW() - INTERVAL '7 days'\nGROUP BY workflow_id, workflow_name, status;"
-      }
-    },
-    {
-      "name": "Generate Summary",
-      "type": "n8n-nodes-base.code",
-      "position": [750, 300]
-    },
-    {
-      "name": "Send to Datadog",
-      "type": "n8n-nodes-base.httpRequest",
-      "position": [1000, 300]
-    }
-  ]
-}
-```
+1. **Start simple**: Small, working workflows first
+2. **Use sub-workflows**: Reuse common patterns
+3. **Handle errors**: Always have error handling
+4. **Log everything**: For debugging and auditing
+5. **Use credentials**: Never hardcode secrets
+6. **Test thoroughly**: Test each node individually
+7. **Monitor execution**: Track success/failure rates
+8. **Document workflows**: Explain what each does
+9. **Version control**: Keep workflows in git
+10. **Consider scaling**: Design for expected load
 
-## Anti Pattern
+## Liên kết (Cross-references)
 
-- [ ] **Monolithic workflows**: Everything in one workflow
-- [ ] **No error handling**: Silent failures
-- [ ] **Hardcoded credentials**: Security risk
-- [ ] **No timeout**: Infinite waits
-- [ ] **No logging**: No visibility
-- [ ] **Tight coupling**: Workflows depend on specific execution order
-
-## Best Practice
-
-- [ ] **Modular design**: Break into reusable sub-workflows
-- [ ] **Error workflows**: Attach error handlers
-- [ ] **Environment variables**: Store secrets securely
-- [ ] **Timeouts**: Set reasonable limits
-- [ ] **Comprehensive logging**: Track execution
-- [ ] **Idempotency**: Safe to retry
-
-## Liên kết
-
-- [[../rules/core-architecture]] - Core Architecture
-- [[../rules/queue]] - Queue Best Practices
-- [[../skills/microservices-design]] - Microservices Design
-- [[../skills/performance-audit]] - Performance Audit
-- [[../skills/temporal-workflow]] - Temporal Workflows
+- **Related Skills**: [temporal-workflow](./temporal-workflow.mdc), [automation](../automation/automation.mdc)
+- **Documentation**: n8n.io docs
+- **Integrations**: HTTP, databases, Slack, email, CRM systems

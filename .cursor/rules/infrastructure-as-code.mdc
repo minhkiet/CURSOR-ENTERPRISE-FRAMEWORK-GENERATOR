@@ -1,0 +1,207 @@
+---
+description: Nguyên tắc và best practices cho Infrastructure as Code (IaC) trong Cursor Enterprise Framework
+created: 2026-06-23
+version: 1.0.0
+tags:
+  - iac
+  - terraform
+  - ansible
+  - infrastructure
+  - devops
+---
+
+# Infrastructure as Code Guidelines
+
+## Mục tiêu
+
+Tài liệu này định nghĩa các nguyên tắc và best practices cho việc implement Infrastructure as Code (IaC) trong Cursor Enterprise Framework. Mục tiêu là đảm bảo consistent, versioned, và auditable infrastructure management.
+
+IaC cho phép teams define và manage infrastructure thông qua code, enabling reproducibility và automation.
+
+## Nguyên tắc cơ bản
+
+### 1. Terraform Structure
+
+Organized Terraform codebase.
+
+```
+terraform/
+├── environments/
+│   ├── dev/
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   ├── outputs.tf
+│   │   └── terraform.tfvars
+│   ├── staging/
+│   └── production/
+├── modules/
+│   ├── vpc/
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   ├── ec2/
+│   ├── rds/
+│   └── eks/
+├── shared/
+│   └── common/
+└── backend.tf
+```
+
+### 2. Module Design
+
+Reusable infrastructure modules.
+
+```hcl
+# modules/vpc/main.tf
+variable "environment" {
+  description = "Environment name"
+  type        = string
+}
+
+variable "cidr_block" {
+  description = "VPC CIDR block"
+  type        = string
+}
+
+variable "availability_zones" {
+  description = "List of AZs"
+  type        = list(string)
+}
+
+resource "aws_vpc" "main" {
+  cidr_block           = var.cidr_block
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+
+  tags = {
+    Name        = "${var.environment}-vpc"
+    Environment = var.environment
+  }
+}
+
+resource "aws_subnet" "private" {
+  count             = length(var.availability_zones)
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = cidrsubnet(var.cidr_block, 8, count.index + 1)
+  availability_zone = var.availability_zones[count.index]
+
+  tags = {
+    Name        = "${var.environment}-private-subnet-${count.index + 1}"
+    Environment = var.environment
+  }
+}
+
+output "vpc_id" {
+  value = aws_vpc.main.id
+}
+```
+
+### 3. State Management
+
+Secure Terraform state.
+
+```hcl
+# backend.tf
+terraform {
+  backend "s3" {
+    bucket         = "terraform-state-prod"
+    key            = "production/api/main.tfstate"
+    region         = "us-east-1"
+    encrypt        = true
+    dynamodb_table = "terraform-locks"
+  }
+
+  required_version = ">= 1.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+```
+
+### 4. Variable Management
+
+Input/output patterns.
+
+```hcl
+# variables.tf
+variable "environment" {
+  type        = string
+  description = "Environment name"
+  validation {
+    condition     = contains(["dev", "staging", "production"], var.environment)
+    error_message = "Environment must be dev, staging, or production."
+  }
+}
+
+variable "tags" {
+  type        = map(string)
+  description = "Resource tags"
+
+  default = {
+    ManagedBy = "Terraform"
+  }
+}
+
+# outputs.tf
+output "vpc_id" {
+  description = "VPC ID"
+  value       = module.vpc.vpc_id
+  sensitive   = false
+}
+
+output "database_password" {
+  description = "Database password (sensitive)"
+  value       = aws_db_instance.main.password
+  sensitive   = true
+}
+```
+
+### 5. Security Practices
+
+Secure IaC practices.
+
+```hcl
+# Security group rules
+resource "aws_security_group_rule" "web_allow_https" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.web.id
+  description       = "Allow HTTPS from anywhere"
+}
+
+# Secrets management
+data "aws_secretsmanager_secret_version" "db_password" {
+  secret_id = "prod/database-password"
+}
+
+# Encryption
+resource "aws_s3_bucket" "bucket" {
+  bucket = "my-secure-bucket"
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+
+  versioning {
+    enabled = true
+  }
+}
+```
+
+## Liên kết
+
+- [Terraform Documentation](https://www.terraform.io/)
+- [Ansible Documentation](https://docs.ansible.com/)
+- Cloud Architecture: `.cursor/rules/cloud-architecture.mdc`
+- CI/CD: `.cursor/rules/ci-cd.mdc`

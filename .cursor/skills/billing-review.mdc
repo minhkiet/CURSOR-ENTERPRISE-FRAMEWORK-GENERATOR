@@ -1,302 +1,401 @@
 ---
-description: Review billing system bao gồm subscription management, payments, và invoices
-purpose: Audit billing systems cho accuracy, security, và compliance
-input: Billing codebase, payment configurations, subscription logic
-output: Billing review report, security findings, recommendations
+description: Skill review billing systems để ensure accurate charging, subscription management, và financial compliance
+purpose: Cung cấp comprehensive billing review framework để evaluate billing logic, subscription lifecycles, invoice generation, và payment processing
+input:
+  - Billing code
+  - Subscription configurations
+  - Payment integrations
+  - Invoice templates
+output:
+  - Billing logic review
+  - Subscription analysis
+  - Compliance assessment
+  - Recommendations
 version: 1.0.0
-tags: [billing, subscription, payments, invoices, stripe, revenue]
+tags:
+  - billing
+  - payments
+  - subscriptions
+  - invoicing
+  - finance
 ---
 
-# Billing Review Skill - Kiểm Toán Billing System
+# Billing Review
 
 ## Tổng quan
 
-Billing systems require careful implementation cho accuracy và compliance. Skill này cung cấp framework để review billing implementations.
+Billing Review là skill chuyên biệt để review và assess billing systems. Skill này cung cấp systematic approach để evaluate billing logic, subscription management, payment processing, invoice generation, và financial compliance. Critical cho SaaS và e-commerce applications.
 
 ## Purpose (Mục đích)
 
-Billing Review Skill được thiết kế để:
+Billing errors có thể gây ra:
 
-1. **Subscription Review**: Verify plan management
-2. **Payment Security**: Audit payment handling
-3. **Invoice Accuracy**: Check billing calculations
-4. **Compliance**: Verify regulatory compliance
-5. **Error Handling**: Ensure graceful failures
+1. **Revenue leakage**: Undercharging customers
+2. **Compliance issues**: Tax calculations, accounting
+3. **Customer disputes**: Incorrect invoices
+4. **Financial losses**: Payment failures
+5. **Trust issues**: Billing errors damage trust
 
-### Khi nào sử dụng Billing Review
+Billing Review tồn tại để:
 
-- Khi auditing billing systems
-- Khi reviewing payment logic
-- Khi investigating billing issues
-- Khi setting up subscriptions
+- **Ensure accurate billing** calculations
+- **Validate subscription lifecycle** management
+- **Review payment processing** security
+- **Check compliance** requirements
+- **Identify optimization** opportunities
 
 ## Input (Đầu vào)
 
-- [ ] Billing codebase
-- [ ] Payment configurations
-- [ ] Subscription logic
+| Input | Mô tả | Required |
+|-------|-------|----------|
+| `billing_code` | Billing implementation | Yes |
+| `subscription_config` | Subscription plans | Yes |
+| `payment_config` | Payment configuration | Yes |
+| `invoice_templates` | Invoice templates | No |
 
 ## Output (Đầu ra)
 
-- [ ] Security findings
-- [ ] Accuracy recommendations
-- [ ] Compliance checklist
+| Output | Mô tả | Format |
+|--------|-------|--------|
+| `billing_logic_review` | Billing calculations | Review |
+| `subscription_review` | Subscription analysis | Review |
+| `payment_review` | Payment security | Review |
+| `compliance_review` | Compliance assessment | Review |
+| `recommendations` | Improvements | List |
 
 ## Workflow (Quy trình)
 
-### Phase 1: Subscription Management
-
-### Bước 1: Plan Configuration
+### Bước 1: Billing Logic Review
 
 ```typescript
-// Subscription Plans
-interface SubscriptionPlan {
-  id: string;
-  name: string;
-  price: Money;
-  interval: 'monthly' | 'yearly';
-  features: string[];
-  limits: ResourceLimits;
-  tier: 'free' | 'starter' | 'professional' | 'enterprise';
+// Review billing calculations
+interface BillingLogicReview {
+  calculations: CalculationAnalysis[];
+  issues: BillingIssue[];
+  accuracy_score: number;
 }
 
-const PLANS: SubscriptionPlan[] = [
-  {
-    id: 'free',
-    name: 'Free',
-    price: Money.create(0, Currency.USD),
-    interval: 'monthly',
-    features: ['Basic features', 'Community support'],
-    limits: { users: 5, storage: 1, apiCalls: 1000 },
-    tier: 'free'
-  },
-  {
-    id: 'starter',
-    name: 'Starter',
-    price: Money.create(29, Currency.USD),
-    interval: 'monthly',
-    features: ['All Free features', 'Priority support', 'Advanced analytics'],
-    limits: { users: 25, storage: 50, apiCalls: 50000 },
-    tier: 'starter'
-  },
-  {
-    id: 'professional',
-    name: 'Professional',
-    price: Money.create(99, Currency.USD),
-    interval: 'monthly',
-    features: ['All Starter features', 'SSO', 'Audit logs', 'Custom integrations'],
-    limits: { users: 100, storage: 500, apiCalls: 500000 },
-    tier: 'professional'
-  },
-  {
-    id: 'enterprise',
-    name: 'Enterprise',
-    price: Money.create(299, Currency.USD),
-    interval: 'monthly',
-    features: ['All Professional features', 'Dedicated support', 'SLA', 'Custom contracts'],
-    limits: { users: -1, storage: -1, apiCalls: -1 },
-    tier: 'enterprise'
+interface CalculationAnalysis {
+  operation: string;
+  formula: string;
+  edge_cases: string[];
+  tested: boolean;
+}
+
+async function reviewBillingLogic(
+  code: BillingCode
+): Promise<BillingLogicReview> {
+  const calculations = extractCalculations(code);
+  const issues: BillingIssue[] = [];
+  
+  for (const calc of calculations) {
+    // Check for floating point issues
+    if (hasFloatingPointIssue(calc)) {
+      issues.push({
+        type: 'floating_point_error',
+        severity: 'critical',
+        location: calc.operation,
+        message: 'Use integer cents instead of floating point',
+        suggestion: 'Store all amounts in cents, divide for display'
+      });
+    }
+    
+    // Check for rounding issues
+    if (hasRoundingIssue(calc)) {
+      issues.push({
+        type: 'rounding_issue',
+        severity: 'high',
+        location: calc.operation,
+        message: 'Inconsistent rounding may cause penny differences',
+        suggestion: 'Use HALF_UP rounding consistently'
+      });
+    }
+    
+    // Check for timezone issues
+    if (hasTimezoneIssue(calc)) {
+      issues.push({
+        type: 'timezone_issue',
+        severity: 'high',
+        location: calc.operation,
+        message: 'Date/time without timezone may cause billing errors',
+        suggestion: 'Always use UTC with timezone for billing dates'
+      });
+    }
   }
-];
+  
+  return {
+    calculations,
+    issues,
+    accuracy_score: calculateAccuracyScore(calculations, issues)
+  };
+}
+
+function hasFloatingPointIssue(calc: Calculation): boolean {
+  // Check for operations like price * quantity where price might be float
+  return calc.formula.match(/\*\s*[\d.]+/) !== null;
+}
 ```
 
-### Bước 2: Payment Processing
+### Bước 2: Subscription Review
 
 ```typescript
-// Payment Service Interface
-interface PaymentService {
-  createCustomer(email: string, paymentMethodId: string): Promise<Customer>;
-  createSubscription(customerId: string, planId: string): Promise<Subscription>;
-  updateSubscription(subscriptionId: string, planId: string): Promise<Subscription>;
-  cancelSubscription(subscriptionId: string): Promise<void>;
-  chargeForOverage(customerId: string, usage: UsageRecord): Promise<Payment>;
+// Review subscription management
+interface SubscriptionReview {
+  plans: PlanInfo[];
+  lifecycle: LifecycleAnalysis;
+  prorations: ProrationAnalysis;
+  issues: SubscriptionIssue[];
 }
 
-// Stripe Implementation
-class StripePaymentService implements PaymentService {
-  constructor(
-    private stripeClient: Stripe,
-    private eventBus: EventBus
-  ) {}
+async function reviewSubscriptions(
+  config: SubscriptionConfig
+): Promise<SubscriptionReview> {
+  const plans = parsePlans(config);
+  const issues: SubscriptionIssue[] = [];
   
-  async createSubscription(
-    customerId: string,
-    planId: string
-  ): Promise<Subscription> {
-    const plan = PLANS.find(p => p.id === planId);
-    if (!plan) throw new PlanNotFoundError(planId);
+  // Check for proration logic
+  const prorationAnalysis = analyzeProration(config);
+  
+  for (const plan of plans) {
+    // Check for negative trial periods
+    if (plan.trialDays < 0) {
+      issues.push({
+        type: 'invalid_trial',
+        plan: plan.name,
+        severity: 'critical',
+        message: 'Trial period cannot be negative'
+      });
+    }
     
-    const subscription = await this.stripeClient.subscriptions.create({
-      customer: customerId,
-      items: [{ price: plan.stripePriceId }],
-      payment_behavior: 'default_incomplete',
-      expand: ['latest_invoice.payment_intent']
+    // Check for proration during upgrade
+    if (plan.upgradeProration === 'immediate') {
+      issues.push({
+        type: 'immediate_upgrade',
+        plan: plan.name,
+        severity: 'medium',
+        message: 'Immediate upgrade may cause customer confusion',
+        suggestion: 'Consider end-of-cycle upgrade'
+      });
+    }
+  }
+  
+  return {
+    plans,
+    lifecycle: analyzeLifecycle(config),
+    prorations: prorationAnalysis,
+    issues
+  };
+}
+
+function analyzeProration(config: SubscriptionConfig): ProrationAnalysis {
+  return {
+    upgrade_method: config.proration?.upgradeMethod || 'immediate',
+    downgrade_method: config.proration?.downgradeMethod || 'end_of_cycle',
+    grace_period_days: config.proration?.gracePeriodDays || 0,
+    issues: checkProrationEdgeCases(config)
+  };
+}
+```
+
+### Bước 3: Payment Security Review
+
+```typescript
+// Review payment processing security
+interface PaymentSecurityReview {
+  pci_compliance: PCIStatus;
+  encryption: EncryptionStatus;
+  tokenization: TokenizationStatus;
+  issues: SecurityIssue[];
+}
+
+async function reviewPaymentSecurity(
+  code: PaymentCode
+): Promise<PaymentSecurityReview> {
+  const issues: SecurityIssue[] = [];
+  
+  // Check for PCI compliance
+  const pciStatus = await checkPCICompliance(code);
+  if (!pciStatus.compliant) {
+    issues.push(...pciStatus.violations);
+  }
+  
+  // Check for card data storage
+  const cardStorage = findCardDataStorage(code);
+  if (cardStorage.found) {
+    issues.push({
+      type: 'card_data_storage',
+      severity: 'critical',
+      message: 'Card data found in storage - PCI violation',
+      locations: cardStorage.locations
     });
-    
-    await this.eventBus.publish(new SubscriptionCreated(subscription));
-    
-    return this.mapToSubscription(subscription);
   }
   
-  async handleWebhook(event: Stripe.Event): Promise<void> {
-    switch (event.type) {
-      case 'invoice.paid':
-        await this.handleInvoicePaid(event.data.object as Stripe.Invoice);
-        break;
-      case 'customer.subscription.deleted':
-        await this.handleSubscriptionDeleted(event.data.object as Stripe.Subscription);
-        break;
-      case 'payment_intent.payment_failed':
-        await this.handlePaymentFailed(event.data.object as Stripe.PaymentIntent);
-        break;
-    }
+  // Check for encryption
+  const encryption = analyzeEncryption(code);
+  if (!encryption.strong) {
+    issues.push({
+      type: 'weak_encryption',
+      severity: 'critical',
+      message: 'Payment data should use AES-256 encryption'
+    });
   }
+  
+  return {
+    pci_compliance: pciStatus,
+    encryption,
+    tokenization: analyzeTokenization(code),
+    issues
+  };
 }
 ```
 
-### Phase 2: Invoice Generation
-
-### Bước 3: Invoice Service
+### Bước 4: Invoice Generation Review
 
 ```typescript
-// Invoice Generation
-class InvoiceService {
-  constructor(
-    private subscriptionRepo: SubscriptionRepository,
-    private usageRepo: UsageRepository,
-    private pdfGenerator: PDFGenerator
-  ) {}
+// Review invoice generation
+interface InvoiceReview {
+  templates: TemplateAnalysis[];
+  calculations: InvoiceCalculation[];
+  issues: InvoiceIssue[];
+}
+
+async function reviewInvoices(
+  config: InvoiceConfig
+): Promise<InvoiceReview> {
+  const templates = await analyzeTemplates(config.templates);
+  const calculations = analyzeInvoiceCalculations(config);
   
-  async generateInvoice(
-    customerId: string,
-    period: BillingPeriod
-  ): Promise<Invoice> {
-    const subscription = await this.subscriptionRepo.findActiveByCustomer(customerId);
-    if (!subscription) throw new NoActiveSubscriptionError(customerId);
-    
-    const baseAmount = subscription.plan.price;
-    
-    // Calculate overages
-    const usage = await this.usageRepo.getUsage(customerId, period);
-    const overages = this.calculateOverages(subscription.plan.limits, usage);
-    
-    // Calculate taxes
-    const subtotal = baseAmount.add(overages.total);
-    const taxes = this.calculateTaxes(subtotal, customerId);
-    const total = subtotal.add(taxes);
-    
-    // Create invoice record
-    const invoice = Invoice.create({
-      customerId,
-      period,
-      baseAmount,
-      overages,
-      taxes,
-      total,
-      lineItems: this.buildLineItems(baseAmount, overages, taxes)
-    });
-    
-    await this.invoiceRepo.save(invoice);
-    
-    // Generate PDF
-    const pdf = await this.pdfGenerator.generate(invoice);
-    await this.fileStorage.upload(`invoices/${invoice.id}.pdf`, pdf);
-    
-    return invoice;
-  }
+  const issues: InvoiceIssue[] = [];
   
-  private calculateOverages(
-    limits: ResourceLimits,
-    usage: UsageRecord
-  ): OverageDetails {
-    const overages: OverageDetails = { items: [], total: Money.zero() };
-    
-    if (limits.users !== -1 && usage.users > limits.users) {
-      const overageUnits = usage.users - limits.users;
-      const overageAmount = Money.create(overageUnits * 2, Currency.USD); // $2 per user
-      overages.items.push({ type: 'extra_users', units: overageUnits, amount: overageAmount });
-      overages.total = overages.total.add(overageAmount);
+  for (const calc of calculations) {
+    // Check tax calculation
+    if (!calc.taxCalculation) {
+      issues.push({
+        type: 'missing_tax',
+        severity: 'high',
+        message: 'Invoice missing tax calculation'
+      });
     }
     
-    if (limits.apiCalls !== -1 && usage.apiCalls > limits.apiCalls) {
-      const overageUnits = usage.apiCalls - limits.apiCalls;
-      const overageAmount = Money.create(overageUnits * 0.001, Currency.USD); // $0.001 per call
-      overages.items.push({ type: 'extra_api_calls', units: overageUnits, amount: overageAmount });
-      overages.total = overages.total.add(overageAmount);
+    // Check discount application
+    if (calc.discounts && !calc.discountsConsistent) {
+      issues.push({
+        type: 'inconsistent_discount',
+        severity: 'medium',
+        message: 'Discounts applied inconsistently'
+      });
     }
-    
-    return overages;
   }
+  
+  return { templates, calculations, issues };
 }
 ```
 
-## Checklist
+## Checklist (Danh sách kiểm tra)
 
-- [ ] Payment security verified
-- [ ] Subscription logic tested
-- [ ] Invoice calculations verified
-- [ ] Webhook handling secured
-- [ ] Refund logic tested
-- [ ] Compliance requirements met
+- [ ] All amounts stored in cents (integers)
+- [ ] Rounding consistent (HALF_UP)
+- [ ] Timezone handling for billing dates
+- [ ] Proration calculations verified
+- [ ] Trial periods correctly applied
+- [ ] Upgrade/downgrade logic tested
+- [ ] PCI-DSS compliance verified
+- [ ] No card data stored locally
+- [ ] Encryption at rest and in transit
+- [ ] Invoice totals match source calculations
+- [ ] Tax calculations per jurisdiction
+- [ ] Failed payment handling
+- [ ] Dunning process for retries
+- [ ] Refund calculations verified
+- [ ] Financial audit trail complete
 
 ## Examples (Ví dụ)
 
-### Ví dụ: Complete Billing Flow
+### Ví dụ 1: Safe Billing Calculation
 
 ```typescript
-async function upgradeSubscription(
-  customerId: string,
-  newPlanId: string
-): Promise<void> {
-  const customer = await getCustomer(customerId);
-  const currentSubscription = customer.subscription;
-  const newPlan = PLANS.find(p => p.id === newPlanId);
-  
-  // Calculate prorated amount
-  const proration = calculateProration(
-    currentSubscription.plan,
-    newPlan,
-    currentSubscription.currentPeriodEnd
-  );
-  
-  // Update subscription
-  await stripe.subscriptions.update(currentSubscription.stripeId, {
-    items: [{ id: currentSubscription.stripeItemId, price: newPlan.stripePriceId }],
-    proration_behavior: 'create_prorations'
-  });
-  
-  // Charge difference
-  if (proration.amount > 0) {
-    await stripe.invoices.createInvoiceItem({
-      customer: customer.stripeId,
-      amount: Math.round(proration.amount * 100),
-      currency: 'usd',
-      description: `Proration for upgrade to ${newPlan.name}`
-    });
+// ✅ GOOD: Safe billing calculation
+class BillingCalculator {
+  calculateInvoice(items: InvoiceItem[], taxRate: number): Invoice {
+    // All amounts in cents
+    let subtotalCents = 0;
+    
+    for (const item of items) {
+      // price is in cents
+      subtotalCents += item.priceCents * item.quantity;
+    }
+    
+    // Calculate tax (round to nearest cent)
+    const taxCents = Math.round(subtotalCents * taxRate / 100);
+    
+    // Total
+    const totalCents = subtotalCents + taxCents;
+    
+    return {
+      subtotalCents,
+      taxCents,
+      totalCents,
+      // For display
+      subtotal: this.formatCurrency(subtotalCents),
+      tax: this.formatCurrency(taxCents),
+      total: this.formatCurrency(totalCents)
+    };
   }
   
-  // Update local record
-  await subscriptionRepo.update(customerId, { planId: newPlanId });
+  private formatCurrency(cents: number): string {
+    return `$${(cents / 100).toFixed(2)}`;
+  }
 }
 ```
 
-## Anti Pattern
+## Anti Patterns (Các pattern cần tránh)
 
-- [ ] **No Idempotency**: Duplicate charges
-- [ ] **No Audit Trail**: Missing transaction history
-- [ ] **Floating Point Math**: Inaccurate calculations
-- [ ] **No Webhook Verification**: Security vulnerability
+### 1. Floating Point for Money
+```typescript
+// ❌ BAD: Floating point for money
+const total = price * quantity; // Floating point!
 
-## Best Practice
+// ✅ GOOD: Integer cents
+const totalCents = priceCents * quantity;
+```
 
-- [ ] **Idempotency Keys**: Prevent duplicate charges
-- [ ] **Decimal Math**: Use precise calculations
-- [ ] **Audit Logging**: Track all transactions
-- [ ] **Webhook Verification**: Validate signatures
+### 2. Storing Card Data
+```typescript
+// ❌ BAD: Storing card details
+class BadPaymentService {
+  async process(card: CreditCard): Promise<void> {
+    await db.save({
+      cardNumber: card.number,
+      cvv: card.cvv, // NEVER store CVV!
+      expiry: card.expiry
+    });
+  }
+}
 
-## Liên kết
+// ✅ GOOD: Tokenize via payment provider
+class GoodPaymentService {
+  async process(token: PaymentToken): Promise<void> {
+    // Only store token, not card data
+    await paymentProvider.charge(token);
+  }
+}
+```
 
-- [[../rules/core-architecture]] - Core Architecture
-- [[../skills/security-audit]] - Security Audit
-- [[../skills/crm-saas-review]] - CRM SaaS Review
-- [[../skills/api-review]] - API Review
+## Best Practices (Thực hành tốt nhất)
+
+1. **Integer cents**: Store all amounts as integers (cents)
+2. **HALF_UP rounding**: Consistent rounding strategy
+3. **UTC timestamps**: All billing dates in UTC
+4. **PCI compliance**: Never store card data
+5. **Audit logging**: Track all billing events
+6. **Idempotency**: Prevent duplicate charges
+7. **Proration**: Clear calculation documentation
+8. **Grace periods**: For failed payments
+9. **Automated reconciliation**: Daily checks
+10. **Financial audits**: Regular review
+
+## Liên kết (Cross-references)
+
+- **Related Skills**: [crm-saas-review](./crm-saas-review.mdc), [security-audit](./security-audit.mdc)
+- **Standards**: PCI-DSS, GAAP, IFRS
+- **Providers**: Stripe, Braintree, Recurly

@@ -1,52 +1,600 @@
 ---
-description: Nguyên tắc Incident Response cho production incidents
+description: Nguyên tắc và best practices cho Incident Response trong Cursor Enterprise Framework
 created: 2026-06-23
 version: 1.0.0
-tags: [incident, response, on-call, postmortem, enterprise]
+tags: [incident-response, on-call, postmortem, sla, sre]
 ---
 
 # Incident Response
 
 ## Mục tiêu
 
-Incident Response là quy trình xử lý các sự cố production một cách systematic và hiệu quả. Trong Cursor Enterprise Framework, Incident Response rule định nghĩa các nguyên tắc và best practices cho việc respond to incidents nhanh chóng, minimize impact, và learn from failures. Mục tiêu là tạo ra một incident response process giảm thiểu downtime và cải thiện over time.
+Incident Response là systematic approach để handle production incidents, minimize impact, và restore service quickly. Trong Cursor Enterprise Framework, incident response được formalize với clear processes, roles, và communication channels. Mục tiêu của rule này là hướng dẫn teams trong việc respond to incidents một cách effective và learn from them.
+
+Effective incident response minimizes business impact, maintains customer trust, và creates learning opportunities cho future prevention.
 
 ## Nguyên tắc
 
-**1. Severity Levels**
+**1. Blameless Culture**
 
-Define severity levels clearly. P1: Complete outage. P2: Major degradation. P3: Minor issue. P4: Low impact. Response times per severity.
+Focus on systems, not individuals. Learn from incidents. Psychological safety. Continuous improvement.
 
-**2. On-Call Rotation**
+**2. Clear Roles**
 
-Rotate on-call schedule. Multiple responders. Escalation paths. Tooling access. Compensation.
+Incident Commander. Technical Lead. Communications Lead. Clear responsibilities. Defined authority.
 
-**3. Incident Command**
+**3. Structured Response**
 
-Assign incident commander. Clear roles. Coordinate response. Communicate status. Make decisions.
+Detect. Triage. Respond. Resolve. Review. Clear phases.
 
 **4. Communication**
 
-Stakeholder updates. Status page updates. Internal communication. Customer communication. Escalation notices.
+Internal updates. Customer communication. Status page. Stakeholder updates. Clear channels.
 
-**5. Resolution**
+**5. Escalation Path**
 
-Temporary fixes. Rollback procedures. Hotfix deployment. Validation steps. Monitoring confirmation.
+Define escalation criteria. Time-based escalation. Severity levels. Clear contacts.
 
-**6. Postmortem**
+**6. Runbooks**
 
-Blameless postmortem. Root cause analysis. Action items. Follow-up tracking. Process improvement.
+Pre-defined procedures. Step-by-step guides. Tested regularly. Kept current.
 
-**7. Learning Culture**
+**7. Postmortems**
 
-Share learnings. Process improvements. Tool improvements. Training. Documentation.
+Blame-free review. Root cause analysis. Action items. Follow-up tracking.
 
-**8. Automation**
+**8. On-Call**
 
-Automated rollback. Self-healing. Alert suppression. Runbook automation. Recovery playbooks.
+Fair rotation. Reasonable load. Tools and access. Support and compensation.
+
+**9. Severity Levels**
+
+P1: Complete outage. P2: Major degradation. P3: Minor issue. P4: Low impact.
+
+**10. Continuous Improvement**
+
+Track metrics. Identify trends. Improve processes. Update runbooks.
+
+## Checklist
+
+- [ ] On-call rotation defined
+- [ ] Escalation paths documented
+- [ ] Runbooks written for common issues
+- [ ] Communication templates prepared
+- [ ] Status page configured
+- [ ] Incident channel created
+- [ ] Postmortem template ready
+- [ ] Action item tracking set up
+- [ ] Team trained on process
+- [ ] Tools and access verified
+
+## Anti Pattern
+
+**1. Blame Culture**
+
+Punishing individuals. Hiding incidents. No learning. Fear of reporting.
+
+**2. No Runbooks**
+
+Improvising during incidents. Missing steps. Wasted time. Inconsistent responses.
+
+**3. Poor Communication**
+
+No updates. Conflicting messages. Missing stakeholders. Status unknown.
+
+**4. Ignoring Postmortems**
+
+No reviews. Same incidents repeat. No improvements. Lost learnings.
+
+**5. Undefined Severity**
+
+Treating everything as P1. Alert fatigue. Resource waste. Priority confusion.
+
+## Best Practice
+
+**1. Incident Severity Matrix**
+
+```markdown
+| Severity | Description | Response Time | Update Frequency | Example |
+|----------|-------------|---------------|-----------------|---------|
+| SEV1 | Complete outage affecting all users | Immediate | Every 15 min | API down, payment failed |
+| SEV2 | Major feature degraded, >25% users affected | 15 min | Every 30 min | Login broken, checkout failed |
+| SEV3 | Minor feature degraded, <25% users affected | 1 hour | Hourly | Slow search, email delayed |
+| SEV4 | Cosmetic issue, no user impact | Next business day | Daily | UI bug, minor typo |
+
+Escalation Criteria:
+- No progress in 30 min → Escalate
+- Multiple teams affected → Escalate
+- Customer data at risk → Escalate immediately
+- Media/social attention → Escalate immediately
+```
+
+**2. Incident Commander Role**
+
+```typescript
+// incident-commander responsibilities
+interface IncidentCommander {
+  // Take command of the incident
+  takeCommand(): void;
+  
+  // Coordinate response
+  coordinate(): void;
+  
+  // Make decisions
+  makeDecision(): void;
+  
+  // Communicate status
+  communicate(): void;
+  
+  // Delegate tasks
+  delegate(): void;
+  
+  // Close incident
+  closeIncident(): void;
+}
+
+// Responsibilities
+// 1. Declare incident severity
+// 2. Assemble response team
+// 3. Ensure communication
+// 4. Make critical decisions
+// 5. Authorize escalations
+// 6. Declare resolution
+// 7. Coordinate postmortem
+```
+
+**3. Escalation Policy**
+
+```yaml
+# escalation.yaml
+escalation:
+  policy: "immediate_escalation"
+  
+  levels:
+    - level: 1
+      responders:
+        - team: "on-call-engineer"
+          timeout: 15m
+      escalate_to: 2
+      
+    - level: 2
+      responders:
+        - team: "team-lead"
+          timeout: 15m
+        - team: "sre-on-call"
+          timeout: 30m
+      escalate_to: 3
+      
+    - level: 3
+      responders:
+        - team: "engineering-manager"
+          timeout: 15m
+        - team: "platform-lead"
+          timeout: 30m
+      escalate_to: 4
+      
+    - level: 4
+      responders:
+        - team: "vp-engineering"
+          timeout: 15m
+        - team: "cto"
+          timeout: 30m
+      notify: ["c-level", "comms-lead"]
+
+  rules:
+    - condition: "user_impact > 50%"
+      severity: "SEV1"
+      auto_escalate: true
+      
+    - condition: "revenue_impact > $10k/hour"
+      severity: "SEV1"
+      auto_escalate: true
+      
+    - condition: "data_loss"
+      severity: "SEV1"
+      auto_escalate: true
+      
+    - condition: "security_breach"
+      severity: "SEV1"
+      auto_escalate: true
+```
+
+**4. Incident Response Workflow**
+
+```markdown
+# Incident Response Workflow
+
+## 1. DETECTION (T+0:00)
+
+**Who**: Anyone detecting the issue
+
+**Actions**:
+- Verify the issue is real (not false positive)
+- Note initial symptoms and impact
+- Check if already known/being worked
+
+**Output**:
+- Issue confirmed
+- Initial severity assessment
+- Created incident channel (#inc-YYYY-MM-DD-XXX)
+
+## 2. TRIAGE (T+0:15)
+
+**Who**: First responder / On-call engineer
+
+**Actions**:
+- Assign severity (P1-P4)
+- Page incident commander for P1/P2
+- Start incident channel
+- Begin logging timeline
+- Initial investigation
+
+**Communication**:
+- Post initial message to #incidents
+- Update status page if customer-visible
+- Notify stakeholders if P1/P2
+
+**Output**:
+- Severity assigned
+- IC assigned (P1/P2)
+- Response team assembled
+- Timeline started
+
+## 3. RESPONSE (T+0:15 to T+Resolution)
+
+**Who**: Response team led by IC
+
+**Actions**:
+- Follow runbooks
+- Investigate root cause
+- Implement mitigation
+- Test fix
+- Coordinate across teams
+- Regular updates
+
+**Communication**:
+- Updates every 15-30 min to #incidents
+- Status page updates
+- Stakeholder notifications
+- Customer comms if needed
+
+**Output**:
+- Root cause identified
+- Fix implemented
+- Service restored
+
+## 4. RESOLUTION (T+Resolution)
+
+**Who**: IC with team
+
+**Actions**:
+- Verify fix is working
+- Confirm metrics are normal
+- Declare resolution
+- Plan follow-up actions
+
+**Communication**:
+- Resolution message to #incidents
+- Update status page
+- Notify stakeholders
+- Cancel any active pages
+
+**Output**:
+- Incident resolved
+- Follow-up items documented
+- Postmortem scheduled
+
+## 5. POSTMORTEM (Within 48-72 hours)
+
+**Who**: Response team + IC + stakeholders
+
+**Actions**:
+- Timeline review
+- Root cause analysis (5 Whys, Fishbone)
+- Impact assessment
+- Action items creation
+- Process improvements
+
+**Output**:
+- Postmortem document
+- Action items with owners
+- Process improvements
+- Updated runbooks
+```
+
+**5. Communication Templates**
+
+```markdown
+# Incident Communication Templates
+
+## Initial Notification (P1/P2)
+```
+🚨 [SEV1] Incident Declared - <Brief Description>
+
+Impact: <Who/what is affected>
+Duration: <How long ongoing>
+Status: Investigating
+
+IC: @name
+Team: @team
+
+We are investigating reports of <issue>.
+Status page: <link>
+Incident channel: #inc-YYYY-MM-DD-XXX
+
+Updates every 15 minutes.
+```
+
+## Status Update
+```
+📊 [SEV1] Status Update - <Brief>
+
+Current Status: Investigating / Identified / Mitigating
+Duration: <X hours Y minutes>
+
+What we know:
+- <Known facts>
+
+What we're doing:
+- <Actions being taken>
+
+ETA for resolution: <Estimate or "Unknown">
+
+Next update: <Time>
+```
+
+## Resolution
+```
+✅ [SEV1] RESOLVED - <Brief Description>
+
+Resolved At: <Time>
+Total Duration: <X hours Y minutes>
+Root Cause: <Brief cause>
+
+What happened:
+<Brief explanation>
+
+What we did:
+<How it was fixed>
+
+What we'll do next:
+- <Follow-up items>
+
+Postmortem: <Link>
+
+Thank you for your patience.
+```
+
+## Customer Communication
+```
+Subject: Service Issue Resolution - [Service Name]
+
+Dear Customer,
+
+We experienced a service interruption affecting [service/feature] 
+from [start time] to [end time] (UTC).
+
+Impact: <What was affected>
+
+The issue has been resolved and all services are now operating normally.
+
+We apologize for any inconvenience this may have caused. 
+A detailed post-incident report will be published on our status page.
+
+Thank you for your patience and understanding.
+
+[Company] Team
+```
+```
+
+**6. Runbook Template**
+
+```markdown
+# Runbook: Database Connection Pool Exhaustion
+
+## Symptoms
+- High latency on all API requests
+- Connection timeout errors
+- Database connection errors in logs
+- Error: "too many connections"
+
+## Severity
+SEV1 if: >50% of users affected
+SEV2 if: <50% of users affected
+
+## Diagnosis
+
+### 1. Verify the issue
+```bash
+# Check database connections
+SELECT count(*) FROM pg_stat_activity;
+
+# Check for long-running queries
+SELECT pid, now() - pg_stat_activity.query_start AS duration, query
+FROM pg_stat_activity
+WHERE state != 'idle'
+ORDER BY duration DESC;
+
+# Check connection limits
+SHOW max_connections;
+```
+
+### 2. Identify the source
+```bash
+# Check which service is using most connections
+SELECT application_name, count(*)
+FROM pg_stat_activity
+GROUP BY application_name;
+
+# Check for connection leaks
+# Look for connections in 'idle in transaction' state
+SELECT * FROM pg_stat_activity 
+WHERE state = 'idle in transaction';
+```
+
+## Mitigation
+
+### Immediate Actions
+
+**Option 1: Kill long-running queries**
+```sql
+SELECT pg_terminate_backend(pid)
+FROM pg_stat_activity
+WHERE state = 'active'
+AND query_start < now() - interval '5 minutes';
+```
+
+**Option 2: Kill idle connections**
+```sql
+SELECT pg_terminate_backend(pid)
+FROM pg_stat_activity
+WHERE state = 'idle'
+AND state_change < now() - interval '30 minutes';
+```
+
+**Option 3: Reduce application connection pool**
+```bash
+kubectl scale deployment api --replicas=1 -n production
+```
+
+### Medium-term Actions
+
+**Option 1: Increase connection limit (temporary)**
+```sql
+ALTER SYSTEM SET max_connections = '500';
+SELECT pg_reload_conf();
+```
+
+**Option 2: Enable connection pooling**
+- Deploy PgBouncer
+- Reduce application connection pool size
+
+## Resolution Verification
+```bash
+# Verify connections are healthy
+watch 'psql -c "SELECT count(*) FROM pg_stat_activity;"'
+
+# Verify API is responding
+curl -s https://api.example.com/health
+```
+
+## Follow-up Actions
+- [ ] Investigate root cause of connection leak
+- [ ] Review connection pool settings
+- [ ] Add monitoring for connection pool usage
+- [ ] Schedule database maintenance window for PgBouncer deployment
+
+## Related Documents
+- Database Architecture
+- Connection Pooling Strategy
+- Monitoring Dashboards
+```
+
+**7. Postmortem Template**
+
+```markdown
+# Postmortem: <Incident Title>
+
+**Date**: YYYY-MM-DD  
+**Duration**: X hours Y minutes  
+**Severity**: SEV1/SEV2/SEV3  
+**Status**: Completed
+
+## Summary
+
+One paragraph summary of what happened, impact, and resolution.
+
+## Impact
+
+| Metric | Value |
+|--------|-------|
+| Users Affected | ~X |
+| Revenue Impact | ~$Y |
+| Error Rate | Z% |
+| Duration | X hours |
+
+## Timeline (All times UTC)
+
+| Time | Event |
+|------|-------|
+| 14:00 | Alert triggered: High error rate |
+| 14:02 | On-call paged |
+| 14:05 | Initial investigation started |
+| 14:15 | Root cause identified |
+| 14:20 | Mitigation deployed |
+| 14:30 | Service restored |
+| 14:35 | Incident resolved |
+
+## Root Cause
+
+Detailed explanation of the root cause.
+
+**Root Cause Category**: [Configuration / Code / Hardware / Third-party / Process]
+
+## Contributing Factors
+
+- Factor 1
+- Factor 2
+
+## Resolution
+
+How the issue was fixed.
+
+## Lessons Learned
+
+### What went well?
+- Point 1
+- Point 2
+
+### What could be improved?
+- Point 1
+- Point 2
+
+## Action Items
+
+| Action | Owner | Due Date | Status |
+|--------|-------|----------|--------|
+| Add monitoring for X | @name | YYYY-MM-DD | In Progress |
+| Update runbook for Z | @name | YYYY-MM-DD | Done |
+| Implement circuit breaker | @name | YYYY-MM-DD | Pending |
+
+## Supporting Data
+
+- Charts showing impact
+- Relevant logs
+- Metrics before/during/after
+```
+
+## Workflow
+
+**Phase 1: Detection**
+
+Monitor alerts. Receive reports. Verify issue. Declare incident.
+
+**Phase 2: Triage**
+
+Assess severity. Assign IC. Assemble team. Start communication.
+
+**Phase 3: Response**
+
+Investigate. Mitigate. Communicate. Coordinate.
+
+**Phase 4: Resolution**
+
+Verify fix. Declare resolution. Update stakeholders.
+
+**Phase 5: Postmortem**
+
+Review timeline. Analyze root cause. Create action items. Update processes.
+
+**Phase 6: Follow-up**
+
+Complete action items. Verify improvements. Update runbooks.
 
 ## Liên kết
 
-- [[observability]] - Observability
-- [[monitoring]] - Monitoring
-- [[deployment]] - Deployment
+- [[observability]] - Monitoring and alerting
+- [[monitoring]] - System monitoring
+- [[sre]] - Site Reliability Engineering
+- [[on-call]] - On-call practices
+- [[postmortem]] - Postmortem process

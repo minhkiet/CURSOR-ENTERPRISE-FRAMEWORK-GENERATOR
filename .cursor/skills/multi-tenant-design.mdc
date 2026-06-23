@@ -1,1079 +1,444 @@
 ---
-description: Thiết kế multi-tenant architecture với various isolation strategies, tenant management, và resource allocation
-purpose: Design scalable multi-tenant systems cho SaaS applications với proper isolation và resource management
-input: Business requirements, isolation requirements, scaling needs, compliance needs
-output: Multi-tenant architecture design, isolation strategy, tenant management design
+description: Skill design multi-tenant systems với various isolation strategies, tenant management, và resource allocation
+purpose: Cung cấp comprehensive multi-tenant design framework để choose isolation strategies, implement tenant management, và optimize resource sharing
+input:
+  - Application requirements
+  - Isolation requirements
+  - Scalability needs
+  - Cost constraints
+output:
+  - Isolation strategy
+  - Tenant management design
+  - Resource allocation plan
+  - Migration approach
 version: 1.0.0
-tags: [multi-tenant, saas, isolation, tenant-management, tenant-provisioning, resource-management]
+tags:
+  - multi-tenant
+  - architecture
+  - isolation
+  - saas
+  - scalability
 ---
 
-# Multi-Tenant Design Skill - Thiết Kế Multi-Tenant Architecture Cho SaaS
+# Multi-Tenant Design
 
 ## Tổng quan
 
-Multi-tenant architecture là nền tảng của SaaS applications, cho phép nhiều tenants (customers) chia sẻ infrastructure trong khi vẫn đảm bảo isolation. Skill này cung cấp framework để thiết kế và implement multi-tenant systems với various isolation strategies.
+Multi-Tenant Design là skill chuyên biệt để design multi-tenant systems. Skill này cung cấp systematic approach để choose isolation strategies, implement tenant management, design data models, và plan resource allocation. Critical cho SaaS applications.
 
 ## Purpose (Mục đích)
 
-Multi-Tenant Design Skill được thiết kế để:
+Multi-tenancy affects:
 
-1. **Isolation Strategy**: Choose appropriate isolation level
-2. **Tenant Management**: Design tenant lifecycle management
-3. **Resource Allocation**: Plan resource distribution
-4. **Data Architecture**: Structure tenant data
-5. **Cost Optimization**: Optimize infrastructure costs
-6. **Compliance**: Meet regulatory requirements
+1. **Security**: Data isolation requirements
+2. **Cost**: Shared vs dedicated resources
+3. **Scalability**: How tenants scale
+4. **Complexity**: Implementation complexity
+5. **Operations**: Management overhead
 
-### Khi nào sử dụng Multi-Tenant Design
+Multi-Tenant Design tồn tại để:
 
-- Khi designing new SaaS applications
-- Khi planning tenant onboarding
-- Khi selecting isolation strategy
-- Khi optimizing multi-tenant costs
-- Khi implementing tenant billing
-- Khi designing tenant migration
+- **Choose appropriate isolation** strategy
+- **Design tenant data models** correctly
+- **Implement tenant management** systems
+- **Plan resource allocation** efficiently
+- **Support tenant migrations**
 
 ## Input (Đầu vào)
 
-- [ ] Business requirements
-- [ ] Tenant isolation requirements
-- [ ] Data sensitivity levels
-- [ ] Scaling requirements
-- [ ] Compliance requirements
-- [ ] Budget constraints
+| Input | Mô tả | Required |
+|-------|-------|----------|
+| `requirements` | Application requirements | Yes |
+| `isolation_level` | Isolation requirements | Yes |
+| `scale_needs` | Scalability needs | Yes |
+| `budget` | Cost constraints | No |
 
 ## Output (Đầu ra)
 
-- [ ] Isolation strategy selection
-- [ ] Architecture diagram
-- [ ] Tenant management design
-- [ ] Data model design
-- [ ] Resource allocation plan
-- [ ] Migration strategy
+| Output | Mô tả | Format |
+|--------|-------|--------|
+| `isolation_strategy` | Strategy recommendation | Strategy |
+| `data_model` | Tenant data model | Model |
+| `management_plan` | Tenant management | Plan |
+| `migration_plan` | Migration approach | Plan |
 
 ## Workflow (Quy trình)
 
-### Phase 1: Isolation Strategies
-
-### Bước 1: Isolation Strategy Comparison
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                    MULTI-TENANT ISOLATION STRATEGIES                        │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│  STRATEGY 1: Shared Database, Shared Schema (Siloed)                        │
-│  ┌─────────────────────────────────────────────────────────┐                │
-│  │  Table: orders                                          │                │
-│  │  ┌─────────────────────────────────────────────────┐   │                │
-│  │  │ id | tenant_id | customer_id | amount | ...      │   │                │
-│  │  │ 1  | tenant_a  | cust_1       | 100.00 |        │   │                │
-│  │  │ 2  | tenant_b  | cust_2       | 200.00 |        │   │                │
-│  │  │ 3  | tenant_a  | cust_3       | 150.00 |        │   │                │
-│  │  └─────────────────────────────────────────────────┘   │                │
-│  │                                                         │                │
-│  │  • RLS enforced at database level                       │                │
-│  │  • Cost: Very Low                                       │                │
-│  │  • Isolation: Low-Medium                                │                │
-│  │  • Use: Low-risk, similar-sized tenants                 │                │
-│  └─────────────────────────────────────────────────────────┘                │
-│                                                                             │
-│  STRATEGY 2: Shared Database, Separate Schemas                              │
-│  ┌─────────────────────────────────────────────────────────┐                │
-│  │  Database: app_db                                        │                │
-│  │  ├── schema.tenant_a                                    │                │
-│  │  │   ├── orders                                          │                │
-│  │  │   ├── customers                                       │                │
-│  │  │   └── products                                        │                │
-│  │  ├── schema.tenant_b                                    │                │
-│  │  │   ├── orders                                          │                │
-│  │  │   ├── customers                                       │                │
-│  │  │   └── products                                        │                │
-│  │  └── schema.tenant_c                                    │                │
-│  │                                                         │                │
-│  │  • Separate schemas per tenant                          │                │
-│  │  • Cost: Low-Medium                                     │                │
-│  │  • Isolation: Medium                                    │                │
-│  │  • Use: Different tenants need schema flexibility        │                │
-│  └─────────────────────────────────────────────────────────┘                │
-│                                                                             │
-│  STRATEGY 3: Separate Databases per Tenant                                  │
-│  ┌─────────────────────────────────────────────────────────┐                │
-│  │  Database Server                                          │                │
-│  │  ├── Database: tenant_a_db                              │                │
-│  │  ├── Database: tenant_b_db                              │                │
-│  │  └── Database: tenant_c_db                              │                │
-│  │                                                         │                │
-│  │  • Complete database isolation                           │                │
-│  │  • Cost: High                                            │                │
-│  │  • Isolation: High                                       │                │
-│  │  • Use: Enterprise tenants, compliance requirements      │                │
-│  └─────────────────────────────────────────────────────────┘                │
-│                                                                             │
-│  STRATEGY 4: Separate Infrastructure per Tenant                             │
-│  ┌─────────────────────────────────────────────────────────┐                │
-│  │  Tenant A Instance         Tenant B Instance            │                │
-│  │  ┌──────────────────┐    ┌──────────────────┐        │                │
-│  │  │ App Server       │    │ App Server       │        │                │
-│  │  │ Database Server  │    │ Database Server  │        │                │
-│  │  │ Cache Server     │    │ Cache Server     │        │                │
-│  │  │ File Storage     │    │ File Storage     │        │                │
-│  │  └──────────────────┘    └──────────────────┘        │                │
-│  │                                                         │                │
-│  │  • Complete infrastructure isolation                    │                │
-│  │  • Cost: Very High                                      │                │
-│  │  • Isolation: Maximum                                   │                │
-│  │  • Use: Highest compliance, custom requirements         │                │
-│  └─────────────────────────────────────────────────────────┘                │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
-### Bước 2: Decision Matrix
+### Bước 1: Isolation Strategy Selection
 
 ```typescript
-// Isolation strategy decision matrix
-interface TenantRequirements {
-  isolationLevel: 'low' | 'medium' | 'high';
-  dataSize: 'small' | 'medium' | 'large';
-  compliance: ('none' | 'soc2' | 'hipaa' | 'gdpr' | 'pci')[];
-  budget: 'low' | 'medium' | 'high';
-  scalingNeeds: 'low' | 'medium' | 'high';
-  customizations: 'none' | 'schema' | 'full';
+// Choose isolation strategy
+interface IsolationStrategy {
+  model: 'shared' | 'partial' | 'isolated';
+  database: DatabaseStrategy;
+  infrastructure: InfrastructureStrategy;
+  cost_profile: CostProfile;
+  complexity: ComplexityLevel;
 }
 
-type IsolationStrategy = 
-  | 'shared-db-siloed'
-  | 'shared-db-schemas'
-  | 'separate-databases'
-  | 'separate-infrastructure';
+type DatabaseStrategy = 'shared_database' | 'shared_schema' | 'database_per_tenant';
+type InfrastructureStrategy = 'shared' | 'container_per_tenant' | 'instance_per_tenant';
 
-export function selectIsolationStrategy(
+function selectIsolationStrategy(
   requirements: TenantRequirements
 ): IsolationStrategy {
-  // Highest isolation required
-  if (requirements.compliance.includes('pci') || 
-      requirements.isolationLevel === 'high' ||
-      requirements.customizations === 'full') {
-    return 'separate-infrastructure';
-  }
+  const factors = evaluateFactors(requirements);
   
-  // High compliance or separate schemas needed
-  if (requirements.compliance.includes('hipaa') ||
-      requirements.compliance.includes('gdpr') ||
-      requirements.isolationLevel === 'medium' ||
-      requirements.customizations === 'schema' ||
-      requirements.scalingNeeds === 'high') {
-    return 'separate-databases';
-  }
-  
-  // Medium isolation, shared schemas acceptable
-  if (requirements.isolationLevel === 'medium' ||
-      requirements.scalingNeeds === 'medium' ||
-      requirements.dataSize === 'large') {
-    return 'shared-db-schemas';
-  }
-  
-  // Default to most cost-effective
-  return 'shared-db-siloed';
-}
-
-// Strategy implementation
-const strategyConfig: Record<IsolationStrategy, StrategyConfig> = {
-  'shared-db-siloed': {
-    database: 'single',
-    schema: 'shared',
-    rls: true,
-    estimatedCost: 1,
-    maxTenants: 1000
-  },
-  'shared-db-schemas': {
-    database: 'single',
-    schema: 'per-tenant',
-    rls: false,
-    estimatedCost: 10,
-    maxTenants: 100
-  },
-  'separate-databases': {
-    database: 'per-tenant',
-    schema: 'shared',
-    rls: false,
-    estimatedCost: 100,
-    maxTenants: 50
-  },
-  'separate-infrastructure': {
-    database: 'per-tenant',
-    schema: 'shared',
-    rls: false,
-    estimatedCost: 1000,
-    maxTenants: 10
-  }
-};
-```
-
-### Phase 2: Tenant Data Model
-
-### Bước 3: Database Schema Design
-
-```sql
--- Good: Multi-tenant schema design
--- Using shared database with tenant_id column
-
--- Tenants master table
-CREATE TABLE tenants (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    slug VARCHAR(100) UNIQUE NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    plan_id UUID REFERENCES plans(id),
-    status VARCHAR(50) NOT NULL DEFAULT 'active',
-    
-    -- Billing
-    billing_email VARCHAR(255),
-    billing_address JSONB,
-    
-    -- Settings
-    settings JSONB DEFAULT '{}',
-    custom_domain VARCHAR(255),
-    
-    -- Quotas
-    max_users INTEGER DEFAULT 10,
-    max_storage_gb INTEGER DEFAULT 10,
-    max_api_calls INTEGER DEFAULT 100000,
-    
-    -- Timestamps
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    deleted_at TIMESTAMPTZ,
-    
-    CONSTRAINT tenants_slug_format CHECK (slug ~ '^[a-z0-9-]+$')
-);
-
--- Enable RLS
-ALTER TABLE tenants ENABLE ROW LEVEL SECURITY;
-
--- Users (scoped by tenant)
-CREATE TABLE users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    tenant_id UUID NOT NULL REFERENCES tenants(id),
-    email VARCHAR(255) NOT NULL,
-    password_hash VARCHAR(255),
-    name VARCHAR(255),
-    role VARCHAR(50) NOT NULL DEFAULT 'member',
-    
-    -- SSO
-    sso_provider VARCHAR(50),
-    sso_external_id VARCHAR(255),
-    
-    -- Metadata
-    metadata JSONB DEFAULT '{}',
-    
-    -- Timestamps
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    last_login_at TIMESTAMPTZ,
-    deleted_at TIMESTAMPTZ,
-    
-    -- Constraints
-    CONSTRAINT users_tenant_email_unique UNIQUE (tenant_id, email)
-);
-
--- RLS Policies
-CREATE POLICY users_tenant_isolation ON users
-    USING (tenant_id = current_setting('app.current_tenant_id')::UUID);
-
--- Products (tenant-scoped)
-CREATE TABLE products (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    tenant_id UUID NOT NULL REFERENCES tenants(id),
-    sku VARCHAR(100) NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    description TEXT,
-    price DECIMAL(12, 2) NOT NULL,
-    cost DECIMAL(12, 2),
-    stock_quantity INTEGER DEFAULT 0,
-    
-    -- Category
-    category_id UUID REFERENCES categories(id),
-    
-    -- Status
-    is_active BOOLEAN DEFAULT true,
-    
-    -- Timestamps
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    deleted_at TIMESTAMPTZ,
-    
-    -- Constraints
-    CONSTRAINT products_tenant_sku_unique UNIQUE (tenant_id, sku)
-);
-
--- Orders (tenant-scoped)
-CREATE TABLE orders (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    tenant_id UUID NOT NULL REFERENCES tenants(id),
-    order_number VARCHAR(50) NOT NULL,
-    customer_id UUID REFERENCES customers(id),
-    user_id UUID REFERENCES users(id),
-    
-    status VARCHAR(50) NOT NULL DEFAULT 'pending',
-    total_amount DECIMAL(12, 2) NOT NULL,
-    currency VARCHAR(3) DEFAULT 'USD',
-    
-    -- Shipping
-    shipping_address JSONB,
-    
-    -- Timestamps
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    shipped_at TIMESTAMPTZ,
-    delivered_at TIMESTAMPTZ,
-    cancelled_at TIMESTAMPTZ,
-    
-    -- Constraints
-    CONSTRAINT orders_tenant_number_unique UNIQUE (tenant_id, order_number)
-);
-
--- Indexes for performance
-CREATE INDEX idx_users_tenant_id ON users(tenant_id);
-CREATE INDEX idx_users_email_tenant ON users(tenant_id, email);
-CREATE INDEX idx_products_tenant_id ON products(tenant_id);
-CREATE INDEX idx_orders_tenant_id ON orders(tenant_id);
-CREATE INDEX idx_orders_tenant_status ON orders(tenant_id, status);
-
--- Covering indexes for common queries
-CREATE INDEX idx_users_tenant_active ON users(tenant_id) 
-    WHERE deleted_at IS NULL;
-```
-
-### Bước 4: Separate Schemas Strategy
-
-```sql
--- For separate schemas strategy
--- Create tenant schema dynamically
-
-CREATE OR REPLACE FUNCTION create_tenant_schema(tenant_slug VARCHAR)
-RETURNS VOID AS $$
-DECLARE
-    schema_name TEXT := 'tenant_' || tenant_slug;
-BEGIN
-    -- Create schema
-    EXECUTE format('CREATE SCHEMA IF NOT EXISTS %I', schema_name);
-    
-    -- Create tables in schema
-    EXECUTE format('
-        CREATE TABLE %I.users (
-            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            email VARCHAR(255) NOT NULL UNIQUE,
-            name VARCHAR(255),
-            password_hash VARCHAR(255),
-            role VARCHAR(50) DEFAULT ''member'',
-            created_at TIMESTAMPTZ DEFAULT NOW(),
-            updated_at TIMESTAMPTZ DEFAULT NOW()
-        )', schema_name);
-    
-    EXECUTE format('
-        CREATE TABLE %I.products (
-            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            sku VARCHAR(100) NOT NULL UNIQUE,
-            name VARCHAR(255) NOT NULL,
-            price DECIMAL(12, 2) NOT NULL,
-            created_at TIMESTAMPTZ DEFAULT NOW()
-        )', schema_name);
-    
-    -- Create indexes
-    EXECUTE format('CREATE INDEX ON %I.users(email)', schema_name);
-    EXECUTE format('CREATE INDEX ON %I.products(sku)', schema_name);
-    
-    -- Grant permissions
-    EXECUTE format('GRANT USAGE ON SCHEMA %I TO app_user', schema_name);
-    EXECUTE format('GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA %I TO app_user', schema_name);
-    
-END;
-$$ LANGUAGE plpgsql;
-
--- Migration between strategies
-CREATE OR REPLACE FUNCTION migrate_tenant_to_separate_schema(
-    tenant_id UUID,
-    new_schema_name VARCHAR
-) RETURNS VOID AS $$
-DECLARE
-BEGIN
-    -- 1. Create new schema
-    PERFORM create_tenant_schema(new_schema_name);
-    
-    -- 2. Copy data (using transaction)
-    BEGIN
-        -- Copy users
-        EXECUTE format(
-            'INSERT INTO %I.users (id, email, name, password_hash, role)
-             SELECT id, email, name, password_hash, role FROM users WHERE tenant_id = $1',
-            'tenant_' || new_schema_name
-        ) USING tenant_id;
-        
-        -- Copy products
-        EXECUTE format(
-            'INSERT INTO %I.products (id, sku, name, price)
-             SELECT id, sku, name, price FROM products WHERE tenant_id = $1',
-            'tenant_' || new_schema_name
-        ) USING tenant_id;
-        
-        -- 3. Mark migration complete
-        UPDATE tenants 
-        SET settings = settings || '{"schema": "' || new_schema_name || '"}'::jsonb
-        WHERE id = tenant_id;
-        
-    EXCEPTION
-        WHEN OTHERS THEN
-            -- Rollback and cleanup on failure
-            EXECUTE format('DROP SCHEMA IF EXISTS %I CASCADE', 'tenant_' || new_schema_name);
-            RAISE;
-    END;
-END;
-$$ LANGUAGE plpgsql;
-```
-
-### Phase 3: Tenant Management
-
-### Bước 5: Tenant Lifecycle Management
-
-```typescript
-// Tenant lifecycle service
-export class TenantLifecycleService {
-  constructor(
-    private db: DatabaseContext,
-    private eventBus: EventBus,
-    private provisioningService: ProvisioningService,
-    private billingService: BillingService,
-    private logger: Logger
-  ) {}
-  
-  async createTenant(input: CreateTenantInput): Promise<Tenant> {
-    const { name, slug, planId, adminEmail, settings } = input;
-    
-    // Validate slug uniqueness
-    const existing = await this.db.query(
-      'SELECT id FROM tenants WHERE slug = $1',
-      [slug]
-    );
-    
-    if (existing.rows.length > 0) {
-      throw new ValidationError('Tenant slug already exists');
-    }
-    
-    // Create tenant record
-    const tenant = await this.db.transaction(async (tx) => {
-      const result = await tx.query(
-        `INSERT INTO tenants (name, slug, plan_id, billing_email, settings, status)
-         VALUES ($1, $2, $3, $4, $5, 'provisioning')
-         RETURNING *`,
-        [name, slug, planId, adminEmail, JSON.stringify(settings || {})]
-      );
-      
-      const newTenant = result.rows[0];
-      
-      // Create admin user
-      await tx.query(
-        `INSERT INTO users (tenant_id, email, role, status)
-         VALUES ($1, $2, 'owner', 'invited')`,
-        [newTenant.id, adminEmail]
-      );
-      
-      return newTenant;
-    });
-    
-    // Provision tenant resources asynchronously
-    this.provisionTenantResources(tenant.id);
-    
-    // Emit event
-    await this.eventBus.publish('tenant.created', {
-      tenantId: tenant.id,
-      slug: tenant.slug,
-      planId: tenant.plan_id
-    });
-    
-    return tenant;
-  }
-  
-  private async provisionTenantResources(tenantId: string): Promise<void> {
-    try {
-      // Get tenant
-      const tenant = await this.db.findById('tenants', tenantId);
-      
-      // Provision based on strategy
-      switch (tenant.provisioningStrategy) {
-        case 'shared-db-siloed':
-          // No additional provisioning needed
-          break;
-          
-        case 'shared-db-schemas':
-          // Create tenant schema
-          await this.provisioningService.createSchema(tenant.slug);
-          break;
-          
-        case 'separate-databases':
-          // Create tenant database
-          await this.provisioningService.createDatabase(tenant.slug);
-          break;
-          
-        case 'separate-infrastructure':
-          // Provision dedicated infrastructure
-          await this.provisioningService.provisionDedicatedResources(tenant.slug);
-          break;
-      }
-      
-      // Create storage bucket
-      await this.provisioningService.createStorageBucket(tenant.slug);
-      
-      // Initialize integrations
-      await this.initializeIntegrations(tenant);
-      
-      // Update status
-      await this.db.update('tenants', tenantId, { status: 'active' });
-      
-      // Send welcome email
-      await this.sendWelcomeEmail(tenant);
-      
-      this.logger.info('Tenant provisioned successfully', { tenantId });
-      
-    } catch (error) {
-      this.logger.error('Tenant provisioning failed', { tenantId, error });
-      
-      // Mark as failed and notify
-      await this.db.update('tenants', tenantId, { status: 'failed' });
-      
-      await this.eventBus.publish('tenant.provisioning.failed', {
-        tenantId,
-        error: error.message
-      });
-    }
-  }
-  
-  async suspendTenant(tenantId: string, reason: string): Promise<void> {
-    const tenant = await this.db.findById('tenants', tenantId);
-    
-    if (tenant.status === 'suspended') {
-      throw new ValidationError('Tenant is already suspended');
-    }
-    
-    await this.db.transaction(async (tx) => {
-      // Update status
-      await tx.query(
-        'UPDATE tenants SET status = $1, updated_at = NOW() WHERE id = $2',
-        ['suspended', tenantId]
-      );
-      
-      // Revoke all user sessions
-      await tx.query(
-        'UPDATE users SET last_logout_at = NOW() WHERE tenant_id = $1',
-        [tenantId]
-      );
-      
-      // Log suspension
-      await tx.query(
-        `INSERT INTO tenant_events (tenant_id, event_type, metadata)
-         VALUES ($1, 'suspended', $2)`,
-        [tenantId, JSON.stringify({ reason, suspendedBy: 'system' })]
-      );
-    });
-    
-    await this.eventBus.publish('tenant.suspended', { tenantId, reason });
-  }
-  
-  async deleteTenant(tenantId: string, options?: { 
-    immediate?: boolean;
-    retentionDays?: number;
-  }): Promise<void> {
-    const tenant = await this.db.findById('tenants', tenantId);
-    const retentionDays = options?.retentionDays ?? 30;
-    
-    if (options?.immediate) {
-      // Immediate deletion
-      await this.performTenantDeletion(tenant);
-    } else {
-      // Soft delete with grace period
-      await this.db.query(
-        `UPDATE tenants 
-         SET status = 'scheduled_for_deletion',
-             deleted_at = NOW(),
-             settings = settings || $1::jsonb
-         WHERE id = $2`,
-        [JSON.stringify({ deletionScheduledAt: new Date(), retentionEndsAt: new Date(Date.now() + retentionDays * 24 * 60 * 60 * 1000) }), tenantId]
-      );
-      
-      // Schedule actual deletion
-      await this.scheduleTenantDeletion(tenantId, retentionDays);
-    }
-    
-    await this.eventBus.publish('tenant.deleted', { tenantId });
-  }
-  
-  private async performTenantDeletion(tenant: Tenant): Promise<void> {
-    // Clean up based on strategy
-    switch (tenant.provisioningStrategy) {
-      case 'shared-db-schemas':
-        await this.provisioningService.dropSchema(tenant.slug);
-        break;
-      case 'separate-databases':
-        await this.provisioningService.dropDatabase(tenant.slug);
-        break;
-      case 'separate-infrastructure':
-        await this.provisioningService.cleanupDedicatedResources(tenant.slug);
-        break;
-    }
-    
-    // Clean up storage
-    await this.provisioningService.deleteStorageBucket(tenant.slug);
-    
-    // Delete tenant record
-    await this.db.query('DELETE FROM tenants WHERE id = $1', [tenant.id]);
-  }
-}
-```
-
-### Bước 6: Tenant Provisioning Service
-
-```typescript
-// Provisioning service for different isolation strategies
-export class ProvisioningService {
-  constructor(
-    private db: DatabaseContext,
-    private storage: StorageService,
-    private config: ProvisioningConfig,
-    private logger: Logger
-  ) {}
-  
-  async createSchema(tenantSlug: string): Promise<void> {
-    const schemaName = `tenant_${tenantSlug.replace(/-/g, '_')}`;
-    
-    await this.db.query(`CREATE SCHEMA IF NOT EXISTS "${schemaName}"`);
-    
-    // Create tables
-    await this.db.query(`
-      CREATE TABLE "${schemaName}".users (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        email VARCHAR(255) NOT NULL UNIQUE,
-        name VARCHAR(255),
-        role VARCHAR(50) DEFAULT 'member',
-        created_at TIMESTAMPTZ DEFAULT NOW()
-      )
-    `);
-    
-    // Grant permissions
-    await this.db.query(`GRANT USAGE ON SCHEMA "${schemaName}" TO app_user`);
-    await this.db.query(`GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA "${schemaName}" TO app_user`);
-    
-    this.logger.info('Tenant schema created', { schemaName });
-  }
-  
-  async createDatabase(tenantSlug: string): Promise<void> {
-    const dbName = `tenant_${tenantSlug.replace(/-/g, '_')}`;
-    
-    // Create database (requires superuser or createdb privilege)
-    await this.db.query(`CREATE DATABASE "${dbName}"`);
-    
-    // Connect to new database and create tables
-    const newDbConnection = await this.createConnectionForDatabase(dbName);
-    
-    try {
-      await newDbConnection.query(`
-        CREATE TABLE users (
-          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-          email VARCHAR(255) NOT NULL UNIQUE,
-          name VARCHAR(255),
-          role VARCHAR(50) DEFAULT 'member',
-          created_at TIMESTAMPTZ DEFAULT NOW()
-        )
-      `);
-    } finally {
-      await newDbConnection.end();
-    }
-    
-    this.logger.info('Tenant database created', { dbName });
-  }
-  
-  async provisionDedicatedResources(tenantSlug: string): Promise<void> {
-    const namespace = `tenant-${tenantSlug}`;
-    
-    // Create dedicated resources (for Kubernetes-based deployment)
-    await this.k8s.createNamespace(namespace);
-    
-    // Deploy application instance
-    await this.k8s.deployApplication(namespace, {
-      image: this.config.appImage,
-      replicas: 1,
-      resources: {
-        cpu: '500m',
-        memory: '512Mi'
-      }
-    });
-    
-    // Create database
-    await this.createDatabase(namespace);
-    
-    // Create cache
-    await this.redis.createTenantNamespace(namespace);
-    
-    // Create storage
-    await this.storage.createBucket(namespace);
-    
-    this.logger.info('Tenant dedicated resources provisioned', { tenantSlug });
-  }
-}
-```
-
-### Phase 4: Resource Management
-
-### Bước 7: Quota Management
-
-```typescript
-// Quota management service
-export class QuotaService {
-  constructor(
-    private db: DatabaseContext,
-    private metricsService: MetricsService,
-    private logger: Logger
-  ) {}
-  
-  async checkQuota(tenantId: string, resource: ResourceType): Promise<QuotaCheckResult> {
-    const tenant = await this.db.findById('tenants', tenantId);
-    const quota = this.getQuotaLimits(tenant.planId);
-    
-    switch (resource) {
-      case 'users':
-        return this.checkUsersQuota(tenantId, quota);
-      case 'storage':
-        return this.checkStorageQuota(tenantId, quota);
-      case 'api_calls':
-        return this.checkApiCallsQuota(tenantId, quota);
-      case 'database':
-        return this.checkDatabaseQuota(tenantId, quota);
-    }
-  }
-  
-  private async checkUsersQuota(tenantId: string, quota: TenantQuota): Promise<QuotaCheckResult> {
-    const current = await this.db.count('users', {
-      where: { tenantId, deletedAt: null }
-    });
-    
+  if (factors.isolationRequirement === 'maximum') {
     return {
-      resource: 'users',
-      current,
-      limit: quota.maxUsers,
-      available: quota.maxUsers - current,
-      percentage: (current / quota.maxUsers) * 100,
-      exceeded: current >= quota.maxUsers
+      model: 'isolated',
+      database: 'database_per_tenant',
+      infrastructure: 'instance_per_tenant',
+      cost_profile: { per_tenant_fixed: true, shared: false },
+      complexity: 'high'
     };
   }
   
-  private async checkStorageQuota(tenantId: string, quota: TenantQuota): Promise<QuotaCheckResult> {
-    const usage = await this.metricsService.getStorageUsage(tenantId);
-    
+  if (factors.isolationRequirement === 'high' && factors.scale === 'large') {
     return {
-      resource: 'storage',
-      current: usage.bytes,
-      limit: quota.maxStorageGb * 1e9,
-      available: (quota.maxStorageGb * 1e9) - usage.bytes,
-      percentage: (usage.bytes / (quota.maxStorageGb * 1e9)) * 100,
-      exceeded: usage.bytes >= quota.maxStorageGb * 1e9
+      model: 'partial',
+      database: 'shared_schema',
+      infrastructure: 'shared',
+      cost_profile: { per_tenant_fixed: false, shared: true },
+      complexity: 'medium'
     };
   }
   
-  async recordApiUsage(tenantId: string, endpoint: string, duration: number): Promise<void> {
-    // Record metrics
-    await this.metricsService.record({
-      tenantId,
-      metric: 'api_call',
-      value: 1,
-      tags: { endpoint, success: true }
-    });
-    
-    // Update rate limit counters
-    await this.redis.incr(`quota:${tenantId}:api_calls:${this.getCurrentPeriod()}`);
-    
-    // Check if approaching limit
-    const check = await this.checkQuota(tenantId, 'api_calls');
-    if (check.percentage >= 80) {
-      await this.notifyTenantApproachingLimit(tenantId, check);
-    }
-  }
-  
-  async enforceQuotaLimit(tenantId: string, resource: ResourceType): Promise<void> {
-    const check = await this.checkQuota(tenantId, resource);
-    
-    if (check.exceeded) {
-      // Record violation
-      await this.db.query(
-        `INSERT INTO quota_violations (tenant_id, resource, current, "limit", recorded_at)
-         VALUES ($1, $2, $3, $4, NOW())`,
-        [tenantId, resource, check.current, check.limit]
-      );
-      
-      // Emit event for handling
-      await this.eventBus.emit('quota.exceeded', {
-        tenantId,
-        resource,
-        check
-      });
-      
-      throw new QuotaExceededError(resource, check.current, check.limit);
-    }
-  }
+  // Default to shared for cost efficiency
+  return {
+    model: 'shared',
+    database: 'shared_database',
+    infrastructure: 'shared',
+    cost_profile: { per_tenant_fixed: false, shared: true },
+    complexity: 'low'
+  };
 }
 
-// Quota middleware
-export function quotaMiddleware(
-  quotaService: QuotaService
-): Middleware {
-  return async (req, res, next) => {
-    const tenantId = req.headers['x-tenant-id'] as string;
-    
-    if (!tenantId) {
-      return next();
-    }
-    
-    try {
-      // Check API calls quota
-      await quotaService.enforceQuotaLimit(tenantId, 'api_calls');
-      
-      // Record usage
-      await quotaService.recordApiUsage(
-        tenantId,
-        req.path,
-        Date.now() - req.startTime
-      );
-      
-      next();
-    } catch (error) {
-      if (error instanceof QuotaExceededError) {
-        return res.status(429).json({
-          error: 'QUOTA_EXCEEDED',
-          message: `API quota exceeded for ${error.resource}`,
-          resource: error.resource,
-          limit: error.limit,
-          retryAfter: 3600 // 1 hour
-        });
-      }
-      next(error);
-    }
+function evaluateFactors(req: TenantRequirements): FactorAnalysis {
+  return {
+    isolationRequirement: determineIsolationLevel(req),
+    scale: determineScale(req),
+    compliance: determineCompliance(req),
+    costSensitivity: determineCostSensitivity(req),
+    customization: determineCustomization(req)
   };
 }
 ```
 
-### Bước 8: Tenant Context
+### Bước 2: Tenant Data Model
 
 ```typescript
-// Tenant context middleware
-export class TenantMiddleware {
-  constructor(
-    private tenantResolver: TenantResolver,
-    private rlsManager: RLSManager
-  ) {}
-  
-  async handle(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      // Extract tenant identifier
-      const tenantId = this.extractTenantId(req);
-      
-      if (!tenantId) {
-        res.status(401).json({ error: 'Tenant identification required' });
-        return;
-      }
-      
-      // Resolve tenant
-      const tenant = await this.tenantResolver.resolve(tenantId);
-      
-      if (!tenant) {
-        res.status(404).json({ error: 'Tenant not found' });
-        return;
-      }
-      
-      if (tenant.status !== 'active') {
-        res.status(403).json({ 
-          error: 'Tenant not active',
-          status: tenant.status 
-        });
-        return;
-      }
-      
-      // Set tenant context
-      req.tenant = tenant;
-      
-      // Set RLS context
-      await this.rlsManager.setContext(tenantId);
-      
-      // Add tenant to response headers
-      res.setHeader('X-Tenant-ID', tenantId);
-      
-      next();
-    } catch (error) {
-      this.logger.error('Tenant middleware error', { error });
-      next(error);
-    }
-  }
-  
-  private extractTenantId(req: Request): string | null {
-    // Try different sources in order of preference
-    // 1. Path parameter
-    if (req.params.tenantId) {
-      return req.params.tenantId;
-    }
-    
-    // 2. Header
-    const headerTenant = req.headers['x-tenant-id'] as string;
-    if (headerTenant) {
-      return headerTenant;
-    }
-    
-    // 3. Subdomain
-    const host = req.headers.host || '';
-    const subdomain = host.split('.')[0];
-    if (subdomain && subdomain !== 'www' && subdomain !== 'app') {
-      return subdomain;
-    }
-    
-    // 4. JWT token
-    const token = extractToken(req);
-    if (token) {
-      const payload = decodeToken(token);
-      return payload.tenantId;
-    }
-    
-    return null;
-  }
+// Design tenant data model
+interface TenantDataModel {
+  entities: TenantEntity[];
+  relationships: Relationship[];
+  indexes: IndexDefinition[];
+  migrations: Migration[];
 }
 
-// RLS context manager
-export class RLSManager {
-  async setContext(tenantId: string): Promise<void> {
-    await this.db.query(
-      `SET app.current_tenant_id = $1`,
-      [tenantId]
-    );
+function designTenantDataModel(
+  strategy: IsolationStrategy,
+  schema: ApplicationSchema
+): TenantDataModel {
+  if (strategy.database === 'database_per_tenant') {
+    return designPerTenantDatabaseModel(schema);
   }
   
-  async clearContext(): Promise<void> {
-    await this.db.query(`RESET app.current_tenant_id`);
+  if (strategy.database === 'shared_schema') {
+    return designSharedSchemaModel(schema);
   }
+  
+  return designSharedDatabaseModel(schema);
+}
+
+function designSharedDatabaseModel(
+  schema: ApplicationSchema
+): TenantDataModel {
+  const entities: TenantEntity[] = [];
+  
+  // Add tenant_id to all entities
+  for (const entity of schema.entities) {
+    entities.push({
+      ...entity,
+      columns: [
+        ...entity.columns,
+        {
+          name: 'tenant_id',
+          type: 'UUID',
+          nullable: false,
+          indexed: true,
+          foreignKey: 'tenants.id'
+        }
+      ]
+    });
+  }
+  
+  // Add RLS policies
+  const rlsPolicies = generateRLSPolicies(entities);
+  
+  return {
+    entities,
+    relationships: schema.relationships,
+    indexes: generateTenantIndexes(entities),
+    migrations: generateMigrations(entities, rlsPolicies)
+  };
 }
 ```
 
-## Checklist
+### Bước 3: Tenant Management
 
-- [ ] Isolation strategy selected based on requirements
-- [ ] Database schema designed for multi-tenancy
-- [ ] RLS policies implemented (if shared database)
-- [ ] Tenant lifecycle management designed
-- [ ] Provisioning automation implemented
-- [ ] Quota management system designed
-- [ ] Resource monitoring set up
-- [ ] Tenant context handling implemented
-- [ ] Migration strategy defined
-- [ ] Cost model established
+```typescript
+// Design tenant management
+interface TenantManagement {
+  provisioning: ProvisioningWorkflow;
+  lifecycle: LifecycleManager;
+  monitoring: TenantMonitoring;
+  billing: TenantBilling;
+}
+
+function designTenantManagement(
+  strategy: IsolationStrategy
+): TenantManagement {
+  return {
+    provisioning: designProvisioningWorkflow(strategy),
+    lifecycle: designLifecycleManager(),
+    monitoring: designTenantMonitoring(),
+    billing: designTenantBilling()
+  };
+}
+
+function designProvisioningWorkflow(
+  strategy: IsolationStrategy
+): ProvisioningWorkflow {
+  const steps = [
+    { name: 'Validate', handler: validateTenant },
+    { name: 'Create', handler: createTenant },
+    { name: 'Initialize', handler: initializeTenant },
+    { name: 'Configure', handler: configureTenant }
+  ];
+  
+  if (strategy.database === 'database_per_tenant') {
+    steps.push({ name: 'CreateDatabase', handler: createTenantDatabase });
+  }
+  
+  if (strategy.infrastructure === 'instance_per_tenant') {
+    steps.push({ name: 'ProvisionInfrastructure', handler: provisionInfrastructure });
+  }
+  
+  steps.push({ name: 'Verify', handler: verifyTenant });
+  
+  return { steps };
+}
+```
+
+### Bước 4: Resource Allocation
+
+```typescript
+// Design resource allocation
+interface ResourceAllocation {
+  shared: SharedResources;
+  dedicated: DedicatedResources;
+  limits: ResourceLimits;
+  quotas: TenantQuotas;
+}
+
+function designResourceAllocation(
+  strategy: IsolationStrategy,
+  tiers: TenantTier[]
+): ResourceAllocation {
+  if (strategy.model === 'isolated') {
+    return designDedicatedAllocation(tiers);
+  }
+  
+  return designSharedAllocation(tiers);
+}
+
+function designSharedAllocation(tiers: TenantTier[]): ResourceAllocation {
+  const limits = {
+    maxTenants: 10000,
+    maxDatabases: 1,
+    maxConnectionsPerTenant: 100
+  };
+  
+  const quotas = tiers.reduce((acc, tier) => ({
+    ...acc,
+    [tier.name]: {
+      api_rate_limit: tier.apiRateLimit,
+      storage_gb: tier.storageGB,
+      compute_units: tier.computeUnits,
+      database_connections: tier.dbConnections,
+      support_level: tier.supportLevel
+    }
+  }), {} as TenantQuotas);
+  
+  return {
+    shared: {
+      database: true,
+      cache: true,
+      storage: 'shared_with_quota'
+    },
+    dedicated: {},
+    limits,
+    quotas
+  };
+}
+```
+
+## Checklist (Danh sách kiểm tra)
+
+- [ ] Isolation strategy aligned with requirements
+- [ ] All tables have tenant_id (if shared)
+- [ ] RLS policies properly configured
+- [ ] Tenant provisioning automated
+- [ ] Tenant lifecycle managed
+- [ ] Resource limits enforced
+- [ ] Monitoring per tenant
+- [ ] Billing integrated
+- [ ] Migration plan documented
+- [ ] Disaster recovery tested
+- [ ] Performance isolated for premium tenants
+- [ ] Security audit passed
+- [ ] Compliance requirements met
+- [ ] Cost tracking per tenant
+- [ ] Upgrade/migration path clear
 
 ## Examples (Ví dụ)
 
-### Ví dụ: Complete Tenant Architecture
+### Ví dụ 1: Shared Database with RLS
 
-```typescript
-// Architecture overview
-// src/
-// ├── multi-tenant/
-// │   ├── context/
-// │   │   ├── TenantContext.ts
-// │   │   ├── TenantMiddleware.ts
-// │   │   └── TenantResolver.ts
-// │   │
-// │   ├── isolation/
-// │   │   ├── strategies/
-// │   │   │   ├── SharedDatabaseStrategy.ts
-// │   │   │   ├── SchemaPerTenantStrategy.ts
-// │   │   │   ├── DatabasePerTenantStrategy.ts
-// │   │   │   └── DedicatedInfrastructureStrategy.ts
-// │   │   └── TenantIsolationManager.ts
-// │   │
-// │   ├── lifecycle/
-// │   │   ├── TenantService.ts
-// │   │   ├── TenantProvisioningService.ts
-// │   │   └── TenantDeletionService.ts
-// │   │
-// │   ├── quotas/
-// │   │   ├── QuotaService.ts
-// │   │   ├── QuotaMiddleware.ts
-// │   │   └── UsageTracker.ts
-// │   │
-// │   └── rls/
-// │       ├── RLSManager.ts
-// │       ├── policies.sql
-// │       └── TenantPolicies.ts
+```sql
+-- ✅ GOOD: Shared database with Row-Level Security
+CREATE TABLE orders (
+  id UUID PRIMARY KEY,
+  tenant_id UUID NOT NULL REFERENCES tenants(id),
+  customer_id UUID NOT NULL,
+  total_cents INTEGER NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Index for tenant queries
+CREATE INDEX idx_orders_tenant_id ON orders(tenant_id);
+
+-- Enable RLS
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policy
+CREATE POLICY tenant_isolation ON orders
+  FOR ALL
+  USING (tenant_id = current_setting('app.current_tenant_id')::UUID)
+  WITH CHECK (tenant_id = current_setting('app.current_tenant_id')::UUID);
+
+-- Force RLS
+ALTER TABLE orders FORCE ROW LEVEL SECURITY;
 ```
 
-### Ví dụ: Plan-Based Feature Access
+### Ví dụ 2: Tenant Middleware
 
 ```typescript
-// Feature flags based on plan
-const planFeatures: Record<PlanType, string[]> = {
-  free: [
-    'basic_dashboard',
-    'limited_users_5',
-    'limited_storage_1gb',
-    'email_support'
-  ],
-  starter: [
-    'basic_dashboard',
-    'advanced_analytics',
-    'limited_users_25',
-    'limited_storage_10gb',
-    'api_access',
-    'email_support'
-  ],
-  professional: [
-    'basic_dashboard',
-    'advanced_analytics',
-    'unlimited_users',
-    'unlimited_storage',
-    'full_api_access',
-    'sso',
-    'custom_integrations',
-    'priority_support'
-  ],
-  enterprise: [
-    'everything',
-    'dedicated_infrastructure',
-    'custom_developments',
-    'slas',
-    'dedicated_support'
-  ]
-};
-
-export function hasFeature(tenant: Tenant, feature: string): boolean {
-  const planType = tenant.plan.type;
-  const features = planFeatures[planType];
-  return features.includes(feature) || features.includes('everything');
+// ✅ GOOD: Tenant context middleware
+class TenantMiddleware {
+  constructor(
+    private tenantResolver: TenantResolver,
+    private tenantValidator: TenantValidator
+  ) {}
+  
+  async handle(req: Request, res: Response, next: NextFunction) {
+    const tenantId = this.extractTenantId(req);
+    
+    if (!tenantId) {
+      return res.status(401).json({ error: 'Tenant required' });
+    }
+    
+    const tenant = await this.tenantResolver.resolve(tenantId);
+    
+    if (!tenant) {
+      return res.status(404).json({ error: 'Tenant not found' });
+    }
+    
+    if (!this.tenantValidator.isActive(tenant)) {
+      return res.status(403).json({ error: 'Tenant suspended' });
+    }
+    
+    // Set tenant context for database queries
+    await this.setTenantContext(tenantId);
+    
+    req.tenant = tenant;
+    next();
+  }
+  
+  private async setTenantContext(tenantId: string): Promise<void> {
+    await db.query(`SET LOCAL app.current_tenant_id = $1`, [tenantId]);
+  }
 }
 ```
 
-## Anti Pattern
+## Anti Patterns (Các pattern cần tránh)
 
-- [ ] **Missing tenant_id**: Data leakage risk
-- [ ] **No RLS on shared DB**: Cross-tenant access
-- [ ] **Hard-coded tenant IDs**: Migration issues
-- [ ] **No quota enforcement**: Resource exhaustion
-- [ ] **No isolation strategy**: Compliance issues
-- [ ] **Shared credentials**: Security vulnerability
+### 1. Missing Tenant Filter
+```typescript
+// ❌ BAD: Query without tenant filter
+async function getOrders() {
+  return db.query('SELECT * FROM orders');
+}
 
-## Best Practice
+// ✅ GOOD: Always filter by tenant
+async function getOrders(tenantId: string) {
+  return db.query(
+    'SELECT * FROM orders WHERE tenant_id = $1',
+    [tenantId]
+  );
+}
+```
 
-- [ ] **Always use tenant_id**: Every table needs it
-- [ ] **Enable RLS**: For shared database strategy
-- [ ] **Design for migration**: Between strategies
-- [ ] **Enforce quotas**: Prevent resource exhaustion
-- [ ] **Automate provisioning**: Consistent tenant setup
-- [ ] **Monitor usage**: Track per-tenant metrics
+### 2. Single-Tenant Architecture
+```typescript
+// ❌ BAD: One database per tenant (scales poorly)
+class TenantDatabase {
+  async findTenant(tenantId: string) {
+    return this.databases[tenantId]; // Dict of connections!
+  }
+}
 
-## Liên kết
+// ✅ GOOD: Shared with isolation
+class SharedDatabase {
+  async findTenant(tenantId: string) {
+    return db.query(
+      'SELECT * FROM tenants WHERE id = $1',
+      [tenantId]
+    );
+  }
+}
+```
 
-- [[../rules/core-architecture]] - Core Architecture
-- [[../rules/rls]] - Row Level Security Rules
-- [[../rules/security]] - Security Best Practices
-- [[../skills/tenant-isolation-review]] - Tenant Isolation Review
-- [[../skills/billing-review]] - Billing Review
+### 3. Hardcoded Tenant ID
+```typescript
+// ❌ BAD: Hardcoded tenant
+const orders = await db.query(
+  "SELECT * FROM orders WHERE tenant_id = 'tenant_123'"
+);
+
+// ✅ GOOD: From context
+const orders = await db.query(
+  'SELECT * FROM orders WHERE tenant_id = $1',
+  [req.tenant.id]
+);
+```
+
+## Best Practices (Thực hành tốt nhất)
+
+1. **Start shared, migrate to dedicated**: For cost efficiency
+2. **Always filter by tenant**: Never forget tenant_id
+3. **Use middleware**: Centralize tenant resolution
+4. **Implement RLS**: Database-level isolation
+5. **Monitor per tenant**: Track usage and health
+6. **Automate provisioning**: Self-service onboarding
+7. **Plan for data migrations**: Moving tenants between strategies
+8. **Consider tenant tiers**: Premium gets dedicated resources
+9. **Test isolation**: Verify no cross-tenant data access
+10. **Document tenant lifecycle**: Clear procedures
+
+## Liên kết (Cross-references)
+
+- **Related Skills**: [tenant-isolation-review](./tenant-isolation-review.mdc), [crm-saas-review](./crm-saas-review.mdc), [microservice-design](./microservice-design.mdc)
+- **Databases**: PostgreSQL RLS, MySQL Row Security
+- **Patterns**: Database per tenant, Schema per tenant, Shared database

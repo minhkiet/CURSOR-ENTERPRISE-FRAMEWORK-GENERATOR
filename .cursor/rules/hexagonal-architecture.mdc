@@ -1,0 +1,966 @@
+---
+description: Nguyên tắc và best practices cho Hexagonal Architecture (Ports and Adapters) trong Cursor Enterprise Framework
+created: 2026-06-23
+version: 1.0.0
+tags:
+  - hexagonal-architecture
+  - ports-and-adapters
+  - architecture
+  - clean-architecture
+---
+
+# Hexagonal Architecture Guidelines
+
+## Mục tiêu
+
+Tài liệu này định nghĩa các nguyên tắc và best practices cho việc implement Hexagonal Architecture (còn gọi là Ports and Adapters) trong Cursor Enterprise Framework. Mục tiêu là đảm bảo application có thể được drive bởi users, programs, tests, hoặc batch scripts một cách independent của actual runtime databases và services.
+
+Hexagonal Architecture tách biệt application core (domain logic) khỏi external systems thông qua ports và adapters. Điều này tạo ra highly testable và maintainable systems.
+
+## Nguyên tắc cơ bản
+
+### 1. Hexagonal Architecture Overview
+
+Understanding the hexagon metaphor.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                   Hexagonal Architecture                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│                    ┌─────────────────────┐                      │
+│                    │                     │                      │
+│                    │      Application    │                      │
+│                    │        Core         │                      │
+│                    │                     │                      │
+│                    │  ┌───────────────┐  │                      │
+│                    │  │   Domain      │  │                      │
+│                    │  │   Services    │  │                      │
+│                    │  └───────────────┘  │                      │
+│                    │                     │                      │
+│                    └─────────┬───────────┘                      │
+│                              │                                    │
+│           ┌──────────────────┼──────────────────┐               │
+│           │                  │                  │                │
+│    ┌──────▼──────┐   ┌───────▼──────┐  ┌──────▼──────┐        │
+│    │    Port     │   │    Port      │  │    Port     │        │
+│    │  (Driving)  │   │  (Driving)   │  │  (Driven)   │        │
+│    │             │   │              │  │             │        │
+│    │  REST API   │   │   GraphQL    │  │ Repository  │        │
+│    │  Controller │   │   Resolver   │  │  Interface   │        │
+│    └──────┬──────┘   └───────┬──────┘  └──────┬──────┘        │
+│           │                  │                  │                │
+│    ┌──────▼──────┐   ┌───────▼──────┐  ┌──────▼──────┐        │
+│    │   Adapter    │   │   Adapter    │  │   Adapter   │        │
+│    │   (Driving)  │   │   (Driving)  │  │   (Driven)  │        │
+│    │             │   │              │  │             │        │
+│    │   Express   │   │   Apollo    │  │  PostgreSQL │        │
+│    │   Router    │   │   Server    │  │   Driver    │        │
+│    └─────────────┘   └──────────────┘  └─────────────┘        │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 2. Ports Definition
+
+Define ports as interfaces.
+
+```typescript
+// ports/input/IOrderService.ts (Driving Port)
+export interface IOrderService {
+    createOrder(input: CreateOrderInput): Promise<OrderOutput>;
+    getOrder(id: string): Promise<OrderOutput | null>;
+    cancelOrder(id: string, reason: string): Promise<void>;
+    listOrders(filter: OrderFilter): Promise<OrderListOutput>;
+}
+
+// ports/output/IOrderRepository.ts (Driven Port)
+export interface IOrderRepository {
+    save(order: Order): Promise<void>;
+    findById(id: OrderId): Promise<Order | null>;
+    findByCustomer(customerId: CustomerId): Promise<Order[]>;
+    findByStatus(status: OrderStatus): Promise<Order[]>;
+    delete(id: OrderId): Promise<void>;
+}
+
+// ports/output/IPaymentGateway.ts (Driven Port)
+export interface IPaymentGateway {
+    processPayment(request: PaymentRequest): Promise<PaymentResponse>;
+    refundPayment(paymentId: string): Promise<RefundResponse>;
+    getPaymentStatus(paymentId: string): Promise<PaymentStatus>;
+}
+
+// ports/output/INotificationPort.ts (Driven Port)
+export interface INotificationPort {
+    sendEmail(to: string, template: string, data: any): Promise<void>;
+    sendSMS(phone: string, message: string): Promise<void>;
+    sendPushNotification(userId: string, notification: PushNotification): Promise<void>;
+}
+
+// ports/output/IEventPublisher.ts (Driven Port)
+export interface IEventPublisher {
+    publish(event: DomainEvent): Promise<void>;
+    publishBatch(events: DomainEvent[]): Promise<void>;
+}
+```
+
+### 3. Application Layer
+
+Implement application services với ports.
+
+```typescript
+// application/OrderApplicationService.ts
+export class OrderApplicationService implements IOrderService {
+    constructor(
+        private orderRepository: IOrderRepository,
+        private paymentGateway: IPaymentGateway,
+        private notificationPort: INotificationPort,
+        private eventPublisher: IEventPublisher
+    ) {}
+
+    async createOrder(input: CreateOrderInput): Promise<OrderOutput> {
+        // Create domain order
+        const order = Order.create({
+            customerId: new CustomerId(input.customerId),
+            shippingAddress: Address.create(input.shippingAddress)
+        });
+
+        // Add items
+        for (const itemInput of input.items) {
+            const product = await this.getProduct(itemInput.productId);
+            order.addItem(product, new Quantity(itemInput.quantity));
+        }
+
+        // Process payment
+        const paymentResult = await this.paymentGateway.processPayment({
+            orderId: order.id.value,
+            amount: order.total.amount,
+            currency: order.total.currency
+        });
+
+        if (!paymentResult.success) {
+            throw new PaymentFailedException(paymentResult.error);
+        }
+
+        // Confirm order
+        order.confirm(paymentResult.paymentId);
+
+        // Persist
+        await this.orderRepository.save(order);
+
+        // Publish event
+        await this.eventPublisher.publish(OrderCreatedEvent.create(order));
+
+        // Notify
+        await this.notificationPort.sendEmail(
+            order.customerEmail,
+            'order-confirmation',
+            { orderId: order.id.value }
+        );
+
+        return this.toOutput(order);
+    }
+
+    async cancelOrder(id: string, reason: string): Promise<void> {
+        const order = await this.orderRepository.findById(new OrderId(id));
+
+        if (!order) {
+            throw new OrderNotFoundException(id);
+        }
+
+        order.cancel(new CancellationReason(reason));
+
+        // Process refund
+        if (order.paymentId) {
+            await this.paymentGateway.refundPayment(order.paymentId);
+        }
+
+        await this.orderRepository.save(order);
+
+        await this.eventPublisher.publish(OrderCancelledEvent.create(order, reason));
+
+        await this.notificationPort.sendEmail(
+            order.customerEmail,
+            'order-cancellation',
+            { orderId: id, reason }
+        );
+    }
+
+    async getOrder(id: string): Promise<OrderOutput | null> {
+        const order = await this.orderRepository.findById(new OrderId(id));
+        return order ? this.toOutput(order) : null;
+    }
+
+    async listOrders(filter: OrderFilter): Promise<OrderListOutput> {
+        const orders = filter.customerId
+            ? await this.orderRepository.findByCustomer(new CustomerId(filter.customerId))
+            : filter.status
+                ? await this.orderRepository.findByStatus(filter.status)
+                : await this.orderRepository.findAll();
+
+        return {
+            orders: orders.map(o => this.toOutput(o)),
+            total: orders.length
+        };
+    }
+
+    private toOutput(order: Order): OrderOutput {
+        return {
+            id: order.id.value,
+            status: order.status.value,
+            items: order.items.map(i => ({
+                productId: i.productId.value,
+                quantity: i.quantity.value,
+                price: i.price.amount
+            })),
+            total: order.total.amount,
+            createdAt: order.createdAt.toISOString()
+        };
+    }
+
+    private async getProduct(productId: string): Promise<Product> {
+        // Could be from another service or cache
+        throw new Error('Not implemented');
+    }
+}
+```
+
+### 4. Adapters Implementation
+
+Implement adapters cho external systems.
+
+```typescript
+// adapters/persistence/PostgresOrderRepository.ts
+export class PostgresOrderRepository implements IOrderRepository {
+    constructor(private db: Database) {}
+
+    async save(order: Order): Promise<void> {
+        const data = {
+            id: order.id.value,
+            customer_id: order.customerId.value,
+            status: order.status.value,
+            total: order.total.amount,
+            currency: order.total.currency.value,
+            shipping_address: JSON.stringify(order.shippingAddress),
+            payment_id: order.paymentId?.value,
+            created_at: order.createdAt,
+            updated_at: new Date()
+        };
+
+        await this.db.query(`
+            INSERT INTO orders (id, customer_id, status, total, currency, shipping_address, payment_id, created_at, updated_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            ON CONFLICT (id) DO UPDATE SET
+                status = EXCLUDED.status,
+                total = EXCLUDED.total,
+                updated_at = EXCLUDED.updated_at
+        `, [data.id, data.customer_id, data.status, data.total, data.currency, data.shipping_address, data.payment_id, data.created_at, data.updated_at]);
+
+        // Save items
+        await this.db.query('DELETE FROM order_items WHERE order_id = $1', [data.id]);
+
+        for (const item of order.items) {
+            await this.db.query(`
+                INSERT INTO order_items (id, order_id, product_id, quantity, price)
+                VALUES ($1, $2, $3, $4, $5)
+            `, [item.id.value, data.id, item.productId.value, item.quantity.value, item.price.amount]);
+        }
+    }
+
+    async findById(id: OrderId): Promise<Order | null> {
+        const result = await this.db.query(
+            'SELECT * FROM orders WHERE id = $1',
+            [id.value]
+        );
+
+        if (result.rows.length === 0) {
+            return null;
+        }
+
+        const orderData = result.rows[0];
+        const items = await this.getOrderItems(orderData.id);
+
+        return this.mapToDomain(orderData, items);
+    }
+
+    async findByCustomer(customerId: CustomerId): Promise<Order[]> {
+        const result = await this.db.query(
+            'SELECT * FROM orders WHERE customer_id = $1 ORDER BY created_at DESC',
+            [customerId.value]
+        );
+
+        return Promise.all(result.rows.map(async row => {
+            const items = await this.getOrderItems(row.id);
+            return this.mapToDomain(row, items);
+        }));
+    }
+
+    async findByStatus(status: OrderStatus): Promise<Order[]> {
+        const result = await this.db.query(
+            'SELECT * FROM orders WHERE status = $1 ORDER BY created_at DESC',
+            [status.value]
+        );
+
+        return Promise.all(result.rows.map(async row => {
+            const items = await this.getOrderItems(row.id);
+            return this.mapToDomain(row, items);
+        }));
+    }
+
+    async delete(id: OrderId): Promise<void> {
+        await this.db.query('DELETE FROM orders WHERE id = $1', [id.value]);
+    }
+
+    private async getOrderItems(orderId: string): Promise<OrderItemData[]> {
+        const result = await this.db.query(
+            'SELECT * FROM order_items WHERE order_id = $1',
+            [orderId]
+        );
+        return result.rows;
+    }
+
+    private mapToDomain(data: OrderData, items: OrderItemData[]): Order {
+        const order = new Order(
+            new OrderId(data.id),
+            new CustomerId(data.customer_id),
+            JSON.parse(data.shipping_address)
+        );
+
+        // Map items
+        for (const item of items) {
+            order['items'].push(new OrderItem(
+                new OrderItemId(item.id),
+                new ProductId(item.product_id),
+                new Quantity(item.quantity),
+                new Money(item.price, new Currency(data.currency))
+            ));
+        }
+
+        return order;
+    }
+}
+
+// adapters/external/StripePaymentGateway.ts
+export class StripePaymentGateway implements IPaymentGateway {
+    constructor(private stripe: Stripe, private logger: Logger) {}
+
+    async processPayment(request: PaymentRequest): Promise<PaymentResponse> {
+        try {
+            const charge = await this.stripe.charges.create({
+                amount: Math.round(request.amount * 100),
+                currency: request.currency.toLowerCase(),
+                metadata: { orderId: request.orderId }
+            });
+
+            return {
+                success: true,
+                paymentId: charge.id,
+                status: charge.status
+            };
+        } catch (error) {
+            this.logger.error('Payment failed', { error });
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    async refundPayment(paymentId: string): Promise<RefundResponse> {
+        try {
+            const refund = await this.stripe.refunds.create({
+                charge: paymentId
+            });
+
+            return {
+                success: true,
+                refundId: refund.id
+            };
+        } catch (error) {
+            this.logger.error('Refund failed', { error });
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    async getPaymentStatus(paymentId: string): Promise<PaymentStatus> {
+        const charge = await this.stripe.charges.retrieve(paymentId);
+        return {
+            status: charge.status,
+            amount: charge.amount / 100
+        };
+    }
+}
+
+// adapters/messaging/RabbitMQEventPublisher.ts
+export class RabbitMQEventPublisher implements IEventPublisher {
+    constructor(
+        private channel: Channel,
+        private exchange: string
+    ) {}
+
+    async publish(event: DomainEvent): Promise<void> {
+        this.channel.publish(
+            this.exchange,
+            event.eventType,
+            Buffer.from(JSON.stringify(event)),
+            { persistent: true }
+        );
+    }
+
+    async publishBatch(events: DomainEvent[]): Promise<void> {
+        for (const event of events) {
+            await this.publish(event);
+        }
+    }
+}
+```
+
+### 5. Primary Adapters (Driving)
+
+Implement driving adapters (UI layer).
+
+```typescript
+// adapters/primary/http/OrderHttpAdapter.ts
+export class OrderHttpAdapter {
+    constructor(
+        private orderService: IOrderService,
+        private logger: Logger
+    ) {}
+
+    async handleCreateOrder(req: Request, res: Response): Promise<void> {
+        try {
+            const input: CreateOrderInput = {
+                customerId: req.body.customerId,
+                shippingAddress: req.body.shippingAddress,
+                items: req.body.items
+            };
+
+            const output = await this.orderService.createOrder(input);
+
+            res.status(201).json({
+                success: true,
+                data: output
+            });
+        } catch (error) {
+            this.handleError(res, error);
+        }
+    }
+
+    async handleGetOrder(req: Request, res: Response): Promise<void> {
+        try {
+            const output = await this.orderService.getOrder(req.params.id);
+
+            if (!output) {
+                res.status(404).json({
+                    success: false,
+                    error: 'Order not found'
+                });
+                return;
+            }
+
+            res.json({
+                success: true,
+                data: output
+            });
+        } catch (error) {
+            this.handleError(res, error);
+        }
+    }
+
+    async handleCancelOrder(req: Request, res: Response): Promise<void> {
+        try {
+            await this.orderService.cancelOrder(
+                req.params.id,
+                req.body.reason
+            );
+
+            res.json({
+                success: true
+            });
+        } catch (error) {
+            this.handleError(res, error);
+        }
+    }
+
+    async handleListOrders(req: Request, res: Response): Promise<void> {
+        try {
+            const filter: OrderFilter = {
+                customerId: req.query.customerId as string,
+                status: req.query.status as OrderStatus
+            };
+
+            const output = await this.orderService.listOrders(filter);
+
+            res.json({
+                success: true,
+                data: output
+            });
+        } catch (error) {
+            this.handleError(res, error);
+        }
+    }
+
+    private handleError(res: Response, error: Error): void {
+        this.logger.error('Request failed', { error });
+
+        if (error instanceof ValidationException) {
+            res.status(400).json({
+                success: false,
+                error: error.message
+            });
+            return;
+        }
+
+        if (error instanceof PaymentFailedException) {
+            res.status(402).json({
+                success: false,
+                error: error.message
+            });
+            return;
+        }
+
+        res.status(500).json({
+            success: false,
+            error: 'Internal server error'
+        });
+    }
+}
+
+// adapters/primary/graphql/OrderGraphQLAdapter.ts
+export class OrderGraphQLAdapter {
+    constructor(private orderService: IOrderService) {}
+
+    Query = {
+        order: async (_: any, { id }: { id: string }) => {
+            return this.orderService.getOrder(id);
+        },
+
+        orders: async (_: any, { filter }: { filter: OrderFilter }) => {
+            return this.orderService.listOrders(filter);
+        }
+    };
+
+    Mutation = {
+        createOrder: async (_: any, { input }: { input: CreateOrderInput }) => {
+            return this.orderService.createOrder(input);
+        },
+
+        cancelOrder: async (_: any, { id, reason }: { id: string; reason: string }) => {
+            await this.orderService.cancelOrder(id, reason);
+            return { success: true };
+        }
+    };
+}
+```
+
+### 6. Dependency Injection Setup
+
+Wire everything together.
+
+```typescript
+// config/container.ts
+import { Container } from 'inversify';
+
+export function createContainer(): Container {
+    const container = new Container();
+
+    // Order Repository
+    container.bind<IOrderRepository>('IOrderRepository')
+        .to(PostgresOrderRepository);
+
+    // Payment Gateway
+    container.bind<IPaymentGateway>('IPaymentGateway')
+        .to(StripePaymentGateway);
+
+    // Notification Port
+    container.bind<INotificationPort>('INotificationPort')
+        .to(SendGridNotificationAdapter);
+
+    // Event Publisher
+    container.bind<IEventPublisher>('IEventPublisher')
+        .to(RabbitMQEventPublisher);
+
+    // Application Service
+    container.bind<IOrderService>('IOrderService')
+        .to(OrderApplicationService);
+
+    // HTTP Adapter
+    container.bind<OrderHttpAdapter>('OrderHttpAdapter')
+        .to(OrderHttpAdapter);
+
+    return container;
+}
+
+// usage
+const container = createContainer();
+const orderService = container.get<IOrderService>('IOrderService');
+```
+
+### 7. Testing with Hexagonal Architecture
+
+Test adapters và ports independently.
+
+```typescript
+// tests/unit/application/OrderApplicationService.test.ts
+describe('OrderApplicationService', () => {
+    let service: OrderApplicationService;
+    let mockRepository: jest.Mocked<IOrderRepository>;
+    let mockPaymentGateway: jest.Mocked<IPaymentGateway>;
+    let mockNotification: jest.Mocked<INotificationPort>;
+    let mockPublisher: jest.Mocked<IEventPublisher>;
+
+    beforeEach(() => {
+        mockRepository = createMockRepository();
+        mockPaymentGateway = createMockPaymentGateway();
+        mockNotification = createMockNotification();
+        mockPublisher = createMockPublisher();
+
+        service = new OrderApplicationService(
+            mockRepository,
+            mockPaymentGateway,
+            mockNotification,
+            mockPublisher
+        );
+    });
+
+    it('should create order successfully', async () => {
+        const input: CreateOrderInput = {
+            customerId: 'cust-123',
+            shippingAddress: testAddress(),
+            items: [{ productId: 'prod-1', quantity: 2 }]
+        };
+
+        mockPaymentGateway.processPayment.mockResolvedValue({
+            success: true,
+            paymentId: 'pay-123'
+        });
+
+        const result = await service.createOrder(input);
+
+        expect(result.id).toBeDefined();
+        expect(result.status).toBe('CONFIRMED');
+        expect(mockRepository.save).toHaveBeenCalled();
+        expect(mockPublisher.publish).toHaveBeenCalled();
+    });
+});
+
+// tests/integration/adapters/PostgresOrderRepository.test.ts
+describe('PostgresOrderRepository', () => {
+    let repository: PostgresOrderRepository;
+    let db: TestDatabase;
+
+    beforeAll(async () => {
+        db = await createTestDatabase();
+        repository = new PostgresOrderRepository(db);
+    });
+
+    afterAll(async () => {
+        await db.close();
+    });
+
+    it('should save and retrieve order', async () => {
+        const order = Order.create(testCustomerId(), testAddress());
+
+        await repository.save(order);
+
+        const retrieved = await repository.findById(order.id);
+
+        expect(retrieved).not.toBeNull();
+        expect(retrieved!.id.value).toBe(order.id.value);
+    });
+});
+```
+
+### 8. Directory Structure
+
+Organize code by hexagonal structure.
+
+```
+src/
+├── domain/                    # Pure domain (no dependencies)
+│   ├── model/
+│   │   ├── Order.ts
+│   │   ├── Product.ts
+│   │   └── Customer.ts
+│   ├── value-objects/
+│   │   ├── Money.ts
+│   │   ├── Address.ts
+│   │   └── OrderId.ts
+│   ├── events/
+│   │   └── OrderEvents.ts
+│   └── exceptions/
+│       └── DomainExceptions.ts
+│
+├── application/               # Application services (depends only on ports)
+│   ├── ports/
+│   │   ├── input/
+│   │   │   └── IOrderService.ts
+│   │   └── output/
+│   │       ├── IOrderRepository.ts
+│   │       ├── IPaymentGateway.ts
+│   │       └── INotificationPort.ts
+│   ├── services/
+│   │   └── OrderApplicationService.ts
+│   └── dto/
+│       ├── CreateOrderDTO.ts
+│       └── OrderDTO.ts
+│
+├── adapters/                  # Adapters (implement ports)
+│   ├── primary/              # Driving adapters
+│   │   ├── http/
+│   │   │   └── OrderHttpAdapter.ts
+│   │   ├── graphql/
+│   │   │   └── OrderGraphQLAdapter.ts
+│   │   └── cli/
+│   │       └── OrderCliAdapter.ts
+│   └── secondary/           # Driven adapters
+│       ├── persistence/
+│       │   ├── postgres/
+│       │   │   └── PostgresOrderRepository.ts
+│       │   └── mongodb/
+│       │       └── MongoOrderRepository.ts
+│       ├── external/
+│       │   ├── payment/
+│       │   │   └── StripePaymentGateway.ts
+│       │   └── notification/
+│       │       └── SendGridNotificationAdapter.ts
+│       └── messaging/
+│           └── RabbitMQEventPublisher.ts
+│
+├── config/                    # Configuration
+│   ├── container.ts
+│   └── database.ts
+│
+└── main.ts                   # Entry point
+```
+
+## Checklist
+
+- [ ] Define ports as interfaces
+- [ ] Implement domain without external dependencies
+- [ ] Create application services using ports
+- [ ] Implement driving adapters (UI)
+- [ ] Implement driven adapters (external systems)
+- [ ] Wire dependencies properly
+- [ ] Test ports in isolation
+- [ ] Test adapters independently
+- [ ] Keep domain pure
+- [ ] Document ports
+
+## Anti Patterns
+
+### 1. Leaking Infrastructure into Domain
+
+```typescript
+// Không nên - infrastructure in domain
+class Order {
+    saveToDatabase() {
+        const db = new PostgresConnection();
+        db.query('INSERT INTO orders...');
+    }
+}
+
+// Nên - domain is pure
+class Order {
+    // Only domain logic
+}
+```
+
+### 2. Missing Ports
+
+```typescript
+// Không nên - direct dependency
+class OrderService {
+    constructor(
+        private db: PostgresConnection,  // Too concrete
+        private stripe: Stripe          // Too concrete
+    ) {}
+}
+
+// Nên - use ports
+class OrderService {
+    constructor(
+        private repository: IOrderRepository,    // Port
+        private paymentGateway: IPaymentGateway // Port
+    ) {}
+}
+```
+
+### 3. Heavy Application Layer
+
+```typescript
+// Không nên - application layer does everything
+class OrderService {
+    async createOrder(input) {
+        // Validation logic
+        // Business logic
+        // Database operations
+        // Payment processing
+        // Notification sending
+        // All in one!
+    }
+}
+
+// Nên - delegate to domain
+class OrderService {
+    async createOrder(input) {
+        const order = this.createOrderDomain(input);
+        order.confirm(this.paymentGateway.charge(...));
+        this.repository.save(order);
+    }
+}
+```
+
+## Best Practices
+
+### 1. Single Responsibility per Adapter
+
+```typescript
+// One adapter per port
+class PostgresOrderRepository implements IOrderRepository {}
+class MongoOrderRepository implements IOrderRepository {}
+
+// One adapter per external service
+class StripePaymentGateway implements IPaymentGateway {}
+class PayPalPaymentGateway implements IPaymentGateway {}
+```
+
+### 2. Immutable Domain
+
+```typescript
+// Domain objects should be immutable or have controlled mutations
+class Order {
+    private _status: OrderStatus;
+
+    confirm(): void {
+        if (this._status !== OrderStatus.DRAFT) {
+            throw new BusinessRuleViolation();
+        }
+        this._status = OrderStatus.CONFIRMED;
+    }
+}
+```
+
+### 3. Async Adapters
+
+```typescript
+// Adapters can be sync or async
+interface IOrderRepository {
+    save(order: Order): Promise<void>;  // Async
+}
+
+interface ICacheAdapter {
+    get<T>(key: string): Promise<T | null>;  // Async
+}
+```
+
+## Workflow
+
+### 1. Design Phase
+
+1. Identify domain model
+2. Define driving ports (use cases)
+3. Define driven ports (external systems)
+4. Plan adapters needed
+
+### 2. Implementation
+
+1. Implement domain layer
+2. Implement ports (interfaces)
+3. Implement application services
+4. Implement adapters
+5. Wire dependencies
+
+### 3. Testing
+
+1. Unit test domain
+2. Unit test application services
+3. Integration test adapters
+
+## Ví dụ
+
+### Ví dụ 1: Complete Adapter Example
+
+```typescript
+// adapters/secondary/persistence/InMemoryOrderRepository.ts
+export class InMemoryOrderRepository implements IOrderRepository {
+    private orders: Map<string, Order> = new Map();
+
+    async save(order: Order): Promise<void> {
+        this.orders.set(order.id.value, order);
+    }
+
+    async findById(id: OrderId): Promise<Order | null> {
+        return this.orders.get(id.value) || null;
+    }
+
+    async findByCustomer(customerId: CustomerId): Promise<Order[]> {
+        return Array.from(this.orders.values())
+            .filter(o => o.customerId.equals(customerId));
+    }
+
+    async findByStatus(status: OrderStatus): Promise<Order[]> {
+        return Array.from(this.orders.values())
+            .filter(o => o.status.equals(status));
+    }
+
+    async delete(id: OrderId): Promise<void> {
+        this.orders.delete(id.value);
+    }
+}
+
+// Usage in tests
+describe('OrderApplicationService', () => {
+    let service: OrderApplicationService;
+    const repository = new InMemoryOrderRepository();
+
+    beforeEach(() => {
+        service = new OrderApplicationService(
+            repository,           // In-memory for tests
+            new MockPaymentGateway(),
+            new MockNotification(),
+            new MockPublisher()
+        );
+    });
+
+    it('should work with in-memory repository', async () => {
+        const order = await service.createOrder(testInput());
+        const retrieved = await service.getOrder(order.id);
+        expect(retrieved).not.toBeNull();
+    });
+});
+```
+
+### Ví dụ 2: Event-Driven Adapter
+
+```typescript
+// adapters/secondary/messaging/EventBridgePublisher.ts
+export class EventBridgePublisher implements IEventPublisher {
+    constructor(
+        private eventBridge: AWS.EventBridge,
+        private eventBusName: string
+    ) {}
+
+    async publish(event: DomainEvent): Promise<void> {
+        await this.eventBridge.putEvents({
+            Entries: [{
+                EventBusName: this.eventBusName,
+                Source: 'order-service',
+                DetailType: event.eventType,
+                Detail: JSON.stringify(event)
+            }]
+        });
+    }
+}
+```
+
+## Liên kết
+
+- [Hexagonal Architecture - Alistair Cockburn](https://alistair.cockburn.us/hexagonal-architecture/)
+- [Ports and Adapters - Thoughtworks](https://www.thoughtworks.com/insights/blog/pacts-and-contracts)
+- Clean Architecture: `.cursor/rules/clean-architecture.mdc`
+- DDD: `.cursor/rules/ddd.mdc`
+- Microservices: `.cursor/rules/microservices.mdc`
