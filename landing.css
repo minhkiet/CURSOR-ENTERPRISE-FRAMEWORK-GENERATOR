@@ -2386,8 +2386,12 @@ ul, ol { list-style: none; }
   background: rgba(4, 4, 14, 0.6);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 12px 14px;
+  padding: 10px 12px;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .step-code code {
@@ -2395,14 +2399,15 @@ ul, ol { list-style: none; }
   font-size: 11px;
   color: var(--text-secondary);
   line-height: 1.6;
-  display: block;
   white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
 }
 
 .step-copy-btn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
+  flex-shrink: 0;
 }
 
 /* Scripts table */
