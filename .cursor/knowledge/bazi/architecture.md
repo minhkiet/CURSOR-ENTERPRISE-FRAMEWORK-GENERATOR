@@ -1,119 +1,846 @@
-# Bazi Architecture - Kiến Trúc Hệ Thống Bazi
+# Kiến Trúc Hệ Thống Bazi
 
-## Tổng quan kiến trúc
+## 1. Tổng Quan Kiến Trúc
 
-Hệ thống Bazi là một nền tảng phân tích phong thủy và tử vi được xây dựng trên kiến trúc microservices, cho phép mở rộng linh hoạt và tích hợp đa nền tảng. Kiến trúc được thiết kế theo nguyên tắc Domain-Driven Design (DDD), tách biệt rõ ràng các domain nghiệp vụ và infrastructure. Hệ thống bao gồm các module chính: Core Engine (xử lý tính toán Bazi), API Gateway, Database Layer, Cache Layer, AI/ML Services, và Frontend Applications.
+### 1.1 High-Level Architecture
 
-Kiến trúc tuân thủ mô hình Layered Architecture với sự phân tách rõ ràng giữa Presentation Layer, Business Logic Layer, Data Access Layer, và Infrastructure Layer. Mỗi layer có trách nhiệm riêng biệt và giao tiếp thông qua các interfaces được định nghĩa rõ ràng. Điều này đảm bảo tính maintainable, testable, và scalable của hệ thống trong quá trình phát triển và vận hành lâu dài.
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        API Gateway Layer                         │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
+│  │  REST API    │  │  GraphQL     │  │  WebSocket (Real-time)│ │
+│  └──────────────┘  └──────────────┘  └──────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+┌─────────────────────────────────────────────────────────────────┐
+│                     Business Logic Layer                        │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
+│  │  BaziService │  │ CungMenhSvc  │  │   NapAmService       │  │
+│  └──────────────┘  └──────────────┘  └──────────────────────┘  │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
+│  │  PhuongMenSvc │  │ ThaiDuyenSvc │  │   LyHoaService       │  │
+│  └──────────────┘  └──────────────┘  └──────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+┌─────────────────────────────────────────────────────────────────┐
+│                       Data Access Layer                         │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
+│  │  Repository  │  │   Cache      │  │   External APIs       │  │
+│  │  Pattern     │  │  (Redis)     │  │   (LichViet, etc.)    │  │
+│  └──────────────┘  └──────────────┘  └──────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+┌─────────────────────────────────────────────────────────────────┐
+│                        Storage Layer                             │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
+│  │  PostgreSQL   │  │    Redis     │  │   Object Storage     │  │
+│  │  (Primary)    │  │  (Cache)     │  │   (Charts, Reports)  │  │
+│  └──────────────┘  └──────────────┘  └──────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-## Kiến trúc chi tiết các thành phần
+### 1.2 Component Architecture
 
-### 1. Core Engine Layer - Tầng Xử Lý Tính Toán Cốt Lõi
+```
+bazi-system/
+├── src/
+│   ├── api/
+│   │   ├── controllers/
+│   │   │   ├── BaziController.ts
+│   │   │   ├── CungMenhController.ts
+│   │   │   └── NapAmController.ts
+│   │   ├── routes/
+│   │   │   ├── baziRoutes.ts
+│   │   │   └── apiRoutes.ts
+│   │   └── middleware/
+│   │       ├── auth.ts
+│   │       ├── validation.ts
+│   │       └── rateLimit.ts
+│   ├── services/
+│   │   ├── bazi/
+│   │   │   ├── BaziCalculator.ts
+│   │   │   ├── BaziInterpreter.ts
+│   │   │   ├── BaziReportGenerator.ts
+│   │   │   └── BaziCacheService.ts
+│   │   ├── cung-menh/
+│   │   │   ├── CungMenhCalculator.ts
+│   │   │   ├── NgayHoangDao.ts
+│   │   │   └── GioHoangDao.ts
+│   │   └── nap-am/
+│   │       ├── NapAmCalculator.ts
+│   │       ├── AmDongNguyen.ts
+│   │       └── AmDongTay.ts
+│   ├── domain/
+│   │   ├── entities/
+│   │   │   ├── BaziChart.ts
+│   │   │   ├── BaziElement.ts
+│   │   │   ├── BaziRelation.ts
+│   │   │   └── CungMenh.ts
+│   │   ├── value-objects/
+│   │   │   ├── CanChi.ts
+│   │   │   ├── NgũHành.ts
+│   │   │   └── NapAm.ts
+│   │   └── events/
+│   │       ├── BaziCalculated.ts
+│   │       └── ReportGenerated.ts
+│   ├── infrastructure/
+│   │   ├── repositories/
+│   │   │   ├── BaziRepository.ts
+│   │   │   └── UserRepository.ts
+│   │   ├── cache/
+│   │   │   └── BaziCache.ts
+│   │   └── external/
+│   │       └── LichVietClient.ts
+│   └── shared/
+│       ├── constants/
+│       ├── utils/
+│       └── exceptions/
+├── tests/
+│   ├── unit/
+│   ├── integration/
+│   └── e2e/
+└── config/
+```
 
-Core Engine là thành phần quan trọng nhất của hệ thống, chịu trách nhiệm thực hiện tất cả các tính toán liên quan đến Bazi. Module này được viết bằng các ngôn ngữ có hiệu suất cao như TypeScript, Python, hoặc Rust để đảm bảo tốc độ xử lý. Core Engine bao gồm các submodule chính: LunarCalendarService (chuyển đổi Dương Lịch sang Âm Lịch), BaZiCalculator (tính toán Bát Tự), ElementAnalyzer (phân tích Ngũ Hành), RelationshipResolver (xác định quan hệ giữa các yếu tố).
+## 2. Data Model
 
-LunarCalendarService sử dụng thuật toán chuyển đổi chính xác giữa Dương Lịch và Âm Lịch, bao gồm cả các năm nhuận âm lịch. Đây là module foundation vì hầu hết các tính toán Bazi đều dựa trên ngày tháng âm lịch. Thuật toán cần xử lý múi giờ chính xác vì giờ sinh ảnh hưởng trực tiếp đến kết quả lá số. Service này được implement như một microservice riêng biệt, có thể được gọi từ bất kỳ ứng dụng nào cần thông tin âm lịch.
+### 2.1 Core Entities
 
-BaZiCalculator là module trung tâm thực hiện các tính toán chính: xác định thiên can và địa chi cho năm, tháng, ngày, giờ sinh; tính toán ngũ hành của từng cột; xác định thập thần; phân tích cục diện. Các thuật toán trong module này dựa trên các công thức toán học và logic nghiệp vụ chuyên sâu về Bazi. Module cần được test kỹ lưỡng với các test cases từ các nguồn uy tín để đảm bảo độ chính xác cao nhất.
+```typescript
+// BaziChart Entity
+interface BaziChart {
+  id: string;
+  userId: string;
+  
+  // Thông tin thời gian
+  birthDate: Date;
+  birthTime: string; // "HH:MM" format
+  timeZone: string;
+  lunarDate: LunarDate;
+  
+  // Bốn trụ (Tứ Trụ)
+  yearPillar: Pillar;
+  monthPillar: Pillar;
+  dayPillar: Pillar;
+  hourPillar: Pillar;
+  
+  // Ngũ Hành
+  elementBalance: ElementBalance;
+  dominantElement: Element;
+  weakElement: Element;
+  
+  // Cung Mệnh
+  menhInfo: MenhInfo;
+  
+  // Nắp Ấm
+  napAm: NapAmInfo;
+  
+  // Metadata
+  createdAt: Date;
+  updatedAt: Date;
+  version: number;
+}
 
-ElementAnalyzer xử lý các phân tích liên quan đến ngũ hành: tính tổng số ngũ hành trong lá số, xác định ngũ hành vượng và ngũ hành thiếu, tính toán các chỉ số cân bằng ngũ hành. Module này cung cấp các API để các service khác có thể truy vấn thông tin ngũ hành. Kết quả từ ElementAnalyzer là input quan trọng cho các module phân tích cao cấp hơn như FortuneTeller và HoroscopeGenerator.
+interface Pillar {
+  can: Can;      // Thiên Can
+  chi: Chi;      // Địa Chi
+  nhAm: number;  // Nạp Âm (âm/dương)
+  napAm: string; // Tên Nạp Âm
+  hiddenStem: Can[]; // Can ẩn trong Chi
+}
 
-RelationshipResolver xác định các mối quan hệ giữa các yếu tố trong Bazi: Lục Hợp, Lục Xung, Tam Hợp, Tứ Hành Xung, và các quan hệ giữa các thiên can. Module này trả về ma trận quan hệ có thể được sử dụng để phân tích sự tương thích, xác định thời điểm tốt/xấu, và đưa ra các đề xuất phong thủy. RelationshipResolver là module có độ phức tạp cao vì cần xử lý nhiều loại quan hệ và các trường hợp đặc biệt.
+interface LunarDate {
+  day: number;
+  month: number;
+  year: number;
+  isLeapMonth: boolean;
+}
 
-### 2. API Gateway Layer - Tầng Cổng API
+interface ElementBalance {
+  wood: number;   // Mộc
+  fire: number;   // Hỏa
+  earth: number;  // Thổ
+  metal: number;  // Kim
+  water: number;  // Thủy
+}
 
-API Gateway đóng vai trò điểm đầu vào duy nhất cho tất cả các request từ client applications. Layer này xử lý authentication, authorization, rate limiting, request routing, và response caching. API Gateway được implement bằng Kong, AWS API Gateway, hoặc tự xây dựng bằng Node.js/Express với các middleware cần thiết. Tất cả các API endpoints được định nghĩa rõ ràng trong OpenAPI Specification để đảm bảo tính nhất quán và dễ dàng tích hợp.
+interface MenhInfo {
+  menh: string;           // Tên Cung Mệnh
+  element: Element;       // Hành của Mệnh
+  napAm: string;          // Nạp Âm của Mệnh
+  can: Can;               // Can của Mệnh
+  description: string;
+  strengths: string[];
+  weaknesses: string[];
+  compatibleElements: Element[];
+  inCompatibleElements: Element[];
+}
 
-Authentication trong API Gateway sử dụng JWT tokens với refresh token mechanism. Users được xác thực qua email/password, OAuth providers (Google, Facebook), hoặc phone number OTP. Mỗi user có một profile chứa thông tin Bazi cơ bản đã được tính toán sẵn để giảm thời gian xử lý cho các request thường xuyên. JWT tokens có thời hạn ngắn (15 phút) và refresh tokens có thời hạn dài hơn (30 ngày) để đảm bảo bảo mật.
+interface NapAmInfo {
+  yearOfBirth: string;
+  napAmName: string;
+  description: string;
+  characteristics: string[];
+  suitableDirections: Direction[];
+  suitableColors: string[];
+  luckyNumbers: number[];
+}
+```
 
-Rate limiting được implement ở cả user level và IP level để ngăn chặn abuse và đảm bảo chất lượng dịch vụ cho tất cả users. Các endpoint có giới hạn request khác nhau tùy thuộc vào độ phức tạp của tính toán: simple endpoints có thể cho phép 100 requests/phút, trong khi các endpoints phân tích sâu có thể giới hạn ở mức 10 requests/phút. Rate limit information được trả về trong response headers để clients có thể xử lý phù hợp.
+### 2.2 Database Schema (PostgreSQL)
 
-Request routing trong API Gateway phân phối requests đến các microservices tương ứng dựa trên URL path và các rules được cấu hình. Gateway sử dụng circuit breaker pattern để handle failures từ downstream services một cách graceful, trả về cached responses hoặc fallback responses khi services không khả dụng. Health checks được implement để monitor trạng thái của các microservices và tự động remove unhealthy services khỏi pool.
+```sql
+-- Bảng chính lưu trữ Tứ Trụ
+CREATE TABLE bazi_charts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id),
+    
+    -- Thông tin sinh
+    birth_date DATE NOT NULL,
+    birth_time TIME NOT NULL,
+    timezone VARCHAR(50) NOT NULL,
+    
+    -- Dương lịch
+    solar_day INT NOT NULL,
+    solar_month INT NOT NULL,
+    solar_year INT NOT NULL,
+    
+    -- Âm lịch
+    lunar_day INT NOT NULL,
+    lunar_month INT NOT NULL,
+    lunar_year INT NOT NULL,
+    is_leap_month BOOLEAN DEFAULT FALSE,
+    
+    -- Năm Trụ
+    year_can VARCHAR(2) NOT NULL,
+    year_chi VARCHAR(2) NOT NULL,
+    year_nap_am VARCHAR(10),
+    
+    -- Tháng Trụ
+    month_can VARCHAR(2) NOT NULL,
+    month_chi VARCHAR(2) NOT NULL,
+    month_nap_am VARCHAR(10),
+    
+    -- Ngày Trụ
+    day_can VARCHAR(2) NOT NULL,
+    day_chi VARCHAR(2) NOT NULL,
+    day_nap_am VARCHAR(10),
+    
+    -- Giờ Trụ
+    hour_can VARCHAR(2) NOT NULL,
+    hour_chi VARCHAR(2) NOT NULL,
+    hour_nap_am VARCHAR(10),
+    
+    -- Ngũ Hành tương sinh/tương khắc
+    element_wood INT DEFAULT 0,
+    element_fire INT DEFAULT 0,
+    element_earth INT DEFAULT 0,
+    element_metal INT DEFAULT 0,
+    element_water INT DEFAULT 0,
+    
+    -- Cung Mệnh
+    menh_name VARCHAR(50),
+    menh_element VARCHAR(10),
+    
+    -- Nắp Ấm
+    nap_am_name VARCHAR(50),
+    
+    -- Metadata
+    version INT DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-### 3. Data Access Layer - Tầng Truy Cập Dữ Liệu
+-- Bảng quan hệ Bazi
+CREATE TABLE bazi_relations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    chart_id UUID REFERENCES bazi_charts(id) ON DELETE CASCADE,
+    
+    -- Mối quan hệ giữa các Can
+    can_relation JSONB,
+    
+    -- Mối quan hệ giữa các Chi  
+    chi_relation JSONB,
+    
+    -- Mối quan hệ với Cung Mệnh
+    menh_relation JSONB,
+    
+    -- Tương Sinh
+    generative_interactions JSONB,
+    
+    -- Tương Khắc
+    controlling_interactions JSONB,
+    
+    -- Metadata
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-Data Access Layer cung cấp interface thống nhất để truy cập các nguồn dữ liệu khác nhau: Relational Database (PostgreSQL/MySQL), Document Database (MongoDB), Cache (Redis), và Search Engine (Elasticsearch). Layer này sử dụng Repository Pattern để tách biệt logic truy cập dữ liệu khỏi business logic. Mỗi aggregate root trong domain có một repository tương ứng với các CRUD operations và các query methods chuyên biệt.
+-- Bảng lưu Interpretation và Reports
+CREATE TABLE bazi_reports (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    chart_id UUID REFERENCES bazi_charts(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id),
+    
+    -- Phân tích tổng quát
+    general_analysis TEXT,
+    
+    -- Phân tích chi tiết từng Trụ
+    year_pillar_analysis TEXT,
+    month_pillar_analysis TEXT,
+    day_pillar_analysis TEXT,
+    hour_pillar_analysis TEXT,
+    
+    -- Cung Mệnh
+    menh_analysis TEXT,
+    
+    -- Nắp Ấm
+    nap_am_analysis TEXT,
+    
+    -- Ngũ Hành
+    element_analysis TEXT,
+    
+    -- Vận hạn
+    fortune_analysis TEXT,
+    
+    -- Recommendations
+    recommendations JSONB,
+    
+    -- Version để cache
+    version INT DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-UserRepository quản lý thông tin người dùng: profile, authentication data, subscription status, và preferences. User entity là một trong những entity quan trọng nhất trong hệ thống vì nó chứa thông tin Bazi đã được tính toán sẵn (birth data, calculated BaZi). Các queries phổ biến như "tìm user theo email" hoặc "lấy thông tin subscription của user" được optimize với appropriate indexes. User data được replicated sang Redis để giảm latency cho các read-heavy operations.
+-- Indexes
+CREATE INDEX idx_bazi_charts_user_id ON bazi_charts(user_id);
+CREATE INDEX idx_bazi_charts_birth_date ON bazi_charts(birth_date);
+CREATE INDEX idx_bazi_charts_lunar ON bazi_charts(lunar_year, lunar_month, lunar_day);
+CREATE INDEX idx_bazi_reports_chart_id ON bazi_reports(chart_id);
+```
 
-BaZiRepository lưu trữ các lá số đã tính toán và các kết quả phân tích liên quan. Mỗi lá số được lưu với các computed fields: thiên can, địa chi, ngũ hành, thập thần, cục diện. Repository cũng lưu trữ các phiên bản khác nhau của cùng một lá số (khi người dùng thay đổi ngày sinh hoặc khi có cập nhật về thuật toán). History tracking được implement để support việc xem lại các phân tích trước đó.
+## 3. API Design
 
-ReportRepository quản lý các báo cáo phân tích chi tiết được tạo ra cho người dùng. Reports có thể được regenerate dựa trên lá số và thời điểm hiện tại, nên repository lưu trữ template và parameters thay vì static content. Cache mechanism được implement để lưu các reports thường xuyên được truy cập. Reports có thể được export ra various formats: PDF, HTML, JSON với appropriate rendering logic.
+### 3.1 REST API Endpoints
 
-### 4. Caching Layer - Tầng Cache
+```
+Base URL: /api/v1/bazi
 
-Redis được sử dụng làm caching layer chính với các chiến lược cache khác nhau cho các loại dữ liệu khác nhau. Cache-aside pattern được áp dụng cho các read-heavy operations như lấy thông tin user, lá số, và các báo cáo thường xuyên được truy cập. Cache được invalidate theo TTL hoặc khi có data changes để đảm bảo consistency. Memory footprint của Redis được monitor để đảm bảo không vượt quá giới hạn và cache hit ratio được track để optimize caching strategy.
+# Chart Management
+POST   /charts                    # Tạo Bazi Chart mới
+GET    /charts/:id                # Lấy Bazi Chart theo ID
+GET    /charts/user/:userId       # Lấy tất cả charts của user
+PUT    /charts/:id                # Cập nhật chart
+DELETE /charts/:id                # Xóa chart
 
-Session management cũng được xử lý qua Redis với TTL phù hợp cho từng loại session. User sessions, API sessions, và temporary calculation sessions có các TTL khác nhau. Session data bao gồm authentication tokens, user preferences, và recent calculation results. Redis cluster được setup với replication để đảm bảo high availability và failover capability.
+# Analysis Endpoints
+GET    /charts/:id/analysis       # Phân tích tổng quát
+GET    /charts/:id/cung-menh      # Phân tích Cung Mệnh
+GET    /charts/:id/nap-am         # Phân tích Nắp Ấm
+GET    /charts/:id/ngu-hanh       # Phân tích Ngũ Hành
+GET    /charts/:id/van-han        # Phân tích Vận Hạn
+GET    /charts/:id/relations      # Phân tích quan hệ
 
-Distributed locking được implement bằng Redis để handle concurrent access đến các shared resources. Ví dụ khi nhiều services cùng truy cập và update một lá số, distributed lock đảm bảo consistency. Lock timeout được set phù hợp để tránh deadlock và resource contention. Các operations như billing, subscription changes, và data migrations sử dụng locking mechanism này.
+# Report Endpoints
+GET    /charts/:id/report         # Lấy full report
+POST   /charts/:id/report/regenerate # Tạo lại report
 
-### 5. AI/ML Services Layer - Tầng Dịch Vụ AI/ML
+# Utility Endpoints
+GET    /lich-viet/lunar-date       # Chuyển đổi Dương → Âm lịch
+GET    /lich-viet/solar-date      # Chuyển đổi Âm → Dương lịch
+GET    /thien-can                  # Danh sách Thiên Can
+GET    /dia-chi                    # Danh sách Địa Chi
+GET    /nap-am                     # Danh sách Nạp Âm
+```
 
-AI/ML Services cung cấp các tính năng thông minh: phân tích lá số tự động, đề xuất cá nhân hóa, chatbot tư vấn, và dự đoán xu hướng. Layer này được xây dựng trên các ML frameworks như TensorFlow, PyTorch, hoặc sử dụng managed services như OpenAI API, Google Gemini. Các models được trained trên large datasets về Bazi readings và historical outcomes.
+### 3.2 Request/Response Examples
 
-Interpretation Engine sử dụng NLP models để tạo ra các bản phân tích lá số tự động bằng ngôn ngữ tự nhiên. Engine nhận input là structured BaZi data và output là paragraphs về tính cách, vận mệnh, và đề xuất. Quality của interpretations được continuously improved thông qua feedback loop từ users và expert reviewers. Engine cũng hỗ trợ multiple languages để phục vụ users từ different regions.
+```typescript
+// POST /api/v1/bazi/charts - Tạo Bazi Chart mới
+interface CreateBaziRequest {
+  birthDate: string;      // "1990-05-15"
+  birthTime: string;      // "14:30"
+  timeZone: string;       // "Asia/Ho_Chi_Minh"
+  gender: 'male' | 'female';
+  name?: string;
+}
 
-Recommendation Engine sử dụng collaborative filtering và content-based approaches để đề xuất các sản phẩm và dịch vụ phù hợp với từng user. Recommendations được cá nhân hóa dựa trên BaZi profile, usage patterns, và explicit feedback. Engine tích hợp với e-commerce module để track conversion rates và optimize recommendation algorithms. A/B testing framework được implement để test các recommendation strategies mới.
+interface CreateBaziResponse {
+  success: boolean;
+  data: {
+    chart: BaziChart;
+    analysis: {
+      elementBalance: ElementBalance;
+      menh: string;
+      napAm: string;
+    };
+  };
+  meta: {
+    calculationTime: number; // ms
+    cacheHit: boolean;
+  };
+}
 
-Chatbot Service cung cấp conversational interface cho users để hỏi về lá số của họ, yêu cầu phân tích chi tiết, hoặc tìm hiểu về các khái niệm Bazi. Chatbot được implement bằng combination của rule-based logic và AI models. Context management cho phép users có multi-turn conversations về cùng một lá số. Integration với WhatsApp, Facebook Messenger, và website chat widgets mở rộng reach của service.
+// GET /api/v1/bazi/charts/:id/analysis
+interface BaziAnalysisResponse {
+  success: boolean;
+  data: {
+    chartId: string;
+    
+    // Tứ Trụ
+    fourPillars: {
+      year: PillarAnalysis;
+      month: PillarAnalysis;
+      day: PillarAnalysis;
+      hour: PillarAnalysis;
+    };
+    
+    // Cung Mệnh
+    menh: MenhAnalysis;
+    
+    // Nắp Ấm
+    napAm: NapAmAnalysis;
+    
+    // Ngũ Hành
+    elements: ElementAnalysis;
+    
+    // Quan hệ
+    relations: RelationAnalysis;
+    
+    // Vận hạn
+    fortune: FortuneAnalysis;
+  };
+}
+```
 
-### 6. Frontend Applications - Các Ứng Dụng Frontend
+### 3.3 GraphQL Schema
 
-Web Application được xây dựng bằng Next.js hoặc React với server-side rendering cho SEO và performance optimization. Application bao gồm các trang chính: landing page, user dashboard, BaZi calculator, report viewer, và settings. UI được design responsive để support cả desktop và mobile users. State management sử dụng Redux Toolkit hoặc Zustand với proper caching và optimistic updates.
+```graphql
+type Query {
+  # Lấy Bazi Chart
+  baziChart(id: ID!): BaziChart
+  
+  # Lấy tất cả charts của user
+  userBaziCharts(userId: ID!): [BaziChart!]!
+  
+  # Phân tích nhanh
+  quickBaziAnalysis(input: BaziInput!): BaziAnalysis!
+}
 
-Mobile Application được phát triển bằng React Native hoặc Flutter để support cả iOS và Android. App bao gồm các tính năng tương tự web application nhưng được optimize cho touch interfaces và offline usage. Local storage được sử dụng để cache user data và recent calculations. Push notifications được implement để remind users về favorable dates hoặc new features. App có integration với device calendar để schedule reminders.
+type Mutation {
+  # Tạo Chart mới
+  createBaziChart(input: CreateBaziInput!): BaziChart!
+  
+  # Cập nhật Chart
+  updateBaziChart(id: ID!, input: UpdateBaziInput!): BaziChart!
+  
+  # Xóa Chart
+  deleteBaziChart(id: ID!): Boolean!
+}
 
-Admin Dashboard cho phép administrators quản lý users, subscriptions, content, và system configurations. Dashboard cung cấp analytics về usage patterns, revenue metrics, và system health. CMS integration cho phép content team update interpretations và explanations mà không cần developer involvement. Role-based access control đảm bảo only authorized personnel có access đến sensitive functions.
+input BaziInput {
+  birthDate: String!
+  birthTime: String!
+  timeZone: String!
+  gender: Gender!
+}
 
-## Database Schema Design
+input CreateBaziInput {
+  birthDate: String!
+  birthTime: String!
+  timeZone: String!
+  gender: Gender!
+  name: String
+}
 
-### Core Tables
+type BaziChart {
+  id: ID!
+  userId: ID!
+  
+  # Thông tin sinh
+  birthDate: Date!
+  birthTime: String!
+  lunarDate: LunarDate!
+  
+  # Tứ Trụ
+  yearPillar: Pillar!
+  monthPillar: Pillar!
+  dayPillar: Pillar!
+  hourPillar: Pillar!
+  
+  # Ngũ Hành
+  elementBalance: ElementBalance!
+  dominantElement: Element!
+  
+  # Cung Mệnh
+  menh: Menh!
+  
+  # Nắp Ấm
+  napAm: NapAm!
+  
+  # Reports
+  reports: [BaziReport!]
+}
 
-Users table chứa thông tin authentication và profile. Các columns quan trọng: id (UUID), email, password_hash, phone, birth_date, birth_time, birth_timezone, gender, created_at, updated_at, subscription_tier, subscription_expires_at. Indexes được tạo trên email, phone, và subscription fields. Soft delete được implement để preserve user data và support data recovery.
+type Pillar {
+  can: Can!
+  chi: Chi!
+  napAm: String
+  hiddenStems: [Can!]
+  element: Element!
+}
 
-BaZi readings table lưu trữ các lá số đã tính toán. Mỗi reading có relationship 1:1 với user nhưng có thể có multiple readings cho cùng user (khi user update birth info). Reading entity chứa tất cả các computed fields: year_can, year_chi, month_can, month_chi, day_can, day_chi, hour_can, hour_chi, element_counts, destiny_number, luck_number. Denormalized design được sử dụng để optimize read performance vì reads远远多于 writes.
+type Menh {
+  name: String!
+  element: Element!
+  description: String!
+  strengths: [String!]!
+  weaknesses: [String!]!
+}
 
-Relationships table lưu trữ các mối quan hệ giữa users (cho tính năng so sánh lá số, tìm bạn đời). Relationships có type: FRIEND, PARTNER, BUSINESS, FAMILY. Compatibility scores được calculated và cached trong table. Graph database (Neo4j) có thể được sử dụng thay vì relational table để optimize traversal queries.
+type NapAm {
+  name: String!
+  description: String!
+  characteristics: [String!]!
+  suitableDirections: [Direction!]!
+}
+```
 
-Subscriptions table tracking billing và subscription information. Integration với payment gateways (Stripe, PayPal) được implement để handle recurring payments. Webhook handlers process payment events và update subscription status. Invoice history được maintained cho compliance và user reference. Refund và cancellation logic được implement với proper state management.
+## 4. Business Logic
 
-## Security Architecture
+### 4.1 Core Services
 
-Authentication sử dụng multi-factor authentication (MFA) cho enhanced security. Passwords được hashed bằng bcrypt với appropriate salt rounds. OAuth 2.0 flows được implement cho social logins. API keys được provided cho programmatic access với rate limiting cao hơn. Session tokens có short expiration và rotation mechanism để minimize security risks.
+```typescript
+// BaziCalculator - Service chính tính toán Bazi
+class BaziCalculator {
+  constructor(
+    private lunarCalendarService: LunarCalendarService,
+    private napAmService: NapAmService
+  ) {}
 
-Authorization sử dụng role-based access control (RBAC) với predefined roles: GUEST, USER, PREMIUM_USER, ADMIN, SUPER_ADMIN. Permissions được defined theo resource và action. API Gateway enforce authorization checks trước khi routing requests đến services. Audit logging được implement để track sensitive operations và support security investigations.
+  async calculateBazi(
+    birthDate: Date,
+    birthTime: string,
+    timeZone: string,
+    gender: Gender
+  ): Promise<BaziChart> {
+    // 1. Chuyển đổi Dương lịch → Âm lịch
+    const lunarDate = await this.lunarCalendarService.toLunar(
+      birthDate,
+      timeZone
+    );
 
-Data encryption được applied ở cả data-at-rest và data-in-transit. TLS 1.3 được enforced cho all communications. Database encryption sử dụng AES-256 cho sensitive fields như PII và payment information. Key management được handled bằng cloud KMS services (AWS KMS, Azure Key Vault). Regular security audits và penetration testing được conducted để identify và fix vulnerabilities.
+    // 2. Xác định Can Chi cho Ngày
+    const dayCanChi = this.calculateDayCanChi(lunarDate);
 
-## Deployment Architecture
+    // 3. Xác định Can Chi cho Tháng
+    const monthCanChi = this.calculateMonthCanChi(lunarDate.year, lunarDate.month);
 
-Container orchestration sử dụng Kubernetes cho container management, scaling, và high availability. Services được containerized với Docker và deployed lên Kubernetes cluster. Horizontal pod autoscaling được configured dựa trên CPU và memory usage. PodDisruptionBudgets đảm bảo minimum availability during maintenance và failures. Multi-region deployment được setup để minimize latency cho global users.
+    // 4. Xác định Can Chi cho Năm
+    const yearCanChi = this.calculateYearCanChi(lunarDate.year);
 
-CI/CD pipeline sử dụng GitHub Actions hoặc GitLab CI để automate testing, building, và deployment. Pipeline bao gồm stages: lint, unit tests, integration tests, security scans, build, deploy to staging, smoke tests, deploy to production. Blue-green deployment strategy được sử dụng để minimize downtime và enable quick rollbacks. Canary deployments cho phép gradual rollout của new features với small percentage users.
+    // 5. Xác định Can Chi cho Giờ
+    const hourCanChi = this.calculateHourCanChi(dayCanChi.can, birthTime);
 
-Monitoring và observability được setup với Prometheus cho metrics, Grafana cho visualization, ELK stack cho logging, và Jaeger cho distributed tracing. Alerts được configured cho critical metrics và automated remediation được implement cho common issues. Regular SLO reviews và error budget tracking đảm bảo system reliability. Runbooks được maintained để guide operators through incident response procedures.
+    // 6. Tính Nạp Âm
+    const pillars = [yearCanChi, monthCanChi, dayCanChi, hourCanChi];
+    const napAmInfo = this.napAmService.calculateNapAm(pillars);
 
-## Integration Architecture
+    // 7. Tính Ngũ Hành
+    const elementBalance = this.calculateElementBalance(pillars);
 
-Payment integrations với Stripe và PayPal handle subscriptions và one-time payments. Webhook handlers process payment events asynchronously. Idempotency được implement để handle duplicate events gracefully. Refund và dispute handling được automated với proper notifications to users.
+    // 8. Xác định Cung Mệnh
+    const menhInfo = this.determineMenh(dayCanChi, gender);
 
-Notification integrations với email providers (SendGrid, AWS SES), SMS providers (Twilio), và push notification services (Firebase) cung cấp multi-channel communications. Templates được managed centrally và supports multiple languages. Rate limiting được implemented per channel để avoid spam và maintain sender reputation.
+    return {
+      id: generateUUID(),
+      birthDate,
+      birthTime,
+      timeZone,
+      lunarDate,
+      yearPillar: yearCanChi,
+      monthPillar: monthCanChi,
+      dayPillar: dayCanChi,
+      hourPillar: hourCanChi,
+      elementBalance,
+      menhInfo,
+      napAmInfo,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      version: 1
+    };
+  }
 
-Third-party API integrations với calendar services, social media platforms, và other Bazi resources mở rộng functionality của platform. API clients được implement với retry logic, circuit breakers, và proper error handling. Data synchronization với external services được handled asynchronously để avoid blocking main flows.
+  private calculateDayCanChi(lunarDate: LunarDate): Pillar {
+    // Sử dụng thuật toán Lịch Việt
+    const jd = this.lunarToJulianDay(lunarDate);
+    const dayIndex = (jd + 1) % 10;
+    const chiIndex = (jd + 1) % 12;
+    return {
+      can: CAN[dayIndex],
+      chi: CHI[chiIndex],
+      napAm: this.napAmService.getNapAm(CAN[dayIndex], CHI[chiIndex]),
+      hiddenStem: this.getHiddenStems(CHI[chiIndex])
+    };
+  }
 
-## Scalability và Performance Considerations
+  private calculateYearCanChi(lunarYear: number): Pillar {
+    const canIndex = (lunarYear + 6) % 10;
+    const chiIndex = (lunarYear + 8) % 12;
+    return {
+      can: CAN[canIndex],
+      chi: CHI[chiIndex],
+      napAm: this.napAmService.getNapAm(CAN[canIndex], CHI[chiIndex]),
+      hiddenStem: []
+    };
+  }
 
-Database sharding được implemented khi data size vượt quá single node capacity. Sharding key được chọn carefully để ensure even distribution và minimize cross-shard queries. Consistent hashing được sử dụng để minimize data movement khi adding/removing shards.
+  private calculateMonthCanChi(yearCan: Can, month: number): Pillar {
+    const canTable = [
+      ['Giáp', 'Ất'], ['Bính', 'Đinh'], ['Mậu', 'Kỷ'],
+      ['Canh', 'Tân'], ['Nhâm', 'Quý']
+    ];
+    const yearCanIndex = CAN.indexOf(yearCan);
+    const canGroup = Math.floor(yearCanIndex / 2);
+    const canIndex = (yearCanIndex % 2 === 0) ? canTable[canGroup][0] : canTable[canGroup][1];
+    
+    const monthChi = CHI[(month + 1) % 12];
+    return {
+      can: canIndex,
+      chi: monthChi,
+      napAm: this.napAmService.getNapAm(canIndex, monthChi),
+      hiddenStem: []
+    };
+  }
 
-Read replicas được configured để handle read-heavy workloads. Caching strategy được optimized để reduce database load. Query optimization với proper indexes và query plans. Connection pooling được used để maximize database connection efficiency.
+  private calculateHourCanChi(dayCan: Can, time: string): Pillar {
+    const [hours] = time.split(':').map(Number);
+    const chiIndex = Math.floor((hours + 1) / 2) % 12;
+    
+    // Bảng tính Giờ Can
+    const canTable = ['Giáp', 'Ất', 'Bính', 'Đinh', 'Mậu', 'Kỷ', 'Canh', 'Tân', 'Nhâm', 'Quý'];
+    const dayCanIndex = CAN.indexOf(dayCan);
+    const hourCanIndex = (dayCanIndex % 5) * 2 + Math.floor(chiIndex / 2);
+    
+    return {
+      can: canTable[hourCanIndex % 10],
+      chi: CHI[chiIndex],
+      napAm: this.napAmService.getNapAm(canTable[hourCanIndex % 10], CHI[chiIndex]),
+      hiddenStem: []
+    };
+  }
+}
 
-Asynchronous processing với message queues (RabbitMQ, Kafka) cho các operations không cần immediate response: report generation, email sending, analytics processing. Workers consume messages và process asynchronously. Dead letter queues handle failed messages cho investigation và retry.
+// NapAmService - Service tính Nạp Âm
+class NapAmService {
+  private readonly NAP_AM_RULES = {
+    // Nạp Âm theo Can-Chi của Năm
+    'Giáp Tý': 'Hải Trung Kim',
+    'Ất Tý': 'Hải Trung Kim',
+    'Bính Tý': 'Diện Không Hỏa',
+    'Đinh Tý': 'Diện Không Hỏa',
+    'Mậu Tý': 'Sơn Hạ Hỏa',
+    'Kỷ Tý': 'Sơn Hạ Hỏa',
+    // ... (đầy đủ 60 Nạp Âm)
+  };
 
-## Disaster Recovery và Business Continuity
+  calculateNapAm(pillars: Pillar[]): NapAmInfo {
+    // Nạp Âm chính dựa vào Năm
+    const yearPillar = pillars[0];
+    const napAmName = this.NAP_AM_RULES[`${yearPillar.can} ${yearPillar.chi}`];
+    
+    return {
+      name: napAmName,
+      element: this.getNapAmElement(napAmName),
+      description: NAP_AM_DESCRIPTIONS[napAmName],
+      characteristics: NAP_AM_CHARACTERISTICS[napAmName],
+      suitableDirections: NAP_AM_DIRECTIONS[napAmName],
+      luckyNumbers: NAP_AM_NUMBERS[napAmName]
+    };
+  }
 
-Backup strategy bao gồm automated daily backups với point-in-time recovery capability. Backups được stored ở multiple geographic locations để ensure data durability. Regular backup restoration tests được conducted để verify backup integrity.
+  getNapAm(can: string, chi: string): string {
+    return this.NAP_AM_RULES[`${can} ${chi}`] || 'Không xác định';
+  }
 
-Multi-region deployment với active-active hoặc active-passive setup đảm bảo business continuity. Automated failover mechanisms detect failures và route traffic to healthy region. Data replication between regions được configured với appropriate consistency guarantees.
+  private getNapAmElement(napAmName: string): Element {
+    const elementMap = {
+      'Kim': 'metal',
+      'Mộc': 'wood',
+      'Thủy': 'water',
+      'Hỏa': 'fire',
+      'Thổ': 'earth'
+    };
+    return elementMap[napAmName] || 'unknown';
+  }
+}
 
-Incident response procedures được documented và regularly tested. Communication plans đảm bảo stakeholders được notified promptly during incidents. Post-mortem reviews được conducted after major incidents để prevent recurrence.
+// CungMenhService - Service phân tích Cung Mệnh
+class CungMenhService {
+  private readonly MENH_TABLE = {
+    male: {
+      'Giáp': 'Mộc', 'Ất': 'Mộc',
+      'Bính': 'Hỏa', 'Đinh': 'Hỏa',
+      'Mậu': 'Thổ', 'Kỷ': 'Thổ',
+      'Canh': 'Kim', 'Tân': 'Kim',
+      'Nhâm': 'Thủy', 'Quý': 'Thủy'
+    },
+    female: {
+      'Giáp': 'Mộc', 'Ất': 'Mộc',
+      'Bính': 'Hỏa', 'Đinh': 'Hỏa',
+      'Mậu': 'Thổ', 'Kỷ': 'Thổ',
+      'Canh': 'Kim', 'Tân': 'Kim',
+      'Nhâm': 'Thủy', 'Quý': 'Thủy'
+    }
+  };
+
+  analyzeMenh(dayPillar: Pillar, gender: Gender): MenhInfo {
+    const can = dayPillar.can;
+    const menhElement = this.MENH_TABLE[gender][can];
+    
+    return {
+      menh: `${can} ${menhElement}`,
+      element: menhElement,
+      napAm: dayPillar.napAm,
+      description: this.getMenhDescription(menhElement),
+      strengths: this.getStrengths(menhElement),
+      weaknesses: this.getWeaknesses(menhElement),
+      compatibleElements: this.getCompatibleElements(menhElement),
+      inCompatibleElements: this.getInCompatibleElements(menhElement)
+    };
+  }
+}
+```
+
+## 5. Caching Strategy
+
+### 5.1 Redis Cache Structure
+
+```typescript
+interface CacheStrategy {
+  // Cache key patterns
+  keys: {
+    baziChart: 'bazi:chart:{id}',
+    userCharts: 'bazi:user:{userId}:charts',
+    analysis: 'bazi:analysis:{chartId}',
+    lunarDate: 'lichviet:lunar:{date}',
+    napAm: 'napam:{can}:{chi}'
+  };
+
+  // TTL settings
+  ttl: {
+    chartData: 86400,      // 24 hours
+    analysis: 43200,       // 12 hours
+    lunarConversion: 604800, // 7 days (không đổi)
+    napAmInfo: 2592000     // 30 days
+  };
+
+  // Cache invalidation patterns
+  invalidation: {
+    onChartUpdate: ['bazi:chart:*', 'bazi:analysis:*'],
+    onUserUpdate: ['bazi:user:{userId}:*']
+  };
+}
+
+// Cache Service Implementation
+class BaziCacheService {
+  async getChart(id: string): Promise<BaziChart | null> {
+    const cached = await redis.get(`bazi:chart:${id}`);
+    return cached ? JSON.parse(cached) : null;
+  }
+
+  async setChart(chart: BaziChart): Promise<void> {
+    await redis.setex(
+      `bazi:chart:${chart.id}`,
+      86400,
+      JSON.stringify(chart)
+    );
+  }
+
+  async invalidateChart(id: string): Promise<void> {
+    await redis.del(`bazi:chart:${id}`);
+    await redis.del(`bazi:analysis:${id}`);
+  }
+}
+```
+
+## 6. Error Handling
+
+### 6.1 Custom Exceptions
+
+```typescript
+class BaziException extends Error {
+  constructor(
+    message: string,
+    public code: string,
+    public statusCode: number = 500
+  ) {
+    super(message);
+    this.name = 'BaziException';
+  }
+}
+
+class InvalidBirthDateException extends BaziException {
+  constructor(date: string) {
+    super(
+      `Ngày sinh không hợp lệ: ${date}`,
+      'INVALID_BIRTH_DATE',
+      400
+    );
+  }
+}
+
+class LunarConversionException extends BaziException {
+  constructor(date: string, reason: string) {
+    super(
+      `Không thể chuyển đổi ngày ${date}: ${reason}`,
+      'LUNAR_CONVERSION_ERROR',
+      422
+    );
+  }
+}
+
+class ChartNotFoundException extends BaziException {
+  constructor(chartId: string) {
+    super(
+      `Không tìm thấy Bazi chart với ID: ${chartId}`,
+      'CHART_NOT_FOUND',
+      404
+    );
+  }
+}
+
+class UnauthorizedAccessException extends BaziException {
+  constructor() {
+    super(
+      'Bạn không có quyền truy cập tài nguyên này',
+      'UNAUTHORIZED_ACCESS',
+      403
+    );
+  }
+}
+```
+
+## 7. Security Considerations
+
+### 7.1 Data Protection
+
+```typescript
+// Mã hóa dữ liệu nhạy cảm
+interface DataProtection {
+  // Mã hóa ngày sinh khi lưu vào database
+  encryptBirthDate(date: Date, userId: string): EncryptedData;
+  
+  // Giải mã khi cần thiết
+  decryptBirthDate(encrypted: EncryptedData): Date;
+  
+  // Anonymize cho analytics
+  anonymizeChartData(chart: BaziChart): AnonymizedChart;
+}
+
+// Rate Limiting
+const rateLimiter = {
+  createChart: { limit: 10, window: '1m' },
+  getAnalysis: { limit: 100, window: '1m' },
+  exportReport: { limit: 5, window: '1m' }
+};
+```

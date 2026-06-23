@@ -1,0 +1,991 @@
+---
+description: Thiết kế và implement Temporal workflows cho reliable business process orchestration với durability và fault tolerance
+purpose: Build reliable long-running workflows với Temporal cho complex business process orchestration
+input: Business process definitions, activity requirements, failure scenarios
+output: Temporal workflow definitions, activity implementations, deployment configurations
+version: 1.0.0
+tags: [temporal, workflow, orchestration, saga, activity, durable-execution, reliability]
+---
+
+# Temporal Workflow Skill - Thiết Kế Temporal Workflows Cho Enterprise Reliability
+
+## Tổng quan
+
+Temporal là một powerful orchestration platform cung cấp durable execution cho long-running workflows. Skill này cung cấp framework để thiết kế và implement Temporal workflows với fault tolerance và reliability cao.
+
+## Purpose (Mục đích)
+
+Temporal Workflow Skill được thiết kế để:
+
+1. **Durable Execution**: Handle failures without losing state
+2. **Long-Running Processes**: Support processes spanning hours/days/months
+3. **Reliable Orchestration**: Coordinate distributed activities
+4. **Fault Tolerance**: Automatic retry và recovery
+5. **Observability**: Built-in tracing và monitoring
+
+### Khi nào sử dụng Temporal Workflow
+
+- Khi building long-running business processes
+- Khi need guaranteed execution
+- Khi orchestrating distributed systems
+- Khi implementing saga patterns
+- Khi need automatic retry/recovery
+- Khi building event-driven architectures
+
+## Input (Đầu vào)
+
+- [ ] Business process specifications
+- [ ] Activity definitions
+- [ ] Failure handling requirements
+- [ ] Timeout configurations
+- [ ] Scaling requirements
+
+## Output (Đầu ra)
+
+- [ ] Temporal workflow definitions
+- [ ] Activity implementations
+- [ ] Signal handlers
+- [ ] Query handlers
+- [ ] Deployment configurations
+
+## Workflow (Quy trình)
+
+### Phase 1: Workflow Design
+
+### Bước 1: Workflow Structure
+
+```typescript
+// workflow-definitions/order.workflow.ts
+import { proxyActivities, log, startChild } from '@temporalio/workflow';
+import type * as activities from '../activities';
+
+// Activity options with timeouts
+const activityOptions = {
+  startToCloseTimeout: '5 minutes',
+  retry: {
+    initialInterval: '1 second',
+    backoffCoefficient: 2,
+    maximumInterval: '5 minutes',
+    maximumAttempts: 3,
+    nonRetryableErrorTypes: ['InvalidOrderError', 'PaymentDeclinedError']
+  }
+};
+
+// Workflow interface
+export interface OrderWorkflowInput {
+  customerId: string;
+  items: OrderItem[];
+  shippingAddress: Address;
+  paymentMethodId: string;
+}
+
+export interface OrderWorkflowResult {
+  orderId: string;
+  status: 'completed' | 'failed' | 'cancelled';
+  fulfillmentId?: string;
+  error?: string;
+}
+
+export async function processOrderWorkflow(
+  input: OrderWorkflowInput
+): Promise<OrderWorkflowResult> {
+  const { customerId, items, shippingAddress, paymentMethodId } = input;
+  
+  log.info('Starting order processing', { customerId, itemCount: items.length });
+  
+  let orderId: string | undefined;
+  
+  try {
+    // Activity proxies with options
+    const {
+      validateInventory,
+      reserveInventory,
+      processPayment,
+      createOrder,
+      sendConfirmationEmail,
+      notifyFulfillment
+    } = proxyActivities<typeof activities>(activityOptions);
+    
+    // Step 1: Validate inventory
+    log.info('Validating inventory');
+    const inventoryResult = await validateInventory(items);
+    
+    if (!inventoryResult.available) {
+      log.error('Inventory not available', { unavailableItems: inventoryResult.unavailableItems });
+      return {
+        orderId: '',
+        status: 'failed',
+        error: `Items not available: ${inventoryResult.unavailableItems.join(', ')}`
+      };
+    }
+    
+    // Step 2: Reserve inventory
+    log.info('Reserving inventory');
+    const reservationId = await reserveInventory(items);
+    
+    // Step 3: Process payment
+    log.info('Processing payment');
+    const paymentResult = await processPayment({
+      customerId,
+      amount: inventoryResult.totalAmount,
+      paymentMethodId
+    });
+    
+    if (!paymentResult.success) {
+      // Compensate: release inventory
+      log.error('Payment failed, releasing inventory', { reason: paymentResult.error });
+      await releaseInventory(reservationId);
+      return {
+        orderId: '',
+        status: 'failed',
+        error: `Payment failed: ${paymentResult.error}`
+      };
+    }
+    
+    // Step 4: Create order
+    log.info('Creating order record');
+    const order = await createOrder({
+      customerId,
+      items,
+      totalAmount: paymentResult.amount,
+      paymentId: paymentResult.paymentId,
+      shippingAddress
+    });
+    
+    orderId = order.id;
+    
+    // Step 5: Send confirmation
+    log.info('Sending confirmation email');
+    await sendConfirmationEmail({
+      customerId,
+      orderId: order.id,
+      email: input.customerEmail
+    });
+    
+    // Step 6: Notify fulfillment (async)
+    log.info('Notifying fulfillment system');
+    await notifyFulfillment({
+      orderId: order.id,
+      items,
+      shippingAddress
+    });
+    
+    log.info('Order processing completed', { orderId: order.id });
+    
+    return {
+      orderId: order.id,
+      status: 'completed'
+    };
+    
+  } catch (error) {
+    log.error('Order processing failed', { error, orderId });
+    
+    // Compensate any completed steps
+    if (orderId) {
+      // Could start compensation workflow here
+    }
+    
+    return {
+      orderId: orderId || '',
+      status: 'failed',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
+  }
+}
+```
+
+### Bước 2: Saga Pattern Implementation
+
+```typescript
+// workflow-definitions/order-saga.workflow.ts
+import { proxyActivities, continueAsNew } from '@temporalio/workflow';
+import type * as activities from '../activities';
+
+export interface SagaState {
+  orderId?: string;
+  reservationId?: string;
+  paymentId?: string;
+  currentStep: number;
+  completedSteps: string[];
+  failedStep?: string;
+  error?: string;
+}
+
+const activityOptions = {
+  startToCloseTimeout: '10 minutes',
+  retry: {
+    maximumAttempts: 3
+  }
+};
+
+export async function orderSagaWorkflow(
+  input: OrderWorkflowInput
+): Promise<OrderWorkflowResult> {
+  const saga = new SagaOrchestrator<SagaState>({
+    orderId: undefined,
+    reservationId: undefined,
+    paymentId: undefined,
+    currentStep: 0,
+    completedSteps: []
+  });
+  
+  const {
+    reserveInventory,
+    processPayment,
+    createOrder,
+    releaseInventory,
+    refundPayment,
+    cancelOrder
+  } = proxyActivities<typeof activities>(activityOptions);
+  
+  try {
+    // Step 1: Reserve Inventory
+    const reservationResult = await saga.execute(
+      'reserve-inventory',
+      async () => {
+        const result = await reserveInventory(input.items);
+        return { reservationId: result.reservationId };
+      },
+      async (result) => {
+        // Compensation
+        await releaseInventory(result.reservationId);
+      }
+    );
+    
+    // Step 2: Process Payment
+    const paymentResult = await saga.execute(
+      'process-payment',
+      async () => {
+        const result = await processPayment({
+          customerId: input.customerId,
+          amount: reservationResult.totalAmount,
+          paymentMethodId: input.paymentMethodId
+        });
+        return { paymentId: result.paymentId };
+      },
+      async (result) => {
+        // Compensation
+        await refundPayment(result.paymentId);
+      }
+    );
+    
+    // Step 3: Create Order
+    const orderResult = await saga.execute(
+      'create-order',
+      async () => {
+        const result = await createOrder({
+          customerId: input.customerId,
+          items: input.items,
+          totalAmount: paymentResult.totalAmount,
+          paymentId: paymentResult.paymentId
+        });
+        return { orderId: result.orderId };
+      },
+      async (result) => {
+        // Compensation
+        await cancelOrder(result.orderId);
+      }
+    );
+    
+    return {
+      orderId: orderResult.orderId,
+      status: 'completed'
+    };
+    
+  } catch (error) {
+    log.error('Saga failed', { error, sagaState: saga.getState() });
+    
+    // Run compensation for completed steps
+    await saga.compensate();
+    
+    return {
+      orderId: saga.getState().orderId || '',
+      status: 'failed',
+      error: error instanceof Error ? error.message : 'Saga failed'
+    };
+  }
+}
+
+// Saga Orchestrator helper class
+class SagaOrchestrator<TState> {
+  private state: TState;
+  
+  constructor(initialState: TState) {
+    this.state = initialState;
+  }
+  
+  async execute<TResult>(
+    stepName: string,
+    execute: () => Promise<TResult>,
+    compensate: (result: TResult) => Promise<void>
+  ): Promise<TResult> {
+    log.info(`Executing saga step: ${stepName}`);
+    
+    try {
+      const result = await execute();
+      
+      // Update state with result
+      this.state = {
+        ...this.state,
+        currentStep: this.state.currentStep + 1,
+        completedSteps: [...this.state.completedSteps, stepName]
+      } as TState;
+      
+      log.info(`Saga step completed: ${stepName}`);
+      return result;
+      
+    } catch (error) {
+      log.error(`Saga step failed: ${stepName}`, { error });
+      this.state = { ...this.state, failedStep: stepName } as TState;
+      throw error;
+    }
+  }
+  
+  async compensate(): Promise<void> {
+    log.info('Starting saga compensation');
+    
+    for (const stepName of this.state.completedSteps.reverse()) {
+      try {
+        log.info(`Compensating step: ${stepName}`);
+        // Execute compensation logic based on step name
+      } catch (error) {
+        log.error(`Compensation failed for step: ${stepName}`, { error });
+        // Log for manual intervention
+      }
+    }
+  }
+  
+  getState(): TState {
+    return this.state;
+  }
+}
+```
+
+### Phase 2: Activity Implementation
+
+### Bước 3: Activities with Retry
+
+```typescript
+// activities/order.activities.ts
+import { Context } from '@temporalio/activity';
+
+export interface ValidateInventoryInput {
+  items: OrderItem[];
+}
+
+export interface ValidateInventoryOutput {
+  available: boolean;
+  unavailableItems: string[];
+  totalAmount: number;
+}
+
+export async function validateInventory(
+  input: ValidateInventoryInput
+): Promise<ValidateInventoryOutput> {
+  const ctx = Context.current();
+  
+  log.info('Validating inventory', { itemCount: input.items.length });
+  
+  const unavailableItems: string[] = [];
+  let totalAmount = 0;
+  
+  for (const item of input.items) {
+    const product = await inventoryService.getProduct(item.productId);
+    
+    if (product.stock < item.quantity) {
+      unavailableItems.push(item.productId);
+    } else {
+      totalAmount += product.price * item.quantity;
+    }
+  }
+  
+  return {
+    available: unavailableItems.length === 0,
+    unavailableItems,
+    totalAmount
+  };
+}
+
+export interface ReserveInventoryInput {
+  items: OrderItem[];
+}
+
+export interface ReserveInventoryOutput {
+  reservationId: string;
+  expiresAt: Date;
+  totalAmount: number;
+}
+
+export async function reserveInventory(
+  input: ReserveInventoryInput
+): Promise<ReserveInventoryOutput> {
+  const ctx = Context.current();
+  
+  log.info('Reserving inventory', { itemCount: input.items.length });
+  
+  // Check for cancellation
+  if (ctx.cancelled) {
+    log.warn('Activity cancelled, releasing reservation');
+    throw new CancellationError('Activity was cancelled');
+  }
+  
+  const reservation = await inventoryService.reserveStock(input.items, {
+    ttlMinutes: 30
+  });
+  
+  return {
+    reservationId: reservation.id,
+    expiresAt: reservation.expiresAt,
+    totalAmount: reservation.totalAmount
+  };
+}
+
+export interface ProcessPaymentInput {
+  customerId: string;
+  amount: number;
+  paymentMethodId: string;
+}
+
+export interface ProcessPaymentOutput {
+  success: boolean;
+  paymentId?: string;
+  error?: string;
+}
+
+export async function processPayment(
+  input: ProcessPaymentInput
+): Promise<ProcessPaymentOutput> {
+  const ctx = Context.current();
+  
+  log.info('Processing payment', { 
+    customerId: input.customerId, 
+    amount: input.amount 
+  });
+  
+  try {
+    const payment = await paymentService.charge({
+      customerId: input.customerId,
+      amount: input.amount,
+      paymentMethodId: input.paymentMethodId,
+      idempotencyKey: ctx.workflowExecution?.workflowId + '-' + ctx.activityId
+    });
+    
+    return {
+      success: true,
+      paymentId: payment.id
+    };
+    
+  } catch (error) {
+    log.error('Payment failed', { error });
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Payment failed'
+    };
+  }
+}
+
+export async function releaseInventory(
+  reservationId: string
+): Promise<void> {
+  log.info('Releasing inventory reservation', { reservationId });
+  await inventoryService.releaseReservation(reservationId);
+}
+
+export async function refundPayment(
+  paymentId: string
+): Promise<void> {
+  log.info('Refunding payment', { paymentId });
+  await paymentService.refund(paymentId);
+}
+```
+
+### Phase 3: Signals và Queries
+
+### Bước 4: Signal Handlers
+
+```typescript
+// workflow-definitions/order-with-signals.workflow.ts
+import { proxyActivities, setHandler, log, workflowInfo } from '@temporalio/workflow';
+import type * as activities from '../activities';
+
+export interface OrderWorkflowState {
+  orderId?: string;
+  status: 'pending' | 'processing' | 'completed' | 'cancelled';
+  items: OrderItem[];
+  shippingAddress?: Address;
+  notes: string[];
+  lastUpdated: Date;
+}
+
+export async function orderWorkflowWithSignals(
+  input: OrderWorkflowInput
+): Promise<OrderWorkflowResult> {
+  const state: OrderWorkflowState = {
+    status: 'pending',
+    items: input.items,
+    notes: [],
+    lastUpdated: new Date()
+  };
+  
+  const { createOrder, updateOrderStatus } = proxyActivities<typeof activities>({
+    startToCloseTimeout: '5 minutes'
+  });
+  
+  // Signal: Add items to order
+  setHandler('add-item-signal', async (item: OrderItem) => {
+    log.info('Received add-item signal', { item });
+    state.items.push(item);
+    state.lastUpdated = new Date();
+  });
+  
+  // Signal: Update shipping address
+  setHandler('update-address-signal', async (address: Address) => {
+    log.info('Received update-address signal', { address });
+    state.shippingAddress = address;
+    state.lastUpdated = new Date();
+  });
+  
+  // Signal: Cancel order
+  setHandler('cancel-signal', async (reason: string) => {
+    log.info('Received cancel signal', { reason });
+    state.status = 'cancelled';
+    state.notes.push(`Cancelled: ${reason}`);
+    // Throw to exit workflow
+    throw new WorkflowCancelledError(`Order cancelled: ${reason}`);
+  });
+  
+  // Signal: Add note
+  setHandler('add-note-signal', async (note: string) => {
+    log.info('Received add-note signal', { note });
+    state.notes.push(note);
+    state.lastUpdated = new Date();
+  });
+  
+  // Query: Get order status
+  setHandler('get-status-query', () => {
+    return {
+      orderId: state.orderId,
+      status: state.status,
+      itemCount: state.items.length,
+      lastUpdated: state.lastUpdated
+    };
+  });
+  
+  // Query: Get all items
+  setHandler('get-items-query', () => {
+    return state.items;
+  });
+  
+  // Main workflow logic
+  try {
+    state.status = 'processing';
+    
+    // ... rest of workflow logic
+    
+    state.status = 'completed';
+    return { orderId: state.orderId!, status: 'completed' };
+    
+  } catch (error) {
+    if (error instanceof WorkflowCancelledError) {
+      return { orderId: state.orderId || '', status: 'cancelled', error: error.message };
+    }
+    throw error;
+  }
+}
+```
+
+### Bước 5: Continue As New Pattern
+
+```typescript
+// workflow-definitions/batch-processor.workflow.ts
+import { proxyActivities, continueAsNew, log } from '@temporalio/workflow';
+
+export interface BatchWorkflowInput {
+  batchId: string;
+  items: BatchItem[];
+  cursor: number;
+  processedCount: number;
+}
+
+export async function batchProcessingWorkflow(
+  input: BatchWorkflowInput
+): Promise<BatchResult> {
+  const { processItem } = proxyActivities<typeof activities>({
+    startToCloseTimeout: '1 minute',
+    retry: { maximumAttempts: 2 }
+  });
+  
+  const { batchId, items, cursor, processedCount } = input;
+  const BATCH_SIZE = 100;
+  
+  log.info('Starting batch processing', { batchId, cursor, itemsRemaining: items.length });
+  
+  let currentCursor = cursor;
+  let currentProcessed = processedCount;
+  
+  // Process batch
+  const batchEnd = Math.min(currentCursor + BATCH_SIZE, items.length);
+  
+  for (let i = currentCursor; i < batchEnd; i++) {
+    try {
+      await processItem(items[i]);
+      currentProcessed++;
+    } catch (error) {
+      log.error('Failed to process item', { item: items[i], error });
+      // Continue with next item
+    }
+  }
+  
+  currentCursor = batchEnd;
+  
+  // Check if more items to process
+  if (currentCursor < items.length) {
+    log.info('Continuing with next batch', { 
+      currentCursor, 
+      remaining: items.length - currentCursor 
+    });
+    
+    // Continue as new with updated state
+    await continueAsNew<typeof batchProcessingWorkflow>({
+      batchId,
+      items,
+      cursor: currentCursor,
+      processedCount: currentProcessed
+    });
+  }
+  
+  log.info('Batch processing completed', { 
+    batchId, 
+    totalProcessed: currentProcessed 
+  });
+  
+  return {
+    batchId,
+    totalProcessed: currentProcessed,
+    status: 'completed'
+  };
+}
+```
+
+### Phase 4: Child Workflows
+
+### Bước 6: Child Workflow Pattern
+
+```typescript
+// workflow-definitions/order-with-child-workflows.ts
+import { startChild, proxyActivities, log, waitForChild } from '@temporalio/workflow';
+import type * as activities from '../activities';
+
+export async function orderWithShippingWorkflow(
+  input: OrderWorkflowInput
+): Promise<OrderWorkflowResult> {
+  const { createOrder, sendConfirmationEmail } = proxyActivities<typeof activities>({
+    startToCloseTimeout: '5 minutes'
+  });
+  
+  // Start shipping workflow as child
+  const shippingHandle = await startChild(shippingWorkflow, {
+    args: [{ orderId: '', items: input.items, address: input.shippingAddress }],
+    workflowId: `shipping-${input.customerId}-${Date.now()}`,
+    parentClosePolicy: 'REQUEST_CANCEL'
+  });
+  
+  try {
+    // Create order
+    const order = await createOrder({
+      customerId: input.customerId,
+      items: input.items,
+      shippingAddress: input.shippingAddress
+    });
+    
+    // Update shipping workflow with order ID
+    await shippingHandle.signal('setOrderId', order.id);
+    
+    // Send confirmation
+    await sendConfirmationEmail({
+      customerId: input.customerId,
+      orderId: order.id
+    });
+    
+    // Wait for shipping to complete
+    const shippingResult = await waitForChild(shippingHandle);
+    
+    return {
+      orderId: order.id,
+      status: 'completed',
+      fulfillmentId: shippingResult.fulfillmentId
+    };
+    
+  } catch (error) {
+    // Cancel shipping if order creation fails
+    await shippingHandle.cancel();
+    throw error;
+  }
+}
+
+export async function shippingWorkflow(
+  input: ShippingInput
+): Promise<ShippingResult> {
+  let orderId: string | undefined;
+  const { notifyShippingCarrier, trackShipment } = proxyActivities<typeof activities>({
+    startToCloseTimeout: '10 minutes'
+  });
+  
+  // Signal to receive order ID
+  setHandler('setOrderIdSignal', (id: string) => {
+    orderId = id;
+  });
+  
+  // Wait for order ID to be set
+  if (!orderId) {
+    await new Promise<void>((resolve) => {
+      setHandler('setOrderIdSignal', () => resolve());
+    });
+  }
+  
+  // Book shipment
+  const shipment = await notifyShippingCarrier({
+    orderId: orderId!,
+    items: input.items,
+    address: input.address
+  });
+  
+  // Track until delivered (long-running)
+  let trackingStatus = 'shipped';
+  while (trackingStatus !== 'delivered' && trackingStatus !== 'failed') {
+    const status = await trackShipment(shipment.trackingId);
+    trackingStatus = status.status;
+    
+    if (trackingStatus !== 'delivered') {
+      // Sleep for 1 hour before next check
+      await new Promise(resolve => setTimeout(resolve, 60 * 60 * 1000));
+    }
+  }
+  
+  return {
+    fulfillmentId: shipment.fulfillmentId,
+    trackingId: shipment.trackingId,
+    status: trackingStatus as 'delivered' | 'failed'
+  };
+}
+```
+
+### Phase 5: Deployment và Configuration
+
+### Bước 7: Worker Configuration
+
+```typescript
+// worker.ts
+import { Worker } from '@temporalio/worker';
+import { Connection } from '@temporalio/client';
+import * as activities from '../activities';
+import * as workflows from '../workflows';
+
+async function run() {
+  const connection = await Connection.connect({
+    address: process.env.TEMPORAL_ADDRESS || 'localhost:7233'
+  });
+  
+  const worker = await Worker.create({
+    workflowsPath: require.resolve('../workflows'),
+    activities,
+    taskQueue: 'order-processing',
+    
+    // Worker options
+    maxConcurrentWorkflowTaskExecutions: 100,
+    maxConcurrentActivityTaskExecutions: 50,
+    maxCancelsRequested: 100,
+    
+    // Workflow options
+    workflowDefaults: {
+      executionTimeout: '24 hours',
+      runTimeout: '1 hour',
+      taskTimeout: '10 seconds'
+    },
+    
+    // Activity options
+    activityDefaults: {
+      startToCloseTimeout: '5 minutes',
+      scheduleToStartTimeout: '1 minute',
+      heartbeatTimeout: '30 seconds',
+      retryPolicy: {
+        initialInterval: '1s',
+        backoffCoefficient: 2,
+        maximumInterval: '10m',
+        maximumAttempts: 5,
+        nonRetryableErrorTypes: ['InvalidInputError']
+      }
+    },
+    
+    // Interceptors
+    interceptors: {
+      workflowModules: [require.resolve('./workflow-interceptors')],
+      activityModules: [require.resolve('./activity-interceptors')]
+    },
+    
+    // Namespace
+    namespace: 'default'
+  });
+  
+  console.log('Worker started, connecting to Temporal at', connection.options.address);
+  await worker.run();
+}
+
+run().catch((err) => {
+  console.error('Worker failed', err);
+  process.exit(1);
+});
+```
+
+### Bước 8: Workflow Interceptors
+
+```typescript
+// workflow-interceptors.ts
+import { WorkflowInterceptors } from '@temporalio/workflow';
+
+export const workflowInterceptors: WorkflowInterceptors = {
+  calls: {
+    async startWorkflow(input, next) {
+      console.log('Starting workflow', { 
+        workflowType: input.workflowType, 
+        workflowId: input.workflowId 
+      });
+      
+      const result = await next(input);
+      
+      console.log('Workflow started', { workflowId: input.workflowId });
+      return result;
+    },
+    
+    async executeWorkflow(input, next) {
+      const startTime = Date.now();
+      
+      try {
+        const result = await next(input);
+        const duration = Date.now() - startTime;
+        
+        console.log('Workflow completed', { 
+          workflowType: input.workflowType, 
+          duration 
+        });
+        
+        return result;
+        
+      } catch (error) {
+        const duration = Date.now() - startTime;
+        
+        console.error('Workflow failed', { 
+          workflowType: input.workflowType, 
+          error,
+          duration 
+        });
+        
+        throw error;
+      }
+    }
+  },
+  
+  signals: {},
+  queries: {}
+};
+```
+
+## Checklist
+
+- [ ] Workflow có deterministic logic
+- [ ] Activities có proper timeouts
+- [ ] Retry policies được configured
+- [ ] Signals và queries được implemented
+- [ ] Compensation logic được handle
+- [ ] Child workflows được managed đúng
+- [ ] Worker configuration optimized
+- [ ] Observability được setup
+- [ ] Error types được defined rõ ràng
+- [ ] Idempotency được ensured
+
+## Examples (Ví dụ)
+
+### Ví dụ: Complete Order Processing Deployment
+
+```typescript
+// docker-compose.yml (Temporal services)
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: temporal
+      POSTGRES_USER: temporal
+      POSTGRES_PASSWORD: temporal
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  elasticsearch:
+    image: elasticsearch:7.16.2
+    environment:
+      - discovery.type=single-node
+      - cluster.name=temporal
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+
+  temporal:
+    image: temporalio/auto-setup:1.22.0
+    depends_on:
+      - postgres
+      - elasticsearch
+    environment:
+      - DB=postgresql
+      - DB_PORT=5432
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=temporal
+      - POSTGRES_SEEDS=postgres
+      - ENABLE_EXPERIMENTAL_STORE_ESCALATION_API=true
+    ports:
+      - "7233:7233"
+```
+
+### Ví dụ: Monitoring with Metrics
+
+```typescript
+// metrics.ts
+import { metrics } from '@temporalio/worker';
+
+const scope = metrics.getMeterScope();
+
+const workflowStartedCounter = scope.createCounter('workflow_started_total', {
+  description: 'Total number of workflows started'
+});
+
+const activityDurationHistogram = scope.createHistogram('activity_duration_seconds', {
+  description: 'Activity execution duration in seconds'
+});
+
+export { workflowStartedCounter, activityDurationHistogram };
+```
+
+## Anti Pattern
+
+- [ ] **Non-deterministic code**: Using random, time in workflow logic
+- [ ] **Large payloads**: Passing too much data between workflow and activity
+- [ ] **No timeouts**: Activities can hang forever
+- [ ] **No retry**: Failing permanently on transient errors
+- [ ] **Synchronous external calls**: Blocking on external systems
+- [ ] **Mutable static state**: Using global variables
+
+## Best Practice
+
+- [ ] **Deterministic workflows**: Only use Temporal SDK functions for time/random
+- [ ] **Activity heartbeating**: Long-running activities should heartbeat
+- [ ] **Proper timeouts**: Always set activity timeouts
+- [ ] **Retry policies**: Configure for transient failures
+- [ ] **Idempotent activities**: Safe to retry
+- [ ] **Async patterns**: Use signals for external events
+
+## Liên kết
+
+- [[../rules/core-architecture]] - Core Architecture
+- [[../rules/queue]] - Queue Best Practices
+- [[../skills/microservices-design]] - Microservices Design
+- [[../skills/clean-architecture]] - Clean Architecture
+- [[../skills/n8n-workflow]] - N8N Workflows

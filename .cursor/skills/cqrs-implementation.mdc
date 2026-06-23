@@ -1,0 +1,332 @@
+---
+description: Implement Command Query Responsibility Segregation cho scalable applications
+purpose: Implement CQRS pattern để separate read và write operations
+input: Domain model, read/write requirements, event sourcing setup
+output: CQRS implementation, command handlers, query models
+version: 1.0.0
+tags: [cqrs, command, query, event-sourcing, read-model, write-model]
+---
+
+# CQRS Implementation Skill - Triển Khai CQRS Pattern
+
+## Tổng quan
+
+CQRS (Command Query Responsibility Segregation) separates read và write models for better scalability và flexibility. Skill này cung cấp framework để implement CQRS pattern effectively.
+
+## Purpose (Mục đích)
+
+CQRS Implementation Skill được thiết kế để:
+
+1. **Architecture Design**: Separate models
+2. **Command Implementation**: Handle writes
+3. **Query Implementation**: Handle reads
+4. **Event Handling**: Sync read models
+5. **Consistency**: Manage eventual consistency
+
+### Khi nào sử dụng CQRS
+
+- Khi scaling read/write differently
+- Khi implementing event sourcing
+- Khi simplifying complex domain
+- Khi optimizing performance
+
+## Input (Đầu vào)
+
+- [ ] Domain model
+- [ ] Read/write patterns
+- [ ] Event definitions
+
+## Output (Đầu ra)
+
+- [ ] Command handlers
+- [ ] Query handlers
+- [ ] Read models
+- [ ] Event projectors
+
+## Workflow (Quy trình)
+
+### Phase 1: Command Side
+
+### Bước 1: Command Definition
+
+```typescript
+// Command pattern
+interface Command {
+  commandId: string;
+  timestamp: Date;
+  aggregateId: string;
+}
+
+interface CommandHandler<T extends Command> {
+  handle(command: T): Promise<void>;
+}
+
+// Commands
+class CreateOrderCommand implements Command {
+  constructor(
+    public readonly commandId: string = generateUUID(),
+    public readonly timestamp: Date = new Date(),
+    public readonly customerId: string,
+    public readonly items: OrderItemDTO[],
+    public readonly shippingAddress: AddressDTO
+  ) {}
+}
+
+class UpdateOrderStatusCommand implements Command {
+  constructor(
+    public readonly commandId: string = generateUUID(),
+    public readonly timestamp: Date = new Date(),
+    public readonly orderId: string,
+    public readonly newStatus: OrderStatus
+  ) {}
+}
+
+// Command Handler
+class CreateOrderHandler implements CommandHandler<CreateOrderCommand> {
+  constructor(
+    private readonly eventStore: EventStore,
+    private readonly eventBus: EventBus
+  ) {}
+  
+  async handle(command: CreateOrderCommand): Promise<void> {
+    // Create aggregate
+    const order = Order.create(
+      CustomerId.create(command.customerId),
+      Address.create(command.shippingAddress)
+    );
+    
+    // Add items
+    for (const item of command.items) {
+      order.addItem(
+        ProductId.create(item.productId),
+        Quantity.create(item.quantity),
+        Money.create(item.price, Currency.USD)
+      );
+    }
+    
+    // Persist events
+    await this.eventStore.save(order, order.getDomainEvents());
+    
+    // Publish events
+    for (const event of order.getDomainEvents()) {
+      await this.eventBus.publish(event);
+    }
+  }
+}
+```
+
+### Bước 2: Command Bus
+
+```typescript
+// Command Bus
+class CommandBus {
+  private handlers: Map<string, CommandHandler<any>> = new Map();
+  
+  register<T extends Command>(
+    commandType: new (...args: any[]) => T,
+    handler: CommandHandler<T>
+  ): void {
+    this.handlers.set(commandType.name, handler);
+  }
+  
+  async dispatch<T extends Command>(command: T): Promise<void> {
+    const handler = this.handlers.get(command.constructor.name);
+    
+    if (!handler) {
+      throw new Error(`No handler for command ${command.constructor.name}`);
+    }
+    
+    // Validation
+    await this.validate(command);
+    
+    // Authorization
+    await this.authorize(command);
+    
+    // Execution
+    await handler.handle(command);
+  }
+  
+  private async validate(command: Command): Promise<void> {
+    // Add validation logic
+  }
+  
+  private async authorize(command: Command): Promise<void> {
+    // Add authorization logic
+  }
+}
+
+// Mediator pattern
+class CommandMediator {
+  constructor(private commandBus: CommandBus) {}
+  
+  async send<T extends Command>(command: T): Promise<void> {
+    return this.commandBus.dispatch(command);
+  }
+}
+```
+
+### Phase 2: Query Side
+
+### Bước 3: Query Models
+
+```typescript
+// Read Model / DTOs
+interface OrderListDTO {
+  orderId: string;
+  customerName: string;
+  status: string;
+  total: number;
+  itemCount: number;
+  createdAt: Date;
+}
+
+interface OrderDetailDTO {
+  orderId: string;
+  customer: CustomerDTO;
+  items: OrderItemDTO[];
+  shippingAddress: AddressDTO;
+  status: string;
+  subtotal: number;
+  tax: number;
+  total: number;
+  timeline: TimelineEvent[];
+}
+
+// Query Handler
+interface Query<T> {
+  // Marker interface
+}
+
+interface QueryHandler<T extends Query<R>, R> {
+  handle(query: T): Promise<R>;
+}
+
+class GetOrderListQuery implements Query<OrderListDTO[]> {
+  constructor(
+    public readonly customerId?: string,
+    public readonly status?: OrderStatus,
+    public readonly page: number = 1,
+    public readonly pageSize: number = 20
+  ) {}
+}
+
+class GetOrderListHandler implements QueryHandler<GetOrderListQuery, OrderListDTO[]> {
+  constructor(private readonly readDb: ReadDatabase) {}
+  
+  async handle(query: GetOrderListQuery): Promise<OrderListDTO[]> {
+    return this.readDb.query<OrderListDTO>(`
+      SELECT 
+        o.id as "orderId",
+        c.name as "customerName",
+        o.status,
+        o.total,
+        COUNT(oi.id) as "itemCount",
+        o.created_at as "createdAt"
+      FROM orders o
+      JOIN customers c ON o.customer_id = c.id
+      LEFT JOIN order_items oi ON o.id = oi.order_id
+      WHERE ($1::uuid IS NULL OR o.customer_id = $1)
+        AND ($2::text IS NULL OR o.status = $2)
+      GROUP BY o.id, c.name, o.status, o.total, o.created_at
+      ORDER BY o.created_at DESC
+      LIMIT $3 OFFSET $4
+    `, [query.customerId, query.status, query.pageSize, (query.page - 1) * query.pageSize]);
+  }
+}
+```
+
+### Phase 3: Event Handlers
+
+### Bước 4: Read Model Projection
+
+```typescript
+// Projector / Event Handler
+interface EventHandler<T extends DomainEvent> {
+  handle(event: T): Promise<void>;
+}
+
+class OrderProjector implements EventHandler<OrderCreated> {
+  constructor(private readonly readDb: ReadDatabase) {}
+  
+  async handle(event: OrderCreated): Promise<void> {
+    await this.readDb.execute(`
+      INSERT INTO order_read_models (
+        id, customer_id, status, total, created_at, updated_at
+      ) VALUES ($1, $2, $3, $4, $5, $5)
+    `, [
+      event.orderId.value,
+      event.customerId.value,
+      OrderStatus.PENDING,
+      0,
+      event.occurredAt
+    ]);
+  }
+}
+
+class OrderItemProjector implements EventHandler<ItemAddedToOrder> {
+  constructor(private readonly readDb: ReadDatabase) {}
+  
+  async handle(event: ItemAddedToOrder): Promise<void> {
+    await this.readDb.transaction(async (tx) => {
+      // Update total
+      await tx.execute(`
+        UPDATE order_read_models 
+        SET total = total + $1, updated_at = NOW()
+        WHERE id = $2
+      `, [event.price.amount, event.orderId.value]);
+      
+      // Add item
+      await tx.execute(`
+        INSERT INTO order_item_read_models (
+          id, order_id, product_id, quantity, price, created_at
+        ) VALUES ($1, $2, $3, $4, $5, NOW())
+      `, [
+        event.itemId.value,
+        event.orderId.value,
+        event.productId.value,
+        event.quantity.value,
+        event.price.amount
+      ]);
+    });
+  }
+}
+```
+
+## Checklist
+
+- [ ] Commands defined
+- [ ] Command handlers implemented
+- [ ] Query models designed
+- [ ] Query handlers implemented
+- [ ] Projectors created
+- [ ] Event bus configured
+
+## Examples (Ví dụ)
+
+### Ví dụ: CQRS Flow
+
+```typescript
+// Write flow
+async function createOrder(dto: CreateOrderDTO) {
+  const command = new CreateOrderCommand(
+    dto.customerId,
+    dto.items,
+    dto.shippingAddress
+  );
+  
+  await commandBus.dispatch(command);
+}
+
+// Read flow
+async function getOrders(customerId?: string) {
+  const query = new GetOrderListQuery(customerId);
+  return queryBus.execute(query);
+}
+```
+
+## Liên kết
+
+- [[../skills/ddd-design]] - DDD Design
+- [[../skills/clean-architecture]] - Clean Architecture
+- [[../skills/microservice-design]] - Microservice Design
+- [[../skills/event-sourcing]] - Event Sourcing

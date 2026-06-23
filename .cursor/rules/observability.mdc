@@ -1,0 +1,60 @@
+---
+description: Nguyên tắc Observability toàn diện cho distributed systems
+created: 2026-06-23
+version: 1.0.0
+tags: [observability, monitoring, logging, tracing, enterprise]
+---
+
+# Observability
+
+## Mục tiêu
+
+Observability là khả năng understand internal system state từ external outputs, bao gồm metrics, logs, và traces. Trong Cursor Enterprise Framework, Observability rule định nghĩa các nguyên tắc và best practices cho việc implement comprehensive observability trong complex distributed systems. Mục tiêu là đảm bảo teams có thể understand, debug, và optimize systems effectively.
+
+## Nguyên tắc
+
+**1. Three Pillars**
+
+Metrics: Quantitative measurements. Logs: Discrete events. Traces: Request flows. All three essential. Correlate across pillars.
+
+**2. Structured Logging**
+
+JSON format. Consistent fields. Correlation IDs. Log levels. No sensitive data. Searchable fields.
+
+**3. Distributed Tracing**
+
+Trace requests across services. Context propagation. Sampling strategy. Trace correlation. End-to-end visibility.
+
+**4. Metrics**
+
+Golden signals. RED method. USE method. SLOs và SLIs. Alerts thresholds. Dashboards.
+
+**5. Alerting Philosophy**
+
+Alert on symptoms. Minimize noise. Every alert actionable. Severity levels. Runbooks.
+
+**6. Service Level Objectives**
+
+Define SLOs. Measure SLIs. Track SLO status. Error budgets. Alerts on budget burn.
+
+**7. Dashboards**
+
+Purpose-built. Right granularity. Meaningful visualizations. Link related metrics. Update regularly.
+
+**8. Debugging**
+
+Trace exploration. Log aggregation. Metrics correlation. Debug UIs. Root cause analysis.
+
+**9. Chaos Engineering**
+
+Test resilience intentionally. Inject failures. Measure recovery. Improve confidence.
+
+**10. Cost**
+
+Observability costs money. Balance coverage vs cost. Sample appropriately. Retention policies.
+
+## Liên kết
+
+- [[monitoring]] - Monitoring
+- [[performance]] - Performance
+- [[incident-response]] - Incident Response

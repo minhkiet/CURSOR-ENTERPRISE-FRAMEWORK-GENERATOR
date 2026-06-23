@@ -1,0 +1,52 @@
+---
+description: Nguyên tắc và best practices cho Microsoft Azure
+created: 2026-06-23
+version: 1.0.0
+tags: [azure, microsoft, cloud, enterprise, deployment]
+---
+
+# Azure
+
+## Mục tiêu
+
+Microsoft Azure là cloud platform cung cấp broad range of services cho computing, storage, AI, và enterprise applications. Trong Cursor Enterprise Framework, Azure được sử dụng cho organizations đã invest trong Microsoft ecosystem hoặc cần enterprise features như Active Directory integration, compliance certifications, và hybrid cloud capabilities.
+
+## Nguyên tắc
+
+**1. Resource Organization**
+
+Resource groups. Management groups. Subscriptions. Naming conventions.
+
+**2. Networking**
+
+Virtual networks. Subnets. VPN gateway. ExpressRoute. Private endpoints.
+
+**3. Compute**
+
+Azure VMs. App Service. Azure Kubernetes Service. Azure Functions. Container Instances.
+
+**4. Storage**
+
+Blob storage. Files. Tables. Queues. Disk storage.
+
+**5. Databases**
+
+Azure SQL. Cosmos DB. Azure Database for PostgreSQL. Azure Database for MySQL.
+
+**6. Security**
+
+Azure Active Directory. RBAC. Key Vault. Security Center. Defender for Cloud.
+
+**7. Monitoring**
+
+Azure Monitor. Log Analytics. Application Insights. Azure Dashboards.
+
+**8. DevOps**
+
+Azure DevOps. GitHub Actions. ARM templates. Bicep.
+
+## Liên kết
+
+- [[cloudflare]] - Cloudflare
+- [[aws]] - AWS
+- [[gcp]] - GCP

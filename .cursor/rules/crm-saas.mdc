@@ -1,0 +1,239 @@
+---
+description: Nguyên tắc CRM SaaS cho enterprise applications
+created: 2026-06-23
+version: 1.0.0
+tags: [crm, saas, sales, enterprise, customer]
+---
+
+# CRM SaaS
+
+## Mục tiêu
+
+CRM SaaS là hệ thống quản lý quan hệ khách hàng được xây dựng theo mô hình Software-as-a-Service, phục vụ nhiều doanh nghiệp (tenants) trên cùng một infrastructure. Trong Cursor Enterprise Framework, CRM SaaS rule định nghĩa các nguyên tắc và best practices cho việc xây dựng một CRM platform enterprise-grade với các features như contact management, deal tracking, pipeline management, reporting, và automation. Mục tiêu là tạo ra một hệ thống có thể scale, secure, và customizable cho các doanh nghiệp với quy mô và yêu cầu khác nhau.
+
+CRM là một trong những loại SaaS applications phổ biến nhất, đòi hỏi careful consideration về multi-tenancy, data isolation, customization capabilities, và performance. Rule này cover architecture, data models, features implementation, và operational excellence cho CRM SaaS.
+
+## Nguyên tắc
+
+**1. Multi-Tenant Architecture**
+
+Shared database với tenant_id column và RLS. Separate schemas cho large tenants nếu cần. Tenant context được set cho mỗi request. All queries phải be scoped to tenant. Tenant identification từ JWT hoặc subdomain. Cross-tenant access phải be prevented at all levels.
+
+**2. Contact Management**
+
+Store contacts với comprehensive profile data. Support custom fields per tenant. Tag và segment contacts. Handle duplicate detection. Store contact activities và history. Support contact import/export. GDPR compliance for data handling.
+
+**3. Deal Pipeline**
+
+Flexible pipeline stages per tenant. Customizable deal fields. Track deal value và probability. Drag-and-drop interface. Activity tracking on deals. Automated stage transitions. Deal scoring models.
+
+**4. Activity Tracking**
+
+Log all customer interactions. Email, calls, meetings, notes. Attachments và file storage. Activity timeline view. Automated activity logging. Calendar integration. Task management.
+
+**5. Reporting và Analytics**
+
+Real-time dashboards. Custom report builder. Scheduled reports. Export to various formats. Multi-tenant analytics isolation. Performance metrics per tenant. Data retention policies.
+
+**6. Workflow Automation**
+
+Visual workflow builder. Trigger-based automation. Email sequences. Task automation. Approval workflows. Webhook integrations. Workflow analytics.
+
+**7. Integration Platform**
+
+API-first design. Webhook notifications. OAuth integrations. Third-party sync. Data mapping. Integration marketplace. Rate limiting per tenant.
+
+**8. Security và Compliance**
+
+SOC 2 Type II compliance. GDPR data handling. Data encryption at rest và in transit. Audit logging. Access controls. IP restrictions. Two-factor authentication.
+
+**9. Performance**
+
+Database indexing strategy. Query optimization per tenant. Caching layers. Async processing. Background jobs. Connection pooling. CDN for static assets.
+
+**10. Scalability**
+
+Horizontal scaling support. Database sharding option. Queue-based processing. Stateless application servers. Load balancing. Geographic distribution.
+
+## Checklist
+
+- [ ] Multi-tenant architecture implemented
+- [ ] Contact management module built
+- [ ] Deal pipeline implemented
+- [ ] Activity tracking system built
+- [ ] Reporting module implemented
+- [ ] Workflow automation built
+- [ ] API endpoints created
+- [ ] Webhook system implemented
+- [ ] Security hardening applied
+- [ ] Performance optimized
+- [ ] Compliance requirements met
+- [ ] Documentation complete
+
+## Anti Pattern
+
+**1. No Tenant Isolation**
+
+Querying without tenant filter. Data leakage. Security breach. Solution: RLS + application checks.
+
+**2. Monolithic Customization**
+
+Hard-coded field names. No extensibility. Limited tenant needs. Solution: Dynamic fields, metadata.
+
+**3. Synchronous Processing**
+
+Heavy operations blocking requests. Timeouts. Poor UX. Solution: Async processing with queues.
+
+**4. Ignoring Data Retention**
+
+Keeping all data forever. Storage costs. Compliance issues. Solution: Data retention policies.
+
+## Best Practice
+
+**1. Contact Model**
+
+```typescript
+interface Contact {
+  id: string;
+  tenantId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+  company?: string;
+  jobTitle?: string;
+  status: 'active' | 'inactive' | 'archived';
+  customFields: Record<string, any>;
+  ownerId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Custom fields stored as JSONB
+// Index on email, company for fast lookup
+// RLS policy for tenant isolation
+```
+
+**2. Deal Pipeline**
+
+```typescript
+interface Pipeline {
+  id: string;
+  tenantId: string;
+  name: string;
+  stages: PipelineStage[];
+  isDefault: boolean;
+}
+
+interface PipelineStage {
+  id: string;
+  name: string;
+  order: number;
+  probability: number;
+  isWon: boolean;
+  isLost: boolean;
+  stageColor: string;
+}
+
+interface Deal {
+  id: string;
+  tenantId: string;
+  contactId: string;
+  pipelineId: string;
+  stageId: string;
+  name: string;
+  value: number;
+  currency: string;
+  probability: number;
+  expectedCloseDate?: Date;
+  ownerId?: string;
+  customFields: Record<string, any>;
+  activities: Activity[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+**3. Activity Logging**
+
+```typescript
+async function logActivity(
+  tenantId: string,
+  data: {
+    type: 'email' | 'call' | 'meeting' | 'note' | 'task';
+    contactId: string;
+    dealId?: string;
+    subject: string;
+    description?: string;
+    metadata?: Record<string, any>;
+  }
+): Promise<Activity> {
+  const activity = await db.activities.create({
+    tenantId,
+    ...data,
+    createdAt: new Date()
+  });
+  
+  // Trigger automations
+  await triggerWorkflows(tenantId, 'activity_created', activity);
+  
+  return activity;
+}
+```
+
+**4. Reporting Query**
+
+```typescript
+async function getSalesReport(
+  tenantId: string,
+  options: {
+    startDate: Date;
+    endDate: Date;
+    groupBy: 'day' | 'week' | 'month';
+  }
+): Promise<SalesReport[]> {
+  const query = `
+    SELECT 
+      DATE_TRUNC($3, deals.created_at) as period,
+      COUNT(*) FILTER (WHERE deals.stage_id = won_stage_id) as won_deals,
+      SUM(value) FILTER (WHERE deals.stage_id = won_stage_id) as revenue,
+      COUNT(*) as total_deals,
+      AVG(value) as avg_deal_value
+    FROM deals
+    JOIN pipelines ON deals.pipeline_id = pipelines.id
+    JOIN pipeline_stages ON pipelines.id = pipeline_stages.pipeline_id
+    WHERE deals.tenant_id = $1
+      AND deals.created_at BETWEEN $2 AND $4
+      AND pipeline_stages.is_won = true
+    GROUP BY DATE_TRUNC($3, deals.created_at)
+    ORDER BY period
+  `;
+  
+  return db.query(query, [tenantId, options.startDate, options.groupBy, options.endDate]);
+}
+```
+
+## Workflow
+
+**Phase 1: Planning**
+
+Define core features. Design data model. Plan multi-tenancy.
+
+**Phase 2: Development**
+
+Build core modules. Implement tenant isolation. Add features incrementally.
+
+**Phase 3: Testing**
+
+Test tenant isolation. Performance testing. Security testing.
+
+**Phase 4: Deployment**
+
+Deploy to production. Configure monitoring. Set up backups.
+
+## Liên kết
+
+- [[multi-tenant]] - Multi-tenant: Multi-tenant architecture
+- [[billing]] - Billing: Subscription management
+- [[security]] - Security: Security best practices
+- [[performance]] - Performance: Performance optimization

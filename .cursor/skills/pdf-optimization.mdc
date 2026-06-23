@@ -1,0 +1,941 @@
+---
+description: Skill tối ưu hóa PDF documents về kích thước, chất lượng, và production-ready settings cho various use cases
+purpose: Cung cấp comprehensive PDF optimization toolkit để reduce file size, improve rendering quality, và optimize for specific output targets
+input:
+  - Source PDF files
+  - Optimization targets (web, print, archive)
+  - Quality settings
+  - Compression levels
+  - Output specifications
+output:
+  - Optimized PDF files
+  - Size reduction reports
+  - Quality comparisons
+  - Batch processing results
+  - Conversion results
+version: 1.0.0
+tags:
+  - pdf
+  - optimization
+  - compression
+  - quality
+---
+
+# PDF Optimization
+
+## Tổng quan
+
+PDF Optimization là skill chuyên biệt để optimize PDF documents cho various use cases trong Cursor Enterprise Framework. Skill này cover tất cả aspects của PDF optimization: file size reduction, image compression, font optimization, color management, và conversion. Được thiết kế cho production workloads với support cho batch processing và automated optimization pipelines.
+
+## Purpose (Mục đích)
+
+PDF files thường được tạo với suboptimal settings, dẫn đến:
+
+1. **Large file sizes**: Unnecessarily large for their content
+2. **Slow loading**: Poor performance in web applications
+3. **Printing issues**: Wrong color profiles hoặc resolution
+4. **Archive bloat**: Wasted storage cho long-term preservation
+5. **Compatibility issues**: Features not supported across viewers
+
+PDF Optimization tồn tại để:
+
+- **Reduce file size** without significant quality loss
+- **Optimize for target use case** (web, print, archive)
+- **Standardize PDFs** across organization
+- **Automate optimization** trong CI/CD pipelines
+- **Preserve quality** where it matters most
+
+## Input (Đầu vào)
+
+| Input | Mô tả | Required |
+|-------|-------|----------|
+| `source_pdf` | Input PDF file | Yes |
+| `optimization_target` | Target use case | Yes |
+| `quality_settings` | Quality vs size tradeoff | No |
+| `compression_level` | Compression intensity | No |
+| `output_format` | Output format settings | No |
+| `metadata` | Optimization metadata | No |
+
+## Output (Đầu ra)
+
+| Output | Mô tả | Format |
+|--------|-------|--------|
+| `optimized_pdf` | Optimized PDF file | Buffer |
+| `size_reduction` | Percentage reduction | Percentage |
+| `quality_report` | Quality assessment | Report |
+| `comparison` | Before/after comparison | Comparison |
+| `metadata` | Optimization metadata | Object |
+
+## Workflow (Quy trình)
+
+### Bước 1: PDF Analysis
+
+```typescript
+// Analyze PDF characteristics
+interface PDFAnalysis {
+  fileSize: number;
+  pageCount: number;
+  dimensions: PageDimensions[];
+  colorSpace: ColorSpace[];
+  imageCount: number;
+  fontCount: number;
+  embeddedFonts: string[];
+  compression: CompressionInfo;
+  metadata: DocumentMetadata;
+  objects: ObjectSummary;
+  issues: PDFIssue[];
+}
+
+class PDFAnalyzer {
+  async analyze(pdfBuffer: Buffer): Promise<PDFAnalysis> {
+    const doc = await PDFDocument.load(pdfBuffer, {
+      ignoreEncryption: true
+    });
+    
+    const pages = doc.getPages();
+    const analysis: PDFAnalysis = {
+      fileSize: pdfBuffer.length,
+      pageCount: pages.length,
+      dimensions: pages.map(p => ({
+        width: p.getWidth(),
+        height: p.getHeight()
+      })),
+      colorSpace: await this.detectColorSpaces(doc),
+      imageCount: await this.countImages(doc),
+      fontCount: await this.countFonts(doc),
+      embeddedFonts: await this.listEmbeddedFonts(doc),
+      compression: await this.analyzeCompression(doc),
+      metadata: this.extractMetadata(doc),
+      objects: await this.summarizeObjects(doc),
+      issues: await this.identifyIssues(doc)
+    };
+    
+    return analysis;
+  }
+  
+  private async identifyIssues(doc: PDFDocument): Promise<PDFIssue[]> {
+    const issues: PDFIssue[] = [];
+    
+    // Check for uncompressed streams
+    const uncompressed = await this.findUncompressedStreams(doc);
+    if (uncompressed.length > 0) {
+      issues.push({
+        type: 'uncompressed_streams',
+        severity: 'warning',
+        count: uncompressed.length,
+        recommendation: 'Compress streams to reduce file size'
+      });
+    }
+    
+    // Check for duplicate fonts
+    const duplicateFonts = await this.findDuplicateFonts(doc);
+    if (duplicateFonts.length > 0) {
+      issues.push({
+        type: 'duplicate_fonts',
+        severity: 'info',
+        count: duplicateFonts.length,
+        recommendation: 'Subset fonts to remove duplicates'
+      });
+    }
+    
+    // Check for high-res images
+    const highResImages = await this.findHighResImages(doc);
+    if (highResImages.length > 0) {
+      issues.push({
+        type: 'high_resolution_images',
+        severity: 'warning',
+        count: highResImages.length,
+        recommendation: 'Downsample images for web-optimized output'
+      });
+    }
+    
+    // Check for missing fonts
+    const missingFonts = await this.findMissingFonts(doc);
+    if (missingFonts.length > 0) {
+      issues.push({
+        type: 'missing_fonts',
+        severity: 'error',
+        count: missingFonts.length,
+        recommendation: 'Embed or subset required fonts'
+      });
+    }
+    
+    return issues;
+  }
+}
+```
+
+### Bước 2: Image Optimization
+
+```typescript
+// Optimize images within PDF
+interface ImageOptimizationConfig {
+  maxWidth: number;
+  maxHeight: number;
+  targetDPI: number;
+  compression: 'jpeg' | 'jpeg2000' | 'flate' | 'jpx';
+  quality: number; // 0-100
+  convertCMYK: boolean;
+  removeAlpha: boolean;
+}
+
+class ImageOptimizer {
+  async optimizeImages(
+    pdfBuffer: Buffer,
+    config: ImageOptimizationConfig
+  ): Promise<Buffer> {
+    const doc = await PDFDocument.load(pdfBuffer);
+    const pages = doc.getPages();
+    
+    for (const page of pages) {
+      const pageDict = page.node;
+      const resources = pageDict.get(PDFName.of('Resources'));
+      
+      if (resources && resources.has(PDFName.of('XObject'))) {
+        const xobjects = resources.get(PDFName.of('XObject'));
+        
+        for (const [name, ref] of xobjects.entries()) {
+          const xobject = await page.context.lookup(ref);
+          
+          if (xobject instanceof PDFImage) {
+            const optimized = await this.optimizeImage(xobject, config);
+            await page.node.assign(PDFName.of(name), optimized);
+          }
+        }
+      }
+    }
+    
+    return await doc.save();
+  }
+  
+  private async optimizeImage(
+    image: PDFImage,
+    config: ImageOptimizationConfig
+  ): Promise<PDFImage> {
+    // Get current dimensions
+    const currentWidth = image.getWidth();
+    const currentHeight = image.getHeight();
+    
+    // Calculate target dimensions
+    const { width, height } = this.calculateTargetDimensions(
+      currentWidth, currentHeight, config
+    );
+    
+    // Resize if necessary
+    if (width < currentWidth || height < currentHeight) {
+      image.scale(width / currentWidth, height / currentHeight);
+    }
+    
+    // Compress based on color space
+    const colorSpace = image.getColorSpace();
+    
+    if (colorSpace === 'DeviceCMYK' && config.convertCMYK) {
+      image.convertColorSpace('DeviceRGB');
+    }
+    
+    // Apply compression
+    switch (config.compression) {
+      case 'jpeg':
+        image.setCompressionQuality(config.quality);
+        break;
+      case 'flate':
+        // Lossless compression
+        break;
+      case 'jpeg2000':
+        image.setCompression('DCTDecode');
+        break;
+    }
+    
+    return image;
+  }
+  
+  private calculateTargetDimensions(
+    currentWidth: number,
+    currentHeight: number,
+    config: ImageOptimizationConfig
+  ): { width: number; height: number } {
+    const maxDimension = Math.max(currentWidth, currentHeight);
+    const targetPixels = (config.targetDPI / 72) * Math.max(config.maxWidth, config.maxHeight);
+    
+    if (maxDimension <= targetPixels) {
+      return { width: currentWidth, height: currentHeight };
+    }
+    
+    const scale = targetPixels / maxDimension;
+    return {
+      width: Math.round(currentWidth * scale),
+      height: Math.round(currentHeight * scale)
+    };
+  }
+}
+```
+
+### Bước 3: Font Optimization
+
+```typescript
+// Optimize fonts (subsetting và embedding)
+interface FontOptimizationConfig {
+  subset: boolean;
+  embedAll: boolean;
+  removeUnused: boolean;
+  convertTo: 'opentype' | 'truetype' | 'type1';
+}
+
+class FontOptimizer {
+  async optimizeFonts(
+    pdfBuffer: Buffer,
+    config: FontOptimizationConfig
+  ): Promise<Buffer> {
+    const doc = await PDFDocument.load(pdfBuffer);
+    
+    if (config.subset) {
+      await this.subsetFonts(doc);
+    }
+    
+    if (config.removeUnused) {
+      await this.removeUnusedGlyphs(doc);
+    }
+    
+    return await doc.save();
+  }
+  
+  private async subsetFonts(doc: PDFDocument): Promise<void> {
+    const pages = doc.getPages();
+    const usedGlyphs = new Map<string, Set<number>>();
+    
+    // Collect all used glyphs
+    for (const page of pages) {
+      const operators = await this.extractTextOperators(page);
+      
+      for (const op of operators) {
+        if (op.font) {
+          if (!usedGlyphs.has(op.font)) {
+            usedGlyphs.set(op.font, new Set());
+          }
+          for (const glyph of op.glyphs) {
+            usedGlyphs.get(op.font)!.add(glyph);
+          }
+        }
+      }
+    }
+    
+    // Subset each font
+    for (const [fontName, glyphs] of usedGlyphs) {
+      await this.createFontSubset(doc, fontName, glyphs);
+    }
+  }
+  
+  private async createFontSubset(
+    doc: PDFDocument,
+    fontName: string,
+    glyphs: Set<number>
+  ): Promise<void> {
+    // Get font data
+    const font = await this.getFont(doc, fontName);
+    
+    // Create glyph subset
+    const subsetGlyphs = this.buildGlyphSubset(font, glyphs);
+    
+    // Replace font with subset
+    await this.replaceFont(doc, fontName, subsetGlyphs);
+  }
+}
+```
+
+### Bước 4: Compression Configuration
+
+```typescript
+// Apply compression settings
+interface CompressionConfig {
+  streams: 'flate' | 'lzw' | 'ascii85';
+  images: 'jpeg' | 'jpx' | 'flate' | 'none';
+  imageQuality: number;
+  objectStreams: 'generate' | 'preserve' | 'none';
+  removeMetadata: boolean;
+  removeJavaScript: boolean;
+  removeEmbeddedFiles: boolean;
+  linearize: boolean;
+}
+
+class CompressionEngine {
+  async compress(
+    pdfBuffer: Buffer,
+    config: CompressionConfig
+  ): Promise<CompressionResult> {
+    const originalSize = pdfBuffer.length;
+    let doc = await PDFDocument.load(pdfBuffer);
+    
+    // Remove unwanted content
+    if (config.removeMetadata) {
+      doc.setTitle('');
+      doc.setAuthor('');
+      doc.setSubject('');
+      doc.setKeywords([]);
+      doc.setCreator('');
+      doc.setProducer('');
+    }
+    
+    if (config.removeJavaScript) {
+      await this.removeJavaScript(doc);
+    }
+    
+    if (config.removeEmbeddedFiles) {
+      await this.removeEmbeddedFiles(doc);
+    }
+    
+    // Optimize streams
+    await this.compressStreams(doc, config.streams);
+    
+    // Generate object streams
+    if (config.objectStreams === 'generate') {
+      doc = await this.generateObjectStreams(doc);
+    }
+    
+    // Linearize for web
+    if (config.linearize) {
+      doc = await this.linearizeDocument(doc);
+    }
+    
+    // Save with optimization
+    const optimizedBuffer = await doc.save({
+      useObjectStreams: config.objectStreams === 'generate',
+      addDefaultPage: false,
+      preserveEditability: false
+    });
+    
+    return {
+      originalSize,
+      optimizedSize: optimizedBuffer.length,
+      reduction: (1 - optimizedBuffer.length / originalSize) * 100,
+      buffer: optimizedBuffer
+    };
+  }
+  
+  private async compressStreams(
+    doc: PDFDocument,
+    method: 'flate' | 'lzw' | 'ascii85'
+  ): Promise<void> {
+    const context = doc.context;
+    
+    for (const ref of doc.context.enumerateIndirectObjects()) {
+      const obj = await context.lookup(ref);
+      
+      if (obj instanceof PDFStream) {
+        const dict = obj.dictionary;
+        
+        // Only compress uncompressed streams
+        const filter = dict.get(PDFName.of('Filter'));
+        if (!filter || filter.toString() === 'FlateDecode') {
+          // Already compressed
+          continue;
+        }
+        
+        // Recompress with specified method
+        const content = await obj.contents();
+        let compressed: Uint8Array;
+        
+        switch (method) {
+          case 'flate':
+            compressed = await this.deflateCompress(content);
+            dict.set(PDFName.of('Filter'), PDFName.of('FlateDecode'));
+            break;
+          case 'lzw':
+            compressed = await this.lzwCompress(content);
+            dict.set(PDFName.of('Filter'), PDFName.of('LZWDecode'));
+            break;
+        }
+        
+        obj.contents = compressed;
+      }
+    }
+  }
+}
+```
+
+### Bước 5: Target-Specific Optimization
+
+```typescript
+// Optimize for specific use cases
+enum OptimizationTarget {
+  WEB = 'web',
+  PRINT = 'print',
+  ARCHIVE = 'archive',
+  MOBILE = 'mobile',
+  SCREEN = 'screen',
+  PREPRESS = 'prepress'
+}
+
+class TargetOptimizer {
+  private readonly targetConfigs: Record<OptimizationTarget, CompressionConfig> = {
+    [OptimizationTarget.WEB]: {
+      streams: 'flate',
+      images: 'jpeg',
+      imageQuality: 80,
+      objectStreams: 'generate',
+      removeMetadata: false,
+      removeJavaScript: true,
+      removeEmbeddedFiles: true,
+      linearize: true
+    },
+    [OptimizationTarget.PRINT]: {
+      streams: 'flate',
+      images: 'flate',
+      imageQuality: 100,
+      objectStreams: 'preserve',
+      removeMetadata: false,
+      removeJavaScript: true,
+      removeEmbeddedFiles: false,
+      linearize: false
+    },
+    [OptimizationTarget.ARCHIVE]: {
+      streams: 'flate',
+      images: 'flate',
+      imageQuality: 100,
+      objectStreams: 'preserve',
+      removeMetadata: false,
+      removeJavaScript: true,
+      removeEmbeddedFiles: false,
+      linearize: false
+    },
+    [OptimizationTarget.MOBILE]: {
+      streams: 'flate',
+      images: 'jpeg',
+      imageQuality: 70,
+      objectStreams: 'generate',
+      removeMetadata: true,
+      removeJavaScript: true,
+      removeEmbeddedFiles: true,
+      linearize: true
+    },
+    [OptimizationTarget.SCREEN]: {
+      streams: 'flate',
+      images: 'jpeg',
+      imageQuality: 75,
+      objectStreams: 'generate',
+      removeMetadata: true,
+      removeJavaScript: true,
+      removeEmbeddedFiles: true,
+      linearize: true
+    },
+    [OptimizationTarget.PREPRESS]: {
+      streams: 'flate',
+      images: 'flate',
+      imageQuality: 100,
+      objectStreams: 'preserve',
+      removeMetadata: false,
+      removeJavaScript: true,
+      removeEmbeddedFiles: false,
+      linearize: false
+    }
+  };
+  
+  async optimizeForTarget(
+    pdfBuffer: Buffer,
+    target: OptimizationTarget
+  ): Promise<Buffer> {
+    const config = this.targetConfigs[target];
+    const analyzer = new PDFAnalyzer();
+    const analysis = await analyzer.analyze(pdfBuffer);
+    
+    let result = pdfBuffer;
+    
+    // Apply image optimization
+    if (target !== OptimizationTarget.PRINT && 
+        target !== OptimizationTarget.ARCHIVE &&
+        target !== OptimizationTarget.PREPRESS) {
+      const imageOptimizer = new ImageOptimizer();
+      const imageConfig = this.getImageConfig(target, analysis);
+      result = await imageOptimizer.optimizeImages(result, imageConfig);
+    }
+    
+    // Apply compression
+    const compressor = new CompressionEngine();
+    result = (await compressor.compress(result, config)).buffer;
+    
+    // Validate output
+    await this.validateOutput(result, target);
+    
+    return result;
+  }
+  
+  private getImageConfig(
+    target: OptimizationTarget,
+    analysis: PDFAnalysis
+  ): ImageOptimizationConfig {
+    const baseConfigs: Record<OptimizationTarget, Partial<ImageOptimizationConfig>> = {
+      [OptimizationTarget.WEB]: { targetDPI: 150, quality: 80 },
+      [OptimizationTarget.MOBILE]: { targetDPI: 96, quality: 70 },
+      [OptimizationTarget.SCREEN]: { targetDPI: 72, quality: 75 },
+      [OptimizationTarget.PRINT]: { targetDPI: 300, quality: 100 },
+      [OptimizationTarget.ARCHIVE]: { targetDPI: 300, quality: 100 },
+      [OptimizationTarget.PREPRESS]: { targetDPI: 300, quality: 100 }
+    };
+    
+    return {
+      maxWidth: 2000,
+      maxHeight: 2000,
+      compression: 'jpeg',
+      convertCMYK: false,
+      removeAlpha: true,
+      ...baseConfigs[target]
+    };
+  }
+}
+```
+
+### Bước 6: Quality Validation
+
+```typescript
+// Validate optimized PDF quality
+interface QualityValidation {
+  isValid: boolean;
+  visualDiff: number; // 0-100 percentage difference
+  textPreserved: boolean;
+  imagesPreserved: boolean;
+  linksWorking: boolean;
+  issues: ValidationIssue[];
+}
+
+class QualityValidator {
+  async validate(
+    original: Buffer,
+    optimized: Buffer,
+    target: OptimizationTarget
+  ): Promise<QualityValidation> {
+    const issues: ValidationIssue[] = [];
+    
+    // Visual comparison
+    const visualDiff = await this.compareVisually(original, optimized);
+    if (visualDiff > 5) { // More than 5% visual difference
+      issues.push({
+        type: 'visual_degradation',
+        severity: 'warning',
+        message: `Visual difference: ${visualDiff}%`
+      });
+    }
+    
+    // Text extraction comparison
+    const textPreserved = await this.compareText(original, optimized);
+    if (!textPreserved) {
+      issues.push({
+        type: 'text_corruption',
+        severity: 'error',
+        message: 'Text content changed after optimization'
+      });
+    }
+    
+    // Image count comparison
+    const imagesPreserved = await this.compareImages(original, optimized);
+    if (!imagesPreserved) {
+      issues.push({
+        type: 'image_loss',
+        severity: 'error',
+        message: 'Some images were removed or corrupted'
+      });
+    }
+    
+    // Link validation
+    const linksWorking = await this.validateLinks(optimized);
+    if (!linksWorking) {
+      issues.push({
+        type: 'broken_links',
+        severity: 'warning',
+        message: 'Some internal links may be broken'
+      });
+    }
+    
+    return {
+      isValid: issues.filter(i => i.severity === 'error').length === 0,
+      visualDiff,
+      textPreserved,
+      imagesPreserved,
+      linksWorking,
+      issues
+    };
+  }
+}
+```
+
+## Checklist (Danh sách kiểm tra)
+
+- [ ] PDF analyzed for characteristics và issues
+- [ ] Images downsampled appropriately for target
+- [ ] Fonts subset to used glyphs only
+- [ ] Streams compressed with appropriate method
+- [ ] Object streams generated or preserved as needed
+- [ ] Linearization applied for web output
+- [ ] Metadata handled according to target
+- [ ] JavaScript and embedded files removed for security
+- [ ] Color spaces converted if needed
+- [ ] Quality validation passed
+- [ ] File size reduction meets targets
+- [ ] Output format matches requirements
+- [ ] Batch processing handles large volumes
+- [ ] CI/CD integration working
+- [ ] Monitoring captures optimization metrics
+
+## Examples (Ví dụ)
+
+### Ví dụ 1: Web Optimization Pipeline
+
+```typescript
+// Optimize PDFs for web delivery
+async function optimizeForWeb(inputPath: string, outputPath: string) {
+  const pdfBuffer = await fs.readFile(inputPath);
+  
+  // Analyze first
+  const analyzer = new PDFAnalyzer();
+  const analysis = await analyzer.analyze(pdfBuffer);
+  
+  console.log(`Original size: ${(analysis.fileSize / 1024).toFixed(2)} KB`);
+  console.log(`Pages: ${analysis.pageCount}`);
+  console.log(`Images: ${analysis.imageCount}`);
+  console.log(`Fonts: ${analysis.fontCount}`);
+  console.log(`Issues: ${analysis.issues.length}`);
+  
+  // Optimize
+  const optimizer = new TargetOptimizer();
+  const optimized = await optimizer.optimizeForTarget(
+    pdfBuffer,
+    OptimizationTarget.WEB
+  );
+  
+  // Validate
+  const validator = new QualityValidator();
+  const validation = await validator.validate(
+    pdfBuffer,
+    optimized,
+    OptimizationTarget.WEB
+  );
+  
+  if (!validation.isValid) {
+    throw new OptimizationError('Quality validation failed', validation.issues);
+  }
+  
+  // Save
+  await fs.writeFile(outputPath, optimized);
+  
+  const reduction = (1 - optimized.length / pdfBuffer.length) * 100;
+  console.log(`Optimized size: ${(optimized.length / 1024).toFixed(2)} KB`);
+  console.log(`Reduction: ${reduction.toFixed(1)}%`);
+}
+```
+
+### Ví dụ 2: Batch Processing
+
+```typescript
+// Batch optimize multiple PDFs
+async function batchOptimize(
+  inputDir: string,
+  outputDir: string,
+  target: OptimizationTarget
+) {
+  const files = await glob('**/*.pdf', { cwd: inputDir });
+  
+  const optimizer = new TargetOptimizer();
+  const validator = new QualityValidator();
+  
+  const results: BatchResult[] = [];
+  
+  for (const file of files) {
+    try {
+      const inputBuffer = await fs.readFile(path.join(inputDir, file));
+      
+      const startTime = Date.now();
+      const optimized = await optimizer.optimizeForTarget(inputBuffer, target);
+      const duration = Date.now() - startTime;
+      
+      const validation = await validator.validate(inputBuffer, optimized, target);
+      
+      const outputPath = path.join(outputDir, file);
+      await fs.mkdir(path.dirname(outputPath), { recursive: true });
+      await fs.writeFile(outputPath, optimized);
+      
+      results.push({
+        file,
+        originalSize: inputBuffer.length,
+        optimizedSize: optimized.length,
+        reduction: (1 - optimized.length / inputBuffer.length) * 100,
+        duration,
+        valid: validation.isValid
+      });
+      
+      console.log(`✓ ${file}: ${results[results.length - 1].reduction.toFixed(1)}% smaller`);
+      
+    } catch (error) {
+      results.push({
+        file,
+        error: error.message
+      });
+      console.log(`✗ ${file}: ${error.message}`);
+    }
+  }
+  
+  // Summary
+  const successful = results.filter(r => !r.error);
+  const avgReduction = successful.reduce((sum, r) => sum + r.reduction, 0) / successful.length;
+  
+  console.log('\n--- Batch Summary ---');
+  console.log(`Total files: ${results.length}`);
+  console.log(`Successful: ${successful.length}`);
+  console.log(`Failed: ${results.length - successful.length}`);
+  console.log(`Average reduction: ${avgReduction.toFixed(1)}%`);
+  
+  return results;
+}
+```
+
+### Ví dụ 3: Archive Preparation
+
+```typescript
+// Prepare PDFs for long-term archive
+async function prepareForArchive(inputPath: string): Promise<Buffer> {
+  const pdfBuffer = await fs.readFile(inputPath);
+  
+  // Use archive-specific settings
+  const archiveConfig: CompressionConfig = {
+    streams: 'flate',
+    images: 'flate',
+    imageQuality: 100,
+    objectStreams: 'preserve',
+    removeMetadata: false,
+    removeJavaScript: true,
+    removeEmbeddedFiles: false,
+    linearize: false
+  };
+  
+  const imageConfig: ImageOptimizationConfig = {
+    maxWidth: 5000,
+    maxHeight: 5000,
+    targetDPI: 300,
+    compression: 'flate',
+    quality: 100,
+    convertCMYK: false,
+    removeAlpha: false
+  };
+  
+  // Optimize images (lossless)
+  const imageOptimizer = new ImageOptimizer();
+  let optimized = await imageOptimizer.optimizeImages(pdfBuffer, imageConfig);
+  
+  // Apply compression (lossless)
+  const compressor = new CompressionEngine();
+  optimized = (await compressor.compress(optimized, archiveConfig)).buffer;
+  
+  // Validate for archive
+  const validator = new QualityValidator();
+  const validation = await validator.validate(
+    pdfBuffer,
+    optimized,
+    OptimizationTarget.ARCHIVE
+  );
+  
+  if (!validation.isValid) {
+    throw new ArchivePreparationError('Validation failed', validation.issues);
+  }
+  
+  // Ensure PDF/A compliance
+  const pdfaCompliance = await checkPDFACompliance(optimized);
+  if (!pdfaCompliance.isCompliant) {
+    throw new ArchivePreparationError(
+      'PDF/A compliance required for archive',
+      pdfaCompliance.issues
+    );
+  }
+  
+  return optimized;
+}
+```
+
+## Anti Patterns (Các pattern cần tránh)
+
+### 1. Aggressive Compression
+```typescript
+// ❌ BAD: Over-compress everything
+const config = {
+  imageQuality: 10, // Too low
+  compression: 'jpeg'
+};
+const result = await compressor.compress(pdf, config); // Poor quality
+
+// ✅ GOOD: Target-appropriate compression
+const config = {
+  imageQuality: 80, // Balanced
+  compression: 'jpeg'
+};
+```
+
+### 2. Ignoring Color Profiles
+```typescript
+// ❌ BAD: Blindly convert CMYK to RGB
+image.convertColorSpace('DeviceRGB'); // May lose color accuracy
+
+// ✅ GOOD: Preserve or properly convert color
+if (config.preserveCMYK) {
+  // Keep CMYK for print
+} else {
+  // Convert with ICC profile
+  image.convertWithICC(iccProfile);
+}
+```
+
+### 3. Removing All Metadata
+```typescript
+// ❌ BAD: Strip all metadata
+doc.setTitle('');
+doc.setAuthor('');
+
+// ✅ GOOD: Keep relevant metadata
+doc.setTitle(documentTitle); // Keep title
+doc.setAuthor(author); // Keep author
+doc.removeXMPMetadata(); // But remove XMP
+```
+
+### 4. No Quality Validation
+```typescript
+// ❌ BAD: Trust optimization blindly
+const optimized = await optimizer.optimize(input);
+
+// ✅ GOOD: Always validate
+const optimized = await optimizer.optimize(input);
+const validation = await validator.validate(input, optimized);
+if (!validation.isValid) {
+  throw new Error('Optimization compromised quality');
+}
+```
+
+### 5. Batch Processing Without Monitoring
+```typescript
+// ❌ BAD: Batch without progress tracking
+for (const file of files) {
+  await processFile(file);
+}
+
+// ✅ GOOD: Monitor and report
+const progress = new ProgressBar(files.length);
+for (const file of files) {
+  const result = await processFile(file);
+  progress.update(result);
+  metrics.record(result);
+}
+```
+
+## Best Practices (Thực hành tốt nhất)
+
+1. **Analyze before optimizing**: Know what you're optimizing
+2. **Match target use case**: Web vs Print vs Archive have different requirements
+3. **Preserve quality where it matters**: Print and archive need higher quality
+4. **Validate after optimization**: Ensure quality wasn't compromised
+5. **Monitor file sizes**: Track reduction rates across batches
+6. **Use appropriate compression**: JPEG for photos, lossless for graphics
+7. **Subset fonts**: Remove unused glyphs to reduce size
+8. **Linearize for web**: Enable fast web viewing
+9. **Automate in CI/CD**: Integrate optimization into build pipelines
+10. **Document optimization settings**: Track what works for each use case
+
+## Liên kết (Cross-references)
+
+- **Related Skills**: [pdf-generator](./pdf-generator.mdc), [document-processing](./document-processing.mdc)
+- **Libraries**: pdf-lib, pdfcpu, Ghostscript, pdftk
+- **Standards**: PDF/A, PDF/UA, PDF/X
+- **Tools**: Adobe Acrobat, PDF Optimizer, Ghostscript

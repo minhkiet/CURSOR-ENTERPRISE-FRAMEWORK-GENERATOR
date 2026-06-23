@@ -1,0 +1,530 @@
+---
+description: Skill biên dịch và tổng hợp kiến thức từ nhiều nguồn thành unified knowledge base có cấu trúc
+purpose: Chuẩn hóa và biên dịch kiến thức từ documentation, codebase, rules, và best practices thành knowledge graph có thể truy vấn hiệu quả
+input:
+  - Raw documentation files (markdown, MDC, txt)
+  - Codebase source files
+  - Existing rules và conventions
+  - API specifications
+  - Architecture decision records
+  - Test cases và specifications
+  - Legacy documentation
+  - Technical debt notes
+output:
+  - Structured knowledge base (JSON/YAML)
+  - Entity definitions (functions, classes, modules)
+  - Relationship maps (dependencies, usages)
+  - Semantic embeddings
+  - Indexed knowledge graph
+  - Cross-reference index
+  - Version metadata
+  - Provenance tracking
+version: 1.0.0
+tags:
+  - knowledge-management
+  - documentation
+  - knowledge-graph
+  - embeddings
+---
+
+# Knowledge Compiler
+
+## Tổng quan
+
+Knowledge Compiler là skill chuyên biệt để biên dịch, tổng hợp và chuẩn hóa kiến thức từ nhiều nguồn không đồng nhất thành một unified knowledge base có cấu trúc rõ ràng, có thể truy vấn và tái sử dụng. Skill này xử lý documentation phân tán, codebase metrics, và technical knowledge thành knowledge graph có semantic relationships.
+
+## Purpose (Mục đích)
+
+Trong môi trường Cursor Enterprise Framework, kiến thức tồn tại ở nhiều dạng: markdown files, code comments, rules, conventions, API specs, và ADRs. Knowledge Compiler tồn tại để:
+
+1. **Unify fragmented knowledge**: Gom nhặt kiến thức rời rạc từ nhiều nguồn
+2. **Normalize structure**: Chuẩn hóa format và structure cho consistency
+3. **Build relationships**: Tạo semantic relationships giữa entities
+4. **Enable retrieval**: Biên dịch thành format có thể truy vấn nhanh
+5. **Maintain provenance**: Track nguồn gốc và version của knowledge
+
+## Input (Đầu vào)
+
+| Input | Mô tả | Required |
+|-------|-------|----------|
+| `source_files` | Array các file nguồn (md, mdc, ts, js, py) | Yes |
+| `knowledge_domains` | Danh sách domains cần biên dịch | Yes |
+| `output_format` | Format đầu ra (json, yaml, ttl, neo4j) | Yes |
+| `normalization_rules` | Rules để normalize content | No |
+| `embedding_config` | Configuration cho embedding generation | No |
+| `exclusion_patterns` | Patterns cần loại trừ | No |
+
+## Output (Đầu ra)
+
+| Output | Mô tả | Format |
+|--------|-------|--------|
+| `entities` | Danh sách entities đã extracted | Array |
+| `relationships` | Semantic relationships giữa entities | Array |
+| `knowledge_graph` | Graph representation hoàn chỉnh | Graph |
+| `embeddings` | Vector embeddings cho semantic search | Vectors |
+| `metadata` | Provenance, version, timestamps | Object |
+| `indexes` | Optimized indexes cho retrieval | Object |
+| `cross_references` | Bi-directional references | Map |
+
+## Workflow (Quy trình)
+
+### Bước 1: Source Discovery và Collection
+
+```typescript
+// Khám phá và thu thập tất cả source files
+async function collectSources(config: CompilerConfig): Promise<SourceFile[]> {
+  const sources: SourceFile[] = [];
+  
+  for (const pattern of config.source_patterns) {
+    const files = await glob(pattern, { 
+      cwd: config.root_path,
+      ignore: config.exclusion_patterns 
+    });
+    
+    for (const file of files) {
+      const content = await readFile(file);
+      const metadata = await extractMetadata(file, content);
+      
+      sources.push({
+        path: file,
+        content,
+        type: detectType(file),
+        metadata,
+        hash: await hashContent(content)
+      });
+    }
+  }
+  
+  return deduplicate(sources);
+}
+```
+
+### Bước 2: Content Normalization
+
+```typescript
+// Chuẩn hóa content từ các format khác nhau
+function normalizeContent(source: SourceFile): NormalizedContent {
+  const parser = getParser(source.type);
+  const parsed = parser.parse(source.content);
+  
+  return {
+    id: generateId(source.path),
+    title: extractTitle(parsed),
+    sections: normalizeSections(parsed),
+    code_blocks: extractCodeBlocks(parsed),
+    definitions: extractDefinitions(parsed),
+    references: extractReferences(parsed),
+    raw_text: stripMarkup(source.content)
+  };
+}
+```
+
+### Bước 3: Entity Extraction
+
+```typescript
+// Trích xuất entities từ normalized content
+interface ExtractedEntity {
+  id: string;
+  type: EntityType; // function, class, module, concept, rule
+  name: string;
+  definition: string;
+  location: SourceLocation;
+  relationships: Relationship[];
+  metadata: Record<string, any>;
+}
+
+function extractEntities(content: NormalizedContent): ExtractedEntity[] {
+  const entities: ExtractedEntity[] = [];
+  
+  // Extract code entities
+  for (const block of content.code_blocks) {
+    entities.push(...extractCodeEntities(block));
+  }
+  
+  // Extract concept entities
+  for (const section of content.sections) {
+    entities.push(...extractConceptEntities(section));
+  }
+  
+  // Extract definition entities
+  for (const def of content.definitions) {
+    entities.push(createDefinitionEntity(def));
+  }
+  
+  return deduplicateEntities(entities);
+}
+```
+
+### Bước 4: Relationship Mapping
+
+```typescript
+// Tạo semantic relationships giữa entities
+function mapRelationships(entities: ExtractedEntity[]): Relationship[] {
+  const relationships: Relationship[] = [];
+  const entityIndex = buildEntityIndex(entities);
+  
+  for (const entity of entities) {
+    for (const ref of entity.references) {
+      const target = entityIndex.get(ref);
+      if (target) {
+        relationships.push({
+          source: entity.id,
+          target: target.id,
+          type: inferRelationshipType(entity, target),
+          confidence: calculateConfidence(entity, target)
+        });
+      }
+    }
+  }
+  
+  return transitiveClosure(relationships);
+}
+```
+
+### Bước 5: Embedding Generation
+
+```typescript
+// Generate embeddings cho semantic search
+async function generateEmbeddings(
+  entities: ExtractedEntity[],
+  config: EmbeddingConfig
+): Promise<EntityEmbedding[]> {
+  const embeddings: EntityEmbedding[] = [];
+  
+  for (const entity of entities) {
+    const text = buildSearchableText(entity);
+    const vector = await embeddingService.encode(text, {
+      model: config.model,
+      dimensions: config.dimensions
+    });
+    
+    embeddings.push({
+      entity_id: entity.id,
+      vector,
+      text,
+      created_at: new Date()
+    });
+  }
+  
+  return embeddings;
+}
+```
+
+### Bước 6: Graph Construction
+
+```typescript
+// Xây dựng knowledge graph hoàn chỉnh
+interface KnowledgeGraph {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+  metadata: GraphMetadata;
+}
+
+function buildKnowledgeGraph(
+  entities: ExtractedEntity[],
+  relationships: Relationship[],
+  config: CompilerConfig
+): KnowledgeGraph {
+  return {
+    nodes: entities.map(e => ({
+      id: e.id,
+      label: e.name,
+      type: e.type,
+      properties: e.metadata
+    })),
+    edges: relationships.map(r => ({
+      source: r.source,
+      target: r.target,
+      label: r.type,
+      weight: r.confidence
+    })),
+    metadata: {
+      generated_at: new Date(),
+      entity_count: entities.length,
+      relationship_count: relationships.length,
+      version: config.version
+    }
+  };
+}
+```
+
+### Bước 7: Indexing và Storage
+
+```typescript
+// Tạo indexes và lưu trữ
+async function persistKnowledgeBase(
+  graph: KnowledgeGraph,
+  embeddings: EntityEmbedding[],
+  config: CompilerConfig
+): Promise<KnowledgeBase> {
+  const storage = getStorageBackend(config.output_format);
+  
+  // Store graph
+  await storage.write('graph.json', graph);
+  
+  // Store embeddings
+  await vectorStore.upsert(embeddings);
+  
+  // Store indexes
+  const indexes = {
+    by_type: indexByType(graph.nodes),
+    by_name: indexByName(graph.nodes),
+    by_relationship: indexByRelationship(graph.edges)
+  };
+  await storage.write('indexes.json', indexes);
+  
+  // Store metadata
+  await storage.write('metadata.json', graph.metadata);
+  
+  return { graph, embeddings, indexes, metadata: graph.metadata };
+}
+```
+
+## Checklist (Danh sách kiểm tra)
+
+- [ ] Source discovery cover tất cả relevant directories
+- [ ] Exclusion patterns loại trừ được generated files, node_modules
+- [ ] Content normalization handle được multi-language content
+- [ ] Entity extraction nhận diện được all entity types
+- [ ] Relationship mapping có transitive closure
+- [ ] Embedding generation sử dụng model phù hợp với domain
+- [ ] Graph construction maintain referential integrity
+- [ ] Indexing hỗ trợ O(1) lookup by common patterns
+- [ ] Version tracking lưu trữ được provenance
+- [ ] Incremental compilation chỉ rebuild changed parts
+- [ ] Error handling graceful khi encountering malformed content
+- [ ] Performance optimization cho large knowledge bases
+- [ ] Metadata extraction capture được authorship và dates
+- [ ] Cross-reference resolution bidirectional và complete
+- [ ] Quality validation đảm bảo consistency
+
+## Examples (Ví dụ)
+
+### Ví dụ 1: Compiling API Documentation
+
+```typescript
+// Compile API documentation thành knowledge base
+const config: CompilerConfig = {
+  source_patterns: [
+    '**/api/**/*.md',
+    '**/endpoints/*.yaml',
+    '**/schemas/*.json'
+  ],
+  knowledge_domains: ['api', 'schemas', 'authentication'],
+  output_format: 'json',
+  embedding_config: {
+    model: 'text-embedding-3-small',
+    dimensions: 1536
+  }
+};
+
+const knowledgeBase = await compileKnowledge(config);
+
+// Result structure
+{
+  "entities": [
+    {
+      "id": "api:users:create",
+      "type": "endpoint",
+      "name": "CreateUser",
+      "method": "POST",
+      "path": "/api/v1/users",
+      "request_schema": "CreateUserRequest",
+      "response_schema": "UserResponse"
+    }
+  ],
+  "relationships": [
+    {
+      "source": "api:users:create",
+      "target": "schema:CreateUserRequest",
+      "type": "validates_with",
+      "confidence": 1.0
+    }
+  ],
+  "metadata": {
+    "entity_count": 45,
+    "relationship_count": 120,
+    "generated_at": "2026-06-23T14:00:00Z"
+  }
+}
+```
+
+### Ví dụ 2: Compiling Codebase Patterns
+
+```typescript
+// Extract và compile coding patterns
+async function compileCodePatterns(rootPath: string) {
+  const compiler = new KnowledgeCompiler({
+    root_path: rootPath,
+    source_patterns: [
+      'src/**/*.ts',
+      'src/**/*.tsx',
+      '*.md'
+    ],
+    extraction_rules: {
+      patterns: [
+        { type: 'naming_convention', regex: /^[a-z][a-z0-9]*$/ },
+        { type: 'component_pattern', extraction: extractReactPatterns },
+        { type: 'hook_pattern', extraction: extractHookPatterns }
+      ]
+    }
+  });
+  
+  const kb = await compiler.compile();
+  
+  // Query patterns
+  const reactPatterns = kb.query({ type: 'component_pattern' });
+  const namingRules = kb.query({ type: 'naming_convention' });
+  
+  return { kb, reactPatterns, namingRules };
+}
+```
+
+### Ví dụ 3: Incremental Compilation
+
+```typescript
+// Incremental compile chỉ changed files
+class IncrementalCompiler extends KnowledgeCompiler {
+  async compileIncremental(changes: FileChange[]): Promise<Diff> {
+    const affectedEntities = new Set<string>();
+    
+    for (const change of changes) {
+      const source = await this.readSource(change.path);
+      const normalized = this.normalizeContent(source);
+      const entities = this.extractEntities(normalized);
+      
+      // Remove old entities
+      const oldEntities = await this.getEntitiesAtPath(change.path);
+      await this.removeEntities(oldEntities);
+      
+      // Add new entities
+      await this.addEntities(entities);
+      
+      // Update relationships
+      await this.updateRelationships(entities);
+      
+      entities.forEach(e => affectedEntities.add(e.id));
+    }
+    
+    // Regenerate affected embeddings
+    await this.regenerateEmbeddings([...affectedEntities]);
+    
+    return { affectedEntities, timestamp: new Date() };
+  }
+}
+```
+
+## Anti Patterns (Các pattern cần tránh)
+
+### 1. Monolithic Compilation
+```typescript
+// ❌ BAD: Compile toàn bộ một lần, không incremental
+async function badCompile(path: string) {
+  const allFiles = await getAllFiles(path);
+  const allContent = await Promise.all(allFiles.map(readFile));
+  return parse(allContent.join('\n'));
+}
+
+// ✅ GOOD: Incremental compilation với change detection
+async function goodCompile(path: string) {
+  const changes = await detectChanges(path);
+  return incrementalCompile(changes);
+}
+```
+
+### 2. Ignoring Provenance
+```typescript
+// ❌ BAD: Không track nguồn gốc
+function badExtract(doc: string) {
+  return { content: doc, id: generateId() };
+}
+
+// ✅ GOOD: Full provenance tracking
+function goodExtract(doc: Document) {
+  return {
+    content: doc.content,
+    id: generateId(),
+    source: doc.path,
+    author: doc.metadata.author,
+    version: doc.metadata.version,
+    lineage: doc.metadata.derived_from
+  };
+}
+```
+
+### 3. Shallow Relationships
+```typescript
+// ❌ BAD: Chỉ direct relationships, no transitive
+function badMap(entities: Entity[]) {
+  return entities.flatMap(e => 
+    e.references.map(r => ({ source: e.id, target: r }))
+  );
+}
+
+// ✅ GOOD: Full transitive closure
+function goodMap(entities: Entity[]) {
+  const direct = extractDirectRelationships(entities);
+  return transitiveClosure(direct);
+}
+```
+
+### 4. Static Embeddings
+```typescript
+// ❌ BAD: Embeddings không update khi content thay đổi
+function badEmbed(entities: Entity[]) {
+  return entities.map(e => ({
+    entity_id: e.id,
+    vector: staticEmbed(e.text)
+  }));
+}
+
+// ✅ GOOD: Dynamic embedding với versioning
+function goodEmbed(entities: Entity[]) {
+  return entities.map(e => ({
+    entity_id: e.id,
+    vector: currentEmbed(e.text),
+    version: hash(e.text),
+    embedding_model: CURRENT_MODEL
+  }));
+}
+```
+
+### 5. Flat Structure
+```typescript
+// ❌ BAD: Flat list, no hierarchy
+function badStore(entities: Entity[]) {
+  return { entities: entities.flat() };
+}
+
+// ✅ GOOD: Hierarchical structure với indexes
+function goodStore(entities: Entity[]) {
+  return {
+    entities: nestByType(entities),
+    indexes: {
+      by_type: indexBy(entities, 'type'),
+      by_domain: indexBy(entities, 'domain'),
+      by_dependency: buildDependencyIndex(entities)
+    }
+  };
+}
+```
+
+## Best Practices (Thực hành tốt nhất)
+
+1. **Always use incremental compilation**: Chỉ rebuild phần thay đổi, không rebuild toàn bộ
+2. **Maintain bidirectional references**: Cập nhật cả source và target references
+3. **Version everything**: Track versions cho cả content và relationships
+4. **Validate after extraction**: Đảm bảo extracted entities có integrity
+5. **Use canonical IDs**: Consistent ID scheme across all entities
+6. **Separate concerns**: Tách biệt extraction, normalization, và storage
+7. **Cache intermediate results**: Tránh recomputation không cần thiết
+8. **Monitor quality metrics**: Track precision, recall của extraction
+9. **Support rollback**: Có mechanism để revert bad compilations
+10. **Document provenance**: Rõ ràng về nguồn gốc và transformation chain
+
+## Liên kết (Cross-references)
+
+- **Related Skills**: [embedding-builder](./embedding-builder.mdc), [rag-builder](./rag-builder.mdc), [memory-manager](./memory-manager.mdc)
+- **Related Rules**: [token-optimization](./token-optimization.mdc), [core-architecture](./core-architecture.mdc)
+- **Tools**: Vector database (Pinecone, Weaviate, Chroma), Graph database (Neo4j)
+- **Input Skills**: Document parsing, Code analysis, API specification parsing

@@ -1,0 +1,935 @@
+---
+description: Skill tối ưu hóa PostgreSQL databases cho performance, bao gồm query optimization, indexing strategies, và configuration tuning
+purpose: Cung cấp comprehensive PostgreSQL optimization toolkit để improve database performance, reduce latency, và optimize resource usage
+input:
+  - Database connection
+  - Query logs
+  - Schema information
+  - Performance metrics
+  - Slow query data
+output:
+  - Query optimization results
+  - Index recommendations
+  - Configuration changes
+  - Migration scripts
+  - Performance benchmarks
+version: 1.0.0
+tags:
+  - postgresql
+  - database
+  - optimization
+  - performance
+  - indexing
+---
+
+# PostgreSQL Optimization
+
+## Tổng quan
+
+PostgreSQL Optimization là skill chuyên biệt để optimize PostgreSQL databases cho production workloads. Skill này cung cấp systematic approach để analyze queries, design indexes, tune configuration, và monitor performance. Được thiết kế cho high-traffic applications với requirements cho low latency và high throughput.
+
+## Purpose (Mục đích)
+
+PostgreSQL performance issues có thể impact entire application:
+
+1. **Slow queries**: User-facing latency và poor UX
+2. **Missing indexes**: Full table scans gây system-wide slowdown
+3. **Poor configuration**: Default settings không optimal cho workload
+4. **Lock contention**: Concurrent operations block each other
+5. **Resource exhaustion**: Memory/CPU limits reached
+
+PostgreSQL Optimization tồn tại để:
+
+- **Identify bottlenecks** through systematic analysis
+- **Design optimal indexes** cho query patterns
+- **Tune configuration** cho specific workloads
+- **Optimize queries** với rewrite và hints
+- **Monitor improvements** với benchmarks
+
+## Input (Đầu vào)
+
+| Input | Mô tả | Required |
+|-------|-------|----------|
+| `connection` | Database connection | Yes |
+| `slow_queries` | Slow query log | Yes |
+| `schema` | Schema information | Yes |
+| `pg_stat_statements` | Query statistics | No |
+| `workload_profile` | Workload characteristics | No |
+
+## Output (Đầu ra)
+
+| Output | Mô tả | Format |
+|--------|-------|--------|
+| `query_optimizations` | Rewritten queries | Array |
+| `index_recommendations` | New indexes to create | Array |
+| `config_changes` | PostgreSQL config changes | Object |
+| `migration_scripts` | DDL for changes | Scripts |
+| `benchmark_results` | Before/after metrics | Results |
+
+## Workflow (Quy trình)
+
+### Bước 1: Database Analysis
+
+```typescript
+// Analyze current database state
+interface DatabaseAnalysis {
+  version: string;
+  configuration: ConfigAnalysis;
+  schemas: SchemaInfo[];
+  tables: TableStats[];
+  indexes: IndexStats[];
+  extensions: ExtensionInfo[];
+  replication: ReplicationInfo;
+}
+
+async function analyzeDatabase(db: DB): Promise<DatabaseAnalysis> {
+  const [
+    version,
+    config,
+    schemas,
+    tables,
+    indexes,
+    extensions,
+    replication
+  ] = await Promise.all([
+    getPostgresVersion(db),
+    analyzeConfiguration(db),
+    getSchemaInfo(db),
+    getTableStatistics(db),
+    getIndexStatistics(db),
+    getExtensions(db),
+    getReplicationStatus(db)
+  ]);
+  
+  return {
+    version,
+    configuration: config,
+    schemas,
+    tables,
+    indexes,
+    extensions,
+    replication
+  };
+}
+
+async function getTableStatistics(db: DB): Promise<TableStats[]> {
+  const query = `
+    SELECT 
+      schemaname,
+      relname as table_name,
+      n_live_tup as row_count,
+      n_dead_tup as dead_tuples,
+      last_vacuum,
+      last_autovacuum,
+      last_analyze,
+      last_autoanalyze,
+      vacuum_count,
+      autovacuum_count,
+      pg_size_pretty(pg_total_relation_size(relid)) as total_size,
+      pg_size_pretty(pg_relation_size(relid)) as table_size,
+      pg_size_pretty(pg_indexes_size(relid)) as index_size
+    FROM pg_stat_user_tables
+    ORDER BY pg_total_relation_size(relid) DESC;
+  `;
+  
+  const result = await db.query(query);
+  
+  return result.rows.map(row => ({
+    schema: row.schemaname,
+    table: row.table_name,
+    rowCount: parseInt(row.row_count),
+    deadTuples: parseInt(row.dead_tuples),
+    lastVacuum: row.last_vacuum,
+    lastAutovacuum: row.last_autovacuum,
+    vacuumCount: parseInt(row.vacuum_count),
+    autovacuumCount: parseInt(row.autovacuum_count),
+    totalSize: row.total_size,
+    tableSize: row.table_size,
+    indexSize: row.index_size,
+    bloatEstimate: estimateBloat(row)
+  }));
+}
+```
+
+### Bước 2: Query Analysis
+
+```typescript
+// Analyze slow queries
+interface QueryAnalysis {
+  query: string;
+  normalizedQuery: string;
+  executionStats: ExecutionStats;
+  planAnalysis: PlanAnalysis;
+  issues: QueryIssue[];
+  recommendations: QueryRecommendation[];
+}
+
+class QueryAnalyzer {
+  async analyzeSlowQueries(
+    db: DB,
+    minDuration: number = 100
+  ): Promise<QueryAnalysis[]> {
+    const slowQueries = await this.getSlowQueries(db, minDuration);
+    const analyses: QueryAnalysis[] = [];
+    
+    for (const query of slowQueries) {
+      const analysis = await this.analyzeQuery(db, query);
+      analyses.push(analysis);
+    }
+    
+    return analyses.sort((a, b) => 
+      b.executionStats.totalTime - a.executionStats.totalTime
+    );
+  }
+  
+  async analyzeQuery(db: DB, query: SlowQuery): Promise<QueryAnalysis> {
+    // Get execution plan
+    const plan = await this.explainQuery(db, query.query);
+    
+    // Analyze plan
+    const planAnalysis = this.analyzePlan(plan);
+    
+    // Identify issues
+    const issues = this.identifyIssues(planAnalysis, query);
+    
+    // Generate recommendations
+    const recommendations = this.generateRecommendations(issues);
+    
+    return {
+      query: query.query,
+      normalizedQuery: this.normalizeQuery(query.query),
+      executionStats: {
+        calls: query.calls,
+        totalTime: query.total_time,
+        avgTime: query.mean_time,
+        minTime: query.min_time,
+        maxTime: query.max_time,
+        stdDevTime: query.stddev_time
+      },
+      planAnalysis,
+      issues,
+      recommendations
+    };
+  }
+  
+  private async explainQuery(db: DB, query: string): Promise<ExplainPlan> {
+    const result = await db.query(`EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) ${query}`);
+    return result.rows[0].query_plan;
+  }
+  
+  private analyzePlan(plan: ExplainPlan): PlanAnalysis {
+    const nodes: PlanNode[] = [];
+    let totalCost = 0;
+    let estimatedRows = 0;
+    
+    this.traversePlan(plan, (node) => {
+      totalCost += node.total_cost;
+      estimatedRows = Math.max(estimatedRows, node.plan_rows);
+      
+      nodes.push({
+        nodeType: node.node_type,
+        operation: node.operation,
+        estimatedCost: node.total_cost,
+        actualCost: node.actual_total_time,
+        estimatedRows: node.plan_rows,
+        actualRows: node.actual_rows,
+        buffersHit: node.buffers?.hit || 0,
+        buffersRead: node.buffers?.read || 0,
+        sharedHitBlocks: node.shared_hit_blocks || 0,
+        sharedReadBlocks: node.shared_read_blocks || 0,
+        executionTime: node.actual_execution_time || 0,
+        workers: node.workers_planned || 0,
+        workersLaunched: node.workers_launched || 0
+      });
+    });
+    
+    return {
+      nodes,
+      totalEstimatedCost: totalCost,
+      estimatedRows,
+      planningTime: plan.ExecutionTime ? plan.PlanningTime : undefined,
+      executionTime: plan.ExecutionTime
+    };
+  }
+  
+  private traversePlan(plan: ExplainPlan, callback: (node: any) => void): void {
+    const node = plan.Plan || plan;
+    callback(node);
+    
+    if (node.Plans) {
+      for (const child of node.Plans) {
+        this.traversePlan(child, callback);
+      }
+    }
+  }
+  
+  private identifyIssues(
+    plan: PlanAnalysis,
+    query: SlowQuery
+  ): QueryIssue[] {
+    const issues: QueryIssue[] = [];
+    
+    for (const node of plan.nodes) {
+      // Check for sequential scans
+      if (node.nodeType === 'Seq Scan') {
+        issues.push({
+          type: 'sequential_scan',
+          severity: node.actualRows > 1000 ? 'high' : 'medium',
+          node: node.nodeType,
+          table: node.operation,
+          estimatedRows: node.estimatedRows,
+          actualRows: node.actualRows,
+          suggestion: 'Consider creating an index for this table'
+        });
+      }
+      
+      // Check for high cost nodes
+      if (node.estimatedCost > 10000) {
+        issues.push({
+          type: 'high_cost_node',
+          severity: 'high',
+          node: node.nodeType,
+          cost: node.estimatedCost,
+          suggestion: 'This operation has high estimated cost'
+        });
+      }
+      
+      // Check for large actual vs estimated
+      if (node.estimatedRows > 0) {
+        const ratio = node.actualRows / node.estimatedRows;
+        if (ratio > 10 || ratio < 0.1) {
+          issues.push({
+            type: 'row_estimate_error',
+            severity: 'medium',
+            node: node.nodeType,
+            estimated: node.estimatedRows,
+            actual: node.actualRows,
+            ratio: ratio,
+            suggestion: 'Run ANALYZE to update statistics'
+          });
+        }
+      }
+      
+      // Check for high buffer reads
+      if (node.buffersRead > 1000) {
+        issues.push({
+          type: 'high_buffer_reads',
+          severity: 'medium',
+          node: node.nodeType,
+          buffersRead: node.buffersRead,
+          suggestion: 'Consider increasing shared_buffers or adding index'
+        });
+      }
+      
+      // Check for hash joins with large rows
+      if (node.nodeType === 'Hash Join' && node.actualRows > 10000) {
+        issues.push({
+          type: 'large_hash_join',
+          severity: 'medium',
+          node: node.nodeType,
+          rows: node.actualRows,
+          suggestion: 'Consider using merge join or adding filter'
+        });
+      }
+    }
+    
+    return issues;
+  }
+}
+```
+
+### Bước 3: Index Recommendations
+
+```typescript
+// Generate index recommendations
+interface IndexRecommendation {
+  table: string;
+  columns: string[];
+  indexType: IndexType;
+  estimatedSize: string;
+  estimatedImprovement: string;
+  sql: string;
+  priority: 'high' | 'medium' | 'low';
+}
+
+class IndexRecommender {
+  private db: DB;
+  
+  constructor(db: DB) {
+    this.db = db;
+  }
+  
+  async generateRecommendations(
+    queries: QueryAnalysis[]
+  ): Promise<IndexRecommendation[]> {
+    const recommendations: IndexRecommendation[] = [];
+    const existingIndexes = await this.getExistingIndexes();
+    
+    for (const query of queries) {
+      // Extract column references from WHERE, JOIN, ORDER BY
+      const columnRefs = this.extractColumnReferences(query.normalizedQuery);
+      
+      for (const [table, columns] of Object.entries(columnRefs)) {
+        // Check if similar index exists
+        const existingIndex = this.findSimilarIndex(
+          existingIndexes,
+          table,
+          columns
+        );
+        
+        if (!existingIndex) {
+          recommendations.push({
+            table,
+            columns,
+            indexType: this.determineIndexType(query, columns),
+            estimatedSize: await this.estimateIndexSize(table, columns),
+            estimatedImprovement: this.estimateImprovement(query, columns),
+            sql: this.generateIndexSQL(table, columns),
+            priority: this.calculatePriority(query, columns)
+          });
+        }
+      }
+    }
+    
+    // Sort by priority and estimated improvement
+    return this.sortRecommendations(recommendations);
+  }
+  
+  private extractColumnReferences(query: string): Record<string, string[]> {
+    const refs: Record<string, string[]> = {};
+    
+    // Extract table.column references from WHERE
+    const whereMatch = query.match(/WHERE\s+(.+?)(?:GROUP|ORDER|LIMIT|$)/i);
+    if (whereMatch) {
+      const columns = this.parseColumnReferences(whereMatch[1]);
+      this.mergeColumnRefs(refs, columns);
+    }
+    
+    // Extract JOIN conditions
+    const joinMatches = query.matchAll(/JOIN\s+(\w+)\s+ON\s+(.+?)(?:JOIN|WHERE|GROUP|ORDER)/gi);
+    for (const match of joinMatches) {
+      const table = match[1];
+      const conditions = match[2];
+      const columns = this.parseColumnReferences(conditions);
+      refs[table] = [...(refs[table] || []), ...columns];
+    }
+    
+    // Extract ORDER BY columns
+    const orderMatch = query.match(/ORDER BY\s+(.+?)(?:LIMIT|$)/i);
+    if (orderMatch) {
+      const columns = this.parseColumnReferences(orderMatch[1]);
+      // Add to all referenced tables (simplified)
+      for (const table of Object.keys(refs)) {
+        refs[table] = [...refs[table], ...columns];
+      }
+    }
+    
+    return refs;
+  }
+  
+  private determineIndexType(
+    query: QueryAnalysis,
+    columns: string[]
+  ): IndexType {
+    // Check if query uses equality predicates
+    const hasEquality = columns.every(col => 
+      query.normalizedQuery.includes(`${col} =`)
+    );
+    
+    // Check if query has range predicates
+    const hasRange = /[<>]|BETWEEN|IN\s*\(|LIKE\s+'%/.test(query.normalizedQuery);
+    
+    // Check for text search
+    const hasTextSearch = /ILIKE|LIKE\s+'%/.test(query.normalizedQuery);
+    
+    if (hasTextSearch) {
+      return 'GIN'; // GIN for full-text search
+    }
+    
+    if (hasRange && !hasEquality) {
+      return 'B-tree'; // Range queries benefit from B-tree
+    }
+    
+    if (hasEquality) {
+      return 'B-tree'; // Default for equality
+    }
+    
+    return 'B-tree';
+  }
+  
+  private generateIndexSQL(table: string, columns: string[]): string {
+    const indexName = `idx_${table}_${columns.join('_')}`;
+    return `CREATE INDEX CONCURRENTLY IF NOT EXISTS ${indexName} 
+ON ${table} (${columns.join(', ')});`;
+  }
+}
+```
+
+### Bước 4: Configuration Tuning
+
+```typescript
+// Tune PostgreSQL configuration
+interface ConfigRecommendation {
+  parameter: string;
+  currentValue: string;
+  recommendedValue: string;
+  reason: string;
+  impact: 'performance' | 'memory' | 'concurrency';
+  restartRequired: boolean;
+}
+
+class ConfigTuner {
+  async analyzeAndRecommend(
+    db: DB,
+    workloadType: 'oltp' | 'olap' | 'mixed'
+  ): Promise<ConfigRecommendation[]> {
+    const currentConfig = await this.getCurrentConfig(db);
+    const recommendations: ConfigRecommendation[] = [];
+    
+    // Memory settings
+    const memoryInfo = await this.getMemoryInfo();
+    recommendations.push(...this.recommendMemorySettings(currentConfig, memoryInfo));
+    
+    // Connection settings
+    recommendations.push(...this.recommendConnectionSettings(currentConfig));
+    
+    // Query planner settings
+    recommendations.push(...this.recommendPlannerSettings(currentConfig));
+    
+    // Write ahead log settings
+    recommendations.push(...this.recommendWALSettings(currentConfig, workloadType));
+    
+    // Autovacuum settings
+    recommendations.push(...this.recommendAutovacuumSettings(currentConfig));
+    
+    return recommendations;
+  }
+  
+  private recommendMemorySettings(
+    current: Config,
+    memory: MemoryInfo
+  ): ConfigRecommendation[] {
+    const recommendations: ConfigRecommendation[] = [];
+    const totalMemoryMB = memory.totalBytes / (1024 * 1024);
+    
+    // shared_buffers
+    const sharedBuffersMB = Math.floor(totalMemoryMB * 0.25);
+    if (current.shared_buffers !== `${sharedBuffersMB}MB`) {
+      recommendations.push({
+        parameter: 'shared_buffers',
+        currentValue: current.shared_buffers,
+        recommendedValue: `${sharedBuffersMB}MB`,
+        reason: 'Should be set to 25% of total memory for dedicated DB server',
+        impact: 'memory',
+        restartRequired: true
+      });
+    }
+    
+    // effective_cache_size
+    const cacheSizeMB = Math.floor(totalMemoryMB * 0.75);
+    if (current.effective_cache_size !== `${cacheSizeMB}MB`) {
+      recommendations.push({
+        parameter: 'effective_cache_size',
+        currentValue: current.effective_cache_size,
+        recommendedValue: `${cacheSizeMB}MB`,
+        reason: 'Should be set to 75% of total memory',
+        impact: 'performance',
+        restartRequired: false
+      });
+    }
+    
+    // work_mem
+    const workMemMB = 64; // Per sort/hash operation
+    if (current.work_mem !== `${workMemMB}MB`) {
+      recommendations.push({
+        parameter: 'work_mem',
+        currentValue: current.work_mem,
+        recommendedValue: `${workMemMB}MB`,
+        reason: 'Per-operation memory for sorting and hashing',
+        impact: 'performance',
+        restartRequired: false
+      });
+    }
+    
+    // maintenance_work_mem
+    const maintMemMB = Math.floor(totalMemoryMB * 0.1);
+    if (current.maintenance_work_mem !== `${maintMemMB}MB`) {
+      recommendations.push({
+        parameter: 'maintenance_work_mem',
+        currentValue: current.maintenance_work_mem,
+        recommendedValue: `${maintMemMB}MB`,
+        reason: 'Memory for VACUUM, CREATE INDEX, etc.',
+        impact: 'performance',
+        restartRequired: false
+      });
+    }
+    
+    return recommendations;
+  }
+  
+  private recommendConnectionSettings(
+    current: Config
+  ): ConfigRecommendation[] {
+    const recommendations: ConfigRecommendation[] = [];
+    
+    // max_connections
+    if (parseInt(current.max_connections) > 1000) {
+      recommendations.push({
+        parameter: 'max_connections',
+        currentValue: current.max_connections,
+        recommendedValue: '1000',
+        reason: 'Very high connections may cause overhead',
+        impact: 'concurrency',
+        restartRequired: true
+      });
+    }
+    
+    // connection pooling recommendation
+    recommendations.push({
+      parameter: 'pgbouncer',
+      currentValue: 'Not configured',
+      recommendedValue: 'Enable PgBouncer',
+      reason: 'Use connection pooling for better concurrency',
+      impact: 'concurrency',
+      restartRequired: false
+    });
+    
+    return recommendations;
+  }
+  
+  private recommendWALSettings(
+    current: Config,
+    workloadType: string
+  ): ConfigRecommendation[] {
+    const recommendations: ConfigRecommendation[] = [];
+    
+    if (workloadType === 'oltp') {
+      // Synchronous commit
+      if (current.synchronous_commit !== 'on') {
+        recommendations.push({
+          parameter: 'synchronous_commit',
+          currentValue: current.synchronous_commit,
+          recommendedValue: 'on',
+          reason: 'OLTP workloads require durability',
+          impact: 'performance',
+          restartRequired: false
+        });
+      }
+      
+      // WAL level
+      if (current.wal_level !== 'replica') {
+        recommendations.push({
+          parameter: 'wal_level',
+          currentValue: current.wal_level,
+          recommendedValue: 'replica',
+          reason: 'Enable logical replication for better options',
+          impact: 'performance',
+          restartRequired: true
+        });
+      }
+    } else if (workloadType === 'olap') {
+      // Async commit for better throughput
+      if (current.synchronous_commit === 'on') {
+        recommendations.push({
+          parameter: 'synchronous_commit',
+          currentValue: current.synchronous_commit,
+          recommendedValue: 'off',
+          reason: 'OLAP can tolerate slight data loss for better throughput',
+          impact: 'performance',
+          restartRequired: false
+        });
+      }
+    }
+    
+    return recommendations;
+  }
+}
+```
+
+### Bước 5: Query Rewriting
+
+```typescript
+// Rewrite problematic queries
+class QueryRewriter {
+  rewriteSlowQueries(
+    queries: QueryAnalysis[]
+  ): RewriteResult[] {
+    return queries.map(q => this.rewriteQuery(q));
+  }
+  
+  private rewriteQuery(query: QueryAnalysis): RewriteResult {
+    let rewritten = query.query;
+    const changes: RewriteChange[] = [];
+    
+    // Check for SELECT *
+    if (this.hasSelectStar(query.query)) {
+      const suggestion = this.suggestExplicitColumns(query);
+      changes.push({
+        type: 'select_star',
+        original: 'SELECT *',
+        suggested: suggestion,
+        reason: 'SELECT * causes unnecessary data transfer'
+      });
+    }
+    
+    // Check for implicit type casting
+    if (this.hasImplicitCasting(query.query)) {
+      const fixed = this.fixImplicitCasting(query.query);
+      changes.push({
+        type: 'implicit_casting',
+        original: query.query,
+        suggested: fixed,
+        reason: 'Implicit casting prevents index usage'
+      });
+      rewritten = fixed;
+    }
+    
+    // Check for function on indexed column
+    if (this.hasFunctionOnColumn(query.query)) {
+      const fixed = this.suggestExpressionIndex(query.query);
+      changes.push({
+        type: 'function_on_column',
+        original: query.query,
+        suggested: fixed,
+        reason: 'Function on column prevents index usage'
+      });
+    }
+    
+    // Check for OR conditions
+    if (this.hasOrConditions(query.query)) {
+      const fixed = this.suggestUnionRewrite(query.query);
+      changes.push({
+        type: 'or_conditions',
+        original: query.query,
+        suggested: fixed,
+        reason: 'OR conditions may not use indexes efficiently'
+      });
+      rewritten = fixed;
+    }
+    
+    // Check for NOT IN with NULLs
+    if (this.hasNotInWithNulls(query.query)) {
+      const fixed = this.fixNotInNulls(query.query);
+      changes.push({
+        type: 'not_in_nulls',
+        original: query.query,
+        suggested: fixed,
+        reason: 'NOT IN with NULLs returns unexpected results'
+      });
+      rewritten = fixed;
+    }
+    
+    return {
+      original: query.query,
+      rewritten,
+      changes,
+      estimatedImprovement: this.estimateImprovement(changes)
+    };
+  }
+  
+  private hasImplicitCasting(query: string): boolean {
+    // Pattern: column = 'string' when column is numeric
+    const pattern = /\w+\s*=\s*'[^']+'/g;
+    return pattern.test(query);
+  }
+  
+  private fixImplicitCasting(query: string): string {
+    // This requires schema knowledge - simplified version
+    // In practice, would need to check column types
+    return query;
+  }
+}
+```
+
+## Checklist (Danh sách kiểm tra)
+
+- [ ] Slow queries identified và analyzed
+- [ ] Query execution plans examined
+- [ ] Missing indexes identified
+- [ ] Unused indexes found
+- [ ] Configuration reviewed for workload
+- [ ] Memory settings optimized
+- [ ] Connection pooling enabled
+- [ ] Autovacuum properly configured
+- [ ] Statistics up-to-date
+- [ ] Bloat identified và addressed
+- [ ] Query rewrites applied
+- [ ] Indexes created safely (CONCURRENTLY)
+- [ ] Performance benchmarked
+- [ ] Monitoring in place
+- [ ] Documentation updated
+
+## Examples (Ví dụ)
+
+### Ví dụ 1: Full Optimization Workflow
+
+```typescript
+async function optimizeDatabase(
+  connection: ConnectionConfig
+): Promise<OptimizationReport> {
+  const db = await connect(connection);
+  
+  console.log('Analyzing database...');
+  const analysis = await analyzeDatabase(db);
+  
+  console.log('Analyzing slow queries...');
+  const analyzer = new QueryAnalyzer();
+  const queries = await analyzer.analyzeSlowQueries(db, 100);
+  
+  console.log('Generating index recommendations...');
+  const indexer = new IndexRecommender(db);
+  const indexRecommendations = await indexer.generateRecommendations(queries);
+  
+  console.log('Tuning configuration...');
+  const tuner = new ConfigTuner();
+  const configRecommendations = await tuner.analyzeAndRecommend(
+    db, 
+    'mixed'
+  );
+  
+  console.log('Rewriting queries...');
+  const rewriter = new QueryRewriter();
+  const rewrites = rewriter.rewriteSlowQueries(queries);
+  
+  return {
+    analysis,
+    queries,
+    indexRecommendations,
+    configRecommendations,
+    rewrites,
+    actionPlan: generateActionPlan({
+      indexRecommendations,
+      configRecommendations,
+      rewrites
+    })
+  };
+}
+```
+
+### Ví dụ 2: Safe Index Creation
+
+```typescript
+async function createIndexSafely(
+  db: Database,
+  table: string,
+  columns: string[],
+  options?: IndexOptions
+): Promise<void> {
+  const indexName = `idx_${table}_${columns.join('_')}`;
+  
+  // Check if index already exists
+  const exists = await db.query(
+    `SELECT 1 FROM pg_indexes WHERE indexname = $1`,
+    [indexName]
+  );
+  
+  if (exists.rows.length > 0) {
+    console.log(`Index ${indexName} already exists`);
+    return;
+  }
+  
+  // Check table size
+  const sizeResult = await db.query(
+    `SELECT pg_size_pretty(pg_relation_size($1)) as size`,
+    [table]
+  );
+  
+  const tableSize = sizeResult.rows[0].size;
+  
+  // For large tables, warn and use CONCURRENTLY
+  const sql = options?.concurrently !== false
+    ? `CREATE INDEX CONCURRENTLY IF NOT EXISTS ${indexName} ON ${table} (${columns.join(', ')});`
+    : `CREATE INDEX IF NOT EXISTS ${indexName} ON ${table} (${columns.join(', ')});`;
+  
+  console.log(`Creating index ${indexName} on ${table} (size: ${tableSize})`);
+  console.log('This may take a while for large tables...');
+  
+  await db.query(sql);
+  
+  console.log(`Index ${indexName} created successfully`);
+}
+```
+
+## Anti Patterns (Các pattern cần tránh)
+
+### 1. Index Everything
+```sql
+-- ❌ BAD: Create indexes on everything "just in case"
+CREATE INDEX idx_users_all ON users(id, email, name, created_at, updated_at, role);
+
+-- ✅ GOOD: Create targeted indexes based on query patterns
+CREATE INDEX idx_users_email ON users(email);  -- For login lookups
+CREATE INDEX idx_users_role ON users(role);  -- For role-based queries
+```
+
+### 2. Ignoring Autovacuum
+```sql
+-- ❌ BAD: Disable autovacuum
+ALTER TABLE large_table SET (autovacuum_enabled = false);
+
+-- ✅ GOOD: Tune autovacuum for workload
+ALTER TABLE large_table SET (
+  autovacuum_vacuum_scale_factor = 0.01,
+  autovacuum_analyze_scale_factor = 0.005,
+  autovacuum_vacuum_cost_delay = 2
+);
+```
+
+### 3. Sequential Scans on Large Tables
+```sql
+-- ❌ BAD: Force sequential scan
+SET enable_seqscan = off; -- Don't do this globally
+
+-- ✅ GOOD: Ensure proper indexes exist
+CREATE INDEX idx_orders_user_id ON orders(user_id);
+CREATE INDEX idx_orders_status ON orders(status) WHERE status != 'completed';
+```
+
+### 4. Not Using Prepared Statements
+```sql
+-- ❌ BAD: Parse query every time
+SELECT * FROM users WHERE email = 'test@example.com';
+SELECT * FROM users WHERE email = 'user@example.com';
+
+-- ✅ GOOD: Use prepared statements
+PREPARE user_lookup AS SELECT * FROM users WHERE email = $1;
+EXECUTE user_lookup('test@example.com');
+```
+
+### 5. Inappropriate Data Types
+```sql
+-- ❌ BAD: Use varchar for everything
+CREATE TABLE events (
+  id serial PRIMARY KEY,
+  event_type varchar(100),  -- Could be enum
+  event_date varchar(50),  -- Should be timestamp
+  metadata jsonb  -- Fine for flexible data
+);
+
+-- ✅ GOOD: Use appropriate types
+CREATE TABLE events (
+  id serial PRIMARY KEY,
+  event_type event_types,  -- Enum
+  event_date timestamp with time zone,
+  metadata jsonb
+);
+```
+
+## Best Practices (Thực hành tốt nhất)
+
+1. **Monitor continuously**: Use pg_stat_statements và query views
+2. **Index strategically**: Based on actual query patterns, not guesses
+3. **Use EXPLAIN ANALYZE**: Always check execution plans
+4. **Test changes**: Benchmark before và after in staging
+5. **Create indexes CONCURRENTLY**: Avoid locking production tables
+6. **Keep statistics fresh**: Regular ANALYZE after data changes
+7. **Tune autovacuum**: Prevent table bloat proactively
+8. **Use connection pooling**: PgBouncer for high concurrency
+9. **Partition large tables**: For time-series và archival data
+10. **Document changes**: Track what changed và why
+
+## Liên kết (Cross-references)
+
+- **Related Skills**: [database-optimization](./database-optimization.mdc), [rls-audit](./rls-audit.mdc), [postgres](../rules/postgres.mdc)
+- **Tools**: pg_stat_statements, pgBadger, pgCluu, EXPLAIN ANALYZE
+- **Documentation**: PostgreSQL Performance Tips

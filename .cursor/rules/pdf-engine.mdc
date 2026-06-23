@@ -1,0 +1,1018 @@
+---
+description: Nguyên tắc và best practices cho PDF Engine Implementation trong Cursor Enterprise Framework
+created: 2026-06-23
+version: 1.0.0
+tags: [pdf, document, extraction, processing, ocr]
+---
+
+# PDF Engine
+
+## Mục tiêu
+
+PDF Engine là hệ thống xử lý tài liệu PDF cho việc tạo, chỉnh sửa, trích xuất nội dung, và chuyển đổi. Trong Cursor Enterprise Framework, PDF Engine được sử dụng cho các ứng dụng như invoice generation, report creation, document merging, OCR processing, và data extraction. Mục tiêu của rule này là hướng dẫn developers trong việc implement PDF processing systems hiệu quả và reliable.
+
+PDF processing đòi hỏi sự hiểu biết về PDF format, rendering engines, security considerations, và performance optimization. Một PDF engine tốt cần handle được các loại documents khác nhau từ simple text documents đến complex forms với embedded images và fonts.
+
+## Nguyên tắc
+
+**1. Library Selection**
+
+Choose appropriate PDF library. Consider performance needs. Evaluate rendering quality. Check browser compatibility. Consider commercial vs open source.
+
+**2. Document Generation**
+
+Use templates for consistency. Handle complex layouts. Support dynamic content. Include proper fonts. Optimize for file size.
+
+**3. Text Extraction**
+
+Extract text accurately. Handle multiple encodings. Preserve structure. Support OCR when needed. Handle images with text.
+
+**4. Security Considerations**
+
+Sanitize PDF inputs. Prevent malicious PDFs. Handle password-protected files. Validate content. Monitor for exploits.
+
+**5. Performance Optimization**
+
+Use streaming for large files. Cache rendered pages. Optimize memory usage. Use worker threads. Process in batches.
+
+**6. Template Management**
+
+Store templates securely. Version control templates. Validate template syntax. Support template inheritance. Monitor template usage.
+
+**7. Data Binding**
+
+Bind data to templates. Handle nested data. Support conditions. Include formatting. Validate data types.
+
+**8. Conversion Formats**
+
+Support multiple output formats. PDF/A for archival. PDF/UA for accessibility. Optimize for web. Handle conversion errors.
+
+**9. Accessibility**
+
+Support screen readers. Include alt text. Create tagged PDFs. Follow PDF/UA standards. Test accessibility.
+
+**10. Compliance**
+
+Follow PDF standards. Support PDF/A, PDF/X. Include metadata. Support digital signatures. Maintain audit trails.
+
+## Checklist
+
+- [ ] PDF library selected
+- [ ] Document generation implemented
+- [ ] Text extraction set up
+- [ ] OCR integration configured
+- [ ] Template system designed
+- [ ] Security measures implemented
+- [ ] Performance optimized
+- [ ] Accessibility supported
+- [ ] Conversion formats defined
+- [ ] Monitoring set up
+
+## Anti Pattern
+
+**1. Loading Entire PDFs into Memory**
+
+Loading large PDFs fully into memory. Memory exhaustion. Performance degradation. Use streaming instead.
+
+**2. Ignoring Font Embedding**
+
+Not embedding fonts. Cross-platform issues. Missing characters. Embed all fonts.
+
+**3. No Input Validation**
+
+Processing untrusted PDFs. Security vulnerabilities. Malicious content. Always validate.
+
+**4. Synchronous Processing**
+
+Processing PDFs on main thread. UI blocking. Poor responsiveness. Use async/workers.
+
+**5. Hardcoded Templates**
+
+Embedding templates in code. No reusability. Difficult updates. Use template management system.
+
+## Best Practice
+
+**1. PDF Generation với Puppeteer**
+
+```typescript
+// services/pdf-generator.service.ts
+import puppeteer, { Browser, PDFOptions } from 'puppeteer';
+import { compile } from 'handlebars';
+import fs from 'fs/promises';
+import path from 'path';
+
+interface PDFTemplate {
+  name: string;
+  html: string;
+  styles?: string;
+}
+
+interface PDFData {
+  [key: string]: any;
+}
+
+class PDFGeneratorService {
+  private browser: Browser | null = null;
+  private templates: Map<string, HandlebarsTemplateDelegate> = new Map();
+
+  async initialize(): Promise<void> {
+    this.browser = await puppeteer.launch({
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage'
+      ]
+    });
+  }
+
+  async registerTemplate(name: string, html: string, styles?: string): Promise<void> {
+    const fullHtml = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            ${styles || ''}
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .content { line-height: 1.6; }
+            .footer { position: fixed; bottom: 0; width: 100%; }
+          </style>
+        </head>
+        <body>
+          ${html}
+        </body>
+      </html>
+    `;
+
+    const template = compile(fullHtml);
+    this.templates.set(name, template);
+  }
+
+  async registerTemplateFromFile(
+    name: string,
+    templatePath: string,
+    stylesPath?: string
+  ): Promise<void> {
+    const html = await fs.readFile(templatePath, 'utf-8');
+    const styles = stylesPath ? await fs.readFile(stylesPath, 'utf-8') : undefined;
+    await this.registerTemplate(name, html, styles);
+  }
+
+  async generatePDF(
+    templateName: string,
+    data: PDFData,
+    options: PDFOptions = {}
+  ): Promise<Buffer> {
+    if (!this.browser) {
+      await this.initialize();
+    }
+
+    const template = this.templates.get(templateName);
+    if (!template) {
+      throw new Error(`Template not found: ${templateName}`);
+    }
+
+    // Compile template with data
+    const html = template(data);
+
+    // Create a new page
+    const page = await this.browser.newPage();
+
+    try {
+      // Set content
+      await page.setContent(html, {
+        waitUntil: 'networkidle0'
+      });
+
+      // Generate PDF
+      const pdfOptions: PDFOptions = {
+        format: 'A4',
+        printBackground: true,
+        margin: {
+          top: '20mm',
+          bottom: '20mm',
+          left: '15mm',
+          right: '15mm'
+        },
+        ...options
+      };
+
+      const pdfBuffer = await page.pdf(pdfOptions);
+
+      return Buffer.from(pdfBuffer);
+    } finally {
+      await page.close();
+    }
+  }
+
+  async generatePDFStream(
+    templateName: string,
+    data: PDFData,
+    options: PDFOptions = {}
+  ): Promise<NodeJS.ReadableStream> {
+    const buffer = await this.generatePDF(templateName, data, options);
+    return Readable.from(buffer);
+  }
+
+  async generateBulkPDFs(
+    documents: Array<{ templateName: string; data: PDFData; filename: string }>,
+    options: PDFOptions = {}
+  ): Promise<Map<string, Buffer>> {
+    const results = new Map<string, Buffer>();
+
+    // Process in parallel with concurrency limit
+    const concurrency = 3;
+    const chunks = this.chunkArray(documents, concurrency);
+
+    for (const chunk of chunks) {
+      const promises = chunk.map(async (doc) => {
+        const buffer = await this.generatePDF(doc.templateName, doc.data, options);
+        return { filename: doc.filename, buffer };
+      });
+
+      const chunkResults = await Promise.all(promises);
+      chunkResults.forEach(({ filename, buffer }) => {
+        results.set(filename, buffer);
+      });
+    }
+
+    return results;
+  }
+
+  private chunkArray<T>(array: T[], size: number): T[][] {
+    const chunks: T[][] = [];
+    for (let i = 0; i < array.length; i += size) {
+      chunks.push(array.slice(i, i + size));
+    }
+    return chunks;
+  }
+
+  async shutdown(): Promise<void> {
+    if (this.browser) {
+      await this.browser.close();
+      this.browser = null;
+    }
+  }
+}
+```
+
+**2. Text Extraction với pdf-parse**
+
+```typescript
+// services/pdf-extractor.service.ts
+import fs from 'fs/promises';
+import path from 'path';
+import pdf from 'pdf-parse';
+
+interface ExtractionResult {
+  text: string;
+  pages: PageContent[];
+  metadata: PDFMetadata;
+  outlines: Outline[];
+}
+
+interface PageContent {
+  pageNumber: number;
+  text: string;
+  images: ImageInfo[];
+  tables: TableInfo[];
+}
+
+interface ImageInfo {
+  pageNumber: number;
+  index: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  base64?: string;
+}
+
+interface TableInfo {
+  pageNumber: number;
+  rows: string[][];
+  boundingBox: BoundingBox;
+}
+
+interface BoundingBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+interface PDFMetadata {
+  title?: string;
+  author?: string;
+  subject?: string;
+  keywords?: string;
+  creator?: string;
+  producer?: string;
+  creationDate?: Date;
+  modificationDate?: Date;
+}
+
+interface Outline {
+  title: string;
+  level: number;
+  pageNumber: number;
+  children?: Outline[];
+}
+
+class PDFExtractorService {
+  async extractText(filePath: string): Promise<string> {
+    const dataBuffer = await fs.readFile(filePath);
+    const data = await pdf(dataBuffer);
+    return data.text;
+  }
+
+  async extractFullContent(filePath: string): Promise<ExtractionResult> {
+    const dataBuffer = await fs.readFile(filePath);
+    const data = await pdf(dataBuffer);
+
+    const pages = await this.extractPageContents(dataBuffer, data);
+    const metadata = this.extractMetadata(data);
+    const outlines = this.extractOutlines(data);
+
+    return {
+      text: data.text,
+      pages,
+      metadata,
+      outlines
+    };
+  }
+
+  private async extractPageContents(
+    dataBuffer: Buffer,
+    data: any
+  ): Promise<PageContent[]> {
+    const pages: PageContent[] = [];
+
+    for (let i = 0; i < data.numpages; i++) {
+      // Extract text for each page
+      const pageText = data.pages[i]?.replace(/\s+/g, ' ').trim() || '';
+
+      pages.push({
+        pageNumber: i + 1,
+        text: pageText,
+        images: [], // Images require additional processing
+        tables: [] // Tables require specialized extraction
+      });
+    }
+
+    return pages;
+  }
+
+  private extractMetadata(data: any): PDFMetadata {
+    return {
+      title: data.info?.Title,
+      author: data.info?.Author,
+      subject: data.info?.Subject,
+      keywords: data.info?.Keywords,
+      creator: data.info?.Creator,
+      producer: data.info?.Producer,
+      creationDate: data.info?.CreationDate,
+      modificationDate: data.info?.ModDate
+    };
+  }
+
+  private extractOutlines(data: any): Outline[] {
+    // Extract TOC/outlines if available
+    // This requires parsing the PDF structure
+    return [];
+  }
+
+  async extractTextByPage(filePath: string): Promise<string[]> {
+    const dataBuffer = await fs.readFile(filePath);
+    const data = await pdf(dataBuffer);
+    return data.pages.map((page: string) => page.replace(/\s+/g, ' ').trim());
+  }
+
+  async extractTextByArea(
+    filePath: string,
+    pageNumber: number,
+    boundingBox: BoundingBox
+  ): Promise<string> {
+    const fullText = await this.extractText(filePath);
+    const pages = await this.extractTextByPage(filePath);
+    // Note: Full bbox extraction requires OCR or advanced parsing
+    return pages[pageNumber - 1] || '';
+  }
+}
+```
+
+**3. PDF Merger và Splitter**
+
+```typescript
+// services/pdf-manipulation.service.ts
+import PDFMerger from 'pdf-merger-js';
+import { PDFDocument } from 'pdf-lib';
+
+class PDFManipulationService {
+  async mergePDFs(filePaths: string[]): Promise<Buffer> {
+    const merger = new PDFMerger();
+
+    for (const filePath of filePaths) {
+      merger.add(filePath);
+    }
+
+    const mergedBuffer = await merger.save();
+    return Buffer.from(mergedBuffer);
+  }
+
+  async splitPDF(
+    filePath: string,
+    splitPages: number[]
+  ): Promise<Map<number, Buffer>> {
+    const pdfBytes = await fs.readFile(filePath);
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+    const results = new Map<number, Buffer>();
+
+    for (const pageNum of splitPages) {
+      if (pageNum < 1 || pageNum > pdfDoc.getPageCount()) {
+        throw new Error(`Invalid page number: ${pageNum}`);
+      }
+
+      const newPdf = await PDFDocument.create();
+      const [copiedPage] = await newPdf.copyPages(pdfDoc, [pageNum - 1]);
+      newPdf.addPage(copiedPage);
+
+      const pdfBytes = await newPdf.save();
+      results.set(pageNum, Buffer.from(pdfBytes));
+    }
+
+    return results;
+  }
+
+  async splitPDFByRanges(
+    filePath: string,
+    ranges: Array<{ start: number; end: number }>
+  ): Promise<Buffer> {
+    const pdfBytes = await fs.readFile(filePath);
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+    const newPdf = await PDFDocument.create();
+
+    for (const range of ranges) {
+      for (let i = range.start; i <= range.end; i++) {
+        if (i >= 1 && i <= pdfDoc.getPageCount()) {
+          const [copiedPage] = await newPdf.copyPages(pdfDoc, [i - 1]);
+          newPdf.addPage(copiedPage);
+        }
+      }
+    }
+
+    const mergedPdf = await newPdf.save();
+    return Buffer.from(mergedPdf);
+  }
+
+  async rotatePages(
+    filePath: string,
+    pageRotations: Map<number, number>
+  ): Promise<Buffer> {
+    const pdfBytes = await fs.readFile(filePath);
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+
+    for (const [pageNum, degrees] of pageRotations) {
+      if (pageNum >= 1 && pageNum <= pdfDoc.getPageCount()) {
+        const page = pdfDoc.getPages()[pageNum - 1];
+        const currentRotation = page.getRotation().angle;
+        page.setRotation({
+          angle: currentRotation + degrees,
+          type: page.getRotation().type
+        });
+      }
+    }
+
+    const rotatedPdf = await pdfDoc.save();
+    return Buffer.from(rotatedPdf);
+  }
+
+  async extractPages(
+    filePath: string,
+    startPage: number,
+    endPage: number
+  ): Promise<Buffer> {
+    const ranges: Array<{ start: number; end: number }> = [];
+    for (let i = startPage; i <= endPage; i++) {
+      ranges.push({ start: i, end: i });
+    }
+    return this.splitPDFByRanges(filePath, ranges);
+  }
+
+  async addPageNumbers(
+    filePath: string,
+    options: {
+      position?: 'top' | 'bottom';
+      startNumber?: number;
+      format?: string;
+    } = {}
+  ): Promise<Buffer> {
+    const { position = 'bottom', startNumber = 1, format = '{n} of {total}' } = options;
+
+    const pdfBytes = await fs.readFile(filePath);
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+    const pages = pdfDoc.getPages();
+    const totalPages = pages.length;
+
+    // Note: Adding text requires font embedding
+    // This is a simplified example
+
+    for (let i = 0; i < pages.length; i++) {
+      const page = pages[i];
+      const pageNum = startNumber + i;
+      const text = format
+        .replace('{n}', pageNum.toString())
+        .replace('{total}', totalPages.toString());
+
+      // Embed font and add text
+      const font = await pdfDoc.embedFont(PDFDocument.FONT_IDENTITY_H);
+      const { height } = page.getSize();
+
+      page.drawText(text, {
+        x: 50,
+        y: position === 'top' ? height - 50 : 50,
+        size: 12,
+        font
+      });
+    }
+
+    const numberedPdf = await pdfDoc.save();
+    return Buffer.from(numberedPdf);
+  }
+}
+```
+
+**4. OCR với Tesseract**
+
+```typescript
+// services/pdf-ocr.service.ts
+import Tesseract from 'tesseract.js';
+import { createCanvas, loadImage } from 'canvas';
+import path from 'path';
+
+interface OCRResult {
+  text: string;
+  confidence: number;
+  blocks: OCRBlock[];
+  boundingBoxes: BoundingBox[][];
+}
+
+interface OCRBlock {
+  text: string;
+  confidence: number;
+  bbox: BoundingBox;
+}
+
+interface BoundingBox {
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+}
+
+class PDFOCRService {
+  private worker: Tesseract.Worker | null = null;
+  private language: string;
+
+  constructor(language: string = 'eng') {
+    this.language = language;
+  }
+
+  async initialize(): Promise<void> {
+    this.worker = await Tesseract.createWorker(this.language, 1, {
+      logger: (m) => console.log(m)
+    });
+  }
+
+  async recognizeFromImage(
+    imagePath: string,
+    options: {
+      enhance?: boolean;
+      scale?: number;
+    } = {}
+  ): Promise<OCRResult> {
+    if (!this.worker) {
+      await this.initialize();
+    }
+
+    const { data } = await this.worker.recognize(imagePath);
+
+    return {
+      text: data.text,
+      confidence: data.confidence,
+      blocks: data.blocks?.map(block => ({
+        text: block.text,
+        confidence: block.confidence,
+        bbox: block.bbox
+      })) || [],
+      boundingBoxes: data.words?.map(word => [word.bbox]) || []
+    };
+  }
+
+  async recognizeFromPDF(
+    pdfPath: string,
+    options: {
+      startPage?: number;
+      endPage?: number;
+      enhance?: boolean;
+    } = {}
+  ): Promise<OCRResult[]> {
+    // Convert PDF pages to images first
+    // This requires a PDF to image converter like pdf2pic or sharp
+    const images = await this.convertPDFToImages(pdfPath, options);
+    
+    const results: OCRResult[] = [];
+
+    for (const image of images) {
+      const result = await this.recognizeFromImage(image, options);
+      results.push(result);
+    }
+
+    return results;
+  }
+
+  private async convertPDFToImages(
+    pdfPath: string,
+    options: { startPage?: number; endPage?: number }
+  ): Promise<string[]> {
+    // Use pdf2pic or similar library
+    // This is a placeholder
+    return [];
+  }
+
+  async recognizeBatch(
+    images: string[],
+    options: { onProgress?: (progress: number) => void } = {}
+  ): Promise<OCRResult[]> {
+    if (!this.worker) {
+      await this.initialize();
+    }
+
+    const results: OCRResult[] = [];
+
+    for (let i = 0; i < images.length; i++) {
+      const result = await this.recognizeFromImage(images[i]);
+      results.push(result);
+      
+      if (options.onProgress) {
+        options.onProgress((i + 1) / images.length);
+      }
+    }
+
+    return results;
+  }
+
+  async terminate(): Promise<void> {
+    if (this.worker) {
+      await this.worker.terminate();
+      this.worker = null;
+    }
+  }
+}
+```
+
+**5. Invoice Generation Template**
+
+```typescript
+// templates/invoice.handlebars
+const invoiceTemplate = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DejaVu Sans', Arial, sans-serif; font-size: 12px; line-height: 1.5; }
+    
+    .invoice-container { max-width: 800px; margin: 0 auto; padding: 40px; }
+    
+    .header { display: flex; justify-content: space-between; margin-bottom: 40px; border-bottom: 2px solid #333; padding-bottom: 20px; }
+    .company-info h1 { font-size: 24px; color: #333; margin-bottom: 10px; }
+    .company-info p { color: #666; }
+    
+    .invoice-title { text-align: right; }
+    .invoice-title h2 { font-size: 32px; color: #4CAF50; }
+    .invoice-number { font-size: 14px; color: #666; margin-top: 10px; }
+    
+    .parties { display: flex; justify-content: space-between; margin-bottom: 40px; }
+    .party { width: 45%; }
+    .party h3 { font-size: 14px; color: #333; margin-bottom: 10px; text-transform: uppercase; }
+    .party p { margin-bottom: 5px; }
+    
+    .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+    .info-item { background: #f5f5f5; padding: 15px; border-radius: 4px; }
+    .info-item label { font-size: 10px; color: #666; text-transform: uppercase; display: block; }
+    .info-item span { font-size: 14px; font-weight: bold; color: #333; }
+    
+    table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+    th { background: #333; color: #fff; padding: 12px; text-align: left; }
+    th:last-child { text-align: right; }
+    td { padding: 12px; border-bottom: 1px solid #ddd; }
+    td:last-child { text-align: right; }
+    .item-name { font-weight: bold; }
+    .item-description { font-size: 10px; color: #666; }
+    
+    .totals { display: flex; justify-content: flex-end; margin-bottom: 30px; }
+    .totals-table { width: 300px; }
+    .totals-table tr td { padding: 8px; }
+    .totals-table .label { text-align: left; }
+    .totals-table .value { text-align: right; font-weight: bold; }
+    .totals-table .total-row { background: #333; color: #fff; }
+    .totals-table .total-row td { font-size: 16px; }
+    
+    .payment-terms { background: #f9f9f9; padding: 20px; border-radius: 4px; margin-bottom: 30px; }
+    .payment-terms h4 { margin-bottom: 10px; }
+    
+    .footer { text-align: center; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 10px; }
+    
+    @page { size: A4; margin: 20mm; }
+  </style>
+</head>
+<body>
+  <div class="invoice-container">
+    <div class="header">
+      <div class="company-info">
+        <h1>{{company.name}}</h1>
+        <p>{{company.address}}</p>
+        <p>{{company.city}}, {{company.country}}</p>
+        <p>Email: {{company.email}}</p>
+        <p>Phone: {{company.phone}}</p>
+      </div>
+      <div class="invoice-title">
+        <h2>INVOICE</h2>
+        <p class="invoice-number">#{{invoiceNumber}}</p>
+      </div>
+    </div>
+    
+    <div class="parties">
+      <div class="party">
+        <h3>Bill To</h3>
+        <p><strong>{{customer.name}}</strong></p>
+        <p>{{customer.address}}</p>
+        <p>{{customer.city}}, {{customer.country}}</p>
+        <p>{{customer.email}}</p>
+      </div>
+      <div class="party">
+        <h3>Ship To</h3>
+        <p><strong>{{shipTo.name}}</strong></p>
+        <p>{{shipTo.address}}</p>
+        <p>{{shipTo.city}}, {{shipTo.country}}</p>
+      </div>
+    </div>
+    
+    <div class="info-grid">
+      <div class="info-item">
+        <label>Invoice Date</label>
+        <span>{{invoiceDate}}</span>
+      </div>
+      <div class="info-item">
+        <label>Due Date</label>
+        <span>{{dueDate}}</span>
+      </div>
+      <div class="info-item">
+        <label>Payment Terms</label>
+        <span>{{paymentTerms}}</span>
+      </div>
+    </div>
+    
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Description</th>
+          <th>Qty</th>
+          <th>Unit Price</th>
+          <th>Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each items}}
+        <tr>
+          <td class="item-name">{{name}}</td>
+          <td class="item-description">{{description}}</td>
+          <td>{{quantity}}</td>
+          <td>{{formatCurrency unitPrice}}</td>
+          <td>{{formatCurrency amount}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    
+    <div class="totals">
+      <table class="totals-table">
+        <tr>
+          <td class="label">Subtotal</td>
+          <td class="value">{{formatCurrency subtotal}}</td>
+        </tr>
+        {{#if taxRate}}
+        <tr>
+          <td class="label">Tax ({{taxRate}}%)</td>
+          <td class="value">{{formatCurrency taxAmount}}</td>
+        </tr>
+        {{/if}}
+        {{#if discountAmount}}
+        <tr>
+          <td class="label">Discount</td>
+          <td class="value">-{{formatCurrency discountAmount}}</td>
+        </tr>
+        {{/if}}
+        <tr class="total-row">
+          <td class="label">Total</td>
+          <td class="value">{{formatCurrency total}}</td>
+        </tr>
+      </table>
+    </div>
+    
+    <div class="payment-terms">
+      <h4>Payment Terms</h4>
+      <p>{{paymentInstructions}}</p>
+    </div>
+    
+    <div class="footer">
+      <p>Thank you for your business!</p>
+      <p>{{company.name}} | {{company.email}}</p>
+    </div>
+  </div>
+</body>
+</html>
+`;
+```
+
+**6. PDF Security**
+
+```typescript
+// services/pdf-security.service.ts
+import { PDFDocument, StandardEncryption, AES256Encryption } from 'pdf-lib';
+
+interface EncryptionOptions {
+  userPassword?: string;
+  ownerPassword?: string;
+  permissions?: PDFPermissions;
+  encryptionLevel?: 'medium' | 'high';
+}
+
+interface PDFPermissions {
+  print?: boolean;
+  modify?: boolean;
+  copy?: boolean;
+  annotate?: boolean;
+  fillForms?: boolean;
+  extract?: boolean;
+  assemble?: boolean;
+  printFaithful?: boolean;
+}
+
+class PDFSecurityService {
+  async encryptPDF(
+    filePath: string,
+    options: EncryptionOptions
+  ): Promise<Buffer> {
+    const pdfBytes = await fs.readFile(filePath);
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+
+    const encryption = options.encryptionLevel === 'high'
+      ? AES256Encryption.new()
+      : StandardEncryption.new();
+
+    // Set passwords
+    encryption.setUserPassword(options.userPassword || '');
+    encryption.setOwnerPassword(options.ownerPassword || '');
+
+    // Set permissions
+    const permissions = this.buildPermissions(options.permissions || {});
+    encryption.setPermissions(permissions);
+
+    // Encrypt
+    pdfDoc.attach(encryption);
+
+    const encryptedPdf = await pdfDoc.save();
+    return Buffer.from(encryptedPdf);
+  }
+
+  private buildPermissions(perms: PDFPermissions): number {
+    // PDF permission flags
+    let flags = 0;
+    
+    if (perms.print) flags |= 0b0000000100;
+    if (perms.modify) flags |= 0b0000001000;
+    if (perms.copy) flags |= 0b0000010000;
+    if (perms.annotate) flags |= 0b0000100000;
+    if (perms.fillForms) flags |= 0b0001000000;
+    if (perms.extract) flags |= 0b0010000000;
+    if (perms.assemble) flags |= 0b0100000000;
+    if (perms.printFaithful) flags |= 0b1000000000;
+    
+    return flags;
+  }
+
+  async removePassword(
+    filePath: string,
+    ownerPassword: string
+  ): Promise<Buffer> {
+    const pdfBytes = await fs.readFile(filePath);
+    const pdfDoc = await PDFDocument.load(pdfBytes, {
+      password: ownerPassword
+    });
+
+    // Save without encryption
+    const unlockedPdf = await pdfDoc.save();
+    return Buffer.from(unlockedPdf);
+  }
+
+  async verifyPDFSafety(filePath: string): Promise<{
+    isSafe: boolean;
+    issues: string[];
+  }> {
+    const issues: string[] = [];
+
+    try {
+      const pdfBytes = await fs.readFile(filePath);
+      
+      // Check file size
+      if (pdfBytes.length > 100 * 1024 * 1024) { // 100MB
+        issues.push('File size exceeds safe limit');
+      }
+
+      // Check for JavaScript
+      // This requires parsing the PDF structure
+      
+      // Check for external links
+      // This requires parsing the PDF structure
+      
+      return {
+        isSafe: issues.length === 0,
+        issues
+      };
+    } catch (error) {
+      return {
+        isSafe: false,
+        issues: [`Error analyzing PDF: ${error.message}`]
+      };
+    }
+  }
+}
+```
+
+## Workflow
+
+**Phase 1: Requirements Analysis**
+
+Define PDF processing needs. Choose appropriate libraries. Plan architecture. Estimate scale.
+
+**Phase 2: Implementation**
+
+Set up PDF library. Implement generation. Add extraction. Configure OCR. Set up security.
+
+**Phase 3: Template Development**
+
+Design templates. Implement template system. Add data binding. Test templates.
+
+**Phase 4: Optimization**
+
+Implement caching. Optimize performance. Add streaming. Configure workers.
+
+**Phase 5: Testing**
+
+Test with various PDFs. Test generation. Test extraction. Test OCR. Performance testing.
+
+**Phase 6: Deployment**
+
+Deploy PDF services. Configure scaling. Set up monitoring. Document usage.
+
+## Ví dụ
+
+**Ví dụ 1: Automated Report Generation**
+
+```typescript
+async function generateMonthlyReport(data: ReportData): Promise<Buffer> {
+  const template = await pdfService.getTemplate('monthly-report');
+  
+  const reportData = {
+    reportTitle: 'Monthly Sales Report',
+    period: `${data.month} ${data.year}`,
+    generatedAt: new Date().toISOString(),
+    summary: data.summary,
+    charts: await Promise.all(
+      data.charts.map(chart => generateChartImage(chart))
+    ),
+    tables: data.tables,
+    footer: `Generated on ${new Date().toLocaleDateString()}`
+  };
+  
+  return pdfService.generatePDF(template, reportData, {
+    format: 'A4',
+    landscape: true
+  });
+}
+```
+
+## Liên kết
+
+- [[document-processing]] - Document processing
+- [[ocr]] - OCR integration
+- [[storage]] - File storage
+- [[security]] - PDF security
+- [[performance]] - Performance optimization
+- [[templates]] - Template management

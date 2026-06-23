@@ -1,0 +1,36 @@
+---
+description: Nguyên tắc và best practices cho Cloudflare cho edge computing
+created: 2026-06-23
+version: 1.0.0
+tags: [cloudflare, cdn, edge, workers, enterprise]
+---
+
+# Cloudflare
+
+## Mục tiêu
+
+Cloudflare là CDN và cloud platform cung cấp edge computing, security, và performance services. Trong Cursor Enterprise Framework, Cloudflare được sử dụng cho CDN, DDoS protection, edge functions, và Workers deployment. Mục tiêu là hướng dẫn developers leverage Cloudflare services cho optimal performance và security.
+
+## Nguyên tắc
+
+**1. CDN Configuration**
+
+Cache rules. Purge strategies. Cache control headers. Origin shielding.
+
+**2. Edge Workers**
+
+Serverless at edge. Workers scripts. KV storage. Durable objects.
+
+**3. Security**
+
+DDoS protection. WAF rules. Bot management. SSL/TLS configuration.
+
+**4. DNS Management**
+
+DNSSEC. Load balancing. Traffic routing. Health checks.
+
+## Liên kết
+
+- [[performance]] - Performance
+- [[security]] - Security
+- [[deployment]] - Deployment

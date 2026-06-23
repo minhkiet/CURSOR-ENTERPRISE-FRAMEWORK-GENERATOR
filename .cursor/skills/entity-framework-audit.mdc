@@ -1,0 +1,896 @@
+---
+description: Skill audit Entity Framework Core implementations về query performance, tracking behavior, và best practices
+purpose: Cung cấp comprehensive EF Core audit framework để optimize queries, prevent N+1 problems, và ensure efficient database operations
+input:
+  - EF Core DbContext
+  - Entity definitions
+  - Repository patterns
+  - Query usage patterns
+output:
+  - Query optimization report
+  - N+1 detection results
+  - Tracking analysis
+  - Index recommendations
+  - Migration suggestions
+version: 1.0.0
+tags:
+  - entity-framework
+  - ef-core
+  - orm
+  - database
+  - performance
+---
+
+# Entity Framework Core Audit
+
+## Tổng quan
+
+Entity Framework Core Audit là skill chuyên biệt để audit và optimize EF Core implementations. Skill này cung cấp systematic approach để analyze DbContext configurations, identify N+1 query problems, optimize tracking behavior, review relationships, và ensure efficient database operations. Essential cho applications sử dụng EF Core as their ORM.
+
+## Purpose (Mục đử)
+
+EF Core is powerful nhưng easy to misuse:
+
+1. **N+1 queries**: Loading related data inefficiently
+2. **Excessive tracking**: Unnecessary change tracking overhead
+3. **Missing indexes**: Foreign keys without indexes
+4. **Poor projections**: Selecting all columns when not needed
+5. **Inefficient queries**: Client-side evaluation, missing eager loading
+
+Entity Framework Core Audit tồn tại để:
+
+- **Identify performance bottlenecks** trong EF Core usage
+- **Detect N+1 patterns** before they hit production
+- **Optimize tracking behavior** cho different scenarios
+- **Review entity relationships** cho efficiency
+- **Provide query optimization** recommendations
+
+## Input (Đầu vào)
+
+| Input | Mô tả | Required |
+|-------|-------|----------|
+| `dbcontext` | DbContext implementation | Yes |
+| `entities` | Entity class definitions | Yes |
+| `repositories` | Repository patterns used | No |
+| `query_logs` | EF Core query logs | No |
+
+## Output (Đầu ra)
+
+| Output | Mô tả | Format |
+|--------|-------|--------|
+| `n_plus_one_report` | N+1 detection results | Report |
+| `tracking_analysis` | Tracking behavior analysis | Analysis |
+| `index_recommendations` | Database index suggestions | List |
+| `query_optimizations` | Query rewrite suggestions | List |
+| `migration_scripts` | DDL for changes | Scripts |
+
+## Workflow (Quy trình)
+
+### Bước 1: DbContext Analysis
+
+```typescript
+// Analyze DbContext configuration
+interface DbContextAnalysis {
+  entities: EntityInfo[];
+  relationships: RelationshipInfo[];
+  configuration: DbContextConfig;
+  issues: ConfigurationIssue[];
+}
+
+async function analyzeDbContext(
+  dbContextPath: string
+): Promise<DbContextAnalysis> {
+  const content = await readFile(dbContextPath);
+  const parsed = parseDbContext(content);
+  
+  return {
+    entities: extractEntities(parsed),
+    relationships: extractRelationships(parsed),
+    configuration: analyzeConfiguration(parsed),
+    issues: identifyIssues(parsed)
+  };
+}
+
+function extractEntities(parsed: ParsedDbContext): EntityInfo[] {
+  return parsed.entitySets.map(set => ({
+    name: set.name,
+    entityType: set.entityType,
+    tableName: set.tableName || set.name,
+    keys: set.keys,
+    properties: set.properties.map(p => ({
+      name: p.name,
+      type: p.clrType,
+      columnName: p.columnName,
+      isNullable: p.isNullable,
+      isRequired: p.isRequired,
+      isKey: p.isKey,
+      isForeignKey: p.isForeignKey,
+      isConcurrencyToken: p.isConcurrencyToken
+    })),
+    indexes: set.indexes
+  }));
+}
+
+function extractRelationships(parsed: ParsedDbContext): RelationshipInfo[] {
+  return parsed.relationships.map(rel => ({
+    name: rel.name,
+    entityType: rel.entityType,
+    targetEntity: rel.targetEntity,
+    type: rel.type, // one-to-one, one-to-many, many-to-many
+    foreignKey: rel.foreignKey,
+    isRequired: rel.isRequired,
+    deleteBehavior: rel.deleteBehavior,
+    navigationProperty: rel.navigationProperty,
+    inverseNavigation: rel.inverseNavigation
+  }));
+}
+```
+
+### Bước 2: N+1 Query Detection
+
+```typescript
+// Detect N+1 query patterns
+interface NPlusOneDetection {
+  patterns: NPlusOnePattern[];
+  locations: NPlusOneLocation[];
+  severity: 'critical' | 'high' | 'medium' | 'low';
+  totalQueries: number;
+  suggestedFixes: FixSuggestion[];
+}
+
+class NPlusOneDetector {
+  private dbContextPath: string;
+  
+  constructor(dbContextPath: string) {
+    this.dbContextPath = dbContextPath;
+  }
+  
+  async detect(): Promise<NPlusOneDetection> {
+    const sourceFiles = await this.findQueryFiles();
+    const patterns: NPlusOnePattern[] = [];
+    const locations: NPlusOneLocation[] = [];
+    
+    for (const file of sourceFiles) {
+      const content = await readFile(file);
+      const tree = parseSyntaxTree(content);
+      
+      // Check for foreach loops with database access
+      const foreachLoops = this.findForeachLoops(tree);
+      
+      for (const loop of foreachLoops) {
+        const queries = this.findQueriesInLoop(loop);
+        
+        if (queries.length > 0) {
+          const pattern = this.classifyPattern(loop, queries);
+          patterns.push(pattern);
+          
+          locations.push({
+            file,
+            line: loop.startLine,
+            method: loop.methodName,
+            pattern,
+            estimatedQueryCount: this.estimateQueryCount(loop)
+          });
+        }
+      }
+      
+      // Check for explicit iteration with lazy loading
+      const lazyLoads = this.findLazyLoads(tree);
+      patterns.push(...lazyLoads.map(l => ({
+        type: 'lazy_loading',
+        severity: 'high' as const,
+        description: 'Lazy loading causes N+1',
+        entity: l.entity,
+        property: l.property
+      })));
+      
+      // Check for Select N+1 (selecting navigation properties in loop)
+      const selectNPlusOne = this.findSelectNPlusOne(tree);
+      patterns.push(...selectNPlusOne);
+    }
+    
+    return {
+      patterns,
+      locations,
+      severity: this.calculateOverallSeverity(patterns),
+      totalQueries: locations.reduce((sum, l) => sum + l.estimatedQueryCount, 0),
+      suggestedFixes: this.generateFixes(patterns)
+    };
+  }
+  
+  private findForeachLoops(tree: SyntaxTree): ForeachLoop[] {
+    const loops: ForeachLoop[] = [];
+    
+    // Find all foreach statements
+    const foreachStmts = tree.findAll('ForEachStatement');
+    
+    for (const stmt of foreachStmts) {
+      const body = stmt.body;
+      
+      // Check if body contains database queries
+      const queries = this.findQueriesInNode(body);
+      
+      if (queries.length > 0) {
+        loops.push({
+          variable: stmt.variable,
+          collection: stmt.collection,
+          body: body,
+          startLine: stmt.startLine,
+          endLine: stmt.endLine,
+          queries
+        });
+      }
+    }
+    
+    return loops;
+  }
+  
+  private findQueriesInLoop(loop: ForeachLoop): QueryInfo[] {
+    const queries: QueryInfo[] = [];
+    
+    // Find LINQ queries in loop body
+    const methodCalls = loop.body.findAll('InvocationExpression');
+    
+    for (const call of methodCalls) {
+      if (this.isDbSetMethod(call)) {
+        queries.push({
+          type: this.classifyDbCall(call),
+          method: call.methodName,
+          line: call.startLine
+        });
+      }
+    }
+    
+    return queries;
+  }
+  
+  private classifyPattern(
+    loop: ForeachLoop,
+    queries: QueryInfo[]
+  ): NPlusOnePattern {
+    // Classic N+1: foreach + query in body
+    if (queries.some(q => q.type === 'query')) {
+      return {
+        type: 'classic_n_plus_one',
+        severity: 'critical',
+        description: `Query executed ${loop.estimatedIterations || 'N'} times`
+      };
+    }
+    
+    // Include in foreach
+    if (loop.collection.includes('Include')) {
+      return {
+        type: 'include_in_foreach',
+        severity: 'medium',
+        description: 'Include inside foreach - consider batch loading'
+      };
+    }
+    
+    // Reference access (lazy loading)
+    if (queries.some(q => q.type === 'reference_access')) {
+      return {
+        type: 'lazy_loading',
+        severity: 'high',
+        description: 'Navigation property access triggers query'
+      };
+    }
+    
+    return {
+      type: 'unknown',
+      severity: 'low',
+      description: 'Potential N+1 pattern'
+    };
+  }
+  
+  private findLazyLoads(tree: SyntaxTree): LazyLoadInfo[] {
+    const lazyLoads: LazyLoadInfo[] = [];
+    
+    // Pattern: .Entity.Property where Entity is tracked
+    const memberAccesses = tree.findAll('MemberAccessExpression');
+    
+    for (const access of memberAccesses) {
+      // Check if accessing a navigation property
+      if (this.isNavigationProperty(access)) {
+        lazyLoads.push({
+          entity: access.expression.toString(),
+          property: access.memberName,
+          line: access.startLine
+        });
+      }
+    }
+    
+    return lazyLoads;
+  }
+  
+  private generateFixes(patterns: NPlusOnePattern[]): FixSuggestion[] {
+    return patterns.map(pattern => {
+      switch (pattern.type) {
+        case 'classic_n_plus_one':
+          return {
+            pattern: pattern.type,
+            fix: 'Use Include() with ThenInclude() for eager loading, or batch query',
+            example: `// Before (N+1)\nforeach (var order in orders)\n{\n    var customer = db.Customers.Find(order.CustomerId);\n}\n\n// After (Eager loading)\nvar orders = db.Orders.Include(o => o.Customer).ToList();`
+          };
+        
+        case 'lazy_loading':
+          return {
+            pattern: pattern.type,
+            fix: 'Use eager loading (Include) or explicit loading',
+            example: `// Before (Lazy loading)\nvar order = db.Orders.First();\nvar customerName = order.Customer.Name; // Triggers query\n\n// After (Eager loading)\nvar order = db.Orders.Include(o => o.Customer).First();`
+          };
+        
+        case 'collection_in_foreach':
+          return {
+            pattern: pattern.type,
+            fix: 'Use projection or batch query',
+            example: `// Before (Collection access)\nforeach (var user in users)\n{\n    var roles = db.Roles.Where(r => r.UserId == user.Id).ToList();\n}\n\n// After (Batch query)\nvar userIds = users.Select(u => u.Id).ToList();\nvar rolesByUser = db.Roles.Where(r => userIds.Contains(r.UserId)).ToLookup(r => r.UserId);`
+          };
+        
+        default:
+          return {
+            pattern: pattern.type,
+            fix: 'Review query pattern',
+            example: ''
+          };
+      }
+    });
+  }
+}
+```
+
+### Bước 3: Tracking Behavior Analysis
+
+```typescript
+// Analyze tracking behavior
+interface TrackingAnalysis {
+  queries: QueryTrackingInfo[];
+  issues: TrackingIssue[];
+  recommendations: TrackingRecommendation[];
+}
+
+async function analyzeTracking(
+  dbContext: string,
+  repositories: string[]
+): Promise<TrackingAnalysis> {
+  const queries: QueryTrackingInfo[] = [];
+  const issues: TrackingIssue[] = [];
+  
+  // Analyze DbContext configuration
+  const content = await readFile(dbContext);
+  const queriesInContext = findAllQueries(content);
+  
+  for (const query of queriesInContext) {
+    const trackingInfo = analyzeQueryTracking(query);
+    queries.push(trackingInfo);
+    
+    // Check for unnecessary tracking
+    if (trackingInfo.isTracked && !trackingInfo.modifiesData) {
+      issues.push({
+        type: 'unnecessary_tracking',
+        query: trackingInfo.query,
+        severity: 'medium',
+        suggestion: 'Add .AsNoTracking() for read-only queries',
+        impact: 'Memory usage and change tracking overhead'
+      });
+    }
+    
+    // Check for tracking with projections
+    if (trackingInfo.isTracked && trackingInfo.hasProjection) {
+      issues.push({
+        type: 'tracking_with_projection',
+        query: trackingInfo.query,
+        severity: 'low',
+        suggestion: 'Use AsNoTracking() with projections for better performance',
+        impact: 'Unnecessary entity materialization'
+      });
+    }
+  }
+  
+  // Check repository patterns
+  for (const repo of repositories) {
+    const repoContent = await readFile(repo);
+    const repoQueries = findAllQueries(repoContent);
+    
+    for (const query of repoQueries) {
+      // Read operations should typically use AsNoTracking
+      if (isReadOnlyQuery(query) && !query.asNoTracking) {
+        issues.push({
+          type: 'tracking_in_read',
+          query: query.query,
+          location: repo,
+          severity: 'medium',
+          suggestion: 'Use AsNoTracking() for read-only operations'
+        });
+      }
+    }
+  }
+  
+  return {
+    queries,
+    issues,
+    recommendations: generateTrackingRecommendations(issues)
+  };
+}
+
+function analyzeQueryTracking(query: ParsedQuery): QueryTrackingInfo {
+  return {
+    query: query.raw,
+    isTracked: !query.asNoTracking && !query.asNoTrackingWithIdentityResolution,
+    hasProjection: query.selectClause !== null,
+    modifiesData: false, // Would need more analysis
+    usesInclude: query.includes.length > 0,
+    usesThenInclude: query.thenIncludes.length > 0,
+    useOfSplitQuery: query.isSplitQuery
+  };
+}
+```
+
+### Bước 4: Index Recommendations
+
+```typescript
+// Generate index recommendations
+interface IndexRecommendation {
+  table: string;
+  columns: string[];
+  indexType: 'btree' | 'hash' | 'gin' | 'gist';
+  reason: string;
+  estimatedImpact: string;
+  existingIndex?: string;
+  migration: string;
+}
+
+async function generateIndexRecommendations(
+  dbContextPath: string
+): Promise<IndexRecommendation[]> {
+  const recommendations: IndexRecommendation[] = [];
+  
+  // Analyze foreign keys
+  const relationships = await extractRelationships(dbContextPath);
+  
+  for (const rel of relationships) {
+    // Check if FK column has index
+    const hasIndex = await checkIndexExists(rel.tableName, rel.foreignKeyColumns);
+    
+    if (!hasIndex) {
+      recommendations.push({
+        table: rel.tableName,
+        columns: rel.foreignKeyColumns,
+        indexType: 'btree',
+        reason: 'Foreign key column should be indexed for join performance',
+        estimatedImpact: `Improves ${rel.type} query performance`,
+        migration: `CREATE INDEX idx_${rel.tableName}_${rel.foreignKeyColumns.join('_')} ON ${rel.tableName} (${rel.foreignKeyColumns.join(', ')});`
+      });
+    }
+  }
+  
+  // Analyze WHERE clauses
+  const queries = await extractWhereClauses(dbContextPath);
+  const columnUsage = countColumnUsageInWhere(queries);
+  
+  for (const [table, columns] of Object.entries(columnUsage)) {
+    for (const [column, count] of Object.entries(columns)) {
+      if (count >= 3) { // Column used in 3+ WHERE clauses
+        const hasIndex = await checkIndexExists(table, [column]);
+        
+        if (!hasIndex) {
+          recommendations.push({
+            table,
+            columns: [column],
+            indexType: 'btree',
+            reason: `Column used in ${count} WHERE clauses`,
+            estimatedImpact: 'High - frequently filtered column',
+            migration: `CREATE INDEX idx_${table}_${column} ON ${table} (${column});`
+          });
+        }
+      }
+    }
+  }
+  
+  // Analyze ORDER BY clauses
+  const orderByColumns = await extractOrderByColumns(dbContextPath);
+  
+  for (const [table, columns] of Object.entries(orderByColumns)) {
+    if (columns.length > 0) {
+      const existingIndex = await findCoveringIndex(table, columns);
+      
+      if (!existingIndex) {
+        recommendations.push({
+          table,
+          columns,
+          indexType: 'btree',
+          reason: 'Columns used in ORDER BY',
+          estimatedImpact: 'Eliminates sort operations',
+          migration: `CREATE INDEX idx_${table}_${columns.join('_')} ON ${table} (${columns.join(', ')});`
+        });
+      }
+    }
+  }
+  
+  return recommendations;
+}
+
+function countColumnUsageInWhere(
+  queries: ParsedQuery[]
+): Record<string, Record<string, number>> {
+  const usage: Record<string, Record<string, number>> = {};
+  
+  for (const query of queries) {
+    for (const column of query.filteredColumns) {
+      if (!usage[column.table]) {
+        usage[column.table] = {};
+      }
+      usage[column.table][column.name] = (usage[column.table][column.name] || 0) + 1;
+    }
+  }
+  
+  return usage;
+}
+```
+
+### Bước 5: Query Optimization
+
+```typescript
+// Generate query optimization suggestions
+interface QueryOptimization {
+  original: string;
+  optimized: string;
+  technique: string;
+  estimatedImprovement: string;
+  beforeMetrics: QueryMetrics;
+  afterMetrics: QueryMetrics;
+}
+
+class QueryOptimizer {
+  async optimizeQueries(
+    slowQueries: ParsedQuery[]
+  ): Promise<QueryOptimization[]> {
+    const optimizations: QueryOptimization[] = [];
+    
+    for (const query of slowQueries) {
+      const optimization = await this.optimizeQuery(query);
+      if (optimization) {
+        optimizations.push(optimization);
+      }
+    }
+    
+    return optimizations;
+  }
+  
+  private async optimizeQuery(query: ParsedQuery): Promise<QueryOptimization | null> {
+    const techniques: OptimizationTechnique[] = [];
+    
+    // Check for SELECT *
+    if (query.hasSelectStar) {
+      techniques.push({
+        name: 'Projection',
+        description: 'Select only needed columns',
+        example: `// Before\nvar data = db.Products.ToList();\n\n// After\nvar data = db.Products\n    .Select(p => new { p.Id, p.Name, p.Price })\n    .ToList();`
+      });
+    }
+    
+    // Check for missing AsNoTracking
+    if (!query.asNoTracking && isReadOnly(query)) {
+      techniques.push({
+        name: 'NoTracking',
+        description: 'Disable change tracking for read-only queries',
+        example: `db.Products.AsNoTracking().Where(...).ToList();`
+      });
+    }
+    
+    // Check for client-side evaluation
+    if (query.hasClientEvaluation) {
+      techniques.push({
+        name: 'ServerSideEvaluation',
+        description: 'Move filtering to database',
+        example: `// Avoid client-side evaluation\ndb.Products.Where(p => ExpensiveMethod(p)).ToList();\n\n// Use server-side filtering\ndb.Products.Where(p => p.Price > minPrice).ToList();`
+      });
+    }
+    
+    // Check for missing pagination
+    if (!query.hasSkipTake && query.mayReturnMany) {
+      techniques.push({
+        name: 'Pagination',
+        description: 'Add pagination to limit result size',
+        example: `db.Products.Skip(0).Take(pageSize).ToList();`
+      });
+    }
+    
+    // Generate optimized query
+    let optimized = query.raw;
+    
+    for (const tech of techniques) {
+      optimized = this.applyOptimization(optimized, tech.name);
+    }
+    
+    if (techniques.length === 0) {
+      return null;
+    }
+    
+    return {
+      original: query.raw,
+      optimized,
+      technique: techniques.map(t => t.name).join(', '),
+      estimatedImprovement: this.estimateImprovement(techniques),
+      beforeMetrics: await this.measureQuery(query.raw),
+      afterMetrics: await this.measureQuery(optimized)
+    };
+  }
+  
+  private applyOptimization(query: string, technique: string): string {
+    // Simplified - actual implementation would be more sophisticated
+    switch (technique) {
+      case 'NoTracking':
+        if (!query.includes('AsNoTracking')) {
+          const match = query.match(/(\w+)\.(\w+)\(/);
+          if (match) {
+            return query.replace(
+              match[0],
+              `${match[1]}.${match[2]}.AsNoTracking(`
+            );
+          }
+        }
+        return query;
+        
+      case 'Pagination':
+        if (!query.includes('Skip') && !query.includes('Take')) {
+          return query.replace('ToList()', 'Take(1000).ToList()');
+        }
+        return query;
+        
+      default:
+        return query;
+    }
+  }
+}
+```
+
+### Bước 6: Migration Planning
+
+```typescript
+// Generate migration scripts
+interface MigrationPlan {
+  indexMigrations: string[];
+  queryChanges: QueryChange[];
+  breakingChanges: BreakingChange[];
+  rollbackPlan: string;
+}
+
+function generateMigrationPlan(
+  recommendations: {
+    indexes: IndexRecommendation[];
+    queryOptimizations: QueryOptimization[];
+    trackingChanges: TrackingIssue[];
+  }
+): MigrationPlan {
+  const indexMigrations: string[] = [];
+  const queryChanges: QueryChange[] = [];
+  const breakingChanges: BreakingChange[] = [];
+  
+  // Index migrations
+  for (const idx of recommendations.indexes) {
+    indexMigrations.push(`-- Create index for ${idx.table}.${idx.columns.join(', ')}
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_${idx.table}_${idx.columns.join('_')}
+ON ${idx.table} (${idx.columns.join(', ')});`);
+  }
+  
+  // Query changes
+  for (const opt of recommendations.queryOptimizations) {
+    queryChanges.push({
+      file: opt.sourceFile,
+      original: opt.original,
+      optimized: opt.optimized,
+      reason: opt.technique
+    });
+  }
+  
+  return {
+    indexMigrations,
+    queryChanges,
+    breakingChanges,
+    rollbackPlan: generateRollbackPlan(recommendations)
+  };
+}
+```
+
+## Checklist (Danh sách kiểm tra)
+
+- [ ] All foreign keys have indexes
+- [ ] Read-only queries use AsNoTracking()
+- [ ] Eager loading (Include) used instead of lazy loading
+- [ ] No SELECT * in queries
+- [ ] Pagination on all list endpoints
+- [ ] No N+1 patterns in loops
+- [ ] Split queries for large collections
+- [ ] Proper use of AsNoTrackingWithIdentityResolution
+- [ ] Batch operations for bulk updates
+- [ ] Change tracking disabled where appropriate
+- [ ] No client-side evaluation
+- [ ] Compiled queries for repeated operations
+- [ ] Global query filters for soft deletes
+- [ ] Proper concurrency tokens configured
+- [ ] Indexes for frequently filtered columns
+
+## Examples (Ví dụ)
+
+### Ví dụ 1: Full EF Core Audit
+
+```typescript
+async function auditEFCore(
+  dbContextPath: string,
+  repositoryPaths: string[]
+): Promise<EFAuditReport> {
+  console.log('Starting EF Core audit...');
+  
+  // 1. DbContext analysis
+  const dbAnalysis = await analyzeDbContext(dbContextPath);
+  console.log(`Found ${dbAnalysis.entities.length} entities`);
+  
+  // 2. N+1 detection
+  const nPlusOne = await new NPlusOneDetector(dbContextPath).detect();
+  console.log(`Found ${nPlusOne.patterns.length} N+1 patterns`);
+  
+  // 3. Tracking analysis
+  const tracking = await analyzeTracking(dbContextPath, repositoryPaths);
+  console.log(`Found ${tracking.issues.length} tracking issues`);
+  
+  // 4. Index recommendations
+  const indexes = await generateIndexRecommendations(dbContextPath);
+  console.log(`Recommended ${indexes.length} indexes`);
+  
+  // 5. Query optimizations
+  const optimizer = new QueryOptimizer();
+  const optimizations = await optimizer.optimizeQueries(
+    await getSlowQueries(dbContextPath)
+  );
+  console.log(`Generated ${optimizations.length} optimizations`);
+  
+  return {
+    timestamp: new Date(),
+    dbContext: dbAnalysis,
+    nPlusOne,
+    tracking,
+    indexes,
+    optimizations,
+    migrationPlan: generateMigrationPlan({ indexes, optimizations, tracking }),
+    summary: generateSummary({ nPlusOne, tracking, indexes, optimizations }),
+    recommendations: prioritizeRecommendations({ nPlusOne, tracking, indexes, optimizations })
+  };
+}
+```
+
+### Ví dụ 2: Fix N+1 Pattern
+
+```typescript
+// Common N+1 pattern detection và fix
+
+// ❌ BEFORE: N+1 Query
+async function GetOrdersWithCustomers_N_plus_1(orderIds: number[]) {
+  var orders = await _context.Orders
+    .Where(o => orderIds.Contains(o.Id))
+    .ToListAsync();
+  
+  var result = new List<OrderDto>();
+  foreach (var order in orders) {
+    // N+1: Query for each customer!
+    var customer = await _context.Customers.FindAsync(order.CustomerId);
+    result.Add(new OrderDto {
+      OrderId = order.Id,
+      CustomerName = customer.Name
+    });
+  }
+  return result;
+}
+
+// ✅ AFTER: Eager Loading
+async function GetOrdersWithCustomers_Eager(orderIds: number[]) {
+  var orders = await _context.Orders
+    .Where(o => orderIds.Contains(o.Id))
+    .Include(o => o.Customer)  // Eager load
+    .AsNoTracking()  // Read-only
+    .ToListAsync();
+  
+  return orders.Select(o => new OrderDto {
+    OrderId = o.Id,
+    CustomerName = o.Customer.Name
+  }).ToList();
+}
+
+// ✅ ALTERNATIVE: Projection
+async function GetOrdersWithCustomers_Projection(orderIds: number[]) {
+  return await _context.Orders
+    .Where(o => orderIds.Contains(o.Id))
+    .Select(o => new OrderDto {
+      OrderId = o.Id,
+      CustomerName = o.Customer.Name  // EF handles this efficiently
+    })
+    .AsNoTracking()
+    .ToListAsync();
+}
+```
+
+## Anti Patterns (Các pattern cần tránh)
+
+### 1. Lazy Loading Everywhere
+```csharp
+// ❌ BAD: Lazy loading enabled globally
+protected override void OnConfiguring(DbContextOptionsBuilder options)
+    => options.UseLazyLoadingProxies();
+
+// ❌ BAD: Accessing navigation in loop
+foreach (var order in orders)
+{
+    var customerName = order.Customer.Name; // Triggers query each time!
+}
+
+// ✅ GOOD: Eager loading
+var orders = await _context.Orders
+    .Include(o => o.Customer)
+    .AsNoTracking()
+    .ToListAsync();
+```
+
+### 2. Tracking Everything
+```csharp
+// ❌ BAD: Track all queries
+var products = await _context.Products.ToListAsync();
+
+// ✅ GOOD: No tracking for read-only
+var products = await _context.Products
+    .AsNoTracking()
+    .ToListAsync();
+```
+
+### 3. SELECT * Usage
+```csharp
+// ❌ BAD: Select all columns
+var products = await _context.Products.ToListAsync();
+
+// ✅ GOOD: Select only needed columns
+var products = await _context.Products
+    .Select(p => new { p.Id, p.Name, p.Price })
+    .AsNoTracking()
+    .ToListAsync();
+```
+
+### 4. Missing Pagination
+```csharp
+// ❌ BAD: Load all records
+var orders = await _context.Orders.ToListAsync(); // Could be millions!
+
+// ✅ GOOD: Paginate
+var orders = await _context.Orders
+    .OrderBy(o => o.OrderDate)
+    .Skip(page * pageSize)
+    .Take(pageSize)
+    .AsNoTracking()
+    .ToListAsync();
+```
+
+### 5. Synchronous Over Async
+```csharp
+// ❌ BAD: Synchronous call
+var order = _context.Orders.FirstOrDefault(o => o.Id == id);
+
+// ✅ GOOD: Async for web applications
+var order = await _context.Orders
+    .FirstOrDefaultAsync(o => o.Id == id);
+```
+
+## Best Practices (Thực hành tốt nhất)
+
+1. **Disable lazy loading by default**: Enable only when needed explicitly
+2. **Use AsNoTracking() for read-only queries**: Significant performance gain
+3. **Use Include() for related data**: Batch load instead of lazy loading
+4. **Project to DTOs**: Select only needed data
+5. **Paginate list endpoints**: Always limit result sets
+6. **Use compiled queries for hot paths**: Repeated similar queries
+7. **Configure indexes in Fluent API**: Document expected queries
+8. **Use split queries for large Include()**: Avoid Cartesian product
+9. **Consider stored procedures for complex queries**: When EF can't optimize
+10. **Monitor query performance**: Use logging and profiling
+
+## Liên kết (Cross-references)
+
+- **Related Skills**: [postgres-optimization](./postgres-optimization.mdc), [aspnet-review](./aspnet-review.mdc), [database-optimization](./database-optimization.mdc)
+- **Documentation**: Microsoft EF Core Docs
+- **Tools**: EF Core Profiler, SQL Server Profiler

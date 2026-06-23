@@ -1,0 +1,55 @@
+---
+description: Nguyên tắc Microservices cho distributed systems
+created: 2026-06-23
+version: 1.0.0
+tags: [microservices, distributed, api-gateway, service-mesh, enterprise]
+---
+
+# Microservice
+
+## Mục tiêu
+
+Microservices là một architectural style tổ chức application thành các services nhỏ, độc lập, có thể deploy được. Trong Cursor Enterprise Framework, microservices được sử dụng cho các ứng dụng cần independent scaling, technology diversity, và team autonomy. Mục tiêu là hướng dẫn developers decompose systems appropriately và manage microservices complexity.
+
+Microservices mang lại nhiều benefits nhưng cũng introduce complexity về distributed systems. Rule này cover service decomposition, inter-service communication, data management, và operational patterns.
+
+## Nguyên tắc
+
+**1. Service Boundaries**
+
+Define bounded contexts clearly. Single responsibility per service. Loose coupling, high cohesion. Team owns service. Database per service.
+
+**2. API Design**
+
+Well-defined APIs per service. Versioning strategy. Contract testing. Documentation. Backward compatibility.
+
+**3. Communication Patterns**
+
+Synchronous: REST, gRPC. Asynchronous: Events, messaging. Choose based on use case. Don't share databases.
+
+**4. Data Management**
+
+Database per service. Eventual consistency. Saga pattern for distributed transactions. CQRS where appropriate.
+
+**5. Service Discovery**
+
+Dynamic service registration. Discovery mechanisms. Load balancing. Health checks.
+
+**6. Resilience**
+
+Circuit breakers. Bulkheads. Retry policies. Fallbacks. Timeouts.
+
+**7. Observability**
+
+Distributed tracing. Correlation IDs. Centralized logging. Metrics per service.
+
+**8. Deployment**
+
+Containerization. CI/CD per service. Independent deployment. Blue-green deployments.
+
+## Liên kết
+
+- [[clean-architecture]] - Clean Architecture
+- [[docker]] - Docker
+- [[kubernetes]] - Kubernetes
+- [[queue]] - Message Queue

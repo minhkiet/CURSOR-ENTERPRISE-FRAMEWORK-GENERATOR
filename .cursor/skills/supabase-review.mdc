@@ -1,0 +1,841 @@
+---
+description: Skill đánh giá và review Supabase implementations bao gồm database schema, authentication, real-time features, và edge functions
+purpose: Cung cấp comprehensive review framework cho Supabase projects, identify optimization opportunities và best practice violations
+input:
+  - Supabase project configuration
+  - Database schemas và migrations
+  - Auth configuration
+  - Row Level Security policies
+  - Edge functions code
+  - Storage buckets
+output:
+  - Architecture review
+  - Security assessment
+  - Performance analysis
+  - Optimization recommendations
+  - Migration plan
+  - Cost estimation
+version: 1.0.0
+tags:
+  - supabase
+  - backend
+  - database
+  - review
+---
+
+# Supabase Review
+
+## Tổng quan
+
+Supabase Review là skill chuyên biệt để review và assess Supabase implementations trong Cursor Enterprise Framework. Skill này cung cấp systematic approach để evaluate database schema design, Row Level Security policies, authentication setup, edge functions, storage configuration, và real-time subscriptions. Phù hợp cho both new projects và existing production systems cần audit.
+
+## Purpose (Mục đích)
+
+Supabase là powerful backend-as-a-service platform, nhưng đi kèm với unique considerations:
+
+1. **Database design**: PostgreSQL underneath nhưng với Supabase-specific features
+2. **Security patterns**: RLS policies require careful design
+3. **Auth integration**: Multiple auth providers và JWT handling
+4. **Edge functions**: Deno runtime với specific constraints
+5. **Cost optimization**: Usage-based pricing requires careful planning
+
+Supabase Review tồn tại để:
+
+- **Audit existing implementations** for security và best practices
+- **Identify performance bottlenecks** in queries và indexes
+- **Review RLS policies** for correctness và completeness
+- **Assess auth configuration** for security
+- **Optimize costs** by identifying waste
+- **Provide actionable recommendations** with implementation guides
+
+## Input (Đầu vào)
+
+| Input | Mô tả | Required |
+|-------|-------|----------|
+| `project_ref` | Supabase project reference | Yes |
+| `schema_dump` | Database schema export | Yes |
+| `rlp_policies` | RLS policy configurations | Yes |
+| `edge_functions` | Edge function code | No |
+| `storage_config` | Storage bucket configurations | No |
+| `usage_metrics` | Usage statistics | No |
+
+## Output (Đầu ra)
+
+| Output | Mô tả | Format |
+|--------|-------|--------|
+| `architecture_review` | Overall architecture assessment | Report |
+| `security_audit` | Security findings và recommendations | Audit |
+| `performance_review` | Query và index analysis | Review |
+| `rlp_analysis` | RLS policy analysis | Analysis |
+| `cost_analysis` | Cost optimization suggestions | Analysis |
+| `action_items` | Prioritized improvements | List |
+
+## Workflow (Quy trình)
+
+### Bước 1: Project Discovery
+
+```typescript
+// Discover và document current Supabase setup
+interface SupabaseProject {
+  ref: string;
+  region: string;
+  plan: 'free' | 'pro' | 'team' | 'enterprise';
+  database: DatabaseConfig;
+  auth: AuthConfig;
+  storage: StorageConfig;
+  realtime: RealtimeConfig;
+  functions: FunctionsConfig;
+}
+
+async function discoverProject(
+  supabase: SupabaseClient
+): Promise<SupabaseProject> {
+  // Get project info
+  const { data: project } = await supabase.rpc('get_project_info');
+  
+  // Get database stats
+  const dbStats = await getDatabaseStats(supabase);
+  
+  // Get auth providers
+  const authConfig = await getAuthConfig(supabase);
+  
+  // Get storage buckets
+  const storageConfig = await getStorageConfig(supabase);
+  
+  // Get realtime status
+  const realtimeConfig = await getRealtimeConfig(supabase);
+  
+  return {
+    ref: project.ref,
+    region: project.region,
+    plan: project.plan,
+    database: dbStats,
+    auth: authConfig,
+    storage: storageConfig,
+    realtime: realtimeConfig,
+    functions: await getFunctionsConfig()
+  };
+}
+
+async function getDatabaseStats(
+  supabase: SupabaseClient
+): Promise<DatabaseConfig> {
+  const queries = await Promise.all([
+    supabase.rpc('get_table_count'),
+    supabase.rpc('get_total_rows'),
+    supabase.rpc('get_index_count'),
+    supabase.rpc('get_database_size')
+  ]);
+  
+  return {
+    tables: queries[0].data,
+    totalRows: queries[1].data,
+    indexes: queries[2].data,
+    size: queries[3].data,
+    extensions: await getEnabledExtensions(supabase)
+  };
+}
+```
+
+### Bước 2: Schema Analysis
+
+```typescript
+// Analyze database schema
+interface SchemaAnalysis {
+  tables: TableAnalysis[];
+  relationships: Relationship[];
+  indexes: IndexAnalysis[];
+  missingIndexes: IndexRecommendation[];
+  denormalizationOpportunities: Suggestion[];
+  partitionOpportunities: Suggestion[];
+  issues: SchemaIssue[];
+}
+
+async function analyzeSchema(
+  supabase: SupabaseClient
+): Promise<SchemaAnalysis> {
+  // Get all tables
+  const tables = await getAllTables(supabase);
+  
+  const tableAnalyses: TableAnalysis[] = [];
+  const allRelationships: Relationship[] = [];
+  
+  for (const table of tables) {
+    // Analyze each table
+    const tableAnalysis = await analyzeTable(supabase, table);
+    tableAnalyses.push(tableAnalysis);
+    
+    // Extract relationships
+    allRelationships.push(...tableAnalysis.foreignKeys);
+    
+    // Analyze indexes
+    await analyzeIndexes(supabase, table);
+  }
+  
+  return {
+    tables: tableAnalyses,
+    relationships: allRelationships,
+    indexes: await analyzeAllIndexes(supabase, tables),
+    missingIndexes: await findMissingIndexes(supabase, tables),
+    denormalizationOpportunities: await findDenormOpportunities(tables),
+    partitionOpportunities: await findPartitionOpportunities(tables),
+    issues: await identifySchemaIssues(tables)
+  };
+}
+
+async function analyzeTable(
+  supabase: SupabaseClient,
+  table: TableInfo
+): Promise<TableAnalysis> {
+  // Get table structure
+  const columns = await getTableColumns(supabase, table.name);
+  
+  // Get row count
+  const { count } = await supabase
+    .from(table.name)
+    .select('*', { count: 'exact', head: true });
+  
+  // Get column stats
+  const stats = await getColumnStats(supabase, table.name);
+  
+  // Get constraints
+  const constraints = await getTableConstraints(supabase, table.name);
+  
+  // Check for UUID primary keys
+  const hasUUIDPK = columns.some(c => 
+    c.isPrimaryKey && c.dataType === 'uuid'
+  );
+  
+  // Check for timestamps
+  const hasCreatedAt = columns.some(c => 
+    c.name === 'created_at' && c.dataType === 'timestamp with time zone'
+  );
+  
+  return {
+    name: table.name,
+    rowCount: count || 0,
+    columns: columns.map(c => ({
+      name: c.name,
+      type: c.dataType,
+      nullable: c.isNullable,
+      hasDefault: !!c.columnDefault,
+      isPrimaryKey: c.isPrimaryKey,
+      isForeignKey: !!c.references
+    })),
+    sizeEstimate: estimateTableSize(columns, count || 0),
+    issues: identifyTableIssues(columns, count || 0, constraints),
+    suggestions: generateTableSuggestions(columns, stats, count || 0)
+  };
+}
+```
+
+### Bước 3: RLS Policy Review
+
+```typescript
+// Review Row Level Security policies
+interface RLSPolicyAnalysis {
+  tables: TableRLSAnalysis[];
+  publicAccessRisks: Risk[];
+  policyGaps: Gap[];
+  performanceIssues: Issue[];
+  recommendations: Recommendation[];
+}
+
+async function analyzeRLSPolicies(
+  supabase: SupabaseClient
+): Promise<RLSPolicyAnalysis> {
+  const tables = await getAllTables(supabase);
+  const tableAnalyses: TableRLSAnalysis[] = [];
+  const risks: Risk[] = [];
+  
+  for (const table of tables) {
+    const policies = await getTablePolicies(supabase, table.name);
+    const rlsEnabled = await isRLSEnabled(supabase, table.name);
+    
+    const analysis: TableRLSAnalysis = {
+      table: table.name,
+      rlsEnabled,
+      policies,
+      issues: []
+    };
+    
+    // Check for public access
+    if (rlsEnabled && policies.some(p => p.roles.includes('anon'))) {
+      const publicPolicies = policies.filter(p => 
+        p.roles.includes('anon') && !p.withCheck && !p.using
+      );
+      
+      if (publicPolicies.length > 0) {
+        risks.push({
+          severity: 'high',
+          table: table.name,
+          issue: 'Public access with no conditions',
+          policies: publicPolicies.map(p => p.name)
+        });
+      }
+    }
+    
+    // Check for missing SELECT policies
+    const selectPolicies = policies.filter(p => p.command === 'SELECT');
+    if (rlsEnabled && selectPolicies.length === 0) {
+      analysis.issues.push({
+        type: 'missing_policy',
+        command: 'SELECT',
+        message: 'No SELECT policy - may cause access denied'
+      });
+    }
+    
+    // Check for missing INSERT policies
+    const insertPolicies = policies.filter(p => p.command === 'INSERT');
+    if (rlsEnabled && insertPolicies.length === 0) {
+      analysis.issues.push({
+        type: 'missing_policy',
+        command: 'INSERT',
+        message: 'No INSERT policy - inserts may be denied'
+      });
+    }
+    
+    tableAnalyses.push(analysis);
+  }
+  
+  return {
+    tables: tableAnalyses,
+    publicAccessRisks: risks,
+    policyGaps: findPolicyGaps(tableAnalyses),
+    performanceIssues: analyzeRLSPerformance(tableAnalyses),
+    recommendations: generateRLSRecommendations(tableAnalyses)
+  };
+}
+
+function analyzeRLSPerformance(
+  analyses: TableRLSAnalysis[]
+): Issue[] {
+  const issues: Issue[] = [];
+  
+  for (const analysis of analyses) {
+    for (const policy of analysis.policies) {
+      // Check for non-deterministic functions in policies
+      if (policy.using?.includes('now()') || 
+          policy.using?.includes('random()')) {
+        issues.push({
+          severity: 'medium',
+          table: analysis.table,
+          policy: policy.name,
+          issue: 'Non-deterministic functions may cause performance issues'
+        });
+      }
+      
+      // Check for subqueries in policies
+      if (policy.using?.includes('SELECT')) {
+        issues.push({
+          severity: 'medium',
+          table: analysis.table,
+          policy: policy.name,
+          issue: 'Subqueries in policies may impact performance'
+        });
+      }
+      
+      // Check for complex conditions
+      if (policy.using && policy.using.length > 500) {
+        issues.push({
+          severity: 'low',
+          table: analysis.table,
+          policy: policy.name,
+          issue: 'Very long policy expression - consider simplifying'
+        });
+      }
+    }
+  }
+  
+  return issues;
+}
+```
+
+### Bước 4: Query Performance Analysis
+
+```typescript
+// Analyze query performance
+interface QueryPerformanceAnalysis {
+  slowQueries: SlowQuery[];
+  missingIndexes: MissingIndex[];
+  n_plus_one_patterns: Pattern[];
+  inefficient_joins: JoinIssue[];
+  recommendations: QueryRecommendation[];
+}
+
+async function analyzeQueryPerformance(
+  supabase: SupabaseClient
+): Promise<QueryPerformanceAnalysis> {
+  // Get query statistics from pg_stat_statements
+  const queryStats = await getQueryStats(supabase);
+  
+  // Find slow queries
+  const slowQueries = queryStats
+    .filter(q => q.mean_exec_time > 100) // > 100ms average
+    .map(q => ({
+      query: normalizeQuery(q.query),
+      meanTime: q.mean_exec_time,
+      calls: q.calls,
+      totalTime: q.total_exec_time,
+      suggestions: suggestOptimizations(q)
+    }))
+    .sort((a, b) => b.totalTime - a.totalTime);
+  
+  // Find missing indexes
+  const missingIndexes = await findMissingIndexesFromStats(queryStats);
+  
+  // Detect N+1 patterns
+  const nPlusOne = await detectNPlusOnePatterns(supabase);
+  
+  // Analyze joins
+  const joinIssues = await analyzeJoins(supabase, queryStats);
+  
+  return {
+    slowQueries,
+    missingIndexes,
+    n_plus_one_patterns: nPlusOne,
+    inefficient_joins: joinIssues,
+    recommendations: generateQueryRecommendations(slowQueries, missingIndexes)
+  };
+}
+
+async function detectNPlusOnePatterns(
+  supabase: SupabaseClient
+): Promise<Pattern[]> {
+  const patterns: Pattern[] = [];
+  
+  // Get recent queries
+  const recentQueries = await getRecentQueries(supabase);
+  
+  // Group queries by pattern
+  const queryGroups = groupByPattern(recentQueries);
+  
+  for (const [pattern, queries] of Object.entries(queryGroups)) {
+    if (pattern.includes('SELECT') && 
+        pattern.includes('FROM') && 
+        queries.length > 10) {
+      // Check if this looks like N+1
+      const hasSubquery = queries.some(q => 
+        q.includes('SELECT') && q.includes('WHERE id IN')
+      );
+      
+      if (hasSubquery) {
+        patterns.push({
+          type: 'n_plus_one',
+          severity: 'high',
+          pattern: pattern.substring(0, 200),
+          occurrenceCount: queries.length,
+          suggestion: 'Use JOIN or batch query instead'
+        });
+      }
+    }
+  }
+  
+  return patterns;
+}
+```
+
+### Bước 5: Auth Security Review
+
+```typescript
+// Review authentication configuration
+interface AuthSecurityReview {
+  providers: ProviderConfig[];
+  securitySettings: SecuritySettings;
+  vulnerabilities: Vulnerability[];
+  mfaStatus: MFAStatus;
+  sessionConfig: SessionConfig;
+  recommendations: AuthRecommendation[];
+}
+
+async function reviewAuthSecurity(
+  supabase: SupabaseClient
+): Promise<AuthSecurityReview> {
+  // Get auth providers
+  const providers = await getAuthProviders(supabase);
+  
+  // Get security settings
+  const settings = await getSecuritySettings(supabase);
+  
+  // Analyze vulnerabilities
+  const vulnerabilities: Vulnerability[] = [];
+  
+  // Check for weak password policy
+  if (settings.passwordMinLength < 8) {
+    vulnerabilities.push({
+      severity: 'medium',
+      type: 'weak_password_policy',
+      message: 'Password minimum length should be at least 8',
+      current: settings.passwordMinLength
+    });
+  }
+  
+  // Check for email confirmations
+  if (!settings.emailConfirm) {
+    vulnerabilities.push({
+      severity: 'high',
+      type: 'no_email_confirmation',
+      message: 'Email confirmation is disabled - users may use unverified emails'
+    });
+  }
+  
+  // Check session configuration
+  const sessionIssues = analyzeSessionConfig(settings);
+  vulnerabilities.push(...sessionIssues);
+  
+  // Check MFA status
+  const mfaStatus = await checkMFAStatus(supabase);
+  
+  return {
+    providers,
+    securitySettings: settings,
+    vulnerabilities,
+    mfaStatus,
+    sessionConfig: settings.session,
+    recommendations: generateAuthRecommendations(vulnerabilities)
+  };
+}
+
+function analyzeSessionConfig(settings: SecuritySettings): Vulnerability[] {
+  const issues: Vulnerability[] = [];
+  
+  // Check JWT expiry
+  if (settings.session.jwtExpiry > 3600) { // > 1 hour
+    issues.push({
+      severity: 'low',
+      type: 'long_jwt_expiry',
+      message: 'Long JWT expiry increases window for token theft',
+      current: `${settings.session.jwtExpiry}s`,
+      recommended: '3600'
+    });
+  }
+  
+  // Check for refresh token rotation
+  if (!settings.session.refreshTokenRotation) {
+    issues.push({
+      severity: 'medium',
+      type: 'no_refresh_rotation',
+      message: 'Refresh token rotation is disabled',
+      recommendation: 'Enable refresh token rotation'
+    });
+  }
+  
+  // Check for secure cookie settings
+  if (!settings.session.secureCookie) {
+    issues.push({
+      severity: 'medium',
+      type: 'insecure_cookie',
+      message: 'Secure cookie flag is disabled',
+      recommendation: 'Enable secure cookie for HTTPS'
+    });
+  }
+  
+  return issues;
+}
+```
+
+### Bước 6: Cost Analysis
+
+```typescript
+// Analyze Supabase costs
+interface CostAnalysis {
+  currentUsage: UsageMetrics;
+  costBreakdown: CostItem[];
+  optimizationOpportunities: Opportunity[];
+  projectedCosts: ProjectedCost[];
+  recommendations: CostRecommendation[];
+}
+
+async function analyzeCosts(
+  supabase: SupabaseClient
+): Promise<CostAnalysis> {
+  // Get usage metrics
+  const usage = await getUsageMetrics(supabase);
+  
+  // Calculate current costs
+  const currentCosts = calculateCurrentCosts(usage);
+  
+  // Find optimization opportunities
+  const opportunities = [];
+  
+  // Database size optimization
+  if (usage.databaseSize > 8 * 1024 * 1024 * 1024) { // > 8GB
+    opportunities.push({
+      type: 'database_size',
+      potential: '30-50%',
+      description: 'Archive old data or implement cleanup policies'
+    });
+  }
+  
+  // API request optimization
+  if (usage.apiRequests > 500000) { // > 500k
+    opportunities.push({
+      type: 'api_requests',
+      potential: '20-40%',
+      description: 'Implement query caching and batch operations'
+    });
+  }
+  
+  // Storage optimization
+  if (usage.storageUsed > 100 * 1024 * 1024) { // > 100MB
+    opportunities.push({
+      type: 'storage',
+      potential: '40-60%',
+      description: 'Compress images and remove unused files'
+    });
+  }
+  
+  // Realtime optimization
+  if (usage.realtimeConnections > 200) {
+    opportunities.push({
+      type: 'realtime',
+      potential: '30-50%',
+      description: 'Reduce realtime subscriptions or implement pooling'
+    });
+  }
+  
+  return {
+    currentUsage: usage,
+    costBreakdown: currentCosts,
+    optimizationOpportunities: opportunities,
+    projectedCosts: projectFutureCosts(usage, opportunities),
+    recommendations: generateCostRecommendations(opportunities)
+  };
+}
+```
+
+## Checklist (Danh sách kiểm tra)
+
+- [ ] All tables have appropriate indexes
+- [ ] RLS policies cover all operations
+- [ ] RLS policies use safe, performant expressions
+- [ ] Auth providers properly configured
+- [ ] Password policies meet security requirements
+- [ ] MFA enabled for sensitive operations
+- [ ] Session configuration is secure
+- [ ] Slow queries identified và optimized
+- [ ] N+1 patterns eliminated
+- [ ] Database size under control
+- [ ] Storage properly organized
+- [ ] Edge functions follow best practices
+- [ ] Realtime subscriptions minimized
+- [ ] Cost optimization opportunities identified
+- [ ] Migration plan documented
+
+## Examples (Ví dụ)
+
+### Ví dụ 1: Full Supabase Audit
+
+```typescript
+// Complete Supabase project audit
+async function auditSupabaseProject(
+  supabase: SupabaseClient
+): Promise<AuditReport> {
+  console.log('Starting Supabase audit...');
+  
+  // Phase 1: Discovery
+  const project = await discoverProject(supabase);
+  console.log(`Project: ${project.ref} (${project.plan})`);
+  
+  // Phase 2: Schema analysis
+  console.log('\nAnalyzing schema...');
+  const schema = await analyzeSchema(supabase);
+  console.log(`Found ${schema.tables.length} tables`);
+  console.log(`Identified ${schema.missingIndexes.length} missing indexes`);
+  
+  // Phase 3: RLS review
+  console.log('\nReviewing RLS policies...');
+  const rlsAnalysis = await analyzeRLSPolicies(supabase);
+  console.log(`Reviewed ${rlsAnalysis.tables.length} tables`);
+  console.log(`Found ${rlsAnalysis.publicAccessRisks.length} security risks`);
+  
+  // Phase 4: Performance analysis
+  console.log('\nAnalyzing query performance...');
+  const performance = await analyzeQueryPerformance(supabase);
+  console.log(`Found ${performance.slowQueries.length} slow queries`);
+  console.log(`Identified ${performance.n_plus_one_patterns.length} N+1 patterns`);
+  
+  // Phase 5: Auth review
+  console.log('\nReviewing auth security...');
+  const authSecurity = await reviewAuthSecurity(supabase);
+  console.log(`Found ${authSecurity.vulnerabilities.length} vulnerabilities`);
+  
+  // Phase 6: Cost analysis
+  console.log('\nAnalyzing costs...');
+  const costs = await analyzeCosts(supabase);
+  console.log(`Current monthly cost: $${costs.currentUsage.estimatedCost}`);
+  
+  // Compile report
+  return {
+    project,
+    schema,
+    rlsAnalysis,
+    performance,
+    authSecurity,
+    costs,
+    actionItems: prioritizeActionItems({
+      schema,
+      rlsAnalysis,
+      performance,
+      authSecurity,
+      costs
+    })
+  };
+}
+```
+
+### Ví dụ 2: RLS Policy Generator
+
+```typescript
+// Generate secure RLS policies
+function generateSecureRLSPolicies(
+  table: TableInfo,
+  userRole: 'user' | 'admin' | 'public'
+): Policy[] {
+  const policies: Policy[] = [];
+  
+  switch (userRole) {
+    case 'user':
+      // User can only see their own data
+      policies.push({
+        name: `${table.name}_owner_select`,
+        command: 'SELECT',
+        definition: `auth.uid() = ${table.name}.user_id`
+      });
+      
+      // User can only insert their own data
+      policies.push({
+        name: `${table.name}_owner_insert`,
+        command: 'INSERT',
+        definition: `auth.uid() = new.user_id`
+      });
+      
+      // User can only update their own data
+      policies.push({
+        name: `${table.name}_owner_update`,
+        command: 'UPDATE',
+        definition: `auth.uid() = ${table.name}.user_id`
+      });
+      
+      // User can only delete their own data
+      policies.push({
+        name: `${table.name}_owner_delete`,
+        command: 'DELETE',
+        definition: `auth.uid() = ${table.name}.user_id`
+      });
+      break;
+      
+    case 'admin':
+      // Admin can see all data
+      policies.push({
+        name: `${table.name}_admin_select`,
+        command: 'SELECT',
+        definition: `auth.jwt()->>'role' = 'admin'`
+      });
+      
+      // Admin can do everything
+      policies.push({
+        name: `${table.name}_admin_all`,
+        command: 'ALL',
+        definition: `auth.jwt()->>'role' = 'admin'`
+      });
+      break;
+      
+    case 'public':
+      // Public can only see published items
+      policies.push({
+        name: `${table.name}_public_select`,
+        command: 'SELECT',
+        definition: `${table.name}.is_published = true`
+      });
+      break;
+  }
+  
+  return policies;
+}
+```
+
+## Anti Patterns (Các pattern cần tránh)
+
+### 1. Disabled RLS
+```typescript
+// ❌ BAD: RLS disabled for convenience
+ALTER TABLE users DISABLE ROW LEVEL SECURITY;
+
+// ✅ GOOD: Enable RLS with proper policies
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can view own profile" ON users
+  FOR SELECT USING (auth.uid() = id);
+```
+
+### 2. Bypassing RLS with Service Key
+```typescript
+// ❌ BAD: Using service role key in frontend
+const supabase = createClient(
+  'https://xxx.supabase.co',
+  'service-role-key', // Never in frontend!
+  { auth: { persistSession: false } }
+);
+
+// ✅ GOOD: Use anon key in frontend
+const supabase = createClient(
+  'https://xxx.supabase.co',
+  'anon-key', // Safe for frontend
+  { auth: { persistSession: true } }
+);
+```
+
+### 3. Non-performant RLS
+```typescript
+// ❌ BAD: Complex subquery in every row check
+CREATE POLICY "slow_policy" ON orders
+  FOR SELECT USING (
+    auth.uid() = user_id AND
+    EXISTS (SELECT 1 FROM user_teams WHERE team_id = orders.team_id)
+  );
+
+// ✅ GOOD: Denormalized flag for fast checks
+CREATE POLICY "fast_policy" ON orders
+  FOR SELECT USING (auth.uid() = user_id);
+```
+
+### 4. Missing Indexes on Foreign Keys
+```typescript
+// ❌ BAD: Foreign key without index
+ALTER TABLE orders ADD COLUMN user_id uuid REFERENCES users(id);
+
+// ✅ GOOD: Add index for RLS performance
+ALTER TABLE orders ADD COLUMN user_id uuid REFERENCES users(id);
+CREATE INDEX idx_orders_user_id ON orders(user_id);
+```
+
+### 5. No Pagination
+```typescript
+// ❌ BAD: Fetching all rows
+const { data } = await supabase.from('posts').select('*');
+
+// ✅ GOOD: Paginated queries
+const { data } = await supabase
+  .from('posts')
+  .select('*')
+  .range(0, 9); // First 10 items
+```
+
+## Best Practices (Thực hành tốt nhất)
+
+1. **Always enable RLS**: Security first, convenience second
+2. **Use proper indexes**: Especially on foreign keys và RLS columns
+3. **Test policies thoroughly**: Use `supabase.test' để verify
+4. **Monitor query performance**: Use pg_stat_statements
+5. **Implement proper error handling**: Handle RLS errors gracefully
+6. **Use appropriate auth providers**: Match security requirements
+7. **Enable MFA for sensitive apps**: User security matters
+8. **Regular security audits**: Review RLS policies periodically
+9. **Optimize costs proactively**: Monitor usage dashboards
+10. **Document your schema**: Especially RLS policy rationale
+
+## Liên kết (Cross-references)
+
+- **Related Skills**: [database-optimization](./database-optimization.mdc), [security-audit](./security-audit.mdc), [postgres-optimization](./postgres-optimization.mdc)
+- **Supabase Docs**: RLS, Auth, Edge Functions, Storage
+- **PostgreSQL**: Performance tuning, Index strategies

@@ -1,0 +1,256 @@
+---
+description: Nguyên tắc Cost Optimization cho cloud resources và infrastructure
+created: 2026-06-23
+version: 1.0.0
+tags: [cost, optimization, cloud, aws, azure, gcp, enterprise]
+---
+
+# Cost Optimization
+
+## Mục tiêu
+
+Cost Optimization là quá trình liên tục giám sát, phân tích, và cải thiện việc sử dụng cloud resources để đạt được hiệu quả chi phí tối đa mà không ảnh hưởng đến performance và reliability. Trong Cursor Enterprise Framework, Cost Optimization rule định nghĩa các nguyên tắc và best practices cho việc quản lý chi phí cloud một cách chủ động, từ architecture design đến day-to-day operations. Mục tiêu là giúp teams reduce costs mà vẫn maintain required service levels.
+
+Cloud costs có thể spiral out of control nếu không được quản lý chủ động. Một application có thể chạy được nhưng với chi phí cao hơn mức cần thiết. Rule này cover cost visibility, resource optimization, pricing models, và governance processes.
+
+## Nguyên tắc
+
+**1. Cost Visibility**
+
+Tag all resources for attribution. Cost allocation by team, project, environment. Budget alerts và notifications. Regular cost reviews. Cost dashboards. Trend analysis. Anomaly detection.
+
+**2. Right-Sizing**
+
+Right-size compute resources. Analyze utilization metrics. Scale down over-provisioned. Use burstable instances appropriately. Review regularly. Automate recommendations.
+
+**3. Reserved Capacity**
+
+Purchase reserved instances for steady-state. Convertible vs standard. 1-year vs 3-year terms. Analyze utilization before purchase. Savings plans options. Balance commitment vs flexibility.
+
+**4. Auto-Scaling**
+
+Implement auto-scaling policies. Scale based on metrics. Use predictive scaling. Scale down during low traffic. Avoid scaling thrashing. Test scaling policies.
+
+**5. Resource Scheduling**
+
+Schedule non-production resources. Dev/test environments. Batch processing jobs. Spot/preemptible for fault-tolerant. Scheduled start/stop. Cost allocation.
+
+**6. Storage Optimization**
+
+Choose appropriate storage classes. Lifecycle policies. Delete unused data. Archive old data. Compression. Data transfer costs.
+
+**7. Networking Optimization**
+
+Minimize data transfer. Use VPC endpoints. CDN for static assets. Cache aggressively. Data compression. Regional affinity.
+
+**8. Serverless Efficiency**
+
+Use serverless for variable workloads. Pay per invocation. Optimize function memory. Cold start optimization. Batch invocations. Architecture for cost.
+
+**9. Database Optimization**
+
+Right-size database instances. Connection pooling. Read replicas for read-heavy. Auto-scaling databases. Reserved capacity. Query optimization.
+
+**10. FinOps Practices**
+
+Embed cost in design decisions. Cost-aware architecture. Showback/chargeback. Cost optimization culture. Regular optimization reviews. Engineer accountability.
+
+## Checklist
+
+- [ ] Tagging strategy implemented
+- [ ] Cost monitoring set up
+- [ ] Budget alerts configured
+- [ ] Rightsizing recommendations reviewed
+- [ ] Reserved capacity planned
+- [ ] Auto-scaling implemented
+- [ ] Resource scheduling configured
+- [ ] Storage lifecycle policies set
+- [ ] Networking costs optimized
+- [ ] FinOps process established
+- [ ] Regular reviews scheduled
+- [ ] Documentation complete
+
+## Anti Pattern
+
+**1. No Resource Tagging**
+
+Untagged resources. Can't attribute costs. Wasted spend. Solution: Enforce tagging policy.
+
+**2. Over-Provisioning**
+
+Always using largest instances. Paying for unused capacity. Solution: Monitor utilization, right-size.
+
+**3. Ignoring Data Transfer**
+
+Data egress costs. Cross-region traffic. CDN not used. Solution: Architect for minimal transfer.
+
+**4. No Budget Alerts**
+
+Costs spike without awareness. Budget overruns. Solution: Set budget alerts.
+
+## Best Practice
+
+**1. Cost Allocation**
+
+```typescript
+// Cost tagging for AWS resources
+const tagSpecification = {
+  ResourceType: 'instance',
+  Tags: [
+    { Key: 'Environment', Value: process.env.ENV },
+    { Key: 'Team', Value: 'platform' },
+    { Key: 'Project', Value: 'backend-api' },
+    { Key: 'CostCenter', Value: 'engineering' }
+  ]
+};
+
+// Azure tags
+const azureTags = {
+  environment: process.env.ENV,
+  team: 'platform',
+  project: 'backend-api',
+  costCenter: 'engineering'
+};
+
+// GCP labels
+const gcpLabels = {
+  environment: process.env.ENV,
+  team: 'platform',
+  project: 'backend-api',
+  cost_center: 'engineering'
+};
+```
+
+**2. Budget Alerts**
+
+```typescript
+// AWS Budget setup
+async function setupBudgetAlerts(tenantId: string) {
+  const budgetAmount = getTenantBudget(tenantId);
+  
+  await aws.budgets.createBudget({
+    AccountId: process.env.AWS_ACCOUNT_ID,
+    Budget: {
+      BudgetName: `${tenantId}-monthly`,
+      BudgetType: 'COST',
+      TimeUnit: 'MONTHLY',
+      BudgetLimit: {
+        Amount: budgetAmount.toString(),
+        Unit: 'USD'
+      },
+      CostFilters: {
+        TagKeyValue: [
+          `$${tenants:${tenantId}}`
+        ]
+      }
+    },
+    NotificationsWithSubscribers: [
+      {
+        Notification: {
+          NotificationType: 'ACTUAL',
+          ComparisonOperator: 'GREATER_THAN',
+          Threshold: 80
+        },
+        Subscribers: [
+          {
+            SubscriptionType: 'EMAIL',
+            Address: getTenantBillingEmail(tenantId)
+          }
+        ]
+      }
+    ]
+  });
+}
+```
+
+**3. Cost Dashboard Query**
+
+```typescript
+async function getCostBreakdown(
+  startDate: Date,
+  endDate: Date
+): Promise<CostReport> {
+  const query = `
+    SELECT 
+      service,
+      SUM(cost) as total_cost,
+      SUM(usage_quantity) as total_usage,
+      AVG(unit_cost) as avg_unit_cost
+    FROM costs
+    WHERE date BETWEEN $1 AND $2
+      AND tag_team = $3
+    GROUP BY service
+    ORDER BY total_cost DESC
+  `;
+  
+  const results = await db.query(query, [startDate, endDate, currentTeam]);
+  
+  // Calculate trends
+  const previousPeriod = calculatePreviousPeriod(startDate, endDate);
+  const previousCosts = await getCosts(previousPeriod.start, previousPeriod.end);
+  
+  return {
+    period: { start: startDate, end: endDate },
+    breakdown: results.rows,
+    trends: calculateTrends(results.rows, previousCosts),
+    budget: await getBudgetStatus()
+  };
+}
+```
+
+**4. Reserved Capacity Calculator**
+
+```typescript
+async function analyzeReservedCapacity(): Promise<ReservedRecommendation[]> {
+  const onDemandInstances = await getRunningInstances();
+  const utilization = await analyzeUtilization(onDemandInstances);
+  
+  const recommendations: ReservedRecommendation[] = [];
+  
+  for (const instance of utilization) {
+    if (instance.utilizationPercent > 70 && instance.uptimePercent > 90) {
+      // Good candidate for reservation
+      const onDemandCost = calculateOnDemandCost(instance);
+      const reservedCost = calculateReservedCost(instance);
+      const savings = onDemandCost - reservedCost;
+      
+      recommendations.push({
+        instanceType: instance.type,
+        quantity: instance.count,
+        currentUtilization: instance.utilizationPercent,
+        estimatedMonthlySavings: savings / 12,
+        reservationTerm: '1y',
+        paymentOption: 'No Upfront'
+      });
+    }
+  }
+  
+  return recommendations.sort((a, b) => b.estimatedMonthlySavings - a.estimatedMonthlySavings);
+}
+```
+
+## Workflow
+
+**Phase 1: Assessment**
+
+Tag resources. Set up cost tracking. Identify current spend. Baseline metrics.
+
+**Phase 2: Analysis**
+
+Analyze utilization. Identify waste. Review pricing models. Get recommendations.
+
+**Phase 3: Implementation**
+
+Right-size resources. Implement scheduling. Purchase reservations. Optimize storage.
+
+**Phase 4: Monitoring**
+
+Set up alerts. Regular reviews. Track savings. Continuous optimization.
+
+## Liên kết
+
+- [[aws]] - AWS: AWS cost optimization
+- [[azure]] - Azure: Azure cost optimization
+- [[gcp]] - GCP: GCP cost optimization
+- [[cloudflare]] - Cloudflare: CDN optimization
+- [[performance]] - Performance: Performance optimization

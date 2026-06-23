@@ -1,0 +1,239 @@
+---
+description: Review Kubernetes deployment bao gồm pods, services, deployments, và security
+purpose: Audit Kubernetes configurations cho reliability, security, và performance
+input: Kubernetes manifests, Helm charts, kubectl configurations
+output: Kubernetes review report, recommendations, security findings
+version: 1.0.0
+tags: [kubernetes, k8s, pods, services, deployments, security, helm]
+---
+
+# Kubernetes Review Skill - Kiểm Toán Kubernetes Deployment
+
+## Tổng quan
+
+Kubernetes là orchestration platform cho containerized applications. Skill này cung cấp framework để review Kubernetes configurations.
+
+## Purpose (Mục đích)
+
+Kubernetes Review Skill được thiết kế để:
+
+1. **Deployment Review**: Verify configurations
+2. **Security Audit**: Check security settings
+3. **Performance Check**: Optimize resources
+4. **Networking Review**: Verify networking
+5. **Best Practices**: Ensure standards
+
+### Khi nào sử dụng Kubernetes Review
+
+- Khi auditing Kubernetes setup
+- Khi optimizing deployments
+- Khi investigating issues
+- Khi hardening security
+
+## Input (Đầu vào)
+
+- [ ] Kubernetes manifests
+- [ ] Helm charts
+- [ ] kubectl configs
+
+## Output (Đầu ra)
+
+- [ ] Security findings
+- [ ] Performance recommendations
+- [ ] Best practice checklist
+
+## Workflow (Quy trình)
+
+### Phase 1: Deployment Review
+
+### Bước 1: Pod Security
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-pod
+spec:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    fsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
+  
+  containers:
+    - name: app
+      image: app:1.0.0
+      imagePullPolicy: Always
+      
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+            - ALL
+          add:
+            - NET_BIND_SERVICE
+      
+      resources:
+        requests:
+          memory: "128Mi"
+          cpu: "100m"
+        limits:
+          memory: "256Mi"
+          cpu: "500m"
+      
+      env:
+        - name: SECRET
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: secret
+      
+      volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: config
+          mountPath: /config
+          readOnly: true
+      
+      ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+      
+      livenessProbe:
+        httpGet:
+          path: /health/live
+          port: http
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        failureThreshold: 3
+      
+      readinessProbe:
+        httpGet:
+          path: /health/ready
+          port: http
+        initialDelaySeconds: 5
+        periodSeconds: 5
+      
+      startupProbe:
+        httpGet:
+          path: /health/startup
+          port: http
+        failureThreshold: 30
+        periodSeconds: 10
+  
+  volumes:
+    - name: tmp
+      emptyDir:
+        medium: Memory
+        sizeLimit: 100Mi
+    - name: config
+      configMap:
+        name: app-config
+```
+
+### Bước 2: Network Policies
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: app-network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: app
+      tier: frontend
+  
+  policyTypes:
+    - Ingress
+    - Egress
+  
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+        - podSelector:
+            matchLabels:
+              app: nginx-ingress
+      ports:
+        - protocol: TCP
+          port: 8080
+  
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: api
+              tier: backend
+      ports:
+        - protocol: TCP
+          port: 8080
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+```
+
+### Phase 2: Resource Management
+
+### Bước 3: Resource Quotas
+
+```yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: production-quota
+spec:
+  hard:
+    requests.cpu: "20"
+    requests.memory: 40Gi
+    limits.cpu: "40"
+    limits.memory: 80Gi
+    pods: "100"
+    services: "10"
+    secrets: "20"
+
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: production-limits
+spec:
+  limits:
+    - max:
+        memory: 1Gi
+        cpu: "1"
+      min:
+        memory: 64Mi
+        cpu: 50m
+      default:
+        memory: 256Mi
+        cpu: 200m
+      defaultRequest:
+        memory: 128Mi
+        cpu: 100m
+      type: Container
+```
+
+## Checklist
+
+- [ ] Non-root containers
+- [ ] Read-only root filesystem
+- [ ] Resource limits
+- [ ] Health probes
+- [ ] Network policies
+- [ ] Secrets management
+
+## Liên kết
+
+- [[../rules/core-architecture]] - Core Architecture
+- [[../skills/docker-review]] - Docker Review
+- [[../skills/security-audit]] - Security Audit
+- [[../skills/deployment-review]] - Deployment Review

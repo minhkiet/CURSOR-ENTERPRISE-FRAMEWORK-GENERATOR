@@ -1,0 +1,1304 @@
+---
+description: Nguyên tắc và best practices cho Caching Strategies trong Cursor Enterprise Framework
+created: 2026-06-23
+version: 1.0.0
+tags:
+  - caching
+  - cache
+  - performance
+  - redis
+  - memory-cache
+---
+
+# Caching Strategies Guidelines
+
+## Mục tiêu
+
+Tài liệu này định nghĩa các nguyên tắc và best practices cho việc implement caching strategies trong Cursor Enterprise Framework. Mục tiêu là tối ưu hóa application performance, reduce database load, và improve response times thông qua việc sử dụng caching hiệu quả.
+
+Caching là kỹ thuật lưu trữ copies của data hoặc computation results để future requests có thể được served nhanh hơn. Việc implement caching đúng cách có thể improve performance đáng kể trong khi vẫn đảm bảo data consistency.
+
+## Nguyên tắc cơ bản
+
+### 1. Cache Hierarchy
+
+Understand different cache levels.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Cache Hierarchy                          │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Level 1: Application Cache (In-Memory)                    │
+│  ├── Fastest access (< 1ms)                                │
+│  ├── Limited size (MB)                                     │
+│  └── Process-specific                                      │
+│                                                             │
+│  Level 2: Distributed Cache (Redis/Memcached)              │
+│  ├── Fast access (1-10ms)                                  │
+│  ├── Larger size (GB)                                      │
+│  └── Shared across instances                               │
+│                                                             │
+│  Level 3: Database Cache                                   │
+│  ├── Query cache                                           │
+│  ├── Buffer pool                                           │
+│  └── Connection pool                                       │
+│                                                             │
+│  Level 4: CDN Cache                                        │
+│  ├── Static assets                                         │
+│  ├── Edge locations                                        │
+│  └── Geographic distribution                               │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 2. Cache Patterns
+
+Common caching patterns và use cases.
+
+```typescript
+// Cache-Aside Pattern (Lazy Loading)
+class CacheAsideService<T> {
+    constructor(
+        private cache: CacheClient,
+        private db: Database,
+        private ttl: number = 3600
+    ) {}
+
+    async get(key: string, fetcher: () => Promise<T>): Promise<T> {
+        // Try cache first
+        const cached = await this.cache.get(key);
+        if (cached) {
+            return JSON.parse(cached);
+        }
+
+        // Cache miss - fetch from source
+        const data = await fetcher();
+
+        // Store in cache
+        await this.cache.setex(key, this.ttl, JSON.stringify(data));
+
+        return data;
+    }
+
+    async invalidate(key: string): Promise<void> {
+        await this.cache.del(key);
+    }
+
+    async refresh(key: string, fetcher: () => Promise<T>): Promise<T> {
+        // Invalidate first
+        await this.invalidate(key);
+
+        // Fetch fresh data
+        const data = await fetcher();
+
+        // Store in cache
+        await this.cache.setex(key, this.ttl, JSON.stringify(data));
+
+        return data;
+    }
+}
+
+// Read-Through Pattern
+class ReadThroughCache {
+    async get(key: string): Promise<any> {
+        const cached = await this.cache.get(key);
+        if (cached) {
+            return cached;
+        }
+
+        const data = await this.db.read(key);
+        await this.cache.set(key, data);
+        return data;
+    }
+}
+
+// Write-Through Pattern
+class WriteThroughCache {
+    async set(key: string, data: any): Promise<void> {
+        await this.db.write(key, data);
+        await this.cache.set(key, data);
+    }
+
+    async delete(key: string): Promise<void> {
+        await this.db.delete(key);
+        await this.cache.del(key);
+    }
+}
+
+// Write-Behind Pattern
+class WriteBehindCache {
+    private queue: Queue;
+
+    async set(key: string, data: any): Promise<void> {
+        await this.cache.set(key, data);
+        await this.queue.enqueue('db-write', { key, data });
+    }
+}
+```
+
+### 3. Cache Key Design
+
+Design cache keys for optimal performance.
+
+```typescript
+// Cache key conventions
+class CacheKeyBuilder {
+    static readonly SEPARATOR = ':';
+
+    static resource(resource: string, id: string): string {
+        return `${resource}${this.SEPARATOR}${id}`;
+    }
+
+    static resourceList(resource: string, params?: Record<string, any>): string {
+        const sortedParams = params ? Object.keys(params).sort().map(
+            k => `${k}=${params[k]}`
+        ).join('&') : '';
+        return `${resource}${this.SEPARATOR}list${sortedParams ? this.SEPARATOR + sortedParams : ''}`;
+    }
+
+    static userResource(userId: string, resource: string, id: string): string {
+        return `user${this.SEPARATOR}${userId}${this.SEPARATOR}${resource}${this.SEPARATOR}${id}`;
+    }
+
+    static versioned(key: string, version: number): string {
+        return `${key}${this.SEPARATOR}v${version}`;
+    }
+
+    static pagination(
+        resource: string,
+        params: { page?: number; limit?: number; sort?: string }
+    ): string {
+        return `${resource}${this.SEPARATOR}p${params.page || 1}${this.SEPARATOR}l${params.limit || 20}`;
+    }
+}
+
+// Usage
+const userKey = CacheKeyBuilder.resource('user', '123');                    // user:123
+const userListKey = CacheKeyBuilder.resourceList('users', { role: 'admin' }); // users:list&role=admin
+const userPostKey = CacheKeyBuilder.userResource('123', 'post', '456');       // user:123:post:456
+```
+
+### 4. TTL Configuration
+
+Configure TTL based on data characteristics.
+
+```typescript
+// TTL configuration by data type
+const TTL_CONFIG = {
+    // Static reference data - long TTL
+    'country': 86400 * 30,           // 30 days
+    'language': 86400 * 30,          // 30 days
+    'category': 86400 * 7,          // 7 days
+
+    // User-specific data - medium TTL
+    'user:profile': 3600,           // 1 hour
+    'user:settings': 3600 * 6,      // 6 hours
+    'user:permissions': 3600,       // 1 hour
+
+    // Session data - short TTL
+    'session': 1800,                // 30 minutes
+    'token': 900,                  // 15 minutes
+    'rate_limit': 60,              // 1 minute
+
+    // Content - variable TTL
+    'post': 3600,                  // 1 hour
+    'post:popular': 300,           // 5 minutes
+    'comment': 1800,               // 30 minutes
+
+    // Metrics - very short TTL
+    'metrics:daily': 3600,         // 1 hour
+    'metrics:realtime': 60,       // 1 minute
+    'leaderboard': 300,           // 5 minutes
+};
+
+// TTL Strategy
+class TTLStrategy {
+    static forResource(type: string): number {
+        return TTL_CONFIG[type] || 3600;
+    }
+
+    static withJitter(ttl: number): number {
+        // Add random jitter (±10%) to prevent cache stampede
+        const jitter = ttl * 0.1;
+        return ttl + Math.floor((Math.random() * 2 - 1) * jitter);
+    }
+
+    static adaptive(
+        accessCount: number,
+        lastAccess: Date,
+        baseTTL: number
+    ): number {
+        // Frequently accessed data gets longer TTL
+        if (accessCount > 1000) {
+            return baseTTL * 2;
+        }
+        if (accessCount > 100) {
+            return baseTTL * 1.5;
+        }
+        return baseTTL;
+    }
+}
+```
+
+### 5. Cache Invalidation
+
+Implement proper cache invalidation strategies.
+
+```typescript
+// Direct invalidation
+class CacheInvalidator {
+    constructor(private cache: CacheClient) {}
+
+    async invalidate(key: string): Promise<void> {
+        await this.cache.del(key);
+    }
+
+    async invalidatePattern(pattern: string): Promise<void> {
+        const keys = await this.cache.keys(pattern);
+        if (keys.length > 0) {
+            await this.cache.del(...keys);
+        }
+    }
+
+    async invalidateByPrefix(prefix: string): Promise<void> {
+        await this.invalidatePattern(`${prefix}*`);
+    }
+}
+
+// Event-driven invalidation
+class EventDrivenCacheInvalidator {
+    constructor(
+        private cache: CacheClient,
+        private eventBus: EventBus
+    ) {
+        this.subscribeToEvents();
+    }
+
+    private subscribeToEvents(): void {
+        this.eventBus.subscribe('user.updated', async (event) => {
+            const { userId } = event.data;
+            await Promise.all([
+                this.cache.del(`user:${userId}`),
+                this.cache.del(`user:${userId}:profile`),
+                this.cache.invalidateByPrefix(`users:list*`)
+            ]);
+        });
+
+        this.eventBus.subscribe('post.created', async (event) => {
+            const { post } = event.data;
+            await Promise.all([
+                this.cache.invalidateByPrefix(`post:${post.id}`),
+                this.cache.invalidateByPrefix(`user:${post.authorId}:posts`),
+                this.cache.invalidateByPrefix(`posts:list*`)
+            ]);
+        });
+    }
+}
+
+// Time-based expiration with refresh
+class CacheWithRefresh {
+    constructor(
+        private cache: CacheClient,
+        private ttl: number
+    ) {}
+
+    async getOrRefresh(
+        key: string,
+        fetcher: () => Promise<any>
+    ): Promise<any> {
+        const cached = await this.cache.get(key);
+        const metadata = await this.cache.hgetall(`${key}:meta`);
+
+        if (cached) {
+            // Check if refresh needed (stale-while-revalidate)
+            if (this.shouldRefresh(metadata)) {
+                // Return cached data, refresh in background
+                this.refreshInBackground(key, fetcher);
+            }
+            return JSON.parse(cached);
+        }
+
+        // No cache - fetch and cache
+        const data = await fetcher();
+        await this.cache.setex(key, this.ttl, JSON.stringify(data));
+        await this.cache.hset(`${key}:meta`, {
+            cachedAt: Date.now().toString(),
+            accessCount: '0'
+        });
+
+        return data;
+    }
+
+    private shouldRefresh(metadata: Record<string, string>): boolean {
+        if (!metadata.cachedAt) return true;
+
+        const age = Date.now() - parseInt(metadata.cachedAt);
+        const refreshThreshold = this.ttl * 0.8; // Refresh at 80% of TTL
+
+        return age > refreshThreshold;
+    }
+
+    private async refreshInBackground(key: string, fetcher: () => Promise<any>): Promise<void> {
+        try {
+            const data = await fetcher();
+            await this.cache.setex(key, this.ttl, JSON.stringify(data));
+        } catch (error) {
+            console.error('Background refresh failed:', error);
+        }
+    }
+}
+```
+
+### 6. Distributed Caching
+
+Redis-based distributed cache implementation.
+
+```typescript
+// Redis cache client
+class RedisCacheClient implements CacheClient {
+    constructor(private redis: Redis) {}
+
+    async get<T>(key: string): Promise<T | null> {
+        const value = await this.redis.get(key);
+        return value ? JSON.parse(value) : null;
+    }
+
+    async set(key: string, value: any, ttl?: number): Promise<void> {
+        const serialized = JSON.stringify(value);
+        if (ttl) {
+            await this.redis.setex(key, ttl, serialized);
+        } else {
+            await this.redis.set(key, serialized);
+        }
+    }
+
+    async del(key: string): Promise<void> {
+        await this.redis.del(key);
+    }
+
+    async mget<T>(keys: string[]): Promise<(T | null)[]> {
+        const values = await this.redis.mget(...keys);
+        return values.map(v => v ? JSON.parse(v) : null);
+    }
+
+    async mset(entries: Record<string, any>, ttl?: number): Promise<void> {
+        const pipeline = this.redis.pipeline();
+
+        for (const [key, value] of Object.entries(entries)) {
+            const serialized = JSON.stringify(value);
+            if (ttl) {
+                pipeline.setex(key, ttl, serialized);
+            } else {
+                pipeline.set(key, serialized);
+            }
+        }
+
+        await pipeline.exec();
+    }
+
+    async keys(pattern: string): Promise<string[]> {
+        return this.redis.keys(pattern);
+    }
+}
+
+// Distributed locking
+class DistributedLock {
+    constructor(private redis: Redis) {}
+
+    async acquire(
+        key: string,
+        ttl: number = 10000
+    ): Promise<string | null> {
+        const lockKey = `lock:${key}`;
+        const lockValue = nanoid();
+
+        const acquired = await this.redis.set(
+            lockKey,
+            lockValue,
+            'PX',
+            ttl,
+            'NX'
+        );
+
+        return acquired ? lockValue : null;
+    }
+
+    async release(key: string, value: string): Promise<boolean> {
+        const lockKey = `lock:${key}`;
+
+        // Use Lua script for atomic check-and-delete
+        const script = `
+            if redis.call("get", KEYS[1]) == ARGV[1] then
+                return redis.call("del", KEYS[1])
+            else
+                return 0
+            end
+        `;
+
+        const result = await this.redis.eval(script, 1, lockKey, value);
+        return result === 1;
+    }
+
+    async withLock<T>(
+        key: string,
+        fn: () => Promise<T>,
+        ttl: number = 10000
+    ): Promise<T> {
+        const lockValue = await this.acquire(key, ttl);
+
+        if (!lockValue) {
+            throw new Error(`Failed to acquire lock for ${key}`);
+        }
+
+        try {
+            return await fn();
+        } finally {
+            await this.release(key, lockValue);
+        }
+    }
+}
+
+// Cache stampede prevention
+class CacheStampedeProtection {
+    constructor(
+        private cache: CacheClient,
+        private lock: DistributedLock
+    ) {}
+
+    async getOrCompute<T>(
+        key: string,
+        compute: () => Promise<T>,
+        ttl: number
+    ): Promise<T> {
+        const cached = await this.cache.get<T>(key);
+        if (cached !== null) {
+            return cached;
+        }
+
+        // Try to acquire lock
+        const lockValue = await this.lock.acquire(`stampede:${key}`, 5000);
+
+        if (!lockValue) {
+            // Another process is computing, wait and retry
+            await this.sleep(100);
+            return this.getOrCompute(key, compute, ttl);
+        }
+
+        try {
+            // Double-check after acquiring lock
+            const cached = await this.cache.get<T>(key);
+            if (cached !== null) {
+                return cached;
+            }
+
+            // Compute and cache
+            const value = await compute();
+            await this.cache.set(key, value, ttl);
+            return value;
+        } finally {
+            await this.lock.release(`stampede:${key}`, lockValue);
+        }
+    }
+
+    private sleep(ms: number): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+}
+```
+
+### 7. Multi-Layer Caching
+
+Implement multi-layer caching strategy.
+
+```typescript
+// Multi-layer cache
+class MultiLayerCache {
+    constructor(
+        private l1: MemoryCache,  // In-memory
+        private l2: RedisCache,   // Redis
+        private l3: Database     // Database
+    ) {}
+
+    async get<T>(key: string): Promise<T | null> {
+        // Check L1 first
+        let value = await this.l1.get<T>(key);
+        if (value !== null) {
+            return value;
+        }
+
+        // Check L2
+        value = await this.l2.get<T>(key);
+        if (value !== null) {
+            // Populate L1 from L2
+            await this.l1.set(key, value, 60); // Short TTL for L1
+            return value;
+        }
+
+        return null;
+    }
+
+    async set<T>(key: string, value: T, l1Ttl: number, l2Ttl: number): Promise<void> {
+        // Set in both layers
+        await Promise.all([
+            this.l1.set(key, value, l1Ttl),
+            this.l2.set(key, value, l2Ttl)
+        ]);
+    }
+
+    async invalidate(key: string): Promise<void> {
+        await Promise.all([
+            this.l1.invalidate(key),
+            this.l2.invalidate(key)
+        ]);
+    }
+}
+
+// Memory cache with LRU
+class MemoryCache {
+    private cache: Map<string, CacheEntry>;
+    private maxSize: number;
+
+    constructor(maxSize: number = 1000) {
+        this.cache = new Map();
+        this.maxSize = maxSize;
+    }
+
+    async get<T>(key: string): Promise<T | null> {
+        const entry = this.cache.get(key);
+
+        if (!entry) {
+            return null;
+        }
+
+        if (entry.expiresAt < Date.now()) {
+            this.cache.delete(key);
+            return null;
+        }
+
+        // Move to end (most recently used)
+        this.cache.delete(key);
+        this.cache.set(key, entry);
+
+        return entry.value as T;
+    }
+
+    async set<T>(key: string, value: T, ttl: number): Promise<void> {
+        // Evict if at max size
+        if (this.cache.size >= this.maxSize && !this.cache.has(key)) {
+            const firstKey = this.cache.keys().next().value;
+            this.cache.delete(firstKey);
+        }
+
+        this.cache.set(key, {
+            value,
+            expiresAt: Date.now() + ttl * 1000
+        });
+    }
+
+    async invalidate(key: string): Promise<void> {
+        this.cache.delete(key);
+    }
+}
+```
+
+### 8. Query Caching
+
+Cache database query results.
+
+```typescript
+// Query cache
+class QueryCache {
+    constructor(
+        private cache: CacheClient,
+        private defaultTTL: number = 300
+    ) {}
+
+    async getQuery<T>(
+        query: string,
+        params: any[],
+        fetcher: () => Promise<T>
+    ): Promise<T> {
+        const cacheKey = this.buildCacheKey(query, params);
+
+        const cached = await this.cache.get<T>(cacheKey);
+        if (cached !== null) {
+            return cached;
+        }
+
+        const result = await fetcher();
+        await this.cache.set(cacheKey, result, this.defaultTTL);
+
+        return result;
+    }
+
+    private buildCacheKey(query: string, params: any[]): string {
+        const normalizedQuery = query.replace(/\s+/g, ' ').trim();
+        const paramsHash = crypto.createHash('md5')
+            .update(JSON.stringify(params))
+            .digest('hex');
+        return `query:${crypto.createHash('md5')
+            .update(normalizedQuery)
+            .digest('hex')}:${paramsHash}`;
+    }
+
+    async invalidateByTable(tableName: string): Promise<void> {
+        await this.cache.invalidateByPrefix(`query:*:${tableName}*`);
+    }
+
+    async invalidateByPattern(pattern: string): Promise<void> {
+        await this.cache.invalidateByPrefix(`query:${pattern}`);
+    }
+}
+
+// ORM integration
+class CachedModel<T> {
+    constructor(
+        private model: Model<T>,
+        private queryCache: QueryCache
+    ) {}
+
+    async findAll(options?: FindOptions): Promise<T[]> {
+        return this.queryCache.getQuery(
+            'findAll',
+            [options],
+            () => this.model.findAll(options)
+        );
+    }
+
+    async findById(id: string): Promise<T | null> {
+        return this.queryCache.getQuery(
+            `findById:${id}`,
+            [],
+            () => this.model.findById(id)
+        );
+    }
+
+    async create(data: Partial<T>): Promise<T> {
+        const result = await this.model.create(data);
+        await this.queryCache.invalidateByTable(this.model.tableName);
+        return result;
+    }
+}
+```
+
+### 9. Cache Monitoring
+
+Monitor cache health và performance.
+
+```typescript
+// Cache metrics
+interface CacheMetrics {
+    hits: number;
+    misses: number;
+    hitRate: number;
+    evictions: number;
+    memoryUsage: number;
+    keyCount: number;
+}
+
+class CacheMonitor {
+    constructor(
+        private cache: CacheClient,
+        private metrics: MetricsCollector
+    ) {
+        this.startCollection();
+    }
+
+    private startCollection(): void {
+        setInterval(async () => {
+            await this.collectMetrics();
+        }, 60000); // Every minute
+    }
+
+    async collectMetrics(): Promise<CacheMetrics> {
+        const info = await this.cache.getInfo();
+
+        const hits = parseInt(info.keyspace_hits || '0');
+        const misses = parseInt(info.keyspace_misses || '0');
+        const total = hits + misses;
+
+        const metrics: CacheMetrics = {
+            hits,
+            misses,
+            hitRate: total > 0 ? (hits / total) * 100 : 0,
+            evictions: parseInt(info.evicted_keys || '0'),
+            memoryUsage: parseInt(info.used_memory || '0'),
+            keyCount: parseInt(info.db0?.keys || '0')
+        };
+
+        // Send to metrics collector
+        await this.metrics.gauge('cache.hit_rate', metrics.hitRate);
+        await this.metrics.gauge('cache.memory_usage', metrics.memoryUsage);
+        await this.metrics.gauge('cache.key_count', metrics.keyCount);
+
+        return metrics;
+    }
+
+    async getCacheStats(): Promise<CacheStats> {
+        const metrics = await this.collectMetrics();
+
+        return {
+            hitRate: `${metrics.hitRate.toFixed(2)}%`,
+            totalKeys: metrics.keyCount,
+            memoryUsed: this.formatBytes(metrics.memoryUsage),
+            evictions: metrics.evictions
+        };
+    }
+
+    private formatBytes(bytes: number): string {
+        if (bytes < 1024) return `${bytes}B`;
+        if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)}KB`;
+        if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(2)}MB`;
+        return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)}GB`;
+    }
+}
+
+// Health check
+class CacheHealthCheck {
+    async check(): Promise<HealthStatus> {
+        try {
+            await this.cache.ping();
+            return { healthy: true, latency: await this.measureLatency() };
+        } catch (error) {
+            return { healthy: false, error: error.message };
+        }
+    }
+
+    private async measureLatency(): Promise<number> {
+        const start = Date.now();
+        await this.cache.ping();
+        return Date.now() - start;
+    }
+}
+```
+
+### 10. Session Caching
+
+Implement session storage with caching.
+
+```typescript
+// Session cache
+interface Session {
+    id: string;
+    userId: string;
+    data: Record<string, any>;
+    createdAt: Date;
+    expiresAt: Date;
+}
+
+class SessionCache {
+    constructor(
+        private cache: CacheClient,
+        private ttl: number = 1800 // 30 minutes
+    ) {}
+
+    async create(userId: string, data: Record<string, any> = {}): Promise<Session> {
+        const session: Session = {
+            id: nanoid(32),
+            userId,
+            data,
+            createdAt: new Date(),
+            expiresAt: new Date(Date.now() + this.ttl * 1000)
+        };
+
+        await this.cache.setex(
+            `session:${session.id}`,
+            this.ttl,
+            JSON.stringify(session)
+        );
+
+        // Add to user's session set
+        await this.cache.sadd(`user:${userId}:sessions`, session.id);
+        await this.cache.expire(`user:${userId}:sessions`, this.ttl);
+
+        return session;
+    }
+
+    async get(sessionId: string): Promise<Session | null> {
+        const data = await this.cache.get(`session:${sessionId}`);
+        return data ? JSON.parse(data) : null;
+    }
+
+    async update(sessionId: string, data: Partial<Session>): Promise<Session | null> {
+        const session = await this.get(sessionId);
+        if (!session) return null;
+
+        const updated = { ...session, ...data };
+        await this.cache.setex(
+            `session:${sessionId}`,
+            this.ttl,
+            JSON.stringify(updated)
+        );
+
+        return updated;
+    }
+
+    async delete(sessionId: string): Promise<void> {
+        const session = await this.get(sessionId);
+        if (session) {
+            await this.cache.srem(`user:${session.userId}:sessions`, sessionId);
+        }
+        await this.cache.del(`session:${sessionId}`);
+    }
+
+    async deleteAllUserSessions(userId: string): Promise<void> {
+        const sessionIds = await this.cache.smembers(`user:${userId}:sessions`);
+        for (const id of sessionIds) {
+            await this.cache.del(`session:${id}`);
+        }
+        await this.cache.del(`user:${userId}:sessions`);
+    }
+
+    async refresh(sessionId: string): Promise<Session | null> {
+        const session = await this.get(sessionId);
+        if (!session) return null;
+
+        session.expiresAt = new Date(Date.now() + this.ttl * 1000);
+        await this.cache.setex(
+            `session:${sessionId}`,
+            this.ttl,
+            JSON.stringify(session)
+        );
+
+        return session;
+    }
+}
+```
+
+## Checklist
+
+- [ ] Identify caching opportunities
+- [ ] Choose appropriate cache patterns
+- [ ] Design cache key naming convention
+- [ ] Configure TTL appropriately
+- [ ] Implement cache invalidation strategy
+- [ ] Add monitoring và metrics
+- [ ] Handle cache failures gracefully
+- [ ] Prevent cache stampede
+- [ ] Test cache behavior
+- [ ] Document cache configuration
+- [ ] Set up alerting for cache issues
+- [ ] Implement circuit breaker
+- [ ] Configure cache size limits
+- [ ] Plan for cache warming
+- [ ] Test cache recovery
+
+## Anti Patterns
+
+### 1. Caching Everything
+
+```typescript
+// Không nên - cache too much
+const value = await cache.get('everything');
+if (!value) {
+    value = await heavyComputation();
+    await cache.set('everything', value, 3600);
+}
+
+// Nên - cache selectively based on access patterns
+const value = await cache.get('frequently-accessed');
+if (!value) {
+    value = await heavyComputation();
+    await cache.set('frequently-accessed', value, 300);
+}
+```
+
+### 2. Very Long TTLs
+
+```typescript
+// Không nên - data becomes stale
+await cache.set('user:123', data, 86400 * 30); // 30 days!
+
+// Nên - reasonable TTL with refresh
+await cache.set('user:123', data, 3600); // 1 hour
+// Use stale-while-revalidate for background refresh
+```
+
+### 3. No Invalidation Strategy
+
+```typescript
+// Không nên - no invalidation
+await cache.set('user:123', data, 3600);
+// User updates profile... but cache still has old data!
+
+// Nên - proper invalidation
+await cache.set('user:123', data, 3600);
+// When user updates:
+await cache.invalidate('user:123');
+```
+
+### 4. Blocking Cache Reads
+
+```typescript
+// Không nên - blocking on cache miss
+const value = cache.get('key');
+if (!value) {
+    value = await fetchFromDatabase(); // Blocks!
+}
+
+// Nên - async pattern
+const value = await cache.get('key') || await fetchFromDatabase();
+```
+
+### 5. Not Handling Cache Failures
+
+```typescript
+// Không nên - cache failure crashes app
+const value = await cache.get('key'); // If redis is down...
+
+// Nên - graceful degradation
+try {
+    const value = await cache.get('key');
+} catch (error) {
+    // Fall back to database
+    const value = await db.get('key');
+    logger.warn('Cache unavailable, using database');
+}
+```
+
+## Best Practices
+
+### 1. Cache-Aside with Fallback
+
+```typescript
+class ResilientCacheService<T> {
+    constructor(
+        private cache: CacheClient,
+        private circuitBreaker: CircuitBreaker
+    ) {}
+
+    async get(
+        key: string,
+        fetcher: () => Promise<T>,
+        ttl: number
+    ): Promise<T> {
+        try {
+            // Try cache
+            const cached = await this.circuitBreaker.execute(
+                () => this.cache.get<T>(key)
+            );
+
+            if (cached !== null) {
+                return cached;
+            }
+        } catch (error) {
+            // Circuit breaker open or cache error
+            this.logger.warn('Cache unavailable', { key, error });
+        }
+
+        // Fetch from source
+        const value = await fetcher();
+
+        // Try to cache (non-blocking)
+        this.cache.set(key, value, ttl).catch(err => {
+            this.logger.warn('Failed to cache value', { key, err });
+        });
+
+        return value;
+    }
+}
+```
+
+### 2. Cache Warming
+
+```typescript
+class CacheWarmer {
+    constructor(
+        private cache: CacheClient,
+        private dataService: DataService
+    ) {}
+
+    async warmPopularItems(): Promise<void> {
+        const popularIds = await this.dataService.getPopularItemIds();
+
+        await Promise.all(
+            popularIds.map(async (id) => {
+                const data = await this.dataService.getItemById(id);
+                await this.cache.set(`item:${id}`, data, 3600);
+            })
+        );
+
+        this.logger.info('Cache warmed', { itemCount: popularIds.length });
+    }
+
+    async warmUserCaches(userIds: string[]): Promise<void> {
+        await Promise.all(
+            userIds.map(async (userId) => {
+                const [profile, settings, permissions] = await Promise.all([
+                    this.dataService.getUserProfile(userId),
+                    this.dataService.getUserSettings(userId),
+                    this.dataService.getUserPermissions(userId)
+                ]);
+
+                await Promise.all([
+                    this.cache.set(`user:${userId}:profile`, profile, 3600),
+                    this.cache.set(`user:${userId}:settings`, settings, 3600),
+                    this.cache.set(`user:${userId}:permissions`, permissions, 1800)
+                ]);
+            })
+        );
+    }
+}
+```
+
+### 3. Consistent Hashing
+
+```typescript
+// For distributed cache nodes
+class ConsistentHashRing {
+    private ring: Map<number, string> = new Map();
+    private sortedKeys: number[] = [];
+    private replicas: number;
+
+    constructor(replicas: number = 150) {
+        this.replicas = replicas;
+    }
+
+    addNode(node: string): void {
+        for (let i = 0; i < this.replicas; i++) {
+            const hash = this.hash(`${node}:${i}`);
+            this.ring.set(hash, node);
+            this.sortedKeys.push(hash);
+        }
+        this.sortedKeys.sort((a, b) => a - b);
+    }
+
+    removeNode(node: string): void {
+        for (let i = 0; i < this.replicas; i++) {
+            const hash = this.hash(`${node}:${i}`);
+            this.ring.delete(hash);
+            this.sortedKeys = this.sortedKeys.filter(k => k !== hash);
+        }
+    }
+
+    getNode(key: string): string {
+        if (this.ring.size === 0) {
+            throw new Error('No nodes in ring');
+        }
+
+        const hash = this.hash(key);
+        const position = this.findPosition(hash);
+        return this.ring.get(this.sortedKeys[position])!;
+    }
+
+    private findPosition(hash: number): number {
+        let low = 0;
+        let high = this.sortedKeys.length;
+
+        while (low < high) {
+            const mid = Math.floor((low + high) / 2);
+            if (this.sortedKeys[mid] < hash) {
+                low = mid + 1;
+            } else {
+                high = mid;
+            }
+        }
+
+        return low === this.sortedKeys.length ? 0 : low;
+    }
+
+    private hash(key: string): number {
+        return crypto.createHash('md5').update(key).digest('hex')
+            .substring(0, 8) as unknown as number;
+    }
+}
+```
+
+## Workflow
+
+### 1. Caching Strategy Design
+
+1. Identify frequently accessed data
+2. Analyze access patterns
+3. Determine cache candidates
+4. Choose caching patterns
+5. Define TTL policies
+6. Plan invalidation strategy
+
+### 2. Implementation
+
+1. Set up cache infrastructure
+2. Implement cache client
+3. Add caching to services
+4. Configure TTL và invalidation
+5. Add monitoring
+
+### 3. Testing
+
+1. Test cache hit/miss scenarios
+2. Test invalidation
+3. Test failure scenarios
+4. Test performance impact
+
+### 4. Optimization
+
+1. Analyze cache metrics
+2. Tune TTL values
+3. Optimize cache size
+4. Improve invalidation efficiency
+
+## Ví dụ
+
+### Ví dụ 1: Complete Caching Service
+
+```typescript
+export class CachingService {
+    private cache: CacheClient;
+    private invalidator: CacheInvalidator;
+    private monitor: CacheMonitor;
+
+    constructor(config: CacheConfig) {
+        this.cache = new RedisCacheClient(config.redis);
+        this.invalidator = new CacheInvalidator(this.cache);
+        this.monitor = new CacheMonitor(this.cache);
+    }
+
+    async getUserProfile(userId: string): Promise<UserProfile> {
+        const key = `user:${userId}:profile`;
+        return new CacheAsideService(this.cache).get(key, () =>
+            this.db.users.findById(userId)
+        );
+    }
+
+    async getPosts(options: PostQueryOptions): Promise<PostList> {
+        const key = CacheKeyBuilder.pagination('posts', options);
+        return new CacheAsideService(this.cache).get(key, () =>
+            this.db.posts.findAll(options)
+        );
+    }
+
+    async invalidateUser(userId: string): Promise<void> {
+        await this.invalidator.invalidateByPrefix(`user:${userId}*`);
+    }
+
+    async invalidatePost(postId: string): Promise<void> {
+        const post = await this.db.posts.findById(postId);
+        await Promise.all([
+            this.invalidator.invalidate(`post:${postId}`),
+            this.invalidator.invalidateByPrefix(`user:${post.authorId}:posts`),
+            this.invalidator.invalidateByPrefix('posts:list*')
+        ]);
+    }
+
+    async getMetrics(): Promise<CacheMetrics> {
+        return this.monitor.collectMetrics();
+    }
+}
+```
+
+### Ví dụ 2: HTTP Caching
+
+```typescript
+// HTTP caching headers
+class HTTPCache {
+    static setCacheHeaders(
+        res: Response,
+        options: {
+            maxAge?: number;
+            isPrivate?: boolean;
+            mustRevalidate?: boolean;
+        }
+    ): void {
+        const { maxAge = 3600, isPrivate = false, mustRevalidate = true } = options;
+
+        const directives = [];
+
+        if (isPrivate) {
+            directives.push('private');
+        } else {
+            directives.push('public');
+        }
+
+        directives.push(`max-age=${maxAge}`);
+
+        if (mustRevalidate) {
+            directives.push('must-revalidate');
+        }
+
+        res.set('Cache-Control', directives.join(', '));
+        res.set('Expires', new Date(Date.now() + maxAge * 1000).toUTCString());
+        res.set('Vary', 'Accept-Encoding');
+    }
+
+    static setETag(res: Response, data: any): void {
+        const etag = crypto.createHash('md5').update(JSON.stringify(data)).digest('hex');
+        res.set('ETag', `"${etag}"`);
+
+        // Check If-None-Match
+        if (res.req.headers['if-none-match'] === `"${etag}"`) {
+            res.status(304).end();
+            return null;
+        }
+
+        return data;
+    }
+}
+
+// Usage in Express
+app.get('/api/posts', async (req, res) => {
+    const posts = await postService.findAll();
+
+    if (req.fresh) {
+        return res.status(304).end();
+    }
+
+    HTTPCache.setCacheHeaders(res, { maxAge: 300, isPrivate: false });
+    res.json(posts);
+});
+```
+
+### Ví dụ 3: Application-Level Cache
+
+```typescript
+// Decorator-based caching
+function cached(ttl: number, keyPrefix?: string) {
+    return function (
+        target: any,
+        propertyKey: string,
+        descriptor: PropertyDescriptor
+    ) {
+        const originalMethod = descriptor.value;
+
+        descriptor.value = async function (...args: any[]) {
+            const cacheKey = keyPrefix || propertyKey;
+            const cache = getCacheFor(this);
+            const fullKey = `${cacheKey}:${args.join(':')}`;
+
+            const cached = await cache.get(fullKey);
+            if (cached !== null) {
+                return cached;
+            }
+
+            const result = await originalMethod.apply(this, args);
+            await cache.set(fullKey, result, ttl);
+
+            return result;
+        };
+
+        return descriptor;
+    };
+}
+
+// Usage
+class UserService {
+    @cached(3600, 'user:profile')
+    async getUserProfile(userId: string): Promise<UserProfile> {
+        return this.database.users.findById(userId);
+    }
+
+    @cached(300, 'posts:list')
+    async getPosts(options: PostQueryOptions): Promise<Post[]> {
+        return this.database.posts.findAll(options);
+    }
+}
+```
+
+## Liên kết
+
+- [Caching Best Practices](https://docs.microsoft.com/en-us/azure/architecture/best-practices/caching)
+- [Redis Caching Patterns](https://redis.io/topics/lru-cache)
+- [HTTP Caching](https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching)
+- Redis Guidelines: `.cursor/rules/redis.mdc`
+- Performance: `.cursor/rules/performance.mdc`
+- API: `.cursor/rules/api.mdc`

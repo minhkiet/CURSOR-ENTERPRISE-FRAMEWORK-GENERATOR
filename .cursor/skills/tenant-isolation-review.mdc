@@ -1,0 +1,629 @@
+---
+description: Skill review tenant isolation implementations trong multi-tenant systems để đảm bảo data security và privacy
+purpose: Cung cấp comprehensive review framework cho tenant isolation strategies, identify vulnerabilities, và ensure compliance requirements
+input:
+  - Multi-tenant architecture
+  - Database schema
+  - Application code
+  - Security policies
+  - Access patterns
+output:
+  - Isolation assessment
+  - Vulnerability analysis
+  - Compliance review
+  - Risk assessment
+  - Recommendations
+version: 1.0.0
+tags:
+  - multi-tenant
+  - tenant-isolation
+  - security
+  - data-privacy
+---
+
+# Tenant Isolation Review
+
+## Tổng quan
+
+Tenant Isolation Review là skill chuyên biệt để review và assess tenant isolation trong multi-tenant applications. Skill này cung cấp systematic approach để evaluate isolation strategies, identify data leakage vulnerabilities, assess performance impact, và ensure compliance. Critical cho B2B SaaS applications.
+
+## Purpose (Mục đích)
+
+Tenant isolation là foundation của multi-tenant SaaS security:
+
+1. **Data privacy**: One tenant cannot access another's data
+2. **Compliance**: GDPR, HIPAA, SOC 2 requirements
+3. **Trust**: Customer confidence in data protection
+4. **Performance**: Isolation can impact resource usage
+5. **Cost efficiency**: Balance isolation vs shared infrastructure
+
+Tenant Isolation Review tồn tại để:
+
+- **Verify complete isolation** across all layers
+- **Identify vulnerabilities** before breach
+- **Assess compliance** requirements
+- **Optimize isolation strategy** for cost/performance
+- **Provide security recommendations**
+
+## Input (Đầu vào)
+
+| Input | Mô tả | Required |
+|-------|-------|----------|
+| `architecture` | System architecture | Yes |
+| `database` | Database schema | Yes |
+| `code` | Application code | Yes |
+| `policies` | Security policies | Yes |
+| `isolation_model` | Current isolation model | Yes |
+
+## Output (Đầu ra)
+
+| Output | Mô tả | Format |
+|--------|-------|--------|
+| `isolation_assessment` | Current isolation level | Assessment |
+| `vulnerabilities` | Security vulnerabilities | List |
+| `compliance_gaps` | Compliance gaps | List |
+| `risk_assessment` | Risk levels | RiskReport |
+| `recommendations` | Improvements | List |
+
+## Workflow (Quy trình)
+
+### Bước 1: Architecture Discovery
+
+```typescript
+// Discover isolation architecture
+interface IsolationArchitecture {
+  model: IsolationModel;
+  layers: IsolationLayer[];
+  shared_components: SharedComponent[];
+  boundary_controls: BoundaryControl[];
+}
+
+type IsolationModel = 
+  | 'shared_everything'
+  | 'shared_database'
+  | 'shared_schema'
+  | 'separate_schema'
+  | 'separate_database'
+  | 'separate_instance';
+
+interface IsolationLayer {
+  name: string;
+  type: 'network' | 'application' | 'database' | 'storage';
+  isolation_mechanism: string;
+  coverage: number; // 0-100%
+  issues: LayerIssue[];
+}
+
+async function discoverArchitecture(
+  config: ArchitectureConfig
+): Promise<IsolationArchitecture> {
+  const model = detectIsolationModel(config);
+  const layers: IsolationLayer[] = [];
+  
+  // Analyze network isolation
+  layers.push(await analyzeNetworkIsolation(config));
+  
+  // Analyze application isolation
+  layers.push(await analyzeApplicationIsolation(config));
+  
+  // Analyze database isolation
+  layers.push(await analyzeDatabaseIsolation(config));
+  
+  // Analyze storage isolation
+  layers.push(await analyzeStorageIsolation(config));
+  
+  return {
+    model,
+    layers,
+    shared_components: identifySharedComponents(config),
+    boundary_controls: identifyBoundaryControls(config)
+  };
+}
+
+function detectIsolationModel(config: ArchitectureConfig): IsolationModel {
+  const { database_per_tenant, schema_per_tenant, instance_per_tenant } = config;
+  
+  if (instance_per_tenant) return 'separate_instance';
+  if (database_per_tenant) return 'separate_database';
+  if (schema_per_tenant) return 'separate_schema';
+  if (config.use_rls) return 'shared_database';
+  return 'shared_everything';
+}
+```
+
+### Bước 2: Data Isolation Analysis
+
+```typescript
+// Analyze data isolation mechanisms
+interface DataIsolationAnalysis {
+  tables: TableIsolation[];
+  queries: QueryAnalysis[];
+  vulnerabilities: IsolationVulnerability[];
+  missing_filters: MissingFilter[];
+}
+
+interface TableIsolation {
+  table: string;
+  has_tenant_column: boolean;
+  index_exists: boolean;
+  rls_enabled: boolean;
+  rls_policy: string;
+  issues: string[];
+}
+
+async function analyzeDataIsolation(
+  database: DatabaseSchema
+): Promise<DataIsolationAnalysis> {
+  const tables: TableIsolation[] = [];
+  const vulnerabilities: IsolationVulnerability[] = [];
+  const missingFilters: MissingFilter[] = [];
+  
+  for (const table of database.tables) {
+    const tenantColumn = table.columns.find(c => 
+      c.name === 'tenant_id' || c.name === 'organization_id'
+    );
+    
+    const analysis: TableIsolation = {
+      table: table.name,
+      has_tenant_column: !!tenantColumn,
+      index_exists: table.indexes.some(i => 
+        i.columns.includes(tenantColumn?.name || 'tenant_id')
+      ),
+      rls_enabled: await checkRLSEnabled(database.connection, table.name),
+      rls_policy: await getRLSPolicy(database.connection, table.name),
+      issues: []
+    };
+    
+    // Check for missing tenant column
+    if (!tenantColumn) {
+      analysis.issues.push('Missing tenant identifier column');
+      vulnerabilities.push({
+        table: table.name,
+        type: 'missing_tenant_column',
+        severity: 'critical',
+        description: `Table ${table.name} has no tenant identifier`
+      });
+    }
+    
+    // Check for missing index
+    if (!analysis.index_exists && analysis.has_tenant_column) {
+      analysis.issues.push('Missing index on tenant column');
+      missingFilters.push({
+        table: table.name,
+        column: 'tenant_id',
+        severity: 'medium'
+      });
+    }
+    
+    // Check RLS
+    if (!analysis.rls_enabled && analysis.has_tenant_column) {
+      vulnerabilities.push({
+        table: table.name,
+        type: 'rls_disabled',
+        severity: 'high',
+        description: `RLS not enabled on ${table.name}`
+      });
+    }
+    
+    tables.push(analysis);
+  }
+  
+  return { tables, queries: [], vulnerabilities, missingFilters };
+}
+```
+
+### Bước 3: Query Analysis
+
+```typescript
+// Analyze application queries
+interface QueryAnalysis {
+  queries: QueryInfo[];
+  vulnerabilities: QueryVulnerability[];
+  recommendations: QueryRecommendation[];
+}
+
+async function analyzeQueries(
+  codeFiles: string[]
+): Promise<QueryAnalysis> {
+  const queries: QueryInfo[] = [];
+  const vulnerabilities: QueryVulnerability[] = [];
+  
+  for (const file of codeFiles) {
+    const content = await readFile(file);
+    const fileQueries = extractQueries(content);
+    
+    for (const query of fileQueries) {
+      queries.push({
+        ...query,
+        file,
+        hasTenantFilter: checkTenantFilter(query),
+        parameterized: isParameterized(query)
+      });
+      
+      // Check for vulnerabilities
+      if (!query.hasTenantFilter && isDataQuery(query)) {
+        vulnerabilities.push({
+          file,
+          query: query.raw,
+          type: 'missing_tenant_filter',
+          severity: 'critical',
+          description: 'Query may return data from all tenants'
+        });
+      }
+      
+      if (!query.parameterized) {
+        vulnerabilities.push({
+          file,
+          query: query.raw,
+          type: 'sql_injection_risk',
+          severity: 'high',
+          description: 'Query is not parameterized - SQL injection risk'
+        });
+      }
+    }
+  }
+  
+  return {
+    queries,
+    vulnerabilities,
+    recommendations: generateQueryRecommendations(vulnerabilities)
+  };
+}
+
+function checkTenantFilter(query: ExtractedQuery): boolean {
+  const tenantPatterns = [
+    /tenant_id\s*=/i,
+    /organization_id\s*=/i,
+    /WHERE.*tenant_id/i,
+    /WHERE.*organization_id/i
+  ];
+  
+  return tenantPatterns.some(p => p.test(query.raw));
+}
+```
+
+### Bước 4: Boundary Control Review
+
+```typescript
+// Review boundary controls
+interface BoundaryControlReview {
+  authentication: AuthControl;
+  authorization: AuthzControl;
+  network: NetworkControl;
+  api: APIControl;
+  issues: ControlIssue[];
+}
+
+async function reviewBoundaryControls(
+  config: SecurityConfig
+): Promise<BoundaryControlReview> {
+  const review: BoundaryControlReview = {
+    authentication: await reviewAuthentication(config),
+    authorization: await reviewAuthorization(config),
+    network: await reviewNetworkControls(config),
+    api: await reviewAPIControls(config),
+    issues: []
+  };
+  
+  // Identify gaps
+  if (!review.authentication.mfa_enabled) {
+    review.issues.push({
+      type: 'missing_mfa',
+      severity: 'high',
+      message: 'Multi-factor authentication not required'
+    });
+  }
+  
+  if (!review.authorization.rbac_implemented) {
+    review.issues.push({
+      type: 'missing_rbac',
+      severity: 'high',
+      message: 'Role-based access control not implemented'
+    });
+  }
+  
+  return review;
+}
+
+async function reviewAPIControls(
+  config: SecurityConfig
+): Promise<APIControl> {
+  return {
+    tenant_isolation_enforced: config.api?.tenantIsolation,
+    rate_limiting: config.api?.rateLimiting,
+    tenant_id_validation: config.api?.validateTenantId,
+    cross_tenant_access_prevention: config.api?.preventCrossTenantAccess,
+    issues: []
+  };
+}
+```
+
+### Bước 5: Vulnerability Assessment
+
+```typescript
+// Comprehensive vulnerability assessment
+interface VulnerabilityAssessment {
+  critical: Vulnerability[];
+  high: Vulnerability[];
+  medium: Vulnerability[];
+  low: Vulnerability[];
+  overall_risk_score: number;
+}
+
+async function assessVulnerabilities(
+  dataIsolation: DataIsolationAnalysis,
+  queryAnalysis: QueryAnalysis,
+  boundaryReview: BoundaryControlReview
+): Promise<VulnerabilityAssessment> {
+  const allVulnerabilities: Vulnerability[] = [];
+  
+  // Collect from all sources
+  allVulnerabilities.push(
+    ...dataIsolation.vulnerabilities.map(v => ({ ...v, source: 'data' }))
+  );
+  allVulnerabilities.push(
+    ...queryAnalysis.vulnerabilities.map(v => ({ ...v, source: 'query' }))
+  );
+  allVulnerabilities.push(
+    ...boundaryReview.issues.map(v => ({ ...v, source: 'boundary' }))
+  );
+  
+  // Categorize by severity
+  const categorized = {
+    critical: allVulnerabilities.filter(v => v.severity === 'critical'),
+    high: allVulnerabilities.filter(v => v.severity === 'high'),
+    medium: allVulnerabilities.filter(v => v.severity === 'medium'),
+    low: allVulnerabilities.filter(v => v.severity === 'low')
+  };
+  
+  // Calculate risk score (0-100)
+  const riskScore = calculateRiskScore(categorized);
+  
+  return {
+    ...categorized,
+    overall_risk_score: riskScore
+  };
+}
+
+function calculateRiskScore(vulns: {
+  critical: Vulnerability[];
+  high: Vulnerability[];
+  medium: Vulnerability[];
+  low: Vulnerability[];
+}): number {
+  const weights = {
+    critical: 40,
+    high: 25,
+    medium: 10,
+    low: 2
+  };
+  
+  const total = 
+    vulns.critical.length * weights.critical +
+    vulns.high.length * weights.high +
+    vulns.medium.length * weights.medium +
+    vulns.low.length * weights.low;
+  
+  // Normalize to 0-100
+  return Math.min(100, total);
+}
+```
+
+### Bước 6: Risk Assessment
+
+```typescript
+// Generate comprehensive risk assessment
+interface RiskAssessment {
+  inherent_risk: RiskLevel;
+  residual_risk: RiskLevel;
+  threat_scenarios: ThreatScenario[];
+  mitigation_effectiveness: number;
+  recommendations: RiskRecommendation[];
+}
+
+async function generateRiskAssessment(
+  assessment: VulnerabilityAssessment,
+  isolation: IsolationArchitecture
+): Promise<RiskAssessment> {
+  const threatScenarios = identifyThreatScenarios(isolation);
+  
+  return {
+    inherent_risk: determineRiskLevel(assessment.overall_risk_score),
+    residual_risk: calculateResidualRisk(assessment),
+    threat_scenarios: threatScenarios,
+    mitigation_effectiveness: calculateMitigationEffectiveness(assessment),
+    recommendations: generateRiskRecommendations(assessment, threatScenarios)
+  };
+}
+
+function identifyThreatScenarios(
+  isolation: IsolationArchitecture
+): ThreatScenario[] {
+  const scenarios: ThreatScenario[] = [];
+  
+  // Cross-tenant data access
+  if (isolation.model === 'shared_everything') {
+    scenarios.push({
+      name: 'Cross-Tenant Data Access',
+      likelihood: 'high',
+      impact: 'critical',
+      vectors: [
+        'Missing tenant filter in queries',
+        'RLS not enforced',
+        'Application bug exposing data'
+      ],
+      likelihood_score: 0.8,
+      impact_score: 1.0
+    });
+  }
+  
+  // SQL injection leading to tenant breach
+  scenarios.push({
+    name: 'SQL Injection Tenant Breach',
+    likelihood: 'medium',
+    impact: 'critical',
+    vectors: [
+      'Unparameterized queries',
+      'Dynamic SQL construction',
+      'ORM misconfiguration'
+    ],
+    likelihood_score: 0.5,
+    impact_score: 1.0
+  });
+  
+  return scenarios;
+}
+```
+
+## Checklist (Danh sách kiểm tra)
+
+- [ ] All tables have tenant identifier column
+- [ ] All queries include tenant filter
+- [ ] RLS policies enforced at database level
+- [ ] Indexes on tenant columns
+- [ ] No hardcoded tenant IDs in code
+- [ ] API validates tenant ownership
+- [ ] Authentication requires MFA
+- [ ] Authorization enforces tenant scope
+- [ ] Network isolation configured
+- [ ] Audit logging captures tenant context
+- [ ] Compliance requirements met (GDPR, HIPAA)
+- [ ] Regular security testing performed
+- [ ] Incident response plan in place
+- [ ] Data encryption at rest and in transit
+- [ ] Access reviews conducted regularly
+
+## Examples (Ví dụ)
+
+### Ví dụ 1: Comprehensive RLS Implementation
+
+```sql
+-- Enable RLS on table
+ALTER TABLE contacts ENABLE ROW LEVEL SECURITY;
+
+-- Create policy for SELECT
+CREATE POLICY tenant_isolation_select ON contacts
+FOR SELECT
+USING (
+  auth.jwt() ->> 'tenant_id' = contacts.tenant_id
+);
+
+-- Create policy for INSERT
+CREATE POLICY tenant_isolation_insert ON contacts
+FOR INSERT
+WITH CHECK (
+  auth.jwt() ->> 'tenant_id' = contacts.tenant_id
+);
+
+-- Create policy for UPDATE
+CREATE POLICY tenant_isolation_update ON contacts
+FOR UPDATE
+USING (
+  auth.jwt() ->> 'tenant_id' = contacts.tenant_id
+)
+WITH CHECK (
+  auth.jwt() ->> 'tenant_id' = contacts.tenant_id
+);
+
+-- Create policy for DELETE
+CREATE POLICY tenant_isolation_delete ON contacts
+FOR DELETE
+USING (
+  auth.jwt() ->> 'tenant_id' = contacts.tenant_id
+);
+
+-- Force RLS for table owner too
+ALTER TABLE contacts FORCE ROW LEVEL SECURITY;
+```
+
+### Ví dụ 2: Application-Level Tenant Middleware
+
+```typescript
+// Tenant context middleware
+const tenantMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  const token = extractToken(req);
+  const tenantId = decodeTenantFromToken(token);
+  
+  if (!tenantId) {
+    return res.status(401).json({ error: 'Invalid tenant context' });
+  }
+  
+  // Attach tenant context
+  req.tenantId = tenantId;
+  req.tenant = { id: tenantId };
+  
+  // Validate tenant exists and is active
+  TenantService.validateTenant(tenantId)
+    .then(isValid => {
+      if (!isValid) {
+        return res.status(403).json({ error: 'Tenant inactive' });
+      }
+      next();
+    })
+    .catch(err => {
+      logger.error('Tenant validation failed', { tenantId, err });
+      res.status(500).json({ error: 'Internal error' });
+    });
+};
+
+// Apply to all routes
+app.all('/api/*', tenantMiddleware);
+```
+
+## Anti Patterns (Các pattern cần tránh)
+
+### 1. Trusting Client-Side Tenant ID
+```typescript
+// ❌ BAD: Accept tenant_id from client
+app.get('/contacts', (req, res) => {
+  const tenantId = req.query.tenant_id; // From client!
+  const contacts = db.query('SELECT * FROM contacts WHERE tenant_id = $1', [tenantId]);
+});
+
+// ✅ GOOD: Extract from authenticated context
+app.get('/contacts', authMiddleware, (req, res) => {
+  const tenantId = req.auth.tenant_id; // From auth token
+  const contacts = db.query('SELECT * FROM contacts WHERE tenant_id = $1', [tenantId]);
+});
+```
+
+### 2. RLS Without FORCE
+```sql
+-- ❌ BAD: RLS but not forced
+ALTER TABLE contacts ENABLE ROW LEVEL SECURITY;
+CREATE POLICY tenant_policy ON contacts FOR SELECT USING (tenant_id = current_user);
+
+-- ✅ GOOD: Force RLS
+ALTER TABLE contacts FORCE ROW LEVEL SECURITY;
+```
+
+### 3. Separate Tables Per Tenant
+```sql
+-- ❌ BAD: Table per tenant (scaling nightmare)
+CREATE TABLE contacts_tenant_a (...);
+CREATE TABLE contacts_tenant_b (...);
+CREATE TABLE contacts_tenant_c (...);
+
+-- ✅ GOOD: Shared table with RLS
+CREATE TABLE contacts (...);
+ALTER TABLE contacts ENABLE ROW LEVEL SECURITY;
+```
+
+## Best Practices (Thực hành tốt nhất)
+
+1. **Defense in depth**: Multiple layers of isolation
+2. **Database-level enforcement**: RLS as last line of defense
+3. **Application-level validation**: Every query filtered
+4. **No client-provided tenant IDs**: Use authenticated context
+5. **Comprehensive indexing**: All tenant_id columns indexed
+6. **Regular testing**: Automated tenant isolation tests
+7. **Audit everything**: Log all tenant context
+8. **Encrypt tenant data**: Additional encryption layer
+9. **Monitor anomalies**: Detect cross-tenant access attempts
+10. **Document isolation strategy**: Clear architecture documentation
+
+## Liên kết (Cross-references)
+
+- **Related Skills**: [multi-tenant-design](./multi-tenant-design.mdc), [security-audit](./security-audit.mdc), [crm-saas-review](./crm-saas-review.mdc)
+- **Standards**: SOC 2, GDPR, HIPAA, ISO 27001
+- **Databases**: PostgreSQL RLS, MySQL Row Security

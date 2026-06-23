@@ -1,0 +1,931 @@
+---
+description: Thiết kế và implement microservices architecture với service decomposition, communication patterns, và data management
+purpose: Design scalable microservices systems với proper boundaries và integration patterns
+input: Business capabilities, data requirements, scalability needs
+output: Microservices architecture design, service contracts, integration patterns
+version: 1.0.0
+tags: [microservices, distributed-systems, api-gateway, service-mesh, event-driven, containers]
+---
+
+# Microservices Design Skill - Thiết Kế Microservices Architecture Toàn Diện
+
+## Tổng quan
+
+Microservices architecture là approach để develop applications như suite của small services. Skill này cung cấp framework để thiết kế và implement microservices với proper decomposition, communication patterns, và data management.
+
+## Purpose (Mục đích)
+
+Microservices Design Skill được thiết kế để:
+
+1. **Service Decomposition**: Break down system into bounded contexts
+2. **Communication Patterns**: Define sync/async communication
+3. **Data Management**: Handle distributed data
+4. **Resilience**: Build fault-tolerant systems
+5. **Observability**: Implement monitoring và tracing
+
+### Khi nào sử dụng Microservices Design
+
+- Khi designing new distributed systems
+- Khi decomposing monolith
+- Khi planning service boundaries
+- Khi implementing API contracts
+- Khi setting up service mesh
+- Khi designing event-driven architecture
+
+## Input (Đầu vào)
+
+- [ ] Business capabilities catalog
+- [ ] Data models và relationships
+- [ ] Performance requirements
+- [ ] Team structure
+- [ ] Infrastructure constraints
+
+## Output (Đầu ra)
+
+- [ ] Service decomposition plan
+- [ ] API contracts (OpenAPI specs)
+- [ ] Communication architecture
+- [ ] Data ownership diagram
+- [ ] Deployment topology
+
+## Workflow (Quy trình)
+
+### Phase 1: Service Decomposition
+
+### Bước 1: Domain-Driven Decomposition
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        Business Capabilities                             │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐     │
+│  │   Customer        │  │   Order          │  │   Payment        │     │
+│  │   Management      │  │   Management     │  │   Processing     │     │
+│  │                  │  │                  │  │                  │     │
+│  │  - Registration  │  │  - Order Create  │  │  - Payment Auth  │     │
+│  │  - Profile       │  │  - Order Status  │  │  - Capture       │     │
+│  │  - Authentication│  │  - Fulfillment   │  │  - Refund        │     │
+│  │  - Preferences    │  │  - Returns       │  │  - Disputes      │     │
+│  └────────┬─────────┘  └────────┬─────────┘  └────────┬─────────┘     │
+│           │                    │                    │                │
+│           ▼                    ▼                    ▼                │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐    │
+│  │  Identity        │  │  Order           │  │  Payment         │    │
+│  │  Service         │  │  Service         │  │  Service         │    │
+│  └──────────────────┘  └──────────────────┘  └──────────────────┘    │
+│                                                                          │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐     │
+│  │   Catalog        │  │   Inventory      │  │   Notification   │     │
+│  │   Management     │  │   Management     │  │   Service        │     │
+│  │                  │  │                  │  │                  │     │
+│  │  - Products      │  │  - Stock Levels  │  │  - Email         │     │
+│  │  - Categories    │  │  - Reservations │  │  - SMS           │     │
+│  │  - Search        │  │  - Warehouses    │  │  - Push          │     │
+│  │  - Pricing       │  │  - Transfers     │  │  - Templates     │     │
+│  └────────┬─────────┘  └────────┬─────────┘  └────────┬─────────┘     │
+│           │                    │                    │                │
+│           ▼                    ▼                    ▼                │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐    │
+│  │  Catalog         │  │  Inventory       │  │  Notification     │    │
+│  │  Service         │  │  Service         │  │  Service          │    │
+│  └──────────────────┘  └──────────────────┘  └──────────────────┘    │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Bước 2: Service Boundaries
+
+```yaml
+# services/order-service/openapi.yaml
+openapi: 3.0.3
+info:
+  title: Order Service API
+  version: 1.0.0
+  description: Order management microservice
+  
+servers:
+  - url: https://order-service.internal.example.com
+    description: Internal API
+
+paths:
+  /orders:
+    post:
+      operationId: createOrder
+      summary: Create new order
+      tags: [Orders]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Conflict (e.g., insufficient inventory)
+          
+  /orders/{orderId}:
+    get:
+      operationId: getOrder
+      summary: Get order by ID
+      tags: [Orders]
+      parameters:
+        - $ref: '#/components/parameters/orderId'
+      responses:
+        '200':
+          description: Order found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  schemas:
+    CreateOrderRequest:
+      type: object
+      required:
+        - customerId
+        - items
+        - shippingAddress
+      properties:
+        customerId:
+          type: string
+          format: uuid
+        items:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/OrderItemRequest'
+        shippingAddress:
+          $ref: '#/components/schemas/Address'
+        paymentMethodId:
+          type: string
+      
+    OrderResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        customerId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [pending, confirmed, processing, shipped, delivered, cancelled]
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItemResponse'
+        totalAmount:
+          $ref: '#/components/schemas/Money'
+        createdAt:
+          type: string
+          format: date-time
+          
+  parameters:
+    orderId:
+      name: orderId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+```
+
+### Phase 2: Communication Patterns
+
+### Bước 3: Synchronous Communication (REST/gRPC)
+
+```typescript
+// Service client for synchronous calls
+// clients/order-client.ts
+import { Client } from '@nestjs/microservices';
+import { Injectable } from '@nestjs/common';
+import { Observable } from 'rxjs';
+
+@Injectable()
+export class OrderServiceClient {
+  constructor(
+    private httpClient: HttpService,
+    private logger: Logger
+  ) {}
+  
+  async createOrder(request: CreateOrderRequest): Promise<OrderResponse> {
+    try {
+      const response = await this.httpClient
+        .post('/orders', request)
+        .toPromise();
+      
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Failed to create order: ${error.message}`);
+      throw this.transformError(error);
+    }
+  }
+  
+  async getOrder(orderId: string): Promise<OrderResponse> {
+    return this.httpClient.get(`/orders/${orderId}`).toPromise();
+  }
+  
+  async cancelOrder(orderId: string): Promise<void> {
+    await this.httpClient.delete(`/orders/${orderId}`).toPromise();
+  }
+  
+  private transformError(error: any): Error {
+    if (error.response) {
+      const { status, data } = error.response;
+      
+      switch (status) {
+        case 400:
+          return new ValidationError(data.message);
+        case 404:
+          return new NotFoundError(`Order not found`);
+        case 409:
+          return new ConflictError(data.message);
+        default:
+          return new ServiceError(data.message);
+      }
+    }
+    
+    return new ServiceError('Service unavailable');
+  }
+}
+
+// gRPC service definition
+// proto/order.proto
+syntax = "proto3";
+
+package order;
+
+service OrderService {
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+  rpc GetOrder(GetOrderRequest) returns (Order);
+  rpc CancelOrder(CancelOrderRequest) returns (CancelOrderResponse);
+  rpc StreamOrderUpdates(StreamOrderRequest) returns (stream OrderUpdate);
+}
+
+message CreateOrderRequest {
+  string customer_id = 1;
+  repeated OrderItem items = 2;
+  Address shipping_address = 3;
+  string payment_method_id = 4;
+}
+
+message Order {
+  string id = 1;
+  string customer_id = 2;
+  OrderStatus status = 3;
+  repeated OrderItem items = 4;
+  Money total_amount = 5;
+  google.protobuf.Timestamp created_at = 6;
+}
+
+enum OrderStatus {
+  PENDING = 0;
+  CONFIRMED = 1;
+  PROCESSING = 2;
+  SHIPPED = 3;
+  DELIVERED = 4;
+  CANCELLED = 5;
+}
+```
+
+### Bước 4: Asynchronous Communication (Events)
+
+```typescript
+// Event definitions
+// events/order.events.ts
+export interface OrderCreatedEvent {
+  eventType: 'ORDER_CREATED';
+  orderId: string;
+  customerId: string;
+  items: OrderItem[];
+  totalAmount: Money;
+  timestamp: Date;
+  correlationId: string;
+}
+
+export interface OrderConfirmedEvent {
+  eventType: 'ORDER_CONFIRMED';
+  orderId: string;
+  confirmedAt: Date;
+  timestamp: Date;
+}
+
+export interface OrderCancelledEvent {
+  eventType: 'ORDER_CANCELLED';
+  orderId: string;
+  reason: string;
+  timestamp: Date;
+}
+
+// Event publisher
+// services/event-publisher.service.ts
+@Injectable()
+export class EventPublisher {
+  constructor(
+    private kafka: KafkaService,
+    private logger: Logger
+  ) {}
+  
+  async publishOrderCreated(event: OrderCreatedEvent): Promise<void> {
+    await this.publish('order.events', event);
+  }
+  
+  async publishOrderConfirmed(event: OrderConfirmedEvent): Promise<void> {
+    await this.publish('order.events', event);
+  }
+  
+  private async publish(topic: string, event: any): Promise<void> {
+    const message: KafkaMessage = {
+      key: event.orderId,
+      value: JSON.stringify(event),
+      headers: {
+        'event-type': event.eventType,
+        'timestamp': event.timestamp.toISOString(),
+        'correlation-id': event.correlationId
+      }
+    };
+    
+    try {
+      await this.kafka.emit(topic, [message]);
+      this.logger.debug(`Published event: ${event.eventType}`, { orderId: event.orderId });
+    } catch (error) {
+      this.logger.error(`Failed to publish event: ${error.message}`, { event });
+      throw error;
+    }
+  }
+}
+
+// Event consumer (in another service)
+// consumers/inventory.consumer.ts
+@Injectable()
+export class InventoryConsumer {
+  constructor(
+    private inventoryService: InventoryService,
+    private logger: Logger
+  ) {}
+  
+  @MessagePattern('order.events')
+  async handleOrderEvent(@Payload() message: any, @Ctx() context: KafkaContext) {
+    const event = JSON.parse(message.value);
+    
+    this.logger.info(`Received event: ${event.eventType}`, { orderId: event.orderId });
+    
+    try {
+      switch (event.eventType) {
+        case 'ORDER_CREATED':
+          await this.reserveInventory(event);
+          break;
+          
+        case 'ORDER_CANCELLED':
+          await this.releaseInventory(event);
+          break;
+          
+        default:
+          this.logger.warn(`Unknown event type: ${event.eventType}`);
+      }
+      
+      // Commit offset
+      const partition = context.getPartition();
+      const offset = context.getOffset();
+      await context.commitOffsets([{ partition, offset }]);
+      
+    } catch (error) {
+      this.logger.error(`Failed to process event: ${error.message}`, { event });
+      // Don't commit - message will be reprocessed
+      throw error;
+    }
+  }
+  
+  private async reserveInventory(event: OrderCreatedEvent): Promise<void> {
+    for (const item of event.items) {
+      await this.inventoryService.reserveStock(
+        event.orderId,
+        item.productId,
+        item.quantity
+      );
+    }
+  }
+  
+  private async releaseInventory(event: OrderCancelledEvent): Promise<void> {
+    const reservations = await this.inventoryService.getReservationsForOrder(event.orderId);
+    for (const reservation of reservations) {
+      await this.inventoryService.releaseReservation(reservation.id);
+    }
+  }
+}
+```
+
+### Phase 3: API Gateway và Service Mesh
+
+### Bước 5: API Gateway Configuration
+
+```yaml
+# api-gateway/nginx.conf
+events {
+    worker_connections 1024;
+}
+
+http {
+    # Upstream definitions
+    upstream order_service {
+        server order-service-1:3000;
+        server order-service-2:3000;
+        server order-service-3:3000;
+    }
+    
+    upstream customer_service {
+        server customer-service-1:3000;
+        server customer-service-2:3000;
+    }
+    
+    upstream payment_service {
+        server payment-service-1:3000;
+        server payment-service-2:3000;
+        least_conn;  # Load balancing strategy
+    }
+    
+    server {
+        listen 80;
+        
+        # Rate limiting zones
+        limit_req_zone $binary_remote_addr zone=api:10m rate=100r/s;
+        limit_req_zone $binary_remote_addr zone=auth:10m rate=10r/s;
+        
+        location /api/orders {
+            limit_req zone=api burst=20 nodelay;
+            
+            rewrite ^/api/(.*) /$1 break;
+            proxy_pass http://order_service;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Request-ID $request_id;
+            
+            # Circuit breaker
+            proxy_connect_timeout 5s;
+            proxy_next_upstream error timeout http_502;
+        }
+        
+        location /api/customers {
+            limit_req zone=api burst=20 nodelay;
+            
+            rewrite ^/api/(.*) /$1 break;
+            proxy_pass http://customer_service;
+        }
+        
+        location /api/payments {
+            limit_req zone=api burst=10 nodelay;
+            
+            rewrite ^/api/(.*) /$1 break;
+            proxy_pass http://payment_service;
+        }
+        
+        # Health check
+        location /health {
+            return 200 'OK';
+            add_header Content-Type text/plain;
+        }
+    }
+}
+
+# Kong API Gateway configuration
+# kong.yml
+_format_version: "3.0"
+
+services:
+  - name: order-service
+    url: http://order-service:3000
+    routes:
+      - name: orders-route
+        paths:
+          - /api/orders
+        methods:
+          - GET
+          - POST
+        plugins:
+          - name: rate-limiting
+            config:
+              minute: 100
+              policy: redis
+              redis_host: redis-cluster
+          - name: cors
+          - name: request-transformer
+            config:
+              add:
+                headers:
+                  - X-Service:order
+
+plugins:
+  - name: rate-limiting
+    config:
+      minute: 100
+      hour: 1000
+      policy: redis
+  - name: cors
+    config:
+      origins:
+        - https://app.example.com
+      methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+      headers:
+        - Authorization
+        - Content-Type
+```
+
+### Bước 6: Service Mesh (Istio)
+
+```yaml
+# istio/virtual-service-order.yaml
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: order-service
+  namespace: production
+spec:
+  hosts:
+    - order-service
+  http:
+    - match:
+        - headers:
+            x-user-role:
+              exact: admin
+      route:
+        - destination:
+            host: order-service
+            subset: v2
+          weight: 100
+    - route:
+        - destination:
+            host: order-service
+            subset: v1
+          weight: 100
+        
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: order-service
+spec:
+  host: order-service
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 100
+      http:
+        h2UpgradePolicy: UPGRADE
+        http1MaxPendingRequests: 100
+        http2MaxRequests: 1000
+    loadBalancer:
+      simple: LEAST_REQUEST
+    outlierDetection:
+      consecutive5xxErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+  subsets:
+    - name: v1
+      labels:
+        version: stable
+    - name: v2
+      labels:
+        version: canary
+
+---
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: order-service-mtls
+  namespace: production
+spec:
+  mtls:
+    mode: STRICT
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: order-service-authz
+  namespace: production
+spec:
+  selector:
+    matchLabels:
+      app: order-service
+  rules:
+    - from:
+        - source:
+            principals:
+              - cluster.local/ns/production/sa/customer-service
+              - cluster.local/ns/production/sa/payment-service
+      to:
+        - operation:
+            methods: ["POST"]
+            paths: ["/orders"]
+    - from:
+        - source:
+            principals:
+              - cluster.local/ns/production/sa/gateway
+      to:
+        - operation:
+            methods: ["GET", "POST", "PUT", "DELETE"]
+```
+
+### Phase 4: Data Management
+
+### Bước 7: Database per Service Pattern
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│                        Database per Service                          │
+├──────────────────────────────────────────────────────────────────────┤
+│                                                                       │
+│  ┌─────────────────────┐  ┌─────────────────────┐  ┌─────────────┐  │
+│  │   Order Service     │  │   Customer Service  │  │  Inventory  │  │
+│  │                     │  │                     │  │  Service    │  │
+│  │  ┌───────────────┐  │  │  ┌───────────────┐  │  │  ┌───────┐  │  │
+│  │  │   PostgreSQL   │  │  │  │   PostgreSQL  │  │  │  │Postgre│  │  │
+│  │  │                │  │  │  │                │  │  │  │SQL    │  │  │
+│  │  │ - orders       │  │  │  │ - customers    │  │  │  │       │  │  │
+│  │  │ - order_items  │  │  │  │ - addresses    │  │  │  │-stock │  │  │
+│  │  │ - shipments    │  │  │  │ - preferences  │  │  │  │-reserv│  │  │
+│  │  └───────────────┘  │  │  └───────────────┘  │  │  └───────┘  │  │
+│  └─────────────────────┘  └─────────────────────┘  └─────────────┘  │
+│                                                                       │
+│  ┌─────────────────────────────────────────────────────────────────┐ │
+│  │                     Shared Data (via Events)                     │ │
+│  │                                                                  │ │
+│  │   Customer Service ──── events ────► Order Service              │ │
+│  │        publishes              subscribes                        │ │
+│  │                                                                  │ │
+│  │   Order Service ────── events ────► Customer Service            │ │
+│  │        publishes              subscribes (for notifications)     │ │
+│  └─────────────────────────────────────────────────────────────────┘ │
+│                                                                       │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+### Bước 8: Saga Pattern for Distributed Transactions
+
+```typescript
+// Saga orchestrator
+// sagas/order-saga.orchestrator.ts
+export class OrderSagaOrchestrator {
+  private steps: SagaStep[] = [
+    {
+      name: 'ReserveInventory',
+      execute: (context: OrderContext) => 
+        this.inventoryService.reserve(context.orderId, context.items),
+      compensate: (context: OrderContext) =>
+        this.inventoryService.release(context.orderId)
+    },
+    {
+      name: 'ProcessPayment',
+      execute: (context: OrderContext) =>
+        this.paymentService.charge(context.orderId, context.totalAmount),
+      compensate: (context: OrderContext) =>
+        this.paymentService.refund(context.orderId)
+    },
+    {
+      name: 'ConfirmOrder',
+      execute: (context: OrderContext) =>
+        this.orderService.confirm(context.orderId),
+      compensate: (context: OrderContext) =>
+        this.orderService.cancel(context.orderId, 'Saga compensation')
+    },
+    {
+      name: 'SendNotification',
+      execute: (context: OrderContext) =>
+        this.notificationService.sendOrderConfirmation(context.orderId),
+      compensate: async () => {} // No compensation needed
+    }
+  ];
+  
+  async execute(orderContext: OrderContext): Promise<void> {
+    const completedSteps: SagaStep[] = [];
+    
+    try {
+      for (const step of this.steps) {
+        this.logger.info(`Executing step: ${step.name}`);
+        await step.execute(orderContext);
+        completedSteps.push(step);
+        this.logger.info(`Completed step: ${step.name}`);
+      }
+      
+      this.logger.info(`Saga completed successfully for order: ${orderContext.orderId}`);
+      
+    } catch (error) {
+      this.logger.error(`Saga failed at step ${completedSteps.length + 1}: ${error.message}`);
+      await this.compensate(completedSteps.reverse(), orderContext);
+      throw new SagaExecutionError(`Order creation failed: ${error.message}`);
+    }
+  }
+  
+  private async compensate(
+    completedSteps: SagaStep[],
+    context: OrderContext
+  ): Promise<void> {
+    for (const step of completedSteps) {
+      try {
+        this.logger.info(`Compensating step: ${step.name}`);
+        await step.compensate(context);
+        this.logger.info(`Compensated step: ${step.name}`);
+      } catch (compensationError) {
+        this.logger.error(
+          `Failed to compensate step ${step.name}: ${compensationError.message}`
+        );
+        // Store for retry or manual intervention
+        await this.sagaLog.recordFailure(step.name, context.orderId, compensationError);
+      }
+    }
+  }
+}
+
+// Choreography-based saga
+// events/order-saga.events.ts
+export class OrderSagaChoreography {
+  constructor(
+    private eventBus: EventBus,
+    private orderService: OrderService,
+    private inventoryService: InventoryService,
+    private paymentService: PaymentService
+  ) {}
+  
+  subscribe() {
+    // Step 1: Reserve inventory
+    this.eventBus.subscribe('order.requested', async (event) => {
+      try {
+        await this.inventoryService.reserve(event.orderId, event.items);
+        this.eventBus.publish('inventory.reserved', {
+          orderId: event.orderId,
+          correlationId: event.correlationId
+        });
+      } catch (error) {
+        this.eventBus.publish('inventory.reservation.failed', {
+          orderId: event.orderId,
+          reason: error.message
+        });
+      }
+    });
+    
+    // Step 2: Process payment
+    this.eventBus.subscribe('inventory.reserved', async (event) => {
+      try {
+        const order = await this.orderService.getOrder(event.orderId);
+        await this.paymentService.charge(event.orderId, order.totalAmount);
+        this.eventBus.publish('payment.successful', {
+          orderId: event.orderId,
+          correlationId: event.correlationId
+        });
+      } catch (error) {
+        // Compensate inventory
+        await this.inventoryService.release(event.orderId);
+        this.eventBus.publish('order.creation.failed', {
+          orderId: event.orderId,
+          reason: error.message
+        });
+      }
+    });
+  }
+}
+```
+
+## Checklist
+
+- [ ] Service boundaries clearly defined
+- [ ] API contracts documented (OpenAPI/gRPC)
+- [ ] Communication patterns selected (sync/async)
+- [ ] Database ownership assigned per service
+- [ ] Saga pattern for distributed transactions
+- [ ] API Gateway configured
+- [ ] Service mesh setup (if needed)
+- [ ] Circuit breakers implemented
+- [ ] Retry policies defined
+- [ ] Health checks configured
+- [ ] Distributed tracing enabled
+- [ ] Centralized logging setup
+
+## Examples (Ví dụ)
+
+### Ví dụ: Docker Compose for Local Development
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+
+services:
+  order-service:
+    build: ./services/order-service
+    ports:
+      - "3001:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@order-db:5432/orders
+      - KAFKA_BROKERS=kafka:9092
+      - SERVICE_NAME=order-service
+    depends_on:
+      - order-db
+      - kafka
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  customer-service:
+    build: ./services/customer-service
+    ports:
+      - "3002:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@customer-db:5432/customers
+      - KAFKA_BROKERS=kafka:9092
+    depends_on:
+      - customer-db
+      - kafka
+
+  inventory-service:
+    build: ./services/inventory-service
+    ports:
+      - "3003:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@inventory-db:5432/inventory
+      - KAFKA_BROKERS=kafka:9092
+    depends_on:
+      - inventory-db
+      - kafka
+
+  api-gateway:
+    image: kong:latest
+    ports:
+      - "8000:8000"
+    environment:
+      - KONG_DATABASE=postgres
+      - KONG_PG_HOST=gateway-db
+    depends_on:
+      - gateway-db
+
+  order-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: orders
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - order-db-data:/var/lib/postgresql/data
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+    depends_on:
+      - zookeeper
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"  # UI
+      - "6831:6831"    # Agent
+
+volumes:
+  order-db-data:
+  customer-db-data:
+  inventory-db-data:
+```
+
+## Anti Pattern
+
+- [ ] **Distributed Monolith**: Services tightly coupled
+- [ ] **Shared Databases**: Cross-service data access
+- [ ] **Synchronous Everywhere**: No async communication
+- [ ] **No API Contracts**: Implicit interfaces
+- [ ] **N+1 API Calls**: Chatty interactions
+- [ ] **Missing Idempotency**: Non-idempotent operations
+
+## Best Practice
+
+- [ ] **Single Responsibility**: One bounded context per service
+- [ ] **Database per Service**: Independent data storage
+- [ ] **Async by Default**: Event-driven communication
+- [ ] **API Contracts First**: OpenAPI/Proto definitions
+- [ ] **Circuit Breakers**: Resilience patterns
+- [ ] **Saga Pattern**: Distributed transactions
+
+## Liên kết
+
+- [[../rules/core-architecture]] - Core Architecture
+- [[../rules/api]] - API Design Rules
+- [[../rules/queue]] - Queue Best Practices
+- [[../skills/clean-architecture]] - Clean Architecture
+- [[../skills/performance-audit]] - Performance Audit

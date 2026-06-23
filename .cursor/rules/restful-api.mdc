@@ -1,0 +1,1457 @@
+---
+description: Nguyên tắc và best practices cho RESTful API Design trong Cursor Enterprise Framework
+created: 2026-06-23
+version: 1.0.0
+tags:
+  - restful
+  - api
+  - rest
+  - http
+  - web-services
+---
+
+# RESTful API Design Guidelines
+
+## Mục tiêu
+
+Tài liệu này định nghĩa các nguyên tắc và best practices cho việc thiết kế RESTful APIs trong Cursor Enterprise Framework. Mục tiêu là đảm bảo API consistency, predictability, scalability, và developer experience tối ưu cho các ứng dụng sử dụng REST architecture.
+
+REST (Representational State Transfer) là kiến trúc phổ biến nhất cho việc thiết kế web APIs. Việc tuân thủ các nguyên tắc RESTful trong tài liệu này sẽ giúp team xây dựng APIs dễ hiểu, maintainable, và tương thích với nhiều clients.
+
+## Nguyên tắc cơ bản
+
+### 1. Resource Naming Conventions
+
+Sử dụng nouns thay vì verbs cho resource names.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Resource Naming Pattern                       │
+├─────────────────────────────────────────────────────────────────┤
+│  Bad Practice              │  Good Practice                     │
+├─────────────────────────────────────────────────────────────────┤
+│  GET /getUsers             │  GET /users                        │
+│  POST /createUser          │  POST /users                       │
+│  PUT /updateUser          │  PUT /users/{id}                   │
+│  DELETE /deleteUser        │  DELETE /users/{id}                │
+│  GET /getUserById          │  GET /users/{id}                   │
+│  POST /user/login          │  POST /auth/login                  │
+│  GET /user/posts           │  GET /users/{id}/posts             │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 2. HTTP Methods và Semantics
+
+Sử dụng đúng HTTP methods theo REST conventions.
+
+```yaml
+# RESTful endpoints mapping
+/users:
+  get:
+    summary: List all users
+    description: Retrieve a paginated list of users
+    parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 20
+          maximum: 100
+      - name: sort
+        in: query
+        schema:
+          type: string
+          enum: [name, createdAt, email]
+    responses:
+      '200':
+        description: List of users
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserListResponse'
+
+  post:
+    summary: Create a new user
+    description: Create a new user account
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateUserRequest'
+    responses:
+      '201':
+        description: User created successfully
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserResponse'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '409':
+        $ref: '#/components/responses/Conflict'
+
+/users/{id}:
+  get:
+    summary: Get user by ID
+    description: Retrieve a specific user by their ID
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    responses:
+      '200':
+        description: User found
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserResponse'
+      '404':
+        $ref: '#/components/responses/NotFound'
+
+  put:
+    summary: Update user
+    description: Update an existing user
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdateUserRequest'
+    responses:
+      '200':
+        description: User updated successfully
+      '404':
+        $ref: '#/components/responses/NotFound'
+
+  delete:
+    summary: Delete user
+    description: Delete a user by ID
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '204':
+        description: User deleted successfully
+      '404':
+        $ref: '#/components/responses/NotFound'
+
+/users/{id}/posts:
+  get:
+    summary: Get user's posts
+    description: Retrieve all posts by a specific user
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: published
+        in: query
+        schema:
+          type: boolean
+    responses:
+      '200':
+        description: List of user's posts
+```
+
+### 3. HTTP Status Codes
+
+Sử dụng đúng HTTP status codes.
+
+```typescript
+// HTTP Status Code Usage Guide
+
+// Success Codes (2xx)
+enum SuccessStatus {
+    OK = 200,                    // GET successful, PUT/PATCH successful
+    CREATED = 201,               // Resource created
+    ACCEPTED = 202,              // Request accepted for processing
+    NO_CONTENT = 204,            // DELETE successful, no body to return
+}
+
+// Client Error Codes (4xx)
+enum ClientErrorStatus {
+    BAD_REQUEST = 400,           // Invalid request syntax
+    UNAUTHORIZED = 401,          // Authentication required
+    FORBIDDEN = 403,             // Authenticated but not authorized
+    NOT_FOUND = 404,             // Resource not found
+    METHOD_NOT_ALLOWED = 405,    // HTTP method not supported
+    CONFLICT = 409,              // Conflict with current state
+    UNPROCESSABLE_ENTITY = 422,  // Validation failed
+    TOO_MANY_REQUESTS = 429,     // Rate limit exceeded
+}
+
+// Server Error Codes (5xx)
+enum ServerErrorStatus {
+    INTERNAL_SERVER_ERROR = 500, // Unexpected server error
+    BAD_GATEWAY = 502,           // Invalid response from upstream
+    SERVICE_UNAVAILABLE = 503,   // Server temporarily unavailable
+    GATEWAY_TIMEOUT = 504,       // Upstream server timeout
+}
+
+// Example usage
+class ApiResponse {
+    static success<T>(data: T, status: number = 200) {
+        return {
+            status,
+            data,
+            success: true
+        };
+    }
+
+    static created<T>(data: T) {
+        return {
+            status: 201,
+            data,
+            success: true
+        };
+    }
+
+    static noContent() {
+        return {
+            status: 204,
+            success: true
+        };
+    }
+
+    static error(message: string, code: string, status: number) {
+        return {
+            status,
+            error: {
+                code,
+                message
+            },
+            success: false
+        };
+    }
+}
+```
+
+### 4. Pagination, Filtering, và Sorting
+
+Implement standardized pagination patterns.
+
+```yaml
+# OpenAPI pagination specification
+components:
+  schemas:
+    PaginationRequest:
+      type: object
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          default: 1
+          description: Page number (1-indexed)
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+          description: Items per page
+        sort:
+          type: string
+          description: Sort field (prefix with - for descending)
+          example: "createdAt,-name"
+        filter:
+          type: object
+          description: Filter criteria
+          additionalProperties:
+            type: string
+
+    PaginationResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items: {}
+        pagination:
+          $ref: '#/components/schemas/PaginationMeta'
+
+    PaginationMeta:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        totalItems:
+          type: integer
+        totalPages:
+          type: integer
+        hasNextPage:
+          type: boolean
+        hasPreviousPage:
+          type: boolean
+```
+
+```typescript
+// Pagination implementation
+interface PaginationParams {
+    page: number;
+    limit: number;
+    sort?: SortParams[];
+    filter?: Record<string, any>;
+}
+
+interface PaginatedResult<T> {
+    data: T[];
+    pagination: {
+        page: number;
+        limit: number;
+        totalItems: number;
+        totalPages: number;
+        hasNextPage: boolean;
+        hasPreviousPage: boolean;
+    };
+}
+
+async function paginate<T>(
+    model: Model<T>,
+    params: PaginationParams
+): Promise<PaginatedResult<T>> {
+    const { page, limit, sort, filter } = params;
+    const offset = (page - 1) * limit;
+
+    const [data, totalItems] = await Promise.all([
+        model.findAll({
+            where: filter,
+            limit,
+            offset,
+            order: sort?.map(s => [s.field, s.direction])
+        }),
+        model.count({ where: filter })
+    ]);
+
+    const totalPages = Math.ceil(totalItems / limit);
+
+    return {
+        data,
+        pagination: {
+            page,
+            limit,
+            totalItems,
+            totalPages,
+            hasNextPage: page < totalPages,
+            hasPreviousPage: page > 1
+        }
+    };
+}
+
+// Cursor-based pagination for large datasets
+interface CursorPagination {
+    cursor?: string;
+    limit: number;
+}
+
+async function cursorPaginate<T>(
+    model: Model<T>,
+    params: CursorPagination
+): Promise<PaginatedResult<T>> {
+    const { cursor, limit } = params;
+
+    const query: any = { limit: limit + 1 };
+
+    if (cursor) {
+        query.where = { id: { [Op.lt]: decodeCursor(cursor) } };
+    }
+
+    const data = await model.findAll(query);
+
+    const hasNextPage = data.length > limit;
+    if (hasNextPage) {
+        data.pop(); // Remove extra item
+    }
+
+    return {
+        data,
+        pagination: {
+            nextCursor: hasNextPage ? encodeCursor(data[data.length - 1].id) : null
+        }
+    };
+}
+```
+
+### 5. Error Response Format
+
+Standardized error response structure.
+
+```typescript
+// Error response interface
+interface ErrorResponse {
+    error: {
+        code: string;           // Machine-readable error code
+        message: string;        // Human-readable message
+        details?: ErrorDetail[]; // Additional details
+        traceId?: string;       // For debugging
+    };
+}
+
+interface ErrorDetail {
+    field: string;              // Field that caused error
+    message: string;           // Error message for this field
+    code: string;              // Field-specific error code
+}
+
+// Validation error example
+const validationErrorResponse: ErrorResponse = {
+    error: {
+        code: 'VALIDATION_ERROR',
+        message: 'Request validation failed',
+        details: [
+            { field: 'email', message: 'Invalid email format', code: 'INVALID_FORMAT' },
+            { field: 'password', message: 'Password too short', code: 'TOO_SHORT' }
+        ],
+        traceId: 'req_abc123xyz'
+    }
+};
+
+// Not found error example
+const notFoundErrorResponse: ErrorResponse = {
+    error: {
+        code: 'RESOURCE_NOT_FOUND',
+        message: 'User with ID 123 not found',
+        traceId: 'req_abc123xyz'
+    }
+};
+```
+
+```yaml
+# OpenAPI error specification
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              description: Machine-readable error code
+              example: VALIDATION_ERROR
+            message:
+              type: string
+              description: Human-readable error message
+            details:
+              type: array
+              items:
+                $ref: '#/components/schemas/ErrorDetail'
+            traceId:
+              type: string
+              description: Request trace ID for debugging
+
+    ErrorDetail:
+      type: object
+      properties:
+        field:
+          type: string
+          description: Field that caused the error
+        message:
+          type: string
+          description: Error message
+        code:
+          type: string
+          description: Field-specific error code
+
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    TooManyRequests:
+      description: Too Many Requests
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+```
+
+### 6. Versioning Strategy
+
+API versioning best practices.
+
+```
+# URL Path Versioning (most common)
+GET /api/v1/users
+GET /api/v2/users
+
+# Header Versioning
+GET /users
+Accept: application/vnd.api+json; version=2
+
+# Query Parameter Versioning (least recommended)
+GET /users?version=2
+```
+
+```typescript
+// Versioned router structure
+const v1Router = express.Router();
+const v2Router = express.Router();
+
+// V1 routes
+v1Router.get('/users', userController.listV1);
+v1Router.get('/users/:id', userController.getV1);
+v1Router.post('/users', userController.createV1);
+
+// V2 routes with breaking changes
+v2Router.get('/users', userController.listV2);
+v2Router.get('/users/:id', userController.getV2);
+v2Router.post('/users', userController.createV2);
+v2Router.get('/users/:id/posts', userController.getUserPostsV2); // New endpoint
+
+// Mount versioned routers
+app.use('/api/v1', v1Router);
+app.use('/api/v2', v2Router);
+
+// Deprecation headers
+function addDeprecationHeaders(res: Response, sunsetDate: string) {
+    res.set({
+        'Deprecation': `true`,
+        'Sunset': sunsetDate,
+        'Link': '<https://api.example.com/docs/v2>; rel="deprecation"'
+    });
+}
+```
+
+### 7. Content Negotiation
+
+Handle different content types.
+
+```typescript
+// Content negotiation middleware
+function contentNegotiation(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
+    const accept = req.headers.accept;
+
+    // Set response format
+    if (accept?.includes('application/xml')) {
+        req.responseFormat = 'xml';
+    } else if (accept?.includes('text/csv')) {
+        req.responseFormat = 'csv';
+    } else {
+        req.responseFormat = 'json';
+    }
+
+    next();
+}
+
+// Response transformation
+function formatResponse(data: any, format: string) {
+    switch (format) {
+        case 'xml':
+            return toXml(data);
+        case 'csv':
+            return toCsv(data);
+        default:
+            return data;
+    }
+}
+
+// Multiple format response
+app.get('/users', async (req, res) => {
+    const users = await userService.list();
+
+    const format = req.responseFormat || 'json';
+
+    if (format === 'xml') {
+        res.set('Content-Type', 'application/xml');
+        res.send(toXml({ users }));
+    } else if (format === 'csv') {
+        res.set('Content-Type', 'text/csv');
+        res.send(toCsv(users));
+    } else {
+        res.json(users);
+    }
+});
+```
+
+### 8. Caching Strategy
+
+Implement HTTP caching headers.
+
+```typescript
+// Cache headers implementation
+class CacheController {
+    // Public cache - can be cached by any client
+    static public(maxAge: number = 3600) {
+        return (req: Request, res: Response, next: NextFunction) => {
+            res.set({
+                'Cache-Control': `public, max-age=${maxAge}`,
+                'Expires': new Date(Date.now() + maxAge * 1000).toUTCString()
+            });
+            next();
+        };
+    }
+
+    // Private cache - only browser cache
+    static private(maxAge: number = 3600) {
+        return (req: Request, res: Response, next: NextFunction) => {
+            res.set({
+                'Cache-Control': `private, max-age=${maxAge}`
+            });
+            next();
+        };
+    }
+
+    // No cache
+    static noCache() {
+        return (req: Request, res: Response, next: NextFunction) => {
+            res.set({
+                'Cache-Control': 'no-store, no-cache, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            });
+            next();
+        };
+    }
+
+    // ETag support
+    static withETag(getData: (req: Request) => Promise<any>) {
+        return async (req: Request, res: Response) => {
+            const data = await getData(req);
+            const etag = generateETag(data);
+
+            res.set('ETag', etag);
+
+            if (req.headers['if-none-match'] === etag) {
+                return res.status(304).end();
+            }
+
+            res.json(data);
+        };
+    }
+}
+
+// Usage
+router.get('/users',
+    CacheController.public(300), // Cache for 5 minutes
+    userController.list
+);
+
+router.get('/users/:id',
+    CacheController.private(60), // Cache for 1 minute in browser
+    CacheController.withETag(async (req) => {
+        return await userService.getById(req.params.id);
+    }),
+    userController.get
+);
+
+router.post('/users',
+    CacheController.noCache(), // Never cache mutations
+    userController.create
+);
+```
+
+### 9. Rate Limiting
+
+Implement comprehensive rate limiting.
+
+```typescript
+import rateLimit from 'express-rate-limit';
+import RedisStore from 'rate-limit-redis';
+
+// Global rate limiter
+export const globalLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: {
+        error: {
+            code: 'RATE_LIMIT_EXCEEDED',
+            message: 'Too many requests, please try again later'
+        }
+    },
+    keyGenerator: (req) => {
+        return req.user?.id || req.ip;
+    }
+});
+
+// Auth endpoints - stricter limits
+export const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5,
+    skipSuccessfulRequests: true,
+    message: {
+        error: {
+            code: 'AUTH_RATE_LIMIT_EXCEEDED',
+            message: 'Too many authentication attempts'
+        }
+    }
+});
+
+// API endpoints
+export const apiLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 1000,
+    standardHeaders: true,
+    store: new RedisStore({
+        sendCommand: (...args: string[]) => redisClient.sendCommand(args)
+    })
+});
+
+// File upload - expensive operation
+export const uploadLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 10,
+    message: {
+        error: {
+            code: 'UPLOAD_LIMIT_EXCEEDED',
+            message: 'Upload limit exceeded'
+        }
+    }
+});
+
+// Apply to routes
+app.use(globalLimiter);
+app.post('/auth/login', authLimiter, authController.login);
+app.post('/auth/register', authLimiter, authController.register);
+app.use('/api', apiLimiter);
+app.post('/upload', uploadLimiter, uploadController.upload);
+```
+
+### 10. Security Headers
+
+Implement security headers.
+
+```typescript
+import helmet from 'helmet';
+
+// Security headers middleware
+app.use(helmet());
+
+// Custom security headers
+app.use((req: Request, res: Response, next: NextFunction) => {
+    // CORS
+    res.set({
+        'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGIN,
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Max-Age': '86400',
+
+        // Security
+        'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+        'X-Content-Type-Options': 'nosniff',
+        'X-Frame-Options': 'DENY',
+        'X-XSS-Protection': '1; mode=block',
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
+        'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
+        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';"
+    });
+
+    next();
+});
+
+// Request ID for tracing
+app.use((req: Request, res: Response, next: NextFunction) => {
+    const requestId = req.headers['x-request-id'] || generateUUID();
+    res.set('X-Request-ID', requestId);
+    (req as any).requestId = requestId;
+    next();
+});
+```
+
+## Checklist
+
+- [ ] Use proper HTTP methods (GET, POST, PUT, DELETE, PATCH)
+- [ ] Return appropriate HTTP status codes
+- [ ] Implement pagination for list endpoints
+- [ ] Use standardized error response format
+- [ ] Version API for breaking changes
+- [ ] Implement rate limiting
+- [ ] Add security headers
+- [ ] Document API with OpenAPI/Swagger
+- [ ] Implement caching strategy
+- [ ] Use proper authentication/authorization
+- [ ] Validate input data
+- [ ] Return consistent response structure
+- [ ] Implement request tracing
+- [ ] Add CORS configuration
+- [ ] Handle OPTIONS requests for preflight
+
+## Anti Patterns
+
+### 1. Using Verbs in URLs
+
+```yaml
+# Không nên
+GET /api/getUsers
+POST /api/createUser
+PUT /api/updateUser
+DELETE /api/deleteUser
+
+# Nên
+GET /api/users
+POST /api/users
+PUT /api/users/{id}
+DELETE /api/users/{id}
+```
+
+### 2. Returning Inconsistent Status Codes
+
+```typescript
+// Không nên - inconsistent status codes
+app.get('/users/:id', async (req, res) => {
+    const user = await db.users.findById(req.params.id);
+    if (!user) {
+        return res.json({ error: 'Not found' }); // Should be 404!
+    }
+    return res.status(200).json(user);
+});
+
+// Nên - consistent status codes
+app.get('/users/:id', async (req, res) => {
+    const user = await db.users.findById(req.params.id);
+    if (!user) {
+        return res.status(404).json({
+            error: { code: 'NOT_FOUND', message: 'User not found' }
+        });
+    }
+    return res.status(200).json(user);
+});
+```
+
+### 3. Missing Error Details
+
+```typescript
+// Không nên - generic error
+app.post('/users', async (req, res) => {
+    try {
+        await createUser(req.body);
+        res.status(201).json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Nên - detailed error handling
+app.post('/users', async (req, res) => {
+    try {
+        const user = await createUser(req.body);
+        res.status(201).json(user);
+    } catch (error) {
+        if (error instanceof ValidationError) {
+            return res.status(422).json({
+                error: {
+                    code: 'VALIDATION_ERROR',
+                    message: error.message,
+                    details: error.details
+                }
+            });
+        }
+        if (error instanceof DuplicateError) {
+            return res.status(409).json({
+                error: {
+                    code: 'DUPLICATE_ENTRY',
+                    message: error.message
+                }
+            });
+        }
+        res.status(500).json({
+            error: {
+                code: 'INTERNAL_ERROR',
+                message: 'An unexpected error occurred'
+            }
+        });
+    }
+});
+```
+
+### 4. No Pagination
+
+```typescript
+// Không nên - returning all records
+app.get('/users', async (req, res) => {
+    const users = await db.users.findAll();
+    res.json(users); // Could be thousands!
+});
+
+// Nên - paginated response
+app.get('/users', async (req, res) => {
+    const { page = 1, limit = 20 } = req.query;
+    const offset = (Number(page) - 1) * Number(limit);
+
+    const { rows: users, count } = await db.users.findAndCountAll({
+        limit: Number(limit),
+        offset
+    });
+
+    res.json({
+        data: users,
+        pagination: {
+            page: Number(page),
+            limit: Number(limit),
+            totalItems: count,
+            totalPages: Math.ceil(count / Number(limit))
+        }
+    });
+});
+```
+
+### 5. Versioning via Date
+
+```yaml
+# Không nên - date-based versioning
+GET /api/users/2024-01-15
+
+# Nên - semantic versioning
+GET /api/v1/users
+GET /api/v2/users
+```
+
+## Best Practices
+
+### 1. OpenAPI Specification
+
+```yaml
+openapi: 3.0.3
+info:
+  title: Cursor Enterprise API
+  description: API for Cursor Enterprise Framework
+  version: 1.0.0
+  contact:
+    email: api-support@cursor.io
+
+servers:
+  - url: https://api.cursor.io/v1
+    description: Production
+  - url: https://staging-api.cursor.io/v1
+    description: Staging
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - email
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        role:
+          $ref: '#/components/schemas/UserRole'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UserRole:
+      type: string
+      enum:
+        - ADMIN
+        - USER
+        - MODERATOR
+
+security:
+  - BearerAuth: []
+```
+
+### 2. Request/Response Schemas
+
+```typescript
+// Request validation schemas
+import { z } from 'zod';
+
+export const createUserSchema = z.object({
+    email: z.string().email(),
+    name: z.string().min(1).max(100),
+    password: z.string().min(8).max(100),
+    role: z.enum(['ADMIN', 'USER', 'MODERATOR']).optional()
+});
+
+export const updateUserSchema = z.object({
+    email: z.string().email().optional(),
+    name: z.string().min(1).max(100).optional(),
+    avatar: z.string().url().optional()
+});
+
+// Response schemas
+export const userResponseSchema = z.object({
+    id: z.string().uuid(),
+    email: z.string().email(),
+    name: z.string(),
+    role: z.enum(['ADMIN', 'USER', 'MODERATOR']),
+    createdAt: z.string().datetime(),
+    updatedAt: z.string().datetime()
+});
+
+export const userListResponseSchema = z.object({
+    data: z.array(userResponseSchema),
+    pagination: z.object({
+        page: z.number(),
+        limit: z.number(),
+        totalItems: z.number(),
+        totalPages: z.number(),
+        hasNextPage: z.boolean(),
+        hasPreviousPage: z.boolean()
+    })
+});
+```
+
+### 3. Controller Pattern
+
+```typescript
+export class UserController {
+    constructor(
+        private userService: UserService,
+        private logger: Logger
+    ) {}
+
+    async list(req: Request, res: Response): Promise<void> {
+        try {
+            const { page, limit, sort, filter } = req.query;
+            const result = await this.userService.list({
+                page: Number(page) || 1,
+                limit: Math.min(Number(limit) || 20, 100),
+                sort: this.parseSort(sort as string),
+                filter: filter as Record<string, any>
+            });
+
+            res.json({
+                data: result.data,
+                pagination: result.pagination
+            });
+        } catch (error) {
+            this.handleError(res, error);
+        }
+    }
+
+    async get(req: Request, res: Response): Promise<void> {
+        try {
+            const { id } = req.params;
+            const user = await this.userService.getById(id);
+
+            if (!user) {
+                res.status(404).json({
+                    error: { code: 'NOT_FOUND', message: 'User not found' }
+                });
+                return;
+            }
+
+            res.json({ data: user });
+        } catch (error) {
+            this.handleError(res, error);
+        }
+    }
+
+    async create(req: Request, res: Response): Promise<void> {
+        try {
+            const validatedData = createUserSchema.parse(req.body);
+            const user = await this.userService.create(validatedData);
+
+            res.status(201).json({ data: user });
+        } catch (error) {
+            if (error instanceof z.ZodError) {
+                res.status(422).json({
+                    error: {
+                        code: 'VALIDATION_ERROR',
+                        message: 'Validation failed',
+                        details: error.errors.map(e => ({
+                            field: e.path.join('.'),
+                            message: e.message
+                        }))
+                    }
+                });
+                return;
+            }
+            this.handleError(res, error);
+        }
+    }
+
+    private handleError(res: Response, error: any): void {
+        this.logger.error('User controller error', { error });
+
+        if (error instanceof AppError) {
+            res.status(error.statusCode).json({
+                error: {
+                    code: error.code,
+                    message: error.message
+                }
+            });
+            return;
+        }
+
+        res.status(500).json({
+            error: {
+                code: 'INTERNAL_ERROR',
+                message: 'An unexpected error occurred'
+            }
+        });
+    }
+}
+```
+
+## Workflow
+
+### 1. API Design Phase
+
+1. Identify resources và operations
+2. Design resource URLs
+3. Define HTTP methods
+4. Design request/response schemas
+5. Define error codes
+6. Document with OpenAPI
+
+### 2. Implementation Phase
+
+1. Set up project structure
+2. Implement routing
+3. Create controllers
+4. Implement services
+5. Add validation
+6. Configure error handling
+7. Add authentication/authorization
+
+### 3. Testing Phase
+
+1. Unit tests
+2. Integration tests
+3. Contract tests
+4. Performance tests
+5. Security tests
+
+### 4. Documentation Phase
+
+1. Generate OpenAPI spec
+2. Create API documentation
+3. Write usage examples
+4. Document error codes
+5. Update changelog
+
+## Ví dụ
+
+### Ví dụ 1: Complete REST API Implementation
+
+```typescript
+// Express server with comprehensive REST setup
+import express, { Request, Response, NextFunction } from 'express';
+import helmet from 'helmet';
+import compression from 'compression';
+import { userRoutes } from './routes/user.routes';
+import { authRoutes } from './routes/auth.routes';
+import { errorHandler, notFoundHandler } from './middleware';
+import { rateLimiter } from './middleware/rate-limiter';
+import { requestIdMiddleware } from './middleware/request-id';
+
+const app = express();
+
+// Security middleware
+app.use(helmet());
+app.use(compression());
+
+// Body parsing
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
+
+// Request tracking
+app.use(requestIdMiddleware);
+
+// Rate limiting
+app.use(rateLimiter);
+
+// Routes
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/users', userRoutes);
+
+// Health check
+app.get('/health', (req, res) => {
+    res.json({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        version: process.env.APP_VERSION
+    });
+});
+
+// Error handling
+app.use(notFoundHandler);
+app.use(errorHandler);
+
+export { app };
+```
+
+```typescript
+// User routes
+import { Router } from 'express';
+import { UserController } from '../controllers/user.controller';
+import { authenticate, authorize } from '../middleware/auth';
+import { validate } from '../middleware/validate';
+import { createUserSchema, updateUserSchema } from '../schemas/user.schema';
+
+const router = Router();
+const controller = new UserController();
+
+router.use(authenticate);
+
+router.get('/',
+    controller.list.bind(controller)
+);
+
+router.get('/:id',
+    controller.get.bind(controller)
+);
+
+router.post('/',
+    authorize('ADMIN'),
+    validate(createUserSchema),
+    controller.create.bind(controller)
+);
+
+router.put('/:id',
+    authorize('ADMIN'),
+    validate(updateUserSchema),
+    controller.update.bind(controller)
+);
+
+router.delete('/:id',
+    authorize('ADMIN'),
+    controller.delete.bind(controller)
+);
+
+export { router as userRoutes };
+```
+
+### Ví dụ 2: Service Layer Implementation
+
+```typescript
+export class UserService {
+    constructor(
+        private db: Database,
+        private cache: Cache,
+        private logger: Logger
+    ) {}
+
+    async list(params: ListParams): Promise<PaginatedResult<User>> {
+        const { page, limit, sort, filter } = params;
+        const offset = (page - 1) * limit;
+
+        const result = await this.db.users.findAndCountAll({
+            where: this.buildFilter(filter),
+            limit,
+            offset,
+            order: this.buildOrder(sort),
+            include: ['profile', 'roles']
+        });
+
+        return {
+            data: result.rows,
+            pagination: {
+                page,
+                limit,
+                totalItems: result.count,
+                totalPages: Math.ceil(result.count / limit),
+                hasNextPage: page * limit < result.count,
+                hasPreviousPage: page > 1
+            }
+        };
+    }
+
+    async getById(id: string): Promise<User | null> {
+        // Check cache first
+        const cached = await this.cache.get(`user:${id}`);
+        if (cached) {
+            return JSON.parse(cached);
+        }
+
+        const user = await this.db.users.findById(id, {
+            include: ['profile', 'roles']
+        });
+
+        if (user) {
+            await this.cache.setex(`user:${id}`, 300, JSON.stringify(user));
+        }
+
+        return user;
+    }
+
+    async create(data: CreateUserInput): Promise<User> {
+        const existingUser = await this.db.users.findByEmail(data.email);
+        if (existingUser) {
+            throw new ConflictError('User with this email already exists');
+        }
+
+        const hashedPassword = await bcrypt.hash(data.password, 12);
+        const user = await this.db.users.create({
+            ...data,
+            password: hashedPassword
+        });
+
+        this.logger.info('User created', { userId: user.id });
+
+        return user;
+    }
+
+    async update(id: string, data: UpdateUserInput): Promise<User> {
+        const user = await this.db.users.findById(id);
+        if (!user) {
+            throw new NotFoundError('User');
+        }
+
+        await user.update(data);
+        await this.cache.delete(`user:${id}`);
+
+        this.logger.info('User updated', { userId: id });
+
+        return user;
+    }
+
+    async delete(id: string): Promise<void> {
+        const user = await this.db.users.findById(id);
+        if (!user) {
+            throw new NotFoundError('User');
+        }
+
+        await user.destroy();
+        await this.cache.delete(`user:${id}`);
+
+        this.logger.info('User deleted', { userId: id });
+    }
+}
+```
+
+### Ví dụ 3: Integration Tests
+
+```typescript
+import request from 'supertest';
+import { app } from '../app';
+import { createTestDatabase, cleanDatabase } from './helpers';
+
+describe('User API', () => {
+    let db: TestDatabase;
+
+    beforeAll(async () => {
+        db = await createTestDatabase();
+    });
+
+    afterAll(async () => {
+        await cleanDatabase();
+        await db.close();
+    });
+
+    describe('GET /api/v1/users', () => {
+        it('should return paginated list of users', async () => {
+            const response = await request(app)
+                .get('/api/v1/users')
+                .set('Authorization', `Bearer ${testToken}`)
+                .query({ page: 1, limit: 10 });
+
+            expect(response.status).toBe(200);
+            expect(response.body.data).toBeInstanceOf(Array);
+            expect(response.body.pagination).toBeDefined();
+            expect(response.body.pagination.page).toBe(1);
+        });
+
+        it('should return 401 without authentication', async () => {
+            const response = await request(app)
+                .get('/api/v1/users');
+
+            expect(response.status).toBe(401);
+        });
+    });
+
+    describe('POST /api/v1/users', () => {
+        it('should create a new user', async () => {
+            const userData = {
+                email: 'test@example.com',
+                name: 'Test User',
+                password: 'SecurePass123!'
+            };
+
+            const response = await request(app)
+                .post('/api/v1/users')
+                .set('Authorization', `Bearer ${adminToken}`)
+                .send(userData);
+
+            expect(response.status).toBe(201);
+            expect(response.body.data.email).toBe(userData.email);
+        });
+
+        it('should return 422 for invalid data', async () => {
+            const response = await request(app)
+                .post('/api/v1/users')
+                .set('Authorization', `Bearer ${adminToken}`)
+                .send({ email: 'invalid' });
+
+            expect(response.status).toBe(422);
+            expect(response.body.error.code).toBe('VALIDATION_ERROR');
+        });
+    });
+});
+```
+
+## Liên kết
+
+- [REST API Tutorial](https://restfulapi.net/)
+- [HTTP Status Codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
+- [OpenAPI Specification](https://swagger.io/specification/)
+- API Guidelines: `.cursor/rules/api.mdc`
+- Security: `.cursor/rules/security.mdc`
+- GraphQL: `.cursor/rules/graphql.mdc`
+- Authentication: `.cursor/rules/authentication.mdc`

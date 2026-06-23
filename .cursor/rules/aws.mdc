@@ -1,0 +1,48 @@
+---
+description: Nguyên tắc và best practices cho Amazon Web Services
+created: 2026-06-23
+version: 1.0.0
+tags: [aws, amazon, cloud, enterprise, deployment]
+---
+
+# AWS
+
+## Mục tiêu
+
+Amazon Web Services (AWS) là cloud platform lớn nhất thế giới, cung cấp comprehensive set of services cho computing, storage, databases, AI, và enterprise applications. Trong Cursor Enterprise Framework, AWS được sử dụng cho organizations cần broad service catalog, global infrastructure, và proven enterprise reliability.
+
+## Nguyên tắc
+
+**1. Account Structure**
+
+AWS Organizations. SCPs. Account per environment. Consolidated billing.
+
+**2. Networking**
+
+VPC design. Subnets. Route tables. Internet gateways. NAT gateways. PrivateLink.
+
+**3. Compute**
+
+EC2. ECS/EKS. Lambda. Auto Scaling Groups. LightSail.
+
+**4. Storage**
+
+S3. EBS. EFS. FSx. Glacier. Storage classes.
+
+**5. Databases**
+
+RDS. DynamoDB. Aurora. ElastiCache. DocumentDB.
+
+**6. Security**
+
+IAM. KMS. Security Hub. GuardDuty. WAF. Shield.
+
+**7. Monitoring**
+
+CloudWatch. X-Ray. CloudTrail. Personal Health Dashboard.
+
+## Liên kết
+
+- [[azure]] - Azure
+- [[gcp]] - GCP
+- [[kubernetes]] - Kubernetes

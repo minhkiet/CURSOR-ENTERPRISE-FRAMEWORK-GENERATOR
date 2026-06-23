@@ -1,0 +1,50 @@
+---
+description: Nguyên tắc và best practices cho Docker Container
+created: 2026-06-23
+version: 1.0.0
+tags: [docker, container, devops, deployment, enterprise]
+---
+
+# Docker
+
+## Mục tiêu
+
+Docker là nền tảng containerization cho phép packaging applications và dependencies vào lightweight, portable containers. Trong Cursor Enterprise Framework, Docker được sử dụng như foundation cho containerized applications, đảm bảo consistency giữa các environments từ development đến production. Mục tiêu là hướng dẫn developers build và manage Docker containers hiệu quả với focus vào security, performance, và maintainability.
+
+Containerization mang lại nhiều benefits nhưng đòi hỏi careful attention đến image size, security, và best practices. Rule này cover Dockerfile best practices, multi-stage builds, security scanning, và operational guidelines.
+
+## Nguyên tắc
+
+**1. Image Optimization**
+
+Use minimal base images. Multi-stage builds. Layer caching optimization. Remove unnecessary files. Small image size.
+
+**2. Security Best Practices**
+
+Run as non-root user. Minimal privileges. No secrets in images. Security scanning. Base image updates.
+
+**3. Build Optimization**
+
+Use .dockerignore. Cache dependencies. Parallel builds. Minimize layers.
+
+**4. Health Checks**
+
+Define HEALTHCHECK. Probe internal state. Auto-restart capability.
+
+**5. Logging**
+
+Write to stdout/stderr. Structured logging. Log rotation.
+
+**6. Configuration**
+
+Environment variables. No hardcoded configs. External config management.
+
+**7. Testing**
+
+Test in containers. Integration tests. Security scans in CI.
+
+## Liên kết
+
+- [[kubernetes]] - Kubernetes
+- [[deployment]] - Deployment
+- [[security]] - Security

@@ -1,0 +1,52 @@
+---
+description: Nguyên tắc Incident Response cho production incidents
+created: 2026-06-23
+version: 1.0.0
+tags: [incident, response, on-call, postmortem, enterprise]
+---
+
+# Incident Response
+
+## Mục tiêu
+
+Incident Response là quy trình xử lý các sự cố production một cách systematic và hiệu quả. Trong Cursor Enterprise Framework, Incident Response rule định nghĩa các nguyên tắc và best practices cho việc respond to incidents nhanh chóng, minimize impact, và learn from failures. Mục tiêu là tạo ra một incident response process giảm thiểu downtime và cải thiện over time.
+
+## Nguyên tắc
+
+**1. Severity Levels**
+
+Define severity levels clearly. P1: Complete outage. P2: Major degradation. P3: Minor issue. P4: Low impact. Response times per severity.
+
+**2. On-Call Rotation**
+
+Rotate on-call schedule. Multiple responders. Escalation paths. Tooling access. Compensation.
+
+**3. Incident Command**
+
+Assign incident commander. Clear roles. Coordinate response. Communicate status. Make decisions.
+
+**4. Communication**
+
+Stakeholder updates. Status page updates. Internal communication. Customer communication. Escalation notices.
+
+**5. Resolution**
+
+Temporary fixes. Rollback procedures. Hotfix deployment. Validation steps. Monitoring confirmation.
+
+**6. Postmortem**
+
+Blameless postmortem. Root cause analysis. Action items. Follow-up tracking. Process improvement.
+
+**7. Learning Culture**
+
+Share learnings. Process improvements. Tool improvements. Training. Documentation.
+
+**8. Automation**
+
+Automated rollback. Self-healing. Alert suppression. Runbook automation. Recovery playbooks.
+
+## Liên kết
+
+- [[observability]] - Observability
+- [[monitoring]] - Monitoring
+- [[deployment]] - Deployment

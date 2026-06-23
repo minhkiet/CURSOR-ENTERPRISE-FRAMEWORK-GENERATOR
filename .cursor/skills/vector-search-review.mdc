@@ -1,0 +1,799 @@
+---
+description: Skill đánh giá và tối ưu hóa vector search implementations để đảm bảo high-quality retrieval và low-latency performance
+purpose: Cung cấp comprehensive review framework cho vector search systems, bao gồm indexing strategies, query optimization, và quality benchmarking
+input:
+  - Vector store configurations
+  - Index structures
+  - Query patterns
+  - Performance metrics
+  - Quality benchmarks
+  - Storage requirements
+output:
+  - Performance analysis
+  - Quality assessment
+  - Optimization recommendations
+  - Index configurations
+  - Benchmark results
+  - Scaling strategies
+  - Cost analysis
+version: 1.0.0
+tags:
+  - vector-search
+  - performance
+  - optimization
+  - review
+---
+
+# Vector Search Review
+
+## Tổng quan
+
+Vector Search Review là skill chuyên biệt để review, audit, và optimize vector search implementations. Skill này cung cấp systematic framework để đánh giá performance, quality, và scalability của vector search systems, identify bottlenecks, và recommend optimizations. Phù hợp cho cả greenfield implementations và existing production systems cần improvement.
+
+## Purpose (Mục đích)
+
+Vector search là critical component trong nhiều AI-powered features, nhưng đi kèm với nhiều challenges:
+
+1. **Performance trade-offs**: Accuracy vs speed vs memory
+2. **Index complexity**: Multiple index types với different trade-offs
+3. **Scaling challenges**: Millions of vectors require careful design
+4. **Quality consistency**: Results must be relevant across diverse queries
+5. **Cost management**: Storage và compute costs grow with scale
+
+Vector Search Review tồn tại để:
+
+- **Systematically assess** vector search implementations
+- **Identify performance bottlenecks** và quality issues
+- **Recommend optimizations** dựa trên workload characteristics
+- **Benchmark against industry standards**
+- **Provide actionable improvements** với ROI estimates
+
+## Input (Đầu vào)
+
+| Input | Mô tả | Required |
+|-------|-------|----------|
+| `current_implementation` | Current vector search setup | Yes |
+| `query_workload` | Sample queries và frequencies | Yes |
+| `quality_benchmarks` | Ground truth datasets | No |
+| `performance_baseline` | Current latency/throughput metrics | No |
+| `storage_budget` | Storage và cost constraints | No |
+| `sla_requirements` | Latency và availability SLAs | Yes |
+
+## Output (Đầu ra)
+
+| Output | Mô tả | Format |
+|--------|-------|--------|
+| `performance_report` | Latency và throughput analysis | Report |
+| `quality_assessment` | Retrieval quality metrics | Metrics |
+| `optimization_plan` | Prioritized improvements | Plan |
+| `index_recommendations` | Index type suggestions | Recommendations |
+| `benchmark_results` | Comparative benchmarks | Results |
+| `scaling_strategy` | Scale-up/out recommendations | Strategy |
+| `cost_estimate` | Cost analysis | Estimate |
+
+## Workflow (Quy trình)
+
+### Bước 1: Implementation Discovery
+
+```typescript
+// Khám phá và document current implementation
+interface VectorSearchImplementation {
+  index_type: IndexType;
+  metric: DistanceMetric;
+  vector_dimensions: number;
+  total_vectors: number;
+  storage_backend: StorageBackend;
+  indexing_parameters: Record<string, any>;
+  query_api: QueryAPI;
+}
+
+async function discoverImplementation(
+  config: DiscoveryConfig
+): Promise<VectorSearchImplementation> {
+  const impl: VectorSearchImplementation = {
+    index_type: await detectIndexType(config.connection),
+    metric: await detectMetricType(config.connection),
+    vector_dimensions: await getVectorDimensions(config.connection),
+    total_vectors: await getTotalVectors(config.connection),
+    storage_backend: detectStorageBackend(config),
+    indexing_parameters: await getIndexParameters(config.connection),
+    query_api: await analyzeQueryAPI(config.connection)
+  };
+  
+  // Validate configuration
+  await validateConfiguration(impl);
+  
+  return impl;
+}
+
+async function detectIndexType(connection: Connection): Promise<IndexType> {
+  const indexInfo = await connection.getIndexInfo();
+  
+  if (indexInfo.type === 'hnsw') return 'hnsw';
+  if (indexInfo.type === 'ivf') return 'ivf';
+  if (indexInfo.type === 'flat') return 'flat';
+  
+  return inferIndexType(indexInfo);
+}
+```
+
+### Bước 2: Performance Profiling
+
+```typescript
+// Profile query performance
+interface PerformanceProfile {
+  p50_latency_ms: number;
+  p95_latency_ms: number;
+  p99_latency_ms: number;
+  throughput_qps: number;
+  index_size_mb: number;
+  memory_usage_mb: number;
+  cache_hit_rate: number;
+}
+
+async function profilePerformance(
+  impl: VectorSearchImplementation,
+  workload: QueryWorkload
+): Promise<PerformanceProfile> {
+  const latencies: number[] = [];
+  
+  // Warm-up
+  for (let i = 0; i < 100; i++) {
+    await executeQuery(impl, workload.sample_queries[i % workload.sample_queries.length]);
+  }
+  
+  // Benchmark
+  const start = Date.now();
+  
+  for (const query of workload.sample_queries) {
+    const queryStart = Date.now();
+    await executeQuery(impl, query);
+    latencies.push(Date.now() - queryStart);
+  }
+  
+  const totalDuration = Date.now() - start;
+  
+  return {
+    p50_latency_ms: percentile(latencies, 50),
+    p95_latency_ms: percentile(latencies, 95),
+    p99_latency_ms: percentile(latencies, 99),
+    throughput_qps: workload.sample_queries.length / (totalDuration / 1000),
+    index_size_mb: await getIndexSize(impl),
+    memory_usage_mb: await getMemoryUsage(impl),
+    cache_hit_rate: await getCacheStats(impl)
+  };
+}
+
+async function executeQuery(
+  impl: VectorSearchImplementation,
+  query: SearchQuery
+): Promise<SearchResult> {
+  const start = Date.now();
+  
+  const result = await impl.query_api.search({
+    vector: query.vector,
+    top_k: query.top_k,
+    filter: query.filter
+  });
+  
+  return {
+    ...result,
+    latency_ms: Date.now() - start
+  };
+}
+```
+
+### Bước 3: Quality Assessment
+
+```typescript
+// Assess retrieval quality
+interface QualityMetrics {
+  recall_at_k: number[];
+  mrr: number;
+  ndcg: number;
+  precision_at_k: number[];
+  relevance_distribution: number[];
+}
+
+async function assessQuality(
+  impl: VectorSearchImplementation,
+  benchmarks: QualityBenchmarks
+): Promise<QualityMetrics> {
+  const allRecalls: number[][] = [];
+  const allMrrs: number[] = [];
+  const allNdcgs: number[] = [];
+  
+  for (const testCase of benchmarks.test_cases) {
+    // Execute search
+    const results = await impl.query_api.search({
+      vector: testCase.query_vector,
+      top_k: benchmarks.k_values[benchmarks.k_values.length - 1]
+    });
+    
+    // Calculate metrics
+    const recalls = calculateRecallAtK(
+      results.ids,
+      testCase.relevant_ids,
+      benchmarks.k_values
+    );
+    
+    const mrr = calculateMRR(results.ids, testCase.relevant_ids);
+    const ndcg = calculateNDCG(results.ids, testCase.relevant_ids, testCase.relevance_scores);
+    
+    allRecalls.push(recalls);
+    allMrrs.push(mrr);
+    allNdcgs.push(ndcg);
+  }
+  
+  return {
+    recall_at_k: averageAcross(allRecalls),
+    mrr: average(allMrrs),
+    ndcg: average(allNdcgs),
+    precision_at_k: calculatePrecisionAtK(allRecalls, benchmarks.k_values),
+    relevance_distribution: calculateRelevanceDistribution(allRecalls)
+  };
+}
+
+function calculateRecallAtK(
+  retrieved: string[],
+  relevant: Set<string>,
+  kValues: number[]
+): number[] {
+  const recalls: number[] = [];
+  
+  for (const k of kValues) {
+    const retrievedAtK = retrieved.slice(0, k);
+    const relevantAtK = retrievedAtK.filter(id => relevant.has(id));
+    recalls.push(relevantAtK.length / relevant.size);
+  }
+  
+  return recalls;
+}
+
+function calculateMRR(retrieved: string[], relevant: Set<string>): number {
+  for (let i = 0; i < retrieved.length; i++) {
+    if (relevant.has(retrieved[i])) {
+      return 1 / (i + 1);
+    }
+  }
+  return 0;
+}
+```
+
+### Bước 4: Index Analysis
+
+```typescript
+// Analyze current index configuration
+interface IndexAnalysis {
+  type: IndexType;
+  parameters: IndexParameters;
+  efficiency_score: number;
+  recommendations: IndexRecommendation[];
+}
+
+async function analyzeIndex(
+  impl: VectorSearchImplementation
+): Promise<IndexAnalysis> {
+  const currentParams = await getIndexParameters(impl);
+  
+  const analysis: IndexAnalysis = {
+    type: impl.index_type,
+    parameters: currentParams,
+    efficiency_score: 0,
+    recommendations: []
+  };
+  
+  // Evaluate parameter appropriateness
+  const paramAnalysis = await analyzeParameters(
+    impl.index_type,
+    currentParams,
+    impl.total_vectors
+  );
+  
+  analysis.efficiency_score = paramAnalysis.efficiency;
+  analysis.recommendations = paramAnalysis.recommendations;
+  
+  // Check for known inefficiencies
+  if (impl.index_type === 'hnsw') {
+    const hnswIssues = analyzeHNSW(currentParams);
+    analysis.recommendations.push(...hnswIssues);
+  }
+  
+  return analysis;
+}
+
+async function analyzeHNSW(
+  params: HNSWParameters
+): Promise<IndexRecommendation[]> {
+  const recommendations: IndexRecommendation[] = [];
+  
+  // Check m (connections per node)
+  if (params.m < 8) {
+    recommendations.push({
+      parameter: 'm',
+      current_value: params.m,
+      recommended_value: 16,
+      reason: 'Low m reduces recall but may be acceptable for high-throughput',
+      expected_improvement: 'recall +15%'
+    });
+  }
+  
+  if (params.m > 32) {
+    recommendations.push({
+      parameter: 'm',
+      current_value: params.m,
+      recommended_value: 16,
+      reason: 'High m increases memory without proportional recall gain',
+      expected_improvement: 'memory -30%'
+    });
+  }
+  
+  // Check ef_construction
+  if (params.ef_construction < 100) {
+    recommendations.push({
+      parameter: 'ef_construction',
+      current_value: params.ef_construction,
+      recommended_value: 200,
+      reason: 'Low ef_construction reduces build quality',
+      expected_improvement: 'recall +10%'
+    });
+  }
+  
+  return recommendations;
+}
+```
+
+### Bước 5: Optimization Planning
+
+```typescript
+// Generate optimization plan
+interface OptimizationPlan {
+  short_term: Optimization[];
+  medium_term: Optimization[];
+  long_term: Optimization[];
+  expected_improvements: ImprovementEstimate[];
+  migration_risks: Risk[];
+}
+
+async function generateOptimizationPlan(
+  impl: VectorSearchImplementation,
+  performance: PerformanceProfile,
+  quality: QualityMetrics,
+  requirements: Requirements
+): Promise<OptimizationPlan> {
+  const plan: OptimizationPlan = {
+    short_term: [],
+    medium_term: [],
+    long_term: [],
+    expected_improvements: [],
+    migration_risks: []
+  };
+  
+  // Address SLA violations first
+  if (performance.p95_latency_ms > requirements.max_p95_latency) {
+    const latencyOptimizations = await identifyLatencyOptimizations(
+      impl, performance, requirements
+    );
+    plan.short_term.push(...latencyOptimizations);
+  }
+  
+  // Address quality issues
+  if (quality.recall_at_k[quality.recall_at_k.length - 1] < requirements.min_recall) {
+    const qualityOptimizations = await identifyQualityOptimizations(
+      impl, quality, requirements
+    );
+    plan.medium_term.push(...qualityOptimizations);
+  }
+  
+  // Address scalability
+  if (impl.total_vectors > estimateCapacity(impl)) {
+    const scalingOptions = await identifyScalingOptions(impl);
+    plan.long_term.push(...scalingOptions);
+  }
+  
+  // Generate expected improvements
+  plan.expected_improvements = estimateImprovements(plan);
+  
+  // Identify risks
+  plan.migration_risks = identifyRisks(plan);
+  
+  return plan;
+}
+
+async function identifyLatencyOptimizations(
+  impl: VectorSearchImplementation,
+  performance: PerformanceProfile,
+  requirements: Requirements
+): Promise<Optimization[]> {
+  const optimizations: Optimization[] = [];
+  
+  // Check ef_search vs ef_construction ratio
+  if (impl.index_type === 'hnsw') {
+    const currentParams = await getIndexParameters(impl);
+    
+    if (currentParams.ef_search < 50) {
+      optimizations.push({
+        type: 'parameter_tuning',
+        parameter: 'ef_search',
+        from: currentParams.ef_search,
+        to: Math.min(200, currentParams.ef_construction),
+        expected_latency_reduction: '30-50%'
+      });
+    }
+  }
+  
+  // Check for missing query optimization
+  if (!performance.cache_hit_rate) {
+    optimizations.push({
+      type: 'caching',
+      description: 'Add result caching for repeated queries',
+      expected_latency_reduction: '40-60% for cache hits'
+    });
+  }
+  
+  // Check batch vs single query
+  optimizations.push({
+    type: 'batch_optimization',
+    description: 'Enable batch query processing',
+    expected_latency_reduction: '20-30% throughput improvement'
+  });
+  
+  return optimizations;
+}
+```
+
+### Bước 6: Benchmark Comparison
+
+```typescript
+// Compare different configurations
+interface BenchmarkResult {
+  configuration: string;
+  p50_latency_ms: number;
+  p95_latency_ms: number;
+  recall: number;
+  memory_mb: number;
+  index_size_mb: number;
+  cost_per_1m_ops: number;
+}
+
+async function benchmarkConfigurations(
+  impl: VectorSearchImplementation,
+  workload: QueryWorkload,
+  qualityBenchmarks: QualityBenchmarks
+): Promise<BenchmarkResult[]> {
+  const results: BenchmarkResult[] = [];
+  
+  // Get baseline
+  const baseline = await profilePerformance(impl, workload);
+  const baselineQuality = await assessQuality(impl, qualityBenchmarks);
+  
+  results.push({
+    configuration: 'current',
+    ...baseline,
+    recall: baselineQuality.recall_at_k[9],
+    memory_mb: baseline.memory_usage_mb,
+    index_size_mb: baseline.index_size_mb,
+    cost_per_1m_ops: calculateCost(impl, baseline)
+  });
+  
+  // Benchmark common alternatives
+  const alternatives = [
+    { index_type: 'hnsw', m: 16, ef_construction: 200, ef_search: 100 },
+    { index_type: 'hnsw', m: 32, ef_construction: 200, ef_search: 100 },
+    { index_type: 'ivf', nlist: 1024, nprobe: 20 },
+    { index_type: 'hnsw', m: 16, ef_construction: 400, ef_search: 200 }
+  ];
+  
+  for (const alt of alternatives) {
+    // Create test index
+    const testImpl = await createTestIndex(impl, alt);
+    
+    // Benchmark
+    const perf = await profilePerformance(testImpl, workload);
+    const qual = await assessQuality(testImpl, qualityBenchmarks);
+    
+    results.push({
+      configuration: JSON.stringify(alt),
+      ...perf,
+      recall: qual.recall_at_k[9],
+      memory_mb: perf.memory_usage_mb,
+      index_size_mb: perf.index_size_mb,
+      cost_per_1m_ops: calculateCost(testImpl, perf)
+    });
+    
+    // Cleanup
+    await cleanupTestIndex(testImpl);
+  }
+  
+  return results.sort((a, b) => {
+    // Pareto-optimal: best recall per latency
+    return (b.recall / b.p95_latency_ms) - (a.recall / a.p95_latency_ms);
+  });
+}
+```
+
+## Checklist (Danh sách kiểm tra)
+
+- [ ] Current implementation fully documented
+- [ ] Performance baseline captured accurately
+- [ ] Query workload representative của production traffic
+- [ ] Quality benchmarks have ground truth labels
+- [ ] Index parameters analyzed for inefficiencies
+- [ ] Memory và storage usage measured
+- [ ] Cache effectiveness evaluated
+- [ ] SLA requirements clearly defined
+- [ ] Alternative configurations benchmarked
+- [ ] Cost implications estimated
+- [ ] Migration risks identified
+- [ ] Rollback procedures documented
+- [ ] Monitoring dashboards proposed
+- [ ] Optimization plan prioritized by impact
+- [ ] ROI estimates included
+
+## Examples (Ví dụ)
+
+### Ví dụ 1: Full Implementation Review
+
+```typescript
+// Complete review workflow
+async function reviewVectorSearchImplementation(
+  connectionConfig: ConnectionConfig,
+  requirements: SLARequirements
+): Promise<ReviewReport> {
+  // Phase 1: Discovery
+  const impl = await discoverImplementation(connectionConfig);
+  
+  // Phase 2: Profiling
+  const workload = await generateQueryWorkload(impl, 10000);
+  const performance = await profilePerformance(impl, workload);
+  
+  // Phase 3: Quality
+  const benchmarks = await loadQualityBenchmarks('squad_relevant');
+  const quality = await assessQuality(impl, benchmarks);
+  
+  // Phase 4: Analysis
+  const indexAnalysis = await analyzeIndex(impl);
+  
+  // Phase 5: Optimization
+  const plan = await generateOptimizationPlan(impl, performance, quality, requirements);
+  
+  // Phase 6: Benchmark
+  const alternatives = await benchmarkConfigurations(impl, workload, benchmarks);
+  
+  return {
+    implementation: impl,
+    performance,
+    quality,
+    index_analysis: indexAnalysis,
+    optimization_plan: plan,
+    benchmarks: alternatives,
+    recommendations: prioritizeRecommendations(plan)
+  };
+}
+
+// Usage
+const report = await reviewVectorSearchImplementation(
+  { host: 'localhost', port: 6333 },
+  { max_p95_latency: 50, min_recall: 0.95 }
+);
+```
+
+### Ví dụ 2: Index Migration Planning
+
+```typescript
+// Plan migration từ flat index sang HNSW
+async function planHNSWMigration(
+  currentImpl: VectorSearchImplementation
+): Promise<MigrationPlan> {
+  // Calculate target parameters
+  const targetParams = calculateOptimalHNSWParams({
+    num_vectors: currentImpl.total_vectors,
+    dimensions: currentImpl.vector_dimensions,
+    target_recall: 0.95,
+    target_latency_p95: 30
+  });
+  
+  // Estimate build time
+  const buildTimeHours = estimateBuildTime(
+    currentImpl.total_vectors,
+    targetParams.ef_construction,
+    targetParams.m
+  );
+  
+  // Plan migration steps
+  const plan: MigrationPlan = {
+    phases: [
+      {
+        name: 'preparation',
+        actions: [
+          'Backup current index',
+          'Prepare target infrastructure',
+          'Setup monitoring'
+        ]
+      },
+      {
+        name: 'build',
+        actions: [
+          'Build new HNSW index in parallel',
+          'Monitor build progress',
+          'Validate index integrity'
+        ]
+      },
+      {
+        name: 'cutover',
+        actions: [
+          'Switch read traffic to new index',
+          'Monitor error rates',
+          'Validate query results'
+        ]
+      },
+      {
+        name: 'cleanup',
+        actions: [
+          'Remove old index',
+          'Optimize storage',
+          'Update documentation'
+        ]
+      }
+    ],
+    estimated_duration_hours: buildTimeHours + 2,
+    risks: identifyMigrationRisks(currentImpl, targetParams),
+    rollback: createRollbackPlan(currentImpl)
+  };
+  
+  return plan;
+}
+```
+
+### Ví dụ 3: Cost Optimization Review
+
+```typescript
+// Review vector search costs
+async function reviewVectorSearchCosts(
+  impl: VectorSearchImplementation,
+  usageMetrics: UsageMetrics
+): Promise<CostOptimizationReport> {
+  const currentCosts = calculateCurrentCosts(impl, usageMetrics);
+  
+  const optimizations: CostOptimization[] = [];
+  
+  // Quantize vectors
+  if (impl.vector_dimensions > 768) {
+    const quantized = await estimateQuantization(impl, 'pq', 128);
+    optimizations.push({
+      type: 'quantization',
+      description: 'PQ quantization to 128 bytes',
+      cost_reduction: quantized.savings_usd,
+      recall_impact: -quantized.recall_loss
+    });
+  }
+  
+  // Reduce index precision
+  if (impl.metric === 'euclidean') {
+    const float16 = await estimateFloat16(impl);
+    optimizations.push({
+      type: 'precision_reduction',
+      description: 'Use float16 instead of float32',
+      cost_reduction: float16.savings_usd,
+      recall_impact: -float16.recall_loss
+    });
+  }
+  
+  // Batch queries
+  const batchSavings = await estimateBatchProcessing(impl, usageMetrics);
+  optimizations.push({
+    type: 'batch_processing',
+    description: 'Enable query batching',
+    cost_reduction: batchSavings.usd,
+    recall_impact: 0
+  });
+  
+  return {
+    current_monthly_cost: currentCosts,
+    optimizations: optimizations.sort((a, b) => b.cost_reduction - a.cost_reduction),
+    total_potential_savings: sum(optimizations.map(o => o.cost_reduction)),
+    recommendations: generateCostRecommendations(optimizations)
+  };
+}
+```
+
+## Anti Patterns (Các pattern cần tránh)
+
+### 1. One-Size-Fits-All Index
+```typescript
+// ❌ BAD: Same index config for all use cases
+const index = await pinecone.createIndex({
+  metric: 'cosine',
+  index_type: 'hnsw'
+});
+
+// ✅ GOOD: Workload-specific configurations
+const configs = {
+  'high-recall': { m: 32, ef_construction: 400 },
+  'low-latency': { m: 16, ef_construction: 200 },
+  'memory-constrained': { m: 8, ef_construction: 100 }
+};
+```
+
+### 2. Ignoring Query Patterns
+```typescript
+// ❌ BAD: Same top_k for all queries
+async function badSearch(query) {
+  return await index.search(query, { top_k: 100 });
+}
+
+// ✅ GOOD: Query-aware top_k
+async function goodSearch(query: SearchQuery) {
+  const topK = getOptimalTopK(query.type);
+  return await index.search(query, { top_k: topK });
+}
+```
+
+### 3. No Performance Monitoring
+```typescript
+// ❌ BAD: Deploy and forget
+async function badDeploy(index) {
+  await index.create();
+  return index;
+}
+
+// ✅ GOOD: Full observability
+async function goodDeploy(index) {
+  await index.create();
+  await setupMonitoring(index, {
+    latency: true,
+    quality: true,
+    resource_usage: true,
+    cost_tracking: true
+  });
+  return index;
+}
+```
+
+### 4. Skipping Quality Validation
+```typescript
+// ❌ BAD: Trust vector search implicitly
+const results = await search(query);
+return results;
+
+// ✅ GOOD: Validate and monitor quality
+const results = await search(query);
+const quality = await validateResults(query, results);
+if (quality.recall < THRESHOLD) {
+  await alert('Low recall detected');
+}
+return results;
+```
+
+### 5. Manual Parameter Tuning
+```typescript
+// ❌ BAD: Manual guess-based tuning
+const params = { m: 16, ef_search: 50 }; // Arbitrary values
+
+// ✅ GOOD: Systematic parameter optimization
+const params = await optimizeParameters(impl, {
+  search_space: { m: [8, 16, 32], ef_search: [50, 100, 200] },
+  objective: 'maximize recall_at_10 with p95_latency < 50ms',
+  constraints: { memory_gb: 32 }
+});
+```
+
+## Best Practices (Thực hành tốt nhất)
+
+1. **Profile before optimizing**: Know your baseline trước khi thay đổi
+2. **Quality first, then speed**: Recall > Latency
+3. **Use benchmarks with ground truth**: Generic benchmarks may not reflect your use case
+4. **Monitor continuously**: Performance can degrade over time
+5. **Plan for scale**: Design for 10x current volume
+6. **Document all configurations**: Including rationale
+7. **Test in staging**: Never tune directly in production
+8. **Have rollback plan**: Every change should be reversible
+9. **Track costs**: Vector search can get expensive
+10. **Automate optimization**: Use systematic tuning tools
+
+## Liên kết (Cross-references)
+
+- **Related Skills**: [embedding-builder](./embedding-builder.mdc), [rag-builder](./rag-builder.mdc)
+- **Infrastructure**: Pinecone, Weaviate, Qdrant, Milvus, ChromaDB
+- **Metrics**: Recall@K, MRR, NDCG, Latency percentiles
+- **Tools**: Vector database dashboards, performance profilers

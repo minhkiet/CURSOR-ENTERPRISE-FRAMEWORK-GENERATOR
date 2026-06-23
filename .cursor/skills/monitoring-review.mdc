@@ -1,0 +1,596 @@
+---
+description: Skill review monitoring và observability stack để đảm bảo system visibility, alerting, và incident response
+purpose: Cung cấp comprehensive review framework cho monitoring systems, evaluate metrics, logs, traces, và alerting configurations
+input:
+  - Monitoring configuration
+  - Metrics definitions
+  - Alert rules
+  - Dashboard designs
+  - Incident history
+output:
+  - Coverage assessment
+  - Alert quality review
+  - Dashboard review
+  - Gap analysis
+  - Recommendations
+version: 1.0.0
+tags:
+  - monitoring
+  - observability
+  - alerting
+  - metrics
+  - logging
+---
+
+# Monitoring Review
+
+## Tổng quan
+
+Monitoring Review là skill chuyên biệt để review và assess monitoring và observability implementations. Skill này cung cấp systematic approach để evaluate metrics coverage, alert quality, dashboard effectiveness, incident response procedures, và SLO/SLI definitions. Essential cho production systems.
+
+## Purpose (Mục đích)
+
+Effective monitoring là critical cho operations:
+
+1. **Visibility**: Know what's happening in your system
+2. **Performance**: Identify bottlenecks and optimization opportunities
+3. **Reliability**: Detect issues before they become outages
+4. **Incident Response**: Quick diagnosis and resolution
+5. **Compliance**: Audit trails và reporting
+
+Monitoring Review tồn tại để:
+
+- **Ensure complete coverage** of critical components
+- **Optimize alerting** to reduce noise
+- **Improve dashboards** for faster diagnosis
+- **Verify SLOs/SLIs** are properly defined
+- **Enhance incident response**
+
+## Input (Đầu vào)
+
+| Input | Mô tả | Required |
+|-------|-------|----------|
+| `monitoring_config` | Monitoring setup | Yes |
+| `metrics` | Metrics definitions | Yes |
+| `alerts` | Alert rules | Yes |
+| `dashboards` | Dashboard configs | Yes |
+| `slo_config` | SLO definitions | No |
+
+## Output (Đầu ra)
+
+| Output | Mô tả | Format |
+|--------|-------|--------|
+| `coverage_report` | Metrics coverage | Report |
+| `alert_review` | Alert quality | Review |
+| `dashboard_review` | Dashboard effectiveness | Review |
+| `slo_assessment` | SLO/SLI assessment | Assessment |
+| `recommendations` | Improvements | List |
+
+## Workflow (Quy trình)
+
+### Bước 1: Metrics Coverage Analysis
+
+```typescript
+// Analyze metrics coverage
+interface MetricsCoverage {
+  infrastructure: MetricCategory;
+  application: MetricCategory;
+  business: MetricCategory;
+  gaps: MetricGap[];
+  coverage_percentage: number;
+}
+
+interface MetricCategory {
+  defined: number;
+  collected: number;
+  utilized: number;
+  metrics: MetricInfo[];
+}
+
+async function analyzeMetricsCoverage(
+  config: MonitoringConfig
+): Promise<MetricsCoverage> {
+  const infrastructure = await analyzeCategory('infrastructure', config);
+  const application = await analyzeCategory('application', config);
+  const business = await analyzeCategory('business', config);
+  
+  const allMetrics = [
+    ...infrastructure.metrics,
+    ...application.metrics,
+    ...business.metrics
+  ];
+  
+  const gaps = identifyGaps(allMetrics, getRequiredMetrics());
+  
+  return {
+    infrastructure,
+    application,
+    business,
+    gaps,
+    coverage_percentage: calculateCoverage(allMetrics, getRequiredMetrics())
+  };
+}
+
+async function analyzeCategory(
+  category: string,
+  config: MonitoringConfig
+): Promise<MetricCategory> {
+  const defined = config.metrics.filter(m => m.category === category);
+  const collected = defined.filter(m => m.isCollected);
+  const utilized = collected.filter(m => m.isUsedInDashboards || m.isUsedInAlerts);
+  
+  return {
+    defined: defined.length,
+    collected: collected.length,
+    utilized: utilized.length,
+    metrics: defined
+  };
+}
+
+function getRequiredMetrics(): RequiredMetric[] {
+  return [
+    // Infrastructure
+    { name: 'cpu_usage', category: 'infrastructure', tier: 'gold' },
+    { name: 'memory_usage', category: 'infrastructure', tier: 'gold' },
+    { name: 'disk_usage', category: 'infrastructure', tier: 'gold' },
+    { name: 'network_throughput', category: 'infrastructure', tier: 'silver' },
+    { name: 'connection_count', category: 'infrastructure', tier: 'silver' },
+    
+    // Application
+    { name: 'request_rate', category: 'application', tier: 'gold' },
+    { name: 'error_rate', category: 'application', tier: 'gold' },
+    { name: 'latency_p50', category: 'application', tier: 'gold' },
+    { name: 'latency_p95', category: 'application', tier: 'gold' },
+    { name: 'latency_p99', category: 'application', tier: 'gold' },
+    { name: 'availability', category: 'application', tier: 'gold' },
+    
+    // Business
+    { name: 'active_users', category: 'business', tier: 'silver' },
+    { name: 'conversion_rate', category: 'business', tier: 'silver' },
+    { name: 'revenue', category: 'business', tier: 'gold' }
+  ];
+}
+```
+
+### Bước 2: Alert Quality Review
+
+```typescript
+// Review alert rules
+interface AlertReview {
+  alerts: AlertInfo[];
+  quality_score: number;
+  issues: AlertIssue[];
+  noise_analysis: NoiseAnalysis;
+  recommendations: AlertRecommendation[];
+}
+
+interface AlertInfo {
+  name: string;
+  severity: 'critical' | 'high' | 'medium' | 'low';
+  condition: string;
+  window: string;
+  threshold: number;
+  is_silenced: boolean;
+  silence_reason?: string;
+  fire_count_30d: number;
+  false_positive_rate: number;
+}
+
+async function reviewAlerts(
+  config: AlertConfig
+): Promise<AlertReview> {
+  const alerts = await parseAlerts(config);
+  const issues: AlertIssue[] = [];
+  
+  for (const alert of alerts) {
+    // Check for stale alerts (never fired)
+    if (alert.fire_count_30d === 0 && !alert.is_silenced) {
+      issues.push({
+        type: 'stale_alert',
+        alert: alert.name,
+        severity: 'low',
+        message: 'Alert has not fired in 30 days - may need removal or tuning'
+      });
+    }
+    
+    // Check for high false positive rate
+    if (alert.false_positive_rate > 0.3) {
+      issues.push({
+        type: 'high_false_positive',
+        alert: alert.name,
+        severity: 'high',
+        message: `False positive rate is ${(alert.false_positive_rate * 100).toFixed(0)}%`
+      });
+    }
+    
+    // Check for missing annotations
+    if (!alert.has_runbook_url || !alert.has_summary) {
+      issues.push({
+        type: 'missing_documentation',
+        alert: alert.name,
+        severity: 'medium',
+        message: 'Alert should have runbook and summary annotations'
+      });
+    }
+    
+    // Check for alerting on percentage without context
+    if (alert.condition.includes('%') && !alert.condition.includes('of total')) {
+      issues.push({
+        type: 'misleading_alert',
+        alert: alert.name,
+        severity: 'medium',
+        message: 'Percentage alert should clarify denominator'
+      });
+    }
+  }
+  
+  return {
+    alerts,
+    quality_score: calculateAlertQualityScore(alerts, issues),
+    issues,
+    noise_analysis: analyzeNoise(alerts),
+    recommendations: generateAlertRecommendations(issues)
+  };
+}
+
+function analyzeNoise(alerts: AlertInfo[]): NoiseAnalysis {
+  const totalFires = alerts.reduce((sum, a) => sum + a.fire_count_30d, 0);
+  const acknowledgedFires = alerts.reduce(
+    (sum, a) => sum + (a.fire_count_30d * (1 - a.false_positive_rate)), 
+    0
+  );
+  
+  return {
+    total_alerts_30d: totalFires,
+    actionable_alerts: Math.round(acknowledgedFires),
+    noise_rate: 1 - (acknowledgedFires / totalFires),
+    top_noisy_alerts: alerts
+      .filter(a => a.false_positive_rate > 0.3)
+      .sort((a, b) => b.fire_count_30d - a.fire_count_30d)
+      .slice(0, 5)
+  };
+}
+```
+
+### Bước 3: Dashboard Review
+
+```typescript
+// Review monitoring dashboards
+interface DashboardReview {
+  dashboards: DashboardInfo[];
+  effectiveness_score: number;
+  issues: DashboardIssue[];
+  recommendations: DashboardRecommendation[];
+}
+
+interface DashboardInfo {
+  name: string;
+  panels: PanelInfo[];
+  variables: VariableInfo[];
+  refresh_interval: number;
+  last_viewed: Date;
+  views_30d: number;
+}
+
+async function reviewDashboards(
+  dashboards: DashboardConfig[]
+): Promise<DashboardReview> {
+  const dashboardInfos: DashboardInfo[] = [];
+  const issues: DashboardIssue[] = [];
+  
+  for (const dashboard of dashboards) {
+    const info: DashboardInfo = {
+      name: dashboard.name,
+      panels: dashboard.panels,
+      variables: dashboard.variables,
+      refresh_interval: dashboard.refreshInterval,
+      last_viewed: dashboard.lastViewed,
+      views_30d: dashboard.views30d
+    };
+    
+    dashboardInfos.push(info);
+    
+    // Check for unused dashboards
+    if (dashboard.views30d < 5) {
+      issues.push({
+        type: 'unused_dashboard',
+        dashboard: dashboard.name,
+        severity: 'low',
+        message: `Dashboard viewed ${dashboard.views30d} times in 30 days`
+      });
+    }
+    
+    // Check for panels without queries
+    const panelsWithoutQueries = dashboard.panels.filter(p => !p.query);
+    if (panelsWithoutQueries.length > 0) {
+      issues.push({
+        type: 'empty_panels',
+        dashboard: dashboard.name,
+        panel_count: panelsWithoutQueries.length,
+        severity: 'low',
+        message: `${panelsWithoutQueries.length} panels have no queries`
+      });
+    }
+    
+    // Check for missing SLA indicators
+    if (dashboard.name.includes('Overview') && !dashboard.hasSLAPanel) {
+      issues.push({
+        type: 'missing_sla_panel',
+        dashboard: dashboard.name,
+        severity: 'medium',
+        message: 'Overview dashboard should include SLA indicators'
+      });
+    }
+  }
+  
+  return {
+    dashboards: dashboardInfos,
+    effectiveness_score: calculateDashboardScore(dashboardInfos, issues),
+    issues,
+    recommendations: generateDashboardRecommendations(issues)
+  };
+}
+```
+
+### Bước 4: SLO/SLI Assessment
+
+```typescript
+// Assess SLO and SLI definitions
+interface SLOAssessment {
+  slos: SLOInfo[];
+  compliance_30d: ComplianceInfo[];
+  error_budgets: ErrorBudget[];
+  issues: SLOIssue[];
+}
+
+interface SLOInfo {
+  name: string;
+  sli: SLIDefinition;
+  target: number;
+  current: number;
+  period: string;
+}
+
+interface ErrorBudget {
+  sli: string;
+  budget_total: number;
+  budget_spent: number;
+  budget_remaining: number;
+  burn_rate: number;
+  days_until_exhausted: number;
+}
+
+async function assessSLOs(
+  sloConfig: SLOConfig
+): Promise<SLOAssessment> {
+  const slos: SLOInfo[] = [];
+  const compliance30d: ComplianceInfo[] = [];
+  const errorBudgets: ErrorBudget[] = [];
+  
+  for (const slo of sloConfig.definitions) {
+    slos.push({
+      name: slo.name,
+      sli: slo.sli,
+      target: slo.target,
+      current: await calculateCurrentSLO(slo),
+      period: slo.window
+    });
+    
+    // Calculate error budget
+    const budget = calculateErrorBudget(slo);
+    errorBudgets.push(budget);
+    
+    // Calculate compliance
+    compliance30d.push(await calculateCompliance30d(slo));
+  }
+  
+  return {
+    slos,
+    compliance_30d: compliance30d,
+    error_budgets: errorBudgets,
+    issues: identifySLOIssues(slos, errorBudgets)
+  };
+}
+
+function calculateErrorBudget(slo: SLO): ErrorBudget {
+  const target = slo.target; // e.g., 99.9%
+  const windowSeconds = getWindowSeconds(slo.window);
+  
+  const budgetTotal = windowSeconds * (1 - target);
+  const budgetSpent = budgetTotal * (1 - slo.current / 100);
+  
+  return {
+    sli: slo.name,
+    budget_total: budgetTotal,
+    budget_spent: budgetSpent,
+    budget_remaining: budgetTotal - budgetSpent,
+    burn_rate: budgetSpent / (Date.now() - slo.windowStart),
+    days_until_exhausted: estimateDaysUntilExhaustion(budgetTotal - budgetSpent)
+  };
+}
+```
+
+### Bước 5: Incident Response Review
+
+```typescript
+// Review incident response procedures
+interface IncidentResponseReview {
+  procedures: ProcedureInfo[];
+  runbooks: RunbookInfo[];
+  communication: CommunicationPlan;
+  postmortems: PostmortemAnalysis;
+  issues: ResponseIssue[];
+}
+
+async function reviewIncidentResponse(
+  config: IncidentConfig
+): Promise<IncidentResponseReview> {
+  const procedures = parseProcedures(config);
+  const runbooks = await reviewRunbooks(config);
+  
+  return {
+    procedures,
+    runbooks,
+    communication: config.communication,
+    postmortems: await analyzePostmortems(config),
+    issues: identifyResponseIssues(procedures, runbooks)
+  };
+}
+
+async function analyzePostmortems(
+  config: IncidentConfig
+): Promise<PostmortemAnalysis> {
+  const postmortems = await getPostmortems(config);
+  
+  return {
+    total: postmortems.length,
+    avg_resolution_time: calculateAvgResolution(postmortems),
+    avg_turnaround_time: calculateAvgTurnaround(postmortems),
+    recurrence_rate: calculateRecurrenceRate(postmortems),
+    top_causes: analyzeTopCauses(postmortems),
+    action_items_completion: calculateActionItemCompletion(postmortems)
+  };
+}
+```
+
+## Checklist (Danh sách kiểm tra)
+
+- [ ] All gold metrics collected and utilized
+- [ ] Alerts have appropriate severity levels
+- [ ] False positive rate < 10%
+- [ ] No stale alerts
+- [ ] All alerts have runbooks
+- [ ] Dashboards grouped by service
+- [ ] Overview dashboard includes key SLIs
+- [ ] SLOs defined for all critical services
+- [ ] Error budgets calculated and tracked
+- [ ] Incident response procedures documented
+- [ ] Runbooks for all critical alerts
+- [ ] Postmortems conducted for major incidents
+- [ ] On-call rotation properly staffed
+- [ ] Escalation procedures defined
+- [ ] Communication templates ready
+
+## Examples (Ví dụ)
+
+### Ví dụ 1: Good Alert Definition
+
+```yaml
+# ✅ GOOD: Well-defined alert
+- name: high_error_rate
+  severity: critical
+  summary: "Error rate above 5% for 5 minutes"
+  description: |
+    More than 5% of requests are returning errors.
+    This indicates a potential service degradation.
+  expr: |
+    (
+      sum(rate(http_requests_total{status=~"5.."}[5m]))
+      /
+      sum(rate(http_requests_total[5m]))
+    ) > 0.05
+  for: 5m
+  labels:
+    team: platform
+    service: api
+  annotations:
+    summary: "High error rate detected"
+    description: "Error rate is {{ $value | humanizePercentage }}"
+    runbook_url: "https://wiki.example.com/runbooks/high-error-rate"
+    dashboard_url: "https://grafana.example.com/d/error-overview"
+```
+
+### Ví dụ 2: SLO Definition
+
+```yaml
+# SLO definitions
+slos:
+  - name: api-availability
+    sli: |
+      sum(http_requests_total{status!~"5.."})
+      /
+      sum(http_requests_total)
+    target: 99.95
+    window: 30d
+    description: "API should be available 99.95% of the time"
+    
+  - name: api-latency
+    sli: |
+      histogram_quantile(0.95, 
+        sum(rate(http_request_duration_seconds_bucket[5m])) by (le)
+      )
+    target: 99.0
+    window: 30d
+    description: "95th percentile latency under 500ms"
+    threshold: 0.5
+```
+
+## Anti Patterns (Các pattern cần tránh)
+
+### 1. Alert on Every Metric
+```yaml
+# ❌ BAD: Too many alerts
+- alert: cpu_usage_above_0
+  expr: cpu_usage > 0
+  # Everything is above 0!
+
+# ✅ GOOD: Meaningful threshold
+- alert: HighCPUUsage
+  expr: cpu_usage > 90
+  for: 5m
+```
+
+### 2. No Alert Documentation
+```yaml
+# ❌ BAD: No context
+- alert: HighErrorRate
+  expr: error_rate > 0.05
+
+# ✅ GOOD: Full documentation
+- alert: HighErrorRate
+  expr: error_rate > 0.05
+  annotations:
+    summary: "Error rate exceeded 5%"
+    runbook_url: "https://wiki/runbooks/error-rate"
+    dashboard_url: "https://grafana/d/errors"
+```
+
+### 3. Dashboard Junk Drawer
+```typescript
+// ❌ BAD: Everything in one dashboard
+const dashboard = {
+  name: 'Random Stuff',
+  panels: [
+    { title: 'CPU', query: 'cpu' },
+    { title: 'Errors', query: 'errors' },
+    { title: 'Revenue', query: 'revenue' },
+    { title: 'Temperature', query: 'room_temp' } // Why?
+  ]
+};
+
+// ✅ GOOD: Organized by service/team
+const dashboards = [
+  { name: 'Platform Overview', panels: [cpu, memory, disk, network] },
+  { name: 'API Performance', panels: [latency, errors, throughput] },
+  { name: 'Business Metrics', panels: [revenue, users, conversion] }
+];
+```
+
+## Best Practices (Thực hành tốt nhất)
+
+1. **Use USE method**: Utilization, Saturation, Errors
+2. **Use RED method**: Rate, Errors, Duration (for services)
+3. **Alert on symptoms, not causes**: Alert on errors, not just high CPU
+4. **Keep alert noise low**: Target < 10% false positive rate
+5. **Dashboards for different audiences**: Ops, Dev, Business
+6. **Define SLOs first**: Then create alerts to protect them
+7. **Track error budgets**: Burn rate alerts for early warning
+8. **Regular reviews**: Quarterly alert and dashboard reviews
+9. **Document everything**: Runbooks for all critical alerts
+10. **Practice incidents**: Run game days to test procedures
+
+## Liên kết (Cross-references)
+
+- **Related Skills**: [performance-audit](./performance-audit.mdc), [deployment-review](./deployment-review.mdc)
+- **Tools**: Prometheus, Grafana, Datadog, PagerDuty
+- **Standards**: USE method, RED method, SLI/SLO/SLA

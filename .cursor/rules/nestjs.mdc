@@ -1,0 +1,718 @@
+---
+description: Nguyên tắc và best practices cho NestJS trong Cursor Enterprise Framework
+created: 2026-06-23
+version: 1.0.0
+tags: [nestjs, nodejs, typescript, backend, microservices]
+---
+
+# NestJS
+
+## Mục tiêu
+
+NestJS là một progressive Node.js framework để xây dựng efficient, reliable, và scalable server-side applications. Xây trên Express (hoặc Fastify), NestJS cung cấp an out-of-the-box application architecture với dependency injection, modular organization, và comprehensive tooling. Trong Cursor Enterprise Framework, NestJS là lựa chọn mạnh cho các dự án cần structure rõ ràng, TypeScript-first development, và enterprise-grade features.
+
+Mục tiêu của rule này là hướng dẫn developers trong việc sử dụng NestJS hiệu quả, tận dụng features như modules, controllers, providers, guards, interceptors, và decorators.
+
+## Nguyên tắc
+
+**1. Modular Architecture**
+
+Organize code into modules. Each module encapsulates its functionality. Modules should be cohesive. Limit module dependencies. Use feature-based modules.
+
+**2. Dependency Injection**
+
+Use constructor injection. Define proper providers. Use @Inject decorator when needed. Consider scopes (Default, Request, Transient). Proper lifetime management.
+
+**3. Controllers for Routing**
+
+Controllers handle HTTP requests. Define routes with decorators. Validate inputs with class-validator. Return appropriate responses. Keep controllers thin.
+
+**4. Services for Business Logic**
+
+Services contain business logic. Inject repositories and other services. Services are stateless. Return DTOs, not entities.
+
+**5. Data Transfer Objects (DTOs)**
+
+Use DTOs for input validation. Use TypeScript interfaces or classes. Define validation rules with decorators. Separate Create vs Update DTOs.
+
+**6. Pipes for Transformation**
+
+Use built-in pipes for validation. Create custom pipes when needed. Use ValidationPipe globally. Handle transformation logic in pipes.
+
+**7. Guards for Authorization**
+
+Guards handle authentication/authorization. Return boolean or throw exception. Use for route protection. Create custom guards.
+
+**8. Interceptors for Cross-Cutting**
+
+Interceptors handle cross-cutting concerns. Add headers, transform responses. Handle caching. Implement logging.
+
+**9. Exception Filters for Errors**
+
+Use built-in exceptions. Create custom exception filters. Return consistent error format. Handle different error types.
+
+**10. Database Integration**
+
+Use TypeORM or Prisma. Define entities properly. Use repositories for data access. Implement migrations. Use transactions.
+
+## Checklist
+
+- [ ] NestJS CLI installed
+- [ ] Project structure defined
+- [ ] Modules organized
+- [ ] Controllers implemented
+- [ ] Services created
+- [ ] DTOs defined
+- [ ] Validation configured
+- [ ] Database connection set up
+- [ ] Authentication implemented
+- [ ] Tests written
+
+## Anti Pattern
+
+**1. Fat Controllers**
+
+Controllers doing too much. Business logic in controllers. Hard to test. Violates single responsibility.
+
+**2. Circular Dependencies**
+
+Modules depending on each other. Import cycle issues. Hard to maintain. Break cycles with interfaces.
+
+**3. Not Using DTOs**
+
+Passing raw objects. No validation. Type safety issues. Use DTOs consistently.
+
+**4. Global Scope Abuse**
+
+Overusing request-scoped providers. Memory leaks. Performance issues. Use appropriately.
+
+**5. No Error Handling**
+
+Unhandled exceptions. Inconsistent responses. Missing error logging. Use exception filters.
+
+## Best Practice
+
+**1. Project Structure**
+
+```typescript
+// src/
+// ├── main.ts
+// ├── app.module.ts
+// ├── common/
+// │   ├── decorators/
+// │   │   ├── current-user.decorator.ts
+// │   │   └── permissions.decorator.ts
+// │   ├── filters/
+// │   │   └── http-exception.filter.ts
+// │   ├── guards/
+// │   │   ├── auth.guard.ts
+// │   │   └── roles.guard.ts
+// │   ├── interceptors/
+// │   │   ├── logging.interceptor.ts
+// │   │   └── transform.interceptor.ts
+// │   ├── pipes/
+// │   │   └── validation.pipe.ts
+// │   └── dto/
+// │       ├── pagination.dto.ts
+// │       └── api-response.dto.ts
+// ├── config/
+// │   ├── config.module.ts
+// │   ├── config.service.ts
+// │   └── configuration.ts
+// ├── modules/
+// │   ├── auth/
+// │   │   ├── auth.module.ts
+// │   │   ├── auth.controller.ts
+// │   │   ├── auth.service.ts
+// │   │   ├── strategies/
+// │   │   │   └── jwt.strategy.ts
+// │   │   ├── guards/
+// │   │   └── dto/
+// │   ├── users/
+// │   │   ├── users.module.ts
+// │   │   ├── users.controller.ts
+// │   │   ├── users.service.ts
+// │   │   ├── entities/
+// │   │   │   └── user.entity.ts
+// │   │   └── dto/
+// │   ├── orders/
+// │   │   ├── orders.module.ts
+// │   │   ├── orders.controller.ts
+// │   │   ├── orders.service.ts
+// │   │   ├── entities/
+// │   │   └── dto/
+// │   └── products/
+// │       └── ...
+// └── shared/
+//     ├── utils/
+//     └── constants/
+```
+
+**2. Controllers**
+
+```typescript
+// modules/orders/orders.controller.ts
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+  UseInterceptors,
+  HttpCode,
+  HttpStatus
+} from '@nestjs/common';
+import { OrdersService } from './orders.service';
+import { CreateOrderDto, UpdateOrderDto, OrderQueryDto } from './dto';
+import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { PaginationInterceptor } from '@/common/interceptors/pagination.interceptor';
+
+@Controller('orders')
+@UseGuards(JwtAuthGuard, RolesGuard)
+export class OrdersController {
+  constructor(private readonly ordersService: OrdersService) {}
+
+  @Get()
+  @Roles('admin', 'manager')
+  @UseInterceptors(new PaginationInterceptor())
+  async findAll(@Query() query: OrderQueryDto) {
+    return this.ordersService.findAll(query);
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    const order = await this.ordersService.findById(id);
+    
+    if (!order) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+    
+    return order;
+  }
+
+  @Post()
+  @Roles('customer', 'admin')
+  async create(
+    @Body() createOrderDto: CreateOrderDto,
+    @CurrentUser() user: UserPayload
+  ) {
+    return this.ordersService.create({
+      ...createOrderDto,
+      customerId: user.userId
+    });
+  }
+
+  @Patch(':id')
+  @Roles('admin')
+  async update(
+    @Param('id') id: string,
+    @Body() updateOrderDto: UpdateOrderDto
+  ) {
+    return this.ordersService.update(id, updateOrderDto);
+  }
+
+  @Delete(':id')
+  @Roles('admin')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(@Param('id') id: string) {
+    await this.ordersService.delete(id);
+  }
+
+  @Post(':id/cancel')
+  @Roles('customer', 'admin')
+  async cancel(
+    @Param('id') id: string,
+    @CurrentUser() user: UserPayload
+  ) {
+    return this.ordersService.cancel(id, user.userId);
+  }
+}
+```
+
+**3. Services**
+
+```typescript
+// modules/orders/orders.service.ts
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Order } from './entities/order.entity';
+import { OrderItem } from './entities/order-item.entity';
+import { CreateOrderDto, UpdateOrderDto, OrderQueryDto } from './dto';
+import { OrderStatus } from '@/common/enums';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+
+@Injectable()
+export class OrdersService {
+  constructor(
+    @InjectRepository(Order)
+    private readonly orderRepository: Repository<Order>,
+    @InjectRepository(OrderItem)
+    private readonly orderItemRepository: Repository<OrderItem>,
+    private readonly eventEmitter: EventEmitter2
+  ) {}
+
+  async findAll(query: OrderQueryDto): Promise<PaginatedResult<Order>> {
+    const { page = 1, limit = 20, status, customerId, sortBy = 'createdAt', sortOrder = 'DESC' } = query;
+    
+    const queryBuilder = this.orderRepository
+      .createQueryBuilder('order')
+      .leftJoinAndSelect('order.items', 'items')
+      .leftJoinAndSelect('order.customer', 'customer');
+    
+    if (status) {
+      queryBuilder.andWhere('order.status = :status', { status });
+    }
+    
+    if (customerId) {
+      queryBuilder.andWhere('order.customerId = :customerId', { customerId });
+    }
+    
+    queryBuilder
+      .orderBy(`order.${sortBy}`, sortOrder)
+      .skip((page - 1) * limit)
+      .take(limit);
+    
+    const [data, total] = await queryBuilder.getManyAndCount();
+    
+    return {
+      data,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
+    };
+  }
+
+  async findById(id: string): Promise<Order | null> {
+    return this.orderRepository.findOne({
+      where: { id },
+      relations: ['items', 'customer', 'payments']
+    });
+  }
+
+  async create(createOrderDto: CreateOrderDto): Promise<Order> {
+    const order = this.orderRepository.create({
+      customerId: createOrderDto.customerId,
+      status: OrderStatus.PENDING,
+      shippingAddress: createOrderDto.shippingAddress,
+      notes: createOrderDto.notes
+    });
+    
+    const items = createOrderDto.items.map(itemDto =>
+      this.orderItemRepository.create({
+        productId: itemDto.productId,
+        quantity: itemDto.quantity,
+        price: itemDto.price
+      })
+    );
+    
+    order.items = items;
+    
+    const savedOrder = await this.orderRepository.save(order);
+    
+    // Emit event
+    this.eventEmitter.emit('order.created', {
+      orderId: savedOrder.id,
+      customerId: savedOrder.customerId,
+      total: savedOrder.total
+    });
+    
+    return savedOrder;
+  }
+
+  async update(id: string, updateOrderDto: UpdateOrderDto): Promise<Order> {
+    const order = await this.findById(id);
+    
+    if (!order) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+    
+    Object.assign(order, updateOrderDto);
+    
+    return this.orderRepository.save(order);
+  }
+
+  async delete(id: string): Promise<void> {
+    const result = await this.orderRepository.delete(id);
+    
+    if (result.affected === 0) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+  }
+
+  async cancel(id: string, userId: string): Promise<Order> {
+    const order = await this.findById(id);
+    
+    if (!order) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+    
+    // Check if user owns the order
+    if (order.customerId !== userId) {
+      throw new BadRequestException('You can only cancel your own orders');
+    }
+    
+    if (!order.canBeCancelled()) {
+      throw new BadRequestException('This order cannot be cancelled');
+    }
+    
+    order.status = OrderStatus.CANCELLED;
+    
+    return this.orderRepository.save(order);
+  }
+}
+```
+
+**4. DTOs với Validation**
+
+```typescript
+// modules/orders/dto/create-order.dto.ts
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Max,
+  Min,
+  ValidateNested
+} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { OrderStatus } from '@/common/enums';
+
+export class CreateOrderItemDto {
+  @ApiProperty({ description: 'Product ID' })
+  @IsUUID()
+  @IsNotEmpty()
+  productId!: string;
+
+  @ApiProperty({ description: 'Quantity', minimum: 1, maximum: 100 })
+  @IsNumber()
+  @Min(1)
+  @Max(100)
+  quantity!: number;
+
+  @ApiProperty({ description: 'Price per unit' })
+  @IsNumber()
+  @Min(0)
+  price!: number;
+}
+
+export class ShippingAddressDto {
+  @ApiProperty({ description: 'Street address' })
+  @IsString()
+  @IsNotEmpty()
+  @Max(500)
+  street!: string;
+
+  @ApiProperty({ description: 'City' })
+  @IsString()
+  @IsNotEmpty()
+  @Max(100)
+  city!: string;
+
+  @ApiProperty({ description: 'Country code (ISO 3166-1 alpha-2)' })
+  @IsString()
+  @Length(2)
+  country!: string;
+
+  @ApiPropertyOptional({ description: 'Postal code' })
+  @IsString()
+  @IsOptional()
+  @Max(20)
+  postalCode?: string;
+}
+
+export class CreateOrderDto {
+  @ApiProperty({ description: 'Customer ID' })
+  @IsUUID()
+  @IsNotEmpty()
+  customerId!: string;
+
+  @ApiProperty({ description: 'Order items', type: [CreateOrderItemDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateOrderItemDto)
+  items!: CreateOrderItemDto[];
+
+  @ApiProperty({ description: 'Shipping address', type: ShippingAddressDto })
+  @IsObject()
+  @ValidateNested()
+  @Type(() => ShippingAddressDto)
+  shippingAddress!: ShippingAddressDto;
+
+  @ApiPropertyOptional({ description: 'Order notes' })
+  @IsString()
+  @IsOptional()
+  @Max(2000)
+  notes?: string;
+}
+
+export class OrderQueryDto {
+  @ApiPropertyOptional({ description: 'Page number', default: 1 })
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  @Min(1)
+  page?: number = 1;
+
+  @ApiPropertyOptional({ description: 'Items per page', default: 20 })
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  @Min(1)
+  @Max(100)
+  limit?: number = 20;
+
+  @ApiPropertyOptional({ description: 'Filter by status', enum: OrderStatus })
+  @IsEnum(OrderStatus)
+  @IsOptional()
+  status?: OrderStatus;
+
+  @ApiPropertyOptional({ description: 'Filter by customer ID' })
+  @IsUUID()
+  @IsOptional()
+  customerId?: string;
+
+  @ApiPropertyOptional({ description: 'Sort field', default: 'createdAt' })
+  @IsString()
+  @IsOptional()
+  sortBy?: string = 'createdAt';
+
+  @ApiPropertyOptional({ description: 'Sort order', enum: ['ASC', 'DESC'], default: 'DESC' })
+  @IsEnum(['ASC', 'DESC'])
+  @IsOptional()
+  sortOrder?: 'ASC' | 'DESC' = 'DESC';
+}
+```
+
+**5. Guards**
+
+```typescript
+// common/guards/jwt-auth.guard.ts
+import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { Observable } from 'rxjs';
+
+@Injectable()
+export class JwtAuthGuard extends AuthGuard('jwt') {
+  canActivate(
+    context: ExecutionContext
+  ): boolean | Promise<boolean> | Observable<boolean> {
+    return super.canActivate(context);
+  }
+
+  handleRequest<TUser = any>(err: any, user: TUser, info: any): TUser {
+    if (err || !user) {
+      throw err || new UnauthorizedException('Invalid or expired token');
+    }
+    return user;
+  }
+}
+
+// common/guards/roles.guard.ts
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { ROLES_KEY } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enums';
+
+@Injectable()
+export class RolesGuard implements CanActivate {
+  constructor(private reflector: Reflector) {}
+
+  canActivate(context: ExecutionContext): boolean {
+    const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
+      context.getHandler(),
+      context.getClass()
+    ]);
+
+    if (!requiredRoles) {
+      return true;
+    }
+
+    const { user } = context.switchToHttp().getRequest();
+    
+    return requiredRoles.some((role) => user.roles?.includes(role));
+  }
+}
+
+// common/decorators/roles.decorator.ts
+import { SetMetadata } from '@nestjs/common';
+import { Role } from '@/common/enums';
+
+export const ROLES_KEY = 'roles';
+export const Roles = (...roles: Role[]) => SetMetadata(ROLES_KEY, roles);
+```
+
+**6. Event-Driven Architecture**
+
+```typescript
+// modules/orders/orders.events.ts
+export class OrderCreatedEvent {
+  constructor(
+    public readonly orderId: string,
+    public readonly customerId: string,
+    public readonly total: number,
+    public readonly timestamp: Date = new Date()
+  ) {}
+}
+
+export class OrderStatusChangedEvent {
+  constructor(
+    public readonly orderId: string,
+    public readonly previousStatus: string,
+    public readonly newStatus: string,
+    public readonly changedBy: string
+  ) {}
+}
+
+// modules/notifications/notifications.listener.ts
+import { Injectable } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
+import { NotificationsService } from './notifications.service';
+import { OrderCreatedEvent } from '@/modules/orders/orders.events';
+
+@Injectable()
+export class OrdersEventListener {
+  constructor(
+    private readonly notificationsService: NotificationsService
+  ) {}
+
+  @OnEvent('order.created', { async: true })
+  async handleOrderCreated(event: OrderCreatedEvent) {
+    await this.notificationsService.sendOrderConfirmation({
+      customerId: event.customerId,
+      orderId: event.orderId,
+      total: event.total
+    });
+    
+    await this.notificationsService.notifyAdmins({
+      type: 'new-order',
+      orderId: event.orderId,
+      message: `New order #${event.orderId} placed`
+    });
+  }
+}
+```
+
+## Workflow
+
+**Phase 1: Project Setup**
+
+Install NestJS CLI. Create project. Install dependencies. Configure TypeScript. Set up folder structure.
+
+**Phase 2: Core Modules**
+
+Create config module. Set up database. Create auth module. Set up logging.
+
+**Phase 3: Feature Modules**
+
+Create feature modules. Implement controllers. Implement services. Add DTOs and validation.
+
+**Phase 4: Cross-Cutting**
+
+Add guards. Add interceptors. Add pipes. Add exception filters.
+
+**Phase 5: Testing**
+
+Set up testing utilities. Write unit tests. Write e2e tests. Set up coverage.
+
+**Phase 6: Deployment**
+
+Build for production. Configure environment. Deploy. Set up monitoring.
+
+## Ví dụ
+
+**Ví dụ 1: CQRS Implementation**
+
+```typescript
+// orders.module.ts
+import { Module } from '@nestjs/common';
+import { CqrsModule } from '@nestjs/cqrs';
+import { OrdersController } from './orders.controller';
+import { OrdersService } from './orders.service';
+import { CreateOrderHandler, GetOrderHandler } from './commands';
+import { OrderRepository } from './repositories';
+
+@Module({
+  imports: [CqrsModule],
+  controllers: [OrdersController],
+  providers: [
+    OrdersService,
+    OrderRepository,
+    CreateOrderHandler,
+    GetOrderHandler
+  ]
+})
+export class OrdersModule {}
+```
+
+**Ví dụ 2: WebSocket Gateway**
+
+```typescript
+// modules/orders/orders.gateway.ts
+import {
+  WebSocketGateway,
+  WebSocketServer,
+  SubscribeMessage,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  ConnectedSocket,
+  MessageBody
+} from '@nestjs/websockets';
+import { Server, Socket } from 'socket.io';
+
+@WebSocketGateway({
+  cors: { origin: '*' },
+  namespace: '/orders'
+})
+export class OrdersGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  @WebSocketServer()
+  server!: Server;
+
+  handleConnection(client: Socket) {
+    console.log(`Client connected: ${client.id}`);
+  }
+
+  handleDisconnect(client: Socket) {
+    console.log(`Client disconnected: ${client.id}`);
+  }
+
+  @SubscribeMessage('joinOrderRoom')
+  handleJoinRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() orderId: string
+  ) {
+    client.join(`order:${orderId}`);
+    return { event: 'joinedRoom', data: { orderId } };
+  }
+
+  notifyOrderUpdated(orderId: string, data: any) {
+    this.server.to(`order:${orderId}`).emit('orderUpdated', data);
+  }
+}
+```
+
+## Liên kết
+
+- [[api]] - API design
+- [[typescript]] - TypeScript best practices
+- [[database]] - Database integration
+- [[microservice]] - Microservices patterns
+- [[testing]] - Testing NestJS applications
+- [[docker]] - Docker deployment
+- [[performance]] - Performance optimization

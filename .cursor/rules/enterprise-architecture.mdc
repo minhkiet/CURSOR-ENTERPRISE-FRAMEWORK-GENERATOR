@@ -1,0 +1,64 @@
+---
+description: Nguyên tắc Enterprise Architecture tổng quát
+created: 2026-06-23
+version: 1.0.0
+tags: [enterprise, architecture, design, patterns, framework]
+---
+
+# Enterprise Architecture
+
+## Mục tiêu
+
+Enterprise Architecture là ngành định hướng việc tổ chức, thiết kế, và quản lý các hệ thống công nghệ thông tin trong một tổ chức một cách chiến lược. Trong Cursor Enterprise Framework, Enterprise Architecture rule định nghĩa các nguyên tắc và framework cho việc thiết kế hệ thống phức tạp, đảm bảo alignment giữa business objectives và technology investments. Mục tiêu là tạo ra các hệ thống có thể scale, maintain, và evolve theo nhu cầu kinh doanh.
+
+Enterprise Architecture bao gồm nhiều domains: Business Architecture, Application Architecture, Data Architecture, và Technology Architecture. Rule này cover các nguyên tắc để ensure consistency across these domains và guide architectural decisions.
+
+## Nguyên tắc
+
+**1. Business-IT Alignment**
+
+Technology decisions phải support business objectives. Understand business capabilities. Map technology to business value. Prioritize based on business impact. Communicate in business terms. Measure technology value.
+
+**2. Architecture Principles**
+
+Establish clear architecture principles. Document and communicate. Enforce consistently. Review periodically. Balance flexibility vs. rigidity. Principles guide decisions.
+
+**3.分层 Architecture**
+
+Clear separation of concerns. Presentation layer. Business logic layer. Data access layer. Presentation không biết về data storage. Layers communicate via interfaces.
+
+**4. Modularity**
+
+Decompose into loosely coupled modules. Clear boundaries. Well-defined interfaces. Independent deployment. Team ownership. Reusable components.
+
+**5. Standards và Governance**
+
+Establish technology standards. Document architecture decisions. Architecture review board. Compliance tracking. Standards enable consistency. Balance with innovation.
+
+**6. Risk Management**
+
+Identify architectural risks. Assess and prioritize. Mitigation strategies. Monitor risks continuously. Accept, avoid, or transfer. Risk-informed decisions.
+
+**7. Future-Proofing**
+
+Design for change. Avoid vendor lock-in. Open standards preferred. Technology roadmap alignment. Scalability considerations. Evolution paths.
+
+**8. Integration Architecture**
+
+Integration patterns for connectivity. API management strategy. Event-driven integration. Data flow mapping. Legacy integration. B2B connectivity.
+
+**9. Data Architecture**
+
+Master data management. Data governance. Data quality. Analytics readiness. Data lineage. Privacy compliance.
+
+**10. Reference Architectures**
+
+Document reference architectures. Reusable patterns. Industry standards adaptation. Solution blueprints. Training assets.
+
+## Liên kết
+
+- [[clean-architecture]] - Clean Architecture
+- [[microservice]] - Microservices
+- [[monolith]] - Monolith
+- [[cqrs]] - CQRS
+- [[ddd]] - DDD

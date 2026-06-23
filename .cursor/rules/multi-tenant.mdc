@@ -1,0 +1,245 @@
+---
+description: Nguyên tắc Multi-Tenant Architecture cho SaaS applications
+created: 2026-06-23
+version: 1.0.0
+tags: [multi-tenant, saas, architecture, isolation, enterprise]
+---
+
+# Multi-Tenant
+
+## Mục tiêu
+
+Multi-Tenant Architecture là mô hình kiến trúc cho phép nhiều tenants (doanh nghiệp/khách hàng) chia sẻ cùng một infrastructure trong khi vẫn đảm bảo data isolation và security. Trong Cursor Enterprise Framework, multi-tenancy là nền tảng cho tất cả SaaS applications, đảm bảo rằng mỗi tenant có thể hoạt động độc lập mà không ảnh hưởng đến các tenants khác. Mục tiêu là hướng dẫn developers implement multi-tenancy một cách hiệu quả về cost và performance trong khi vẫn meet các security và compliance requirements.
+
+Việc lựa chọn đúng multi-tenancy model có implications về cost, performance, isolation level, và operational complexity. Rule này cover các models (shared database, separate schemas, separate databases), tenant identification và context management, data isolation strategies, và operational considerations.
+
+## Nguyên tắc
+
+**1. Tenant Identification**
+
+Extract tenant ID từ request context. JWT claims, subdomain, headers. Set tenant context early in request lifecycle. Make tenant ID immutable within transaction. Validate tenant exists và is active. Handle missing tenant gracefully.
+
+**2. Data Isolation**
+
+Enforce isolation at multiple layers. Database-level isolation (RLS, schemas). Application-level filtering. Query-level tenant scope. No cross-tenant data access. Audit all data access. Defense in depth.
+
+**3. Tenant Provisioning**
+
+Automated tenant creation. Idempotent provisioning. Resource allocation. Plan for tenant lifecycle. Handle upgrades/downgrades. Data migration support.
+
+**4. Resource Allocation**
+
+Fair resource sharing. Per-tenant limits. Rate limiting per tenant. Quota management. Resource quotas enforcement. Priority queuing.
+
+**5. Performance Isolation**
+
+Prevent noisy neighbor. Per-tenant caching. Connection pool management. CPU/memory limits. Query timeouts. Background job prioritization.
+
+**6. Security**
+
+Tenant-scoped authentication. Role-based access within tenant. Cross-tenant access prevention. Audit logging per tenant. Encryption per tenant. Compliance requirements.
+
+**7. Cost Optimization**
+
+Shared infrastructure costs. Efficient resource utilization. Tenant-based billing. Cost allocation. Usage tracking. Budget alerts.
+
+**8. Data Migration**
+
+Tenant data portability. Export/import capabilities. Data residency compliance. Retention policies. Deletion procedures. Migration tooling.
+
+**9. Monitoring**
+
+Per-tenant metrics. Tenant health scores. Usage analytics. Anomaly detection. SLA tracking. Cost tracking.
+
+**10. Disaster Recovery**
+
+Per-tenant backup strategies. Point-in-time recovery. Tenant-level restore. Backup verification. DR testing per tenant.
+
+## Checklist
+
+- [ ] Tenant identification implemented
+- [ ] Data isolation enforced at all levels
+- [ ] Tenant provisioning automated
+- [ ] Resource allocation configured
+- [ ] Security controls in place
+- [ ] Cost tracking set up
+- [ ] Monitoring per tenant
+- [ ] Backup strategy defined
+- [ ] Migration tools available
+- [ ] Documentation complete
+
+## Anti Pattern
+
+**1. Missing Tenant Filter**
+
+Queries without tenant_id. Data leakage. Solution: RLS + middleware.
+
+**2. Shared Admin Account**
+
+One admin for all tenants. No isolation. Solution: Tenant-scoped auth.
+
+**3. No Resource Limits**
+
+Tenant consuming all resources. Solution: Per-tenant quotas.
+
+**4. Ignoring Tenant Lifecycle**
+
+Orphaned data. Zombie tenants. Solution: Lifecycle management.
+
+## Best Practice
+
+**1. Tenant Middleware**
+
+```typescript
+// Tenant context middleware
+app.use(async (req, res, next) => {
+  // Extract tenant from JWT
+  const token = req.headers.authorization?.split(' ')[1];
+  const decoded = jwt.decode(token);
+  
+  req.tenant = {
+    id: decoded.tenant_id,
+    plan: decoded.plan,
+    region: decoded.region
+  };
+  
+  // Set database search path
+  await db.query(`SET app.current_tenant = '${req.tenant.id}'`);
+  
+  next();
+});
+
+// RLS policy example
+create policy tenant_isolation on users
+for all using (tenant_id = current_setting('app.current_tenant')::uuid);
+```
+
+**2. Tenant-Scoped Repository**
+
+```typescript
+class TenantRepository<T> {
+  constructor(
+    private readonly db: Database,
+    private readonly tableName: string
+  ) {}
+  
+  async findAll(tenantId: string): Promise<T[]> {
+    return this.db.query(
+      `SELECT * FROM ${this.tableName} WHERE tenant_id = $1`,
+      [tenantId]
+    );
+  }
+  
+  async create(tenantId: string, data: Partial<T>): Promise<T> {
+    return this.db.query(
+      `INSERT INTO ${this.tableName} (tenant_id, ...) VALUES ($1, ...)`,
+      [tenantId, ...]
+    );
+  }
+  
+  async findById(tenantId: string, id: string): Promise<T | null> {
+    return this.db.query(
+      `SELECT * FROM ${this.tableName} WHERE tenant_id = $1 AND id = $2`,
+      [tenantId, id]
+    );
+  }
+}
+
+// Usage
+const userRepo = new TenantRepository<User>(db, 'users');
+const user = await userRepo.findById(req.tenant.id, userId);
+```
+
+**3. Per-Tenant Quotas**
+
+```typescript
+interface TenantQuota {
+  maxUsers: number;
+  maxStorage: number;
+  maxApiCalls: number;
+  maxRecords: number;
+}
+
+async function checkQuota(tenantId: string, resource: string): Promise<boolean> {
+  const quota = await getTenantQuota(tenantId);
+  const usage = await getCurrentUsage(tenantId, resource);
+  
+  switch (resource) {
+    case 'users':
+      return usage < quota.maxUsers;
+    case 'storage':
+      return usage < quota.maxStorage;
+    case 'apiCalls':
+      return usage < quota.maxApiCalls;
+  }
+}
+
+// Rate limiting per tenant
+const tenantRateLimiter = rateLimit({
+  keyGenerator: (req) => req.tenant.id,
+  windowMs: 15 * 60 * 1000,
+  max: (req) => req.tenant.plan === 'enterprise' ? 10000 : 1000
+});
+```
+
+**4. Tenant Provisioning**
+
+```typescript
+async function provisionTenant(
+  data: {
+    name: string;
+    plan: 'free' | 'pro' | 'enterprise';
+    region: string;
+  }
+): Promise<Tenant> {
+  const tenantId = generateUUID();
+  
+  // Create tenant record
+  await db.tenants.create({
+    id: tenantId,
+    name: data.name,
+    plan: data.plan,
+    status: 'provisioning'
+  });
+  
+  // Create default data
+  await Promise.all([
+    createDefaultPipeline(tenantId),
+    createDefaultTags(tenantId),
+    createDefaultSettings(tenantId, data.region)
+  ]);
+  
+  // Update status
+  await db.tenants.update(tenantId, { status: 'active' });
+  
+  // Send welcome email
+  await queue.dispatch('send-welcome-email', { tenantId });
+  
+  return getTenant(tenantId);
+}
+```
+
+## Workflow
+
+**Phase 1: Design**
+
+Choose isolation model. Design data model. Plan tenant lifecycle.
+
+**Phase 2: Implementation**
+
+Implement tenant context. Add RLS policies. Build provisioning.
+
+**Phase 3: Testing**
+
+Test isolation. Test quotas. Test provisioning.
+
+**Phase 4: Deployment**
+
+Configure. Monitor. Iterate.
+
+## Liên kết
+
+- [[rls]] - RLS: Row Level Security
+- [[supabase]] - Supabase: Supabase multi-tenancy
+- [[security]] - Security: Security patterns
+- [[cost-optimization]] - Cost Optimization: Cost management

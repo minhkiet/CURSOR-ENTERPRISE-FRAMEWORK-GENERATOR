@@ -1,0 +1,50 @@
+---
+description: Nguyên tắc và best practices cho Kubernetes Orchestration
+created: 2026-06-23
+version: 1.0.0
+tags: [kubernetes, k8s, orchestration, containers, enterprise]
+---
+
+# Kubernetes
+
+## Mục tiêu
+
+Kubernetes là container orchestration platform cho phép deployment, scaling, và management của containerized applications. Trong Cursor Enterprise Framework, Kubernetes được sử dụng cho production deployments đòi hỏi high availability, auto-scaling, và advanced deployment strategies. Mục tiêu là hướng dẫn developers configure và operate Kubernetes clusters hiệu quả.
+
+Kubernetes cung cấp powerful capabilities nhưng cũng introduce complexity. Rule này cover resource management, deployment strategies, networking, và operational best practices.
+
+## Nguyên tắc
+
+**1. Resource Management**
+
+Define resource requests và limits. Horizontal pod autoscaling. Memory và CPU optimization. Resource quotas.
+
+**2. Deployment Strategies**
+
+Rolling deployments. Blue-green deployments. Canary releases. Progress deadlines.
+
+**3. Health Probes**
+
+Liveness probes. Readiness probes. Startup probes. Proper configuration.
+
+**4. Service Networking**
+
+Services và endpoints. Ingress configuration. Network policies. DNS resolution.
+
+**5. Storage**
+
+Persistent volumes. Storage classes. Volume snapshots. Data persistence.
+
+**6. Security**
+
+RBAC configuration. Pod security policies. Secrets management. Network policies.
+
+**7. Monitoring**
+
+Metrics collection. Log aggregation. Distributed tracing. Alert configuration.
+
+## Liên kết
+
+- [[docker]] - Docker
+- [[monitoring]] - Monitoring
+- [[deployment]] - Deployment

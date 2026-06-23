@@ -1,0 +1,63 @@
+---
+description: Nguyên tắc Domain-Driven Design cho complex business logic
+created: 2026-06-23
+version: 1.0.0
+tags: [ddd, domain, design, aggregate, bounded-context, enterprise]
+---
+
+# DDD
+
+## Mục tiêu
+
+Domain-Driven Design (DDD) là một cách tiếp cận software development tập trung vào việc hiểu và model domain business một cách sâu sắc. Trong Cursor Enterprise Framework, DDD được sử dụng cho các ứng dụng có business logic phức tạp, nơi mà việc align giữa code và business language là critical. Mục tiêu là hướng dẫn developers apply DDD patterns để create maintainable, expressive, và business-aligned code.
+
+DDD đặc biệt phù hợp cho complex domains nơi mà Ubiquitous Language, bounded contexts, và aggregate boundaries giúp manage complexity. Rule này cover strategic và tactical DDD patterns, aggregate design, value objects, domain events, và integration patterns.
+
+## Nguyên tắc
+
+**1. Ubiquitous Language**
+
+Shared language giữa domain experts và developers. Terms được sử dụng consistently trong code, conversations, và documentation. Model ngôn ngữ trong code structure. Avoid technical jargon trong domain models. Language evolves collaboratively. Clear, unambiguous terms.
+
+**2. Bounded Contexts**
+
+Clear boundaries cho different subdomains. Each context có its own model. Context mapping relationships. Anticorruption layers. Published languages. Shared kernels where appropriate.
+
+**3. Aggregates**
+
+Cluster related entities và value objects. Aggregate root controls access. Invariants được enforced at aggregate level. Reference aggregates by ID only. Boundaries define transaction scope. Small aggregates, large systems.
+
+**4. Entities vs Value Objects**
+
+Entities có identity, được so sánh bằng ID. Value Objects immutable, so sánh bằng value. Value Objects describe characteristics. Prefer value objects over entities where possible. Entities own relationships. Immutable where possible.
+
+**5. Domain Events**
+
+Capture significant domain occurrences. Events immutable. Include relevant data. Name in past tense. Published for external consumption. Event sourcing stores events.
+
+**6. Repositories**
+
+Represent collection-like access to aggregates. Encapsulate persistence logic. Only query by identity và specifications. Don't expose IQueryable. One repository per aggregate. Abstract persistence.
+
+**7. Domain Services**
+
+Operations không thuộc về any entity or value object. Stateless services. Orchestrate multiple aggregates. Thin application services, rich domain. Avoid anemic domain models.
+
+**8. Application Services**
+
+Orchestrate domain objects. Coordinate use cases. Transaction boundaries. Security concerns. Don't contain business logic. Thin, workflow-oriented.
+
+**9. Factory Methods**
+
+Create complex objects và aggregates. Encapsulate creation logic. Factory methods on aggregates. Static factory methods. Keep creation testable. Abstract factory for testing.
+
+**10. Anticorruption Layer**
+
+Translate between bounded contexts. Protect domain model. Convert external formats. Isolate legacy systems. Adapters for integration.
+
+## Liên kết
+
+- [[cqrs]] - CQRS Pattern
+- [[clean-architecture]] - Clean Architecture
+- [[microservice]] - Microservices
+- [[ddd-repository]] - Repository Pattern

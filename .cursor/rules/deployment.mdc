@@ -1,0 +1,937 @@
+---
+description: Nguyên tắc và best practices cho deployment trong Cursor Enterprise Framework
+created: 2026-06-23
+version: 1.0.0
+tags: [deployment, ci-cd, release, rollback, infrastructure]
+---
+
+# Deployment
+
+## Mục tiêu
+
+Deployment là quá trình đưa code từ development environment đến production, nơi users có thể interact với nó. Một deployment strategy tốt đảm bảo rằng changes được delivered safely, reliably, và with minimal disruption. Trong Cursor Enterprise Framework, deployment không chỉ là "push code" mà là một structured process bao gồm infrastructure provisioning, configuration management, security hardening, và operational readiness.
+
+Mục tiêu là enable frequent, reliable deployments with confidence. Teams nên có thể deploy multiple times per day without fear. Điều này đòi hỏi automation, proper testing, good monitoring, và well-defined rollback procedures.
+
+## Nguyên tắc
+
+**1. Automate Everything**
+
+Manual deployments are error-prone. Automate the entire deployment pipeline. From code commit to production. Infrastructure as code. Configuration as code. Scripts should be version controlled.
+
+**2. Infrastructure as Code**
+
+Define infrastructure in code. Use Terraform, Pulumi, or CloudFormation. Version control infrastructure. Review infrastructure changes. Environments should be identical. Reproducible infrastructure.
+
+**3. Immutable Infrastructure**
+
+Never modify running servers. Deploy new instances with new code. Destroy old instances. Immutable deployments reduce drift. Easier rollbacks. Consistent environments.
+
+**4. Blue-Green Deployments**
+
+Run two identical environments. Blue is current production. Green is new version. Switch traffic when green is ready. Instant rollback by switching back. Zero downtime deployments possible.
+
+**5. Canary Releases**
+
+Deploy to small subset of users first. Monitor for issues. Gradually increase traffic. Roll back if problems detected. Reduces blast radius. Data-driven release decisions.
+
+**6. Feature Flags**
+
+Decouple deployment from release. Deploy code that's disabled. Enable features gradually. Instant kill switch. A/B testing capability. Emergency disable.
+
+**7. Zero Downtime Deployments**
+
+Design for continuous availability. Use rolling updates. Health checks before traffic switch. Load balancer integration. Handle in-flight requests. Never force kill requests.
+
+**8. Rollback Ready**
+
+Always have rollback plan. Test rollback procedures. Keep previous versions deployable. Database migrations must be reversible. Document rollback steps. Practice rollbacks regularly.
+
+**9. Environment Parity**
+
+Development should mirror production. Use same infrastructure. Same configurations. Same versions. Local development vs production parity. Reduces "works on my machine" issues.
+
+**10. Deployment Verification**
+
+Verify deployments automatically. Health checks. Smoke tests. Synthetic monitoring. Alert on deployment failures. Automated rollback on failure.
+
+## Checklist
+
+- [ ] CI/CD pipeline configured
+- [ ] Infrastructure as code implemented
+- [ ] Environments defined (dev, staging, prod)
+- [ ] Deployment strategy selected (blue-green, canary, rolling)
+- [ ] Rollback procedures documented
+- [ ] Health checks configured
+- [ ] Automated smoke tests on deployment
+- [ ] Feature flags system in place
+- [ ] Monitoring dashboards for deployments
+- [ ] Deployment runbooks complete
+- [ ] On-call trained on deployments
+- [ ] Database migration strategy defined
+
+## Anti Pattern
+
+**1. Manual Deployments**
+
+Deploying manually by logging into servers. Error-prone process. Not repeatable. No audit trail. No easy rollback. Leads to "works on my machine" issues.
+
+**2. Big Bang Releases**
+
+Deploying many changes at once. Hard to identify cause of issues. Long development cycles. Difficult rollback. High risk. Instead, deploy small changes frequently.
+
+**3. No Testing Before Production**
+
+Deploying without proper testing. Only testing in production. Users discover bugs. Reputation damage. Test thoroughly before deployment.
+
+**4. Configuration Drift**
+
+Different configurations across environments. Subtle bugs appear. Hard to reproduce issues. Configuration management is essential.
+
+**5. Long-Lived Branches**
+
+Feature branches that live for weeks. Merge hell at release time. Integrate frequently. Use trunk-based development.
+
+## Best Practice
+
+**1. GitOps Deployment**
+
+```yaml
+# Kubernetes GitOps with ArgoCD
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: order-service
+  namespace: argocd
+spec:
+  project: production
+  source:
+    repoURL: https://github.com/example/order-service
+    targetRevision: HEAD
+    path: deploy/k8s/production
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: order-service
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+```
+
+```yaml
+# Helm values for production
+# deploy/k8s/production/values.yaml
+replicaCount: 3
+
+image:
+  repository: ghcr.io/example/order-service
+  tag: "{{ .Values.image.tag }}"
+  pullPolicy: IfNotPresent
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+env:
+  - name: NODE_ENV
+    value: production
+  - name: LOG_LEVEL
+    value: info
+  - name: DATABASE_POOL_SIZE
+    value: "20"
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: api.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: order-service-tls
+      hosts:
+        - api.example.com
+
+probes:
+  liveness:
+    path: /health/live
+    initialDelaySeconds: 30
+    periodSeconds: 10
+  readiness:
+    path: /health/ready
+    initialDelaySeconds: 5
+    periodSeconds: 5
+```
+
+**2. Deployment Pipeline**
+
+```yaml
+# GitHub Actions deployment pipeline
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run tests
+        run: npm test
+      
+      - name: Run linting
+        run: npm run lint
+      
+      - name: Security audit
+        run: npm audit --audit-level=high
+  
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+      
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+  
+  deploy-staging:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: staging
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy to staging
+        run: |
+          helm upgrade --install order-service ./deploy/helm \
+            --namespace staging \
+            --set image.tag=${{ needs.build.outputs.image-tag }} \
+            --values ./deploy/helm/values-staging.yaml \
+            --wait --timeout 5m
+      
+      - name: Run smoke tests
+        run: |
+          npm run test:smoke -- --env=staging
+  
+  deploy-production:
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy to production (Blue-Green)
+        run: |
+          # Deploy to green environment
+          helm upgrade --install order-service-green ./deploy/helm \
+            --namespace production \
+            --set image.tag=${{ needs.build.outputs.image-tag }} \
+            --values ./deploy/helm/values-production.yaml \
+            --wait --timeout 10m
+          
+          # Wait for health checks
+          kubectl rollout status deployment/order-service-green -n production
+          
+          # Switch traffic (blue-green switch)
+          kubectl patch service order-service \
+            -n production \
+            -p '{"spec":{"selector":{"version":"green"}}}'
+          
+          # Scale down blue
+          kubectl scale deployment/order-service-blue \
+            --replicas=0 -n production
+      
+      - name: Verify deployment
+        run: |
+          curl -f https://api.example.com/health || exit 1
+      
+      - name: Notify success
+        if: success()
+        run: |
+          echo "Deployment successful" | slack-notify
+```
+
+**3. Database Migration Strategy**
+
+```typescript
+// Migration runner with rollback support
+class MigrationRunner {
+  constructor(
+    private db: Database,
+    private logger: Logger
+  ) {}
+  
+  async runPendingMigrations(): Promise<MigrationResult> {
+    const applied = await this.getAppliedMigrations();
+    const pending = await this.getPendingMigrations(applied);
+    
+    const results: MigrationResult[] = [];
+    
+    for (const migration of pending) {
+      const result = await this.runMigration(migration);
+      results.push(result);
+      
+      if (!result.success) {
+        // Stop on first failure
+        await this.handleMigrationFailure(migration, results);
+        break;
+      }
+    }
+    
+    return this.summarizeResults(results);
+  }
+  
+  private async runMigration(
+    migration: Migration
+  ): Promise<MigrationResult> {
+    this.logger.info(`Running migration: ${migration.name}`);
+    
+    const startTime = Date.now();
+    
+    try {
+      await this.db.transaction(async (tx) => {
+        // Record migration start
+        await tx.execute(`
+          INSERT INTO schema_migrations (name, started_at)
+          VALUES (?, NOW())
+        `, [migration.name]);
+        
+        // Run up migration
+        await migration.up(tx);
+        
+        // Mark as completed
+        await tx.execute(`
+          UPDATE schema_migrations
+          SET completed_at = NOW()
+          WHERE name = ?
+        `, [migration.name]);
+      });
+      
+      return {
+        name: migration.name,
+        success: true,
+        duration: Date.now() - startTime
+      };
+    } catch (error) {
+      return {
+        name: migration.name,
+        success: false,
+        error: error.message,
+        duration: Date.now() - startTime
+      };
+    }
+  }
+  
+  async rollback(migrationName: string): Promise<void> {
+    const migration = await this.getMigration(migrationName);
+    
+    if (!migration) {
+      throw new Error(`Migration ${migrationName} not found`);
+    }
+    
+    if (!migration.completedAt) {
+      throw new Error(`Migration ${migrationName} not completed`);
+    }
+    
+    await this.db.transaction(async (tx) => {
+      await migration.down(tx);
+      
+      await tx.execute(`
+        DELETE FROM schema_migrations WHERE name = ?
+      `, [migrationName]);
+    });
+  }
+}
+
+// Example migration
+export class AddOrdersTable20240115 implements Migration {
+  name = '20240115_add_orders_table';
+  
+  async up(tx: Transaction): Promise<void> {
+    await tx.execute(`
+      CREATE TABLE orders (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        customer_id UUID NOT NULL REFERENCES customers(id),
+        status VARCHAR(50) NOT NULL DEFAULT 'pending',
+        total DECIMAL(10, 2) NOT NULL,
+        shipping_address JSONB NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    
+    await tx.execute(`
+      CREATE INDEX idx_orders_customer_id ON orders(customer_id)
+    `);
+    
+    await tx.execute(`
+      CREATE INDEX idx_orders_status ON orders(status)
+    `);
+  }
+  
+  async down(tx: Transaction): Promise<void> {
+    await tx.execute(`DROP TABLE orders CASCADE`);
+  }
+}
+```
+
+**4. Blue-Green Deployment Script**
+
+```bash
+#!/bin/bash
+# deploy-blue-green.sh
+
+set -euo pipefail
+
+DEPLOYMENT_NAME="order-service"
+NAMESPACE="production"
+BLUE_DEPLOYMENT="${DEPLOYMENT_NAME}-blue"
+GREEN_DEPLOYMENT="${DEPLOYMENT_NAME}-green"
+SERVICE_NAME="${DEPLOYMENT_NAME}"
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+log() {
+    echo -e "${GREEN}[$(date +'%Y-%m-%d %H:%M:%S')]${NC} $1"
+}
+
+warn() {
+    echo -e "${YELLOW}[$(date +'%Y-%m-%d %H:%M:%S')] WARNING:${NC} $1"
+}
+
+error() {
+    echo -e "${RED}[$(date +'%Y-%m-%d %H:%M:%S')] ERROR:${NC} $1"
+}
+
+# Check prerequisites
+check_prerequisites() {
+    log "Checking prerequisites..."
+    
+    command -v kubectl >/dev/null 2>&1 || { error "kubectl is required"; exit 1; }
+    command -v helm >/dev/null 2>&1 || { error "helm is required"; exit 1; }
+    
+    kubectl can-i create deployment -n "$NAMESPACE" || { error "Insufficient permissions"; exit 1; }
+}
+
+# Get current active deployment
+get_active_deployment() {
+    kubectl get service "$SERVICE_NAME" -n "$NAMESPACE" \
+        -o jsonpath='{.spec.selector.version}' 2>/dev/null || echo "blue"
+}
+
+# Deploy to inactive environment
+deploy_to_environment() {
+    local target_env=$1
+    local image_tag=$2
+    
+    log "Deploying to ${target_env} environment with image tag ${image_tag}..."
+    
+    helm upgrade --install "${DEPLOYMENT_NAME}-${target_env}" ./deploy/helm \
+        --namespace "$NAMESPACE" \
+        --set image.tag="$image_tag" \
+        --set replicaCount=2 \
+        --set nameOverride="${DEPLOYMENT_NAME}-${target_env}" \
+        --values ./deploy/helm/values-production.yaml \
+        --wait --timeout 10m
+    
+    log "Waiting for rollout..."
+    kubectl rollout status "deployment/${DEPLOYMENT_NAME}-${target_env}" -n "$NAMESPACE"
+}
+
+# Run smoke tests
+run_smoke_tests() {
+    local target_env=$1
+    
+    log "Running smoke tests against ${target_env}..."
+    
+    local endpoint=$(kubectl get ingress "${DEPLOYMENT_NAME}-${target_env}" \
+        -n "$NAMESPACE" -o jsonpath='{.spec.rules[0].host}')
+    
+    if ! curl -sf "https://${endpoint}/health"; then
+        error "Smoke tests failed for ${target_env}"
+        return 1
+    fi
+    
+    log "Smoke tests passed"
+}
+
+# Switch traffic
+switch_traffic() {
+    local from_env=$1
+    local to_env=$2
+    
+    log "Switching traffic from ${from_env} to ${to_env}..."
+    
+    kubectl patch service "$SERVICE_NAME" -n "$NAMESPACE" \
+        -p "{\"spec\":{\"selector\":{\"version\":\"${to_env}\"}}}"
+    
+    sleep 5
+    
+    log "Traffic switched"
+}
+
+# Main deployment process
+main() {
+    local image_tag="${1:-latest}"
+    
+    check_prerequisites
+    
+    local active_env=$(get_active_deployment)
+    local inactive_env=$([[ "$active_env" == "blue" ]] && echo "green" || echo "blue")
+    
+    log "Current active environment: ${active_env}"
+    log "Deploying to inactive environment: ${inactive_env}"
+    
+    # Deploy to inactive environment
+    deploy_to_environment "$inactive_env" "$image_tag"
+    
+    # Run smoke tests
+    if ! run_smoke_tests "$inactive_env"; then
+        error "Smoke tests failed. Rolling back deployment."
+        kubectl delete deployment "${DEPLOYMENT_NAME}-${inactive_env}" -n "$NAMESPACE"
+        exit 1
+    fi
+    
+    # Switch traffic
+    switch_traffic "$active_env" "$inactive_env"
+    
+    # Scale down old environment (keep 0 replicas for instant rollback)
+    log "Scaling down ${active_env} environment..."
+    kubectl scale deployment "${DEPLOYMENT_NAME}-${active_env}" --replicas=0 -n "$NAMESPACE"
+    
+    log "Deployment completed successfully!"
+    log "Previous version: ${active_env}"
+    log "Current version: ${inactive_env}"
+    
+    # Rollback instructions
+    echo ""
+    echo "To rollback:"
+    echo "  kubectl patch service ${SERVICE_NAME} -n ${NAMESPACE} -p '{\"spec\":{\"selector\":{\"version\":\"${active_env}\"}}}'"
+    echo "  kubectl scale deployment ${DEPLOYMENT_NAME}-${inactive_env} --replicas=0 -n ${NAMESPACE}"
+    echo "  kubectl scale deployment ${DEPLOYMENT_NAME}-${active_env} --replicas=2 -n ${NAMESPACE}"
+}
+
+main "$@"
+```
+
+**5. Feature Flag Deployment**
+
+```typescript
+// Feature flag management for deployments
+interface FeatureFlagConfig {
+  flags: Record<string, FeatureFlag>;
+  rolloutPercentage: Record<string, number>;
+  userOverrides: Record<string, boolean>;
+}
+
+interface FeatureFlag {
+  enabled: boolean;
+  rolloutPercentage: number;
+  conditions?: FlagCondition[];
+}
+
+class FeatureFlagService {
+  constructor(
+    private config: FeatureFlagConfig,
+    private userRepository: UserRepository,
+    private analytics: AnalyticsService
+  ) {}
+  
+  async isEnabled(
+    flagName: string,
+    context: FlagContext
+  ): Promise<boolean> {
+    const flag = this.config.flags[flagName];
+    
+    if (!flag) {
+      return false;
+    }
+    
+    // Check user override
+    if (context.userId && this.config.userOverrides[`${flagName}:${context.userId}`] !== undefined) {
+      return this.config.userOverrides[`${flagName}:${context.userId}`];
+    }
+    
+    // Check conditions
+    if (flag.conditions) {
+      const allConditionsMet = flag.conditions.every(
+        condition => this.evaluateCondition(condition, context)
+      );
+      
+      if (!allConditionsMet) {
+        return false;
+      }
+    }
+    
+    // Check rollout percentage
+    if (flag.enabled && flag.rolloutPercentage < 100) {
+      const shouldRollout = this.shouldRollout(
+        flagName,
+        context.userId || context.sessionId
+      );
+      
+      // Track feature flag exposure
+      this.analytics.track('feature_flag_exposure', {
+        flag: flagName,
+        enabled: shouldRollout,
+        percentage: flag.rolloutPercentage
+      });
+      
+      return shouldRollout;
+    }
+    
+    return flag.enabled;
+  }
+  
+  private shouldRollout(flagName: string, identifier: string): boolean {
+    // Consistent hashing for same user always gets same result
+    const hash = this.hash(`${flagName}:${identifier}`);
+    const bucket = hash % 100;
+    
+    return bucket < this.config.flags[flagName].rolloutPercentage;
+  }
+  
+  async enableForUser(flagName: string, userId: string): Promise<void> {
+    this.config.userOverrides[`${flagName}:${userId}`] = true;
+    await this.persistOverride(flagName, userId, true);
+  }
+}
+
+// Middleware for feature flag access
+function featureFlagMiddleware(
+  flagName: string,
+  handler: RequestHandler
+): RequestHandler {
+  return async (req, res, next) => {
+    const isEnabled = await featureFlagService.isEnabled(flagName, {
+      userId: req.user?.id,
+      sessionId: req.sessionId,
+      ip: req.ip,
+      userAgent: req.headers['user-agent']
+    });
+    
+    if (!isEnabled) {
+      return res.status(404).json({
+        error: 'Not found',
+        message: 'This feature is not available'
+      });
+    }
+    
+    next();
+  };
+}
+
+// Usage in routes
+app.post('/api/new-checkout',
+  featureFlagMiddleware('new-checkout-flow'),
+  checkoutController.process
+);
+```
+
+## Workflow
+
+**Phase 1: Pre-Deployment**
+
+Code review completed. All tests passing. Security review done. Stakeholder approval. Rollback plan prepared. Monitoring alerts configured.
+
+**Phase 2: Build**
+
+Compile code. Run tests. Build artifacts. Security scan. Container build. Push to registry.
+
+**Phase 3: Deploy to Staging**
+
+Deploy to staging environment. Run integration tests. Run smoke tests. Performance tests. Security tests.
+
+**Phase 4: Production Deployment**
+
+Deploy to production. Blue-green or canary strategy. Monitor metrics. Watch for errors. Alert on anomalies.
+
+**Phase 5: Post-Deployment**
+
+Verify deployment. Update documentation. Notify stakeholders. Monitor for 24 hours. Document lessons learned.
+
+**Phase 6: Rollback (if needed)**
+
+Detect issue. Execute rollback. Verify rollback. Post-mortem. Fix issues. Redeploy.
+
+## Ví dụ
+
+**Ví dụ 1: Kubernetes Rolling Update**
+
+```yaml
+# Rolling update configuration
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  namespace: production
+spec:
+  replicas: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1        # Allow 1 extra pod during update
+      maxUnavailable: 0  # Always maintain 5 pods
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+        version: v2
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+      - name: order-service
+        image: order-service:v2
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 10"]
+```
+
+**Ví dụ 2: Helm Chart with Smart Defaults**
+
+```yaml
+# values.yaml with environment-aware defaults
+# Development
+env: &env_development
+  replicas: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  autoscaling:
+    enabled: false
+
+# Staging
+staging: &env_staging
+  replicas: 2
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+
+# Production
+production: &env_production
+  replicas: 5
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 5
+    maxReplicas: 20
+    targetCPUUtilizationPercentage: 60
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 3
+
+# Default to development
+default: *env_development
+```
+
+**Ví dụ 3: Deployment Verification Checks**
+
+```typescript
+// Automated deployment verification
+class DeploymentVerifier {
+  constructor(
+    private k8sClient: KubernetesClient,
+    private metricsClient: MetricsClient
+  ) {}
+  
+  async verifyDeployment(
+    deploymentName: string,
+    namespace: string
+  ): Promise<VerificationResult> {
+    const checks: Check[] = [];
+    
+    // Check 1: All replicas are ready
+    checks.push(await this.checkReplicaCount(deploymentName, namespace));
+    
+    // Check 2: No pod restarts
+    checks.push(await this.checkPodRestarts(deploymentName, namespace));
+    
+    // Check 3: Health endpoints respond
+    checks.push(await this.checkHealthEndpoints(deploymentName, namespace));
+    
+    // Check 4: Error rate is normal
+    checks.push(await this.checkErrorRate(deploymentName));
+    
+    // Check 5: Latency is acceptable
+    checks.push(await this.checkLatency(deploymentName));
+    
+    // Check 6: All pods are scheduled
+    checks.push(await this.checkPodScheduling(deploymentName, namespace));
+    
+    return {
+      passed: checks.every(c => c.passed),
+      checks,
+      timestamp: new Date()
+    };
+  }
+  
+  private async checkReplicaCount(
+    name: string,
+    namespace: string
+  ): Promise<Check> {
+    const deployment = await this.k8sClient.appsV1.readNamespacedDeployment(
+      name,
+      namespace
+    );
+    
+    const ready = deployment.status?.readyReplicas || 0;
+    const desired = deployment.spec?.replicas || 0;
+    
+    return {
+      name: 'Replica Count',
+      passed: ready === desired,
+      message: `${ready}/${desired} replicas ready`,
+      severity: 'critical'
+    };
+  }
+  
+  private async checkErrorRate(deploymentName: string): Promise<Check> {
+    const metrics = await this.metricsClient.query({
+      metric: 'http_requests_total',
+      filters: {
+        deployment: deploymentName,
+        status: '5xx'
+      },
+      aggregation: 'rate',
+      window: '5m'
+    });
+    
+    const errorRate = metrics.value;
+    const threshold = 0.01; // 1%
+    
+    return {
+      name: 'Error Rate',
+      passed: errorRate < threshold,
+      message: `Error rate: ${(errorRate * 100).toFixed(2)}%`,
+      severity: 'critical'
+    };
+  }
+}
+```
+
+## Liên kết
+
+- [[ci-cd]] - CI/CD pipelines
+- [[docker]] - Container deployment
+- [[kubernetes]] - Kubernetes deployment
+- [[monitoring]] - Deployment monitoring
+- [[incident-response]] - Deployment incident handling
+- [[rollback]] - Rollback procedures
+- [[feature-flags]] - Feature flag deployment

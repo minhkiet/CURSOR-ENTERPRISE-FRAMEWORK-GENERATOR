@@ -1,0 +1,900 @@
+---
+description: Review AI/ML integration implementation bao gồm model selection, API integration, prompt engineering, và reliability
+purpose: Conduct comprehensive AI integration reviews cho accuracy, reliability, và cost optimization
+input: AI integration code, prompt templates, model configurations, API implementations
+output: AI review report, prompt optimization suggestions, reliability improvements
+version: 1.0.0
+tags: [ai, ml, llm, openai, anthropic, prompt-engineering, embeddings, rag, chatgpt]
+---
+
+# AI Integration Review Skill - Kiểm Toán AI Integration Implementation
+
+## Tổng quan
+
+AI integration đòi hỏi careful planning cho model selection, prompt design, và reliability. Skill này cung cấp framework để review AI implementations, đảm bảo accuracy, cost efficiency, và proper error handling.
+
+## Purpose (Mục đích)
+
+AI Integration Review Skill được thiết kế để:
+
+1. **Model Selection**: Choose appropriate AI models
+2. **Prompt Engineering**: Optimize prompts for accuracy
+3. **API Integration**: Review AI API usage patterns
+4. **Error Handling**: Implement robust error recovery
+5. **Cost Optimization**: Minimize API costs
+6. **Safety Review**: Check for hallucinations và bias
+
+### Khi nào sử dụng AI Integration Review
+
+- Khi reviewing AI-powered features
+- Khi optimizing prompt performance
+- Khi auditing AI costs
+- Khi implementing RAG systems
+- Khi setting up AI guardrails
+- Khi evaluating model accuracy
+
+## Input (Đầu vào)
+
+- [ ] AI integration code
+- [ ] Prompt templates
+- [ ] Model configurations
+- [ ] API usage patterns
+- [ ] Error handling implementation
+
+## Output (Đầu ra)
+
+- [ ] Prompt optimization report
+- [ ] Model selection recommendations
+- [ ] Cost analysis
+- [ ] Reliability improvements
+- [ ] Safety recommendations
+
+## Workflow (Quy trình)
+
+### Phase 1: Model Selection Review
+
+### Bước 1: Model Comparison
+
+```typescript
+// Good: Model selection based on use case
+interface ModelConfig {
+  model: string;
+  provider: 'openai' | 'anthropic' | 'google' | 'local';
+  maxTokens: number;
+  temperature: number;
+  useCase: string;
+}
+
+// Model selection matrix
+const modelConfigs: Record<string, ModelConfig> = {
+  // High accuracy, complex reasoning
+  gpt4Turbo: {
+    model: 'gpt-4-turbo',
+    provider: 'openai',
+    maxTokens: 4096,
+    temperature: 0.7,
+    useCase: 'Complex reasoning, code generation, analysis'
+  },
+  
+  // Balanced performance/cost
+  gpt35Turbo: {
+    model: 'gpt-3.5-turbo',
+    provider: 'openai',
+    maxTokens: 4096,
+    temperature: 0.7,
+    useCase: 'Simple tasks, chat, classification'
+  },
+  
+  // Claude for long context
+  claude3Opus: {
+    model: 'claude-3-opus-20240229',
+    provider: 'anthropic',
+    maxTokens: 4096,
+    temperature: 0.7,
+    useCase: 'Long documents, research, complex analysis'
+  },
+  
+  // Fast responses
+  claude3Haiku: {
+    model: 'claude-3-haiku-20240307',
+    provider: 'anthropic',
+    maxTokens: 4096,
+    temperature: 0.7,
+    useCase: 'Quick classifications, simple tasks'
+  },
+  
+  // Code specialized
+  gpt4Code: {
+    model: 'gpt-4-0125-preview',
+    provider: 'openai',
+    maxTokens: 8192,
+    temperature: 0.2,
+    useCase: 'Code generation, debugging, explanations'
+  }
+};
+
+// Model selector
+export function selectModel(useCase: string, requirements: {
+  accuracy?: 'high' | 'medium' | 'low';
+  latency?: 'fast' | 'medium' | 'slow';
+  cost?: 'high' | 'medium' | 'low';
+}): ModelConfig {
+  switch (useCase) {
+    case 'code-generation':
+      return modelConfigs.gpt4Code;
+      
+    case 'document-analysis':
+      return requirements.cost === 'low' 
+        ? modelConfigs.claude3Opus 
+        : modelConfigs.gpt4Turbo;
+        
+    case 'simple-classification':
+      return modelConfigs.claude3Haiku;
+      
+    case 'customer-service':
+      return modelConfigs.gpt35Turbo;
+      
+    default:
+      return modelConfigs.gpt4Turbo;
+  }
+}
+```
+
+### Bước 2: API Client Implementation
+
+```typescript
+// Good: Robust AI client with error handling
+import OpenAI from 'openai';
+import { z } from 'zod';
+
+export class AIClient {
+  constructor(
+    private client: OpenAI,
+    private logger: Logger,
+    private metrics: MetricsService
+  ) {}
+  
+  async completion<T>(options: {
+    model: string;
+    messages: OpenAI.Chat.ChatCompletionMessageParam[];
+    schema?: z.ZodSchema<T>;
+    temperature?: number;
+    maxTokens?: number;
+    timeout?: number;
+  }): Promise<T> {
+    const startTime = Date.now();
+    
+    try {
+      // Log request
+      this.logger.debug('AI API request', {
+        model: options.model,
+        messageCount: options.messages.length,
+        lastMessage: options.messages[options.messages.length - 1]
+      });
+      
+      // Make request with timeout
+      const response = await this.withTimeout(
+        this.client.chat.completions.create({
+          model: options.model,
+          messages: options.messages,
+          temperature: options.temperature ?? 0.7,
+          max_tokens: options.maxTokens ?? 2048,
+          response_format: options.schema ? { type: 'json_object' } : undefined
+        }),
+        options.timeout ?? 60000
+      );
+      
+      const duration = Date.now() - startTime;
+      
+      // Record metrics
+      this.metrics.record('ai.api.call', {
+        model: options.model,
+        success: true,
+        duration_ms: duration
+      });
+      
+      const content = response.choices[0]?.message?.content;
+      
+      if (!content) {
+        throw new AIError('Empty response from AI API');
+      }
+      
+      // Parse if schema provided
+      if (options.schema) {
+        const parsed = options.schema.safeParse(JSON.parse(content));
+        if (!parsed.success) {
+          this.logger.error('Schema validation failed', {
+            errors: parsed.error.issues,
+            content
+          });
+          throw new AIError('Invalid response format');
+        }
+        return parsed.data;
+      }
+      
+      return content as T;
+      
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      
+      this.metrics.record('ai.api.call', {
+        model: options.model,
+        success: false,
+        error_type: error instanceof Error ? error.name : 'Unknown'
+      });
+      
+      if (error instanceof AIError) {
+        throw error;
+      }
+      
+      // Transform common errors
+      if (error instanceof OpenAI.APIError) {
+        if (error.status === 429) {
+          throw new RateLimitError('AI API rate limit exceeded');
+        }
+        if (error.status === 401) {
+          throw new AuthenticationError('AI API authentication failed');
+        }
+      }
+      
+      throw new AIError(`AI API call failed: ${error}`);
+    }
+  }
+  
+  private withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+    return Promise.race([
+      promise,
+      new Promise<T>((_, reject) =>
+        setTimeout(() => reject(new TimeoutError(`Request timed out after ${timeoutMs}ms`)), timeoutMs)
+      )
+    ]);
+  }
+}
+
+// Streaming completion
+async *streamCompletion(
+  client: AIClient,
+  options: StreamingOptions
+): AsyncGenerator<string> {
+  const stream = await client.client.chat.completions.create({
+    model: options.model,
+    messages: options.messages,
+    stream: true,
+    temperature: options.temperature
+  });
+  
+  for await (const chunk of stream) {
+    const content = chunk.choices[0]?.delta?.content;
+    if (content) {
+      yield content;
+    }
+  }
+}
+```
+
+### Phase 2: Prompt Engineering
+
+### Bước 3: Prompt Templates
+
+```typescript
+// Good: Structured prompt templates
+interface PromptTemplate {
+  system: string;
+  user: string;
+  description: string;
+  variables: string[];
+  examples?: Array<{ input: string; output: string }>;
+}
+
+// Sentiment analysis prompt
+const sentimentAnalysisPrompt: PromptTemplate = {
+  description: 'Analyze sentiment of customer feedback',
+  variables: ['feedback', 'context'],
+  system: `You are a customer feedback analyst specializing in sentiment analysis.
+
+Your task:
+1. Analyze the sentiment of the provided feedback
+2. Classify it as: positive, negative, or neutral
+3. Extract key themes and emotions
+4. Rate confidence from 0-100
+
+Response Format (JSON):
+{
+  "sentiment": "positive|negative|neutral",
+  "confidence": 0-100,
+  "themes": ["theme1", "theme2"],
+  "emotions": ["emotion1", "emotion2"],
+  "summary": "Brief summary"
+}
+
+Important:
+- Be precise in classification
+- Only return valid JSON
+- If uncertain, set confidence below 70`,
+  user: `Analyze this customer feedback:
+
+Feedback: {{feedback}}
+
+Context: {{context}}`,
+  examples: [
+    {
+      input: 'Feedback: "Amazing product! Works perfectly and delivery was super fast."',
+      output: JSON.stringify({
+        sentiment: 'positive',
+        confidence: 95,
+        themes: ['product quality', 'delivery speed'],
+        emotions: ['satisfaction', 'excitement'],
+        summary: 'Highly positive feedback praising product quality and fast delivery'
+      })
+    }
+  ]
+};
+
+// Code review prompt
+const codeReviewPrompt: PromptTemplate = {
+  description: 'Review code for bugs and improvements',
+  variables: ['language', 'code', 'focus'],
+  system: `You are a senior software engineer conducting code review.
+
+Provide a thorough review covering:
+1. Bug identification (critical, major, minor)
+2. Security vulnerabilities
+3. Performance issues
+4. Code quality and readability
+5. Best practice violations
+6. Suggested improvements
+
+Response Format (JSON):
+{
+  "issues": [
+    {
+      "severity": "critical|major|minor",
+      "type": "bug|security|performance|style",
+      "line": "line number or null",
+      "description": "Issue description",
+      "suggestion": "How to fix"
+    }
+  ],
+  "summary": "Overall assessment",
+  "score": 1-10
+}`,
+  user: `Review this {{language}} code:
+
+\`\`\`{{language}}
+{{code}}
+\`\`\`
+
+Focus areas: {{focus}}`
+};
+
+// Prompt renderer
+export function renderPrompt<T extends Record<string, any>>(
+  template: PromptTemplate,
+  variables: T
+): { system: string; user: string } {
+  // Validate required variables
+  const missing = template.variables.filter(v => !(v in variables));
+  if (missing.length > 0) {
+    throw new Error(`Missing required variables: ${missing.join(', ')}`);
+  }
+  
+  const system = template.system;
+  const user = template.user;
+  
+  // Replace variables
+  const renderedSystem = system.replace(
+    /\{\{(\w+)\}\}/g,
+    (_, key) => String(variables[key] ?? `{{${key}}}`)
+  );
+  
+  const renderedUser = user.replace(
+    /\{\{(\w+)\}\}/g,
+    (_, key) => String(variables[key] ?? `{{${key}}}`)
+  );
+  
+  return {
+    system: renderedSystem,
+    user: renderedUser
+  };
+}
+```
+
+### Bước 4: Chain of Thought và Few-Shot
+
+```typescript
+// Chain of Thought prompt
+const cotPrompt = `Solve this problem step by step.
+
+Problem: {{problem}}
+
+Think through:
+1. What is being asked?
+2. What information is given?
+3. What approach should I take?
+4. Calculate step by step
+5. Provide the final answer
+
+Show your reasoning clearly.`;
+
+// Few-shot classification prompt
+const fewShotClassification = `Classify the following emails into categories: urgent, normal, spam.
+
+Examples:
+
+Input: "URGENT: Server is down! Need immediate assistance!"
+Output: {"category": "urgent", "reason": "Critical system failure requiring immediate attention"}
+
+Input: "Hi, just wanted to follow up on our meeting next week."
+Output: {"category": "normal", "reason": "Routine follow-up with no time pressure"}
+
+Input: "Congratulations! You've won $1,000,000! Click here to claim!"
+Output: {"category": "spam", "reason": "Suspicious prize claim, common spam template"}
+
+Now classify:
+Input: "{{email}}"
+Output:`;
+```
+
+### Phase 3: RAG Implementation
+
+### Bước 5: Retrieval Augmented Generation
+
+```typescript
+// Good: RAG implementation
+interface RAGConfig {
+  embeddingModel: string;
+  vectorStore: 'pinecone' | 'weaviate' | 'chroma';
+  topK: number;
+  minSimilarityScore: number;
+}
+
+export class RAGService {
+  constructor(
+    private embeddings: EmbeddingsClient,
+    private vectorStore: VectorStore,
+    private llm: AIClient,
+    private config: RAGConfig
+  ) {}
+  
+  async query(request: {
+    question: string;
+    filters?: Record<string, any>;
+    maxContextTokens?: number;
+  }): Promise<RAGResponse> {
+    // 1. Generate query embedding
+    const queryEmbedding = await this.embeddings.create(
+      request.question,
+      { model: this.config.embeddingModel }
+    );
+    
+    // 2. Retrieve relevant documents
+    const results = await this.vectorStore.search({
+      embedding: queryEmbedding,
+      topK: this.config.topK,
+      filters: request.filters,
+      minScore: this.config.minSimilarityScore
+    });
+    
+    // 3. Build context with token budget
+    const context = await this.buildContext(
+      results.documents,
+      request.maxContextTokens ?? 4000
+    );
+    
+    // 4. Generate answer
+    const prompt = this.buildRAGPrompt(request.question, context);
+    
+    const answer = await this.llm.completion({
+      model: 'gpt-4-turbo',
+      messages: [
+        { role: 'system', content: 'You are a helpful assistant. Answer based on the provided context.' },
+        { role: 'user', content: prompt }
+      ]
+    });
+    
+    return {
+      answer,
+      sources: results.documents.map(d => ({
+        id: d.id,
+        content: d.content,
+        score: d.score
+      })),
+      metadata: {
+        documentsRetrieved: results.documents.length,
+        contextTokens: this.countTokens(context)
+      }
+    };
+  }
+  
+  private buildContext(
+    documents: RetrievedDocument[],
+    maxTokens: number
+  ): Promise<string> {
+    let context = '';
+    let totalTokens = 0;
+    
+    for (const doc of documents) {
+      const docTokens = this.countTokens(doc.content);
+      
+      if (totalTokens + docTokens > maxTokens) {
+        break;
+      }
+      
+      context += `Document: ${doc.id}\n${doc.content}\n\n`;
+      totalTokens += docTokens;
+    }
+    
+    return context;
+  }
+  
+  private buildRAGPrompt(question: string, context: string): string {
+    return `Context:
+${context}
+
+Question: ${question}
+
+Instructions:
+1. Answer based ONLY on the provided context
+2. If the answer cannot be found in the context, say "I don't have enough information to answer this question"
+3. Cite specific documents when making claims
+4. Be precise and avoid hallucinations`;
+  }
+  
+  private countTokens(text: string): number {
+    // Approximate: 1 token ≈ 4 characters
+    return Math.ceil(text.length / 4);
+  }
+}
+
+// Embedding creation
+export async function createEmbeddings(
+  texts: string[],
+  model: string = 'text-embedding-ada-002'
+): Promise<number[][]> {
+  const response = await openai.embeddings.create({
+    model,
+    input: texts
+  });
+  
+  return response.data.map(d => d.embedding);
+}
+```
+
+### Bước 6: Document Processing Pipeline
+
+```typescript
+// Document processing for embeddings
+interface DocumentChunk {
+  id: string;
+  content: string;
+  metadata: {
+    source: string;
+    page?: number;
+    position: number;
+  };
+}
+
+export class DocumentProcessor {
+  constructor(
+    private embeddings: EmbeddingsClient,
+    private vectorStore: VectorStore,
+    private tokenizer: Tiktoken
+  ) {}
+  
+  async processDocument(
+    document: {
+      id: string;
+      content: string;
+      metadata?: Record<string, any>;
+    },
+    options: {
+      chunkSize?: number;
+      chunkOverlap?: number;
+    } = {}
+  ): Promise<void> {
+    const { chunkSize = 1000, chunkOverlap = 200 } = options;
+    
+    // 1. Split into chunks
+    const chunks = this.splitIntoChunks(document.content, chunkSize, chunkOverlap);
+    
+    // 2. Create embeddings
+    const documents: DocumentChunk[] = chunks.map((chunk, index) => ({
+      id: `${document.id}-chunk-${index}`,
+      content: chunk,
+      metadata: {
+        source: document.id,
+        position: index,
+        ...document.metadata
+      }
+    }));
+    
+    // 3. Batch embed
+    const batchSize = 100;
+    for (let i = 0; i < documents.length; i += batchSize) {
+      const batch = documents.slice(i, i + batchSize);
+      
+      const embeddings = await this.embeddings.create(
+        batch.map(d => d.content)
+      );
+      
+      // 4. Store in vector DB
+      await this.vectorStore.upsert({
+        id: document.id,
+        vectors: embeddings,
+        documents: batch
+      });
+    }
+  }
+  
+  private splitIntoChunks(
+    text: string,
+    chunkSize: number,
+    overlap: number
+  ): string[] {
+    const chunks: string[] = [];
+    const tokens = this.tokenizer.encode(text);
+    
+    let start = 0;
+    while (start < tokens.length) {
+      const end = Math.min(start + chunkSize, tokens.length);
+      const chunkTokens = tokens.slice(start, end);
+      
+      chunks.push(this.tokenizer.decode(chunkTokens));
+      start = end - overlap;
+    }
+    
+    return chunks;
+  }
+}
+```
+
+### Phase 4: Safety và Reliability
+
+### Bước 7: Guardrails và Validation
+
+```typescript
+// Good: Output validation và safety
+export class AIOutputValidator {
+  constructor(
+    private schemas: Map<string, z.ZodSchema>
+  ) {}
+  
+  validate<T>(output: unknown, schemaName: string): T {
+    const schema = this.schemas.get(schemaName);
+    
+    if (!schema) {
+      throw new Error(`Unknown schema: ${schemaName}`);
+    }
+    
+    const result = schema.safeParse(output);
+    
+    if (!result.success) {
+      this.logger.warn('Output validation failed', {
+        errors: result.error.issues,
+        schemaName
+      });
+      throw new AIValidationError('Invalid output format', result.error.issues);
+    }
+    
+    return result.data;
+  }
+  
+  // Content safety check
+  async checkSafety(text: string): Promise<SafetyResult> {
+    const sensitivePatterns = [
+      { pattern: /\b\d{3}-\d{2}-\d{4}\b/g, type: 'ssn' },
+      { pattern: /\b\d{16}\b/g, type: 'credit_card' },
+      { pattern: /password[:\s]*\S+/gi, type: 'password' }
+    ];
+    
+    const findings: SafetyFinding[] = [];
+    
+    for (const { pattern, type } of sensitivePatterns) {
+      if (pattern.test(text)) {
+        findings.push({ type, found: true });
+      }
+    }
+    
+    return {
+      safe: findings.length === 0,
+      findings
+    };
+  }
+}
+
+// Hallucination detection
+export class HallucinationDetector {
+  async check(
+    answer: string,
+    context: string
+  ): Promise<HallucinationResult> {
+    const prompt = `Check if the answer is supported by the context.
+    
+Context:
+${context}
+
+Answer:
+${answer}
+
+Respond in JSON:
+{
+  "supported": true/false,
+  "confidence": 0-100,
+  "unsupportedClaims": ["list of claims not in context"]
+}`;
+    
+    const response = await this.llm.completion({
+      model: 'gpt-3.5-turbo',
+      messages: [{ role: 'user', content: prompt }],
+      schema: z.object({
+        supported: z.boolean(),
+        confidence: z.number(),
+        unsupportedClaims: z.array(z.string())
+      })
+    });
+    
+    return response;
+  }
+}
+```
+
+### Bước 8: Cost Optimization
+
+```typescript
+// Good: Cost tracking và optimization
+interface CostTracker {
+  trackRequest(model: string, tokens: number): void;
+  getCost(model: string): number;
+  getTotalCost(): number;
+}
+
+export class AICostOptimizer {
+  constructor(
+    private cache: CacheService,
+    private costTracker: CostTracker
+  ) {}
+  
+  async completion<T>(
+    options: CompletionOptions
+  ): Promise<CachedResult<T> | T> {
+    // Check cache for identical requests
+    const cacheKey = this.generateCacheKey(options);
+    const cached = await this.cache.get<T>(cacheKey);
+    
+    if (cached) {
+      return { data: cached, cached: true };
+    }
+    
+    // Make request
+    const result = await this.llm.completion<T>(options);
+    
+    // Cache result
+    await this.cache.set(cacheKey, result, { ttl: 3600 });
+    
+    // Track cost
+    this.costTracker.trackRequest(options.model, result.usage.total_tokens);
+    
+    return { data: result, cached: false };
+  }
+  
+  private generateCacheKey(options: CompletionOptions): string {
+    const hash = crypto.createHash('sha256');
+    hash.update(JSON.stringify({
+      model: options.model,
+      messages: options.messages,
+      temperature: options.temperature
+    }));
+    return `ai:${hash.digest('hex')}`;
+  }
+}
+
+// Cost estimation
+export function estimateCost(
+  model: string,
+  inputTokens: number,
+  outputTokens: number
+): number {
+  const pricing: Record<string, { input: number; output: number }> = {
+    'gpt-4-turbo': { input: 10, output: 30 },    // $0.01/1K input, $0.03/1K output
+    'gpt-3.5-turbo': { input: 0.5, output: 1.5 }, // $0.0005/1K input, $0.0015/1K output
+    'claude-3-opus': { input: 15, output: 75 },   // $0.015/1K input, $0.075/1K output
+  };
+  
+  const modelPricing = pricing[model] || pricing['gpt-3.5-turbo'];
+  
+  const inputCost = (inputTokens / 1000) * modelPricing.input;
+  const outputCost = (outputTokens / 1000) * modelPricing.output;
+  
+  return inputCost + outputCost;
+}
+```
+
+## Checklist
+
+- [ ] Model selection based on use case
+- [ ] Proper error handling implemented
+- [ ] Rate limiting configured
+- [ ] Cost tracking enabled
+- [ ] Output validation in place
+- [ ] Safety checks implemented
+- [ ] Prompt templates documented
+- [ ] Caching strategy configured
+- [ ] Monitoring setup
+- [ ] Fallback mechanisms defined
+
+## Examples (Ví dụ)
+
+### Ví dụ: Complete AI Service Implementation
+
+```typescript
+// services/ai/assistant.service.ts
+@Injectable()
+export class AssistantService {
+  constructor(
+    private aiClient: AIClient,
+    private ragService: RAGService,
+    private validator: AIOutputValidator,
+    private costTracker: CostTracker,
+    private logger: Logger
+  ) {}
+  
+  async chat(request: ChatRequest): Promise<ChatResponse> {
+    const startTime = Date.now();
+    
+    try {
+      // Build messages with context
+      const messages = await this.buildMessages(request);
+      
+      // Get completion
+      const completion = await this.aiClient.completion({
+        model: this.selectModel(request),
+        messages,
+        temperature: request.temperature ?? 0.7
+      });
+      
+      return {
+        message: completion,
+        metadata: {
+          model: this.selectModel(request),
+          duration: Date.now() - startTime,
+          tokens: completion.usage
+        }
+      };
+      
+    } catch (error) {
+      this.logger.error('Chat failed', { error, request });
+      throw this.transformError(error);
+    }
+  }
+  
+  async ragQuery(request: RAGRequest): Promise<RAGResponse> {
+    return this.ragService.query(request);
+  }
+}
+```
+
+## Anti Pattern
+
+- [ ] **No output validation**: Blind trust in AI responses
+- [ ] **Missing error handling**: Unhandled API failures
+- [ ] **No caching**: Repeated identical requests
+- [ ] **Over-sized prompts**: Wasting tokens
+- [ ] **Hardcoded API keys**: Security risk
+- [ ] **No rate limiting**: API quota exhaustion
+
+## Best Practice
+
+- [ ] **Output validation**: Always validate AI responses
+- [ ] **Robust error handling**: Graceful degradation
+- [ ] **Caching**: Reduce costs và latency
+- [ ] **Token optimization**: Efficient prompts
+- [ ] **Security**: Environment variables for keys
+- [ ] **Monitoring**: Track usage và costs
+
+## Liên kết
+
+- [[../rules/core-architecture]] - Core Architecture
+- [[../rules/security]] - Security Best Practices
+- [[../skills/code-review]] - Code Review
+- [[../skills/performance-audit]] - Performance Audit
+- [[../skills/rag-builder]] - RAG Builder

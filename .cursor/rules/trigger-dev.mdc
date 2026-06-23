@@ -1,0 +1,44 @@
+---
+description: Nguyên tắc và best practices cho Trigger.dev webhook automation
+created: 2026-06-23
+version: 1.0.0
+tags: [trigger-dev, webhooks, automation, serverless]
+---
+
+# Trigger.dev
+
+## Mục tiêu
+
+Trigger.dev là một platform cho việc tạo các reliable background jobs và webhook handlers với built-in retry logic, deduplication, và observability. Trong Cursor Enterprise Framework, Trigger.dev được sử dụng cho việc xây dựng các webhook integrations, scheduled jobs, và event-driven workflows.
+
+## Nguyên tắc
+
+**1. Job Definition**
+
+Type-safe jobs. Trigger types. Input/output schemas. Idempotency keys.
+
+**2. Webhook Handling**
+
+Verify signatures. Parse payloads. Handle retries. Deduplication.
+
+**3. Error Handling**
+
+Retry policies. Dead letter handling. Alerting. Monitoring.
+
+**4. Scheduling**
+
+Cron expressions. Interval triggers. Dynamic schedules.
+
+**5. Performance**
+
+Batch processing. Parallel execution. Resource limits.
+
+**6. Testing**
+
+Test jobs locally. Mock external services. Integration tests.
+
+## Liên kết
+
+- [[webhooks]] - Webhooks
+- [[queue]] - Queue
+- [[automation]] - Automation

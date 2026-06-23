@@ -1,0 +1,302 @@
+---
+description: Review billing system bao gồm subscription management, payments, và invoices
+purpose: Audit billing systems cho accuracy, security, và compliance
+input: Billing codebase, payment configurations, subscription logic
+output: Billing review report, security findings, recommendations
+version: 1.0.0
+tags: [billing, subscription, payments, invoices, stripe, revenue]
+---
+
+# Billing Review Skill - Kiểm Toán Billing System
+
+## Tổng quan
+
+Billing systems require careful implementation cho accuracy và compliance. Skill này cung cấp framework để review billing implementations.
+
+## Purpose (Mục đích)
+
+Billing Review Skill được thiết kế để:
+
+1. **Subscription Review**: Verify plan management
+2. **Payment Security**: Audit payment handling
+3. **Invoice Accuracy**: Check billing calculations
+4. **Compliance**: Verify regulatory compliance
+5. **Error Handling**: Ensure graceful failures
+
+### Khi nào sử dụng Billing Review
+
+- Khi auditing billing systems
+- Khi reviewing payment logic
+- Khi investigating billing issues
+- Khi setting up subscriptions
+
+## Input (Đầu vào)
+
+- [ ] Billing codebase
+- [ ] Payment configurations
+- [ ] Subscription logic
+
+## Output (Đầu ra)
+
+- [ ] Security findings
+- [ ] Accuracy recommendations
+- [ ] Compliance checklist
+
+## Workflow (Quy trình)
+
+### Phase 1: Subscription Management
+
+### Bước 1: Plan Configuration
+
+```typescript
+// Subscription Plans
+interface SubscriptionPlan {
+  id: string;
+  name: string;
+  price: Money;
+  interval: 'monthly' | 'yearly';
+  features: string[];
+  limits: ResourceLimits;
+  tier: 'free' | 'starter' | 'professional' | 'enterprise';
+}
+
+const PLANS: SubscriptionPlan[] = [
+  {
+    id: 'free',
+    name: 'Free',
+    price: Money.create(0, Currency.USD),
+    interval: 'monthly',
+    features: ['Basic features', 'Community support'],
+    limits: { users: 5, storage: 1, apiCalls: 1000 },
+    tier: 'free'
+  },
+  {
+    id: 'starter',
+    name: 'Starter',
+    price: Money.create(29, Currency.USD),
+    interval: 'monthly',
+    features: ['All Free features', 'Priority support', 'Advanced analytics'],
+    limits: { users: 25, storage: 50, apiCalls: 50000 },
+    tier: 'starter'
+  },
+  {
+    id: 'professional',
+    name: 'Professional',
+    price: Money.create(99, Currency.USD),
+    interval: 'monthly',
+    features: ['All Starter features', 'SSO', 'Audit logs', 'Custom integrations'],
+    limits: { users: 100, storage: 500, apiCalls: 500000 },
+    tier: 'professional'
+  },
+  {
+    id: 'enterprise',
+    name: 'Enterprise',
+    price: Money.create(299, Currency.USD),
+    interval: 'monthly',
+    features: ['All Professional features', 'Dedicated support', 'SLA', 'Custom contracts'],
+    limits: { users: -1, storage: -1, apiCalls: -1 },
+    tier: 'enterprise'
+  }
+];
+```
+
+### Bước 2: Payment Processing
+
+```typescript
+// Payment Service Interface
+interface PaymentService {
+  createCustomer(email: string, paymentMethodId: string): Promise<Customer>;
+  createSubscription(customerId: string, planId: string): Promise<Subscription>;
+  updateSubscription(subscriptionId: string, planId: string): Promise<Subscription>;
+  cancelSubscription(subscriptionId: string): Promise<void>;
+  chargeForOverage(customerId: string, usage: UsageRecord): Promise<Payment>;
+}
+
+// Stripe Implementation
+class StripePaymentService implements PaymentService {
+  constructor(
+    private stripeClient: Stripe,
+    private eventBus: EventBus
+  ) {}
+  
+  async createSubscription(
+    customerId: string,
+    planId: string
+  ): Promise<Subscription> {
+    const plan = PLANS.find(p => p.id === planId);
+    if (!plan) throw new PlanNotFoundError(planId);
+    
+    const subscription = await this.stripeClient.subscriptions.create({
+      customer: customerId,
+      items: [{ price: plan.stripePriceId }],
+      payment_behavior: 'default_incomplete',
+      expand: ['latest_invoice.payment_intent']
+    });
+    
+    await this.eventBus.publish(new SubscriptionCreated(subscription));
+    
+    return this.mapToSubscription(subscription);
+  }
+  
+  async handleWebhook(event: Stripe.Event): Promise<void> {
+    switch (event.type) {
+      case 'invoice.paid':
+        await this.handleInvoicePaid(event.data.object as Stripe.Invoice);
+        break;
+      case 'customer.subscription.deleted':
+        await this.handleSubscriptionDeleted(event.data.object as Stripe.Subscription);
+        break;
+      case 'payment_intent.payment_failed':
+        await this.handlePaymentFailed(event.data.object as Stripe.PaymentIntent);
+        break;
+    }
+  }
+}
+```
+
+### Phase 2: Invoice Generation
+
+### Bước 3: Invoice Service
+
+```typescript
+// Invoice Generation
+class InvoiceService {
+  constructor(
+    private subscriptionRepo: SubscriptionRepository,
+    private usageRepo: UsageRepository,
+    private pdfGenerator: PDFGenerator
+  ) {}
+  
+  async generateInvoice(
+    customerId: string,
+    period: BillingPeriod
+  ): Promise<Invoice> {
+    const subscription = await this.subscriptionRepo.findActiveByCustomer(customerId);
+    if (!subscription) throw new NoActiveSubscriptionError(customerId);
+    
+    const baseAmount = subscription.plan.price;
+    
+    // Calculate overages
+    const usage = await this.usageRepo.getUsage(customerId, period);
+    const overages = this.calculateOverages(subscription.plan.limits, usage);
+    
+    // Calculate taxes
+    const subtotal = baseAmount.add(overages.total);
+    const taxes = this.calculateTaxes(subtotal, customerId);
+    const total = subtotal.add(taxes);
+    
+    // Create invoice record
+    const invoice = Invoice.create({
+      customerId,
+      period,
+      baseAmount,
+      overages,
+      taxes,
+      total,
+      lineItems: this.buildLineItems(baseAmount, overages, taxes)
+    });
+    
+    await this.invoiceRepo.save(invoice);
+    
+    // Generate PDF
+    const pdf = await this.pdfGenerator.generate(invoice);
+    await this.fileStorage.upload(`invoices/${invoice.id}.pdf`, pdf);
+    
+    return invoice;
+  }
+  
+  private calculateOverages(
+    limits: ResourceLimits,
+    usage: UsageRecord
+  ): OverageDetails {
+    const overages: OverageDetails = { items: [], total: Money.zero() };
+    
+    if (limits.users !== -1 && usage.users > limits.users) {
+      const overageUnits = usage.users - limits.users;
+      const overageAmount = Money.create(overageUnits * 2, Currency.USD); // $2 per user
+      overages.items.push({ type: 'extra_users', units: overageUnits, amount: overageAmount });
+      overages.total = overages.total.add(overageAmount);
+    }
+    
+    if (limits.apiCalls !== -1 && usage.apiCalls > limits.apiCalls) {
+      const overageUnits = usage.apiCalls - limits.apiCalls;
+      const overageAmount = Money.create(overageUnits * 0.001, Currency.USD); // $0.001 per call
+      overages.items.push({ type: 'extra_api_calls', units: overageUnits, amount: overageAmount });
+      overages.total = overages.total.add(overageAmount);
+    }
+    
+    return overages;
+  }
+}
+```
+
+## Checklist
+
+- [ ] Payment security verified
+- [ ] Subscription logic tested
+- [ ] Invoice calculations verified
+- [ ] Webhook handling secured
+- [ ] Refund logic tested
+- [ ] Compliance requirements met
+
+## Examples (Ví dụ)
+
+### Ví dụ: Complete Billing Flow
+
+```typescript
+async function upgradeSubscription(
+  customerId: string,
+  newPlanId: string
+): Promise<void> {
+  const customer = await getCustomer(customerId);
+  const currentSubscription = customer.subscription;
+  const newPlan = PLANS.find(p => p.id === newPlanId);
+  
+  // Calculate prorated amount
+  const proration = calculateProration(
+    currentSubscription.plan,
+    newPlan,
+    currentSubscription.currentPeriodEnd
+  );
+  
+  // Update subscription
+  await stripe.subscriptions.update(currentSubscription.stripeId, {
+    items: [{ id: currentSubscription.stripeItemId, price: newPlan.stripePriceId }],
+    proration_behavior: 'create_prorations'
+  });
+  
+  // Charge difference
+  if (proration.amount > 0) {
+    await stripe.invoices.createInvoiceItem({
+      customer: customer.stripeId,
+      amount: Math.round(proration.amount * 100),
+      currency: 'usd',
+      description: `Proration for upgrade to ${newPlan.name}`
+    });
+  }
+  
+  // Update local record
+  await subscriptionRepo.update(customerId, { planId: newPlanId });
+}
+```
+
+## Anti Pattern
+
+- [ ] **No Idempotency**: Duplicate charges
+- [ ] **No Audit Trail**: Missing transaction history
+- [ ] **Floating Point Math**: Inaccurate calculations
+- [ ] **No Webhook Verification**: Security vulnerability
+
+## Best Practice
+
+- [ ] **Idempotency Keys**: Prevent duplicate charges
+- [ ] **Decimal Math**: Use precise calculations
+- [ ] **Audit Logging**: Track all transactions
+- [ ] **Webhook Verification**: Validate signatures
+
+## Liên kết
+
+- [[../rules/core-architecture]] - Core Architecture
+- [[../skills/security-audit]] - Security Audit
+- [[../skills/crm-saas-review]] - CRM SaaS Review
+- [[../skills/api-review]] - API Review

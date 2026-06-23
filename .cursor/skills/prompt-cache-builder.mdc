@@ -1,0 +1,676 @@
+---
+description: Skill xây dựng và quản lý prompt cache để tối ưu hóa token usage và giảm latency cho các LLM interactions lặp lại
+purpose: Tạo hệ thống caching thông minh cho prompts, giúp giảm chi phí API và cải thiện response time bằng cách reuse computed results
+input:
+  - Prompt templates
+  - LLM interaction history
+  - Semantic similarity data
+  - Cache invalidation rules
+  - Token budgets
+  - Response patterns
+  - Cost tracking data
+  - Versioned prompt configs
+output:
+  - Cached prompt responses
+  - Cache statistics
+  - Hit rate metrics
+  - Eviction policies
+  - Token savings report
+  - Latency improvements
+  - Cache warming strategies
+  - Version compatibility maps
+version: 1.0.0
+tags:
+  - prompt-engineering
+  - caching
+  - token-optimization
+  - performance
+---
+
+# Prompt Cache Builder
+
+## Tổng quan
+
+Prompt Cache Builder là skill chuyên biệt để xây dựng và quản lý hệ thống cache cho LLM prompts, cho phép reuse computed responses cho các prompts tương tự hoặc identical. Skill này implement semantic caching, exact matching, và intelligent prefetching để tối ưu hóa token usage và giảm API costs đáng kể trong các ứng dụng enterprise.
+
+## Purpose (Mục đích)
+
+Trong các ứng dụng Cursor Enterprise Framework, cùng một prompt hoặc biến thể của nó được gọi nhiều lần, gây ra:
+
+1. **Redundant API calls**: Cùng computation được lặp lại không cần thiết
+2. **Increased costs**: Token usage tăng tuyến tính với requests
+3. **Latency spikes**: User phải chờ response cho prompts đã biết
+4. **Inconsistent responses**: Không cache có thể dẫn đến variations
+
+Prompt Cache Builder tồn tại để giải quyết các vấn đề này bằng cách:
+
+- **Semantic caching**: Cache prompts dựa trên meaning, không chỉ exact text
+- **Intelligent warming**: Prefetch common prompts dựa trên usage patterns
+- **Cost optimization**: Giảm token usage và API costs
+- **Consistency**: Đảm bảo identical prompts luôn có consistent responses
+
+## Input (Đầu vào)
+
+| Input | Mô tả | Required |
+|-------|-------|----------|
+| `prompt_templates` | Template strings với variables | Yes |
+| `interaction_history` | Log của previous LLM calls | Yes |
+| `similarity_threshold` | Threshold cho semantic matching (0.0-1.0) | No |
+| `cache_policy` | Eviction và refresh policies | Yes |
+| `token_budget` | Maximum tokens cho cache storage | Yes |
+| `embedding_model` | Model để compute embeddings | Yes |
+| `invalidations` | Rules khi nào cache bị invalidate | No |
+
+## Output (Đầu ra)
+
+| Output | Mô tả | Format |
+|--------|-------|--------|
+| `cached_response` | Response từ cache nếu có | Response |
+| `cache_status` | HIT, MISS, hoặc PARTIAL | Enum |
+| `statistics` | Hit rate, savings, latency | Object |
+| `eviction_report` | Items evicted và lý do | Array |
+| `warm_prompts` | Prompts recommended cho prefetch | Array |
+| `token_savings` | Tổng token đã tiết kiệm | Number |
+| `cost_reduction` | Percentage cost reduction | Percentage |
+
+## Workflow (Quy trình)
+
+### Bước 1: Cache Initialization
+
+```typescript
+// Khởi tạo cache storage và configuration
+interface PromptCacheConfig {
+  backend: 'memory' | 'redis' | 'dynamodb' | 'sqlite';
+  embedding_model: string;
+  similarity_threshold: number;
+  ttl_seconds: number;
+  max_entries: number;
+  token_budget: number;
+}
+
+class PromptCache {
+  private vectorIndex: VectorIndex;
+  private exactIndex: Map<string, CachedResponse>;
+  private stats: CacheStatistics;
+  
+  constructor(config: PromptCacheConfig) {
+    this.vectorIndex = new VectorIndex(config.embedding_model);
+    this.exactIndex = new Map();
+    this.stats = {
+      hits: 0,
+      misses: 0,
+      tokens_saved: 0,
+      latency_saved_ms: 0
+    };
+  }
+  
+  async initialize(historicalInteractions: Interaction[]): Promise<void> {
+    // Pre-populate cache từ history
+    for (const interaction of historicalInteractions) {
+      await this.add(interaction.prompt, interaction.response);
+    }
+  }
+}
+```
+
+### Bước 2: Prompt Fingerprinting
+
+```typescript
+// Tạo fingerprint cho prompt để enable exact và semantic matching
+interface PromptFingerprint {
+  exact_hash: string;        // SHA-256 của normalized prompt
+  semantic_vector: number[]; // Embedding vector
+  template_id: string;       // ID của template (nếu là template-based)
+  variables: Record<string, any>; // Extracted variables
+  version: string;           // Prompt version
+}
+
+function fingerprint(prompt: string, config: CacheConfig): PromptFingerprint {
+  // Normalize: lowercase, trim, remove extra whitespace
+  const normalized = normalizePrompt(prompt);
+  
+  return {
+    exact_hash: crypto.createHash('sha256').update(normalized).digest('hex'),
+    semantic_vector: await embed(normalized, config.embedding_model),
+    template_id: detectTemplate(normalized),
+    variables: extractVariables(prompt),
+    version: detectVersion(prompt)
+  };
+}
+
+function normalizePrompt(prompt: string): string {
+  return prompt
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, ' ')
+    .replace(/[^\w\s.,!?-]/g, '');
+}
+```
+
+### Bước 3: Cache Lookup
+
+```typescript
+// Lookup cache với cả exact và semantic matching
+interface CacheLookupResult {
+  status: 'HIT' | 'MISS' | 'PARTIAL';
+  response?: CachedResponse;
+  similarity?: number;
+  alternatives?: CachedResponse[];
+}
+
+async function lookup(
+  prompt: string,
+  context?: Record<string, any>
+): Promise<CacheLookupResult> {
+  const fp = fingerprint(prompt, this.config);
+  
+  // 1. Exact match lookup (O(1))
+  const exactMatch = this.exactIndex.get(fp.exact_hash);
+  if (exactMatch && !this.isExpired(exactMatch)) {
+    this.stats.hits++;
+    return { status: 'HIT', response: exactMatch };
+  }
+  
+  // 2. Template-based lookup (for template prompts)
+  if (fp.template_id) {
+    const templateMatches = await this.lookupByTemplate(fp);
+    if (templateMatches.length > 0) {
+      return { 
+        status: 'HIT', 
+        response: templateMatches[0],
+        alternatives: templateMatches.slice(1, 4)
+      };
+    }
+  }
+  
+  // 3. Semantic similarity search
+  const semanticMatches = await this.vectorIndex.search(
+    fp.semantic_vector,
+    { threshold: this.config.similarity_threshold, limit: 5 }
+  );
+  
+  if (semanticMatches.length > 0) {
+    const best = semanticMatches[0];
+    if (best.similarity >= this.config.similarity_threshold) {
+      return {
+        status: 'PARTIAL',
+        response: best.response,
+        similarity: best.similarity,
+        alternatives: semanticMatches.slice(1, 3)
+      };
+    }
+  }
+  
+  return { status: 'MISS' };
+}
+```
+
+### Bước 4: Cache Storage
+
+```typescript
+// Lưu trữ response vào cache
+async function add(
+  prompt: string,
+  response: LLMResponse,
+  metadata?: CacheMetadata
+): Promise<void> {
+  const fp = fingerprint(prompt, this.config);
+  
+  // Check token budget
+  await this.enforceTokenBudget(response.usage.total_tokens);
+  
+  const cacheEntry: CachedResponse = {
+    prompt_fingerprint: fp,
+    response: response.content,
+    usage: response.usage,
+    timestamp: Date.now(),
+    ttl: this.config.ttl_seconds,
+    hit_count: 0,
+    last_accessed: Date.now(),
+    metadata: metadata || {}
+  };
+  
+  // Store in exact index
+  this.exactIndex.set(fp.exact_hash, cacheEntry);
+  
+  // Store in vector index for semantic search
+  await this.vectorIndex.add(
+    fp.semantic_vector,
+    cacheEntry,
+    fp.exact_hash
+  );
+  
+  // Store template-based entry
+  if (fp.template_id) {
+    await this.storeTemplateEntry(fp, cacheEntry);
+  }
+}
+
+async function enforceTokenBudget(newTokens: number): Promise<void> {
+  const currentUsage = await this.getTokenUsage();
+  const budget = this.config.token_budget;
+  
+  if (currentUsage + newTokens > budget) {
+    // Evict LRU entries
+    const toEvict = await this.selectEvictionCandidates(
+      newTokens - (budget - currentUsage)
+    );
+    
+    for (const candidate of toEvict) {
+      await this.evict(candidate);
+    }
+  }
+}
+```
+
+### Bước 5: Cache Warming
+
+```typescript
+// Prefetch common prompts dựa trên usage patterns
+interface WarmingStrategy {
+  type: 'frequency' | 'recency' | 'prediction' | 'hybrid';
+  batch_size: number;
+  priority: 'high' | 'medium' | 'low';
+}
+
+async function warmCache(
+  interactions: Interaction[],
+  strategy: WarmingStrategy
+): Promise<WarmingReport> {
+  const candidates = this.rankCandidates(interactions, strategy);
+  const warmed: string[] = [];
+  const skipped: string[] = [];
+  
+  for (const candidate of candidates.slice(0, strategy.batch_size)) {
+    if (!await this.has(candidate.prompt)) {
+      try {
+        const response = await this.llm.complete(candidate.prompt);
+        await this.add(candidate.prompt, response);
+        warmed.push(candidate.prompt);
+      } catch (error) {
+        skipped.push(candidate.prompt);
+      }
+    }
+  }
+  
+  return {
+    warmed_count: warmed.length,
+    skipped_count: skipped.length,
+    warmed_prompts: warmed,
+    skipped_prompts: skipped
+  };
+}
+
+function rankCandidates(
+  interactions: Interaction[],
+  strategy: WarmingStrategy
+): RankedCandidate[] {
+  const frequencyMap = countByPrompt(interactions);
+  
+  return Object.entries(frequencyMap)
+    .map(([prompt, count]) => ({
+      prompt,
+      frequency: count,
+      recency: getLastUsed(prompt, interactions),
+      score: calculateScore(count, recency, strategy)
+    }))
+    .sort((a, b) => b.score - a.score);
+}
+```
+
+### Bước 6: Invalidation Management
+
+```typescript
+// Xử lý cache invalidation
+interface InvalidationRule {
+  type: 'ttl' | 'manual' | 'semantic' | 'dependency';
+  condition: (entry: CachedResponse) => boolean;
+  action: 'evict' | 'refresh' | 'mark_stale';
+}
+
+class InvalidationManager {
+  private rules: InvalidationRule[] = [];
+  
+  addRule(rule: InvalidationRule): void {
+    this.rules.push(rule);
+  }
+  
+  async processInvalidations(): Promise<InvalidationReport> {
+    const evicted: string[] = [];
+    const refreshed: string[] = [];
+    
+    for (const [hash, entry] of this.cache.exactIndex) {
+      for (const rule of this.rules) {
+        if (rule.condition(entry)) {
+          switch (rule.action) {
+            case 'evict':
+              await this.cache.evict(hash);
+              evicted.push(hash);
+              break;
+            case 'refresh':
+              await this.cache.refresh(hash);
+              refreshed.push(hash);
+              break;
+            case 'mark_stale':
+              entry.metadata.stale = true;
+              break;
+          }
+        }
+      }
+    }
+    
+    return { evicted, refreshed };
+  }
+}
+
+// Common invalidation rules
+const commonRules: InvalidationRule[] = [
+  {
+    type: 'ttl',
+    condition: (e) => Date.now() - e.timestamp > e.ttl * 1000,
+    action: 'evict'
+  },
+  {
+    type: 'dependency',
+    condition: (e) => dependsOnStaleResource(e),
+    action: 'mark_stale'
+  },
+  {
+    type: 'semantic',
+    condition: (e) => isOutdatedSemantic(e),
+    action: 'refresh'
+  }
+];
+```
+
+## Checklist (Danh sách kiểm tra)
+
+- [ ] Cache initialization với appropriate backend storage
+- [ ] Exact match lookup với O(1) performance
+- [ ] Semantic search với configurable similarity threshold
+- [ ] Token budget enforcement và eviction policy
+- [ ] TTL-based automatic expiration
+- [ ] Cache warming cho common prompts
+- [ ] Statistics tracking (hit rate, token savings, latency)
+- [ ] Version-aware caching cho prompt versioning
+- [ ] Context-aware cache key generation
+- [ ] Graceful degradation khi cache unavailable
+- [ ] Thread-safe concurrent access handling
+- [ ] Persistent storage cho cache survival across restarts
+- [ ] Cache invalidation với multiple strategies
+- [ ] Memory-efficient vector storage
+- [ ] Cost tracking và reporting
+
+## Examples (Ví dụ)
+
+### Ví dụ 1: Basic Cache Usage
+
+```typescript
+// Sử dụng prompt cache trong LLM client
+class CachedLLMClient {
+  private cache: PromptCache;
+  private llm: LLMProvider;
+  
+  async complete(
+    prompt: string,
+    options?: CompletionOptions
+  ): Promise<CompletionResponse> {
+    // Check cache first
+    const cached = await this.cache.lookup(prompt);
+    
+    if (cached.status === 'HIT') {
+      console.log(`Cache HIT for prompt: ${cached.response}`);
+      return {
+        ...cached.response,
+        cached: true,
+        cache_hit: true
+      };
+    }
+    
+    if (cached.status === 'PARTIAL') {
+      console.log(`Cache PARTIAL (${cached.similarity})`);
+      // Use cached response với modifications
+      return this.adaptCachedResponse(cached);
+    }
+    
+    // Cache miss - call LLM
+    console.log('Cache MISS - calling LLM');
+    const response = await this.llm.complete(prompt, options);
+    
+    // Store in cache
+    await this.cache.add(prompt, response);
+    
+    return {
+      ...response,
+      cached: false
+    };
+  }
+}
+
+// Usage
+const client = new CachedLLMClient({
+  backend: 'redis',
+  embedding_model: 'text-embedding-3-small',
+  similarity_threshold: 0.95
+});
+
+const response = await client.complete(
+  'Explain async/await in JavaScript'
+);
+```
+
+### Ví dụ 2: Template-based Caching
+
+```typescript
+// Cache với template variables
+const cache = new PromptCache({
+  template_mode: true,
+  variable_extraction: true
+});
+
+// Register template
+cache.registerTemplate('explain_concept', `
+  Explain the concept of {{concept}} in {{language}}.
+  Include {{count}} examples.
+  Difficulty level: {{difficulty}}
+`);
+
+// Now any variation of this template hits cache
+const result1 = await cache.complete(
+  'explain_concept',
+  { concept: 'recursion', language: 'Python', count: 3, difficulty: 'intermediate' }
+);
+
+const result2 = await cache.complete(
+  'explain_concept', 
+  { concept: 'recursion', language: 'Python', count: 5, difficulty: 'advanced' }
+);
+
+// result2 có thể reuse parts của result1
+```
+
+### Ví dụ 3: Cache Analytics Dashboard
+
+```typescript
+// Xây dựng analytics dashboard cho cache
+interface CacheAnalytics {
+  overall_stats: {
+    hit_rate: number;
+    total_requests: number;
+    tokens_saved: number;
+    cost_saved_usd: number;
+    avg_latency_reduction_ms: number;
+  };
+  temporal_stats: {
+    hourly: HeatmapData[];
+    daily: BarChartData[];
+  };
+  top_cached_prompts: PromptStats[];
+  cache_health: {
+    fill_rate: number;
+    eviction_rate: number;
+    stale_percentage: number;
+  };
+}
+
+async function generateCacheReport(cache: PromptCache): Promise<CacheAnalytics> {
+  const stats = await cache.getStatistics();
+  const history = await cache.getHistory({ period: '30d' });
+  
+  return {
+    overall_stats: {
+      hit_rate: stats.hits / (stats.hits + stats.misses),
+      total_requests: stats.hits + stats.misses,
+      tokens_saved: stats.tokens_saved,
+      cost_saved_usd: calculateCostSavings(stats.tokens_saved),
+      avg_latency_reduction_ms: stats.latency_saved / stats.hits
+    },
+    temporal_stats: aggregateTemporal(history),
+    top_cached_prompts: getTopPrompts(history),
+    cache_health: await getCacheHealth(cache)
+  };
+}
+```
+
+## Anti Patterns (Các pattern cần tránh)
+
+### 1. Caching Everything
+```typescript
+// ❌ BAD: Cache tất cả responses không phân biệt
+async function badComplete(prompt: string) {
+  const cached = await cache.get(prompt);
+  if (cached) return cached;
+  
+  const response = await llm.complete(prompt);
+  await cache.set(prompt, response); // Always cache
+  return response;
+}
+
+// ✅ GOOD: Selective caching với policies
+async function goodComplete(prompt: string) {
+  const shouldCache = await cachePolicy.shouldCache(prompt);
+  if (!shouldCache) {
+    return await llm.complete(prompt);
+  }
+  
+  const cached = await cache.get(prompt);
+  if (cached) return cached;
+  
+  const response = await llm.complete(prompt);
+  if (response.quality >= MIN_QUALITY) {
+    await cache.set(prompt, response);
+  }
+  return response;
+}
+```
+
+### 2. No Invalidation Strategy
+```typescript
+// ❌ BAD: Cache vĩnh viễn không expiration
+async function badSetup() {
+  const cache = new PromptCache({
+    ttl_seconds: 0, // Never expires!
+    max_entries: Infinity
+  });
+}
+
+// ✅ GOOD: Proper TTL và eviction
+async function goodSetup() {
+  const cache = new PromptCache({
+    ttl_seconds: 3600, // 1 hour
+    max_entries: 10000,
+    eviction_policy: 'lru'
+  });
+  
+  // Add invalidation rules
+  cache.addRule({
+    type: 'semantic',
+    condition: (e) => hasContextChanged(e),
+    action: 'evict'
+  });
+}
+```
+
+### 3. Ignoring Semantic Drift
+```typescript
+// ❌ BAD: Exact matching only
+async function badLookup(prompt: string) {
+  const hash = sha256(prompt);
+  return await cache.get(hash);
+}
+
+// ✅ GOOD: Semantic awareness
+async function goodLookup(prompt: string) {
+  // Try exact first
+  const exact = await cache.getExact(prompt);
+  if (exact) return { hit: exact, type: 'exact' };
+  
+  // Try semantic
+  const semantic = await cache.getSemantic(prompt, { threshold: 0.95 });
+  if (semantic) return { hit: semantic, type: 'semantic' };
+  
+  return { hit: null };
+}
+```
+
+### 4. No Statistics Tracking
+```typescript
+// ❌ BAD: Black box cache
+async function badCache(prompt: string) {
+  return await cache.get(prompt) || await llm.complete(prompt);
+}
+
+// ✅ GOOD: Full observability
+async function goodCache(prompt: string) {
+  const start = Date.now();
+  const cached = await cache.get(prompt);
+  const latency = Date.now() - start;
+  
+  if (cached) {
+    await stats.recordHit(latency);
+    return cached;
+  }
+  
+  await stats.recordMiss();
+  const response = await llm.complete(prompt);
+  await cache.set(prompt, response);
+  return response;
+}
+```
+
+### 5. Single TTL for All Prompts
+```typescript
+// ❌ BAD: One-size-fits-all TTL
+const config = { ttl_seconds: 3600 }; // 1 hour for everything
+
+// ✅ GOOD: Domain-aware TTL
+const config = {
+  ttl_by_domain: {
+    'documentation': 86400,     // 24 hours - docs change rarely
+    'code_generation': 3600,    // 1 hour - code patterns evolve
+    'troubleshooting': 7200,    // 2 hours - solutions evolve moderately
+    'general': 1800             // 30 min - general knowledge
+  },
+  default_ttl: 3600
+};
+```
+
+## Best Practices (Thực hành tốt nhất)
+
+1. **Start with exact matching, add semantic later**: Exact matching simpler và faster
+2. **Use appropriate similarity thresholds**: 0.95+ cho code, 0.85+ cho general text
+3. **Implement tiered caching**: L1 (memory) → L2 (Redis) → LLM fallback
+4. **Track cost savings**: Monitor actual dollar savings từ caching
+5. **Warm proactively**: Prefetch high-traffic prompts during low usage periods
+6. **Handle partial cache hits**: Có thể combine cached và fresh data
+7. **Version your prompts**: Same prompt khác version = different cache entry
+8. **Use semantic versioning for cache keys**: Major version changes = cache invalidation
+9. **Implement circuit breaker**: Fallback to LLM when cache is unhealthy
+10. **Monitor cache health**: Fill rate, eviction rate, stale percentage
+
+## Liên kết (Cross-references)
+
+- **Related Skills**: [prompt-engineering](./prompt-engineering.mdc), [embedding-builder](./embedding-builder.mdc), [token-optimization](./token-optimization.mdc)
+- **Related Rules**: [token-optimization](../rules/token-optimization.mdc), [core-architecture](../rules/core-architecture.mdc)
+- **Infrastructure**: Redis, Memcached, DynamoDB, SQLite
+- **Metrics**: Prometheus, Grafana, Datadog

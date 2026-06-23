@@ -1,0 +1,1368 @@
+---
+description: Nguyên tắc và best practices cho GraphQL API Design trong Cursor Enterprise Framework
+created: 2026-06-23
+version: 1.0.0
+tags:
+  - graphql
+  - api
+  - query-language
+  - schema
+---
+
+# GraphQL API Design Guidelines
+
+## Mục tiêu
+
+Tài liệu này định nghĩa các nguyên tắc và best practices cho việc thiết kế GraphQL APIs trong Cursor Enterprise Framework. Mục tiêu là đảm bảo API consistency, performance, security, và developer experience tối ưu cho các ứng dụng sử dụng GraphQL.
+
+GraphQL là một query language và runtime cho APIs, cho phép clients request chính xác data mà họ cần. Việc tuân thủ các nguyên tắc trong tài liệu này sẽ giúp team xây dựng GraphQL APIs mạnh mẽ, maintainable, và scalable.
+
+## Nguyên tắc cơ bản
+
+### 1. Schema-First Design
+
+Thiết kế schema trước khi implement logic.
+
+```graphql
+# Schema Definition
+type User {
+  id: ID!
+  email: String!
+  name: String!
+  avatar: String
+  role: UserRole!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  
+  # Relationships
+  posts: [Post!]!
+  comments: [Comment!]!
+  followers: [User!]!
+  following: [User!]!
+  
+  # Computed fields
+  postCount: Int!
+  followerCount: Int!
+  followingCount: Int!
+}
+
+enum UserRole {
+  ADMIN
+  USER
+  MODERATOR
+}
+
+type Post {
+  id: ID!
+  title: String!
+  content: String!
+  published: Boolean!
+  author: User!
+  comments: [Comment!]!
+  tags: [Tag!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  
+  # Pagination helpers
+  commentCount: Int!
+}
+
+type Comment {
+  id: ID!
+  content: String!
+  author: User!
+  post: Post!
+  createdAt: DateTime!
+}
+
+type Tag {
+  id: ID!
+  name: String!
+  slug: String!
+  postCount: Int!
+}
+
+# Input types
+input CreateUserInput {
+  email: String!
+  name: String!
+  password: String!
+  role: UserRole = USER
+}
+
+input UpdateUserInput {
+  name: String
+  avatar: String
+}
+
+input PaginationInput {
+  first: Int = 20
+  after: String
+  last: Int
+  before: String
+}
+
+# Connection types for pagination
+type UserConnection {
+  edges: [UserEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type UserEdge {
+  node: User!
+  cursor: String!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+```
+
+### 2. Query Design
+
+Thiết kế queries theo hierarchical và nested structure.
+
+```graphql
+type Query {
+  # Single resource queries
+  user(id: ID!): User
+  post(id: ID!): Post
+  
+  # List queries với pagination
+  users(
+    filter: UserFilterInput
+    sort: [UserSortInput!]
+    pagination: PaginationInput
+  ): UserConnection!
+  
+  posts(
+    filter: PostFilterInput
+    sort: [PostSortInput!]
+    pagination: PaginationInput
+  ): PostConnection!
+  
+  # Search queries
+  searchPosts(query: String!, pagination: PaginationInput): PostConnection!
+  
+  # Current user
+  me: User
+  
+  # Node interface for Relay compliance
+  node(id: ID!): Node
+}
+
+interface Node {
+  id: ID!
+}
+
+type User implements Node {
+  id: ID!
+  # ... other fields
+}
+```
+
+### 3. Mutation Design
+
+Tổ chức mutations theo action patterns.
+
+```graphql
+type Mutation {
+  # User mutations
+  createUser(input: CreateUserInput!): UserPayload!
+  updateUser(id: ID!, input: UpdateUserInput!): UserPayload!
+  deleteUser(id: ID!): DeletePayload!
+  
+  # Post mutations
+  createPost(input: CreatePostInput!): PostPayload!
+  updatePost(id: ID!, input: UpdatePostInput!): PostPayload!
+  deletePost(id: ID!): DeletePayload!
+  publishPost(id: ID!): PostPayload!
+  unpublishPost(id: ID!): PostPayload!
+  
+  # Comment mutations
+  createComment(postId: ID!, input: CreateCommentInput!): CommentPayload!
+  updateComment(id: ID!, input: UpdateCommentInput!): CommentPayload!
+  deleteComment(id: ID!): DeletePayload!
+  
+  # Auth mutations
+  login(email: String!, password: String!): AuthPayload!
+  register(input: RegisterInput!): AuthPayload!
+  refreshToken(token: String!): AuthPayload!
+  logout: Boolean!
+}
+
+# Payload types với error handling
+type UserPayload {
+  user: User
+  errors: [UserError!]
+  success: Boolean!
+}
+
+type PostPayload {
+  post: Post
+  errors: [PostError!]
+  success: Boolean!
+}
+
+type CommentPayload {
+  comment: Comment
+  errors: [CommentError!]
+  success: Boolean!
+}
+
+type AuthPayload {
+  token: String
+  refreshToken: String
+  user: User
+  errors: [AuthError!]
+  success: Boolean!
+}
+
+type DeletePayload {
+  deletedId: ID
+  success: Boolean!
+  errors: [DeleteError!]
+}
+
+# Error types
+type UserError {
+  field: String
+  message: String!
+  code: UserErrorCode!
+}
+
+enum UserErrorCode {
+  EMAIL_EXISTS
+  INVALID_EMAIL
+  USER_NOT_FOUND
+  PERMISSION_DENIED
+}
+
+type PostError {
+  field: String
+  message: String!
+  code: PostErrorCode!
+}
+
+enum PostErrorCode {
+  TITLE_REQUIRED
+  CONTENT_REQUIRED
+  POST_NOT_FOUND
+}
+
+type AuthError {
+  field: String
+  message: String!
+  code: AuthErrorCode!
+}
+
+enum AuthErrorCode {
+  INVALID_CREDENTIALS
+  INVALID_TOKEN
+  TOKEN_EXPIRED
+  ACCOUNT_LOCKED
+}
+```
+
+### 4. Subscription Design
+
+Implement subscriptions cho real-time features.
+
+```graphql
+type Subscription {
+  # Post subscriptions
+  postCreated: PostSubscriptionPayload!
+  postUpdated(id: ID): PostSubscriptionPayload!
+  postDeleted: PostSubscriptionPayload!
+  
+  # Comment subscriptions
+  commentCreated(postId: ID!): CommentSubscriptionPayload!
+  
+  # User subscriptions
+  userOnline(userId: ID!): UserPresencePayload!
+  
+  # Notification subscriptions
+  notificationReceived: NotificationPayload!
+}
+
+type PostSubscriptionPayload {
+  mutation: MutationType!
+  node: Post
+  previousNode: Post
+}
+
+type CommentSubscriptionPayload {
+  mutation: MutationType!
+  node: Comment
+  post: Post
+}
+
+type UserPresencePayload {
+  user: User!
+  online: Boolean!
+  lastSeen: DateTime!
+}
+
+type NotificationPayload {
+  notification: Notification!
+  userId: ID!
+}
+
+enum MutationType {
+  CREATED
+  UPDATED
+  DELETED
+}
+```
+
+### 5. DataLoader Pattern
+
+Sử dụng DataLoader để prevent N+1 queries.
+
+```typescript
+// DataLoaders
+import DataLoader from 'dataloader';
+import { PostService } from './services/post.service';
+import { UserService } from './services/user.service';
+
+export function createDataLoaders(services: Services) {
+    return {
+        userLoader: new DataLoader<string, User>(async (ids) => {
+            const users = await services.user.findByIds(ids);
+            return ids.map(id => users.find(u => u.id === id));
+        }),
+        
+        postLoader: new DataLoader<string, Post>(async (ids) => {
+            const posts = await services.post.findByIds(ids);
+            return ids.map(id => posts.find(p => p.id === id));
+        }),
+        
+        postsByUserLoader: new DataLoader<string, Post[]>(async (userIds) => {
+            const posts = await services.post.findByUserIds(userIds);
+            const postsByUser = new Map<string, Post[]>();
+            
+            for (const post of posts) {
+                const userPosts = postsByUser.get(post.authorId) || [];
+                userPosts.push(post);
+                postsByUser.set(post.authorId, userPosts);
+            }
+            
+            return userIds.map(id => postsByUser.get(id) || []);
+        }),
+        
+        userByPostLoader: new DataLoader<string, User>(async (postIds) => {
+            const posts = await services.post.findByIds(postIds);
+            const authorIds = posts.map(p => p.authorId);
+            const authors = await services.user.findByIds(authorIds);
+            const authorMap = new Map(authors.map(a => [a.id, a]));
+            
+            return postIds.map(id => {
+                const post = posts.find(p => p.id === id);
+                return post ? authorMap.get(post.authorId) : null;
+            });
+        }),
+        
+        commentCountLoader: new DataLoader<string, number>(async (postIds) => {
+            const counts = await services.comment.countByPostIds(postIds);
+            return postIds.map(id => counts.get(id) || 0);
+        }),
+        
+        followerCountLoader: new DataLoader<string, number>(async (userIds) => {
+            const counts = await services.user.countFollowers(userIds);
+            return userIds.map(id => counts.get(id) || 0);
+        })
+    };
+}
+
+// Usage in resolver
+const resolvers = {
+    User: {
+        posts: (user, args, { loaders }) => {
+            return loaders.postsByUserLoader.load(user.id);
+        },
+        postCount: (user, args, { loaders }) => {
+            return loaders.postsByUserLoader.load(user.id).then(posts => posts.length);
+        },
+        followerCount: (user, args, { loaders }) => {
+            return loaders.followerCountLoader.load(user.id);
+        }
+    },
+    
+    Post: {
+        author: (post, args, { loaders }) => {
+            return loaders.userByPostLoader.load(post.id);
+        },
+        commentCount: (post, args, { loaders }) => {
+            return loaders.commentCountLoader.load(post.id);
+        }
+    }
+};
+```
+
+### 6. Input Validation
+
+Implement comprehensive input validation.
+
+```typescript
+import { z } from 'zod';
+
+// Validation schemas
+const createUserSchema = z.object({
+    email: z.string().email('Invalid email format').max(255),
+    name: z.string().min(1, 'Name is required').max(100),
+    password: z.string()
+        .min(8, 'Password must be at least 8 characters')
+        .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+        .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+        .regex(/[0-9]/, 'Password must contain at least one number'),
+    role: z.enum(['ADMIN', 'USER', 'MODERATOR']).optional()
+});
+
+const createPostSchema = z.object({
+    title: z.string()
+        .min(1, 'Title is required')
+        .max(200, 'Title must be less than 200 characters'),
+    content: z.string()
+        .min(1, 'Content is required')
+        .max(50000, 'Content must be less than 50000 characters'),
+    tags: z.array(z.string()).max(10, 'Maximum 10 tags allowed'),
+    published: z.boolean().optional()
+});
+
+const paginationSchema = z.object({
+    first: z.number().min(1).max(100).optional(),
+    after: z.string().optional(),
+    last: z.number().min(1).max(100).optional(),
+    before: z.string().optional()
+});
+
+// Validation middleware
+import { GraphQLError } from 'graphql';
+
+export function validateInput<T>(schema: z.ZodSchema<T>) {
+    return (input: unknown): T => {
+        const result = schema.safeParse(input);
+        
+        if (!result.success) {
+            const errors = result.error.issues.map(issue => ({
+                field: issue.path.join('.'),
+                message: issue.message,
+                code: 'VALIDATION_ERROR'
+            }));
+            
+            throw new GraphQLError('Validation failed', {
+                extensions: {
+                    code: 'BAD_USER_INPUT',
+                    errors
+                }
+            });
+        }
+        
+        return result.data;
+    };
+}
+
+// Usage
+const createUserValidation = validateInput(createUserSchema);
+
+const resolvers = {
+    Mutation: {
+        createUser: async (_, { input }, context) => {
+            const validatedInput = createUserValidation(input);
+            // ... proceed with mutation
+        }
+    }
+};
+```
+
+### 7. Error Handling
+
+Standardized error handling pattern.
+
+```typescript
+// Custom error classes
+export class AppError extends Error {
+    constructor(
+        message: string,
+        public code: string,
+        public statusCode: number = 500,
+        public details?: Record<string, any>
+    ) {
+        super(message);
+        this.name = 'AppError';
+    }
+}
+
+export class NotFoundError extends AppError {
+    constructor(resource: string, id?: string) {
+        super(
+            `${resource} not found${id ? `: ${id}` : ''}`,
+            'NOT_FOUND',
+            404
+        );
+    }
+}
+
+export class ValidationError extends AppError {
+    constructor(errors: Array<{ field: string; message: string }>) {
+        super('Validation failed', 'VALIDATION_ERROR', 400, { errors });
+    }
+}
+
+export class AuthenticationError extends AppError {
+    constructor(message: string = 'Authentication required') {
+        super(message, 'AUTHENTICATION_ERROR', 401);
+    }
+}
+
+export class AuthorizationError extends AppError {
+    constructor(message: string = 'Permission denied') {
+        super(message, 'AUTHORIZATION_ERROR', 403);
+    }
+}
+
+// Error formatting for GraphQL
+export function formatError(error: GraphQLError) {
+    if (error.originalError instanceof AppError) {
+        return {
+            message: error.message,
+            code: error.originalError.code,
+            statusCode: error.originalError.statusCode,
+            details: error.originalError.details
+        };
+    }
+    
+    // Log unexpected errors
+    if (process.env.NODE_ENV === 'development') {
+        console.error('Unexpected error:', error);
+    }
+    
+    return {
+        message: 'An unexpected error occurred',
+        code: 'INTERNAL_ERROR',
+        statusCode: 500
+    };
+}
+
+// GraphQL error handling
+const errorHandler = (error: GraphQLError) => {
+    return formatError(error);
+};
+
+export const graphqlConfig = {
+    formatError: errorHandler,
+    customFormatErrorFn: errorHandler
+};
+```
+
+### 8. Performance Optimization
+
+Query complexity analysis và response caching.
+
+```typescript
+import { createComplexityLimitRule } from 'graphql-query-complexity';
+
+const complexityRule = createComplexityLimitRule(1000, {
+    formatErrorMessage: (complexity, limit) => {
+        return `Query complexity is ${complexity}, which exceeds maximum complexity of ${limit}`;
+    }
+});
+
+// Persisted queries
+import { createHash } from 'crypto';
+
+const persistedQueries = new Map<string, { query: string; hash: string }>();
+
+function getPersistedQuery(hash: string) {
+    return persistedQueries.get(hash);
+}
+
+function hashQuery(query: string): string {
+    return createHash('sha256').update(query).digest('hex');
+}
+
+// Field-level response caching
+const cacheControlConfig = {
+    sessionId: (_, { session }) => session?.id,
+    products: {
+        maxAge: 60, // 60 seconds
+        scope: 'PRIVATE'
+    },
+    posts: {
+        maxAge: 30,
+        scope: 'PUBLIC'
+    }
+};
+
+// Query depth limiting
+const depthLimitRule = createDepthLimitRule(10, {
+    formatErrorMessage: (depth) => `Query depth exceeds maximum of ${10}`
+});
+```
+
+### 9. Authorization
+
+Implement authorization at multiple levels.
+
+```typescript
+// Authorization decorator
+function Authorized(roles: UserRole[] = []) {
+    return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
+        const originalMethod = descriptor.value;
+        
+        descriptor.value = async function (...args: any[]) {
+            const context = args[2]; // GraphQL context
+            
+            if (!context.user) {
+                throw new AuthenticationError();
+            }
+            
+            if (roles.length > 0 && !roles.includes(context.user.role)) {
+                throw new AuthorizationError();
+            }
+            
+            return originalMethod.apply(this, args);
+        };
+        
+        return descriptor;
+    };
+}
+
+// Field-level authorization
+const resolvers = {
+    User: {
+        email: (user, args, context) => {
+            // Only show own email or admin
+            if (context.user?.id === user.id || context.user?.role === 'ADMIN') {
+                return user.email;
+            }
+            return null;
+        },
+        
+        posts: (user, args, context) => {
+            // Only show own posts or published posts
+            if (context.user?.id === user.id) {
+                return postService.findByAuthor(user.id);
+            }
+            return postService.findPublishedByAuthor(user.id);
+        }
+    }
+};
+
+// Input validation authorization
+const resolvers = {
+    Mutation: {
+        updateUser: async (_, { id, input }, context) => {
+            // Can only update own profile or admin can update anyone
+            if (context.user.id !== id && context.user.role !== 'ADMIN') {
+                throw new AuthorizationError('Can only update own profile');
+            }
+            // ...
+        }
+    }
+};
+```
+
+### 10. Rate Limiting
+
+Implement rate limiting cho GraphQL API.
+
+```typescript
+import { createRateLimitRule } from 'graphql-rate-limit';
+
+const rateLimitRule = createRateLimitRule({
+    identifyContext: (context) => context.user?.id || context.ip,
+    formatErrorMessage: ({ graphileDimensions }) => {
+        return `Rate limit exceeded. Please try again in a few seconds.`;
+    }
+});
+
+const rateLimitDirective = new RateLimitDirective({
+    window: '1 minute',
+    max: 100
+});
+
+// Different limits for different operations
+const resolvers = {
+    Query: {
+        searchPosts: rateLimitRule({
+            window: '1 minute',
+            max: 20,
+            identityArgs: ['query']
+        })(
+            async (_, { query, pagination }, context) => {
+                return searchService.search(query, pagination);
+            }
+        )
+    },
+    
+    Mutation: {
+        login: rateLimitRule({
+            window: '5 minutes',
+            max: 5
+        })(
+            async (_, { email, password }, context) => {
+                // ... login logic
+            }
+        ),
+        
+        createPost: rateLimitRule({
+            window: '1 minute',
+            max: 10
+        })(
+            async (_, { input }, context) => {
+                // ... create post logic
+            }
+        )
+    }
+};
+```
+
+## Checklist
+
+- [ ] Design schema trước khi implement
+- [ ] Use DataLoader cho N+1 prevention
+- [ ] Implement proper error handling
+- [ ] Add input validation
+- [ ] Configure rate limiting
+- [ ] Implement authorization at multiple levels
+- [ ] Use connection pattern cho pagination
+- [ ] Add query complexity analysis
+- [ ] Implement response caching
+- [ ] Document schema thoroughly
+- [ ] Write integration tests
+- [ ] Set up Apollo Studio hoặc GraphQL Playground
+- [ ] Configure persisted queries
+- [ ] Implement field-level resolvers
+- [ ] Add subscriptions for real-time features
+
+## Anti Patterns
+
+### 1. Exposing Entire Database Schema
+
+```graphql
+# Không nên - expose internal database structure
+type User {
+  id: ID!
+  passwordHash: String!  # Security risk!
+  internalNotes: String
+  _internalId: Int!
+  dbLastModified: DateTime
+}
+```
+
+### 2. N+1 Query Problem
+
+```typescript
+// Không nên - querying in loop
+const resolvers = {
+    Query: {
+        users: () => db.getAllUsers(),
+    },
+    User: {
+        posts: async (user) => {
+            // N+1 query - bad!
+            return db.query(`SELECT * FROM posts WHERE author_id = ${user.id}`);
+        }
+    }
+};
+
+// Nên - use DataLoader
+const resolvers = {
+    User: {
+        posts: (user, args, { loaders }) => {
+            return loaders.postsByUserLoader.load(user.id);
+        }
+    }
+};
+```
+
+### 3. Over-fetching without Pagination
+
+```graphql
+# Không nên - return all posts without pagination
+type User {
+    posts: [Post!]!  # Could be thousands!
+}
+
+# Nên - use connection pattern
+type User {
+    posts(
+        first: Int
+        after: String
+    ): PostConnection!
+}
+```
+
+### 4. Missing Error Handling
+
+```typescript
+// Không nên
+const resolvers = {
+    Query: {
+        user: async (_, { id }) => {
+            return await db.users.findById(id);
+        }
+    }
+};
+
+// Nên
+const resolvers = {
+    Query: {
+        user: async (_, { id }) => {
+            const user = await db.users.findById(id);
+            if (!user) {
+                throw new NotFoundError('User', id);
+            }
+            return user;
+        }
+    }
+};
+```
+
+### 5. Mutations returning only boolean
+
+```graphql
+# Không nên - insufficient response
+type Mutation {
+    deleteUser(id: ID!): Boolean!
+}
+
+# Nên - return deleted ID
+type Mutation {
+    deleteUser(id: ID!): DeletePayload!
+}
+
+type DeletePayload {
+    deletedId: ID
+    success: Boolean!
+    errors: [Error!]
+}
+```
+
+## Best Practices
+
+### 1. Schema Design Best Practices
+
+```graphql
+# Use meaningful naming conventions
+type User {
+    id: ID!
+    firstName: String!      # Not: fn
+    lastName: String!       # Not: ln
+    emailAddress: String!   # Not: email
+    createdAt: DateTime!    # Not: created_at
+}
+
+# Use meaningful input names
+input CreateUserInput {
+    firstName: String!
+    lastName: String!
+    email: String!
+    password: String!
+}
+
+# Document everything
+"This represents a user in the system"
+type User {
+    "Unique identifier"
+    id: ID!
+    
+    "User's email address (only visible to owner and admins)"
+    email: String!
+    
+    "User's display name"
+    displayName: String!
+}
+
+# Use enums for limited values
+enum OrderStatus {
+    PENDING
+    PROCESSING
+    SHIPPED
+    DELIVERED
+    CANCELLED
+}
+
+# Use interfaces for shared types
+interface Node {
+    id: ID!
+}
+
+interface Timestamped {
+    createdAt: DateTime!
+    updatedAt: DateTime!
+}
+```
+
+### 2. Naming Conventions
+
+```graphql
+# Operations
+type Query {
+    # Nouns for reads
+    user(id: ID!): User
+    users(filter: UserFilter): UserConnection!
+    
+    # Plural for lists
+    posts: [Post!]!
+    comments: [Comment!]!
+}
+
+type Mutation {
+    # Verbs for actions
+    createUser(input: CreateUserInput!): UserPayload!
+    updateUser(id: ID!, input: UpdateUserInput!): UserPayload!
+    deleteUser(id: ID!): DeletePayload!
+    publishPost(id: ID!): PostPayload!
+}
+
+type Subscription {
+    # Past tense for events
+    postCreated: Post!
+    userSignedUp: User!
+    orderShipped: Order!
+}
+```
+
+### 3. Relay Connection Pattern
+
+```graphql
+type PostConnection {
+    edges: [PostEdge!]!
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type PostEdge {
+    node: Post!
+    cursor: String!
+}
+
+type PageInfo {
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+    startCursor: String
+    endCursor: String
+}
+```
+
+### 4. Federation-ready Schema
+
+```graphql
+# User service - schema.graphql
+type User @key(fields: "id") {
+    id: ID!
+    email: String!
+    name: String!
+    posts: [Post!]!
+}
+
+extend type Post @key(fields: "id") {
+    id: ID! @external
+    author: User!
+}
+```
+
+### 5. Context Management
+
+```typescript
+import { PrismaClient } from '@prisma/client';
+import { Redis } from 'ioredis';
+
+export interface GraphQLContext {
+    prisma: PrismaClient;
+    redis: Redis;
+    user: User | null;
+    ip: string;
+    requestId: string;
+}
+
+export async function createContext({ req, res }): Promise<GraphQLContext> {
+    const user = await authenticateUser(req);
+    
+    return {
+        prisma: prismaClient,
+        redis: redisClient,
+        user,
+        ip: req.ip,
+        requestId: req.headers['x-request-id'] || generateRequestId()
+    };
+}
+```
+
+## Workflow
+
+### 1. Schema Design
+
+1. Gather requirements từ stakeholders
+2. Identify entities và relationships
+3. Design type definitions
+4. Define queries và mutations
+5. Add input types và enums
+6. Review và refine schema
+7. Document schema
+
+### 2. Implementation
+
+1. Generate types from schema
+2. Implement resolvers
+3. Add validation
+4. Configure DataLoaders
+5. Add error handling
+6. Implement authorization
+7. Write tests
+
+### 3. Testing
+
+1. Unit tests cho resolvers
+2. Integration tests
+3. Schema validation tests
+4. Performance tests
+5. Security tests
+
+### 4. Deployment
+
+1. Deploy schema registry
+2. Configure monitoring
+3. Set up rate limiting
+4. Configure caching
+5. Document breaking changes
+
+## Ví dụ
+
+### Ví dụ 1: Complete Schema Definition
+
+```graphql
+# schema.graphql
+
+scalar DateTime
+scalar JSON
+
+interface Node {
+    id: ID!
+}
+
+interface Timestamped {
+    createdAt: DateTime!
+    updatedAt: DateTime!
+}
+
+interface Content {
+    title: String!
+    body: String!
+}
+
+type User implements Node & Timestamped {
+    id: ID!
+    email: String!
+    name: String!
+    avatar: String
+    bio: String
+    role: UserRole!
+    posts: PostConnection!
+    comments: CommentConnection!
+    followers: UserConnection!
+    following: UserConnection!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+}
+
+enum UserRole {
+    ADMIN
+    USER
+    MODERATOR
+}
+
+type Post implements Node & Timestamped & Content {
+    id: ID!
+    title: String!
+    body: String!
+    published: Boolean!
+    author: User!
+    comments: CommentConnection!
+    tags: [Tag!]!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+}
+
+type Comment implements Node & Timestamped {
+    id: ID!
+    body: String!
+    author: User!
+    post: Post!
+    createdAt: DateTime!
+}
+
+type Tag implements Node {
+    id: ID!
+    name: String!
+    slug: String!
+    posts: PostConnection!
+}
+
+type UserConnection {
+    edges: [UserEdge!]!
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type UserEdge {
+    node: User!
+    cursor: String!
+}
+
+type PostConnection {
+    edges: [PostEdge!]!
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type PostEdge {
+    node: Post!
+    cursor: String!
+}
+
+type CommentConnection {
+    edges: [CommentEdge!]!
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type CommentEdge {
+    node: Comment!
+    cursor: String!
+}
+
+type PageInfo {
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+    startCursor: String
+    endCursor: String
+}
+
+type AuthPayload {
+    token: String!
+    refreshToken: String!
+    user: User!
+}
+
+type DeletePayload {
+    deletedId: ID!
+    success: Boolean!
+}
+
+input CreateUserInput {
+    email: String!
+    name: String!
+    password: String!
+    bio: String
+}
+
+input UpdateUserInput {
+    name: String
+    avatar: String
+    bio: String
+}
+
+input CreatePostInput {
+    title: String!
+    body: String!
+    tags: [String!]
+    published: Boolean = false
+}
+
+input UpdatePostInput {
+    title: String
+    body: String
+    tags: [String!]
+    published: Boolean
+}
+
+input UserFilterInput {
+    search: String
+    role: UserRole
+    createdAfter: DateTime
+    createdBefore: DateTime
+}
+
+input PostFilterInput {
+    search: String
+    tags: [String!]
+    authorId: ID
+    published: Boolean
+}
+
+input PaginationInput {
+    first: Int = 20
+    after: String
+    last: Int
+    before: String
+}
+
+type Query {
+    node(id: ID!): Node
+    
+    me: User
+    
+    user(id: ID!): User
+    users(
+        filter: UserFilterInput
+        pagination: PaginationInput
+    ): UserConnection!
+    
+    post(id: ID!): Post
+    posts(
+        filter: PostFilterInput
+        pagination: PaginationInput
+    ): PostConnection!
+    
+    tag(slug: String!): Tag
+    tags: [Tag!]!
+}
+
+type Mutation {
+    login(email: String!, password: String!): AuthPayload!
+    register(input: CreateUserInput!): AuthPayload!
+    refreshToken(token: String!): AuthPayload!
+    logout: Boolean!
+    
+    createUser(input: CreateUserInput!): UserPayload!
+    updateUser(id: ID!, input: UpdateUserInput!): UserPayload!
+    deleteUser(id: ID!): DeletePayload!
+    
+    createPost(input: CreatePostInput!): PostPayload!
+    updatePost(id: ID!, input: UpdatePostInput!): PostPayload!
+    deletePost(id: ID!): DeletePayload!
+    publishPost(id: ID!): PostPayload!
+    unpublishPost(id: ID!): PostPayload!
+}
+
+type Subscription {
+    postCreated: Post!
+    postUpdated(id: ID): Post!
+    postDeleted: Post!
+    commentCreated(postId: ID!): Comment!
+}
+```
+
+### Ví dụ 2: Resolver Implementation
+
+```typescript
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@apollo/server/express4';
+import express from 'express';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import { typeDefs } from './schema';
+import { resolvers } from './resolvers';
+import { createContext, GraphQLContext } from './context';
+import { createDataLoaders } from './loaders';
+import { formatError } from './errors';
+import { rateLimitRule } from 'graphql-rate-limit';
+
+const schema = makeExecutableSchema({ typeDefs, resolvers });
+
+async function startServer() {
+    const app = express();
+    
+    const server = new ApolloServer<GraphQLContext>({
+        schema,
+        formatError,
+        plugins: [
+            {
+                async requestDidStart() {
+                    return {
+                        async willSendResponse({ response }) {
+                            // Add headers
+                            response.http?.headers.set(
+                                'X-Response-Time',
+                                Date.now().toString()
+                            );
+                        }
+                    };
+                }
+            }
+        ]
+    });
+    
+    await server.start();
+    
+    app.use('/graphql', 
+        express.json(),
+        expressMiddleware(server, {
+            context: async ({ req }) => {
+                const context = await createContext({ req });
+                const loaders = createDataLoaders(context);
+                return { ...context, loaders };
+            }
+        })
+    );
+    
+    app.listen(4000, () => {
+        console.log('Server ready at http://localhost:4000/graphql');
+    });
+}
+
+startServer();
+```
+
+### Ví dụ 3: Integration với Existing REST APIs
+
+```typescript
+// REST to GraphQL adapter
+export class RESTAdapter {
+    constructor(private baseUrl: string, private apiKey: string) {}
+    
+    async get<T>(endpoint: string, params?: Record<string, string>): Promise<T> {
+        const url = new URL(endpoint, this.baseUrl);
+        if (params) {
+            Object.entries(params).forEach(([key, value]) => {
+                url.searchParams.set(key, value);
+            });
+        }
+        
+        const response = await fetch(url.toString(), {
+            headers: {
+                'Authorization': `Bearer ${this.apiKey}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`REST API error: ${response.status}`);
+        }
+        
+        return response.json();
+    }
+}
+
+// GraphQL resolver using REST adapter
+const resolvers = {
+    Query: {
+        externalData: async (_, { id }, { restAdapter }) => {
+            const data = await restAdapter.get(`/api/external/${id}`);
+            
+            // Transform to GraphQL format
+            return {
+                id: data.externalId,
+                title: data.name,
+                description: data.description,
+                metadata: data.meta
+            };
+        }
+    }
+};
+```
+
+## Liên kết
+
+- [GraphQL Official Documentation](https://graphql.org/)
+- [Apollo GraphQL](https://www.apollographql.com/)
+- [GraphQL Code Generator](https://www.graphql-code-generator.com/)
+- API Guidelines: `.cursor/rules/api.mdc`
+- RESTful API: `.cursor/rules/restful-api.mdc`
+- Security: `.cursor/rules/security.mdc`

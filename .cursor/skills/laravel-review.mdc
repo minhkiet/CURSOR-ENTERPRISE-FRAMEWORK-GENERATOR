@@ -1,0 +1,796 @@
+---
+description: Skill review Laravel applications về architecture, patterns, security, và performance implementation
+purpose: Cung cấp comprehensive review framework cho Laravel projects, evaluate MVC patterns, Eloquent usage, và Laravel-specific best practices
+input:
+  - Laravel project structure
+  - Controllers và routes
+  - Eloquent models
+  - Service classes
+  - Configuration files
+output:
+  - Architecture assessment
+  - Security audit
+  - Performance analysis
+  - Best practice compliance
+  - Recommendations
+version: 1.0.0
+tags:
+  - laravel
+  - php
+  - review
+  - mvc
+  - eloquent
+---
+
+# Laravel Review
+
+## Tổng quan
+
+Laravel Review là skill chuyên biệt để review và assess Laravel applications. Skill này cung cấp systematic approach để evaluate Laravel-specific patterns, Eloquent usage, security configurations, và performance optimizations. Phù hợp cho both new projects và existing applications needing modernization.
+
+## Purpose (Mục đích)
+
+Laravel có many features nhưng cũng có many ways to misuse:
+
+1. **Architecture issues**: Fat controllers, anemic models, God classes
+2. **Eloquent inefficiencies**: N+1 queries, missing indexes, eager loading
+3. **Security gaps**: XSS, CSRF, SQL injection, auth bypass
+4. **Configuration problems**: Environment handling, secrets management
+5. **Performance bottlenecks**: Missing caching, inefficient queries
+
+Laravel Review tồn tại để:
+
+- **Identify Laravel anti-patterns** early
+- **Optimize Eloquent queries** and relationships
+- **Find security vulnerabilities** before production
+- **Review Laravel-specific configurations**
+- **Provide actionable recommendations**
+
+## Input (Đầu vào)
+
+| Input | Mô tả | Required |
+|-------|-------|----------|
+| `project_structure` | Directory structure | Yes |
+| `controllers` | Controller files | Yes |
+| `models` | Eloquent models | Yes |
+| `routes` | Route definitions | Yes |
+| `migrations` | Database migrations | No |
+
+## Output (Đầu ra)
+
+| Output | Mô tả | Format |
+|--------|-------|--------|
+| `architecture_review` | Architecture assessment | Report |
+| `eloquent_analysis` | Eloquent usage analysis | Analysis |
+| `security_audit` | Security findings | Audit |
+| `performance_review` | Performance analysis | Review |
+| `recommendations` | Actionable improvements | List |
+
+## Workflow (Quy trình)
+
+### Bước 1: Project Structure Analysis
+
+```typescript
+// Analyze Laravel project structure
+interface LaravelStructure {
+  application: AppStructure;
+  packages: PackageInfo[];
+  directories: DirectoryInfo[];
+  issues: StructureIssue[];
+}
+
+async function analyzeLaravelStructure(
+  rootPath: string
+): Promise<LaravelStructure> {
+  const structure = await analyzeDirectory(rootPath);
+  
+  // Check for required Laravel directories
+  const requiredDirs = [
+    'app/Http/Controllers',
+    'app/Models',
+    'app/Services',
+    'app/Repositories',
+    'routes',
+    'config',
+    'database/migrations'
+  ];
+  
+  const missingDirs = requiredDirs.filter(dir => 
+    !structure.directories.includes(dir)
+  );
+  
+  // Check for proper service layer
+  const hasServices = await checkDirectoryExists(`${rootPath}/app/Services`);
+  const hasRepositories = await checkDirectoryExists(`${rootPath}/app/Repositories`);
+  
+  return {
+    application: {
+      name: await getAppName(rootPath),
+      version: await getLaravelVersion(rootPath),
+      phpVersion: await getPHPVersion(rootPath),
+      structure
+    },
+    packages: await analyzePackages(rootPath),
+    directories: structure.directories,
+    issues: [
+      ...missingDirs.map(d => ({
+        type: 'missing_directory',
+        directory: d,
+        severity: 'high',
+        message: `Required Laravel directory ${d} is missing`
+      })),
+      ...(!hasServices ? [{
+        type: 'missing_service_layer',
+        severity: 'medium',
+        message: 'Consider adding Services directory for business logic'
+      }] : [])
+    ]
+  };
+}
+
+async function analyzePackages(
+  rootPath: string
+): Promise<PackageInfo[]> {
+  const composer = await readFile(`${rootPath}/composer.json`);
+  const parsed = JSON.parse(composer);
+  
+  return Object.entries(parsed.require).map(([name, version]) => ({
+    name,
+    version: version as string,
+    isDev: false
+  }));
+}
+```
+
+### Bước 2: Controller Review
+
+```typescript
+// Review Laravel controllers
+interface ControllerAnalysis {
+  controllers: ControllerInfo[];
+  issues: ControllerIssue[];
+  endpoints: EndpointInfo[];
+}
+
+async function analyzeControllers(
+  controllersPath: string
+): Promise<ControllerAnalysis> {
+  const files = await glob('*.php', { cwd: controllersPath });
+  const controllers: ControllerInfo[] = [];
+  const issues: ControllerIssue[] = [];
+  const endpoints: EndpointInfo[] = [];
+  
+  for (const file of files) {
+    const content = await readFile(`${controllersPath}/${file}`);
+    const parsed = parsePHP(content);
+    
+    const controller: ControllerInfo = {
+      name: parsed.className,
+      methods: parsed.methods.map(m => ({
+        name: m.name,
+        parameters: m.parameters,
+        returnType: m.returnType,
+        isPublic: m.isPublic,
+        hasFormRequest: m.hasFormRequestValidation,
+        hasAuthorize: m.hasAuthorize,
+        lines: m.lines
+      })),
+      usesMiddleware: parsed.usesMiddleware,
+      usesTraits: parsed.usesTraits,
+      extends: parsed.extends,
+      file
+    };
+    
+    controllers.push(controller);
+    
+    // Check for issues
+    for (const method of controller.methods) {
+      // Check method length
+      if (method.lines > 50) {
+        issues.push({
+          type: 'fat_method',
+          controller: controller.name,
+          method: method.name,
+          lines: method.lines,
+          severity: 'medium',
+          message: `Method has ${method.lines} lines - consider extracting logic`
+        });
+      }
+      
+      // Check for missing Form Request
+      if (method.parameters.length > 3 && !method.hasFormRequest) {
+        issues.push({
+          type: 'missing_form_request',
+          controller: controller.name,
+          method: method.name,
+          severity: 'low',
+          message: 'Consider using Form Request for validation'
+        });
+      }
+      
+      // Check for business logic in controller
+      if (this.hasBusinessLogic(method)) {
+        issues.push({
+          type: 'business_logic_in_controller',
+          controller: controller.name,
+          method: method.name,
+          severity: 'medium',
+          message: 'Move business logic to Service class'
+        });
+      }
+    }
+    
+    // Check for proper middleware usage
+    if (!controller.usesMiddleware.includes('auth') && !controller.name.includes('Auth')) {
+      issues.push({
+        type: 'missing_auth_middleware',
+        controller: controller.name,
+        severity: 'high',
+        message: 'Controller should use auth middleware'
+      });
+    }
+  }
+  
+  return { controllers, issues, endpoints };
+}
+
+private hasBusinessLogic(method: MethodInfo): boolean {
+  const businessPatterns = [
+    /if\s*\(.*&&.*\)/
+  ];
+  
+  return method.lines > 20;
+}
+```
+
+### Bước 3: Eloquent Model Review
+
+```typescript
+// Review Eloquent models
+interface EloquentAnalysis {
+  models: ModelInfo[];
+  n_plus_one_patterns: NPlusOnePattern[];
+  missing_indexes: IndexIssue[];
+  relationship_issues: RelationshipIssue[];
+}
+
+async function analyzeModels(
+  modelsPath: string
+): Promise<EloquentAnalysis> {
+  const files = await glob('*.php', { cwd: modelsPath });
+  const models: ModelInfo[] = [];
+  const nPlusOne: NPlusOnePattern[] = [];
+  const missingIndexes: IndexIssue[] = [];
+  
+  for (const file of files) {
+    const content = await readFile(`${modelsPath}/${file}`);
+    const parsed = parsePHP(content);
+    
+    const model: ModelInfo = {
+      name: parsed.className,
+      table: parsed.tableName,
+      primaryKey: parsed.primaryKey,
+     fillable: parsed.fillable,
+      hidden: parsed.hidden,
+      casts: parsed.casts,
+      relationships: parsed.relationships.map(r => ({
+        type: r.type,
+        model: r.model,
+        foreignKey: r.foreignKey,
+        localKey: r.localKey
+      })),
+      scopes: parsed.scopes,
+      accessors: parsed.accessors,
+      mutators: parsed.mutators,
+      hasSoftDeletes: parsed.usesSoftDeletes,
+      timestamps: parsed.timestamps,
+      file
+    };
+    
+    models.push(model);
+    
+    // Check for issues
+    if (!model.primaryKey || model.primaryKey !== 'id') {
+      issues.push({
+        type: 'non_standard_pk',
+        model: model.name,
+        severity: 'medium',
+        message: `Primary key is ${model.primaryKey} - ensure consistency`
+      });
+    }
+    
+    // Check fillable vs guarded
+    if (parsed.guarded && parsed.guarded.includes('*')) {
+      issues.push({
+        type: 'unguarded_model',
+        model: model.name,
+        severity: 'high',
+        message: 'Model uses unguarded("*") - security risk'
+      });
+    }
+    
+    // Check timestamps
+    if (!model.timestamps) {
+      issues.push({
+        type: 'missing_timestamps',
+        model: model.name,
+        severity: 'low',
+        message: 'Consider adding timestamps for audit trail'
+      });
+    }
+  }
+  
+  return { models, n_plus_one_patterns: nPlusOne, missing_indexes: missingIndexes, relationship_issues: [] };
+}
+```
+
+### Bước 4: Route Review
+
+```typescript
+// Review Laravel routes
+interface RouteAnalysis {
+  routes: RouteInfo[];
+  issues: RouteIssue[];
+  security_findings: SecurityFinding[];
+}
+
+async function analyzeRoutes(
+  routesPath: string
+): Promise<RouteAnalysis> {
+  const files = await glob('*.php', { cwd: routesPath });
+  const routes: RouteInfo[] = [];
+  const issues: RouteIssue[] = [];
+  
+  for (const file of files) {
+    const content = await readFile(`${routesPath}/${file}`);
+    const parsed = parseRoutes(content);
+    
+    for (const route of parsed) {
+      routes.push({
+        method: route.method,
+        uri: route.uri,
+        action: route.action,
+        middleware: route.middleware,
+        name: route.name,
+        file
+      });
+      
+      // Check for security issues
+      if (!route.middleware.includes('auth') && route.uri.startsWith('/api/')) {
+        issues.push({
+          type: 'unauthenticated_route',
+          uri: route.uri,
+          method: route.method,
+          severity: 'high',
+          message: 'API route should have auth middleware'
+        });
+      }
+      
+      // Check for sensitive routes without rate limiting
+      if (route.uri.includes('login') || route.uri.includes('password')) {
+        if (!route.middleware.includes('throttle')) {
+          issues.push({
+            type: 'missing_rate_limit',
+            uri: route.uri,
+            severity: 'high',
+            message: 'Authentication route should have rate limiting'
+          });
+        }
+      }
+      
+      // Check for API versioning
+      if (route.file === 'api.php' && !route.uri.match(/^\/api\/v\d+\//)) {
+        issues.push({
+          type: 'missing_api_version',
+          uri: route.uri,
+          severity: 'medium',
+          message: 'Consider adding API versioning'
+        });
+      }
+    }
+  }
+  
+  return { routes, issues, security_findings: [] };
+}
+```
+
+### Bước 5: Security Review
+
+```typescript
+// Security audit
+interface SecurityAudit {
+  findings: SecurityFinding[];
+  vulnerabilities: Vulnerability[];
+  recommendations: SecurityRecommendation[];
+}
+
+async function auditSecurity(
+  projectPath: string
+): Promise<SecurityAudit> {
+  const findings: SecurityFinding[] = [];
+  
+  // Check configuration
+  const env = await readFile(`${projectPath}/.env`);
+  const config = parseEnv(env);
+  
+  // Check for debug mode in production
+  if (config.APP_DEBUG === 'true' && config.APP_ENV === 'production') {
+    findings.push({
+      type: 'debug_in_production',
+      severity: 'critical',
+      message: 'APP_DEBUG should be false in production'
+    });
+  }
+  
+  // Check for debug bar in production
+  const composer = await readFile(`${projectPath}/composer.json`);
+  if (composer.includes('barryvdh/laravel-debugbar')) {
+    findings.push({
+      type: 'debug_bar_in_production',
+      severity: 'high',
+      message: 'Debug bar should not be in production'
+    });
+  }
+  
+  // Check CSRF protection
+  const kernel = await readFile(`${projectPath}/app/Http/Kernel.php`);
+  if (!kernel.includes('EncryptCookies') || !kernel.includes('AddQueuedCookiesToResponse')) {
+    findings.push({
+      type: 'csrf_protection',
+      severity: 'critical',
+      message: 'CSRF protection may not be properly configured'
+    });
+  }
+  
+  // Check for SQL injection vulnerabilities
+  const controllers = await glob('**/*Controller.php', { cwd: projectPath });
+  for (const controller of controllers) {
+    const content = await readFile(controller);
+    
+    // Check for raw SQL
+    if (content.includes('DB::select') && content.includes('$_GET')) {
+      findings.push({
+        type: 'sql_injection',
+        file: controller,
+        severity: 'critical',
+        message: 'Potential SQL injection with user input'
+      });
+    }
+    
+    // Check for XSS
+    if (content.includes('echo') || content.includes('{{') && content.includes('Request::')) {
+      findings.push({
+        type: 'potential_xss',
+        file: controller,
+        severity: 'high',
+        message: 'Potential XSS vulnerability'
+      });
+    }
+  }
+  
+  return {
+    findings,
+    vulnerabilities: categorizeVulnerabilities(findings),
+    recommendations: generateSecurityRecommendations(findings)
+  };
+}
+```
+
+### Bước 6: Performance Review
+
+```typescript
+// Performance audit
+interface PerformanceAudit {
+  query_analysis: QueryAnalysis;
+  caching_opportunities: CachingOpportunity[];
+  n_plus_one: NPlusOneIssue[];
+  recommendations: PerformanceRecommendation[];
+}
+
+async function auditPerformance(
+  projectPath: string
+): Promise<PerformanceAudit> {
+  // Check for N+1 queries
+  const nPlusOne = await detectNPlusOne(projectPath);
+  
+  // Check caching
+  const caching = await analyzeCaching(projectPath);
+  
+  // Check Eloquent eager loading
+  const eagerLoading = await analyzeEagerLoading(projectPath);
+  
+  return {
+    query_analysis: {},
+    caching_opportunities: caching,
+    n_plus_one: nPlusOne,
+    recommendations: generatePerformanceRecommendations({ nPlusOne, caching })
+  };
+}
+
+async function detectNPlusOne(
+  projectPath: string
+): Promise<NPlusOneIssue[]> {
+  const issues: NPlusOneIssue[] = [];
+  
+  const controllers = await glob('**/*Controller.php', { cwd: projectPath });
+  
+  for (const controller of controllers) {
+    const content = await readFile(controller);
+    const parsed = parsePHP(content);
+    
+    for (const method of parsed.methods) {
+      // Look for foreach with query in body
+      const foreachMatches = content.match(/foreach\s*\([^)]+\)\s*\{[\s\S]*?\{/g);
+      
+      if (foreachMatches) {
+        for (const match of foreachMatches) {
+          if (match.includes('->find(') || 
+              match.includes('->first(') ||
+              match.includes('->get(')) {
+            issues.push({
+              type: 'n_plus_one',
+              file: controller,
+              method: method.name,
+              severity: 'high',
+              description: 'Query inside foreach loop',
+              suggestion: 'Use eager loading with with() or join()'
+            });
+          }
+        }
+      }
+    }
+  }
+  
+  return issues;
+}
+```
+
+## Checklist (Danh sách kiểm tra)
+
+- [ ] Controllers are thin (business logic in services)
+- [ ] Form Request used for validation
+- [ ] Eloquent models have proper fillable/guarded
+- [ ] Relationships use proper eager loading
+- [ ] Auth middleware on protected routes
+- [ ] Rate limiting on sensitive endpoints
+- [ ] CSRF protection enabled
+- [ ] No raw SQL with user input
+- [ ] Sensitive data not in version control
+- [ ] Environment variables properly configured
+- [ ] Debug mode disabled in production
+- [ ] Caching implemented for expensive operations
+- [ ] Database indexes on foreign keys
+- [ ] Pagination on list endpoints
+- [ ] Soft deletes for audit trail
+
+## Examples (Ví dụ)
+
+### Ví dụ 1: Fixing Fat Controller
+
+```php
+// ❌ BEFORE: Fat Controller
+class OrderController extends Controller
+{
+    public function store(Request $request)
+    {
+        // Validation
+        $validated = $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'items' => 'required|array',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|integer|min:1'
+        ]);
+        
+        // Business logic scattered everywhere
+        $customer = Customer::findOrFail($validated['customer_id']);
+        
+        if ($customer->credit_limit < $this->calculateTotal($validated['items'])) {
+            throw new \Exception('Credit limit exceeded');
+        }
+        
+        DB::beginTransaction();
+        try {
+            $order = Order::create([
+                'customer_id' => $validated['customer_id'],
+                'status' => 'pending',
+                'total' => $this->calculateTotal($validated['items'])
+            ]);
+            
+            foreach ($validated['items'] as $item) {
+                $product = Product::find($item['product_id']);
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item['product_id'],
+                    'quantity' => $item['quantity'],
+                    'price' => $product->price
+                ]);
+            }
+            
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+        
+        return response()->json($order);
+    }
+}
+
+// ✅ AFTER: Thin Controller with Service
+class OrderController extends Controller
+{
+    public function __construct(
+        private OrderService $orderService
+    ) {}
+    
+    public function store(StoreOrderRequest $request): JsonResponse
+    {
+        $order = $this->orderService->createOrder($request->validated());
+        return response()->json($order, 201);
+    }
+}
+
+// Service Class
+class OrderService
+{
+    public function createOrder(array $data): Order
+    {
+        return DB::transaction(function () use ($data) {
+            $customer = Customer::findOrFail($data['customer_id']);
+            $this->validateCreditLimit($customer, $data['items']);
+            
+            $order = Order::create([
+                'customer_id' => $data['customer_id'],
+                'status' => 'pending'
+            ]);
+            
+            $this->createOrderItems($order, $data['items']);
+            $order->calculateTotal();
+            
+            return $order->load('items.product');
+        });
+    }
+}
+```
+
+### Ví dụ 2: Eager Loading Pattern
+
+```php
+// ❌ BEFORE: N+1 Query
+public function index()
+{
+    $orders = Order::all(); // 1 query
+    
+    return $orders->map(function ($order) {
+        return [
+            'id' => $order->id,
+            'customer' => $order->customer->name, // N queries!
+            'items' => $order->items->map(fn($i) => [
+                'product' => $i->product->name, // N*M queries!
+                'quantity' => $i->quantity
+            ])
+        ];
+    });
+}
+
+// ✅ AFTER: Eager Loading
+public function index()
+{
+    $orders = Order::with([
+        'customer',
+        'items.product'
+    ])->get();
+    
+    return $orders->map(fn($order) => [
+        'id' => $order->id,
+        'customer' => $order->customer->name,
+        'items' => $order->items->map(fn($i) => [
+            'product' => $i->product->name,
+            'quantity' => $i->quantity
+        ])
+    ]);
+}
+```
+
+## Anti Patterns (Các pattern cần tránh)
+
+### 1. Fat Controllers
+```php
+// ❌ BAD: Everything in controller
+class UserController extends Controller
+{
+    public function update(Request $request, $id)
+    {
+        // 100 lines of business logic
+    }
+}
+
+// ✅ GOOD: Thin controller, service handles logic
+class UserController extends Controller
+{
+    public function update(UpdateUserRequest $request, $id)
+    {
+        return $this->userService->update($id, $request->validated());
+    }
+}
+```
+
+### 2. Direct Eloquent in Controllers
+```php
+// ❌ BAD: Direct model usage
+public function index()
+{
+    $users = User::where('active', true)
+        ->orderBy('name')
+        ->paginate(20);
+    return view('users.index', compact('users'));
+}
+
+// ✅ GOOD: Repository pattern
+public function index()
+{
+    $users = $this->userRepository->getActiveUsersPaginated(20);
+    return view('users.index', compact('users'));
+}
+```
+
+### 3. N+1 Queries
+```php
+// ❌ BAD: N+1
+foreach ($orders as $order) {
+    echo $order->customer->name;
+}
+
+// ✅ GOOD: Eager loading
+$orders = Order::with('customer')->get();
+foreach ($orders as $order) {
+    echo $order->customer->name;
+}
+```
+
+### 4. Unguarded Models
+```php
+// ❌ BAD: No protection
+class User extends Model
+{
+    protected $guarded = [];
+}
+
+// ✅ GOOD: Explicit fillable
+class User extends Model
+{
+    protected $fillable = ['name', 'email', 'role'];
+    protected $hidden = ['password', 'remember_token'];
+}
+```
+
+### 5. Raw SQL with User Input
+```php
+// ❌ BAD: SQL Injection
+$users = DB::select("SELECT * FROM users WHERE name = '" . $request->name . "'");
+
+// ✅ GOOD: Prepared statements
+$users = DB::select("SELECT * FROM users WHERE name = ?", [$request->name]);
+
+// ✅ BEST: Eloquent
+$users = User::where('name', $request->name)->get();
+```
+
+## Best Practices (Thực hành tốt nhất)
+
+1. **Use Form Requests**: Separate validation from controllers
+2. **Service Layer**: Keep controllers thin, business logic in services
+3. **Repository Pattern**: Abstract data access
+4. **Eager Loading**: Always use with() for relationships
+5. **Mass Assignment Protection**: Use fillable or guarded
+6. **Soft Deletes**: For audit trails and data recovery
+7. **Database Transactions**: Wrap multi-step operations
+8. **Queue Jobs**: For long-running operations
+9. **Middleware**: Keep cross-cutting concerns separate
+10. **Route Model Binding**: Type-safe route parameters
+
+## Liên kết (Cross-references)
+
+- **Related Skills**: [database-optimization](./database-optimization.mdc), [api-review](./api-review.mdc), [security-audit](./security-audit.mdc)
+- **Documentation**: Laravel Docs, Laravel Best Practices
+- **Packages**: Laravel Debugbar, Telescope, Horizon

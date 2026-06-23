@@ -1,0 +1,52 @@
+---
+description: Nguyên tắc và best practices cho Google Cloud Platform
+created: 2026-06-23
+version: 1.0.0
+tags: [gcp, google, cloud, enterprise, deployment]
+---
+
+# GCP
+
+## Mục tiêu
+
+Google Cloud Platform (GCP) là cloud platform cung cấp services cho computing, data, AI, và enterprise applications với focus trên data analytics, machine learning, và container-native development. Trong Cursor Enterprise Framework, GCP được sử dụng cho organizations cần strong data/ML capabilities, Kubernetes-native development (GKE), hoặc BigQuery cho data warehousing.
+
+## Nguyên tắc
+
+**1. Resource Organization**
+
+Projects. Folders. Organizations. Resource hierarchy. Naming conventions.
+
+**2. Networking**
+
+VPC networks. Subnets. Firewall rules. Cloud Router. VPN. Private Google Access.
+
+**3. Compute**
+
+Compute Engine. GKE. Cloud Run. App Engine. Kubernetes Engine.
+
+**4. Storage**
+
+Cloud Storage. Filestore. Persistent Disk. Bigtable.
+
+**5. Data & Analytics**
+
+BigQuery. Dataflow. Dataproc. Pub/Sub. BigQuery ML.
+
+**6. AI & ML**
+
+Vertex AI. AutoML. TensorFlow on GCP. AI Platform.
+
+**7. Security**
+
+IAM. Cloud KMS. Security Command Center. Binary Authorization.
+
+**8. Monitoring**
+
+Cloud Monitoring. Cloud Logging. Cloud Trace. Cloud Profiler.
+
+## Liên kết
+
+- [[azure]] - Azure
+- [[aws]] - AWS
+- [[kubernetes]] - Kubernetes

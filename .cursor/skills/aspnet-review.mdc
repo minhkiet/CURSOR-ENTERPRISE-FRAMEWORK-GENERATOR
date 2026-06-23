@@ -1,0 +1,801 @@
+---
+description: Skill review ASP.NET Core applications về architecture, performance, security, và best practices implementation
+purpose: Cung cấp comprehensive review framework cho ASP.NET Core projects, evaluate patterns, configuration, và production readiness
+input:
+  - ASP.NET Core project structure
+  - Controller/Endpoint definitions
+  - Service registrations
+  - Configuration files
+  - Middleware pipeline
+output:
+  - Architecture assessment
+  - Security review
+  - Performance analysis
+  - Best practice compliance
+  - Recommendations
+version: 1.0.0
+tags:
+  - aspnet-core
+  - dotnet
+  - review
+  - web-api
+  - csharp
+---
+
+# ASP.NET Core Review
+
+## Tổng quan
+
+ASP.NET Core Review là skill chuyên biệt để review và assess ASP.NET Core applications. Skill này cung cấp systematic approach để evaluate architecture, identify security vulnerabilities, analyze performance bottlenecks, và ensure best practice compliance. Phù hợp cho both new projects và existing applications needing modernization.
+
+## Purpose (Mục đích)
+
+ASP.NET Core là powerful framework nhưng có many ways to misconfigure:
+
+1. **Architecture issues**: Poor layering, tight coupling, God classes
+2. **Security vulnerabilities**: Missing auth, improper validation, XSS
+3. **Performance problems**: N+1 queries, blocking code, memory leaks
+4. **Configuration errors**: Environment-specific settings, secrets management
+5. **Operational gaps**: Missing logging, monitoring, health checks
+
+ASP.NET Core Review tồn tại để:
+
+- **Identify architectural weaknesses** early
+- **Find security issues** before production
+- **Optimize performance** based on patterns
+- **Ensure best practices** compliance
+- **Provide actionable recommendations**
+
+## Input (Đầu vào)
+
+| Input | Mô tả | Required |
+|-------|-------|----------|
+| `project_files` | Project structure và code | Yes |
+| `csproj` | Project configuration | Yes |
+| `program_cs` | Application entry point | Yes |
+| `controllers` | API controllers/endpoints | Yes |
+| `services` | Service registrations | Yes |
+
+## Output (Đầu ra)
+
+| Output | Mô tả | Format |
+|--------|-------|--------|
+| `architecture_review` | Architecture assessment | Report |
+| `security_audit` | Security findings | Audit |
+| `performance_review` | Performance analysis | Review |
+| `best_practice_compliance` | Compliance checklist | Checklist |
+| `recommendations` | Actionable improvements | List |
+
+## Workflow (Quy trình)
+
+### Bước 1: Project Structure Analysis
+
+```typescript
+// Analyze project structure
+interface ProjectAnalysis {
+  structure: DirectoryStructure;
+  projects: ProjectInfo[];
+  dependencies: DependencyGraph;
+  technologies: TechnologyStack;
+  issues: StructureIssue[];
+}
+
+async function analyzeProjectStructure(
+  rootPath: string
+): Promise<ProjectAnalysis> {
+  const projectFiles = await glob('**/*.csproj', { cwd: rootPath });
+  const projects: ProjectInfo[] = [];
+  
+  for (const csproj of projectFiles) {
+    const info = await analyzeProject(csproj);
+    projects.push(info);
+  }
+  
+  // Build dependency graph
+  const dependencyGraph = buildDependencyGraph(projects);
+  
+  // Check for circular dependencies
+  const cycles = detectCircularDependencies(dependencyGraph);
+  
+  // Analyze technology stack
+  const techStack = detectTechnologyStack(projects);
+  
+  return {
+    structure: await analyzeDirectoryStructure(rootPath),
+    projects,
+    dependencies: dependencyGraph,
+    technologies: techStack,
+    issues: [...cycles.map(c => ({ type: 'circular_dep', cycle: c }))]
+  };
+}
+
+async function analyzeProject(
+  csprojPath: string
+): Promise<ProjectInfo> {
+  const content = await readFile(csprojPath);
+  const parsed = parseCSPROJ(content);
+  
+  return {
+    name: parsed.Name,
+    path: csprojPath,
+    targetFramework: parsed.TargetFramework,
+    languageVersion: parsed.LangVersion,
+    dependencies: parsed.PackageReferences.map(p => ({
+      name: p.Include,
+      version: p.Version
+    })),
+    projectReferences: parsed.ProjectReferences.map(p => p.Include),
+    isWebApi: parsed.IsWebApi,
+    isTestProject: parsed.IsTestProject
+  };
+}
+```
+
+### Bước 2: Controller/Endpoint Review
+
+```typescript
+// Review API controllers và endpoints
+interface EndpointAnalysis {
+  endpoints: EndpointInfo[];
+  issues: EndpointIssue[];
+  securityFindings: SecurityFinding[];
+  performanceFindings: PerformanceFinding[];
+}
+
+async function analyzeEndpoints(
+  controllers: string[]
+): Promise<EndpointAnalysis> {
+  const endpoints: EndpointInfo[] = [];
+  const issues: EndpointIssue[] = [];
+  
+  for (const controller of controllers) {
+    const content = await readFile(controller);
+    const parsed = parseController(content);
+    
+    for (const method of parsed.methods) {
+      endpoints.push({
+        controller: parsed.name,
+        method: method.name,
+        route: method.route,
+        httpMethod: method.httpMethod,
+        parameters: method.parameters,
+        returnType: method.returnType,
+        attributes: method.attributes,
+        hasAuth: method.hasAuthorize,
+        hasValidation: method.hasValidation
+      });
+      
+      // Check for issues
+      if (!method.hasValidation && method.httpMethod === 'POST') {
+        issues.push({
+          type: 'missing_validation',
+          controller: parsed.name,
+          method: method.name,
+          severity: 'high',
+          message: 'POST endpoint should have input validation'
+        });
+      }
+      
+      if (!method.hasAuth) {
+        issues.push({
+          type: 'missing_auth',
+          controller: parsed.name,
+          method: method.name,
+          severity: 'high',
+          message: 'Endpoint should have [Authorize] attribute'
+        });
+      }
+      
+      if (method.returnType === 'IActionResult' && method.httpMethod === 'GET') {
+        issues.push({
+          type: 'weak_return_type',
+          controller: parsed.name,
+          method: method.name,
+          severity: 'medium',
+          message: 'Consider returning ActionResult<T> for better type safety'
+        });
+      }
+    }
+  }
+  
+  return {
+    endpoints,
+    issues,
+    securityFindings: analyzeEndpointSecurity(endpoints),
+    performanceFindings: analyzeEndpointPerformance(endpoints)
+  };
+}
+
+function analyzeEndpointSecurity(
+  endpoints: EndpointInfo[]
+): SecurityFinding[] {
+  const findings: SecurityFinding[] = [];
+  
+  for (const endpoint of endpoints) {
+    // Check for sensitive data exposure
+    if (endpoint.route.includes('password') || 
+        endpoint.route.includes('secret') ||
+        endpoint.route.includes('key')) {
+      if (!endpoint.hasAuth) {
+        findings.push({
+          type: 'sensitive_data_exposure',
+          endpoint: `${endpoint.controller}.${endpoint.method}`,
+          severity: 'critical',
+          message: 'Sensitive route without authentication'
+        });
+      }
+    }
+    
+    // Check for SQL injection vulnerabilities in raw SQL
+    // (would need deeper code analysis)
+    
+    // Check for missing HTTPS enforcement
+    if (endpoint.route.startsWith('/api/') && endpoint.httpMethod === 'GET') {
+      // Consider if HTTPS should be required
+    }
+  }
+  
+  return findings;
+}
+```
+
+### Bước 3: Dependency Injection Review
+
+```typescript
+// Review service registration patterns
+interface DIAnalysis {
+  registrations: ServiceRegistration[];
+  issues: DIIssue[];
+  lifetimeProblems: LifetimeIssue[];
+}
+
+async function analyzeDI(
+  programCs: string,
+  serviceFiles: string[]
+): Promise<DIAnalysis> {
+  const registrations: ServiceRegistration[] = [];
+  const issues: DIIssue[] = [];
+  
+  // Parse service registrations
+  for (const file of serviceFiles) {
+    const content = await readFile(file);
+    const regs = parseServiceRegistrations(content);
+    registrations.push(...regs);
+  }
+  
+  // Check for common issues
+  for (const reg of registrations) {
+    // Check for Scoped registered as Singleton
+    if (reg.lifetime === 'Singleton') {
+      const serviceType = await getServiceInterface(reg);
+      if (serviceType.includes('DbContext') || 
+          serviceType.includes('IUnitOfWork')) {
+        issues.push({
+          type: 'incorrect_lifetime',
+          service: reg.serviceType,
+          current: 'Singleton',
+          recommended: 'Scoped',
+          severity: 'high',
+          message: 'DbContext should not be registered as Singleton'
+        });
+      }
+    }
+    
+    // Check for disposable singleton
+    if (reg.lifetime === 'Singleton' && reg.implements IDisposable) {
+      issues.push({
+        type: 'singleton_disposable',
+        service: reg.serviceType,
+        severity: 'medium',
+        message: 'Singleton implementing IDisposable may cause memory leak'
+      });
+    }
+    
+    // Check for generic repository anti-pattern
+    if (reg.serviceType.includes('IRepository`1')) {
+      issues.push({
+        type: 'generic_repository',
+        service: reg.serviceType,
+        severity: 'low',
+        message: 'Generic repository may hide EF Core capabilities'
+      });
+    }
+  }
+  
+  // Check for circular dependencies
+  const cycles = detectDICycles(registrations);
+  
+  return {
+    registrations,
+    issues,
+    lifetimeProblems: checkLifetimeConflicts(registrations)
+  };
+}
+
+function checkLifetimeConflicts(
+  registrations: ServiceRegistration[]
+): LifetimeIssue[] {
+  const issues: LifetimeIssue[] = [];
+  const byService = groupBy(registrations, r => r.serviceType);
+  
+  for (const [service, regs] of Object.entries(byService)) {
+    const lifetimes = new Set(regs.map(r => r.lifetime));
+    if (lifetimes.size > 1) {
+      issues.push({
+        service,
+        lifetimes: [...lifetimes],
+        severity: 'high',
+        message: `Service ${service} registered with multiple lifetimes`
+      });
+    }
+  }
+  
+  return issues;
+}
+```
+
+### Bước 4: Configuration Review
+
+```typescript
+// Review configuration patterns
+interface ConfigurationReview {
+  settings: ConfigSetting[];
+  issues: ConfigIssue[];
+  secretsManagement: SecretsAnalysis;
+  environmentHandling: EnvironmentAnalysis;
+}
+
+async function analyzeConfiguration(
+  configFiles: string[],
+  programCs: string
+): Promise<ConfigurationReview> {
+  const settings: ConfigSetting[] = [];
+  const issues: ConfigIssue[] = [];
+  
+  // Parse appsettings files
+  for (const file of configFiles) {
+    const content = await readFile(file);
+    const parsed = parseAppsettings(content);
+    settings.push(...parsed);
+  }
+  
+  // Check for hardcoded secrets
+  for (const setting of settings) {
+    if (isLikelySecret(setting.key)) {
+      if (!setting.isEnvironmentVariable) {
+        issues.push({
+          type: 'hardcoded_secret',
+          key: setting.key,
+          file: setting.sourceFile,
+          severity: 'critical',
+          message: 'Secret should be loaded from environment variable'
+        });
+      }
+    }
+    
+    // Check for connection strings without encryption
+    if (setting.key.toLowerCase().includes('connectionstring')) {
+      if (!setting.value.includes('Encrypt=True')) {
+        issues.push({
+          type: 'unencrypted_connection',
+          key: setting.key,
+          severity: 'high',
+          message: 'Connection string should use encryption'
+        });
+      }
+    }
+  }
+  
+  // Analyze environment handling
+  const envAnalysis = analyzeEnvironmentHandling(configFiles);
+  
+  return {
+    settings,
+    issues,
+    secretsManagement: analyzeSecretsManagement(programCs),
+    environmentHandling: envAnalysis
+  };
+}
+
+function isLikelySecret(key: string): boolean {
+  const secretPatterns = [
+    /password/i, /secret/i, /key/i, /token/i,
+    /api_key/i, /apikey/i, /credential/i, /auth/i
+  ];
+  return secretPatterns.some(p => p.test(key));
+}
+```
+
+### Bước 5: Middleware Pipeline Review
+
+```typescript
+// Review middleware configuration
+interface MiddlewareAnalysis {
+  pipeline: MiddlewareInfo[];
+  issues: MiddlewareIssue[];
+  performanceConcerns: PerformanceConcern[];
+}
+
+async function analyzeMiddleware(
+  programCs: string
+): Promise<MiddlewareAnalysis> {
+  const pipeline = parseMiddlewarePipeline(programCs);
+  const issues: MiddlewareIssue[] = [];
+  
+  // Check for correct ordering
+  const expectedOrder = [
+    'ExceptionHandler',
+    'HSTS',
+    'HTTPS Redirection',
+    'Static Files',
+    'Routing',
+    'Authentication',
+    'Authorization',
+    'Endpoints'
+  ];
+  
+  const currentOrder = pipeline.map(m => m.name);
+  const orderIssues = validateMiddlewareOrder(currentOrder, expectedOrder);
+  issues.push(...orderIssues);
+  
+  // Check for missing middleware
+  if (!pipeline.find(m => m.name === 'Authentication')) {
+    issues.push({
+      type: 'missing_middleware',
+      middleware: 'Authentication',
+      severity: 'high',
+      message: 'Authentication middleware not found'
+    });
+  }
+  
+  if (!pipeline.find(m => m.name === 'Authorization')) {
+    issues.push({
+      type: 'missing_middleware',
+      middleware: 'Authorization',
+      severity: 'high',
+      message: 'Authorization middleware not found'
+    });
+  }
+  
+  if (!pipeline.find(m => m.name === 'ExceptionHandler')) {
+    issues.push({
+      type: 'missing_middleware',
+      middleware: 'ExceptionHandler',
+      severity: 'medium',
+      message: 'Global exception handling not configured'
+    });
+  }
+  
+  // Performance concerns
+  const performanceConcerns = analyzeMiddlewarePerformance(pipeline);
+  
+  return {
+    pipeline,
+    issues,
+    performanceConcerns
+  };
+}
+
+function analyzeMiddlewarePerformance(
+  pipeline: MiddlewareInfo[]
+): PerformanceConcern[] {
+  const concerns: PerformanceConcern[] = [];
+  
+  // Check for heavy middleware position
+  const heavyMiddleware = ['Session', 'ResponseCaching', 'StaticFiles'];
+  
+  for (const middleware of pipeline) {
+    if (heavyMiddleware.includes(middleware.name)) {
+      if (pipeline.indexOf(middleware) > 5) {
+        concerns.push({
+          middleware: middleware.name,
+          type: 'suboptimal_position',
+          message: 'Heavy middleware should be early in pipeline',
+          currentPosition: pipeline.indexOf(middleware),
+          recommendedPosition: 2
+        });
+      }
+    }
+  }
+  
+  return concerns;
+}
+```
+
+### Bước 6: Performance Review
+
+```typescript
+// Review performance patterns
+interface PerformanceReview {
+  blockingPatterns: BlockingPattern[];
+  memoryIssues: MemoryIssue[];
+  n_plus_one: NPlusOnePattern[];
+  recommendations: PerformanceRecommendation[];
+}
+
+async function analyzePerformance(
+  sourceFiles: string[]
+): Promise<PerformanceReview> {
+  const blockingPatterns: BlockingPattern[] = [];
+  const memoryIssues: MemoryIssue[] = [];
+  const nPlusOne: NPlusOnePattern[] = [];
+  
+  for (const file of sourceFiles) {
+    const content = await readFile(file);
+    const tree = parseSyntaxTree(content);
+    
+    // Check for blocking calls
+    const blocking = findBlockingCalls(tree);
+    blockingPatterns.push(...blocking.map(b => ({
+      file,
+      line: b.line,
+      type: b.type,
+      suggestion: `Use ${b.asyncAlternative} instead`
+    })));
+    
+    // Check for memory issues
+    const memory = findMemoryIssues(tree);
+    memoryIssues.push(...memory);
+    
+    // Check for N+1 patterns
+    const n1 = findNPlusOnePatterns(tree);
+    nPlusOne.push(...n1);
+  }
+  
+  return {
+    blockingPatterns,
+    memoryIssues,
+    n_plus_one: nPlusOne,
+    recommendations: generatePerformanceRecommendations({
+      blockingPatterns,
+      memoryIssues,
+      nPlusOne
+    })
+  };
+}
+
+function findNPlusOnePatterns(tree: SyntaxTree): NPlusOnePattern[] {
+  const patterns: NPlusOnePattern[] = [];
+  
+  // Find foreach loops that query in body
+  const foreachLoops = tree.findAll('ForEachStatement');
+  
+  for (const loop of foreachLoops) {
+    const bodyQueries = loop.body.filter(n => n.isDatabaseQuery());
+    
+    if (bodyQueries.length > 0) {
+      // Check if there's a single query that could be used instead
+      const listAccess = loop.expression;
+      if (listAccess.type === 'ToList' || listAccess.type === 'ToArray') {
+        patterns.push({
+          file: tree.filePath,
+          line: loop.startLine,
+          type: 'foreach_to_list',
+          message: 'Query inside foreach after ToList() - could use batch query',
+          suggestion: 'Consider using JOIN or batch query instead'
+        });
+      }
+    }
+  }
+  
+  return patterns;
+}
+```
+
+## Checklist (Danh sách kiểm tra)
+
+- [ ] Project structure follows clean architecture
+- [ ] No circular dependencies
+- [ ] Controllers are thin, business logic in services
+- [ ] Dependency injection properly configured
+- [ ] Service lifetimes correct
+- [ ] Authentication và Authorization configured
+- [ ] Input validation on all endpoints
+- [ ] Configuration via environment variables
+- [ ] Secrets not hardcoded
+- [ ] Error handling centralized
+- [ ] Logging configured appropriately
+- [ ] Health checks implemented
+- [ ] CORS properly configured
+- [ ] Rate limiting in place
+- [ ] Response caching considered
+
+## Examples (Ví dụ)
+
+### Ví dụ 1: Complete Architecture Review
+
+```typescript
+async function reviewAspNetCoreProject(
+  projectPath: string
+): Promise<ReviewReport> {
+  console.log('Starting ASP.NET Core review...');
+  
+  // 1. Project structure
+  const structure = await analyzeProjectStructure(projectPath);
+  
+  // 2. Endpoints
+  const controllers = await findControllers(projectPath);
+  const endpoints = await analyzeEndpoints(controllers);
+  
+  // 3. Dependency Injection
+  const di = await analyzeDI(
+    await readFile(`${projectPath}/Program.cs`),
+    await findServiceFiles(projectPath)
+  );
+  
+  // 4. Configuration
+  const config = await analyzeConfiguration(
+    await findConfigFiles(projectPath),
+    await readFile(`${projectPath}/Program.cs`)
+  );
+  
+  // 5. Middleware
+  const middleware = await analyzeMiddleware(
+    await readFile(`${projectPath}/Program.cs`)
+  );
+  
+  // 6. Performance
+  const performance = await analyzePerformance(
+    await findSourceFiles(projectPath)
+  );
+  
+  return {
+    timestamp: new Date(),
+    structure,
+    endpoints,
+    di,
+    configuration: config,
+    middleware,
+    performance,
+    summary: generateSummary({ structure, endpoints, di, config, middleware, performance }),
+    recommendations: prioritizeRecommendations({ structure, endpoints, di, config, middleware, performance })
+  };
+}
+```
+
+### Ví dụ 2: Security Hardening Checklist
+
+```typescript
+const securityHardeningChecklist = [
+  // Authentication
+  { check: 'JWT tokens have expiration', critical: true },
+  { check: 'Refresh tokens are stored securely', critical: true },
+  { check: 'Password hashing uses secure algorithm (PBKDF2/BCrypt)', critical: true },
+  { check: 'MFA is supported', critical: false },
+  
+  // Authorization
+  { check: '[Authorize] on all protected endpoints', critical: true },
+  { check: 'Role-based access properly implemented', critical: true },
+  { check: 'Resource-based authorization for sensitive data', critical: false },
+  
+  // Input Validation
+  { check: 'Data annotations on all DTOs', critical: true },
+  { check: 'FluentValidation for complex rules', critical: false },
+  { check: 'Request size limits configured', critical: true },
+  
+  // Output Security
+  { check: 'XSS protection headers enabled', critical: true },
+  { check: 'Content Security Policy configured', critical: false },
+  { check: 'Sensitive data not logged', critical: true },
+  { check: 'PII properly masked in responses', critical: true }
+];
+```
+
+## Anti Patterns (Các pattern cần tránh)
+
+### 1. God Controllers
+```csharp
+// ❌ BAD: Fat controller with everything
+public class OrderController : Controller {
+    public async Task<IActionResult> CreateOrder(...) {
+        // Validation
+        // Database query
+        // Email sending
+        // Logging
+        // Cache update
+        // Inventory check
+        // Payment processing
+        // Return response
+    }
+}
+
+// ✅ GOOD: Thin controller, delegate to services
+public class OrderController : Controller {
+    private readonly IOrderService _orderService;
+    
+    [HttpPost]
+    public async Task<ActionResult<OrderDto>> CreateOrder(
+        [FromBody] CreateOrderRequest request) {
+        var order = await _orderService.CreateOrderAsync(request);
+        return CreatedAtAction(nameof(GetOrder), new { id = order.Id }, order);
+    }
+}
+```
+
+### 2. Blocking Calls in Async Methods
+```csharp
+// ❌ BAD: .Result causes thread blocking
+public async Task<Order> GetOrder(int id) {
+    return _context.Orders.FirstOrDefaultAsync().Result; // BAD!
+}
+
+// ✅ GOOD: Proper async/await
+public async Task<Order> GetOrder(int id) {
+    return await _context.Orders.FirstOrDefaultAsync(o => o.Id == id);
+}
+```
+
+### 3. Disposing Scoped Services as Singleton
+```csharp
+// ❌ BAD: DbContext as Singleton
+services.AddDbContext<DbContext>(options =>
+    options.UseSqlServer(connectionString));
+services.AddSingleton<DbContext>(); // WRONG!
+
+// ✅ GOOD: Proper registration
+services.AddDbContext<DbContext>(options =>
+    options.UseSqlServer(connectionString));
+// DbContext will be properly scoped
+```
+
+### 4. Missing Error Handling
+```csharp
+// ❌ BAD: No exception handling
+[HttpGet("{id}")]
+public async Task<ActionResult<Product>> GetProduct(int id) {
+    var product = await _context.Products.FindAsync(id);
+    return Ok(product); // Throws if null!
+}
+
+// ✅ GOOD: Proper error handling
+[HttpGet("{id}")]
+public async Task<ActionResult<Product>> GetProduct(int id) {
+    var product = await _context.Products.FindAsync(id);
+    if (product == null) {
+        return NotFound();
+    }
+    return Ok(product);
+}
+```
+
+### 5. No Request Validation
+```csharp
+// ❌ BAD: No validation
+[HttpPost]
+public async Task<IActionResult> CreateUser(CreateUserRequest request) {
+    // request could be anything!
+    var user = new User { Email = request.Email };
+    await _context.Users.AddAsync(user);
+}
+
+// ✅ GOOD: Proper validation
+[HttpPost]
+public async Task<IActionResult> CreateUser(
+    [FromBody, Required] CreateUserRequest request) {
+    if (!ModelState.IsValid) {
+        return BadRequest(ModelState);
+    }
+    
+    var user = new User { Email = request.Email };
+    await _context.Users.AddAsync(user);
+}
+```
+
+## Best Practices (Thực hành tốt nhất)
+
+1. **Use minimal APIs for simple endpoints**: Reduces ceremony
+2. **Implement health checks**: Critical for container orchestration
+3. **Use structured logging**: With correlation IDs
+4. **Configure CORS properly**: Whitelist specific origins
+5. **Use rate limiting**: Protect against abuse
+6. **Implement API versioning**: For backward compatibility
+7. **Use response compression**: gzip/brotli for performance
+8. **Configure Kestrel properly**: For production workloads
+9. **Use IOptions<T> pattern**: For strongly-typed configuration
+10. **Implement global exception handling**: Consistent error responses
+
+## Liên kết (Cross-references)
+
+- **Related Skills**: [entity-framework-audit](./entity-framework-audit.mdc), [api-review](./api-review.mdc), [performance-audit](./performance-audit.mdc)
+- **Documentation**: Microsoft ASP.NET Core Docs
+- **Patterns**: Repository, Unit of Work, CQRS

@@ -1,0 +1,785 @@
+---
+description: Nguyên tắc và best practices cho Next.js trong Cursor Enterprise Framework
+created: 2026-06-23
+version: 1.0.0
+tags: [nextjs, react, ssr, ssg, frontend]
+---
+
+# Next.js
+
+## Mục tiêu
+
+Next.js là React framework được sử dụng rộng rãi cho việc xây dựng các web applications hiện đại với features như Server-Side Rendering (SSR), Static Site Generation (SSG), và API routes. Trong Cursor Enterprise Framework, Next.js đóng vai trò là primary frontend framework cho các dự án cần SEO tốt, performance cao, và developer experience tuyệt vời. Mục tiêu của rule này là establish consistent patterns và best practices cho việc sử dụng Next.js trong enterprise projects.
+
+Framework này cung cấp nhiều rendering strategies và data fetching patterns. Việc chọn đúng approach cho từng use case là critical cho performance và maintainability. Rule này sẽ guide developers qua các decisions từ project setup, routing, data fetching, đến deployment.
+
+## Nguyên tắc
+
+**1. Rendering Strategy Selection**
+
+SSG cho static content (homepage, blog posts). SSR cho dynamic, personalized content. ISR cho content that changes but can be cached. CSR cho highly interactive, user-specific content. Choose based on data freshness requirements. Consider SEO implications.
+
+**2. App Router vs Pages Router**
+
+Use App Router for new projects. It's the future of Next.js. Better data fetching with Server Components. Built-in layouts and nested routing. More flexible rendering options. Pages Router still supported but App Router preferred.
+
+**3. Server Components by Default**
+
+Start with Server Components. Move to Client Components only when needed. Interactive UI (useState, useEffect). Browser APIs. Real-time data. This reduces client-side JavaScript.
+
+**4. Data Fetching Patterns**
+
+Use async/await in Server Components. Fetch data close to where it's used. Implement proper caching strategies. Use React cache() for request deduplication. Handle loading and error states properly.
+
+**5. Route Organization**
+
+Group related routes together. Use route groups for layout organization. Collocate routes with their components. Keep pages directory structure logical. Use dynamic routes for parameterized URLs.
+
+**6. API Routes for BFF**
+
+Use API routes as Backend-For-Frontend. Aggregate data from multiple sources. Transform data for frontend needs. Handle authentication/authorization. Keep API routes thin.
+
+**7. Image Optimization**
+
+Use next/image for all images. Specify dimensions when known. Use proper image formats (WebP, AVIF). Implement lazy loading. Generate responsive sizes.
+
+**8. Metadata Management**
+
+Use Metadata API for SEO. Configure Open Graph images. Set proper title templates. Manage sitemap automatically. Structured data for rich results.
+
+**9. State Management**
+
+Server state vs client state. Use URL state when possible. React Query for server state. Context for cross-component state. Minimize client-side state.
+
+**10. Performance Optimization**
+
+Monitor Core Web Vitals. Implement code splitting. Bundle optimization. Font optimization with next/font. Analyze bundle size regularly.
+
+## Checklist
+
+- [ ] Next.js version selected (latest stable)
+- [ ] Rendering strategy defined per page
+- [ ] App Router structure established
+- [ ] Data fetching patterns implemented
+- [ ] Image optimization configured
+- [ ] Metadata management setup
+- [ ] Error handling implemented
+- [ ] Loading states designed
+- [ ] Testing strategy defined
+- [ ] Deployment configuration ready
+
+## Anti Pattern
+
+**1. Overusing Client Components**
+
+Marking everything as 'use client'. Unnecessary JavaScript on client. Slower page loads. Higher bundle size. Use Server Components by default.
+
+**2. Data Fetching in Client Components**
+
+Fetching data on client when server fetch possible. Unnecessary loading states. SEO impact. Performance degradation.
+
+**3. Ignoring Loading States**
+
+Not implementing proper loading UI. Layout shifts. Poor user experience. Use Suspense boundaries.
+
+**4. Improper Error Boundaries**
+
+Not handling errors gracefully. Broken pages. No recovery options. Use error.tsx files.
+
+**5. Large Bundle Sizes**
+
+Importing entire libraries. No tree shaking. Large initial load. Optimize imports carefully.
+
+## Best Practice
+
+**1. Project Structure**
+
+```typescript
+// app/
+// ├── (marketing)/
+// │   ├── layout.tsx
+// │   ├── page.tsx
+// │   ├── about/
+// │   └── pricing/
+// ├── (dashboard)/
+// │   ├── layout.tsx
+// │   ├── dashboard/
+// │   ├── settings/
+// │   └── profile/
+// ├── (auth)/
+// │   ├── login/
+// │   └── register/
+// ├── api/
+// │   ├── users/
+// │   └── orders/
+// ├── layout.tsx
+// ├── not-found.tsx
+// └── error.tsx
+
+// Component organization
+// components/
+// ├── ui/                    # Base UI components
+// │   ├── Button.tsx
+// │   ├── Input.tsx
+// │   └── Card.tsx
+// ├── features/              # Feature-specific components
+// │   ├── orders/
+// │   ├── users/
+// │   └── products/
+// ├── layouts/               # Layout components
+// │   ├── DashboardLayout.tsx
+// │   └── MarketingLayout.tsx
+// └── providers/             # Context providers
+//     ├── AuthProvider.tsx
+//     └── QueryProvider.tsx
+```
+
+**2. Server Component Data Fetching**
+
+```typescript
+// app/dashboard/orders/page.tsx
+import { Suspense } from 'react';
+import { getOrders } from '@/lib/orders';
+import { getUser } from '@/lib/auth';
+import { OrderList } from './OrderList';
+import { OrderListSkeleton } from './OrderListSkeleton';
+
+// Revalidation every 60 seconds
+export const revalidate = 60;
+
+export default async function OrdersPage() {
+  // Parallel data fetching
+  const [orders, user] = await Promise.all([
+    getOrders(),
+    getUser()
+  ]);
+  
+  return (
+    <div>
+      <h1>Orders for {user.name}</h1>
+      <Suspense fallback={<OrderListSkeleton />}>
+        <OrderList orders={orders} />
+      </Suspense>
+    </div>
+  );
+}
+
+// Using React cache for request deduplication
+import { cache } from 'react';
+
+export const getOrder = cache(async (orderId: string) => {
+  const order = await db.orders.findById(orderId);
+  
+  if (!order) {
+    notFound();
+  }
+  
+  return order;
+});
+
+// Multiple fetches use cached result
+export default async function OrderDetailPage({ 
+  params 
+}: { 
+  params: { orderId: string } 
+}) {
+  const order = await getOrder(params.orderId);
+  
+  // This will reuse the cached result
+  const relatedOrders = await getRelatedOrders(params.orderId);
+  
+  return <OrderDetail order={order} related={relatedOrders} />;
+}
+```
+
+**3. Client Component Patterns**
+
+```typescript
+// components/features/orders/OrderForm.tsx
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { orderSchema, OrderFormData } from '@/lib/schemas';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+
+interface OrderFormProps {
+  onSuccess?: (orderId: string) => void;
+  defaultValues?: Partial<OrderFormData>;
+}
+
+export function OrderForm({ onSuccess, defaultValues }: OrderFormProps) {
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting }
+  } = useForm<OrderFormData>({
+    resolver: zodResolver(orderSchema),
+    defaultValues
+  });
+  
+  async function onSubmit(data: OrderFormData) {
+    try {
+      setError(null);
+      
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create order');
+      }
+      
+      const { orderId } = await response.json();
+      
+      if (onSuccess) {
+        onSuccess(orderId);
+      } else {
+        router.push(`/orders/${orderId}`);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    }
+  }
+  
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Input
+        label="Customer ID"
+        {...register('customerId')}
+        error={errors.customerId?.message}
+      />
+      
+      <Input
+        label="Total Amount"
+        type="number"
+        step="0.01"
+        {...register('total', { valueAsNumber: true })}
+        error={errors.total?.message}
+      />
+      
+      {error && (
+        <div className="error-message">{error}</div>
+      )}
+      
+      <Button type="submit" loading={isSubmitting}>
+        Create Order
+      </Button>
+    </form>
+  );
+}
+```
+
+**4. Route Handlers (API Routes)**
+
+```typescript
+// app/api/orders/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { z } from 'zod';
+import { createOrder } from '@/lib/orders';
+import { authOptions } from '@/lib/auth';
+import { hasPermission } from '@/lib/permissions';
+
+const createOrderSchema = z.object({
+  customerId: z.string().uuid(),
+  items: z.array(z.object({
+    productId: z.string().uuid(),
+    quantity: z.number().int().positive()
+  })).min(1),
+  shippingAddress: z.object({
+    street: z.string().max(500),
+    city: z.string().max(100),
+    country: z.string().length(2)
+  })
+});
+
+export async function GET(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  
+  if (!hasPermission(session.user, 'orders:read')) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+  
+  const { searchParams } = new URL(request.url);
+  const page = parseInt(searchParams.get('page') || '1');
+  const limit = parseInt(searchParams.get('limit') || '20');
+  
+  const orders = await getOrdersPaginated({
+    page,
+    limit,
+    userId: session.user.id
+  });
+  
+  return NextResponse.json(orders);
+}
+
+export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  
+  if (!hasPermission(session.user, 'orders:write')) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+  
+  try {
+    const body = await request.json();
+    const data = createOrderSchema.parse(body);
+    
+    const order = await createOrder({
+      ...data,
+      userId: session.user.id
+    });
+    
+    return NextResponse.json(order, { status: 201 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: error.errors },
+        { status: 400 }
+      );
+    }
+    
+    throw error;
+  }
+}
+```
+
+**5. Metadata Configuration**
+
+```typescript
+// app/products/[id]/page.tsx
+import { Metadata } from 'next';
+import { getProduct } from '@/lib/products';
+import { notFound } from 'next/navigation';
+
+interface ProductPageProps {
+  params: { id: string };
+}
+
+// Generate metadata dynamically
+export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+  const product = await getProduct(params.id);
+  
+  if (!product) {
+    return { title: 'Product Not Found' };
+  }
+  
+  return {
+    title: `${product.name} - ${product.brand}`,
+    description: product.description,
+    openGraph: {
+      title: product.name,
+      description: product.description,
+      images: [product.imageUrl],
+      type: 'product',
+      product: {
+        price: {
+          amount: product.price,
+          currency: 'USD'
+        }
+      }
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: product.name,
+      description: product.description,
+      images: [product.imageUrl]
+    }
+  };
+}
+
+// Generate static params for SSG
+export async function generateStaticParams() {
+  const products = await getAllProductIds();
+  
+  return products.map((id) => ({
+    id
+  }));
+}
+
+// Revalidate every hour
+export const revalidate = 3600;
+
+export default async function ProductPage({ params }: ProductPageProps) {
+  const product = await getProduct(params.id);
+  
+  if (!product) {
+    notFound();
+  }
+  
+  return (
+    <div className="product-page">
+      <h1>{product.name}</h1>
+      <ProductImage src={product.imageUrl} alt={product.name} />
+      <p>{product.description}</p>
+      <PriceDisplay price={product.price} currency="USD" />
+    </div>
+  );
+}
+```
+
+**6. Error Handling**
+
+```typescript
+// app/error.tsx
+'use client';
+
+import { useEffect } from 'react';
+
+export default function Error({
+  error,
+  reset
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  useEffect(() => {
+    // Log error to monitoring service
+    console.error('Page error:', error);
+  }, [error]);
+  
+  return (
+    <div className="error-container">
+      <h2>Something went wrong!</h2>
+      <p>We&apos;ve been notified and are working on it.</p>
+      <button onClick={() => reset()}>
+        Try again
+      </button>
+    </div>
+  );
+}
+
+// app/not-found.tsx
+export default function NotFound() {
+  return (
+    <div className="not-found-container">
+      <h1>404 - Page Not Found</h1>
+      <p>The page you&apos;re looking for doesn&apos;t exist.</p>
+      <Link href="/">
+        Go back home
+      </Link>
+    </div>
+  );
+}
+
+// app/products/[id]/not-found.tsx
+export default function ProductNotFound() {
+  return (
+    <div className="product-not-found">
+      <h1>Product Not Found</h1>
+      <p>This product may have been removed or doesn&apos;t exist.</p>
+      <Link href="/products">
+        Browse all products
+      </Link>
+    </div>
+  );
+}
+```
+
+## Workflow
+
+**Phase 1: Project Setup**
+
+Initialize Next.js project. Configure TypeScript. Set up folder structure. Configure ESLint và Prettier. Set up testing framework.
+
+**Phase 2: Routing Design**
+
+Define route structure. Plan route groups. Set up layouts. Configure nested routes. Plan dynamic routes.
+
+**Phase 3: Component Development**
+
+Create UI components first. Build feature components. Implement Server vs Client boundaries. Set up state management.
+
+**Phase 4: Data Layer**
+
+Implement data fetching functions. Configure caching. Set up API routes. Handle mutations.
+
+**Phase 5: Performance Optimization**
+
+Optimize images. Configure fonts. Implement code splitting. Set up analytics. Monitor Core Web Vitals.
+
+**Phase 6: Testing và Deployment**
+
+Write component tests. Set up E2E tests. Configure deployment. Set up monitoring.
+
+## Ví dụ
+
+**Ví dụ 1: Static Generation với ISR**
+
+```typescript
+// app/blog/[slug]/page.tsx
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { getBlogPost, getAllBlogSlugs } from '@/lib/blog';
+
+// Revalidate every hour (ISR)
+export const revalidate = 3600;
+
+// Generate static paths at build time
+export async function generateStaticParams() {
+  const slugs = await getAllBlogSlugs();
+  
+  return slugs.map((slug) => ({
+    slug
+  }));
+}
+
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: { slug: string } 
+}): Promise<Metadata> {
+  const post = await getBlogPost(params.slug);
+  
+  if (!post) return { title: 'Post Not Found' };
+  
+  return {
+    title: post.title,
+    description: post.excerpt,
+    authors: [{ name: post.author.name }],
+    openGraph: {
+      type: 'article',
+      publishedTime: post.publishedAt,
+      authors: [post.author.name],
+      tags: post.tags
+    }
+  };
+}
+
+export default async function BlogPostPage({ 
+  params 
+}: { 
+  params: { slug: string } 
+}) {
+  const post = await getBlogPost(params.slug);
+  
+  if (!post) {
+    notFound();
+  }
+  
+  return (
+    <article>
+      <header>
+        <h1>{post.title}</h1>
+        <div className="meta">
+          <span>By {post.author.name}</span>
+          <time>{post.publishedAt}</time>
+        </div>
+      </header>
+      
+      <div dangerouslySetInnerHTML={{ __html: post.content }} />
+      
+      <footer>
+        <Tags tags={post.tags} />
+        <RelatedPosts currentPostId={post.id} />
+      </footer>
+    </article>
+  );
+}
+```
+
+**Ví dụ 2: Real-time Dashboard với Server Components**
+
+```typescript
+// app/dashboard/page.tsx
+import { Suspense } from 'react';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { getDashboardStats } from '@/lib/dashboard';
+import { StatsCards } from './StatsCards';
+import { RecentOrders } from './RecentOrders';
+import { RevenueChart } from './RevenueChart';
+import { DashboardSkeleton } from './DashboardSkeleton';
+
+export default async function DashboardPage() {
+  const session = await getServerSession(authOptions);
+  
+  // Fetch data in parallel
+  const stats = await getDashboardStats(session.user.id);
+  
+  return (
+    <div className="dashboard">
+      <h1>Welcome back, {session.user.name}</h1>
+      
+      <Suspense fallback={<DashboardSkeleton variant="stats" />}>
+        <StatsCards stats={stats} />
+      </Suspense>
+      
+      <div className="dashboard-grid">
+        <Suspense fallback={<DashboardSkeleton variant="chart" />}>
+          <RevenueChart data={stats.revenueData} />
+        </Suspense>
+        
+        <Suspense fallback={<DashboardSkeleton variant="table" />}>
+          <RecentOrders orders={stats.recentOrders} />
+        </Suspense>
+      </div>
+    </div>
+  );
+}
+
+// components/dashboard/StatsCards.tsx
+'use client';
+
+import { useState } from 'react';
+
+export function StatsCards({ stats }: { stats: Stats }) {
+  return (
+    <div className="stats-grid">
+      <StatCard
+        title="Total Revenue"
+        value={formatCurrency(stats.totalRevenue)}
+        change={stats.revenueChange}
+      />
+      <StatCard
+        title="Orders"
+        value={stats.totalOrders.toString()}
+        change={stats.ordersChange}
+      />
+      <StatCard
+        title="Customers"
+        value={stats.totalCustomers.toString()}
+        change={stats.customersChange}
+      />
+      <StatCard
+        title="Average Order"
+        value={formatCurrency(stats.averageOrder)}
+        change={stats.averageOrderChange}
+      />
+    </div>
+  );
+}
+```
+
+**Ví dụ 3: Authentication Integration**
+
+```typescript
+// lib/auth.ts
+import { NextAuthOptions } from 'next-auth';
+import { PrismaAdapter } from '@auth/prisma-adapter';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import { prisma } from '@/lib/prisma';
+import bcrypt from 'bcrypt';
+
+export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
+  providers: [
+    CredentialsProvider({
+      name: 'Credentials',
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
+        
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email }
+        });
+        
+        if (!user || !user.passwordHash) {
+          return null;
+        }
+        
+        const isValid = await bcrypt.compare(
+          credentials.password,
+          user.passwordHash
+        );
+        
+        if (!isValid) {
+          return null;
+        }
+        
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role
+        };
+      }
+    })
+  ],
+  session: {
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60 // 30 days
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
+      }
+      return session;
+    }
+  },
+  pages: {
+    signIn: '/login',
+    error: '/login'
+  }
+};
+
+// components/providers/AuthProvider.tsx
+'use client';
+
+import { SessionProvider } from 'next-auth/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactNode, useState } from 'react';
+
+export function Providers({ children }: { children: ReactNode }) {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 60 * 1000,
+            refetchOnWindowFocus: false
+          }
+        }
+      })
+  );
+  
+  return (
+    <SessionProvider>
+      <QueryClientProvider client={queryClient}>
+        {children}
+      </QueryClientProvider>
+    </SessionProvider>
+  );
+}
+```
+
+## Liên kết
+
+- [[frontend-architecture]] - Frontend architecture principles
+- [[react]] - React patterns
+- [[typescript]] - TypeScript best practices
+- [[testing]] - Testing React components
+- [[api]] - API design
+- [[performance]] - Performance optimization
+- [[deployment]] - Next.js deployment

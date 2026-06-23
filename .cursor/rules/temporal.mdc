@@ -1,0 +1,52 @@
+---
+description: Nguyên tắc và best practices cho Temporal workflow orchestration
+created: 2026-06-23
+version: 1.0.0
+tags: [temporal, workflow, orchestration, durable-execution]
+---
+
+# Temporal
+
+## Mục tiêu
+
+Temporal là một workflow orchestration platform cung cấp durable execution cho các distributed workflows và background jobs. Trong Cursor Enterprise Framework, Temporal được sử dụng cho việc xây dựng các workflows yêu cầu reliability cao, automatic retry, state management, và long-running business processes. Mục tiêu là hướng dẫn developers design và implement Temporal workflows cho enterprise reliability.
+
+## Nguyên tắc
+
+**1. Workflow Design**
+
+Idempotent workflows. Deterministic code. Activity composition. Child workflows. Large workflow considerations.
+
+**2. Activity Patterns**
+
+Short-lived activities. Retry configuration. Heartbeating. Local activities for speed.
+
+**3. Error Handling**
+
+Workflow errors. Activity errors. Retry policies. Custom error types. Dead letter handling.
+
+**4. State Management**
+
+Workflow state. Workflow history. Large event histories. State queries.
+
+**5. Scalability**
+
+Horizontal scaling. Worker deployment. Task routing. Namespace management.
+
+**6. Observability**
+
+Workflow history. Metrics. Tracing. Logging. Debugging workflows.
+
+**7. Testing**
+
+Workflow unit tests. Integration tests. Replay testing. Determinism verification.
+
+**8. Production Deployment**
+
+Worker deployment. Persistence. Clusters configuration. Monitoring.
+
+## Liên kết
+
+- [[workflow]] - Workflow
+- [[queue]] - Queue
+- [[microservice]] - Microservices

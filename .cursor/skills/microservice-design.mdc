@@ -1,0 +1,348 @@
+---
+description: Design microservices architecture cho scalability và maintainability
+purpose: Design và implement microservices với proper boundaries
+input: Domain model, bounded contexts, scaling requirements
+output: Microservice architecture, API contracts, integration patterns
+version: 1.0.0
+tags: [microservices, distributed-systems, api-gateway, service-mesh]
+---
+
+# Microservice Design Skill - Thiết Kế Microservices Architecture
+
+## Tổng quan
+
+Microservices architecture decomposes applications into small, independent services. Skill này cung cấp framework để design microservices với proper boundaries và integration patterns.
+
+## Purpose (Mục đích)
+
+Microservice Design Skill được thiết kế để:
+
+1. **Service Decomposition**: Find service boundaries
+2. **API Design**: Define contracts
+3. **Integration Patterns**: Connect services
+4. **Data Management**: Handle distributed data
+5. **Operational Patterns**: Ensure reliability
+
+### Khi nào sử dụng Microservice Design
+
+- Khi decomposing monoliths
+- Khi designing new systems
+- Khi scaling applications
+- Khi improving team autonomy
+
+## Input (Đầu vào)
+
+- [ ] Domain model
+- [ ] Bounded contexts
+- [ ] Team structure
+- [ ] Scaling requirements
+
+## Output (Đầu ra)
+
+- [ ] Service decomposition
+- [ ] API contracts
+- [ ] Data strategies
+- [ ] Integration patterns
+
+## Workflow (Quy trình)
+
+### Phase 1: Service Decomposition
+
+### Bước 1: Decomposition Strategies
+
+```typescript
+// Decomposition by Business Capability
+interface ServiceDefinition {
+  name: string;
+  capabilities: string[];
+  boundedContext: string;
+  apiContracts: APIContract[];
+  dataOwned: string[];
+  scalingProfile: ScalingProfile;
+}
+
+const MICROSERVICES: ServiceDefinition[] = [
+  {
+    name: 'user-service',
+    capabilities: [
+      'User registration',
+      'Authentication',
+      'Profile management',
+      'Password reset'
+    ],
+    boundedContext: 'Customer',
+    apiContracts: [
+      { endpoint: '/users', methods: ['POST', 'GET'] },
+      { endpoint: '/users/{id}', methods: ['GET', 'PATCH', 'DELETE'] },
+      { endpoint: '/auth/login', methods: ['POST'] }
+    ],
+    dataOwned: ['users', 'sessions', 'refresh_tokens'],
+    scalingProfile: { minInstances: 3, maxInstances: 10 }
+  },
+  {
+    name: 'order-service',
+    capabilities: [
+      'Order creation',
+      'Order management',
+      'Order status tracking',
+      'Order history'
+    ],
+    boundedContext: 'Sales',
+    apiContracts: [
+      { endpoint: '/orders', methods: ['POST', 'GET'] },
+      { endpoint: '/orders/{id}', methods: ['GET', 'PATCH', 'DELETE'] }
+    ],
+    dataOwned: ['orders', 'order_items'],
+    scalingProfile: { minInstances: 3, maxInstances: 20 }
+  },
+  {
+    name: 'catalog-service',
+    capabilities: [
+      'Product management',
+      'Category management',
+      'Search and filtering',
+      'Inventory tracking'
+    ],
+    boundedContext: 'Catalog',
+    apiContracts: [
+      { endpoint: '/products', methods: ['POST', 'GET'] },
+      { endpoint: '/products/{id}', methods: ['GET', 'PUT', 'DELETE'] },
+      { endpoint: '/search', methods: ['GET'] }
+    ],
+    dataOwned: ['products', 'categories', 'inventory'],
+    scalingProfile: { minInstances: 2, maxInstances: 15 }
+  }
+];
+```
+
+### Bước 2: Data Management Strategies
+
+```typescript
+// Database per Service
+interface DataStrategy {
+  service: string;
+  databaseType: 'postgres' | 'mongodb' | 'redis' | 'elasticsearch';
+  schema: 'schema-per-service' | 'database-per-service';
+  connections: ConnectionPool;
+}
+
+// Choreography vs Orchestration
+enum IntegrationPattern {
+  CHOREOGRAPHY = 'choreography',  // Events
+  ORCHESTRATION = 'orchestration' // Commands
+}
+
+// Saga Pattern for distributed transactions
+class OrderSaga {
+  constructor(
+    private eventBus: EventBus,
+    private orderService: OrderServiceClient,
+    private inventoryService: InventoryServiceClient,
+    private paymentService: PaymentServiceClient
+  ) {}
+  
+  async execute(orderId: string): Promise<void> {
+    try {
+      // Step 1: Reserve inventory
+      await this.inventoryService.reserve(orderId, items);
+      
+      // Step 2: Process payment
+      await this.paymentService.charge(orderId, amount);
+      
+      // Step 3: Confirm order
+      await this.orderService.confirm(orderId);
+      
+    } catch (error) {
+      // Compensating transactions
+      await this.paymentService.refund(orderId);
+      await this.inventoryService.release(orderId);
+      await this.orderService.cancel(orderId);
+    }
+  }
+}
+```
+
+### Phase 2: Service Communication
+
+### Bước 3: API Design
+
+```typescript
+// API Contract Definition
+interface APIService {
+  name: string;
+  version: string;
+  basePath: string;
+  endpoints: Endpoint[];
+  schemas: Schema[];
+}
+
+interface Endpoint {
+  path: string;
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  request: Schema;
+  response: Schema;
+  errors: ErrorSchema[];
+  auth: AuthRequirement;
+}
+
+// OpenAPI Specification
+const ORDER_SERVICE_API: APIService = {
+  name: 'order-service',
+  version: '1.0.0',
+  basePath: '/api/v1',
+  endpoints: [
+    {
+      path: '/orders',
+      method: 'POST',
+      request: {
+        type: 'object',
+        required: ['customerId', 'items', 'shippingAddress'],
+        properties: {
+          customerId: { type: 'string', format: 'uuid' },
+          items: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                productId: { type: 'string' },
+                quantity: { type: 'integer', minimum: 1 }
+              }
+            }
+          },
+          shippingAddress: { $ref: '#/components/schemas/Address' }
+        }
+      },
+      response: {
+        201: { description: 'Order created', schema: { $ref: '#/components/schemas/Order' } },
+        400: { description: 'Validation error' },
+        401: { description: 'Unauthorized' }
+      },
+      errors: [
+        { code: 'INVALID_ITEMS', message: 'Some items are invalid' },
+        { code: 'INSUFFICIENT_INVENTORY', message: 'Not enough inventory' }
+      ],
+      auth: { type: 'bearer' }
+    }
+  ]
+};
+```
+
+### Bước 4: Service Mesh
+
+```yaml
+# Kubernetes Service Mesh Configuration (Istio)
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: order-service
+spec:
+  hosts:
+    - order-service
+  http:
+    - match:
+        - headers:
+            x-service-version:
+              exact: v2
+      route:
+        - destination:
+            host: order-service
+            subset: v2
+          weight: 100
+    - route:
+        - destination:
+            host: order-service
+            subset: v1
+          weight: 100
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: order-service
+spec:
+  host: order-service
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 100
+      http:
+        h2UpgradePolicy: UPGRADE
+        http1MaxPendingRequests: 100
+        http2MaxRequests: 1000
+    loadBalancer:
+      simple: LEAST_CONN
+    circuitBreaker:
+      consecutiveGatewayErrors: 5
+      interval: 30s
+      baseEjectionTime: 60s
+  subsets:
+    - name: v1
+      labels:
+        version: v1
+    - name: v2
+      labels:
+        version: v2
+```
+
+## Checklist
+
+- [ ] Services decomposed
+- [ ] API contracts defined
+- [ ] Data strategies selected
+- [ ] Integration patterns chosen
+- [ ] Service mesh configured
+- [ ] Observability set up
+
+## Examples (Ví dụ)
+
+### Ví dụ: Complete Microservices Architecture
+
+```yaml
+# docker-compose.yml for local development
+version: '3.8'
+services:
+  api-gateway:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - user-service
+      - order-service
+      - catalog-service
+  
+  user-service:
+    build: ./services/user-service
+    environment:
+      - DATABASE_URL=postgres://user-service:5432/users
+      - KAFKA_BROKERS=kafka:9092
+  
+  order-service:
+    build: ./services/order-service
+    environment:
+      - DATABASE_URL=postgres://order-service:5432/orders
+      - KAFKA_BROKERS=kafka:9092
+  
+  catalog-service:
+    build: ./services/catalog-service
+    environment:
+      - DATABASE_URL=mongodb://catalog-service:27017/catalog
+      - KAFKA_BROKERS=kafka:9092
+  
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    environment:
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+  
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
+```
+
+## Liên kết
+
+- [[../rules/core-architecture]] - Core Architecture
+- [[../skills/ddd-design]] - DDD Design
+- [[../skills/clean-architecture]] - Clean Architecture
+- [[../skills/kubernetes-review]] - Kubernetes Review

@@ -1,0 +1,52 @@
+---
+description: Nguyên tắc Version Control cho team collaboration
+created: 2026-06-23
+version: 1.0.0
+tags: [git, version-control, branching, collaboration, enterprise]
+---
+
+# Version Control
+
+## Mục tiêu
+
+Version Control là hệ thống quản lý source code changes và collaboration giữa các developers. Trong Cursor Enterprise Framework, Version Control rule định nghĩa các nguyên tắc và best practices cho việc sử dụng Git hiệu quả trong team environment, đảm bảo code quality, traceability, và smooth collaboration. Mục tiêu là hướng dẫn teams establish và maintain healthy version control practices.
+
+## Nguyên tắc
+
+**1. Branch Strategy**
+
+Choose appropriate branching model. GitFlow, Trunk-Based, or custom. Consistent naming conventions. Branch protection rules. Short-lived branches preferred.
+
+**2. Commit Practices**
+
+Atomic commits. Clear commit messages. Reference issues. Small, focused changes. One logical change per commit.
+
+**3. Code Review**
+
+Required reviews for all changes. Constructive feedback. Timely reviews. Small PRs preferred. Review checklist.
+
+**4. Merging Strategy**
+
+Merge vs rebase decisions. Squash merging options. Conflict resolution. Fast-forward when possible.
+
+**5. Release Management**
+
+Version tagging. Release branches. Hotfix procedures. Release notes.
+
+**6. Access Control**
+
+Branch permissions. Protected branches. Team access levels. Audit trail.
+
+**7. CI/CD Integration**
+
+Pipeline on commits. Quality gates. Automated testing. Deployment triggers.
+
+**8. Documentation**
+
+Repository README. Contributing guidelines. Code standards. Architecture docs.
+
+## Liên kết
+
+- [[coding-standards]] - Coding Standards
+- [[deployment]] - Deployment
+- [[security]] - Security

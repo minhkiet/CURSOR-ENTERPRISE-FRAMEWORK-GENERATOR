@@ -1,0 +1,52 @@
+---
+description: Nguyên tắc và best practices cho n8n workflow automation
+created: 2026-06-23
+version: 1.0.0
+tags: [n8n, workflow, automation, integration, low-code]
+---
+
+# n8n
+
+## Mục tiêu
+
+n8n là một workflow automation platform mã nguồn mở cho phép kết nối các ứng dụng và tự động hóa các quy trình công việc. Trong Cursor Enterprise Framework, n8n được sử dụng cho việc tạo các automation workflows giữa các services, business process automation, và no-code/low-code integration solutions. Mục tiêu là hướng dẫn developers sử dụng n8n một cách hiệu quả cho enterprise automation.
+
+## Nguyên tắc
+
+**1. Workflow Design**
+
+Break into logical steps. Error handling at each step. Idempotent operations. Retry logic. Clear workflow naming.
+
+**2. Node Selection**
+
+Use official nodes when available. HTTP Request node for custom APIs. Code node for complex logic. Function node sparingly.
+
+**3. Data Transformation**
+
+Transform data between nodes. JSON operations. Field mapping clearly. Avoid data loss.
+
+**4. Error Handling**
+
+Error triggers và catch nodes. Alert on failures. Retry with backoff. Dead letter handling.
+
+**5. Security**
+
+Credential management. OAuth securely stored. Webhook authentication. IP restrictions.
+
+**6. Performance**
+
+Parallel execution where possible. Limit API calls. Batch operations. Avoid nested loops.
+
+**7. Version Control**
+
+Export workflows to JSON. Version control exports. Document changes. Test before production.
+
+**8. Monitoring**
+
+Execution history. Error tracking. Performance metrics. Alert configuration.
+
+## Liên kết
+
+- [[automation]] - Automation
+- [[queue]] - Queue
+- [[api]] - API

@@ -1,0 +1,551 @@
+---
+description: Nguyên tắc và best practices cho Row Level Security trong PostgreSQL
+created: 2026-06-23
+version: 1.0.0
+tags: [rls, postgres, security, database, multi-tenant]
+---
+
+# RLS
+
+## Mục tiêu
+
+Row Level Security (RLS) là một PostgreSQL feature cho phép kiểm soát truy cập ở cấp độ rows thay vì cấp độ tables. Trong Cursor Enterprise Framework, RLS đóng vai trò quan trọng trong việc implement security ở database layer, đặc biệt cho các multi-tenant applications nơi data isolation là mandatory. Mục tiêu của rule này là hướng dẫn developers trong việc design, implement, và maintain RLS policies một cách hiệu quả và secure.
+
+RLS không chỉ là security feature mà còn là cách để enforce business rules ở database level, đảm bảo rằng dù application code có bug gì, database vẫn enforce access control đúng đắn.
+
+## Nguyên tắc
+
+**1. Security at Database Level**
+
+RLS is defense in depth. Application bugs shouldn't expose data. Enforce access at lowest level. Multiple layers of security. Database is last line of defense.
+
+**2. Explicit Deny**
+
+Default deny principle. Explicit policies for access. Check policies carefully. Audit policy coverage. Regular policy reviews.
+
+**3. Auth.uid() Integration**
+
+Use auth.uid() for user identification. Combine with RLS policies. Session validation. Secure token handling. No bypass mechanisms.
+
+**4. Policy Organization**
+
+Group related policies. Naming conventions. Document policy purpose. Test each policy. Version control policies.
+
+**5. Performance Considerations**
+
+Test policies under load. Consider index impact. Monitor query performance. Optimize where needed. Avoid complex subqueries in policies.
+
+**6. Testing Strategy**
+
+Test every policy thoroughly. Use test users/roles. Test positive and negative cases. Include edge cases. Automate policy testing.
+
+**7. Multi-Tenant Isolation**
+
+Tenant isolation via RLS. Separate tenant data completely. Validate tenant_id in policies. No cross-tenant access. Audit tenant access.
+
+**8. Service Role Usage**
+
+Use service role carefully. Never expose in client. For admin operations only. Combine with additional checks. Monitor service role usage.
+
+**9. Schema Design for RLS**
+
+RLS-friendly schema design. Proper indexing. Avoid polymorphic patterns. Use proper data types. Normalize appropriately.
+
+**10. Monitoring và Auditing**
+
+Log policy violations. Monitor access patterns. Regular security audits. Track unusual access. Compliance reporting.
+
+## Checklist
+
+- [ ] RLS enabled on all sensitive tables
+- [ ] Policies defined for each operation (SELECT, INSERT, UPDATE, DELETE)
+- [ ] Auth integration configured
+- [ ] Multi-tenant isolation implemented
+- [ ] Performance tested
+- [ ] Security audit completed
+- [ ] Documentation updated
+- [ ] Monitoring configured
+
+## Anti Pattern
+
+**1. Disabled RLS**
+
+Disabling RLS "for testing". Bypassing security. Data exposure risk. Only disable in emergencies.
+
+**2. Overly Permissive Policies**
+
+Policies that allow everything. " USING (true) " for all operations. Defeats purpose. Principle of least privilege.
+
+**3. Complex Subqueries**
+
+Deep nesting in policies. Performance impact. Hard to debug. Simplify policies.
+
+**4. Ignoring Policy Interactions**
+
+Multiple policies interacting. Unexpected access grants. Policy order matters. Test combinations.
+
+**5. No Policy Documentation**
+
+Undocumented policies. Unknown security posture. Hard to maintain. Document everything.
+
+## Best Practice
+
+**1. RLS Setup Template**
+
+```sql
+-- Step 1: Enable RLS on table
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+
+-- Step 2: Force RLS for all roles (including owner)
+ALTER TABLE orders FORCE ROW LEVEL SECURITY;
+
+-- Step 3: Create policies
+-- SELECT policy
+CREATE POLICY orders_select ON orders
+  FOR SELECT
+  USING (
+    -- Users can view their own orders
+    customer_id = auth.uid()
+    -- OR admins can view all
+    OR EXISTS (
+      SELECT 1 FROM user_roles
+      WHERE user_id = auth.uid()
+      AND role = 'admin'
+    )
+  );
+
+-- INSERT policy
+CREATE POLICY orders_insert ON orders
+  FOR INSERT
+  WITH CHECK (
+    -- Users can only create orders for themselves
+    customer_id = auth.uid()
+  );
+
+-- UPDATE policy
+CREATE POLICY orders_update ON orders
+  FOR UPDATE
+  USING (
+    -- Users can update their own pending orders
+    (
+      customer_id = auth.uid()
+      AND status = 'pending'
+    )
+    -- Admins can update any orders
+    OR EXISTS (
+      SELECT 1 FROM user_roles
+      WHERE user_id = auth.uid()
+      AND role = 'admin'
+    )
+  )
+  WITH CHECK (
+    -- Prevent changing customer_id
+    customer_id = customer_id
+    -- Only admins can change status
+    AND (
+      status = status
+      OR EXISTS (
+        SELECT 1 FROM user_roles
+        WHERE user_id = auth.uid()
+        AND role = 'admin'
+      )
+    )
+  );
+
+-- DELETE policy
+CREATE POLICY orders_delete ON orders
+  FOR DELETE
+  USING (
+    -- Only admins can delete
+    EXISTS (
+      SELECT 1 FROM user_roles
+      WHERE user_id = auth.uid()
+      AND role = 'admin'
+    )
+  );
+```
+
+**2. Multi-Tenant RLS**
+
+```sql
+-- Add tenant_id to all tenant-scoped tables
+ALTER TABLE orders ADD COLUMN tenant_id UUID NOT NULL DEFAULT gen_random_uuid();
+
+-- Create index for performance
+CREATE INDEX idx_orders_tenant_id ON orders(tenant_id);
+
+-- Create policy for tenant isolation
+CREATE POLICY orders_tenant_isolation ON orders
+  FOR ALL
+  USING (
+    tenant_id = current_setting('app.current_tenant_id')::UUID
+  );
+
+-- Function to set tenant context
+CREATE OR REPLACE FUNCTION set_tenant_context(p_tenant_id UUID)
+RETURNS VOID AS $$
+BEGIN
+  PERFORM set_config('app.current_tenant_id', p_tenant_id::TEXT, false);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Use in transactions
+CREATE OR REPLACE FUNCTION create_tenant_order(
+  p_tenant_id UUID,
+  p_customer_id UUID,
+  p_total DECIMAL
+)
+RETURNS UUID AS $$
+DECLARE
+  v_order_id UUID;
+BEGIN
+  -- Set tenant context
+  PERFORM set_tenant_context(p_tenant_id);
+  
+  -- Create order
+  INSERT INTO orders (tenant_id, customer_id, total)
+  VALUES (p_tenant_id, p_customer_id, p_total)
+  RETURNING id INTO v_order_id;
+  
+  RETURN v_order_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+```
+
+**3. Role-Based RLS**
+
+```sql
+-- Create custom roles
+CREATE ROLE app_user;
+CREATE ROLE app_admin;
+CREATE ROLE app_support;
+
+-- Grant appropriate permissions
+GRANT USAGE ON SCHEMA public TO app_user, app_admin, app_support;
+GRANT SELECT, INSERT, UPDATE ON orders TO app_user;
+GRANT ALL ON orders TO app_admin;
+
+-- Role-based policies
+CREATE POLICY orders_user_read ON orders
+  FOR SELECT
+  TO app_user
+  USING (
+    customer_id = auth.uid()
+    OR auth.uid() IN (
+      SELECT user_id FROM support_access WHERE is_active = true
+    )
+  );
+
+CREATE POLICY orders_admin_all ON orders
+  FOR ALL
+  TO app_admin
+  USING (true);
+```
+
+**4. Complex Business Rules**
+
+```sql
+-- Policy with complex business logic
+CREATE POLICY order_items_access ON order_items
+  FOR ALL
+  USING (
+    -- User must have access to parent order
+    EXISTS (
+      SELECT 1 FROM orders o
+      WHERE o.id = order_items.order_id
+      AND (
+        -- User owns the order
+        o.customer_id = auth.uid()
+        -- OR is admin
+        OR EXISTS (
+          SELECT 1 FROM user_roles ur
+          WHERE ur.user_id = auth.uid() AND ur.role = 'admin'
+        )
+        -- OR has explicit permission
+        OR EXISTS (
+          SELECT 1 FROM order_shares os
+          WHERE os.order_id = o.id
+          AND os.shared_with = auth.uid()
+          AND os.expires_at > NOW()
+        )
+      )
+    )
+  );
+
+-- Conditional policies based on data state
+CREATE POLICY orders_status_change ON orders
+  FOR UPDATE
+  USING (
+    -- Can update if order is still pending
+    status = 'pending'
+    OR status = 'processing'
+  )
+  WITH CHECK (
+    -- Can only set to valid status transitions
+    (
+      status IN ('processing', 'shipped', 'delivered', 'cancelled')
+      AND (
+        -- Normal progression
+        (status = 'processing' AND status = 'pending')
+        OR (status = 'shipped' AND status = 'processing')
+        OR (status = 'delivered' AND status = 'shipped')
+        -- Cancellation
+        OR status = 'cancelled'
+      )
+    )
+    OR EXISTS (
+      -- Admin bypass
+      SELECT 1 FROM user_roles
+      WHERE user_id = auth.uid() AND role = 'admin'
+    )
+  );
+```
+
+**5. Testing RLS Policies**
+
+```sql
+-- Test as different users
+SET ROLE app_user;
+SET request.jwt.claims = '{"sub": "user-uuid-here"}';
+
+-- Test SELECT access
+SELECT * FROM orders WHERE customer_id = 'user-uuid-here'; -- Should succeed
+SELECT * FROM orders WHERE customer_id = 'other-user'; -- Should fail
+
+RESET ROLE;
+
+-- Test as admin
+SET ROLE app_admin;
+SELECT * FROM orders; -- Should see all
+DELETE FROM orders WHERE id = 'some-id'; -- Should succeed
+
+RESET ROLE;
+
+-- Test edge cases
+SET ROLE app_user;
+-- Should fail: trying to read order not owned
+SELECT * FROM orders WHERE id = 'order-id-not-owned'; -- Should return 0 rows
+
+-- Should fail: trying to update another user's order
+UPDATE orders SET notes = 'hacked' WHERE customer_id = 'other-user'; -- Should fail
+
+RESET ROLE;
+```
+
+**6. RLS Performance Optimization**
+
+```sql
+-- Create indexes to support RLS policies
+CREATE INDEX idx_orders_customer ON orders(customer_id) 
+  WHERE EXISTS (
+    SELECT 1 FROM user_roles 
+    WHERE user_id = auth.uid() AND role = 'admin'
+  );
+
+-- Use partial indexes for common patterns
+CREATE INDEX idx_orders_pending_customer 
+  ON orders(customer_id) 
+  WHERE status = 'pending';
+
+-- Analyze tables regularly for RLS optimization
+ANALYZE orders;
+
+-- Check query plans
+EXPLAIN (ANALYZE, BUFFERS) SELECT * FROM orders WHERE customer_id = auth.uid();
+
+-- Monitor RLS performance
+SELECT 
+  schemaname,
+  tablename,
+  policyname,
+  roles,
+  cmd,
+  qual,
+  with_check
+FROM pg_policies
+WHERE tablename = 'orders';
+```
+
+**7. Auditing RLS**
+
+```sql
+-- Create audit log table
+CREATE TABLE rls_audit_log (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  table_name TEXT NOT NULL,
+  operation TEXT NOT NULL,
+  attempted_user_id UUID,
+  policy_name TEXT,
+  row_tenant_id UUID,
+  allowed BOOLEAN NOT NULL,
+  ip_address INET,
+  user_agent TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Create audit trigger
+CREATE OR REPLACE FUNCTION audit_rls_access()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO rls_audit_log (
+    table_name,
+    operation,
+    attempted_user_id,
+    policy_name,
+    row_tenant_id,
+    allowed,
+    ip_address,
+    user_agent
+  )
+  SELECT
+    TG_TABLE_NAME,
+    TG_OP,
+    NULLIF(current_setting('request.jwt.claims', true)::JSONB->>'sub', '')::UUID,
+    NULLIF(current_setting('app.last_policy', true), ''),
+    NEW.tenant_id,
+    TRUE,
+    NULLIF(current_setting('request.client_addr', true), '')::INET,
+    NULLIF(current_setting('request.user_agent', true), '');
+  
+  RETURN NEW;
+EXCEPTION WHEN OTHERS THEN
+  -- Don't fail the operation if audit fails
+  RAISE WARNING 'Audit logging failed: %', SQLERRM;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Apply to sensitive tables
+CREATE TRIGGER orders_rls_audit
+  AFTER INSERT OR UPDATE ON orders
+  FOR EACH ROW EXECUTE FUNCTION audit_rls_access();
+```
+
+## Workflow
+
+**Phase 1: Identify Sensitive Data**
+
+Identify tables requiring RLS. Map data access patterns. Define security requirements. Document sensitive columns.
+
+**Phase 2: Design Policies**
+
+Design policies for each table. Define access rules. Consider performance. Plan policy organization.
+
+**Phase 3: Implementation**
+
+Enable RLS on tables. Create policies. Test policies. Iterate based on testing.
+
+**Phase 4: Testing**
+
+Test all access scenarios. Test positive and negative. Performance testing. Security audit.
+
+**Phase 5: Deployment**
+
+Deploy policies to production. Monitor access. Set up alerting. Document policies.
+
+**Phase 6: Maintenance**
+
+Regular policy reviews. Update for new requirements. Performance monitoring. Security audits.
+
+## Ví dụ
+
+**Ví dụ 1: Complete E-commerce RLS**
+
+```sql
+-- Full e-commerce schema with RLS
+
+-- Enable RLS on all tables
+ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
+
+-- Customers: Users manage own profile
+CREATE POLICY customers_select ON customers
+  FOR SELECT USING (id = auth.uid());
+
+CREATE POLICY customers_update ON customers
+  FOR UPDATE USING (id = auth.uid());
+
+-- Products: Public read, admin write
+CREATE POLICY products_select ON products
+  FOR SELECT USING (is_active = TRUE);
+
+CREATE POLICY products_all ON products
+  FOR ALL USING (
+    EXISTS (SELECT 1 FROM user_roles WHERE user_id = auth.uid() AND role = 'admin')
+  );
+
+-- Orders: User sees own, admin sees all
+CREATE POLICY orders_customer_select ON orders
+  FOR SELECT USING (customer_id = auth.uid());
+
+CREATE POLICY orders_admin_select ON orders
+  FOR SELECT USING (
+    EXISTS (SELECT 1 FROM user_roles WHERE user_id = auth.uid() AND role IN ('admin', 'support'))
+  );
+
+CREATE POLICY orders_insert ON orders
+  FOR INSERT WITH CHECK (customer_id = auth.uid());
+
+CREATE POLICY orders_update ON orders
+  FOR UPDATE USING (
+    customer_id = auth.uid()
+    OR EXISTS (SELECT 1 FROM user_roles WHERE user_id = auth.uid() AND role = 'admin')
+  );
+
+-- Order items: Follow parent order access
+CREATE POLICY order_items_access ON order_items
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM orders
+      WHERE orders.id = order_id
+      AND (
+        orders.customer_id = auth.uid()
+        OR EXISTS (SELECT 1 FROM user_roles WHERE user_id = auth.uid() AND role = 'admin')
+      )
+    )
+  );
+
+-- Payments: Admin only
+CREATE POLICY payments_admin ON payments
+  FOR ALL USING (
+    EXISTS (SELECT 1 FROM user_roles WHERE user_id = auth.uid() AND role = 'admin')
+  );
+```
+
+**Ví dụ 2: Time-Based Access**
+
+```sql
+-- Expired document access
+CREATE TABLE documents (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  owner_id UUID NOT NULL REFERENCES users(id),
+  title TEXT NOT NULL,
+  content TEXT,
+  valid_from TIMESTAMPTZ NOT NULL,
+  valid_until TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE POLICY document_time_access ON documents
+  FOR SELECT USING (
+    owner_id = auth.uid()
+    OR (
+      valid_from <= NOW()
+      AND (valid_until IS NULL OR valid_until > NOW())
+      AND EXISTS (SELECT 1 FROM user_roles WHERE user_id = auth.uid() AND role = 'subscriber')
+    )
+  );
+```
+
+## Liên kết
+
+- [[postgres]] - PostgreSQL best practices
+- [[database]] - Database design
+- [[security]] - Security principles
+- [[multi-tenant]] - Multi-tenant architecture
+- [[supabase]] - Supabase RLS
+- [[audit]] - Audit logging
+- [[testing]] - Testing database security

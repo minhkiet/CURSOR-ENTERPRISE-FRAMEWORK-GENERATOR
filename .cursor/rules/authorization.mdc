@@ -1,0 +1,1307 @@
+---
+description: Nguyên tắc và best practices cho Authorization Patterns trong Cursor Enterprise Framework
+created: 2026-06-23
+version: 1.0.0
+tags:
+  - authorization
+  - permissions
+  - rbac
+  - abac
+  - security
+---
+
+# Authorization Patterns Guidelines
+
+## Mục tiêu
+
+Tài liệu này định nghĩa các nguyên tắc và best practices cho việc implement authorization systems trong Cursor Enterprise Framework. Mục tiêu là đảm bảo proper access control, separation of concerns, và compliance với security requirements.
+
+Authorization (Authorization) là quá trình xác định những gì một authenticated user được phép làm. Việc implement authorization đúng cách đảm bảo users chỉ có thể truy cập resources và actions mà họ được phép.
+
+## Nguyên tắc cơ bản
+
+### 1. Principle of Least Privilege
+
+Mỗi user và system component chỉ nên có đủ permissions để thực hiện công việc của họ.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│              Principle of Least Privilege                   │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  User A (Admin)    │    User B (Editor)   │  User C (Viewer)│
+│  ─────────────────│    ──────────────────│  ───────────────│
+│  ✓ Read all       │    ✓ Read all        │  ✓ Read public  │
+│  ✓ Write all      │    ✓ Write own       │  ✗ Write        │
+│  ✓ Delete all     │    ✗ Delete          │  ✗ Delete       │
+│  ✓ Manage users   │    ✗ Manage users    │  ✗ Manage users │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 2. Role-Based Access Control (RBAC)
+
+Implement RBAC với hierarchical roles.
+
+```typescript
+// Role definitions
+enum Role {
+    SUPER_ADMIN = 'SUPER_ADMIN',
+    ADMIN = 'ADMIN',
+    MANAGER = 'MANAGER',
+    EDITOR = 'EDITOR',
+    USER = 'USER',
+    GUEST = 'GUEST'
+}
+
+// Permission definitions
+enum Permission {
+    // User management
+    USER_READ = 'USER_READ',
+    USER_CREATE = 'USER_CREATE',
+    USER_UPDATE = 'USER_UPDATE',
+    USER_DELETE = 'USER_DELETE',
+    USER_MANAGE = 'USER_MANAGE',
+
+    // Content management
+    CONTENT_READ = 'CONTENT_READ',
+    CONTENT_CREATE = 'CONTENT_CREATE',
+    CONTENT_UPDATE = 'CONTENT_UPDATE',
+    CONTENT_DELETE = 'CONTENT_DELETE',
+    CONTENT_PUBLISH = 'CONTENT_PUBLISH',
+
+    // System
+    SYSTEM_CONFIG = 'SYSTEM_CONFIG',
+    AUDIT_VIEW = 'AUDIT_VIEW'
+}
+
+// Role-Permission mapping
+const rolePermissions: Record<Role, Permission[]> = {
+    [Role.SUPER_ADMIN]: Object.values(Permission),
+    [Role.ADMIN]: [
+        Permission.USER_READ, Permission.USER_CREATE, Permission.USER_UPDATE, Permission.USER_DELETE,
+        Permission.CONTENT_READ, Permission.CONTENT_CREATE, Permission.CONTENT_UPDATE, Permission.CONTENT_DELETE, Permission.CONTENT_PUBLISH,
+        Permission.AUDIT_VIEW
+    ],
+    [Role.MANAGER]: [
+        Permission.USER_READ, Permission.CONTENT_READ, Permission.CONTENT_CREATE, Permission.CONTENT_UPDATE, Permission.CONTENT_PUBLISH
+    ],
+    [Role.EDITOR]: [
+        Permission.CONTENT_READ, Permission.CONTENT_CREATE, Permission.CONTENT_UPDATE
+    ],
+    [Role.USER]: [
+        Permission.CONTENT_READ
+    ],
+    [Role.GUEST]: [
+        Permission.CONTENT_READ
+    ]
+};
+
+// Role hierarchy
+const roleHierarchy: Record<Role, Role[]> = {
+    [Role.SUPER_ADMIN]: [],
+    [Role.ADMIN]: [Role.MANAGER, Role.EDITOR, Role.USER, Role.GUEST],
+    [Role.MANAGER]: [Role.EDITOR, Role.USER, Role.GUEST],
+    [Role.EDITOR]: [Role.USER, Role.GUEST],
+    [Role.USER]: [Role.GUEST],
+    [Role.GUEST]: []
+};
+
+function getEffectivePermissions(role: Role): Permission[] {
+    const permissions = new Set(rolePermissions[role]);
+    
+    // Add permissions from child roles
+    const childRoles = roleHierarchy[role];
+    for (const childRole of childRoles) {
+        for (const permission of rolePermissions[childRole]) {
+            permissions.add(permission);
+        }
+    }
+    
+    return Array.from(permissions);
+}
+```
+
+### 3. Attribute-Based Access Control (ABAC)
+
+Implement ABAC cho fine-grained permissions.
+
+```typescript
+// Resource attributes
+interface ResourceAttributes {
+    owner: string;
+    team: string;
+    department: string;
+    classification: 'public' | 'internal' | 'confidential' | 'restricted';
+    createdAt: Date;
+    status: 'draft' | 'published' | 'archived';
+}
+
+// Subject attributes
+interface SubjectAttributes {
+    id: string;
+    roles: Role[];
+    teams: string[];
+    department: string;
+    clearances: string[];
+    location?: string;
+}
+
+// Environment attributes
+interface EnvironmentAttributes {
+    time: Date;
+    ipAddress: string;
+    deviceType: 'desktop' | 'mobile' | 'tablet';
+    securityLevel: 'low' | 'medium' | 'high';
+}
+
+// ABAC Policy engine
+class ABACEngine {
+    evaluate(
+        subject: SubjectAttributes,
+        resource: ResourceAttributes,
+        action: string,
+        environment: EnvironmentAttributes
+    ): boolean {
+        const policies = this.getPolicies(subject.roles);
+
+        for (const policy of policies) {
+            if (this.matchesPolicy(policy, subject, resource, action, environment)) {
+                return policy.effect === 'PERMIT';
+            }
+        }
+
+        return false; // Default deny
+    }
+
+    private matchesPolicy(
+        policy: Policy,
+        subject: SubjectAttributes,
+        resource: ResourceAttributes,
+        action: string,
+        environment: EnvironmentAttributes
+    ): boolean {
+        // Check action
+        if (!policy.actions.includes(action) && !policy.actions.includes('*')) {
+            return false;
+        }
+
+        // Check conditions
+        for (const condition of policy.conditions) {
+            if (!this.evaluateCondition(condition, subject, resource, environment)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private evaluateCondition(
+        condition: Condition,
+        subject: SubjectAttributes,
+        resource: ResourceAttributes,
+        environment: EnvironmentAttributes
+    ): boolean {
+        switch (condition.type) {
+            case 'resource.owner':
+                return resource.owner === subject.id;
+            case 'resource.team':
+                return resource.team === subject.teams.some(t => condition.value.includes(t));
+            case 'subject.role':
+                return subject.roles.some(r => condition.value.includes(r));
+            case 'time.between':
+                const hour = environment.time.getHours();
+                return hour >= condition.value.start && hour <= condition.value.end;
+            case 'ip.inRange':
+                return this.ipInRange(environment.ipAddress, condition.value);
+            case 'resource.classification':
+                return this.compareClassification(
+                    resource.classification,
+                    subject.clearances
+                );
+            default:
+                return false;
+        }
+    }
+}
+
+// Policy definition
+interface Policy {
+    id: string;
+    name: string;
+    actions: string[];
+    effect: 'PERMIT' | 'DENY';
+    conditions: Condition[];
+}
+
+interface Condition {
+    type: string;
+    value: any;
+}
+```
+
+### 4. Permission Guards
+
+Implement guards cho route và method protection.
+
+```typescript
+// Permission guard decorator
+function RequirePermission(...permissions: Permission[]) {
+    return function (
+        target: any,
+        propertyKey: string,
+        descriptor: PropertyDescriptor
+    ) {
+        const originalMethod = descriptor.value;
+
+        descriptor.value = async function (...args: any[]) {
+            const context = args[2]; // GraphQL context or Express request
+
+            if (!context.user) {
+                throw new AuthorizationError('Authentication required');
+            }
+
+            const hasPermission = permissions.every(p =>
+                context.user.permissions.includes(p)
+            );
+
+            if (!hasPermission) {
+                throw new AuthorizationError('Permission denied');
+            }
+
+            return originalMethod.apply(this, args);
+        };
+
+        return descriptor;
+    };
+}
+
+// Express middleware
+class PermissionMiddleware {
+    constructor(private permissionService: PermissionService) {}
+
+    require(...permissions: Permission[]) {
+        return async (req: Request, res: Response, next: NextFunction) => {
+            const user = req.user;
+
+            if (!user) {
+                return res.status(401).json({
+                    error: { code: 'UNAUTHORIZED', message: 'Authentication required' }
+                });
+            }
+
+            const hasPermission = await this.permissionService.hasAllPermissions(
+                user.id,
+                permissions
+            );
+
+            if (!hasPermission) {
+                return res.status(403).json({
+                    error: { code: 'FORBIDDEN', message: 'Permission denied' }
+                });
+            }
+
+            next();
+        };
+    }
+
+    requireAny(...permissions: Permission[]) {
+        return async (req: Request, res: Response, next: NextFunction) => {
+            const user = req.user;
+
+            if (!user) {
+                return res.status(401).json({
+                    error: { code: 'UNAUTHORIZED', message: 'Authentication required' }
+                });
+            }
+
+            const hasPermission = await this.permissionService.hasAnyPermission(
+                user.id,
+                permissions
+            );
+
+            if (!hasPermission) {
+                return res.status(403).json({
+                    error: { code: 'FORBIDDEN', message: 'Permission denied' }
+                });
+            }
+
+            next();
+        };
+    }
+}
+
+// Usage in Express routes
+router.delete('/users/:id',
+    authenticate,
+    permissionMiddleware.require(Permission.USER_DELETE),
+    userController.delete
+);
+
+router.put('/posts/:id',
+    authenticate,
+    permissionMiddleware.require(Permission.CONTENT_UPDATE),
+    permissionMiddleware.checkOwnership(PostOwnershipChecker),
+    postController.update
+);
+```
+
+### 5. Resource-Level Authorization
+
+Fine-grained authorization cho specific resources.
+
+```typescript
+// Resource ownership checker
+interface ResourceOwnershipChecker<T> {
+    isOwner(userId: string, resourceId: string): Promise<boolean>;
+    canAccess(userId: string, resource: T): Promise<boolean>;
+    canModify(userId: string, resource: T): Promise<boolean>;
+}
+
+class PostOwnershipChecker implements ResourceOwnershipChecker<Post> {
+    constructor(
+        private postRepository: PostRepository,
+        private teamService: TeamService
+    ) {}
+
+    async isOwner(userId: string, postId: string): Promise<boolean> {
+        const post = await this.postRepository.findById(postId);
+        return post.authorId === userId;
+    }
+
+    async canAccess(userId: string, post: Post): Promise<boolean> {
+        // Public posts accessible to all
+        if (post.status === 'published') {
+            return true;
+        }
+
+        // Check ownership
+        if (post.authorId === userId) {
+            return true;
+        }
+
+        // Check team membership
+        const userTeams = await this.teamService.getUserTeams(userId);
+        return userTeams.some(t => t.id === post.teamId);
+    }
+
+    async canModify(userId: string, post: Post): Promise<boolean> {
+        // Only owner or admin can modify
+        if (post.authorId === userId) {
+            return true;
+        }
+
+        const user = await this.userService.findById(userId);
+        return user.roles.includes('ADMIN');
+    }
+}
+
+// Usage in service
+class PostService {
+    constructor(
+        private ownershipChecker: PostOwnershipChecker
+    ) {}
+
+    async updatePost(userId: string, postId: string, data: UpdatePostDto): Promise<Post> {
+        const post = await this.postRepository.findById(postId);
+
+        // Check authorization
+        const canModify = await this.ownershipChecker.canModify(userId, post);
+        if (!canModify) {
+            throw new AuthorizationError('Cannot modify this post');
+        }
+
+        return this.postRepository.update(postId, data);
+    }
+}
+```
+
+### 6. Field-Level Security
+
+Protect specific fields within a resource.
+
+```typescript
+// Field-level permissions
+const fieldPermissions: Record<string, Permission[]> = {
+    'User.salary': [Permission.USER_MANAGE],
+    'User.password': [Permission.USER_SELF],
+    'User.email': [Permission.USER_READ],
+    'Post.draftContent': [Permission.CONTENT_UPDATE],
+    'Post.publishedAt': [Permission.CONTENT_PUBLISH],
+    'AuditLog.internalNotes': [Permission.AUDIT_VIEW]
+};
+
+// Field masking in GraphQL
+const resolvers = {
+    User: {
+        // Only visible to user themselves or admin
+        email: (user, args, context) => {
+            if (context.user.id === user.id || context.user.roles.includes('ADMIN')) {
+                return user.email;
+            }
+            return null;
+        },
+
+        // Only visible to admin
+        salary: (user, args, context) => {
+            if (context.user.roles.includes('ADMIN')) {
+                return user.salary;
+            }
+            return null;
+        },
+
+        // Masked for non-owners
+        phone: (user, args, context) => {
+            if (context.user.roles.includes('ADMIN')) {
+                return user.phone;
+            }
+            return this.maskPhone(user.phone);
+        }
+    }
+};
+
+// Field access control
+function fieldAccessControl(
+    fieldName: string,
+    resource: any,
+    user: User
+): boolean {
+    const requiredPermissions = fieldPermissions[fieldName];
+    
+    if (!requiredPermissions) {
+        return true; // No restriction
+    }
+
+    return requiredPermissions.some(p => user.permissions.includes(p));
+}
+
+// Data filtering based on permissions
+function filterDataByPermission<T extends Record<string, any>>(
+    data: T,
+    user: User,
+    fieldMap: Record<string, (data: T, user: User) => any>
+): Partial<T> {
+    const filtered: any = {};
+
+    for (const [field, resolver] of Object.entries(fieldMap)) {
+        if (fieldAccessControl(field, data, user)) {
+            filtered[field] = resolver(data, user);
+        }
+    }
+
+    return filtered;
+}
+```
+
+### 7. Row-Level Security
+
+Database-level access control.
+
+```sql
+-- PostgreSQL Row-Level Security
+
+-- Enable RLS on posts table
+ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Users can see all published posts
+CREATE POLICY posts_select_published ON posts
+    FOR SELECT
+    USING (status = 'published');
+
+-- Policy: Users can see their own posts
+CREATE POLICY posts_select_own ON posts
+    FOR SELECT
+    USING (author_id = current_setting('app.current_user_id')::uuid);
+
+-- Policy: Users can update their own posts
+CREATE POLICY posts_update_own ON posts
+    FOR UPDATE
+    USING (author_id = current_setting('app.current_user_id')::uuid);
+
+-- Policy: Admins can update all posts
+CREATE POLICY posts_update_admin ON posts
+    FOR UPDATE
+    USING (
+        EXISTS (
+            SELECT 1 FROM user_roles
+            WHERE user_id = current_setting('app.current_user_id')::uuid
+            AND role = 'ADMIN'
+        )
+    );
+```
+
+```typescript
+// RLS in application layer
+class DatabaseRLS {
+    constructor(private pool: Pool) {}
+
+    async executeWithUserContext<T>(
+        userId: string,
+        callback: (client: PoolClient) => Promise<T>
+    ): Promise<T> {
+        const client = await this.pool.connect();
+
+        try {
+            // Set user context
+            await client.query(`SET LOCAL app.current_user_id = '${userId}'`);
+
+            const result = await callback(client);
+            return result;
+        } finally {
+            client.release();
+        }
+    }
+}
+
+// TypeORM with RLS
+@Injectable()
+class PostRepository {
+    constructor(
+        @Inject('DB') private db: Pool,
+        @Inject('AUTH') private authService: AuthService
+    ) {}
+
+    async findAll(): Promise<Post[]> {
+        const userId = this.authService.getCurrentUserId();
+        
+        const query = `
+            SELECT * FROM posts
+            WHERE author_id = $1
+            OR status = 'published'
+        `;
+        
+        const result = await this.db.query(query, [userId]);
+        return result.rows;
+    }
+}
+```
+
+### 8. API Authorization
+
+API-level authorization với scopes.
+
+```yaml
+# OAuth scopes
+scopes:
+  # Read scopes
+  'read:profile':
+    description: Read user profile information
+    grants: [authorization_code, client_credentials]
+
+  'read:posts':
+    description: Read posts
+    grants: [authorization_code, client_credentials]
+
+  # Write scopes
+  'write:posts':
+    description: Create and update posts
+    grants: [authorization_code]
+
+  'write:profile':
+    description: Update user profile
+    grants: [authorization_code]
+
+  # Admin scopes
+  'admin:users':
+    description: Manage users
+    grants: [client_credentials]
+```
+
+```typescript
+// Scope-based authorization
+class ScopeAuthorization {
+    validateScope(requiredScopes: string[]): RequestHandler {
+        return async (req: Request, res: Response, next: NextFunction) => {
+            const tokenScopes = req.authInfo?.scope || [];
+
+            const hasAllScopes = requiredScopes.every(scope =>
+                tokenScopes.includes(scope)
+            );
+
+            if (!hasAllScopes) {
+                return res.status(403).json({
+                    error: {
+                        code: 'INSUFFICIENT_SCOPE',
+                        message: `Required scopes: ${requiredScopes.join(', ')}`
+                    }
+                });
+            }
+
+            next();
+        };
+    }
+}
+
+// Usage
+router.delete('/users/:id',
+    authenticate,
+    scopeAuthorization.validateScope(['admin:users']),
+    userController.delete
+);
+```
+
+### 9. Delegation và Impersonation
+
+Allow authorized users to act on behalf of others.
+
+```typescript
+// Impersonation service
+class ImpersonationService {
+    constructor(
+        private auditLog: AuditLogService
+    ) {}
+
+    async startImpersonation(
+        adminUserId: string,
+        targetUserId: string,
+        reason: string
+    ): Promise<ImpersonationSession> {
+        // Verify admin has permission
+        const admin = await this.userService.findById(adminUserId);
+        if (!admin.roles.includes('ADMIN')) {
+            throw new AuthorizationError('Admin privileges required');
+        }
+
+        // Check if impersonation is allowed
+        const targetUser = await this.userService.findById(targetUserId);
+        if (targetUser.roles.includes('SUPER_ADMIN')) {
+            throw new AuthorizationError('Cannot impersonate super admin');
+        }
+
+        // Create impersonation session
+        const session: ImpersonationSession = {
+            id: nanoid(),
+            adminUserId,
+            targetUserId,
+            reason,
+            startedAt: new Date(),
+            expiresAt: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes
+            originalPermissions: admin.permissions
+        };
+
+        await this.auditLog.log('IMPERSONATION_STARTED', {
+            adminUserId,
+            targetUserId,
+            reason
+        });
+
+        return session;
+    }
+
+    async endImpersonation(sessionId: string): Promise<void> {
+        await this.auditLog.log('IMPERSONATION_ENDED', { sessionId });
+    }
+
+    // Get identity with impersonation context
+    getEffectiveIdentity(
+        requestUserId: string,
+        impersonation?: ImpersonationSession
+    ): Identity {
+        if (impersonation) {
+            return {
+                userId: impersonation.targetUserId,
+                isImpersonating: true,
+                impersonatedBy: impersonation.adminUserId
+            };
+        }
+        return { userId: requestUserId, isImpersonating: false };
+    }
+}
+```
+
+### 10. Audit Logging
+
+Track authorization decisions for security.
+
+```typescript
+// Authorization audit logger
+interface AuthorizationAuditLog {
+    id: string;
+    timestamp: Date;
+    userId: string;
+    action: string;
+    resource: {
+        type: string;
+        id: string;
+    };
+    decision: 'PERMIT' | 'DENY';
+    reason: string;
+    context: {
+        ip: string;
+        userAgent: string;
+        sessionId: string;
+    };
+    evaluationDetails?: {
+        roles: string[];
+        permissions: string[];
+        policies: string[];
+    };
+}
+
+class AuthorizationAuditService {
+    constructor(
+        private auditRepository: AuditRepository,
+        private logger: Logger
+    ) {}
+
+    async logAccessDecision(log: AuthorizationAuditLog): Promise<void> {
+        // Store in database
+        await this.auditRepository.save(log);
+
+        // Also log to structured log
+        this.logger.info('Authorization decision', {
+            type: 'AUTHORIZATION',
+            userId: log.userId,
+            action: log.action,
+            resourceType: log.resource.type,
+            resourceId: log.resource.id,
+            decision: log.decision,
+            reason: log.reason
+        });
+
+        // Alert on denied access
+        if (log.decision === 'DENY') {
+            await this.alertService.alert('ACCESS_DENIED', {
+                userId: log.userId,
+                action: log.action,
+                resource: log.resource,
+                reason: log.reason
+            });
+        }
+    }
+
+    async getAccessHistory(
+        userId: string,
+        options: { from?: Date; to?: Date; limit?: number }
+    ): Promise<AuthorizationAuditLog[]> {
+        return this.auditRepository.find({
+            where: {
+                userId,
+                timestamp: Between(options.from || new Date(0), options.to || new Date())
+            },
+            order: { timestamp: 'DESC' },
+            take: options.limit || 100
+        });
+    }
+}
+
+// Usage in authorization middleware
+function authorizationAuditMiddleware(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
+    const originalSend = res.send;
+
+    res.send = function (body) {
+        // Log authorization decisions
+        if (req.authInfo?.authorizationDecision) {
+            auditService.logAccessDecision({
+                id: nanoid(),
+                timestamp: new Date(),
+                userId: req.user?.id,
+                action: req.method + ' ' + req.path,
+                resource: { type: 'API', id: req.path },
+                decision: res.statusCode < 400 ? 'PERMIT' : 'DENY',
+                reason: body?.error?.message || 'Request processed',
+                context: {
+                    ip: req.ip,
+                    userAgent: req.headers['user-agent'],
+                    sessionId: req.session?.id
+                }
+            });
+        }
+
+        return originalSend.call(this, body);
+    };
+
+    next();
+}
+```
+
+## Checklist
+
+- [ ] Implement role hierarchy
+- [ ] Define permission set clearly
+- [ ] Use principle of least privilege
+- [ ] Implement resource-level authorization
+- [ ] Add field-level security
+- [ ] Configure row-level security in database
+- [ ] Implement RBAC với ABAC combination
+- [ ] Add audit logging
+- [ ] Implement impersonation safely
+- [ ] Add API scope validation
+- [ ] Test all authorization paths
+- [ ] Document permission model
+- [ ] Review access regularly
+- [ ] Implement fallback deny policy
+- [ ] Add authorization in all layers
+
+## Anti Patterns
+
+### 1. Hardcoded Role Checks
+
+```typescript
+// Không nên - hardcoded role check
+if (req.user.role === 'ADMIN') {
+    // Admin action
+}
+
+// Nên - permission-based check
+if (await permissionService.hasPermission(req.user.id, Permission.USER_MANAGE)) {
+    // Action
+}
+```
+
+### 2. Client-Side Authorization Only
+
+```typescript
+// Không nên - client-side only check
+const canDelete = user.role === 'admin'; // Client decides!
+
+// Nên - server-side authorization
+async function deletePost(req: Request, res: Response) {
+    const canDelete = await permissionService.canDelete(req.user.id, req.params.id);
+    if (!canDelete) {
+        throw new AuthorizationError();
+    }
+    // Proceed with deletion
+}
+```
+
+### 3. Missing Default Deny
+
+```typescript
+// Không nên - implicit allow
+async function accessResource(userId: string, resourceId: string) {
+    // No check! Implicitly allows access
+    return resource;
+}
+
+// Nên - explicit check with default deny
+async function accessResource(userId: string, resourceId: string) {
+    const hasAccess = await permissionService.canAccess(userId, resourceId);
+    if (!hasAccess) {
+        throw new AuthorizationError('Access denied');
+    }
+    return resource;
+}
+```
+
+### 4. Permission Proliferation
+
+```typescript
+// Không nên - too many granular permissions
+Permission.POST_UPDATE_OWN
+Permission.POST_UPDATE_TEAM
+Permission.POST_UPDATE_PUBLIC
+Permission.POST_UPDATE_PRIVATE
+// ... too many!
+
+// Nên - logical grouping
+Permission.POST_UPDATE // with resource ownership check
+Permission.POST_MANAGE // for admins
+```
+
+### 5. No Audit Trail
+
+```typescript
+// Không nên - no logging
+async function deleteUser(id: string) {
+    await db.users.delete(id);
+    // No record of who deleted, when, why
+}
+
+// Nên - comprehensive audit
+async function deleteUser(id: string, deletedBy: string, reason: string) {
+    await auditLog.log({ userId: deletedBy, action: 'DELETE', resource: id, reason });
+    await db.users.delete(id);
+}
+```
+
+## Best Practices
+
+### 1. Centralized Permission Service
+
+```typescript
+class PermissionService {
+    constructor(
+        private roleRepository: RoleRepository,
+        private cache: RedisClient
+    ) {}
+
+    async hasPermission(userId: string, permission: Permission): Promise<boolean> {
+        const userPermissions = await this.getUserPermissions(userId);
+        return userPermissions.includes(permission);
+    }
+
+    async hasAllPermissions(userId: string, permissions: Permission[]): Promise<boolean> {
+        const userPermissions = await this.getUserPermissions(userId);
+        return permissions.every(p => userPermissions.includes(p));
+    }
+
+    async hasAnyPermission(userId: string, permissions: Permission[]): Promise<boolean> {
+        const userPermissions = await this.getUserPermissions(userId);
+        return permissions.some(p => userPermissions.includes(p));
+    }
+
+    private async getUserPermissions(userId: string): Promise<Permission[]> {
+        // Check cache
+        const cached = await this.cache.get(`permissions:${userId}`);
+        if (cached) {
+            return JSON.parse(cached);
+        }
+
+        // Get from database
+        const user = await this.userRepository.findByIdWithRoles(userId);
+        const permissions = getEffectivePermissions(user.primaryRole);
+
+        // Cache for 5 minutes
+        await this.cache.setex(`permissions:${userId}`, 300, JSON.stringify(permissions));
+
+        return permissions;
+    }
+}
+```
+
+### 2. Policy Engine
+
+```typescript
+class PolicyEngine {
+    constructor(
+        private policies: Policy[],
+        private abacEngine: ABACEngine
+    ) {}
+
+    async evaluate(
+        subject: SubjectAttributes,
+        resource: any,
+        action: string,
+        environment?: EnvironmentAttributes
+    ): Promise<AuthorizationDecision> {
+        // First check RBAC
+        const hasPermission = this.checkRBAC(subject, action);
+        if (!hasPermission) {
+            return { allowed: false, reason: 'Permission denied by RBAC' };
+        }
+
+        // Then check ABAC policies
+        const env = environment || this.getDefaultEnvironment();
+        const abacResult = this.abacEngine.evaluate(subject, resource, action, env);
+
+        if (!abacResult) {
+            return { allowed: false, reason: 'Permission denied by ABAC policy' };
+        }
+
+        return { allowed: true };
+    }
+
+    private checkRBAC(subject: SubjectAttributes, action: string): boolean {
+        const requiredPermission = this.getPermissionForAction(action);
+        return subject.permissions.includes(requiredPermission);
+    }
+}
+```
+
+### 3. Guard Configuration
+
+```typescript
+// Authorization guard configuration
+const authorizationConfig = {
+    // Default deny policy
+    defaultDecision: 'DENY',
+
+    // Logging
+    logLevel: 'info',
+    logDeniedRequests: true,
+    logSuccessfulRequests: false,
+
+    // Caching
+    cachePermissions: true,
+    cacheTTL: 300, // seconds
+
+    // Audit
+    auditEnabled: true,
+    auditRetentionDays: 365,
+
+    // Rate limiting for authorization checks
+    rateLimit: {
+        windowMs: 60000,
+        maxRequests: 1000
+    }
+};
+```
+
+## Workflow
+
+### 1. Authorization Design
+
+1. Identify resources và actions
+2. Define roles và permissions
+3. Map permissions to roles
+4. Define access policies
+5. Plan audit requirements
+
+### 2. Implementation
+
+1. Create permission constants
+2. Implement permission service
+3. Add authorization middleware
+4. Configure route guards
+5. Implement field-level security
+6. Add row-level security
+
+### 3. Testing
+
+1. Test permission assignments
+2. Test role hierarchy
+3. Test resource ownership
+4. Test audit logging
+5. Test edge cases
+
+### 4. Review và Audit
+
+1. Review role definitions
+2. Audit access patterns
+3. Remove unused permissions
+4. Update policies
+5. Document changes
+
+## Ví dụ
+
+### Ví dụ 1: Complete Authorization System
+
+```typescript
+// Main authorization service
+export class AuthorizationService {
+    constructor(
+        private permissionService: PermissionService,
+        private ownershipService: OwnershipService,
+        private auditService: AuditService,
+        private policyEngine: PolicyEngine
+    ) {}
+
+    async authorize(
+        context: AuthorizationContext
+    ): Promise<AuthorizationDecision> {
+        const { userId, action, resourceType, resourceId, resource } = context;
+
+        // Build subject attributes
+        const subject = await this.buildSubject(userId);
+
+        // Get resource attributes
+        const resourceAttrs = resource || await this.getResource(resourceType, resourceId);
+
+        // Build environment
+        const environment = this.buildEnvironment(context.request);
+
+        // Evaluate policies
+        const decision = await this.policyEngine.evaluate(
+            subject,
+            resourceAttrs,
+            action,
+            environment
+        );
+
+        // Audit
+        await this.auditService.log({
+            userId,
+            action,
+            resourceType,
+            resourceId,
+            decision: decision.allowed ? 'PERMIT' : 'DENY',
+            reason: decision.reason
+        });
+
+        if (!decision.allowed) {
+            throw new AuthorizationError(decision.reason);
+        }
+
+        return decision;
+    }
+
+    async canCreate(userId: string, resourceType: string): Promise<boolean> {
+        const subject = await this.buildSubject(userId);
+        return subject.permissions.includes(this.getCreatePermission(resourceType));
+    }
+
+    async canRead(userId: string, resourceType: string, resourceId: string): Promise<boolean> {
+        const subject = await this.buildSubject(userId);
+        const resource = await this.getResource(resourceType, resourceId);
+        return this.ownershipService.canRead(subject, resource);
+    }
+
+    async canUpdate(userId: string, resourceType: string, resourceId: string): Promise<boolean> {
+        const subject = await this.buildSubject(userId);
+        const resource = await this.getResource(resourceType, resourceId);
+        return this.ownershipService.canUpdate(subject, resource);
+    }
+
+    async canDelete(userId: string, resourceType: string, resourceId: string): Promise<boolean> {
+        const subject = await this.buildSubject(userId);
+        const resource = await this.getResource(resourceType, resourceId);
+        return this.ownershipService.canDelete(subject, resource);
+    }
+}
+
+// Authorization context
+interface AuthorizationContext {
+    userId: string;
+    action: string;
+    resourceType: string;
+    resourceId?: string;
+    resource?: any;
+    request?: Request;
+}
+```
+
+### Ví dụ 2: Route Guards
+
+```typescript
+// Express authorization middleware
+export class AuthorizationMiddleware {
+    constructor(private authService: AuthorizationService) {}
+
+    can(action: Permission) {
+        return async (req: Request, res: Response, next: NextFunction) => {
+            try {
+                const decision = await this.authService.authorize({
+                    userId: req.user.id,
+                    action,
+                    resourceType: req.params.resourceType,
+                    resourceId: req.params.id,
+                    request: req
+                });
+                next();
+            } catch (error) {
+                res.status(403).json({
+                    error: {
+                        code: 'FORBIDDEN',
+                        message: error.message
+                    }
+                });
+            }
+        };
+    }
+
+    canAny(...permissions: Permission[]) {
+        return async (req: Request, res: Response, next: NextFunction) => {
+            for (const permission of permissions) {
+                try {
+                    await this.authService.authorize({
+                        userId: req.user.id,
+                        action: permission,
+                        resourceType: req.params.resourceType,
+                        request: req
+                    });
+                    next();
+                    return;
+                } catch (error) {
+                    // Continue to next permission
+                }
+            }
+            res.status(403).json({
+                error: { code: 'FORBIDDEN', message: 'Permission denied' }
+            });
+        };
+    }
+
+    resourceOwner() {
+        return async (req: Request, res: Response, next: NextFunction) => {
+            const resourceType = req.params.resourceType;
+            const resourceId = req.params.id;
+
+            const canAccess = await this.authService.canRead(
+                req.user.id,
+                resourceType,
+                resourceId
+            );
+
+            if (!canAccess) {
+                return res.status(403).json({
+                    error: { code: 'FORBIDDEN', message: 'Access denied' }
+                });
+            }
+
+            next();
+        };
+    }
+}
+```
+
+### Ví dụ 3: GraphQL Authorization
+
+```typescript
+// GraphQL authorization decorators
+export function RequireAuth() {
+    return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
+        const original = descriptor.value;
+        descriptor.value = async function (...args) {
+            const context = args[2];
+            if (!context.user) {
+                throw new AuthenticationError();
+            }
+            return original.apply(this, args);
+        };
+    };
+}
+
+export function RequirePermission(...permissions: Permission[]) {
+    return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
+        const original = descriptor.value;
+        descriptor.value = async function (...args) {
+            const context = args[2];
+            for (const permission of permissions) {
+                if (!context.user.permissions.includes(permission)) {
+                    throw new AuthorizationError('Permission denied');
+                }
+            }
+            return original.apply(this, args);
+        };
+    };
+}
+
+// Usage in resolvers
+const resolvers = {
+    Query: {
+        @RequireAuth()
+        users() {
+            return userService.findAll();
+        },
+
+        @RequireAuth()
+        @RequirePermission(Permission.USER_READ)
+        user(_, { id }, context) {
+            return userService.findById(id);
+        }
+    },
+
+    Mutation: {
+        @RequireAuth()
+        @RequirePermission(Permission.USER_CREATE)
+        createUser(_, { input }, context) {
+            return userService.create(input);
+        },
+
+        @RequireAuth()
+        async updateUser(_, { id, input }, context) {
+            // Check resource ownership
+            const canModify = await authService.canUpdate(context.user.id, 'User', id);
+            if (!canModify) {
+                throw new AuthorizationError('Cannot modify this user');
+            }
+            return userService.update(id, input);
+        }
+    }
+};
+```
+
+## Liên kết
+
+- [OWASP Authorization Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html)
+- [NIST RBAC](https://csrc.nist.gov/projects/role-based-access-control)
+- [ABAC Overview](https://nvlpubs.nist.gov/nistpubs/specialpublications/NIST.sp.800-162.pdf)
+- Authentication: `.cursor/rules/authentication.mdc`
+- Security: `.cursor/rules/security.mdc`
+- API: `.cursor/rules/api.mdc`
+- RLS: `.cursor/rules/rls.mdc`

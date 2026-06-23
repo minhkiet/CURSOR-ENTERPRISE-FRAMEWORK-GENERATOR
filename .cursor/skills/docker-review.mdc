@@ -1,0 +1,255 @@
+---
+description: Review Docker configuration cho security, performance, và best practices
+purpose: Audit Dockerfiles, docker-compose, và container configurations
+input: Dockerfiles, docker-compose files, container configurations
+output: Docker review report, security findings, optimization recommendations
+version: 1.0.0
+tags: [docker, container, security, optimization, best-practices]
+---
+
+# Docker Review Skill - Kiểm Toán Docker Configuration
+
+## Tổng quan
+
+Docker là essential cho containerization. Skill này cung cấp framework để review Docker configurations cho security, performance, và best practices.
+
+## Purpose (Mục đích)
+
+Docker Review Skill được thiết kế để:
+
+1. **Security Audit**: Check for vulnerabilities
+2. **Performance Review**: Optimize images
+3. **Best Practices**: Ensure standards
+4. **Configuration Review**: Verify settings
+5. **Multi-stage Builds**: Optimize build process
+
+### Khi nào sử dụng Docker Review
+
+- Khi auditing Docker setup
+- Khi optimizing images
+- Khi investigating issues
+- Khi hardening security
+
+## Input (Đầu vào)
+
+- [ ] Dockerfile
+- [ ] docker-compose.yml
+- [ ] .dockerignore
+
+## Output (Đầu ra)
+
+- [ ] Security findings
+- [ ] Performance recommendations
+- [ ] Best practice checklist
+
+## Workflow (Quy trình)
+
+### Phase 1: Dockerfile Review
+
+### Bước 1: Security Best Practices
+
+```dockerfile
+# BAD: Running as root
+FROM ubuntu:22.04
+RUN apt-get update && apt-get install -y curl
+CMD ["bash"]
+
+# GOOD: Non-root user
+FROM ubuntu:22.04
+RUN apt-get update && apt-get install -y curl \
+    && useradd -m appuser \
+    && chown -R appuser:appuser /home/appuser
+
+USER appuser
+CMD ["bash"]
+
+# BAD: Latest tag
+FROM node:latest
+
+# GOOD: Specific version
+FROM node:18.17.0-alpine3.18
+
+# BAD: No health check
+FROM nginx:1.25
+
+# GOOD: Health check
+FROM nginx:1.25
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost/health || exit 1
+
+# BAD: Secrets in image
+RUN echo "password=secret123" > /app/config
+
+# GOOD: Secrets via environment
+ENV APP_SECRET_FILE=/run/secrets/app_secret
+```
+
+### Bước 2: Multi-stage Builds
+
+```dockerfile
+# Multi-stage build for Go application
+# Build stage
+FROM golang:1.21-alpine AS builder
+
+WORKDIR /app
+
+# Install dependencies
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source code
+COPY . .
+
+# Build binary
+RUN CGO_ENABLED=0 GOOS=linux go build \
+    -ldflags="-w -s" \
+    -o /app/bin/server
+
+# Final stage
+FROM alpine:3.18
+
+# Install CA certificates and runtime dependencies
+RUN apk --no-cache add ca-certificates tzdata
+
+# Create non-root user
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+WORKDIR /app
+
+# Copy binary from builder
+COPY --from=builder /app/bin/server .
+COPY --from=builder /app/configs ./configs
+
+# Set ownership
+RUN chown -R appuser:appgroup /app
+
+USER appuser
+
+EXPOSE 8080
+
+ENTRYPOINT ["./server"]
+```
+
+### Phase 2: Docker Compose Review
+
+### Bước 3: Compose Configuration
+
+```yaml
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+      args:
+        - NODE_ENV=production
+    image: app:latest
+    container_name: app
+    restart: unless-stopped
+    
+    # Security
+    user: "1000:1000"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=100m
+    
+    ports:
+      - "3000:3000"
+    
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://user:pass@db:5432/app
+    env_file:
+      - .env.production
+    
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  db:
+    image: postgres:15-alpine
+    container_name: postgres
+    restart: unless-stopped
+    
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
+    
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    
+    secrets:
+      - db_password
+    
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d app"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    
+    networks:
+      - backend
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    
+    command: redis-server --requirepass-file=/run/secrets/redis_password
+    tmpfs:
+      - /data:size=100M,noexec,nosuid,nodev
+    
+    secrets:
+      - redis_password
+    
+    networks:
+      - backend
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+  redis_password:
+    file: ./secrets/redis_password.txt
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  postgres_data:
+```
+
+## Checklist
+
+- [ ] Non-root user
+- [ ] Specific image tags
+- [ ] Health checks
+- [ ] Resource limits
+- [ ] Security options
+- [ ] Secrets management
+
+## Liên kết
+
+- [[../rules/core-architecture]] - Core Architecture
+- [[../skills/deployment-review]] - Deployment Review
+- [[../skills/security-audit]] - Security Audit
+- [[../skills/kubernetes-review]] - Kubernetes Review

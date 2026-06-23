@@ -1,0 +1,50 @@
+---
+description: Nguyên tắc Monolith Architecture cho simpler applications
+created: 2026-06-23
+version: 1.0.0
+tags: [monolith, architecture, simplicity, modular, enterprise]
+---
+
+# Monolith
+
+## Mục tiêu
+
+Monolith Architecture là traditional approach nơi mà toàn bộ application được build như một single unit. Trong Cursor Enterprise Framework, monolith được coi là valid choice cho nhiều applications, đặc biệt khi simplicity và speed of development là priorities. Mục tiêu là hướng dẫn developers build well-structured monoliths có thể evolve thành microservices khi needed.
+
+Monolith không phải là antipattern - nó có advantages về simplicity, development speed, và operational simplicity. Rule này cover when to choose monolith, how to structure monoliths, và patterns cho maintainability.
+
+## Nguyên tắc
+
+**1. When Monolith Makes Sense**
+
+Small to medium teams. Rapid prototyping. Simple domains. Limited scaling needs. Single technology stack. Startup speed priority.
+
+**2. Modular Structure**
+
+Organize by modules/features. Clear boundaries. Dependency rules. Prevent spaghetti. Modules as first-class citizens.
+
+**3. Layered Architecture**
+
+Presentation layer. Business logic layer. Data access layer. Dependency inversion. Clean interfaces.
+
+**4. Shared Database**
+
+Single database, shared schema. Clear table ownership. Module-specific tables. Cross-module relationships. Transactional integrity.
+
+**5. Deployment**
+
+Single deployment unit. Simple CI/CD. Blue-green deployments. Easy rollback.
+
+**6. Scaling**
+
+Scale entire application. Vertical scaling. Horizontal scaling with load balancer.
+
+**7. Operational Simplicity**
+
+Single deployment artifact. Unified monitoring. Simple debugging. Less infrastructure.
+
+## Liên kết
+
+- [[clean-architecture]] - Clean Architecture
+- [[microservice]] - Microservices
+- [[docker]] - Docker

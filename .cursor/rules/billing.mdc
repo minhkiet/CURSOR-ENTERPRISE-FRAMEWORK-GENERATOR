@@ -1,0 +1,300 @@
+---
+description: Nguyên tắc Billing và Subscription Management cho SaaS
+created: 2026-06-23
+version: 1.0.0
+tags: [billing, subscription, payment, stripe, saas, enterprise]
+---
+
+# Billing
+
+## Mục tiêu
+
+Billing là hệ thống quản lý subscription, payments, và invoices cho SaaS applications. Trong Cursor Enterprise Framework, Billing rule định nghĩa các nguyên tắc và best practices cho việc implement một billing system hoàn chỉnh bao gồm subscription management, payment processing, usage-based billing, invoice generation, và revenue recognition. Mục tiêu là tạo ra một hệ thống billing linh hoạt, reliable, và compliant với financial regulations.
+
+Billing là một trong những critical systems trong SaaS, đòi hỏi careful attention đến accuracy, reliability, và compliance. Một billing error có thể dẫn đến revenue loss, customer churn, và legal issues. Rule này cover subscription lifecycle, payment flows, billing operations, và financial reporting.
+
+## Nguyên tắc
+
+**1. Subscription Lifecycle**
+
+Manage subscription states: trial, active, past_due, canceled, paused. Handle plan changes mid-cycle. Process renewals automatically. Handle expiration gracefully. Plan downgrade/upgrades. Support subscription pause/resume.
+
+**2. Plan và Pricing**
+
+Support multiple pricing models. Flat rate plans. Usage-based pricing. Tiered pricing. Per-seat pricing. Custom enterprise plans. Prorated calculations.
+
+**3. Payment Processing**
+
+Integrate with payment providers. Stripe, Braintree, or internal. Tokenization for card storage. Automatic payment retry. Handle payment failures. Payment method management.
+
+**4. Billing Operations**
+
+Invoice generation. Automated billing cycles. Payment collection. Late fee handling. Credit management. Refund processing. Dispute handling.
+
+**5. Usage Tracking**
+
+Track metered usage. Metered billing integration. Usage aggregation. Usage rollup. Overage handling. Usage reports.
+
+**6. Revenue Recognition**
+
+ASC 606 / IFRS 15 compliance. Recognize revenue over time. Track deferred revenue. Generate revenue reports. Audit trail. Period allocation.
+
+**7. Dunning Management**
+
+Payment failure notifications. Retry schedules. Grace periods. Escalation procedures. Account suspension. Recovery campaigns.
+
+**8. Security và Compliance**
+
+PCI DSS compliance for payment data. SOC 2 controls. Data encryption. Audit logging. Access controls. Financial reporting controls.
+
+**9. Tax Handling**
+
+Tax calculation. Tax jurisdiction. VAT/GST handling. Tax nexus awareness. Automatic tax filing. Tax document generation.
+
+**10. Financial Reporting**
+
+Revenue analytics. MRR/ARR tracking. Churn analysis. LTV calculation. Cohort analysis. Financial statements.
+
+## Checklist
+
+- [ ] Payment provider integration complete
+- [ ] Subscription lifecycle implemented
+- [ ] Plan management configured
+- [ ] Invoice generation working
+- [ ] Usage tracking set up
+- [ ] Dunning automation configured
+- [ ] Tax handling implemented
+- [ ] Financial reporting set up
+- [ ] Security compliance met
+- [ ] PCI compliance verified
+- [ ] Documentation complete
+
+## Anti Pattern
+
+**1. No Idempotency**
+
+Duplicate charges on retry. Solution: Idempotency keys.
+
+**2. Storing Card Numbers**
+
+PCI violation. Security risk. Solution: Tokenization only.
+
+**3. Sync Payment Processing**
+
+Payment failures blocking UX. Solution: Async with webhooks.
+
+## Best Practice
+
+**1. Subscription Model**
+
+```typescript
+interface Subscription {
+  id: string;
+  tenantId: string;
+  planId: string;
+  status: SubscriptionStatus;
+  currentPeriodStart: Date;
+  currentPeriodEnd: Date;
+  cancelAtPeriodEnd: boolean;
+  trialEnd?: Date;
+  paymentMethodId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+type SubscriptionStatus = 
+  | 'trialing'
+  | 'active'
+  | 'past_due'
+  | 'canceled'
+  | 'paused'
+  | 'unpaid';
+
+interface Plan {
+  id: string;
+  name: string;
+  price: number;
+  interval: 'month' | 'year';
+  features: string[];
+  limits: {
+    maxUsers: number;
+    maxStorage: number;
+    maxApiCalls: number;
+  };
+}
+```
+
+**2. Payment Integration**
+
+```typescript
+import Stripe from 'stripe';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+async function createSubscription(
+  tenantId: string,
+  planId: string,
+  paymentMethodId: string
+): Promise<Subscription> {
+  const tenant = await getTenant(tenantId);
+  const plan = await getPlan(planId);
+  
+  // Create Stripe customer
+  const customer = await stripe.customers.create({
+    email: tenant.email,
+    metadata: { tenantId }
+  });
+  
+  // Attach payment method
+  await stripe.paymentMethods.attach(paymentMethodId, {
+    customer: customer.id
+  });
+  
+  // Set as default payment
+  await stripe.customers.update(customer.id, {
+    invoice_settings: {
+      default_payment_method: paymentMethodId
+    }
+  });
+  
+  // Create subscription
+  const subscription = await stripe.subscriptions.create({
+    customer: customer.id,
+    items: [{ price: plan.stripePriceId }],
+    payment_behavior: 'default_incomplete',
+    expand: ['latest_invoice.payment_intent'],
+    metadata: { tenantId }
+  });
+  
+  return createSubscriptionRecord(tenantId, subscription);
+}
+```
+
+**3. Webhook Handler**
+
+```typescript
+import { buffer } from 'micro';
+import Stripe from 'stripe';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+export async function webhook(req, res) {
+  const sig = req.headers['stripe-signature'];
+  const body = await buffer(req);
+  
+  let event: Stripe.Event;
+  
+  try {
+    event = stripe.webhooks.constructEvent(body, sig, endpointSecret);
+  } catch (err) {
+    console.error('Webhook signature verification failed:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+  
+  // Idempotency check
+  if (await isEventProcessed(event.id)) {
+    return res.json({ received: true });
+  }
+  
+  switch (event.type) {
+    case 'invoice.paid':
+      await handleInvoicePaid(event.data.object);
+      break;
+    case 'invoice.payment_failed':
+      await handlePaymentFailed(event.data.object);
+      break;
+    case 'customer.subscription.updated':
+      await handleSubscriptionUpdated(event.data.object);
+      break;
+    case 'customer.subscription.deleted':
+      await handleSubscriptionDeleted(event.data.object);
+      break;
+  }
+  
+  await markEventProcessed(event.id);
+  res.json({ received: true });
+}
+```
+
+**4. Usage Tracking**
+
+```typescript
+interface UsageRecord {
+  id: string;
+  tenantId: string;
+  metric: string;
+  quantity: number;
+  period: string; // YYYY-MM
+  recordedAt: Date;
+}
+
+async function recordUsage(
+  tenantId: string,
+  metric: string,
+  quantity: number
+): Promise<void> {
+  const period = format(new Date(), 'yyyy-MM');
+  
+  // Upsert usage record
+  await db.query(`
+    INSERT INTO usage_records (tenant_id, metric, quantity, period, recorded_at)
+    VALUES ($1, $2, $3, $4, NOW())
+    ON CONFLICT (tenant_id, metric, period)
+    DO UPDATE SET 
+      quantity = usage_records.quantity + $3,
+      recorded_at = NOW()
+  `, [tenantId, metric, quantity, period]);
+  
+  // Check if over quota
+  const usage = await getUsageForPeriod(tenantId, metric, period);
+  const quota = await getMetricQuota(tenantId, metric);
+  
+  if (usage > quota) {
+    await notifyOverusage(tenantId, metric, usage, quota);
+  }
+}
+
+// Metered billing aggregation
+async function aggregateUsageForBilling(
+  tenantId: string,
+  startDate: Date,
+  endDate: Date
+): Promise<UsageSummary[]> {
+  const result = await db.query(`
+    SELECT 
+      metric,
+      SUM(quantity) as total_quantity
+    FROM usage_records
+    WHERE tenant_id = $1
+      AND recorded_at BETWEEN $2 AND $3
+    GROUP BY metric
+  `, [tenantId, startDate, endDate]);
+  
+  return result.rows;
+}
+```
+
+## Workflow
+
+**Phase 1: Setup**
+
+Integrate payment provider. Configure billing settings. Set up plans.
+
+**Phase 2: Implementation**
+
+Build subscription management. Implement payment flows. Add usage tracking.
+
+**Phase 3: Testing**
+
+Test billing scenarios. Payment failure flows. Edge cases.
+
+**Phase 4: Compliance**
+
+PCI compliance review. Financial audit. Documentation.
+
+## Liên kết
+
+- [[multi-tenant]] - Multi-tenant: Multi-tenant architecture
+- [[security]] - Security: Security and compliance
+- [[cost-optimization]] - Cost Optimization: Cost management

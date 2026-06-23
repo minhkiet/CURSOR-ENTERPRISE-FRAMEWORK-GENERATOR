@@ -1,0 +1,410 @@
+---
+description: Thiết kế Domain-Driven Design cho complex business domains
+purpose: Apply DDD principles to model complex business domains
+input: Business requirements, domain knowledge, bounded contexts
+output: DDD model, bounded contexts, aggregates, value objects
+version: 1.0.0
+tags: [ddd, domain-driven-design, bounded-context, aggregate, entity]
+---
+
+# DDD Design Skill - Thiết Kế Domain-Driven Design
+
+## Tổng quan
+
+Domain-Driven Design (DDD) là approach để handle complex domains bằng cách connecting technical implementation to business concepts. Skill này cung cấp framework để apply DDD principles và design effective domain models.
+
+## Purpose (Mục đích)
+
+DDD Design Skill được thiết kế để:
+
+1. **Domain Discovery**: Find bounded contexts
+2. **Model Building**: Design entities và aggregates
+3. **Strategic Design**: Define context boundaries
+4. **Tactical Design**: Implement patterns
+5. **Integration**: Map context relationships
+
+### Khi nào sử dụng DDD Design
+
+- Khi designing complex business domains
+- Khi breaking down monoliths
+- Khi improving domain model
+- Khi onboarding to complex systems
+
+## Input (Đầu vào)
+
+- [ ] Business domain knowledge
+- [ ] Requirements documentation
+- [ ] Stakeholder interviews
+- [ ] Existing systems
+
+## Output (Đầu ra)
+
+- [ ] Bounded contexts
+- [ ] Domain model
+- [ ] Aggregates
+- [ ] Value objects
+- [ ] Domain events
+
+## Workflow (Quy trình)
+
+### Phase 1: Strategic Design
+
+### Bước 1: Bounded Context Discovery
+
+```typescript
+// Bounded Context Map
+interface BoundedContext {
+  name: string;
+  responsibility: string;
+  coreDomain: boolean;
+  supportingSubdomains: string[];
+  entities: string[];
+  aggregates: string[];
+  valueObjects: string[];
+  domainEvents: string[];
+}
+
+// Example: E-commerce Bounded Contexts
+const ECOMMERCE_CONTEXTS: BoundedContext[] = [
+  {
+    name: 'Catalog',
+    responsibility: 'Manage product information and categories',
+    coreDomain: true,
+    supportingSubdomains: [],
+    entities: ['Product', 'Category', 'Brand'],
+    aggregates: ['ProductAggregate'],
+    valueObjects: ['Money', 'SKU', 'Price'],
+    domainEvents: ['ProductCreated', 'ProductUpdated', 'CategoryAssigned']
+  },
+  {
+    name: 'Sales',
+    responsibility: 'Handle order lifecycle',
+    coreDomain: true,
+    supportingSubdomains: [],
+    entities: ['Order', 'OrderLineItem', 'ShippingAddress'],
+    aggregates: ['OrderAggregate'],
+    valueObjects: ['OrderId', 'LineItemId', 'ShippingStatus'],
+    domainEvents: ['OrderPlaced', 'OrderPaid', 'OrderShipped']
+  },
+  {
+    name: 'Inventory',
+    responsibility: 'Track product availability',
+    coreDomain: false,
+    supportingSubdomains: [],
+    entities: ['Stock', 'Warehouse', 'Reservation'],
+    aggregates: ['InventoryAggregate'],
+    valueObjects: ['Quantity', 'Location'],
+    domainEvents: ['StockReserved', 'StockReleased', 'StockMoved']
+  },
+  {
+    name: 'Customer',
+    responsibility: 'Manage customer data and preferences',
+    coreDomain: false,
+    supportingSubdomains: [],
+    entities: ['Customer', 'Address', 'PaymentMethod'],
+    aggregates: ['CustomerAggregate'],
+    valueObjects: ['Email', 'PhoneNumber', 'CustomerId'],
+    domainEvents: ['CustomerRegistered', 'CustomerUpdated']
+  }
+];
+```
+
+### Bước 2: Context Mapping
+
+```typescript
+// Context Relationships
+enum ContextRelationship {
+  SHARED_KERNEL = 'shared-kernel',
+  CUSTOMER_SUPPLIER = 'customer-supplier',
+  ANTICORRUPTION_LAYER = 'anticorruption-layer',
+  OPEN_HOST_SERVICE = 'open-host-service',
+  CONFORMIST = 'conformist',
+  SEPARATE_WAYS = 'separate-ways'
+}
+
+interface ContextMap {
+  contexts: Map<string, BoundedContext>;
+  relationships: ContextRelationship[];
+  integrationPatterns: IntegrationPattern[];
+}
+
+interface IntegrationPattern {
+  upstream: string;
+  downstream: string;
+  relationship: ContextRelationship;
+  implementation: string;
+}
+
+// Example Context Map
+const CONTEXT_MAP: ContextMap = {
+  contexts: new Map(Object.entries({
+    'catalog': ECOMMERCE_CONTEXTS[0],
+    'sales': ECOMMERCE_CONTEXTS[1],
+    'inventory': ECOMMERCE_CONTEXTS[2],
+    'customer': ECOMMERCE_CONTEXTS[3]
+  })),
+  relationships: [
+    {
+      upstream: 'catalog',
+      downstream: 'sales',
+      relationship: ContextRelationship.CUSTOMER_SUPPLIER,
+      implementation: 'Sales subscribes to Catalog events'
+    },
+    {
+      upstream: 'inventory',
+      downstream: 'sales',
+      relationship: ContextRelationship.CUSTOMER_SUPPLIER,
+      implementation: 'Sales queries Inventory for stock'
+    }
+  ]
+};
+```
+
+### Phase 2: Tactical Design
+
+### Bước 3: Aggregate Design
+
+```typescript
+// Aggregate Pattern
+class OrderAggregate {
+  private _orderId: OrderId;
+  private _customerId: CustomerId;
+  private _status: OrderStatus;
+  private _items: OrderLineItem[];
+  private _shippingAddress: Address;
+  private _createdAt: Date;
+  private _domainEvents: DomainEvent[] = [];
+  
+  // Factory method
+  static create(
+    customerId: CustomerId,
+    shippingAddress: Address
+  ): OrderAggregate {
+    const order = new OrderAggregate();
+    order._orderId = OrderId.create();
+    order._customerId = customerId;
+    order._status = OrderStatus.PENDING;
+    order._items = [];
+    order._shippingAddress = shippingAddress;
+    order._createdAt = new Date();
+    
+    order.addDomainEvent(new OrderCreated(order._orderId, customerId));
+    
+    return order;
+  }
+  
+  // Aggregate root methods
+  addItem(productId: ProductId, quantity: Quantity, price: Money): void {
+    if (this._status !== OrderStatus.PENDING) {
+      throw new OrderDomainException('Cannot add items to non-pending order');
+    }
+    
+    const existingItem = this._items.find(
+      item => item.productId.equals(productId)
+    );
+    
+    if (existingItem) {
+      existingItem.increaseQuantity(quantity);
+    } else {
+      this._items.push(
+        OrderLineItem.create(productId, quantity, price)
+      );
+    }
+    
+    this.addDomainEvent(new ItemAddedToOrder(this._orderId, productId));
+  }
+  
+  submit(): void {
+    if (this._items.length === 0) {
+      throw new OrderDomainException('Cannot submit empty order');
+    }
+    
+    this._status = OrderStatus.SUBMITTED;
+    this.addDomainEvent(new OrderSubmitted(this._orderId));
+  }
+  
+  private addDomainEvent(event: DomainEvent): void {
+    this._domainEvents.push(event);
+  }
+  
+  // Event retrieval
+  getDomainEvents(): DomainEvent[] {
+    return [...this._domainEvents];
+  }
+  
+  // State access
+  get orderId(): OrderId { return this._orderId; }
+  get status(): OrderStatus { return this._status; }
+  get items(): OrderLineItem[] { return [...this._items]; }
+}
+```
+
+### Bước 4: Value Objects
+
+```typescript
+// Value Object Pattern
+class Money {
+  private constructor(
+    private readonly _amount: number,
+    private readonly _currency: Currency
+  ) {}
+  
+  static create(amount: number, currency: Currency): Money {
+    if (amount < 0) {
+      throw new DomainException('Money amount cannot be negative');
+    }
+    return new Money(Math.round(amount * 100) / 100, currency);
+  }
+  
+  add(other: Money): Money {
+    if (!this._currency.equals(other._currency)) {
+      throw new DomainException('Cannot add different currencies');
+    }
+    return new Money(this._amount + other._amount, this._currency);
+  }
+  
+  multiply(factor: number): Money {
+    return new Money(this._amount * factor, this._currency);
+  }
+  
+  equals(other: Money): boolean {
+    return this._amount === other._amount 
+      && this._currency.equals(other._currency);
+  }
+  
+  toString(): string {
+    return `${this._currency.symbol}${this._amount.toFixed(2)}`;
+  }
+}
+
+// Email Value Object
+class Email {
+  private readonly _value: string;
+  
+  private constructor(value: string) {
+    this._value = value.toLowerCase();
+  }
+  
+  static create(value: string): Email {
+    if (!Email.isValid(value)) {
+      throw new DomainException(`Invalid email: ${value}`);
+    }
+    return new Email(value);
+  }
+  
+  private static isValid(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+  
+  equals(other: Email): boolean {
+    return this._value === other._value;
+  }
+  
+  toString(): string {
+    return this._value;
+  }
+}
+```
+
+### Phase 3: Domain Events
+
+### Bước 5: Event Sourcing
+
+```typescript
+// Domain Event
+interface DomainEvent {
+  eventId: string;
+  occurredAt: Date;
+  aggregateId: string;
+}
+
+class OrderPlaced implements DomainEvent {
+  constructor(
+    public readonly orderId: OrderId,
+    public readonly customerId: CustomerId,
+    public readonly totalAmount: Money,
+    public readonly eventId: string = generateUUID(),
+    public readonly occurredAt: Date = new Date()
+  ) {}
+}
+
+// Event Store
+class EventStore {
+  async save<T extends AggregateRoot>(
+    aggregate: T,
+    events: DomainEvent[]
+  ): Promise<void> {
+    const streamName = aggregate.constructor.name + '-' + aggregate.id;
+    
+    for (const event of events) {
+      await this.eventStore.appendToStream(
+        streamName,
+        this.serializeEvent(event)
+      );
+    }
+    
+    aggregate.clearDomainEvents();
+  }
+  
+  async load<T extends AggregateRoot>(
+    aggregateId: string,
+    aggregateType: new () => T
+  ): Promise<T> {
+    const streamName = aggregateType.name + '-' + aggregateId;
+    const events = await this.eventStore.readStream(streamName);
+    
+    const aggregate = new aggregateType();
+    
+    for (const event of events) {
+      aggregate.apply(this.deserializeEvent(event));
+    }
+    
+    return aggregate;
+  }
+}
+```
+
+## Checklist
+
+- [ ] Bounded contexts identified
+- [ ] Core domains distinguished
+- [ ] Aggregates designed
+- [ ] Value objects implemented
+- [ ] Domain events defined
+- [ ] Context relationships mapped
+
+## Examples (Ví dụ)
+
+### Ví dụ: Complete DDD Design
+
+```typescript
+// Order Aggregate with Domain Events
+class Order extends AggregateRoot {
+  // ... implementation
+  
+  submit() {
+    // Validate business rules
+    if (this.items.isEmpty()) {
+      throw new DomainException('Order must have items');
+    }
+    
+    // Change state
+    this.status = OrderStatus.SUBMITTED;
+    
+    // Emit domain event
+    this.addDomainEvent(new OrderSubmitted(
+      this.id,
+      this.customerId,
+      this.calculateTotal()
+    ));
+  }
+}
+```
+
+## Liên kết
+
+- [[../rules/core-architecture]] - Core Architecture
+- [[../skills/cqrs-implementation]] - CQRS Implementation
+- [[../skills/clean-architecture]] - Clean Architecture
+- [[../skills/microservice-design]] - Microservice Design

@@ -1,0 +1,54 @@
+---
+description: Nguyên tắc Clean Architecture cho maintainable systems
+created: 2026-06-23
+version: 1.0.0
+tags: [clean-architecture, layers, dependency-injection, enterprise]
+---
+
+# Clean Architecture
+
+## Mục tiêu
+
+Clean Architecture là một kiến trúc được đề xuất bởi Robert C. Martin, tập trung vào việc tổ chức code thành các layers với dependency rule rõ ràng. Trong Cursor Enterprise Framework, Clean Architecture được sử dụng như foundation pattern cho việc build maintainable, testable, và independent applications. Mục tiêu là hướng dẫn developers organize code sao cho business rules không depend on frameworks, databases, hoặc UI.
+
+Clean Architecture tách biệt rõ ràng giữa các concerns, cho phép independent development và testing của từng layer. Rule này cover layer definitions, dependency rules, interface definitions, và practical implementation guidelines.
+
+## Nguyên tắc
+
+**1. Layered Structure**
+
+Entities: Business rules core. Use Cases: Application business rules. Interface Adapters: Adapters converting data. Frameworks & Drivers: External tools.
+
+**2. Dependency Rule**
+
+Source code dependencies chỉ được point inward. Inner circles không biết gì về outer circles. Dependencies point toward high-level policies. Use cases don't know about databases.
+
+**3. Entities**
+
+Enterprise-wide business rules. Most stable layer. Core domain logic. No framework dependencies. Pure business concepts.
+
+**4. Use Cases**
+
+Application-specific business rules. Orchestrate data flow. Use case implementations. One use case per class. Input/output boundaries.
+
+**5. Interface Adapters**
+
+Converters between formats. Presenters, gateways, controllers. Implement interfaces from use cases. Adapters for external services.
+
+**6. Frameworks & Drivers**
+
+Databases, web frameworks, UI. External tools. Tools don't influence architecture. Pluggable tools.
+
+**7. Dependency Injection**
+
+Inject dependencies via constructor. Abstract interfaces for dependencies. Concrete implementations at composition root. Mock/stub for testing.
+
+**8. Interface Definitions**
+
+Define interfaces in inner layers. Implement in outer layers. Keep interfaces small. Cohesive interfaces.
+
+## Liên kết
+
+- [[ddd]] - DDD Pattern
+- [[cqrs]] - CQRS Pattern
+- [[coding-standards]] - Coding Standards

@@ -1,123 +1,471 @@
-# Bazi FAQ - Câu Hỏi Thường Gặp
+# FAQ - Hỏi Đáp về Hệ Thống Bazi
 
-## Giới thiệu
+## 1. Câu Hỏi Chung
 
-Tài liệu này tổng hợp các câu hỏi thường gặp về hệ thống Bazi cùng với câu trả lời chi tiết. Các câu hỏi được phân loại theo chủ đề để dễ dàng tra cứu. Đây là tài liệu hữu ích cho cả developers và users muốn hiểu rõ hơn về cách hệ thống hoạt động.
+### Q1: Bazi là gì và nó khác gì so với Tử Vi?
 
-## Câu Hỏi về Tính Toán Bazi
+**A:** Bazi (八字 - Bát Tự) là hệ thống bói toán Trung Hoa dựa trên thời điểm sinh, sử dụng 4 cột (Tứ Trụ) gồm:
+- Năm Trụ (年柱)
+- Tháng Trụ (月柱)
+- Ngày Trụ (日柱)
+- Giờ Trụ (时柱)
 
-### 1. Làm thế nào để hệ thống xác định thiên can và địa chi cho năm sinh?
+Mỗi cột gồm 1 Thiên Can và 1 Địa Chi, tạo thành 8 ký tự → "Bát Tự" (8字).
 
-Hệ thống sử dụng thuật toán chuyển đổi dựa trên chu kỳ 60 năm (Liên Niên). Mỗi năm được gán một cặp can-chi theo công thức toán học đã được xác định từ hàng ngàn năm quan sát thiên văn. Can của năm được tính dựa trên năm dương lịch mod 10, còn chi được tính dựa trên năm dương lịch mod 12. Ví dụ năm 2024 là năm Giáp Thìn, năm 2025 là năm Ất Tỵ. Hệ thống sử dụng thư viện âm lịch đã được kiểm chứng để đảm bảo độ chính xác cao. Ngoài ra, hệ thống còn xử lý các trường hợp đặc biệt như năm nhuận âm lịch và các ngày cắt can đặc biệt trong năm.
+**Sự khác nhau với Tử Vi:**
 
-Việc xác định can-chi của năm phụ thuộc vào ngày bắt đầu của năm âm lịch, không phải ngày 1 tháng 1 dương lịch. Năm âm lịch ở Việt Nam thường bắt đầu trong khoảng từ 21 tháng 1 đến 20 tháng 2 dương lịch. Do đó, những người sinh vào tháng 1 hoặc tháng 2 đầu năm dương lịch có thể thuộc năm âm lịch khác với năm dương lịch. Hệ thống tự động xử lý logic phức tạp này để đảm bảo kết quả chính xác cho tất cả ngày sinh.
+| Tiêu chí | Bazi | Tử Vi |
+|----------|------|-------|
+| **Đơn vị phân tích** | Tứ Trụ (4 cột) | 12 cung, 12 đặc phẩm, sao |
+| **Độ chính xác thời gian** | Cao (tính đến giờ) | Trung bình (tính đến ngày) |
+| **Phương pháp** | Ngũ Hành, Can Chi | Sao, Cung, Lộc |
+| **Ứng dụng** | Phân tích vận mệnh, tính cách | Bói toán chi tiết, hạn |
 
-### 2. Tại sao giờ sinh quan trọng trong việc tính lá số Bazi?
+### Q2: Làm thế nào để tính Bazi chính xác?
 
-Giờ sinh là một trong bốn yếu tố cốt lõi của Bát Tự (năm, tháng, ngày, giờ). Cột giờ mang thông tin về điểm khởi đầu của cuộc đời và ảnh hưởng đến nhiều khía cạnh cuộc sống như con cái, giao tiếp, và hoạt động buổi tối. Trong hệ thống Bazi, giờ sinh được chia thành 12 khoảng, mỗi khoảng 2 giờ, tương ứng với 12 địa chi. Khoảng từ 23:00 đến 01:00 là giờ Tý, 01:00 đến 03:00 là giờ Sửu, và tiếp tục theo thứ tự.
+**A:** Để tính Bazi chính xác, cần:
 
-Thiên can của giờ được xác định dựa trên ngày chủ (can của ngày sinh) và giờ chi. Đây là phép tính phức tạp nhất trong Bazi vì cần xác định giờ chuyển can. Giờ chuyển can không phải lúc 00:00 mà phụ thuộc vào múi giờ địa lý. Việc xác định giờ sinh chính xác là rất quan trọng vì sai 30 phút có thể dẫn đến can của giờ bị sai. Hệ thống yêu cầu người dùng nhập giờ sinh chính xác và hỗ trợ xác định múi giờ tự động dựa trên vị trí.
+1. **Ngày sinh Dương lịch** chính xác (năm, tháng, ngày)
+2. **Giờ sinh** chính xác (theo giờ Trung Quốc, mỗi giờ = 2 tiếng)
+3. **Múi giờ** của nơi sinh
+4. **Chuyển đổi sang Âm lịch** (cần thiết vì Bazi dùng âm lịch)
 
-### 3. Hệ thống xử lý thế nào khi người dùng không biết giờ sinh chính xác?
+**Công thức cơ bản:**
+```
+Năm Trụ = Can của (Năm âm lịch + 6) % 10 + Chi của (Năm âm lịch + 8) % 12
+```
 
-Khi người dùng không biết giờ sinh chính xác, hệ thống cung cấp nhiều tùy chọn. Đầu tiên, người dùng có thể chọn giờ sinh ước lượng dựa trên các manh mối như giờ mẹ sinh, giờ trẻ sơ sinh khóc, hoặc các sự kiện đặc biệt trong gia đình. Hệ thống cũng cung cấp tùy chọn "Giờ tý" (23:00-01:00) như một lựa chọn an toàn khi hoàn toàn không có thông tin. Tuy nhiên, người dùng cần hiểu rằng kết quả sẽ ít chính xác hơn so với giờ sinh chắc chắn.
+**Ví dụ:** Sinh năm 1990-05-15 (Âm lịch: 1990-03-20)
+- Năm Can: (1990 + 6) % 10 = 6 → Canh
+- Năm Chi: (1990 + 8) % 12 = 10 → Ngọ
+- Kết quả: **Canh Ngọ**
 
-Hệ thống còn cung cấp tính năng "Tính lá số với nhiều giờ" để người dùng có thể xem và so sánh các lá số với các giờ sinh khác nhau. Tính năng này đặc biệt hữu ích khi người dùng có khoảng thời gian nhưng không biết chính xác. Ngoài ra, hệ thống có thể đề xuất giờ sinh dựa trên các phân tích về tính cách và sự kiện cuộc đời mà người dùng cung cấp thông qua một bài khảo sát ngắn. Đây là phương pháp bổ sung không thay thế cho giờ sinh chính xác.
+### Q3: Sự khác nhau giữa Giờ sinh Việt Nam và Giờ Trung Quốc?
 
-### 4. Sự khác biệt giữa ngũ hành của can và ngũ hành của chi là gì?
+**A:** Giờ trong Bazi sử dụng **Giờ Trung Quốc** (Chinese Hour), mỗi giờ = 2 tiếng Dương lịch:
 
-Mỗi thiên can mang một ngũ hành cố định: Giáp và Ất thuộc Mộc, Bính và Đinh thuộc Hỏa, Mậu và Kỷ thuộc Thổ, Canh và Tân thuộc Kim, Nhâm và Quý thuộc Thủy. Đây là ngũ hành gốc của can, không thay đổi. Tương tự, mỗi địa chi cũng mang ngũ hành riêng: Tý, Thân, Dậu thuộc Kim; Dần, Mão, Hợi thuộc Mộc; Sửu, Thìn, Tuất thuộc Thổ; Tỵ, Ngọ, Mùi thuộc Hỏa.
+| Giờ Bazi | Giờ Dương lịch | Tên |
+|---------|----------------|-----|
+| Tý | 23:00 - 00:59 | Midnight |
+| Sửu | 01:00 - 02:59 | Ox |
+| Dần | 03:00 - 04:59 | Tiger |
+| Mão | 05:00 - 06:59 | Rabbit |
+| Thìn | 07:00 - 08:59 | Dragon |
+| Tỵ | 09:00 - 10:59 | Snake |
+| Ngọ | 11:00 - 12:59 | Horse |
+| Mùi | 13:00 - 14:59 | Goat |
+| Thân | 15:00 - 16:59 | Monkey |
+| Dậu | 17:00 - 18:59 | Rooster |
+| Tuất | 19:00 - 20:59 | Dog |
+| Hợi | 21:00 - 22:59 | Pig |
 
-Khi tính tổng ngũ hành cho một lá số, hệ thống cộng cả ngũ hành của can và ngũ hành của chi trong mỗi cột. Ví dụ, cột Năm Giáp Tý có ngũ hành: Giáp (Mộc) + Tý (Kim) = Mộc + Kim. Tổng hợp tất cả các cột cho ra bức tranh ngũ hành tổng thể của lá số. Hệ thống còn xem xét ngũ hành của Thập Thần, ngũ hành của Cục Diện, và các yếu tố tương sinh tương khắc để đưa ra đánh giá chính xác về ngũ hành vượng (dư thừa) và ngũ hành thiếu (cần bổ sung).
+**Lưu ý:** Giờ Tý bắt đầu từ 23:00 ngày hôm trước!
 
-## Câu Hỏi về Tính Năng và Sử Dụng
+### Q4: Nạp Âm là gì và nó quan trọng như thế nào?
 
-### 5. Làm thế nào để xem Đại Vận và Tiểu Vận của tôi?
+**A:** Nạp Âm (納音) là hệ thống gán "âm thanh" cho mỗi cặp Can-Chi, đại diện cho vật chất/hiện tượng trong tự nhiên. Có 60 Nạp Âm (10 Thiên Can × 12 Địa Chi).
 
-Sau khi đã có lá số Bazi được tính toán, người dùng có thể truy cập thông tin Vận thông qua dashboard hoặc menu chính của ứng dụng. Hệ thống sẽ tự động xác định Đại Vận hiện tại dựa trên giới tính, năm sinh, và các quy tắc tính Vận. Đại Vận hiện tại được hiển thị kèm theo thông tin chi tiết về năng lượng, xu hướng, và các khuyến nghị cho giai đoạn này. Người dùng cũng có thể xem toàn bộ lịch sử Vận từ quá khứ đến tương lai.
+**Ví dụ:**
+- **Hải Trung Kim** (海 中 金): Vàng dưới biển - Người sinh năm Giáp Tý hoặc Ất Tý
+- **Sơn Hạ Hỏa** (山 下 火): Lửa dưới núi - Người sinh năm Mậu Tý hoặc Kỷ Tý
 
-Tiểu Vận (từng năm) được hiển thị khi người dùng chọn một năm cụ thể hoặc xem timeline Vận. Hệ thống cung cấp thông tin chi tiết cho mỗi năm bao gồm: năm thuộc can chi nào, ngũ hành của năm, các tháng trong năm đó, và những ngày đặc biệt. Người dùng có thể đặt lịch reminder cho các năm Vận tốt hoặc cần thận trọng. Tính năng này đặc biệt hữu ích cho việc lập kế hoạch cuộc sống và công việc dài hạn.
+**Ý nghĩa:**
+1. Bổ sung ý nghĩa cho năm sinh
+2. Xác định tính cách bổ sung
+3. Ảnh hưởng đến vận mệnh
 
-### 6. Tôi có thể so sánh lá số của mình với người khác không?
+## 2. Câu Hỏi Kỹ Thuật
 
-Có, hệ thống cung cấp tính năng So sánh Tương Hợp cho phép người dùng so sánh lá số với người khác. Tính năng này phân tích mức độ hài hòa giữa hai lá số dựa trên các yếu tố như: Lục Hợp, Tam Hợp, các cặp xung, ngũ hành tương thích, và Thập Thần tương tác. Kết quả bao gồm điểm tương thích tổng thể, phân tích từng khía cạnh (tình cảm, công việc, gia đình), và các khuyến nghị để cải thiện mối quan hệ.
+### Q5: Làm thế nào để chuyển đổi Dương lịch sang Âm lịch?
 
-Người dùng có thể so sánh với bạn bè, đối tác kinh doanh, hoặc người yêu. Mỗi loại mối quan hệ có tiêu chí đánh giá khác nhau: hôn nhân tập trung vào sự hòa hợp lâu dài, kinh doanh tập trung vào hợp tác và bổ sung strengths, bạn bè tập trung vào giao tiếp và thấu hiểu. Hệ thống cũng cung cấp thông tin về các năm xung xung có thể gây ra thách thức trong mối quan hệ để người dùng có thể chuẩn bị tinh thần và ứng phó phù hợp.
+**A:** Có 2 phương pháp:
 
-### 7. Hệ thống có hỗ trợ xem lá số cho người sinh năm nhuận không?
+**Phương pháp 1: Sử dụng thư viện Lunar Calendar**
+```typescript
+import { LunarDate } from 'lunar-calendar';
 
-Có, hệ thống xử lý đầy đủ các trường hợp liên quan đến năm nhuận. Năm nhuận trong âm lịch là năm có tháng 13, được thêm vào để giữ cho âm lịch đồng bộ với dương lịch. Khi người dùng nhập ngày sinh thuộc tháng nhuận, hệ thống sẽ hiển thị thông báo cho biết đây là tháng nhuận và hỏi người dùng xác nhận. Việc xác nhận này quan trọng vì tháng nhuận có thể mang năng lượng khác so với tháng chính cùng tên.
+const result = LunarDate.toLunar(new Date(1990, 4, 15));
+// result: { year: 1990, month: 3, day: 20 }
+```
 
-Đối với những người sinh vào năm nhuận dương lịch (năm có ngày 29 tháng 2), hệ thống tự động xác định năm âm lịch tương ứng và tính lá số chính xác. Hệ thống sử dụng database chứa thông tin về tất cả các năm nhuận từ năm 1900 đến 2100 để đảm bảo tính chính xác. Ngoài ra, hệ thống còn cung cấp tài liệu giáo dục giúp người dùng hiểu rõ hơn về cách năm nhuận ảnh hưởng đến lá số Bazi của họ.
+**Phương pháp 2: Tự implement thuật toán**
+```typescript
+function solarToLunar(date: Date): LunarDate {
+  // Sử dụng Julian Day Number
+  const jd = dateToJD(date);
+  const lunar JD = jdToLunar(jd);
+  return jdToLunarDate(lunarJD);
+}
+```
 
-### 8. Tôi có thể lưu và xem lại các lá số đã tính không?
+**Lưu ý:** Cần xử lý tháng nhuận (leap month) trong âm lịch.
 
-Người dùng có tài khoản có thể lưu tất cả các lá số đã tính vào hồ sơ cá nhân. Mỗi lá số được lưu với thông tin ngày giờ tính, ngày sinh gốc, và các phân tích chi tiết. Người dùng có thể xem lịch sử các lá số đã tính, so sánh các phiên bản khác nhau, và export dữ liệu dưới dạng PDF hoặc JSON. Hệ thống còn tự động cập nhật các phân tích Vận khi có thay đổi về thuật toán hoặc khi thời gian trôi qua.
+### Q6: Công thức tính Ngày Trụ (Day Pillar) như thế nào?
 
-Đối với người dùng chưa có tài khoản, hệ thống vẫn cho phép tính lá số nhưng không lưu trữ vĩnh viễn. Người dùng có thể chụp màn hình hoặc export kết quả để lưu trữ riêng. Khi tạo tài khoản sau đó, người dùng có thể nhập lại ngày sinh để hệ thống tính lại lá số và lưu trữ. Hệ thống khuyến khích người dùng tạo tài khoản để tận dụng đầy đủ các tính năng và nhận được các cập nhật phân tích theo thời gian.
+**A:** Ngày Trụ là phức tạp nhất, cần sử dụng **Julian Day Number**:
 
-## Câu Hỏi về Độ Chính Xác và Độ Tin Cậy
+```typescript
+function calculateDayPillar(lunarDate: LunarDate): Pillar {
+  // 1. Chuyển ngày sang Julian Day
+  const jd = lunarToJD(lunarDate);
+  
+  // 2. Tính Can Index: (JD + 1) % 10
+  const canIndex = (Math.floor(jd) + 1) % 10;
+  
+  // 3. Tính Chi Index: (JD + 1) % 12
+  const chiIndex = (Math.floor(jd) + 1) % 12;
+  
+  return {
+    can: CAN[canIndex],
+    chi: CHI[chiIndex]
+  };
+}
+```
 
-### 9. Độ chính xác của hệ thống Bazi là bao nhiêu phần trăm?
+**Ví dụ:** Ngày 15/05/2024
+- JD = 2460456
+- Can Index = (2460456 + 1) % 10 = 7 → Tân
+- Chi Index = (2460456 + 1) % 12 = 1 → Sửu
+- Kết quả: **Tân Sửu**
 
-Không có con số phần trăm cố định nào có thể đại diện cho độ chính xác của Bazi vì đây là hệ thống dựa trên triết học và quan sát thiên văn hàng nghìn năm, không phải khoa học thực nghiệm có thể đo lường bằng thí nghiệm. Hệ thống của chúng tôi được thiết kế để cung cấp kết quả tính toán chính xác nhất dựa trên các công thức và quy tắc đã được ghi chép và kiểm chứng qua nhiều thế hệ. Phần tính toán cơ bản (thiên can, địa chi, ngũ hành) có độ chính xác gần như tuyệt đối nếu ngày giờ sinh chính xác.
+### Q7: Tại sao cần xác định giới tính để tính Cung Mệnh?
 
-Tuy nhiên, phần diễn giải và phân tích mang tính chủ quan cao hơn và phụ thuộc vào kinh nghiệm của người đọc số. Hệ thống AI của chúng tôi được huấn luyện trên dữ liệu từ các chuyên gia Bazi có kinh nghiệm để đưa ra diễn giải có cơ sở. Độ chính xác của diễn giải cũng phụ thuộc vào chất lượng thông tin đầu vào từ người dùng (ngày sinh chính xác, giờ sinh nếu biết). Chúng tôi luôn nhấn mạnh rằng Bazi là công cụ tham khảo và không nên được sử dụng như quyết định duy nhất cho các quyết định quan trọng trong cuộc sống.
+**A:** Cung Mệnh (命) được tính theo **Thập Tự Pháp** (十直法), khác nhau cho Nam và Nữ:
 
-### 10. Hệ thống có thể dự đoán chính xác các sự kiện cụ thể không?
+**Nam mệnh:**
+| Ngày Can | Cung |
+|---------|------|
+| Giáp, Kỷ | Cấn |
+| Ất, Canh | Ly |
+| Bính, Tân | Khôn |
+| Đinh, Nhâm | Khang |
+| Mậu, Quý | Chấn |
 
-Không, hệ thống Bazi không được thiết kế để dự đoán các sự kiện cụ thể như "bạn sẽ gặp ai đó vào ngày X" hoặc "công việc của bạn sẽ thay đổi vào tháng Y". Thay vào đó, Bazi cung cấp thông tin về xu hướng, năng lượng, và các khả năng trong các giai đoạn khác nhau của cuộc đời. Ví dụ, hệ thống có thể cho biết "Năm nay bạn có xu hướng gặp nhiều cơ hội trong công việc" hoặc "Giai đoạn này thuận lợi cho việc mở rộng các mối quan hệ".
+**Nữ mệnh:**
+| Ngày Can | Cung |
+|---------|------|
+| Giáp, Kỷ | Chấn |
+| Ất, Canh | Khôn |
+| Bính, Tân | Ly |
+| Đinh, Nhâm | Cấn |
+| Mậu, Quý | Khang |
 
-Việc diễn giải các dự đoán cần được thực hiện một cách có trách nhiệm. Hệ thống sử dụng ngôn ngữ như "có khả năng", "xu hướng", "tiềm năng" thay vì ngôn ngữ quyết định như "sẽ xảy ra". Người dùng nên hiểu rằng Bazi là một trong nhiều công cụ để hiểu bản thân và lập kế hoạch cuộc sống, không phải công cụ tiên tri chính xác. Các quyết định quan trọng nên được cân nhắc kỹ lưỡng với nhiều yếu tố khác nhau, không chỉ dựa trên lá số Bazi.
+**Ví dụ:** Nam sinh ngày Canh (Day Pillar = Canh)
+→ Cung Mệnh = **Ly** (Lửa)
 
-### 11. Làm thế nào để biết lá số của tôi được tính đúng?
+### Q8: Làm thế nào để tính Ngũ Hành tương sinh/tương khắc?
 
-Người dùng có thể xác minh độ chính xác của lá số bằng cách kiểm tra các thông tin cơ bản. Đầu tiên, kiểm tra năm sinh âm lịch có đúng không (đặc biệt quan trọng với người sinh tháng 1-2). Tiếp theo, kiểm tra giờ sinh thuộc can chi nào bằng cách tra bảng giờ sinh. Sau đó, kiểm tra ngũ hành tổng quan có phản ánh đúng tính cách và xu hướng của bạn không. Nếu các thông tin cơ bản này không chính xác, có thể ngày giờ sinh đã được nhập sai.
+**A:** Ngũ Hành có 2 quy luật chính:
 
-Hệ thống cung cấp tính năng "Kiểm tra lá số" cho phép người dùng trả lời các câu hỏi về tính cách, sự kiện cuộc đời, và so sánh với lá số đã tính. Nếu có sự không khớp đáng kể, hệ thống có thể đề xuất thử các giờ sinh khác để tìm ra lá số phù hợp nhất. Đây là quy trình "calibration" giúp tăng độ chính xác của lá số, đặc biệt quan trọng khi giờ sinh không được biết chắc chắn.
+**Tương Sinh (相生):** A sinh B
+```
+Mộc → Hỏa → Thổ → Kim → Thủy → Mộc
+```
 
-## Câu Hỏi về Kỹ Thuật và Bảo Mật
+**Tương Khắc (相克):** A khắc B
+```
+Mộc → Thổ → Thủy → Hỏa → Kim → Mộc
+```
 
-### 12. Dữ liệu cá nhân của tôi được bảo mật như thế nào?
+```typescript
+function calculateElementBalance(pillars: Pillar[]): ElementBalance {
+  const balance = { wood: 0, fire: 0, earth: 0, metal: 0, water: 0 };
+  
+  for (const pillar of pillars) {
+    // Can cho Ngũ Hành chính
+    balance[getCanElement(pillar.can)] += 2;
+    
+    // Chi cho Ngũ Hành chính
+    balance[getChiElement(pillar.chi)] += 1;
+    
+    // Hidden Stems
+    for (const hiddenCan of pillar.hiddenStems || []) {
+      balance[getCanElement(hiddenCan)] += 0.5;
+    }
+  }
+  
+  return balance;
+}
+```
 
-Hệ thống coi bảo mật dữ liệu là ưu tiên hàng đầu. Thông tin cá nhân như ngày sinh, giờ sinh, và các phân tích Bazi được mã hóa khi lưu trữ (encryption at rest) và khi truyền tải (TLS 1.3). Chỉ có người dùng và các dịch vụ được ủy quyền mới có thể truy cập dữ liệu này. Hệ thống sử dụng các biện pháp bảo mật theo tiêu chuẩn ngành bao gồm mạng riêng ảo (VPN), tường lửa (firewall), và hệ thống phát hiện xâm nhập (IDS).
+## 3. Câu Hỏi Triển Khai
 
-Người dùng có quyền truy cập, chỉnh sửa, và xóa dữ liệu cá nhân của mình bất kỳ lúc nào thông qua cài đặt tài khoản. Hệ thống tuân thủ các quy định về bảo vệ dữ liệu như GDPR và các luật bảo vệ thông tin cá nhân tại Việt Nam. Chúng tôi không bán hoặc chia sẻ dữ liệu cá nhân với bên thứ ba cho mục đích tiếp thị. Chi tiết về chính sách bảo mật có thể được xem trong mục Chính sách Quyền riêng tư trên website.
+### Q9: Nên sử dụng database nào cho hệ thống Bazi?
 
-### 13. Hệ thống có hoạt động offline không?
+**A:** Khuyến nghị:
 
-Ứng dụng web yêu cầu kết nối internet để truy cập server và thực hiện các tính toán phức tạp. Tuy nhiên, một số tính năng cơ bản có thể hoạt động offline sau khi đã được tải trước. Ứng dụng di động (iOS và Android) có hỗ trợ offline với các tính năng giới hạn: xem các lá số đã lưu, xem thông tin Vận đã tải, truy cập một số bài viết giáo dục. Khi có kết nối trở lại, ứng dụng sẽ đồng bộ hóa dữ liệu và cập nhật các thông tin mới.
+| Database | Ưu điểm | Phù hợp khi |
+|---------|---------|------------|
+| **PostgreSQL** | JSON support, Full-text search | Production, complex queries |
+| **MongoDB** | Flexible schema, Easy scaling | Prototype, document storage |
+| **Redis** | Fast caching, Session storage | Caching layer |
 
-Đối với các tính toán cần thiết (tính lá số mới, cập nhật Vận), ứng dụng cần kết nối với server. Chúng tôi đang phát triển tính năng offline calculations cho phiên bản tương lai, cho phép người dùng thực hiện các tính toán cơ bản mà không cần internet. Tuy nhiên, các tính năng AI-powered như diễn giải chi tiết và đề xuất cá nhân hóa vẫn yêu cầu kết nối server do yêu cầu về computational resources.
+**Schema thiết kế:**
+```sql
+CREATE TABLE bazi_charts (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  
+  -- Birth info
+  birth_date DATE NOT NULL,
+  birth_time TIME NOT NULL,
+  timezone VARCHAR(50) NOT NULL,
+  
+  -- Lunar date
+  lunar_year INT NOT NULL,
+  lunar_month INT NOT NULL,
+  lunar_day INT NOT NULL,
+  
+  -- Tứ Trụ
+  year_can VARCHAR(2), year_chi VARCHAR(2),
+  month_can VARCHAR(2), month_chi VARCHAR(2),
+  day_can VARCHAR(2), day_chi VARCHAR(2),
+  hour_can VARCHAR(2), hour_chi VARCHAR(2),
+  
+  -- Metadata
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
 
-### 14. Tôi có thể sử dụng API của hệ thống để tích hợp vào ứng dụng của mình không?
+### Q10: Làm thế nào để optimize performance cho Bazi calculation?
 
-Có, chúng tôi cung cấp API cho developers và partners muốn tích hợp tính năng Bazi vào ứng dụng của họ. API cung cấp các endpoints để tính lá số, xem Vận, phân tích tương hợp, và nhiều tính năng khác. Để sử dụng API, developers cần đăng ký tài khoản developer và lấy API key. Chúng tôi có các gói subscription khác nhau tùy thuộc vào volume sử dụng và tính năng cần thiết.
+**A:** Các strategies:
 
-API documentation chi tiết có sẵn tại portal dành cho developers, bao gồm các ví dụ code, API reference, và hướng dẫn tích hợp. Chúng tôi cung cấp SDK cho các ngôn ngữ phổ biến như JavaScript, Python, Java, và Swift để việc tích hợp trở nên dễ dàng hơn. Đội ngũ hỗ trợ kỹ thuật luôn sẵn sàng giúp đỡ các developers gặp khó khăn trong quá trình tích hợp. Các điều khoản sử dụng API được quy định rõ ràng trong developer agreement.
+**1. Caching:**
+```typescript
+// Cache kết quả lunar conversion
+const lunarCache = new LRUCache<string, LunarDate>({
+  max: 10000,
+  ttl: 30 * 24 * 60 * 60 * 1000 // 30 days
+});
 
-### 15. Điều gì xảy ra nếu tôi thay đổi ngày sinh trong hồ sơ?
+// Cache kết quả Bazi calculation
+const baziCache = new RedisCache({
+  prefix: 'bazi:',
+  ttl: 24 * 60 * 60 // 24 hours
+});
+```
 
-Khi người dùng cập nhật ngày sinh, hệ thống sẽ tự động tính lại toàn bộ lá số dựa trên thông tin mới. Lá số cũ được lưu trong lịch sử để người dùng có thể xem lại và so sánh. Hệ thống sẽ hiển thị thông báo cho biết có sự khác biệt giữa lá số cũ và mới, giúp người dùng hiểu rõ tác động của việc thay đổi này. Các phân tích Vận cũng được cập nhật dựa trên lá số mới vì Đại Vận phụ thuộc vào thông tin năm sinh và giới tính.
+**2. Batch Processing:**
+```typescript
+async function calculateBatch(inputs: BaziInput[]): Promise<BaziChart[]> {
+  // Xử lý song song, giới hạn concurrency
+  return Promise.all(
+    inputs.map(input => calculateWithLock(input))
+  );
+}
+```
 
-Người dùng được khuyến khích chỉ thay đổi ngày sinh nếu có lý do chính đáng như phát hiện sai sót trong thông tin ban đầu. Việc thay đổi ngày sinh thường xuyên không được khuyến khích vì nó có thể gây nhầm lẫn và làm mất đi sự nhất quán của các phân tích theo thời gian. Nếu người dùng không chắc chắn về ngày sinh, hệ thống có tính năng "Xác minh lá số" giúp xác định ngày sinh chính xác nhất dựa trên các thông tin khác.
+**3. Database Optimization:**
+```sql
+-- Index cho các queries thường dùng
+CREATE INDEX idx_bazi_user_date ON bazi_charts(user_id, created_at DESC);
+CREATE INDEX idx_bazi_birth ON bazi_charts(birth_year, birth_month, birth_day);
+```
 
-## Câu Hỏi về Dịch Vụ và Hỗ Trợ
+**4. Pre-computation:**
+```typescript
+// Pre-compute Can-Chi table cho performance
+const CAN_CHI_TABLE = generateCanChiTable(1900, 2100);
+```
 
-### 16. Hệ thống có cung cấp dịch vụ tư vấn từ chuyên gia không?
+## 4. Câu Hỏi Về Độ Chính Xác
 
-Ngoài các tính năng tự động, chúng tôi có kết nối với mạng lưới các chuyên gia Bazi có kinh nghiệm để cung cấp dịch vụ tư vấn cá nhân. Người dùng có thể đặt lịch hẹn với chuyên gia thông qua nền tảng, với các buổi tư vấn kéo dài từ 30 đến 90 phút tùy theo nhu cầu. Chuyên gia sẽ xem xét lá số chi tiết và đưa ra những phân tích sâu hơn so với những gì hệ thống tự động cung cấp. Dịch vụ này có phí và được tính theo từng buổi tư vấn.
+### Q11: Bazi có chính xác 100% không?
 
-Các chuyên gia được tuyển chọn kỹ lưỡng dựa trên kinh nghiệm, kiến thức chuyên môn, và đánh giá từ người dùng trước đó. Chúng tôi duy trì chất lượng dịch vụ bằng cách yêu cầu chuyên gia tuân thủ các tiêu chuẩn đạo đức và chuyên nghiệp. Người dùng có thể đọc reviews và đánh giá từ khách hàng trước khi chọn chuyên gia. Sau buổi tư vấn, người dùng có thể gửi feedback để giúp chúng tôi cải thiện chất lượng dịch vụ.
+**A:** Không có hệ thống bói toán nào chính xác 100%. Bazi có độ chính xác bị ảnh hưởng bởi:
 
-### 17. Làm thế nào để liên hệ với đội ngũ hỗ trợ nếu tôi có vấn đề?
+**Yếu tố ảnh hưởng:**
 
-Người dùng có thể liên hệ với đội ngũ hỗ trợ qua nhiều kênh: chat trực tuyến trên website và ứng dụng, email support, và hotline. Thời gian phản hồi trung bình là dưới 24 giờ cho email và vài phút cho chat trực tuyến trong giờ làm việc. Đội ngũ hỗ trợ được đào tạo để giải quyết các vấn đề kỹ thuật, thắc mắc về tính năng, và các câu hỏi về tài khoản. Chúng tôi có đội ngũ hỗ trợ tiếng Việt và tiếng Anh để phục vụ người dùng trong và ngoài nước.
+| Yếu tố | Mức độ ảnh hưởng | Giải pháp |
+|--------|------------------|------------|
+| Giờ sinh chính xác | **Rất cao** | Cần xác định chính xác giờ sinh |
+| Múi giờ | **Cao** | Sử dụng IANA timezone |
+| Năm nhuận | **Trung bình** | Correct lunar calendar library |
+| Leap second | **Thấp** | Thường bỏ qua |
+| Quốc gia/region | **Thấp** | Bazi dùng âm lịch phổ quát |
 
-Ngoài ra, người dùng có thể tham khảo FAQ, blog, và video hướng dẫn trong trung tâm trợ giúp để tự giải quyết các vấn đề thường gặp. Diễn đàn cộng đồng là nơi người dùng có thể trao đổi kinh nghiệm và hỏi đáp lẫn nhau. Chúng tôi khuyến khích người dùng báo cáo các vấn đề hoặc đề xuất tính năng mới thông qua hệ thống feedback tích hợp trong ứng dụng.
+**Độ chính xác ước tính:**
+- Giờ sinh chính xác (±15 phút): ~95%
+- Giờ sinh approximate (±1 giờ): ~80%
+- Giờ sinh ước lượng (sáng/chiều/tối): ~60%
 
-### 18. Tôi có thể hủy đăng ký premium bất kỳ lúc nào không?
+### Q12: Tại sao cùng ngày sinh nhưng Bazi có thể khác nhau?
 
-Có, người dùng có thể hủy đăng ký premium bất kỳ lúc nào thông qua cài đặt tài khoản. Khi hủy, người dùng vẫn có thể sử dụng các tính năng premium cho đến hết chu kỳ thanh toán hiện tại. Sau đó, tài khoản sẽ tự động chuyển về gói free mà không mất dữ liệu đã lưu. Người dùng có thể đăng ký lại premium bất kỳ lúc nào nếu muốn tiếp tục sử dụng các tính năng cao cấp.
+**A:** Có thể khác nhau vì:
 
-Chúng tôi cung cấp chính sách hoàn tiền trong vòng 7 ngày đầu tiên nếu người dùng không hài lòng với dịch vụ. Để yêu cầu hoàn tiền, người dùng cần liên hệ với đội ngũ hỗ trợ trong khung thời gian này. Chúng tôi không tính phí hủy trước hoặc phí hidden nào. Lịch sử thanh toán và hóa đơn luôn có sẵn trong tài khoản để người dùng theo dõi.
+1. **Khác múi giờ:**
+   - Sinh ở Việt Nam (UTC+7) vs Nhật Bản (UTC+9)
+   - Cùng giờ nhưng khác "giờ Bazi"
+
+2. **Khác ngày âm lịch:**
+   - Gần ngày Tết Nguyên Đán
+   - Tháng nhuận có thể gây confusion
+
+3. **Sai giờ sinh:**
+   - Giờ bệnh viện ghi vs giờ thực
+   - DST adjustment không được tính
+
+4. **Phương pháp tính:**
+   - Lunar calendar library khác nhau
+   - Thuật toán Julian Day khác nhau
+
+### Q13: Có nên dùng Bazi để quyết định quan trọng không?
+
+**A:** Bazi nên được xem là **tham khảo**, không phải quyết định:
+
+**Nên dùng để:**
+- Hiểu bản thân (điểm mạnh/yếu)
+- Xác định hướng phát triển
+- Chọn thời điểm tốt cho việc quan trọng
+- Hiểu mối quan hệ với người khác
+
+**Không nên dùng để:**
+- Quyết định hôn nhân (nên dựa vào tình cảm thực)
+- Chọn nghề nghiệp duy nhất
+- Đặt cược/đầu tư dựa hoàn toàn vào bazi
+- Thay thế tư vấn chuyên môn (y tế, pháp lý)
+
+## 5. Câu Hỏi Về API
+
+### Q14: Làm sao để integrate Bazi API vào ứng dụng?
+
+**A:** Integration steps:
+
+**1. Gọi API:**
+```typescript
+const response = await fetch('/api/v1/bazi/charts', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer <token>'
+  },
+  body: JSON.stringify({
+    birthDate: '1990-05-15',
+    birthTime: '14:30',
+    timeZone: 'Asia/Ho_Chi_Minh',
+    gender: 'male'
+  })
+});
+
+const { data: chart } = await response.json();
+```
+
+**2. Response structure:**
+```typescript
+interface BaziResponse {
+  success: true;
+  data: {
+    id: string;
+    pillars: {
+      year: { can: string; chi: string };
+      month: { can: string; chi: string };
+      day: { can: string; chi: string };
+      hour: { can: string; chi: string };
+    };
+    elements: {
+      balance: { wood: number; fire: number; earth: number; metal: number; water: number };
+    };
+    menh: { name: string; element: string };
+    napAm: { name: string };
+  };
+}
+```
+
+### Q15: Rate limit cho Bazi API là bao nhiêu?
+
+**A:** Rate limits phụ thuộc vào plan:
+
+| Plan | Requests/minute | Requests/day |
+|------|-----------------|--------------|
+| Free | 10 | 100 |
+| Basic | 60 | 1,000 |
+| Pro | 300 | 10,000 |
+| Enterprise | Unlimited | Unlimited |
+
+**Headers returned:**
+```
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 45
+X-RateLimit-Reset: 1640000000
+```
+
+### Q16: Làm thế nào để xử lý error từ Bazi API?
+
+**A:** Error handling pattern:
+
+```typescript
+async function fetchBazi(input: BaziInput) {
+  try {
+    const response = await baziApi.calculate(input);
+    
+    if (!response.success) {
+      switch (response.error.code) {
+        case 'INVALID_BIRTH_DATE':
+          return { valid: false, message: 'Ngày sinh không hợp lệ' };
+        case 'LUNAR_CONVERSION_ERROR':
+          return { valid: false, message: 'Không chuyển được ngày âm lịch' };
+        case 'RATE_LIMIT_EXCEEDED':
+          return { valid: false, message: 'Quá rate limit, thử lại sau' };
+        default:
+          return { valid: false, message: 'Lỗi không xác định' };
+      }
+    }
+    
+    return { valid: true, data: response.data };
+    
+  } catch (error) {
+    // Network error hoặc unexpected error
+    console.error('Bazi API error:', error);
+    return { valid: false, message: 'Lỗi kết nối' };
+  }
+}
+```
+
+## 6. Câu Hỏi Về Bảo Mật
+
+### Q17: Dữ liệu ngày sinh có được bảo mật không?
+
+**A:** Yes, các measures:
+
+1. **Encryption at rest:**
+   ```typescript
+   // Mã hóa birth_date trong database
+   const encrypted = encrypt(birthDate, ENCRYPTION_KEY);
+   ```
+
+2. **HTTPS only:**
+   - Tất cả API calls phải qua HTTPS
+
+3. **Access control:**
+   - Users chỉ truy cập được charts của mình
+   - Admin có thể audit nhưng không đọc raw data
+
+4. **Data retention:**
+   - User có thể xóa data
+   - Auto-delete sau thời gian không hoạt động
+
+### Q18: API key có thể bị revoke không?
+
+**A:** Có, các options:
+
+1. **Manual revoke:**
+   ```
+   DELETE /api/v1/keys/{keyId}
+   ```
+
+2. **Auto-expire:**
+   ```typescript
+   // Key expires sau 1 năm
+   const key = await createApiKey({
+     expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
+   });
+   ```
+
+3. **Scope-based:**
+   ```typescript
+   // Key chỉ có quyền đọc
+   const readOnlyKey = await createApiKey({
+     scopes: ['bazi:read']
+   });
+   ```

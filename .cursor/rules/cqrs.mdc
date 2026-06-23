@@ -1,0 +1,54 @@
+---
+description: Nguyên tắc CQRS cho complex domains và high-performance systems
+created: 2026-06-23
+version: 1.0.0
+tags: [cqrs, commands, queries, separation, patterns, enterprise]
+---
+
+# CQRS
+
+## Mục tiêu
+
+Command Query Responsibility Segregation (CQRS) là pattern phân tách việc đọc và ghi dữ liệu thành các models riêng biệt. Trong Cursor Enterprise Framework, CQRS được sử dụng cho các systems có complex queries, different read/write patterns, hoặc cần high scalability. Mục tiêu là hướng dẫn developers apply CQRS để optimize both read và write operations independently.
+
+CQRS đặc biệt beneficial khi read và write có significantly different requirements về data model, performance, hoặc scalability. Rule này cover CQRS basics, implementation patterns, synchronization strategies, và considerations khi áp dụng CQRS.
+
+## Nguyên tắc
+
+**1. Command vs Query Separation**
+
+Commands thay đổi state, không trả về data. Queries đọc data, không thay đổi state. Separate models cho read và write. Different optimization strategies. Different scalability paths.
+
+**2. Write Model Design**
+
+Domain model oriented. Optimized for consistency. Rich business logic. Enforce invariants. Normalized structures. Transactional integrity.
+
+**3. Read Model Design**
+
+Denormalized for queries. Optimized for performance. Materialized views. Projections. Multiple read models possible. Eventual consistency acceptable.
+
+**4. Synchronization**
+
+Keep read models in sync. Event-driven updates. Polling where needed. Batch synchronization. Conflict resolution. Consistency guarantees.
+
+**5. Event Sourcing**
+
+Store events, not state. Complete audit trail. Temporal queries. Rebuild state from events. Eventual consistency. Complexity management.
+
+**6. Projections**
+
+Define read model projections. Async processing. Idempotent projections. Version handling. Failure recovery.
+
+**7. Command Handling**
+
+Commands validated and executed. Business logic in command handlers. Returns result or confirmation. Async command processing. Retry handling.
+
+**8. Query Handling**
+
+Queries read from materialized views. Caching strategies. Pagination. Filtering. Fast response times.
+
+## Liên kết
+
+- [[ddd]] - DDD Pattern
+- [[clean-architecture]] - Clean Architecture
+- [[event-sourcing]] - Event Sourcing
