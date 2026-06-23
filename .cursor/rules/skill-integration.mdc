@@ -1,0 +1,765 @@
+---
+description: Hướng dẫn skill auto-discovery và execution cho Cursor Enterprise Framework. Định tuyến tự động đến skills phù hợp với pre-review và post-review gates. Mọi task phải pass qua cả hai gates trước khi deliver.
+created: 2026-06-23
+version: 1.1.0
+tags: [skill, auto-discovery, frontend, review, quality, cursor, pre-review, post-review]
+---
+
+# Skill Auto-Discovery & Execution Protocol
+
+## Mục tiêu & Tổng quan
+
+Hệ thống skill cho Cursor Enterprise Framework bao gồm **4 skills chính**, mỗi skill đều có:
+- **Pre-Review Gate** — chạy TRƯỚC khi viết code (lập kế hoạch, lock scope, declare design direction)
+- **Post-Review Gate** — chạy SAU KHI viết code, TRƯỚC KHI deliver (kiểm tra chất lượng)
+
+```
+REQUEST → Skill Detection → Pre-Review Gate
+                                     ↓ (PASS)
+                              Implementation
+                                     ↓
+                              Post-Review Gate
+                                     ↓ (PASS)
+                                  Delivery
+```
+
+**Không có ngoại lệ.** Mọi task phải pass cả hai gates. Bypass dưới mọi hình thức đều bị cấm.
+
+---
+
+## Skill Registry
+
+### 1. frontend-taste
+**Path:** `.cursor/skills/frontend-taste/SKILL.md`
+**Kích hoạt khi:** landing page, portfolio, marketing site, greenfield frontend build, aesthetic keywords (minimalist, Awwwards, Apple-y, Linear-style, brutalist, editorial)
+**Mục đích:** Anti-slop frontend cho landing pages và portfolios. Không phải dashboard, không phải data table.
+
+### 2. frontend-redesign
+**Path:** `.cursor/skills/frontend-redesign/SKILL.md`
+**Kích hoạt khi:** cải thiện/redesign website/app hiện có, apply premium quality vào codebase có sẵn
+**Mục đích:** Upgrade UI hiện tại mà không phá vỡ functionality.
+
+### 3. full-output
+**Path:** `.cursor/skills/full-output/SKILL.md`
+**Kích hoạt khi:** task nhiều file/component, user nhắc "full implementation", "complete", "not skeleton", "no TODO"
+**Mục đích:** Chống truncation, placeholder, skeleton. Đảm bảo output đầy đủ.
+
+### 4. frontend-review
+**Path:** `.cursor/skills/frontend-review/SKILL.md`
+**Kích hoạt khi:** review chất lượng, audit, quality check, hoặc là quality gate cuối cùng cho mọi frontend task
+**Mục đích:** Dual-gate review system cho correctness, design, accessibility, performance, state, testing.
+
+### 5. vietnam-payment-review
+**Path:** `.cursor/skills/vietnam-payment-review/SKILL.md`
+**Kích hoạt khi:** thanh toán MoMo, SePay, PayOS, ZaloPay, VNPay, VietQR, payment integration Việt Nam, webhook thanh toán nội địa, review mã thanh toán online
+**Mục đích:** Comprehensive review framework cho các payment provider phổ biến tại Việt Nam. Evaluate API integration, webhook security, signature validation, payment flow, error handling, và reconciliation.
+
+---
+
+## Skill Combination Rules
+
+| Task Type | Primary Skill | Secondary Skill | Review Gates Applied |
+|---|---|---|---|
+| Landing page mới | frontend-taste | full-output + frontend-review | taste-pre + taste-post + fulloutput-pre + fulloutput-post + review-pre + review-post |
+| Redesign existing site | frontend-redesign | full-output + frontend-review | redesign-pre + redesign-post + fulloutput-pre + fulloutput-post + review-pre + review-post |
+| Greenfield frontend build | frontend-taste | full-output + frontend-review | taste-pre + taste-post + fulloutput-pre + fulloutput-post + review-pre + review-post |
+| Multi-file implementation | full-output | frontend-review | fulloutput-pre + fulloutput-post + review-pre + review-post |
+| Code review / quality check | frontend-review | (standalone) | review-pre + review-post |
+| Vietnam payment integration | vietnam-payment-review | billing-review | payment-review-pre + payment-review-post + billing-review-gate |
+| Payment code review | vietnam-payment-review | (standalone) | payment-review-pre + payment-review-post |
+
+---
+
+## Execution Protocol (Chi tiết 6 Bước)
+
+### Bước 1: Skill Detection
+Khi nhận request:
+1. Phân tích keywords trong request → match với Skill Registry
+2. Xác định primary + secondary skills
+3. Xác định tất cả review gates cần chạy (dựa vào bảng Combination Rules)
+4. Load tất cả SKILL.md files liên quan bằng Read tool
+
+### Bước 2: Pre-Review Gate(s) — TRƯỚC KHI VIẾT CODE
+
+Output header:
+```
+══════════════════════════════════════
+[PRE-REVIEW GATE]
+══════════════════════════════════════
+```
+
+**Với mỗi skill được activate, chạy đầy đủ pre-review checklist của skill đó:**
+
+#### A. frontend-taste Pre-Review (Section 0.A - 0.F)
+
+**0.A Brief Inference:**
+- [ ] Page kind: landing (SaaS/consumer/agency/event), portfolio, redesign, editorial
+- [ ] Vibe words: aesthetic direction keywords
+- [ ] Reference signals: URLs, screenshots, named products/brands
+- [ ] Audience: ai sẽ xem (procurement panel, consumer, recruiter)
+- [ ] Brand assets: logo, color, type, photography có sẵn
+- [ ] Quiet constraints: accessibility-first, public-sector, regulated industries
+
+**0.B Design Read Declaration (bắt buộc, 1 dòng):**
+```
+"Reading this as: [B2B SaaS landing] for [technical buyers], 
+ with a [Linear-style minimalist] language, 
+ leaning toward [Tailwind + Geist + restrained motion]."
+```
+- [ ] Design read declared (verbatim, không được phép suy ra sau khi code)
+
+**0.C Ambiguous Brief Protocol:**
+- [ ] Nếu brief ambiguous → hỏi đúng 1 câu hỏi làm rõ, không đoán
+
+**0.D Anti-Default Discipline:**
+- [ ] Không có AI-purple gradients / centered hero over dark mesh trong plan
+- [ ] Không có Three equal feature cards / generic glassmorphism trong plan
+- [ ] Không có Inter + slate-900 / infinite-loop micro-animations trong plan
+- [ ] Nếu có → loại bỏ trước khi proceed
+
+**0.E Design System Check:**
+- [ ] Brief có match official design system không? Nếu có → dùng official package
+  - Microsoft/enterprise → `@fluentui/react-components`
+  - Google/Material → `@material/web`
+  - IBM/B2B → `@carbon/react`
+  - Shopify → `polaris.js`
+  - Modern SaaS → `shadcn/ui`
+  - Modern accessible → `@radix-ui/themes`
+  - Modern SaaS/AI → Tailwind v4 + `dark:` variant
+
+**0.F Pre-Code Review Checklist (PASS GATE):**
+- [ ] Design read declared (Section 0.B) ✓
+- [ ] No AI-default patterns in draft plan (0.D checked) ✓
+- [ ] Design system selected if applicable (0.E) ✓
+- [ ] Dial values set: VARIANCE (1-10), MOTION (1-10), DENSITY (1-10) ✓
+- [ ] Hero plan fits viewport (headline max 2 lines, subtext max 20 words) ✓
+- [ ] Section layout diversity planned (no 3+ consecutive same-layout sections) ✓
+
+#### B. frontend-redesign Pre-Review (Section 0.A - 0.E)
+
+**0.A Scan the Codebase:**
+- [ ] Framework identified (React/Vue/Next.js/Nuxt/vanilla)
+- [ ] Styling method identified (Tailwind/CSS modules/styled-components/vanilla CSS)
+- [ ] Current design patterns and component structure documented
+- [ ] `package.json` dependencies checked
+- [ ] Tailwind version checked (v3 vs v4) before modifying config
+
+**0.B Audit the Current State:**
+- [ ] Brand tokens: primary/accent colors, type stack, logo treatment, radii
+- [ ] Information architecture: page tree, primary nav, conversion paths
+- [ ] Content blocks: what exists, what's working, what's filler
+- [ ] Patterns to preserve: signature interactions, recognizable hero, copy voice
+- [ ] Patterns to retire: AI-slop tells, broken layouts, dead links, generic imagery
+- [ ] Dial reading: infer VARIANCE/MOTION/DENSITY of existing site
+- [ ] SEO baseline: ranking pages, meta titles, structured data, OG cards
+
+**0.C Classify Redesign Mode:**
+- [ ] **Preserve** — modernize without breaking brand → extract tokens first
+- [ ] **Overhaul** — new visual language on top of existing content → visuals greenfield, preserve content/IA
+
+**0.D Pre-Redesign Review Checklist (PASS GATE):**
+- [ ] Framework and styling method identified ✓
+- [ ] Existing brand tokens extracted ✓
+- [ ] Redesign mode classified ✓
+- [ ] SEO baseline documented ✓
+- [ ] Accessibility baseline noted ✓
+- [ ] Analytics dependencies identified ✓
+- [ ] Dial reading performed ✓
+
+**0.E What Never Changes Without Explicit Approval:**
+- [ ] URL structure / route slugs — protected
+- [ ] Primary nav labels — protected
+- [ ] Form field names or order — protected
+- [ ] Brand logo or wordmark — protected
+- [ ] Existing legal / consent / cookie copy — protected
+
+#### C. full-output Pre-Review (Section 0.A - 0.B)
+
+**0.A Scope Lock:**
+- [ ] Full request read and understood
+- [ ] Deliverable count locked: **"Delivering N deliverables:"** + list each by name
+- [ ] This count is a contract — every item must appear in output
+
+**0.B Pre-Generation Checklist (PASS GATE):**
+- [ ] Full request read and understood ✓
+- [ ] Deliverable count locked (N items) ✓
+- [ ] All dependencies identified (packages, environment, tools) ✓
+- [ ] Framework/stack confirmed from codebase or request ✓
+- [ ] Output file paths confirmed ✓
+- [ ] Test strategy identified ✓
+
+#### D. frontend-review Pre-Review (Part A: A.1 - A.3)
+
+**A.1 Scope Analysis:**
+- [ ] Full request read — understand every requirement, constraint, deliverable
+- [ ] All files to touch listed (components, styles, config, tests)
+- [ ] Dependencies identified (packages, env setup, API contracts)
+- [ ] Existing codebase checked (components, design tokens, patterns)
+
+**A.2 Quality Plan (áp dụng đúng checks dựa trên task type):**
+- [ ] Landing page → taste-skill pre-flight
+- [ ] Redesign → frontend-redesign pre-audit
+- [ ] Full implementation (multi-file) → full-output pre-generation
+- [ ] API + UI → correctness, error handling, loading states
+- [ ] Animation/motion → reduced motion, GSAP patterns, no jank
+- [ ] Forms → validation, WCAG AA contrast, accessibility
+- [ ] Dark mode → both modes, prefers-color-scheme, token strategy
+
+**A.3 Pre-Review Checklist (PASS GATE):**
+
+*Scope:*
+- [ ] All deliverables listed and counted ✓
+- [ ] All file paths confirmed ✓
+- [ ] All dependencies identified ✓
+- [ ] Framework/stack confirmed ✓
+
+*Design (nếu UI task):*
+- [ ] Design read declared ✓
+- [ ] Dial values: VARIANCE / MOTION / DENSITY ✓
+- [ ] Design system selected if applicable ✓
+- [ ] Anti-default discipline applied ✓
+
+*Architecture:*
+- [ ] State management strategy defined ✓
+- [ ] Component hierarchy planned ✓
+- [ ] API integration strategy defined ✓
+- [ ] Error handling strategy defined ✓
+- [ ] Loading/empty/error states planned ✓
+
+*Quality:*
+- [ ] Testing strategy defined ✓
+- [ ] Accessibility requirements identified ✓
+- [ ] Performance budget identified ✓
+
+---
+
+**Pre-Review Summary Output:**
+```
+──────────────────────────────────────
+[PRE-REVIEW GATE] — ALL PASS
+──────────────────────────────────────
+
+Skill(s) Active:  [list skills]
+Deliverables:      N items (scope locked)
+Design Direction:  [from taste-skill 0.B]
+Dial Values:       VARIANCE / MOTION / DENSITY
+Review Gates:      [list all post-review gates to run]
+
+Items Verified:
+  ✓ Design read declared
+  ✓ Scope locked (N deliverables)
+  ✓ Anti-default patterns checked
+  ✓ Design system selected
+  ✓ Framework/stack confirmed
+  ✓ Dependencies identified
+  ✓ Quality plan defined
+
+>>> IMPLEMENTATION APPROVED — Proceed to code
+──────────────────────────────────────
+```
+
+**Nếu BẤT KỲ item nào fail:**
+- Dừng lại, KHÔNG viết code
+- Fix hoặc document intentional exception
+- Re-run gate cho đến khi PASS hoàn toàn
+
+---
+
+### Bước 3: Implementation — VIẾT CODE
+
+Sau khi tất cả pre-review gates PASS:
+
+1. Theo thứ tự skill combination, viết code cho từng deliverable
+2. Áp dụng đầy đủ rules từ từng skill:
+   - **frontend-taste**: Three Dials, Design Engineering, Animation, Performance
+   - **frontend-redesign**: Fix Priority order, Upgrade Techniques
+   - **full-output**: KHÔNG có `// ...`, `// TODO`, skeleton, placeholder, "continue later"
+3. Track từng deliverable đã hoàn thành (cross off trong manifest)
+4. Nếu approach bị chặn bởi ambiguous requirement → hỏi user 1 câu rõ ràng
+5. Nếu approach vi phạm anti-default → stop, revert, restart từ design read
+
+**Bắt buộc tuân thủ:**
+- RSC Safety: Global state chỉ trong Client Components
+- Icons: 1 family per project, không hand-roll SVG
+- Motion: `prefers-reduced-motion` cho MOTION > 3
+- Dark mode: design for BOTH modes từ đầu
+- No em-dash (`—`) — zero tolerance
+- No AI-slop patterns
+
+---
+
+### Bước 4: Post-Review Gate(s) — SAU KHI VIẾT CODE, TRƯỚC KHI DELIVER
+
+Output header:
+```
+══════════════════════════════════════
+[POST-REVIEW GATE]
+══════════════════════════════════════
+```
+
+**Với mỗi skill được activate, chạy đầy đủ post-review checklist:**
+
+#### A. frontend-taste Post-Review (Section 6.A - 6.H)
+
+**6.A Layout & Structure:**
+- [ ] Design read declared at start of response
+- [ ] Dial values (VARIANCE/MOTION/DENSITY) explicit and reasoned
+- [ ] Design system selected if applicable
+- [ ] Hero fits viewport (headline max 2 lines, subtext max 20 words AND max 4 lines)
+- [ ] Hero top padding max `pt-24` at desktop
+- [ ] Hero stack discipline: max 4 text elements (eyebrow OR brand strip, headline, subtext, CTAs)
+- [ ] Navigation on ONE line at desktop, height 64-80px
+- [ ] Section layout diversity: at least 4 different layout families across 8 sections
+- [ ] Zigzag alternation cap: no 3+ consecutive same image+text-split sections
+- [ ] Bento grid: N items → N cells, no empty cells, uses `grid-flow-dense`
+- [ ] No split-header pattern ("left big headline + right small explainer paragraph")
+- [ ] Eyebrow count: `uppercase tracking` labels ≤ ceil(sectionCount / 3)
+- [ ] Mobile collapse explicit for every multi-column layout
+- [ ] Viewport stability: `min-h-[100dvh]`, never `h-screen`
+
+**6.B Design System & Consistency:**
+- [ ] ZERO em-dashes (`—`) anywhere — headlines, eyebrows, pills, body, quotes, attribution, buttons, alt text. Zero.
+- [ ] Page theme lock: ONE theme for whole page, no mid-page inversion
+- [ ] Color consistency lock: one accent color used identically across all sections
+- [ ] Shape consistency lock: one corner-radius system applied consistently
+- [ ] No Inter as default (unless brief is public-sector / Linear-style)
+- [ ] No Fraunces / Instrument_Serif as default serif
+- [ ] Premium-consumer brief: NOT using beige+brass+oxblood+espresso palette family
+- [ ] Different serif from the previous project (if serif is used)
+- [ ] Premium-consumer: different palette family from previous premium-consumer project
+
+**6.C Typography & Content:**
+- [ ] Italic descender clearance: every italic word with y/g/j/p/q has `leading-[1.1]` min + `pb-1` reserve
+- [ ] Copy self-audit: no grammatically broken, AI-hallucinated, or filler-verb strings shipped
+- [ ] No fake-precise numbers without justification
+- [ ] No generic names (John Doe, Acme Corp, Lorem Ipsum)
+- [ ] No startup-slop brand names
+- [ ] No section-numbering eyebrows ("00 / INDEX", "001 · Capabilities", "06 · how it works")
+- [ ] No version labels in hero (V0.6, BETA, INVITE-ONLY) unless brief is a launch
+- [ ] No decoration text strip at hero bottom ("BRAND. MOTION. SPATIAL.")
+- [ ] No floating top-right sub-text in section headings
+- [ ] No scroll cues ("Scroll", "↓ scroll", "Scroll to explore")
+- [ ] No locale / city-name / weather strips unless brief is genuinely place-focused
+- [ ] No version footers on marketing pages
+- [ ] No photo-credit captions as decoration
+- [ ] No pills/labels overlaid on images
+- [ ] No decorative colored status dots (only for real semantic state)
+
+**6.D CTA & Form:**
+- [ ] Button contrast: every CTA text readable against background (WCAG AA 4.5:1)
+- [ ] CTA wrap: no label wraps to 2+ lines at desktop
+- [ ] No duplicate CTA intent on the page
+- [ ] Form contrast: all inputs, placeholders, focus rings, labels pass WCAG AA
+- [ ] Label above input, error below input
+- [ ] No placeholder-as-label
+
+**6.E Assets & Images:**
+- [ ] Real images used (gen-tool first, then Picsum-seed with descriptive seeds)
+- [ ] No div-based fake screenshots
+- [ ] No hand-rolled decorative SVG illustrations
+- [ ] Logo wall = logos only (no industry labels below logos)
+- [ ] "Trusted by / Used by" logo wall lives UNDER hero, not inside it
+- [ ] Bento background diversity: at least 2-3 cells have real visual variation
+
+**6.F Animation & Motion:**
+- [ ] Motion claimed = motion shown (if MOTION > 4, page actually animates)
+- [ ] GSAP patterns use canonical skeleton with `start: "top top"`, `pin: true`
+- [ ] No `window.addEventListener('scroll')` — using allowed alternatives only
+- [ ] Reduced motion wrapped for all MOTION > 3
+- [ ] Dark mode tokens defined and tested in both modes
+- [ ] All animations use only `transform` and `opacity`
+- [ ] `useEffect` animations have strict cleanup functions
+
+**6.G States & Polish:**
+- [ ] Empty / loading / error states provided
+- [ ] Cards omitted in favor of spacing where elevation doesn't communicate hierarchy
+- [ ] Icons from allowed library only (no hand-rolled paths)
+- [ ] Motion isolated in client-leaf components with `'use client'` at top
+- [ ] No AI Tells (three-equal cards, Jane Doe, Acme, "Quietly in use at")
+
+**6.H Performance:**
+- [ ] Core Web Vitals plausibly hit (LCP < 2.5s, INP < 200ms, CLS < 0.1)
+- [ ] One design system per project (no Material + shadcn mixed)
+- [ ] No arbitrary z-index spam
+- [ ] Grain/noise only on fixed `pointer-events-none` layers
+
+#### B. frontend-redesign Post-Review (Section 4.A - 4.E)
+
+**4.A Functionality Preserved:**
+- [ ] Existing navigation works correctly (all links functional)
+- [ ] Forms submit and validate correctly
+- [ ] No broken links introduced
+- [ ] Analytics events still firing correctly (no renamed buttons/fields/IDs)
+- [ ] Focus states, alt text, keyboard nav not regressed
+- [ ] Mobile layout functions correctly
+
+**4.B Design Quality:**
+- [ ] No new AI-default patterns introduced during upgrade
+- [ ] Font has character (not browser default or generic Inter)
+- [ ] Color palette unified (one accent, consistent gray family)
+- [ ] Spacing doubled (sections breathe, not cramped)
+- [ ] Hover states on all interactive elements
+- [ ] Active/pressed feedback on buttons
+- [ ] Smooth transitions on interactive elements (not instant)
+- [ ] Visible focus rings for keyboard navigation
+- [ ] Loading, empty, and error states designed
+
+**4.C Accessibility:**
+- [ ] Alt text on all meaningful images
+- [ ] Color contrast passes WCAG AA (4.5:1 body, 3:1 large text)
+- [ ] Focus order logical
+- [ ] Skip-to-content link present
+- [ ] No `alt=""` or `alt="image"` on meaningful images
+
+**4.D SEO Preserved:**
+- [ ] Meta titles unchanged
+- [ ] Meta descriptions unchanged
+- [ ] OG tags unchanged
+- [ ] URL structure unchanged
+- [ ] Structured data intact
+
+**4.E Code Quality:**
+- [ ] No inline styles introduced
+- [ ] No hardcoded pixel widths introduced
+- [ ] Semantic HTML used
+- [ ] No dead/commented-out code left behind
+- [ ] All imports actually exist in package.json
+
+#### C. full-output Post-Review (Section 5.A - 5.C)
+
+**5.A Completeness Check:**
+- [ ] No banned patterns from Section 2 appear anywhere in output
+  - `// ...`, `// TODO`, `/* ... */`, `// rest of code`, `// implement here`
+  - `// [code omitted]`, `// [skipped]`
+  - "Let me know if you want me to continue", "I can provide more details if needed"
+  - "For brevity", "for simplicity", "similarly for the remaining"
+  - "I'll leave that as an exercise", "You can extend this by..."
+- [ ] Every item from scope list present and finished
+- [ ] Code blocks contain actual runnable code, not descriptions
+- [ ] Nothing was shortened to save space
+- [ ] No skeleton code when full implementation was requested
+- [ ] No skipped sections or "similarly for the rest" replacements
+
+**5.B Quality Check:**
+- [ ] All imports exist in package.json or are standard library
+- [ ] No hardcoded values that should be environment variables
+- [ ] Error handling present for all async operations
+- [ ] Type definitions complete (for TypeScript)
+- [ ] Tests written for all new functions/components
+- [ ] No commented-out debug code left in
+- [ ] No TODO comments remaining
+
+**5.C File Structure Check:**
+- [ ] All file paths match the requested structure
+- [ ] Entry points (index, main, app) correctly exported
+- [ ] No circular import issues
+- [ ] All referenced files actually exist in output
+
+#### D. frontend-review Post-Review (Part B: B.1 - B.7)
+
+**B.1 Correctness Review:**
+- [ ] Code compiles / builds without errors
+- [ ] No TypeScript errors (or all non-null assertions justified)
+- [ ] All imports resolve (packages exist in package.json)
+- [ ] No hardcoded values that should be environment variables
+- [ ] No console.log, debugger, or console.warn left in production code
+- [ ] Error boundaries / try-catch for all async operations
+- [ ] API calls have proper error handling and retry logic
+- [ ] No race conditions in async code
+- [ ] No security vulnerabilities (XSS, injection, exposed secrets)
+
+**B.2 Design & Taste Review:**
+- [ ] Design read declared at the start of the response
+- [ ] Dial values (VARIANCE/MOTION/DENSITY) declared
+- [ ] ZERO em-dashes (`—`) anywhere in code or visible text
+- [ ] Page theme lock: ONE theme for whole page, no mid-page inversion
+- [ ] Color consistency: one accent color used identically across all sections
+- [ ] Shape consistency: one corner-radius system applied consistently
+- [ ] No Inter as default (unless explicitly asked or Linear-style)
+- [ ] No Fraunces/Instrument_Serif as default serif
+- [ ] Premium-consumer brief: NOT using beige+brass+oxblood+espresso palette family
+- [ ] No AI Tells (three-equal cards, Jane Doe, Acme Corp, AI-purple, "Quietly in use at")
+- [ ] Hero fits viewport (headline max 2 lines, subtext max 20 words)
+- [ ] Navigation on ONE line at desktop, height 64-80px
+- [ ] Eyebrow count ≤ ceil(sectionCount / 3)
+- [ ] No split-header pattern
+- [ ] No 3+ consecutive same-layout sections
+- [ ] Bento grid: N items → N cells, no empty cells
+- [ ] Copy self-audit: no grammatically broken or AI-hallucinated strings shipped
+- [ ] No fake-precise numbers without justification
+- [ ] No generic names (John Doe, Lorem Ipsum, Acme Corp)
+- [ ] No filler verbs (Elevate, Seamless, Unleash, Next-Gen, Game-changer)
+- [ ] No section-numbering eyebrows ("00 / INDEX", "001 · Capabilities")
+- [ ] No scroll cues ("Scroll", "↓ scroll")
+- [ ] No locale/city/weather strips
+- [ ] No version footers on marketing pages
+- [ ] Logo wall = logos only (no industry labels below logos)
+- [ ] "Trusted by" lives UNDER hero, not inside hero
+- [ ] Bento background diversity: real visual variation in cells
+
+**B.3 Accessibility Review:**
+- [ ] All images have meaningful alt text (no `alt=""` on meaningful images)
+- [ ] Color contrast passes WCAG AA: 4.5:1 body text, 3:1 large text
+- [ ] Form labels associated with inputs (htmlFor/id or aria-label)
+- [ ] Focus indicators visible for keyboard navigation
+- [ ] Skip-to-content link present for keyboard users
+- [ ] No `tabindex` values > 0 (natural DOM order)
+- [ ] ARIA attributes used correctly (no role conflicts, proper aria-expanded)
+- [ ] Button contrast: every CTA text readable (WCAG AA)
+- [ ] Form contrast: inputs, placeholders, focus rings pass WCAG AA
+- [ ] Motion respects `prefers-reduced-motion` (MOTION > 3)
+- [ ] Semantic HTML (`<button>`, `<a>`, `<nav>`, etc.)
+
+**B.4 Performance Review:**
+- [ ] LCP < 2.5s (hero image priority / preloaded)
+- [ ] Images have width/height to prevent CLS
+- [ ] No layout-triggering animations (transform/opacity only)
+- [ ] No `window.addEventListener('scroll')` — Motion/ScrollTrigger/IntersectionObserver only
+- [ ] Bundle size reasonable (no unnecessary large deps)
+- [ ] Lazy loading for below-the-fold content
+- [ ] No grain/noise on scrolling containers
+- [ ] Google Fonts via `next/font` or `@font-face` with `font-display: swap`
+- [ ] Icons from allowed library only
+- [ ] Motion isolated in client-leaf components with `'use client'`
+
+**B.5 State & Interaction Review:**
+- [ ] Loading state: skeletal loaders matching final layout shape
+- [ ] Empty state: composed view with clear "how to populate" guidance
+- [ ] Error state: clear inline messages (no `window.alert()`)
+- [ ] Button hover states: background shift, scale, or translate
+- [ ] Button active/pressed feedback: `scale(0.98)` or `-translate-y-[1px]`
+- [ ] Smooth transitions on all interactive elements (200-300ms, not instant)
+- [ ] Active nav link styled differently
+- [ ] CTA wrap: no label wraps to 2+ lines at desktop
+- [ ] No duplicate CTA intent on the page
+- [ ] Form: label above input, error below input, no placeholder-as-label
+
+**B.6 Testing Review:**
+- [ ] Unit tests for utility functions and hooks
+- [ ] Component tests for complex UI components
+- [ ] Test coverage for error paths (not just happy path)
+- [ ] No commented-out tests left behind
+- [ ] Mock setup for external dependencies
+
+**B.7 Full-Output Verification (if multi-file task):**
+- [ ] All planned files delivered
+- [ ] All planned functions fully implemented
+- [ ] No `// ...`, `// TODO`, `/* ... */`, `// implement here` patterns
+- [ ] No skeleton when full implementation was requested
+- [ ] No "continue later", "you can extend this", "for brevity" patterns
+
+---
+
+**Post-Review Summary Output:**
+```
+──────────────────────────────────────
+[POST-REVIEW GATE] — RESULTS
+──────────────────────────────────────
+
+Skill(s) Applied: [list skills]
+
+Gate Results:
+  ✓ frontend-taste Post-Review: PASS (6/6 sections)
+  ✓ frontend-redesign Post-Review: PASS (4/4 sections)
+  ✓ full-output Post-Review: PASS (3/3 sections)
+  ✓ frontend-review Post-Review: PASS (7/7 sections)
+
+Total Items Checked: N+
+  ✓ Correctness:            PASS (B.1)
+  ✓ Design & Taste:         PASS (B.2)
+  ✓ Accessibility:           PASS (B.3)
+  ✓ Performance:            PASS (B.4)
+  ✓ State & Interaction:    PASS (B.5)
+  ✓ Testing:                PASS (B.6)
+  ✓ Full-Output:            PASS (B.7)
+
+Reviewer Notes:
+  - Fixed: [specific items fixed during post-review]
+  - Fixed: [specific items fixed during post-review]
+
+──────────────────────────────────────
+[POST-REVIEW] ALL GATES PASS — DELIVERING
+──────────────────────────────────────
+```
+
+**Nếu BẤT KỲ item nào fail:**
+1. KHÔNG deliver
+2. Fix ngay lập tức
+3. Re-run post-review gate
+4. Chỉ deliver khi TẤT CẢ items PASS
+
+---
+
+### Bước 5: Delivery
+
+Sau khi tất cả post-review gates PASS:
+1. Gửi code cho user
+2. Nêu rõ files đã deliver
+3. Nêu review notes nếu có items đã fix trong quá trình review
+4. Nêu rõ any intentional exceptions (documented và justified)
+
+### Bước 6: Long-Output Handling (PAUSE/RESUME)
+
+Khi response tiệm cận token limit:
+
+1. **KHÔNG nén** các phần còn lại
+2. **KHÔNG skip** ahead đến conclusion
+3. **Viết full quality** đến clean breakpoint (end of function, end of file, end of section)
+4. **Kết thúc bằng PAUSE marker:**
+
+```
+══════════════════════════════════════
+[PAUSED] — X of Y deliverables complete
+Send "continue" to resume from: [next deliverable name]
+══════════════════════════════════════
+```
+
+5. On "continue": pick up **exactly** where stopped. No recap, no repetition.
+
+---
+
+## Anti-Pattern: Bypass Gates
+
+### Tuyệt đối cấm:
+
+| Bypass | Lý do cấm |
+|---|---|
+| Skip pre-review để nhảy thẳng vào code | Không có design direction, scope không locked, không có baseline để verify |
+| Skip post-review để deliver ngay | Không verify correctness, design quality, accessibility, performance |
+| Partial review ("check important ones only") | Review gates có dependency — mỗi item bảo vệ một quality dimension |
+| Review-after-delivery ("let me know if needs fixing") | Bug/issue được discover sau khi user đã nhận code = bad UX + tech debt |
+| "I'll add the review checks at the end" | Pre-review gate chạy sau khi design decision đã được make = không có tác dụng |
+| Deliver partial output (1 of 3 files) without pause | Violates full-output enforcement + breaks user expectation |
+| Skip anti-default discipline | AI-slop patterns được "reviewed" = vẫn còn trong output |
+| Bỏ qua em-dash ban | Zero tolerance policy — nếu có 1 cái lọt qua = standard không đáng tin |
+
+### Consequences của Bypass:
+
+- Output không đạt enterprise quality standards
+- Design inconsistency (AI-slop patterns lọt qua)
+- Missed accessibility issues → production violation
+- Performance problems → bad user experience
+- Incomplete implementations → technical debt
+- Security vulnerabilities → production risk
+
+### Legitimate Exceptions (documented only):
+
+| Exception | Khi nào allowed | Phải document |
+|---|---|---|
+| Intentional design choice | Khi brief đặc biệt yêu cầu | Design read phải ghi rõ tại sao |
+| Performance trade-off | Khi có measurable justification | Ghi rõ trade-off và audience impact |
+| Legacy constraint | Khi legacy code không cho phép | Document constraint và workaround plan |
+
+---
+
+## Scope của System
+
+### Áp dụng cho:
+
+- Landing pages, portfolios, marketing sites
+- Redesign existing web/app surfaces
+- Multi-file frontend implementations
+- Full implementation tasks (not skeleton)
+- Quality reviews and audits
+- Bất kỳ task nào user yêu cầu "review", "quality check", "check quality"
+
+### Không áp dụng (standalone):
+
+- Backend-only tasks (API, database, infrastructure)
+- Non-frontend tasks không liên quan đến design/UI
+- Exploratory/debugging tasks
+- Questions-only tasks (không generate code)
+
+**Nhưng:** Nếu task có frontend component, áp dụng frontend-review pre + post gates.
+
+---
+
+## Quick Reference Card
+
+```
+╔══════════════════════════════════════════════════════════════╗
+║            SKILL EXECUTION FLOWCHART                          ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  REQUEST RECEIVED                                            ║
+║       │                                                      ║
+║       ▼                                                      ║
+║  ┌─────────────────────────┐                                 ║
+║  │ 1. SKILL DETECTION      │  Match keywords → Skill Registry║
+║  │    Load SKILL.md files  │  Identify primary + secondary    ║
+║  └──────────┬──────────────┘                                 ║
+║             ▼                                                 ║
+║  ┌─────────────────────────┐                                 ║
+║  │ 2. PRE-REVIEW GATE      │  TRƯỚC KHI VIẾT CODE             ║
+║  │    [PRE-REVIEW] header  │  Run ALL pre-review checklists    ║
+║  │    ALL items PASS →     │  Lock scope + design direction    ║
+║  │    else STOP            │  Dial values + anti-default      ║
+║  └──────────┬──────────────┘                                 ║
+║             ▼                                                 ║
+║  ┌─────────────────────────┐                                 ║
+║  │ 3. IMPLEMENTATION        │  Viết code theo skill guidelines ║
+║  │    Track deliverables   │  Full code, NO placeholders     ║
+║  │    If approaching limit  │  NO em-dashes, NO AI-slop       ║
+║  │    → PAUSE marker        │  Follow anti-default discipline  ║
+║  └──────────┬──────────────┘                                 ║
+║             ▼                                                 ║
+║  ┌─────────────────────────┐                                 ║
+║  │ 4. POST-REVIEW GATE     │  SAU KHI VIẾT CODE               ║
+║  │    [POST-REVIEW] header │  Run ALL post-review checklists  ║
+║  │    ALL items PASS →     │  Design/Taste/Accessibility/Perf ║
+║  │    else FIX + re-run    │  Correctness/State/Testing       ║
+║  └──────────┬──────────────┘                                 ║
+║             ▼                                                 ║
+║  ┌─────────────────────────┐                                 ║
+║  │ 5. DELIVERY             │  Code + review notes              ║
+║  │    + summary output     │  Files delivered + count         ║
+║  └─────────────────────────┘                                 ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+FRONTEND TASK?
+  ├── Landing/Portfolio/Greenfield
+  │     → frontend-taste + full-output + frontend-review
+  │     → PRE: taste §0.F + fulloutput §0.B + review §A.3
+  │     → POST: taste §6.A-H + fulloutput §5.A-C + review §B.1-7
+  │
+  ├── Redesign/Upgrade existing
+  │     → frontend-redesign + full-output + frontend-review
+  │     → PRE: redesign §0.D + fulloutput §0.B + review §A.3
+  │     → POST: redesign §4.A-E + fulloutput §5.A-C + review §B.1-7
+  │
+  ├── Code Review / Quality Check
+  │     → frontend-review (standalone)
+  │     → PRE: review §A.1-A.3
+  │     → POST: review §B.1-B.7
+  │
+  └── Multi-file / Full impl
+        → full-output + frontend-review
+        → PRE: fulloutput §0.B + review §A.1-A.3
+        → POST: fulloutput §5.A-C + review §B.1-B.7
+
+ANTI-BYPASS RULES:
+  ✗ Never skip pre-review (no design direction, no scope lock)
+  ✗ Never skip post-review (no quality verification)
+  ✗ Never partial review ("check important ones only")
+  ✗ Never review-after-delivery ("let me know if needs fixing")
+  ✗ Zero em-dash tolerance — any found = FAIL
+  ✗ Zero placeholder tolerance — any found = FAIL
+  ✗ Never deliver while post-review items are failing
+
+PAUSE/RESUME: If approaching token limit, PAUSE at clean
+breakpoint, resume on "continue". No recap, no repetition.
+```
+
+---
+
+## Liên kết
+
+- [[context-router]] — Context routing rules
+- [[frontend-architecture]] — Frontend architecture patterns
+- [[coding-standards]] — Coding standards
+- [[frontend-taste]] — `.cursor/skills/frontend-taste/SKILL.md`
+- [[frontend-redesign]] — `.cursor/skills/frontend-redesign/SKILL.md`
+- [[full-output]] — `.cursor/skills/full-output/SKILL.md`
+- [[frontend-review]] — `.cursor/skills/frontend-review/SKILL.md`
+- [[vietnam-payment-review]] — `.cursor/skills/vietnam-payment-review/SKILL.md`

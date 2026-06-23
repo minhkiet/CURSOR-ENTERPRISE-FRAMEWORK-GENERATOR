@@ -757,6 +757,53 @@ Performance audit. Optimize rendering. Add lazy loading. Test performance.
 
 Accessibility audit. Cross-browser testing. Mobile optimization. Documentation.
 
+## Skill Integration for Frontend Development
+
+Mọi task frontend phải được thực hiện với skill system chuẩn kép:
+
+### Frontend Taste Skill (.cursor/skills/frontend-taste/)
+Cho landing pages, portfolios, marketing sites, và greenfield builds. Include:
+- **Pre-Review Gate (Section 0):** Brief inference, design read declaration, dial setting (VARIANCE/MOTION/DENSITY), anti-default check, design system selection
+- **3 Dials System:** DESIGN_VARIANCE (1-10), MOTION_INTENSITY (1-10), VISUAL_DENSITY (1-10)
+- **Design Engineering:** Typography, color calibration, layout discipline, interactive states, content rules
+- **Animation Standards:** GSAP canonical patterns (Sticky-Stack, Horizontal-Pan), Motion alternatives, forbidden patterns
+- **Performance & Accessibility:** Hardware acceleration, reduced motion, dark mode, Core Web Vitals
+- **Post-Review Gate (Section 6):** 60+ checklist items across correctness, design, a11y, performance, states
+
+### Frontend Redesign Skill (.cursor/skills/frontend-redesign/)
+Cho việc upgrade website/app hiện có. Include:
+- **Pre-Audit Gate:** Codebase scan, brand token extraction, redesign mode classification (preserve vs overhaul)
+- **Design Audit:** 50+ checklist items across typography, color, layout, interactivity, content, components, icons, code quality
+- **Upgrade Techniques:** Typography, layout, motion, surface upgrades
+- **Fix Priority:** Font swap > Color cleanup > Hover states > Layout > Generic components > States > Polish
+- **Post-Redesign Audit:** Functionality preserved, design quality, accessibility, SEO preserved, code quality
+
+### Full Output Skill (.cursor/skills/full-output/)
+Cho mọi task cần đầy đủ output. Include:
+- **Pre-Generation Scope Lock:** Count deliverables, lock the list
+- **Banned Patterns:** `// ...`, `// TODO`, skeleton when full impl requested, "continue later"
+- **Cross-Check:** Verify deliverable count matches scope before output
+- **Handling Long Outputs:** Clean breakpoint, PAUSE marker, resume exactly where stopped
+
+### Frontend Review Skill (.cursor/skills/frontend-review/)
+Mandatory dual-gate review cho mọi frontend task:
+- **Pre-Review Gate:** Scope analysis, quality plan, checklist
+- **Post-Review Gate:** 60+ items across correctness, design & taste, accessibility, performance, state & interaction, testing, full-output
+- **Review Output Format:** [PRE-REVIEW] summary at start, [POST-REVIEW] summary at delivery
+- **Review Failures:** Do NOT deliver until all boxes pass
+
+### Skill Execution Flow
+```
+Task nhận vào
+  → Context Router phát hiện frontend trigger
+  → Load applicable skill(s)
+  → [PRE-REVIEW] gate chạy (scope, design direction, checklist)
+  → Implementation
+  → [POST-REVIEW] gate chạy (60+ quality gates)
+  → Nếu fail → fix → re-run gate
+  → Deliver khi TẤT CẢ gates pass
+```
+
 ## Liên kết
 
 - [[nextjs]] - Next.js framework
@@ -765,3 +812,7 @@ Accessibility audit. Cross-browser testing. Mobile optimization. Documentation.
 - [[react]] - React patterns
 - [[state-management]] - State management
 - [[performance]] - Frontend performance
+- .cursor/skills/frontend-taste/ - Taste skill (landing/portfolio/greenfield)
+- .cursor/skills/frontend-redesign/ - Redesign skill (existing site upgrade)
+- .cursor/skills/full-output/ - Full output enforcement
+- .cursor/skills/frontend-review/ - Dual-gate review system

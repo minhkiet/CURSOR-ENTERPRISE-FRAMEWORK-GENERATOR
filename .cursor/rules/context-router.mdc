@@ -19,6 +19,33 @@ Mục tiêu chính của Context Router là giải quyết vấn đề "single p
 
 Mọi request phải được phân tích để xác định intent thực sự của người dùng. Intent classification sử dụng NLP techniques để understand what user wants to achieve, không chỉ what họ type. Các intent categories có thể bao gồm: code generation, debugging, refactoring, documentation, explanation, review, hoặc general assistance. Intent được determined dựa trên keywords, context, patterns, và historical data. High-confidence intent matches được routed trực tiếp, low-confidence matches có thể trigger clarification.
 
+**Frontend Skill Routing (Cursor Enterprise Framework)**
+
+Khi request liên quan đến frontend UI, tự động route đến skill phù hợp:
+
+| Trigger Keywords | Skill to Apply |
+|---|---|
+| landing page, portfolio, landing, homepage, marketing site | frontend-taste (pre-review + post-review gates) |
+| redesign, upgrade, improve existing, modernize | frontend-redesign (pre-audit + post-audit gates) |
+| build, create, implement frontend | frontend-taste + full-output (pre-generation + post-generation) |
+| review, quality check, audit UI, taste check | frontend-review (pre-review + post-review gates) |
+| incomplete, missing code, TODO, skeleton | full-output enforcement |
+| multiple files, full implementation | full-output + frontend-review |
+
+**Skill Auto-Discovery Protocol:**
+
+1. Phân tích request keywords và context
+2. Xác định applicable skill(s) từ bảng trên
+3. Load skill trước khi xử lý request
+4. Chạy pre-review gate TRƯỚC khi viết code
+5. Chạy post-review gate SAU KHI viết code, trước khi deliver
+
+**Skill Integration Order:**
+- frontend-taste: cho landing pages, portfolios, greenfield builds
+- frontend-redesign: cho việc cải thiện site/app hiện có
+- full-output: cho mọi task cần đầy đủ output, không truncation
+- frontend-review: cho mọi frontend task, bất kể loại nào (chuẩn kép pre + post)
+
 **2. Context Extraction**
 
 Trước khi routing, hệ thống phải extract tất cả relevant context từ request. Context extraction bao gồm identifying entities (file names, function names, class names), determining technical domain (frontend, backend, database, DevOps), và extracting constraints (performance requirements, security needs, compliance requirements). Extracted context được used cả để routing decision và để provide to destination handler. Incomplete context có thể trigger enrichment step.
