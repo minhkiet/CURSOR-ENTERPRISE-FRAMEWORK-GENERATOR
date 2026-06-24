@@ -1,3 +1,11 @@
+﻿---
+description: Prompt chuan de thiet ke RAG - chunking, embedding, retrieval
+trigger: rag, vector search, retrieval
+category: AI
+framework: Cursor Enterprise Framework V4
+version: 1.0.0
+---
+
 # Prompt: RAG Design - Thiết kế RAG
 
 ```markdown

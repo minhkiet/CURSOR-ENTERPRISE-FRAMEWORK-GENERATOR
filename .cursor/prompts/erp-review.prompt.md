@@ -1,3 +1,11 @@
+﻿---
+description: Prompt chuan de review ERP - inventory, finance, HR
+trigger: erp, enterprise resource planning
+category: Business
+framework: Cursor Enterprise Framework V4
+version: 1.0.0
+---
+
 # Prompt: ERP Review - Review ERP
 
 ```markdown

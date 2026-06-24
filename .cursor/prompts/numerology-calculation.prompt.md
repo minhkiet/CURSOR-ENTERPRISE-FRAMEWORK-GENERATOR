@@ -1,3 +1,11 @@
+﻿---
+description: Prompt chuan de tinh Than So Hoc - so chu dao, so linh hon
+trigger: numerology, than so hoc
+category: Domain
+framework: Cursor Enterprise Framework V4
+version: 1.0.0
+---
+
 # Prompt: Numerology Calculation - Tính Thần Số Học
 
 ```markdown

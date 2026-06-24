@@ -1,4 +1,4 @@
----
+﻿---
 name: frontend-redesign
 description: Upgrades existing websites and apps to premium quality. Audits current design, identifies generic AI patterns, and applies high-end design standards without breaking functionality. Includes mandatory pre-redesign audit and post-redesign validation. Works with any CSS framework or vanilla CSS.
 ---
@@ -249,3 +249,13 @@ Apply in this order for maximum visual impact with minimum risk:
 - Before importing any new library, check package.json first
 - Keep changes reviewable and focused. Small, targeted improvements over big rewrites
 - Honor accessibility wins already in place. Do not regress focus states, alt text, keyboard nav
+
+
+---
+
+## Liens
+
+- [[../rules/skill-integration]] - Skill Integration Rules
+- [[../rules/frontend-architecture]] - Frontend Architecture
+- [[../skills/frontend-review]] - Frontend Review Skill
+- [[../skills/full-output]] - Full Output Skill

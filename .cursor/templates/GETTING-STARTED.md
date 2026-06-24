@@ -1,3 +1,10 @@
+﻿---
+title: Huong dan bat dau voi Cursor Enterprise Framework
+description: Huong dan bat dau voi Cursor Enterprise Framework
+framework: Cursor Enterprise Framework V4
+version: 1.0.0
+---
+
 # Cursor Enterprise Framework V4
 
 ## Giới thiệu

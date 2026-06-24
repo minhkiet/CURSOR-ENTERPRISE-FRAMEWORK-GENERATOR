@@ -1,4 +1,4 @@
-# Cursor Enterprise Framework V4 - Project Overview
+﻿# Cursor Enterprise Framework V4 - Project Overview
 
 ## Version
 4.0.0 - 2026-06-23
@@ -82,13 +82,15 @@ Tái sử dụng existing decisions và solutions.
 .cursor/
 ├── rules/          # Behavioral rules (MDC)
 ├── skills/         # Technical skills (MDC)
+├── commands/       # Slash commands for Cursor IDE (22 commands)
+├── hooks/          # Hooks for Git, CI/CD, and development (12 hooks)
 ├── memory/         # Persistent memory
 │   ├── *.json      # Index files
 │   └── schema/     # SQLite databases
-├── knowledge/      # Domain knowledge (MD)
+├── knowledge/       # Domain knowledge (MD)
 ├── prompts/        # Prompt templates (MD)
-├── workflows/      # Workflow definitions (MD)
-├── templates/      # Code templates
+├── workflows/       # Workflow definitions (MD)
+├── templates/       # Code templates
 ├── scripts/        # Automation scripts (PS1)
 ├── cache/          # Compiled artifacts
 └── vector-db/      # Vector DB configs
@@ -144,13 +146,13 @@ Tái sử dụng existing decisions và solutions.
 - **sessions.sqlite**: Session history
 
 ### JSON Index Files
-- **project-index.json**: Tổng quan dự án
-- **code-index.json**: Code location index
-- **context-router.json**: Context routing rules
+- **project-index.md**: Tổng quan dự án
+- **code-index.md**: Code location index
+- **context-router.md**: Context routing rules
 - **technology-stack.json**: Tech stack definition
-- **business-rules.json**: Business logic rules
-- **customer-rules.json**: Customer-specific rules
-- **prompt-index.json**: Prompt template index
+- **business-rules.md**: Business logic rules
+- **customer-rules.md**: Customer-specific rules
+- **prompt-index.md**: Prompt template index
 
 ## Token Optimization Details
 
@@ -224,6 +226,10 @@ User Query → Embedding → Vector Search → Reranking → Generation
 
 ### Build Scripts
 ```powershell
+# Manage commands and hooks
+. .cursor/scripts/command-registry.ps1 -Action list
+. .cursor/scripts/command-registry.ps1 -Action install
+
 # Build memory system
 . .cursor/scripts/memory-builder/build-memory.ps1
 
@@ -265,4 +271,5 @@ User Query → Embedding → Vector Search → Reranking → Generation
 MIT License
 
 ## Version History
-- v4.0.0 (2026-06-23): Initial release with 29 domains, 55 rules, 44 skills
+- v4.1.0 (2026-06-24): Framework sync - fixed missing hooks, knowledge domains, memory files, prompts/templates frontmatter, SKILL.md Liens
+- v4.0.0 (2026-06-23): Initial release with 34 domains, 55 rules, 44 skills

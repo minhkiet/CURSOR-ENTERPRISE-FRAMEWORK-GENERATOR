@@ -1,4 +1,4 @@
-# Project Index - Chỉ mục Dự án
+﻿# Project Index - Chỉ mục Dự án
 
 ## Thông tin dự án
 - **Tên dự án**: Cursor Enterprise Framework Generator V4
@@ -145,13 +145,13 @@
 ```
 
 ## Memory System
-- **project-index.json**: Chỉ mục toàn dự án
-- **code-index.json**: Chỉ mục code
-- **context-router.json**: Router ngữ cảnh
+- **project-index.md**: Chỉ mục toàn dự án
+- **code-index.md**: Chỉ mục code
+- **context-router.md**: Router ngữ cảnh
 - **technology-stack.json**: Stack công nghệ
-- **business-rules.json**: Quy tắc nghiệp vụ
-- **customer-rules.json**: Quy tắc khách hàng
-- **prompt-index.json**: Chỉ mục prompt
+- **business-rules.md**: Quy tắc nghiệp vụ
+- **customer-rules.md**: Quy tắc khách hàng
+- **prompt-index.md**: Chỉ mục prompt
 
 ## SQLite Databases
 - **decisions.sqlite**: ADR decisions
@@ -162,8 +162,8 @@
 - **sessions.sqlite**: Session history
 
 ## Liên kết nội bộ
-- [[./memory/project-index.json]]
-- [[./memory/code-index.json]]
-- [[./memory/context-router.json]]
+- [[[./memory/project-index.md]]]
+- [[[./memory/code-index.md]]]
+- [[[./memory/context-router.md]]]
 - [[./rules/core-architecture]]
 - [[./skills/memory-manager]]

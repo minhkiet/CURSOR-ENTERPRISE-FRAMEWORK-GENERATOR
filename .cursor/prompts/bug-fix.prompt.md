@@ -1,3 +1,11 @@
+﻿---
+description: Prompt chuan de sua bug - phan tich root cause truoc khi fix
+trigger: bug fix, fix bug, loi, error
+category: Development
+framework: Cursor Enterprise Framework V4
+version: 1.0.0
+---
+
 # Prompt: Bug Fix - Sửa lỗi Bug
 
 ## Mô tả
@@ -109,4 +117,4 @@ Approach: [mô tả approach]
 - [[../skills/root-cause-analysis]] - Root Cause Analysis
 - [[../rules/memory-first]] - Memory First
 - [[../rules/coding-standards]] - Coding Standards
-- [[../memory/bug-history]] - Bug History
+- [[../memory/bug-history]] - Bug History (folder: bug-history/)

@@ -1,3 +1,11 @@
+﻿---
+description: Prompt chuan de review Supabase - auth, database, storage, RLS
+trigger: supabase, baas review
+category: Database
+framework: Cursor Enterprise Framework V4
+version: 1.0.0
+---
+
 # Prompt: Supabase Review - Review Supabase
 
 ```markdown

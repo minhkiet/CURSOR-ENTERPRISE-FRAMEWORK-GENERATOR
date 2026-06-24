@@ -1,3 +1,11 @@
+﻿---
+description: Prompt chuan de refactor code - cai thien quality va maintainability
+trigger: refactor, tai cau truc, improve code
+category: Development
+framework: Cursor Enterprise Framework V4
+version: 1.0.0
+---
+
 # Prompt: Refactor Code - Refactor Code
 
 ```markdown

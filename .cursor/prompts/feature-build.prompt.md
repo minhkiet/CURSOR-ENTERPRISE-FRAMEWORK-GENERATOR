@@ -1,3 +1,11 @@
+﻿---
+description: Prompt chuan de xay dung feature moi - tu yeu cau den implementation
+trigger: build feature, tao feature, feature moi
+category: Development
+framework: Cursor Enterprise Framework V4
+version: 1.0.0
+---
+
 # Prompt: Feature Build - Xây dựng Feature
 
 ## Mô tả

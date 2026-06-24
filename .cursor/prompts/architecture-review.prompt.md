@@ -1,3 +1,11 @@
+﻿---
+description: Prompt chuan de review kien truc - patterns, boundaries, scalability
+trigger: architecture review, review kien truc
+category: Architecture
+framework: Cursor Enterprise Framework V4
+version: 1.0.0
+---
+
 # Prompt: Architecture Review - Review kiến trúc
 
 ```markdown

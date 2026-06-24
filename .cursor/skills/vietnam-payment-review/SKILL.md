@@ -1,4 +1,4 @@
----
+﻿---
 description: Review skill cho Vietnamese online payment integrations (MoMo, SePay, PayOS, ZaloPay, VNPay, VietQR). Đánh giá API integration, webhook handling, security, compliance, và best practices cho thanh toán nội địa Việt Nam.
 purpose: Cung cấp comprehensive review framework cho các payment provider phổ biến tại Việt Nam. Evaluate API integration patterns, webhook security, signature validation, payment flow, error handling, và reconciliation logic.
 input:
@@ -26,6 +26,24 @@ tags:
 ---
 
 # Vietnam Payment Review
+
+## PRE-REVIEW GATE (trước khi review payment integration)
+
+### Scope Analysis
+- [ ] Identify payment provider(s): MoMo, SePay, PayOS, ZaloPay, VNPay, VietQR
+- [ ] List all files: webhook handlers, API clients, payment flow components
+- [ ] Confirm environment (testnet/production) and credentials setup
+- [ ] Identify all integration points (frontend callback, backend webhook, API calls)
+
+### Pre-Integration Checklist
+- [ ] Credentials stored securely (env vars, vault - NOT in code)
+- [ ] Webhook endpoint is HTTPS and publicly accessible
+- [ ] Idempotency strategy defined (unique requestId per payment)
+- [ ] Error handling and retry logic planned
+- [ ] Payment flow UX states mapped (pending, processing, success, failed)
+
+>>> PRE-REVIEW PASSED: Proceed with payment integration review
+---
 
 ## Tổng quan
 
@@ -260,3 +278,54 @@ class PaymentService {
 
 - For detailed API integration code patterns, see [reference.md](reference.md)
 - For provider-specific nuances and gotchas, see [reference.md](reference.md)
+
+
+---
+
+## POST-REVIEW GATE (run after code written)
+
+### API Integration Review
+- [ ] All API calls use correct endpoints (testnet vs production)
+- [ ] Request parameters validated and signed correctly
+- [ ] Response parsing handles all cases (success, pending, failed, error)
+- [ ] Timeout and retry logic implemented (idempotent endpoints)
+- [ ] Credentials never hardcoded or logged
+
+### Webhook Security Review
+- [ ] Webhook signature/checksum validation implemented
+- [ ] Timestamp validation (prevent replay attacks)
+- [ ] Idempotency: duplicate webhook calls handled safely
+- [ ] Webhook URL is HTTPS only
+- [ ] Error responses do not expose internal details
+
+### Payment Flow Review
+- [ ] All payment states handled: pending, processing, success, failed, cancelled, refunded
+- [ ] User redirected/updated correctly on each state transition
+- [ ] Payment timeout handled (15-minute default expiry)
+- [ ] Refund flow implemented with original payment method
+- [ ] Reconciliation logic implemented (daily balance check)
+
+### Vietnam-Specific Review
+- [ ] MoMo: partnerCode, accessKey, secretKey not in code; QR format correct
+- [ ] SePay: auto-reconciliation by amount+content implemented
+- [ ] PayOS: checksum validation with checksumKey implemented
+- [ ] ZaloPay: appTransId uniqueness guaranteed
+- [ ] VNPay: return URL and IPN URL configured correctly
+- [ ] VietQR: bank account validation, VietQR format compliance
+
+### Compliance Review
+- [ ] PCI-DSS: No card data stored locally
+- [ ] Refund policy implemented within allowed window
+- [ ] Invoice generation triggered on successful payment
+- [ ] Audit log records all payment events
+
+>>> POST-REVIEW PASSED: Payment integration ready for production
+
+## Liens
+
+- [[../rules/skill-integration]] - Skill Integration Rules
+- [[../rules/billing]] - Billing Rules
+- [[../rules/security]] - Security Rules
+- [[../rules/web-security]] - Web Security Rules
+- [[../knowledge/security]] - Security Knowledge
+- [[../knowledge/billing]] - Billing Knowledge

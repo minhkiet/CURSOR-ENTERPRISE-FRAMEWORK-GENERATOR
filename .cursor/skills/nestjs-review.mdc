@@ -1,0 +1,54 @@
+---
+description: Review skill cho NestJS applications - modules, dependency injection, decorators, performance
+trigger: nestjs, review nestjs, nest js, NestJS
+category: Framework
+framework: Cursor Enterprise Framework V4
+version: 1.0.0
+---
+
+# NestJS Review Skill
+
+## Muc dich
+Review NestJS applications cho correctness, architecture, performance, va security.
+
+## Khi nao dung
+- Review NestJS application code
+- Audit NestJS modules va dependency injection
+- Performance review cho NestJS API
+- Security review cho NestJS endpoints
+
+## Review Areas
+
+### Architecture Review
+- [ ] Module structure follows NestJS conventions
+- [ ] Dependency injection properly scoped
+- [ ] Feature modules properly isolated
+- [ ] Shared modules for reusable components
+- [ ] Core module for app-wide services
+
+### API Review
+- [ ] Controllers follow REST conventions
+- [ ] DTOs used for validation
+- [ ] Pipes used for transformation/validation
+- [ ] Guards used for auth/authorization
+- [ ] Interceptors used for cross-cutting concerns
+
+### Performance Review
+- [ ] Database queries optimized (use TypeORM wisely)
+- [ ] Connection pooling configured
+- [ ] Response caching implemented
+- [ ] Lazy loading for heavy modules
+- [ ] N+1 query prevention
+
+### Security Review
+- [ ] Input validation with class-validator
+- [ ] Auth guards on protected routes
+- [ ] Rate limiting configured
+- [ ] CORS configured properly
+- [ ] No sensitive data in logs or responses
+
+## Lien ket
+- [[../rules/nestjs]] - NestJS Rules
+- [[../rules/backend-architecture]] - Backend Architecture
+- [[../rules/api]] - API Rules
+- [[../rules/security]] - Security Rules

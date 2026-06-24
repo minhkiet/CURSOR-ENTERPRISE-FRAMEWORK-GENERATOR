@@ -1,4 +1,4 @@
----
+﻿---
 name: frontend-review
 description: Comprehensive frontend code review skill with mandatory pre-review scope analysis and post-review quality gates. Reviews for correctness, design quality, accessibility, performance, and taste. Use before and after every frontend implementation task.
 ---
@@ -216,3 +216,14 @@ This skill activates in these scenarios:
 | API + frontend task | Yes (Part A + API correctness) | Yes (Part B + correctness) |
 
 When the user asks for a review, a code review, quality check, or "is this ready to ship", run the applicable post-review gates.
+
+
+---
+
+## Liens
+
+- [[../rules/skill-integration]] - Skill Integration Rules
+- [[../rules/coding-standards]] - Coding Standards
+- [[../skills/frontend-taste]] - Frontend Taste Skill
+- [[../skills/frontend-redesign]] - Frontend Redesign Skill
+- [[../skills/full-output]] - Full Output Skill

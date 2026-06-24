@@ -1,4 +1,4 @@
----
+﻿---
 name: frontend-taste
 description: Anti-slop frontend skill for landing pages, portfolios, and redesigns. Reads the brief, infers the design direction, sets three dials (VARIANCE/MOTION/DENSITY), and ships interfaces that do not look templated. Includes mandatory pre-review and post-review checkpoints before and after code generation.
 ---
@@ -510,3 +510,13 @@ npm install uswds
 # Motion (GSAP)
 npm install motion gsap
 ```
+
+
+---
+
+## Liens
+
+- [[../rules/skill-integration]] - Skill Integration Rules
+- [[../rules/frontend-architecture]] - Frontend Architecture
+- [[../skills/frontend-review]] - Frontend Review Skill
+- [[../skills/full-output]] - Full Output Skill

@@ -54,6 +54,11 @@ REQUEST → Skill Detection → Pre-Review Gate
 **Kích hoạt khi:** thanh toán MoMo, SePay, PayOS, ZaloPay, VNPay, VietQR, payment integration Việt Nam, webhook thanh toán nội địa, review mã thanh toán online
 **Mục đích:** Comprehensive review framework cho các payment provider phổ biến tại Việt Nam. Evaluate API integration, webhook security, signature validation, payment flow, error handling, và reconciliation.
 
+### 6. security-review
+**Path:** `.cursor/skills/security-review/SKILL.md`
+**Kích hoạt khi:** security review, vulnerability, penetration test, OWASP, XSS, SQL injection, SSRF, CSRF, XXE, authentication, authorization, RBAC, API key, secret, webhook, LLM/AI security, prompt injection, APK decompile, binary analysis, firmware, reverse engineer, malware, CVE, exploit, payload, SSL pinning bypass, Frida hooking, supply chain audit, dependency scan, npm audit, secrets management, JWT, OAuth, CSRF, CORS, CSP, HSTS, encryption, hashing, brute force, brute-force, credential stuffing
+**Mục đích:** Comprehensive security review với layered approach: Static Analysis, OWASP Top 10 + ASVS, LLM/AI Security (ASI Top 10), API/Webhook Security, Supply Chain & Secrets, Cryptographic Practices, và Advanced RE (tich hợp reverse-skill). Tich hợp [reverse-skill](https://github.com/zhaoxuya520/reverse-skill) cho APK/JS/binary/firmware reverse-engineering workflows.
+
 ---
 
 ## Skill Combination Rules
@@ -65,8 +70,11 @@ REQUEST → Skill Detection → Pre-Review Gate
 | Greenfield frontend build | frontend-taste | full-output + frontend-review | taste-pre + taste-post + fulloutput-pre + fulloutput-post + review-pre + review-post |
 | Multi-file implementation | full-output | frontend-review | fulloutput-pre + fulloutput-post + review-pre + review-post |
 | Code review / quality check | frontend-review | (standalone) | review-pre + review-post |
-| Vietnam payment integration | vietnam-payment-review | billing-review | payment-review-pre + payment-review-post + billing-review-gate |
-| Payment code review | vietnam-payment-review | (standalone) | payment-review-pre + payment-review-post |
+| Vietnam payment integration | vietnam-payment-review | security-review + billing-review | payment-review-pre + payment-review-post + security-review-pre + security-review-post |
+| Payment code review | vietnam-payment-review | security-review | payment-review-pre + payment-review-post + security-review-pre + security-review-post |
+| Security vulnerability review | security-review | (standalone or combined with relevant domain skill) | security-review-pre + security-review-post + [domain skill gates] |
+| API security review | security-review | (standalone) | security-review-pre + security-review-post + API-specific checks |
+| APK/binary/JS reverse-engineering | security-review | reverse-skill routing | security-review-pre + RE skill gate + security-review-post |
 
 ---
 
@@ -230,6 +238,41 @@ Output header:
 - [ ] Testing strategy defined ✓
 - [ ] Accessibility requirements identified ✓
 - [ ] Performance budget identified ✓
+
+#### E. security-review Pre-Review (S.1 - S.3)
+
+**S.1 Threat Modeling:**
+- [ ] Attack surface documented (untrusted inputs, external data)
+- [ ] Trust boundaries identified
+- [ ] Top 3 potential threats listed based on feature type
+- [ ] Assets at risk assessed
+
+**S.2 Security Requirements:**
+- [ ] Authentication requirements defined
+- [ ] Authorization model selected (RBAC, ABAC, ownership)
+- [ ] Data classification determined
+- [ ] Compliance requirements identified (GDPR, PCI-DSS, SOC2)
+- [ ] Encryption requirements defined (at rest, in transit)
+- [ ] Secrets storage strategy defined
+- [ ] Audit logging requirements identified
+
+**S.3 Security Design Review:**
+- [ ] Input validation strategy defined
+- [ ] Output encoding strategy defined
+- [ ] Error handling does not leak sensitive info
+- [ ] Rate limiting strategy defined
+- [ ] Authentication method selected (JWT, sessions, API keys, OAuth2)
+- [ ] Authorization model defined
+- [ ] Secrets storage: env vars / vault / KMS decided
+- [ ] Logging strategy for security events defined
+
+**Pre-Review Checklist (PASS GATE):**
+- [ ] Threat model documented ✓
+- [ ] Security requirements locked ✓
+- [ ] Design review PASS ✓
+- [ ] Auth model defined ✓
+- [ ] Secrets strategy defined ✓
+- [ ] Logging strategy defined ✓
 
 ---
 
@@ -548,6 +591,88 @@ Output header:
 - [ ] No skeleton when full implementation was requested
 - [ ] No "continue later", "you can extend this", "for brevity" patterns
 
+#### E. security-review Post-Review (Security-1 through Security-9)
+
+**Security-1: Authentication & Authorization:**
+- [ ] No hardcoded credentials, API keys, or secrets in code
+- [ ] Auth tokens have appropriate expiration (access: 15-60min, refresh: 7-30 days)
+- [ ] Passwords hashed with bcrypt (cost >= 10) or Argon2
+- [ ] Session tokens are random, non-guessable (crypto.randomBytes)
+- [ ] Authorization checks on every protected endpoint
+- [ ] Ownership/resource-level authorization enforced
+- [ ] Privilege escalation prevented (least privilege principle)
+- [ ] No authentication bypass in edge cases
+
+**Security-2: Input Validation & Injection:**
+- [ ] All user input validated before use
+- [ ] SQL injection prevention (parameterized queries, ORM)
+- [ ] No string concatenation in SQL, HTML, or shell commands
+- [ ] XSS prevention (output encoding, CSP header)
+- [ ] Command injection prevention (no exec/eval with user input)
+- [ ] Path traversal prevention (canonicalize paths)
+- [ ] File upload validation (type, size, content scan)
+- [ ] Number/range validation on all numeric inputs
+- [ ] Email/URL validation uses established libraries
+
+**Security-3: Data Protection:**
+- [ ] Sensitive data not logged (passwords, tokens, PII)
+- [ ] Sensitive data encrypted at rest
+- [ ] TLS 1.2+ enforced on all external connections
+- [ ] Certificate validation enabled (no `verify: false` in production)
+- [ ] PII handled per GDPR/compliance requirements
+- [ ] Data minimization: only collect/store necessary data
+- [ ] API responses do not leak internal details (no stack traces)
+
+**Security-4: API & Webhook Security:**
+- [ ] All endpoints require authentication (except intentional public ones)
+- [ ] Rate limiting on all endpoints
+- [ ] CORS policy correctly configured (not `*` for sensitive APIs)
+- [ ] CSRF protection on state-changing operations
+- [ ] Webhook signatures verified (HMAC validation)
+- [ ] Idempotency enforced on webhook/payment handlers
+- [ ] No sensitive data in URLs
+- [ ] API versioning in place
+
+**Security-5: LLM / AI Security (ASI Top 10):**
+- [ ] Prompt injection: user input sanitized before LLM context
+- [ ] No system prompt leakage
+- [ ] Output filtering: LLM responses sanitized before display/storage
+- [ ] Rate limiting on LLM calls (token budget, request budget)
+- [ ] Sensitive data not sent to LLM (PII redaction before context)
+- [ ] Tool/function call validation (no unsafe tool execution)
+- [ ] Resource exhaustion prevention (max tokens, max steps)
+- [ ] Agentic action approval: sensitive actions require human confirmation
+
+**Security-6: Supply Chain & Dependencies:**
+- [ ] Lock files committed (`package-lock.json`, `requirements.lock`)
+- [ ] Dependency audit run: `npm audit` / `pip check` / `safety check`
+- [ ] No `@ts-ignore` masking security warnings
+- [ ] No deprecated cryptographic libraries
+- [ ] Third-party scripts/CDN resources verified (SRI hashes)
+- [ ] License compliance checked for all dependencies
+
+**Security-7: Cryptographic Practices:**
+- [ ] No custom cryptographic implementations
+- [ ] Strong random number generation (`crypto.getRandomValues`, `secrets.token_bytes`)
+- [ ] Keys stored securely (env vars, KMS, vault — not in code)
+- [ ] Deprecated algorithms avoided (MD5, SHA1 for hashing, DES, 3DES)
+- [ ] IV/nonce is unique per encryption operation
+- [ ] JWT signed with RS256/ES256 (not HS256 across services)
+- [ ] HTTPS enforced in production (HSTS header)
+
+**Security-8: Error Handling & Logging:**
+- [ ] No stack traces or internal paths in error responses
+- [ ] User-friendly error messages (no system internals)
+- [ ] All security events logged (auth failures, authorization denials)
+- [ ] Logs do not contain sensitive data (redacted PII, tokens, passwords)
+- [ ] Alerting configured for security anomaly patterns
+
+**Security-9: Advanced RE Review** (if applicable):
+- [ ] APK: SSL pinning implemented, no hardcoded secrets in APK
+- [ ] Binary: Firmware integrity verified, no hardcoded backdoors
+- [ ] JS: No secrets in frontend code, CSP configured, source maps disabled
+- [ ] LLM Security: prompt injection defenses, output sanitization
+
 ---
 
 **Post-Review Summary Output:**
@@ -563,15 +688,25 @@ Gate Results:
   ✓ frontend-redesign Post-Review: PASS (4/4 sections)
   ✓ full-output Post-Review: PASS (3/3 sections)
   ✓ frontend-review Post-Review: PASS (7/7 sections)
+  ✓ security-review Post-Review: PASS (9/9 layers)
 
 Total Items Checked: N+
-  ✓ Correctness:            PASS (B.1)
-  ✓ Design & Taste:         PASS (B.2)
-  ✓ Accessibility:           PASS (B.3)
-  ✓ Performance:            PASS (B.4)
-  ✓ State & Interaction:    PASS (B.5)
-  ✓ Testing:                PASS (B.6)
-  ✓ Full-Output:            PASS (B.7)
+  ✓ Correctness:              PASS (B.1)
+  ✓ Design & Taste:          PASS (B.2)
+  ✓ Accessibility:            PASS (B.3)
+  ✓ Performance:              PASS (B.4)
+  ✓ State & Interaction:      PASS (B.5)
+  ✓ Testing:                  PASS (B.6)
+  ✓ Full-Output:              PASS (B.7)
+  ✓ Auth & Authorization:     PASS (Security-1)
+  ✓ Input Validation:         PASS (Security-2)
+  ✓ Data Protection:          PASS (Security-3)
+  ✓ API & Webhook Security:   PASS (Security-4)
+  ✓ LLM/AI Security:          PASS (Security-5, if applicable)
+  ✓ Supply Chain:             PASS (Security-6)
+  ✓ Cryptography:             PASS (Security-7)
+  ✓ Error Handling & Logging: PASS (Security-8)
+  ✓ Advanced RE:              PASS (Security-9, if applicable)
 
 Reviewer Notes:
   - Fixed: [specific items fixed during post-review]
@@ -662,6 +797,11 @@ Send "continue" to resume from: [next deliverable name]
 - Full implementation tasks (not skeleton)
 - Quality reviews and audits
 - Bất kỳ task nào user yêu cầu "review", "quality check", "check quality"
+- **Security reviews, vulnerability assessments, penetration testing**
+- **API/webhook implementations, authentication/authorization code**
+- **Payment integrations (bất kỳ payment provider nào)**
+- **APK/binary/JS reverse-engineering cho mục đích bảo mật**
+- **LLM/AI integrations, prompt engineering, agentic workflows**
 
 ### Không áp dụng (standalone):
 
@@ -671,6 +811,8 @@ Send "continue" to resume from: [next deliverable name]
 - Questions-only tasks (không generate code)
 
 **Nhưng:** Nếu task có frontend component, áp dụng frontend-review pre + post gates.
+
+**Nhưng:** Nếu task có security component (auth, payment, API, secrets, external data), áp dụng security-review pre + post gates song song với domain skill gates.
 
 ---
 
@@ -738,6 +880,31 @@ FRONTEND TASK?
         → PRE: fulloutput §0.B + review §A.1-A.3
         → POST: fulloutput §5.A-C + review §B.1-B.7
 
+SECURITY TASK?
+  ├── Vulnerability / CVE / Exploit
+  │     → security-review (standalone)
+  │     → PRE: §S.1-S.3 + security-review-post §Security-1-8
+  │
+  ├── API / Auth / Webhook Security
+  │     → security-review + [relevant domain skill]
+  │     → PRE: §S.1-S.3 + domain skill gate
+  │     → POST: security-review §Security-1-8 + domain skill gate
+  │
+  ├── Payment / Vietnam Payment
+  │     → security-review + vietnam-payment-review
+  │     → PRE: payment §pre + security §S.1-S.3
+  │     → POST: security-review §Security-1-8 + payment §post
+  │
+  ├── APK / Binary / JS / Firmware RE
+  │     → security-review + reverse-skill routing
+  │     → PRE: security §S.1-S.3 + RE skill gate
+  │     → POST: security-review §Security-1-9 + RE skill post
+  │
+  └── LLM / AI Security
+        → security-review (§Security-5 + §S.5 LLM)
+        → PRE: §S.1-S.3 + LLM threat model
+        → POST: §Security-5 + OWASP LLM Top 10 + ASI Top 10
+
 ANTI-BYPASS RULES:
   ✗ Never skip pre-review (no design direction, no scope lock)
   ✗ Never skip post-review (no quality verification)
@@ -763,3 +930,5 @@ breakpoint, resume on "continue". No recap, no repetition.
 - [[full-output]] — `.cursor/skills/full-output/SKILL.md`
 - [[frontend-review]] — `.cursor/skills/frontend-review/SKILL.md`
 - [[vietnam-payment-review]] — `.cursor/skills/vietnam-payment-review/SKILL.md`
+- [[security-review]] — `.cursor/skills/security-review/SKILL.md`
+- [reverse-skill](https://github.com/zhaoxuya520/reverse-skill) — Cybersecurity Skills Router (APK RE, Binary Analysis, JS Reverse, Pentest, EDR Bypass, Firmware, LLM Security)

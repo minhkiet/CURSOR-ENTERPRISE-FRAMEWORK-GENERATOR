@@ -1,4 +1,4 @@
----
+﻿---
 name: full-output
 description: Enforces complete, unabridged code generation. Overrides truncation behavior, bans placeholder patterns, handles token-limit splits cleanly. Applies before and after every code generation task. No TODO comments, no "continue later", no skeleton code.
 ---
@@ -164,3 +164,12 @@ If output was truncated mid-delivery:
 2. Resume from the exact stopping point
 3. Do not re-summarize or re-explain what was already delivered
 4. Deliver the remaining items completely
+
+
+---
+
+## Liens
+
+- [[../rules/skill-integration]] - Skill Integration Rules
+- [[../rules/coding-standards]] - Coding Standards
+- [[../skills/frontend-review]] - Frontend Review Skill

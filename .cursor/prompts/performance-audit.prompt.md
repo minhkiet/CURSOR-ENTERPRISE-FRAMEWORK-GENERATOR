@@ -1,3 +1,11 @@
+﻿---
+description: Prompt chuan de audit hieu nang - database, API, frontend
+trigger: performance audit, toi uu hieu nang
+category: Performance
+framework: Cursor Enterprise Framework V4
+version: 1.0.0
+---
+
 # Prompt: Performance Audit - Kiểm tra hiệu năng
 
 ## Mô tả

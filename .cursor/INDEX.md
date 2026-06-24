@@ -1,4 +1,4 @@
-# Cursor Enterprise Framework V4 - Index
+﻿# Cursor Enterprise Framework V4 - Index
 
 ## Tổng quan
 Cursor Enterprise Framework là bộ framework hoàn chỉnh dành cho AI coding agents, được thiết kế theo nguyên tắc Memory First, Retrieval First, Token Optimization First, và Knowledge Reuse First.
@@ -24,7 +24,7 @@ Framework tương thích với:
 │   ├── architecture-history/
 │   ├── decision-history/
 │   └── bug-history/
-├── knowledge/     # Knowledge files - Kiến thức chuyên domain (29 domains)
+├── knowledge/     # Knowledge files - Kiến thức chuyên domain (34 domains)
 ├── prompts/       # Prompt templates - Template prompts
 ├── workflows/    # Standard workflows - Quy trình chuẩn
 ├── templates/     # Template files
@@ -65,7 +65,7 @@ Framework tương thích với:
 | Workflow | n8n-workflow, temporal-workflow |
 | Memory | memory-manager, knowledge-compiler, prompt-cache-builder, adr-generator |
 
-## Knowledge Base (29 domains)
+## Knowledge Base (34 domains)
 Mỗi domain có: glossary, architecture, best-practice, anti-pattern, checklist, faq, decision-tree.
 
 | Domain | Mục đích |
@@ -100,7 +100,7 @@ Mỗi domain có: glossary, architecture, best-practice, anti-pattern, checklist
 | Azure | Microsoft Azure |
 | AWS | Amazon Web Services |
 
-## Prompts Index (30 files)
+## Prompts Index (31 files)
 | ID | Name | Purpose |
 |----|------|---------|
 | DEV-001 | bug-fix | Sửa lỗi bug |
@@ -135,28 +135,73 @@ Mỗi domain có: glossary, architecture, best-practice, anti-pattern, checklist
 | MEM-002 | cost-reduction | Giảm chi phí |
 | OPS-001 | queue-audit | Audit Queue |
 
+## Commands Index (22 commands)
+Slash commands for Cursor IDE, each with workflow, checklist, and links to relevant rules/skills.
+
+| Command | Category | Description |
+|---------|----------|-------------|
+| /build | Development | Build new feature |
+| /fix | Development | Fix bug with root cause analysis |
+| /review | Quality | Code review |
+| /audit | Quality | Audit (security, performance, architecture) |
+| /design | Architecture | Design (DDD, CQRS, Database, API) |
+| /rag | AI | Build RAG system |
+| /deploy | DevOps | Deployment workflow |
+| /test | Testing | Testing strategy |
+| /doc | Documentation | Generate documentation |
+| /memory | Memory | Manage memory system |
+| /adr | Architecture | Create Architecture Decision Record |
+| /payment | Domain | Review Vietnam payments (MoMo, SePay, PayOS, ZaloPay, VNPay, VietQR) |
+| /security | Security | Security review |
+| /frontend | Frontend | Frontend tasks (landing, redesign, review) |
+| /perf | Performance | Performance audit |
+| /refactor | Refactoring | Code refactoring |
+| /generate | Generation | Generate code (PDF, API, migration) |
+| /workflow | Workflow | Execute standard workflows |
+| /report | Reporting | Create report |
+| /bazi | Domain | Four Pillars of Destiny calculation |
+| /tuvi | Domain | Tu Vi astrology calculation |
+| /numerology | Domain | Numerology calculation |
+
+## Hooks Index (14 hooks)
+Auto-trigger hooks for Git, CI/CD, and development workflow automation.
+
+### Git Hooks
+| Hook | Trigger | Description |
+|------|---------|-------------|
+| pre-commit | Before commit | Lint, format, type check |
+| commit-msg | After message | Validate commit message format |
+| pre-push | Before push | Tests, security scan |
+| post-commit | After commit | Update session summary |
+
+### CI/CD Hooks
+| Hook | Trigger | Description |
+|------|---------|-------------|
+| pre-build | Before build | Verify dependencies |
+| post-build | After build | Verify artifacts |
+| pre-deploy | Before deploy | Final checks |
+| post-deploy | After deploy | Health check, notify |
+| on-failure | On failure | Analyze error, suggest fix |
+
+### Development Hooks
+| Hook | Trigger | Description |
+|------|---------|-------------|
+| before-task | Before task | Load context, check memory |
+| after-task | After task | Update memory, summarize |
+| on-error | On error | Analyze error, suggest fix |
+
 ## Workflows Index (10 files)
-- build-feature.md
-- fix-bug.md
-- review-code.md
-- review-security.md
-- optimize-performance.md
-- deployment.md
-- build-rag.md
-- generate-pdf.md
-- create-tenant.md
-- create-report.md
 
 ## Memory System
 
 ### JSON Index Files
-- project-index.json
-- code-index.json
-- context-router.json
+- project-index.md
+- code-index.md
+- context-router.md
 - technology-stack.json
-- business-rules.json
-- customer-rules.json
-- prompt-index.json
+- business-rules.md
+- customer-rules.md
+- prompt-index.md
 
 ### SQLite Databases (Schema files)
 - decisions.schema.sql - ADR decisions
@@ -172,6 +217,7 @@ Mỗi domain có: glossary, architecture, best-practice, anti-pattern, checklist
 | embedding-builder/build-embeddings.ps1 | Build embeddings |
 | memory-builder/build-memory.ps1 | Build memory system |
 | packager.ps1 | Package framework into ZIP |
+| command-registry.ps1 | Manage commands and hooks (install/list/validate) |
 
 ## Token Optimization Strategies
 Framework được thiết kế với 10 chiến lược tối ưu token:

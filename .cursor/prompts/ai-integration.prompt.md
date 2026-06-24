@@ -1,3 +1,11 @@
+﻿---
+description: Prompt chuan de tich hop AI - OpenAI, Gemini, Claude, Ollama
+trigger: ai integration, openai, gemini, claude
+category: AI
+framework: Cursor Enterprise Framework V4
+version: 1.0.0
+---
+
 # Prompt: AI Integration Review - Tích hợp AI
 
 ```markdown

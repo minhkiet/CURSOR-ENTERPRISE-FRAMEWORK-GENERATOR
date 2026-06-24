@@ -1,3 +1,11 @@
+﻿---
+description: Prompt chuan de review E-Commerce - product, order, payment
+trigger: ecommerce, shop, ban hang
+category: Business
+framework: Cursor Enterprise Framework V4
+version: 1.0.0
+---
+
 # Prompt: E-Commerce Review - Review E-Commerce
 
 ```markdown

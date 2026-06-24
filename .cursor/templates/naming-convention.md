@@ -1,3 +1,10 @@
+﻿---
+title: Tien ich dat ten chuan - bien, ham, class, file
+description: Tien ich dat ten chuan - bien, ham, class, file
+framework: Cursor Enterprise Framework V4
+version: 1.0.0
+---
+
 # Naming Convention Template
 
 ## Quy ước đặt tên

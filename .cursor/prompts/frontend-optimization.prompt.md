@@ -1,3 +1,11 @@
+﻿---
+description: Prompt chuan de toi uu frontend - bundle, images, core web vitals
+trigger: frontend optimization, toi uu ui
+category: Performance
+framework: Cursor Enterprise Framework V4
+version: 1.0.0
+---
+
 # Prompt: Frontend Optimization - Tối ưu Frontend
 
 ```markdown

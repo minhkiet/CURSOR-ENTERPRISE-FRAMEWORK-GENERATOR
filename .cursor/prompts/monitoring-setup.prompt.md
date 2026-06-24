@@ -1,3 +1,11 @@
+﻿---
+description: Prompt chuan de setup monitoring - Prometheus, Grafana, alerting
+trigger: monitoring, observability
+category: Infrastructure
+framework: Cursor Enterprise Framework V4
+version: 1.0.0
+---
+
 # Prompt: Monitoring Setup - Thiết lập Monitoring
 
 ```markdown

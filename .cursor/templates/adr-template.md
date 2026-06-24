@@ -1,3 +1,10 @@
+﻿---
+title: Template ADR - Architecture Decision Record
+description: Template ADR - Architecture Decision Record
+framework: Cursor Enterprise Framework V4
+version: 1.0.0
+---
+
 # ADR Template - Architecture Decision Record
 
 ```markdown

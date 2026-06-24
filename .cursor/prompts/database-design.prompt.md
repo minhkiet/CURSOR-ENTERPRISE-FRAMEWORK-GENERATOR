@@ -1,3 +1,11 @@
+﻿---
+description: Prompt chuan de thiet ke database - schema, indexes, migrations
+trigger: database design, thiet ke db
+category: Architecture
+framework: Cursor Enterprise Framework V4
+version: 1.0.0
+---
+
 # Prompt: Database Design - Thiết kế Database
 
 ```markdown

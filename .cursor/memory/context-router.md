@@ -64,7 +64,7 @@ database-core → database/glossary, database/architecture
 ```
 openai      → openai/*
 gemini      → gemini/*
-claude      → claaude/*
+claude      → claude/*
 rag         → rag/*
 vector-search → vector-search/*
 pgvector    → pgvector/*
