@@ -18,22 +18,22 @@ interface Step {
 const steps: Step[] = [
   {
     num: 1,
-    title: 'Copy Framework',
-    description: 'Copy `.cursor/` directory vào root của project hoặc clone repository chính thức.',
-    code: 'git clone https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR.git',
+    title: 'One-Click Install',
+    description: 'Copy framework vào project của bạn với một lệnh PowerShell duy nhất.',
+    code: 'irm https://bit.ly/cef-install | iex',
     copyText: 'Copy command'
   },
   {
     num: 2,
     title: 'Build Memory',
-    description: 'Chạy scripts để khởi tạo SQLite databases, build code index và knowledge embeddings.',
+    description: 'Khởi tạo SQLite databases, code index và knowledge embeddings cho context tối ưu.',
     code: '. .cursor/scripts/memory-builder/build-memory.ps1',
     copyText: 'Copy command'
   },
   {
     num: 3,
     title: 'Start Coding',
-    description: 'Mở project trong Cursor, bắt đầu task mới. Framework tự động load context, rules và knowledge.',
+    description: 'Mở project trong Cursor, bắt đầu task. Framework tự động load context, rules và knowledge.',
     code: '1. Open project in Cursor\n2. Start new chat\n3. CEF auto-loads context',
     copyText: 'Copy steps'
   }
@@ -46,11 +46,11 @@ interface Script {
 }
 
 const scripts: Script[] = [
+  { name: 'Quick Install', description: 'PowerShell one-liner install', command: 'irm https://bit.ly/cef-install | iex' },
+  { name: 'GitHub Clone', description: 'Clone from GitHub', command: 'setup.bat --github' },
   { name: 'Memory Builder', description: 'Build SQLite memory databases', command: '. .cursor/scripts/memory-builder/build-memory.ps1' },
   { name: 'Knowledge Compiler', description: 'Compile and merge knowledge files', command: '. .cursor/scripts/knowledge-compiler/compile-knowledge.ps1' },
-  { name: 'Project Index', description: 'Build semantic code index', command: '. .cursor/scripts/project-index-builder/build-index.ps1' },
-  { name: 'Embeddings', description: 'Generate vector embeddings', command: '. .cursor/scripts/embedding-builder/build-embeddings.ps1' },
-  { name: 'Packager', description: 'Package framework to ZIP', command: '. .cursor/scripts/packager.ps1' }
+  { name: 'Project Index', description: 'Build semantic code index', command: '. .cursor/scripts/project-index-builder/build-index.ps1' }
 ]
 
 const copiedIndex = ref<number | null>(null)
@@ -267,7 +267,7 @@ onMounted(() => {
 
 .scripts-table-header {
   display: grid;
-  grid-template-columns: 150px 1fr 1fr;
+  grid-template-columns: 160px 1fr 1.5fr;
   gap: 14px;
   padding: 12px 18px;
   background: rgba(255, 255, 255, 0.02);
@@ -281,7 +281,7 @@ onMounted(() => {
 
 .scripts-table-row {
   display: grid;
-  grid-template-columns: 150px 1fr 1fr;
+  grid-template-columns: 160px 1fr 1.5fr;
   gap: 14px;
   padding: 12px 18px;
   border-bottom: 1px solid var(--border-subtle);

@@ -19,18 +19,19 @@ function smoothScroll(href: string) {
 const stats = [
   { icon: 'layers', title: 'Rules', count: '79', items: ['core-architecture, coding-standards', 'security, performance, api', 'database, multi-tenant, billing'] },
   { icon: 'file', title: 'Skills', count: '47', items: ['aspnet-core, playwright, figma', 'vercel-deploy, cloudflare-deploy', 'docker, kubernetes, jupyter'], color: 'cyan' },
-  { icon: 'search', title: 'Knowledge', count: '272', items: ['architecture, best-practice, anti-pattern', 'faq, checklist, glossary', 'decision-tree per domain'], color: 'emerald' }
+  { icon: 'search', title: 'Knowledge', count: '272', items: ['architecture, best-practice, anti-pattern', 'faq, checklist, glossary', 'decision-tree per domain'], color: 'emerald' },
+  { icon: 'code', title: 'Components', count: '35+', items: ['Nuxt, Vue, Next, React', 'Laravel, NestJS, ASP.NET Core', 'Supabase, PostgreSQL, Redis'], color: 'violet' }
 ]
 
 const terminalLines = [
-  { type: 'cmd', text: 'Initialize framework for CRM project' },
+  { type: 'cmd', text: 'Initialize CEF for my CRM project' },
   { type: 'muted', text: 'Loading rules...', success: '79 rules loaded' },
   { type: 'muted', text: 'Loading skills...', success: '47 skills loaded' },
   { type: 'muted', text: 'Loading knowledge...', success: '272 knowledge files indexed' },
-  { type: 'muted', text: 'Memory check...', muted: 'No previous decisions found' },
-  { type: 'cmd', text: 'Build Multi-Tenant CRM with Supabase' },
+  { type: 'muted', text: 'Building memory...', success: 'Context optimized' },
+  { type: 'cmd', text: 'Build Multi-Tenant SaaS with Supabase' },
   { type: 'success', text: '✓ Context routed: supabase, rls, multi-tenant' },
-  { type: 'cyan', text: '✓ Token optimized: 12,400 tokens saved' }
+  { type: 'cyan', text: '✓ Token saved: 12,400 (~23% reduction)' }
 ]
 
 onMounted(() => {
@@ -80,41 +81,42 @@ onMounted(() => {
       </div>
 
       <div class="hero-cards">
-        <div class="hc-left">
-          <div
-            v-for="(stat, index) in stats"
-            :key="stat.title"
-            class="hc-card"
-            :style="{ transitionDelay: `${index * 80}ms` }"
-            :class="{ visible: isVisible }"
-          >
-            <div class="hc-card-header">
-              <div class="hc-card-icon" :class="{ cyan: stat.color === 'cyan', emerald: stat.color === 'emerald' }">
-                <svg v-if="stat.icon === 'layers'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
-                <svg v-else-if="stat.icon === 'file'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                  <polyline points="14 2 14 8 20 8"/>
-                  <line x1="8" y1="13" x2="16" y2="13"/>
-                  <line x1="8" y1="17" x2="16" y2="17"/>
-                </svg>
-                <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <circle cx="11" cy="11" r="8"/>
-                  <path d="M21 21l-4.35-4.35"/>
-                </svg>
-              </div>
-              <span class="hc-card-title">{{ stat.title }}</span>
-              <span class="hc-card-count" :class="{ cyan: stat.color === 'cyan', emerald: stat.color === 'emerald' }">
-                {{ stat.count }}
-              </span>
+        <div
+          v-for="(stat, index) in stats"
+          :key="stat.title"
+          class="hc-card"
+          :style="{ transitionDelay: `${index * 80}ms` }"
+          :class="{ visible: isVisible }"
+        >
+          <div class="hc-card-header">
+            <div class="hc-card-icon" :class="{ cyan: stat.color === 'cyan', emerald: stat.color === 'emerald', violet: stat.color === 'violet' }">
+              <svg v-if="stat.icon === 'layers'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+              <svg v-else-if="stat.icon === 'file'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="8" y1="13" x2="16" y2="13"/>
+                <line x1="8" y1="17" x2="16" y2="17"/>
+              </svg>
+              <svg v-else-if="stat.icon === 'search'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="M21 21l-4.35-4.35"/>
+              </svg>
+              <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <polyline points="16 18 22 12 16 6"/>
+                <polyline points="8 6 2 12 8 18"/>
+              </svg>
             </div>
-            <div class="hc-card-items">
-              <div v-for="item in stat.items" :key="item" class="hc-item">
-                <span class="hc-dot" :class="{ 'hc-dot-cyan': stat.color === 'cyan', 'hc-dot-emerald': stat.color === 'emerald' }"></span>
-                {{ item }}
-              </div>
-              <div class="hc-more">+{{ stat.title === 'Rules' ? '72' : stat.title === 'Skills' ? '43' : '269' }} more</div>
+            <span class="hc-card-title">{{ stat.title }}</span>
+            <span class="hc-card-count" :class="{ cyan: stat.color === 'cyan', emerald: stat.color === 'emerald', violet: stat.color === 'violet' }">
+              {{ stat.count }}
+            </span>
+          </div>
+          <div class="hc-card-items">
+            <div v-for="item in stat.items" :key="item" class="hc-item">
+              <span class="hc-dot" :class="{ 'hc-dot-cyan': stat.color === 'cyan', 'hc-dot-emerald': stat.color === 'emerald', 'hc-dot-violet': stat.color === 'violet' }"></span>
+              {{ item }}
             </div>
           </div>
         </div>
@@ -137,7 +139,6 @@ onMounted(() => {
               <span v-if="line.type === 'cmd'" class="ht-cmd">{{ line.text }}</span>
               <span v-if="line.type === 'muted'" class="ht-muted">{{ line.text }}</span>
               <span v-if="line.success" class="ht-success"> {{ line.success }}</span>
-              <span v-if="line.muted" class="ht-muted"> {{ line.muted }}</span>
               <span v-if="line.type === 'success'" class="ht-success">{{ line.text }}</span>
               <span v-if="line.type === 'cyan'" class="ht-cyan">{{ line.text }}</span>
             </div>
@@ -167,6 +168,15 @@ onMounted(() => {
   stroke: #34d399;
 }
 
+.hc-card-icon.violet {
+  background: rgba(120, 119, 232, 0.12);
+  border-color: rgba(120, 119, 232, 0.3);
+}
+
+.hc-card-icon.violet svg {
+  stroke: #a78bfa;
+}
+
 .hc-card-count.cyan {
   color: #06b6d4;
   background: rgba(6, 182, 212, 0.08);
@@ -175,6 +185,15 @@ onMounted(() => {
 .hc-card-count.emerald {
   color: #34d399;
   background: rgba(52, 211, 153, 0.08);
+}
+
+.hc-card-count.violet {
+  color: #a78bfa;
+  background: rgba(120, 119, 232, 0.12);
+}
+
+.hc-dot-violet {
+  background: #a78bfa;
 }
 
 .hc-card {

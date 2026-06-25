@@ -275,6 +275,27 @@ ul, ol {
   color: var(--text-secondary);
 }
 
+.navbar-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  background: var(--gradient-primary);
+  color: #fff;
+  margin-left: 6px;
+  letter-spacing: 0.02em;
+}
+
+.star-badge {
+  color: #fbbf24;
+  font-size: 12px;
+}
+
+.navbar-actions .btn-ghost:hover .star-badge {
+  transform: scale(1.2);
+  transition: transform var(--t-fast);
+}
+
 .navbar-nav {
   display: flex;
   align-items: center;
@@ -561,9 +582,9 @@ ul, ol {
 /* Hero floating cards */
 .hero-cards {
   width: 100%;
-  max-width: 900px;
+  max-width: 1000px;
   display: grid;
-  grid-template-columns: 1fr 1.4fr;
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
   align-items: start;
 }
@@ -896,12 +917,12 @@ ul, ol {
 /* ─── RESPONSIVE ────────────────────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .hero-cards {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     max-width: 600px;
   }
 
   .hc-left {
-    display: grid;
+    display: flex;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
   }
