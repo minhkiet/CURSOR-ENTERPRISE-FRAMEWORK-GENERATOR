@@ -1,6 +1,6 @@
 # One-liner installation for Cursor Enterprise Framework
 # Usage: irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1 | iex
-# Update: irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1 | iex -Update
+# Update: & {irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1} -Update
 
 param(
     [string]$RepoUrl = "https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR",
