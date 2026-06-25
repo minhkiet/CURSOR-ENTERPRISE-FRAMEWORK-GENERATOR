@@ -15,7 +15,7 @@ Write-Host "==================================================" -ForegroundColor
 Write-Host ""
 
 $parsed = $RepoUrl -replace 'https://github\.com/', '' -replace 'http://github\.com/', ''
-$repoPath = $parsed.TrimEnd('.git').TrimEnd('/')
+$repoPath = $parsed -replace '\.git$', '' -replace '/$', ''
 $zipUrl = "https://github.com/$repoPath/archive/refs/heads/$Branch.zip"
 
 Write-Host "Repository: $RepoUrl" -ForegroundColor Gray
