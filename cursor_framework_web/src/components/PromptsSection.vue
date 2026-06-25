@@ -19,6 +19,10 @@ const visibleItems = ref(new Set<string>())
 const activeTab = ref('all')
 const searchQuery = ref('')
 
+function clearSearch() {
+  searchQuery.value = ''
+}
+
 interface TabItem {
   id: string
   label: string
@@ -554,6 +558,12 @@ onMounted(() => {
           type="text"
           placeholder="Tìm kiếm prompt..."
         />
+        <button v-if="searchQuery" class="search-clear" @click="clearSearch">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
       </div>
 
       <!-- Prompts Grid -->
@@ -677,6 +687,29 @@ onMounted(() => {
 
 .prompts-search input::placeholder {
   color: var(--text-muted);
+}
+
+.search-clear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: color var(--t-fast);
+  border-radius: var(--radius-sm);
+}
+
+.search-clear:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.search-clear svg {
+  width: 14px;
+  height: 14px;
 }
 
 .prompts-grid {
