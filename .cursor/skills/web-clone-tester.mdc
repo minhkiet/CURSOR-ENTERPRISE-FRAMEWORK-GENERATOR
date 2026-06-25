@@ -1,0 +1,414 @@
+---
+name: web-clone-tester
+description: "Sử dụng khi cần test và verify độ chính xác của một cloned website so với bản gốc. Test bao gồm UI comparison, functionality verification, responsive testing, và performance audit."
+---
+
+# Web Clone Tester Skill
+
+Skill để verify và test clone website - đảm bảo clone giống bản gốc về cả giao diện và chức năng.
+
+## Khi nào sử dụng
+
+- Sau khi clone một website, verify độ chính xác
+- Khi cần so sánh clone với original
+- Khi cần đảm bảo tất cả features hoạt động
+- Khi cần report differences giữa clone và original
+
+## Test Categories
+
+### 1. Visual Comparison Tests
+- Screenshot comparison
+- Layout structure verification
+- Color/typography matching
+- Spacing/alignment verification
+
+### 2. Functional Tests
+- Navigation links work
+- Forms submit correctly
+- Buttons trigger actions
+- Modals open/close
+- Animations work
+
+### 3. Responsive Tests
+- Mobile viewport (320px - 480px)
+- Tablet viewport (768px - 1024px)
+- Desktop viewport (1920px+)
+- Breakpoint behavior
+
+### 4. Content Tests
+- All text content present
+- All images load
+- Fonts render correctly
+- Icons display properly
+
+### 5. Performance Tests
+- Load time
+- Resource sizes
+- Request count
+- Lighthouse scores
+
+## Test Workflow
+
+### Phase 1: Setup Comparison Environment
+
+```bash
+# Mở original website
+"$PWCLI" open https://original-website.com
+
+# Snapshot original
+"$PWCLI" snapshot
+"$PWCLI" screenshot original-full.png
+
+# Resize to standard desktop
+"$PWCLI" resize 1920 1080
+"$PWCLI" screenshot original-desktop.png
+```
+
+### Phase 2: Open Clone
+
+```bash
+# Mở clone trong new tab
+"$PWCLI" tab-new file:///{path}/clone-project/index.html
+
+# Snapshot clone
+"$PWCLI" snapshot
+"$PWCLI" screenshot clone-full.png
+
+# Resize to same viewport
+"$PWCLI" resize 1920 1080
+"$PWCLI" screenshot clone-desktop.png
+```
+
+### Phase 3: Visual Comparison
+
+#### 3.1 Side-by-Side Screenshots
+
+```bash
+# Original viewport screenshot
+"$PWCLI" tab-select 0
+"$PWCLI" resize 1920 1080
+"$PWCLI" screenshot comparison-original.png
+
+# Clone viewport screenshot
+"$PWCLI" tab-select 1
+"$PWCLI" resize 1920 1080
+"$PWCLI" screenshot comparison-clone.png
+```
+
+#### 3.2 DOM Structure Comparison
+
+```bash
+# Get original DOM
+"$PWCLI" tab-select 0
+"$PWCLI" eval "JSON.stringify({
+  bodyChildren: document.body.children.length,
+  mainElements: document.querySelectorAll('main, article, section').length,
+  navItems: document.querySelectorAll('nav a').length,
+  forms: document.querySelectorAll('form').length,
+  buttons: document.querySelectorAll('button, .btn').length,
+  images: document.querySelectorAll('img').length,
+  links: document.querySelectorAll('a').length
+})"
+
+# Get clone DOM
+"$PWCLI" tab-select 1
+"$PWCLI" eval "JSON.stringify({
+  bodyChildren: document.body.children.length,
+  mainElements: document.querySelectorAll('main, article, section').length,
+  navItems: document.querySelectorAll('nav a').length,
+  forms: document.querySelectorAll('form').length,
+  buttons: document.querySelectorAll('button, .btn').length,
+  images: document.querySelectorAll('img').length,
+  links: document.querySelectorAll('a').length
+})"
+```
+
+#### 3.3 CSS Comparison
+
+```bash
+# Original CSS variables
+"$PWCLI" tab-select 0
+"$PWCLI" eval "JSON.stringify({
+  rootVars: Array.from(document.querySelector(':root').style).filter(p => p.startsWith('--')),
+  fonts: getComputedStyle(document.body).fontFamily,
+  colors: {
+    primary: getComputedStyle(document.documentElement).getPropertyValue('--primary') || getComputedStyle(document.body).color,
+    background: document.body.style.background || getComputedStyle(document.body).backgroundColor
+  }
+})"
+
+# Clone CSS variables
+"$PWCLI" tab-select 1
+"$PWCLI" eval "JSON.stringify({
+  rootVars: Array.from(document.querySelector(':root').style).filter(p => p.startsWith('--')),
+  fonts: getComputedStyle(document.body).fontFamily,
+  colors: {
+    primary: getComputedStyle(document.documentElement).getPropertyValue('--primary') || getComputedStyle(document.body).color,
+    background: document.body.style.background || getComputedStyle(document.body).backgroundColor
+  }
+})"
+```
+
+### Phase 4: Functionality Tests
+
+#### 4.1 Navigation Test
+
+```bash
+# Test clone navigation
+"$PWCLI" tab-select 1
+"$PWCLI" eval "Array.from(document.querySelectorAll('a[href]')).map(a => ({
+  text: a.textContent.trim().substring(0, 30),
+  href: a.href,
+  valid: a.href !== '#' && a.href !== ''
+}))"
+```
+
+#### 4.2 Form Test
+
+```bash
+# Test form existence and fields
+"$PWCLI" eval "JSON.stringify(Array.from(document.querySelectorAll('form')).map(f => ({
+  id: f.id || f.className,
+  action: f.action,
+  method: f.method,
+  fields: Array.from(f.querySelectorAll('input, select, textarea')).map(i => ({
+    name: i.name,
+    type: i.type || i.tagName.toLowerCase(),
+    required: i.required
+  }))
+})))"
+```
+
+#### 4.3 Interactive Elements Test
+
+```bash
+# Test buttons and clickable elements
+"$PWCLI" eval "JSON.stringify({
+  buttons: Array.from(document.querySelectorAll('button, [role=button], .btn, [class*=button]')).map(b => ({
+    text: b.textContent.trim().substring(0, 20),
+    hasHandler: !!b.onclick || b.hasAttribute('data-action') || b.hasAttribute('ng-click') || b.hasAttribute('@click')
+  })),
+  modals: Array.from(document.querySelectorAll('[class*=modal], [class*=dialog]')).map(m => ({
+    trigger: m.id || m.className.substring(0, 30)
+  }))
+})"
+```
+
+### Phase 5: Responsive Tests
+
+```bash
+# Mobile (320px)
+"$PWCLI" tab-select 1
+"$PWCLI" resize 320 568
+"$PWCLI" snapshot
+"$PWCLI" screenshot responsive-mobile.png
+
+# Check if hamburger menu appears
+"$PWCLI" eval "JSON.stringify({
+  viewport: { width: window.innerWidth, height: window.innerHeight },
+  hamburger: !!document.querySelector('.hamburger, .menu-toggle, [class*=hamburger]'),
+  mobileNav: !!document.querySelector('nav.mobile, nav.active, .mobile-menu')
+})"
+
+# Mobile (375px - iPhone)
+"$PWCLI" resize 375 667
+"$PWCLI" screenshot responsive-iphone.png
+
+# Tablet (768px)
+"$PWCLI" resize 768 1024
+"$PWCLI" snapshot
+"$PWCLI" screenshot responsive-tablet.png
+
+# Desktop (1920px)
+"$PWCLI" resize 1920 1080
+"$PWCLI" snapshot
+"$PWCLI" screenshot responsive-desktop.png
+```
+
+### Phase 6: Performance Comparison
+
+```bash
+# Network requests comparison
+"$PWCLI" tab-select 0  # Original
+"$PWCLI" network
+# Navigate to trigger all requests
+"$PWCLI" reload
+"$PWCLI" eval "JSON.stringify({
+  resourceCount: performance.getEntriesByType('resource').length,
+  totalSize: performance.getEntriesByType('resource').reduce((sum, r) => sum + (r.transferSize || 0), 0),
+  domComplete: performance.timing.domContentLoaded,
+  loadComplete: performance.timing.loadComplete
+})"
+
+"$PWCLI" tab-select 1  # Clone
+"$PWCLI" network
+"$PWCLI" reload
+"$PWCLI" eval "JSON.stringify({
+  resourceCount: performance.getEntriesByType('resource').length,
+  totalSize: performance.getEntriesByType('resource').reduce((sum, r) => sum + (r.transferSize || 0), 0),
+  domComplete: performance.timing.domContentLoaded,
+  loadComplete: performance.timing.loadComplete
+})"
+```
+
+## Test Report Template
+
+```markdown
+# Web Clone Test Report
+
+**Original URL:** {original_url}
+**Clone Path:** {clone_path}
+**Test Date:** {date}
+**Tester:** {agent}
+
+---
+
+## 1. Visual Comparison
+
+### Desktop (1920x1080)
+| Element | Original | Clone | Match |
+|---------|----------|-------|-------|
+| Header | ✓ | ✓ | ✅ |
+| Navigation | ✓ | ✓ | ✅ |
+| Hero Section | ✓ | ✓ | ✅ |
+| Content Layout | ✓ | ✓ | ✅ |
+| Footer | ✓ | ✓ | ✅ |
+
+### Color Palette
+| Color | Original | Clone | Match |
+|-------|----------|-------|-------|
+| Primary | #007bff | #007bff | ✅ |
+| Secondary | #6c757d | #6c757d | ✅ |
+| Text | #333 | #333 | ✅ |
+
+### Typography
+| Element | Original | Clone | Match |
+|---------|----------|-------|-------|
+| Headings | Inter Bold | Inter Bold | ✅ |
+| Body | Inter Regular | Inter Regular | ✅ |
+| Code | Fira Code | Fira Code | ✅ |
+
+## 2. Functional Tests
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Page Load | ✅ PASS | |
+| Navigation Links | ✅ PASS | |
+| Form Submission | ✅ PASS | |
+| Button Clicks | ✅ PASS | |
+| Modal Open/Close | ✅ PASS | |
+| Scroll Animations | ✅ PASS | |
+| Hover Effects | ✅ PASS | |
+
+## 3. Responsive Tests
+
+| Viewport | Width | Height | Layout | Status |
+|----------|-------|--------|--------|--------|
+| Mobile S | 320px | 568px | Single column | ✅ |
+| Mobile M | 375px | 667px | Single column | ✅ |
+| Mobile L | 425px | 812px | Single column | ✅ |
+| Tablet | 768px | 1024px | 2 columns | ✅ |
+| Laptop | 1024px | 768px | 3 columns | ✅ |
+| Desktop | 1920px | 1080px | Full layout | ✅ |
+
+## 4. Content Verification
+
+| Content Type | Original | Clone | Status |
+|--------------|----------|-------|--------|
+| Headings | 15 | 15 | ✅ |
+| Paragraphs | 42 | 42 | ✅ |
+| Images | 28 | 28 | ✅ |
+| Links | 67 | 67 | ✅ |
+| Forms | 3 | 3 | ✅ |
+| Buttons | 24 | 24 | ✅ |
+
+## 5. Performance Comparison
+
+| Metric | Original | Clone | Delta |
+|--------|----------|-------|-------|
+| Load Time | 1.2s | 0.8s | -33% |
+| Total Size | 2.4MB | 1.8MB | -25% |
+| Requests | 45 | 32 | -29% |
+| DOM Ready | 0.8s | 0.5s | -37% |
+
+## 6. Issues Found
+
+### Critical Issues
+- None
+
+### Minor Issues
+| Issue | Severity | Description | Fix Required |
+|-------|----------|-------------|--------------|
+| Font loading | Low | Clone uses different font source | Update font URL |
+| Image lazy-load | Low | Clone missing lazy-load class | Add lazy-load |
+
+## 7. Overall Assessment
+
+**Clone Accuracy:** 95%
+
+| Category | Score |
+|----------|-------|
+| Visual Match | 98% |
+| Functionality | 100% |
+| Responsiveness | 100% |
+| Content | 100% |
+| Performance | 90% |
+
+**Verdict:** ✅ CLONE APPROVED
+- Minor differences in font loading strategy
+- All core features working correctly
+- Responsive behavior matches original
+```
+
+## Comparison Script
+
+```javascript
+// Automated comparison script
+const comparison = {
+    compareDOM: (original, clone) => {
+        const originalCount = original.querySelectorAll('*').length;
+        const cloneCount = clone.querySelectorAll('*').length;
+        return {
+            elements: originalCount === cloneCount,
+            difference: Math.abs(originalCount - cloneCount)
+        };
+    },
+    
+    compareStyles: (original, clone) => {
+        const origStyles = getComputedStyle(original);
+        const cloneStyles = getComputedStyle(clone);
+        return {
+            fonts: origStyles.fontFamily === cloneStyles.fontFamily,
+            colors: origStyles.color === cloneStyles.color,
+            spacing: origStyles.margin === cloneStyles.margin
+        };
+    },
+    
+    compareContent: (original, clone) => {
+        const origText = original.innerText.trim();
+        const cloneText = clone.innerText.trim();
+        const similarity = calculateSimilarity(origText, cloneText);
+        return { similarity, threshold: 0.9 };
+    }
+};
+```
+
+## Verification Checklist
+
+- [ ] Screenshots captured for all viewports
+- [ ] DOM structure compared
+- [ ] CSS styles verified
+- [ ] Navigation links tested
+- [ ] Forms functional
+- [ ] Interactive elements work
+- [ ] Responsive breakpoints verified
+- [ ] Content completeness checked
+- [ ] Performance compared
+- [ ] Test report generated
+
+## Related
+
+- [[../skills/web-cloner]] - Web Cloner Skill
+- [[../skills/playwright-web-scraper]] - Web Scraper Skill
+- [[../workflows/web-content-extraction]] - Content Extraction Workflow
+- [[../rules/coding-standards]] - Coding Standards
