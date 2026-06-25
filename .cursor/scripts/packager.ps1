@@ -8,8 +8,8 @@
 
 param(
     [string]$SourcePath = ".cursor",
-    [string]$OutputPath = "cursor-enterprise-framework-v4.zip",
-    [string]$FrameworkVersion = "4.0.0",
+    [string]$OutputPath = "cursor-enterprise-framework-v4.1.zip",
+    [string]$FrameworkVersion = "4.1.0",
     [switch]$IncludeScripts,
     [switch]$Verify
 )
@@ -63,10 +63,10 @@ function Test-FrameworkIntegrity {
     )
 
     $requiredFiles = @(
-        "memory/project-index.json",
-        "memory/context-router.json",
+        "memory/project-index.md",
+        "memory/context-router.md",
         "memory/technology-stack.json",
-        "memory/business-rules.json"
+        "memory/business-rules.md"
     )
 
     $issues = @()
@@ -107,11 +107,15 @@ function Get-FrameworkStats {
         skills = (Get-ChildItem -Path "$Path/skills" -Filter "*.mdc" -ErrorAction SilentlyContinue | Measure-Object).Count
         knowledge_files = (Get-ChildItem -Path "$Path/knowledge" -Filter "*.md" -Recurse -ErrorAction SilentlyContinue | Measure-Object).Count
         knowledge_domains = (Get-ChildItem -Path "$Path/knowledge" -Directory -ErrorAction SilentlyContinue | Measure-Object).Count
-        prompts = (Get-ChildItem -Path "$Path/prompts" -Filter "*.md" -ErrorAction SilentlyContinue | Measure-Object).Count
+        prompts = (Get-ChildItem -Path "$Path/prompts" -Filter "*.prompt.md" -ErrorAction SilentlyContinue | Measure-Object).Count
         workflows = (Get-ChildItem -Path "$Path/workflows" -Filter "*.md" -ErrorAction SilentlyContinue | Measure-Object).Count
+        templates = (Get-ChildItem -Path "$Path/templates" -Filter "*.md" -ErrorAction SilentlyContinue | Measure-Object).Count
         scripts = (Get-ChildItem -Path "$Path/scripts" -Filter "*.ps1" -Recurse -ErrorAction SilentlyContinue | Measure-Object).Count
+        memory_md = (Get-ChildItem -Path "$Path/memory" -Filter "*.md" -ErrorAction SilentlyContinue | Measure-Object).Count
         memory_json = (Get-ChildItem -Path "$Path/memory" -Filter "*.json" -ErrorAction SilentlyContinue | Measure-Object).Count
         memory_sqlite = (Get-ChildItem -Path "$Path/memory/schema" -Filter "*.sql" -ErrorAction SilentlyContinue | Measure-Object).Count
+        hooks = (Get-ChildItem -Path "$Path/hooks" -Filter "hook.md" -Recurse -ErrorAction SilentlyContinue | Measure-Object).Count
+        commands = (Get-ChildItem -Path "$Path/commands" -Filter "command.md" -Recurse -ErrorAction SilentlyContinue | Measure-Object).Count
     }
 
     return $stats
@@ -142,12 +146,16 @@ Write-Log "  Knowledge Domains: $($stats.knowledge_domains)"
 Write-Log "  Knowledge Files: $($stats.knowledge_files)"
 Write-Log "  Prompts: $($stats.prompts)"
 Write-Log "  Workflows: $($stats.workflows)"
+Write-Log "  Templates: $($stats.templates)"
 Write-Log "  Scripts: $($stats.scripts)"
+Write-Log "  Memory MD: $($stats.memory_md)"
 Write-Log "  Memory JSON: $($stats.memory_json)"
 Write-Log "  Memory SQLite Schemas: $($stats.memory_sqlite)"
+Write-Log "  Hooks: $($stats.hooks)"
+Write-Log "  Commands: $($stats.commands)"
 
 # Calculate total
-$total = $stats.rules + $stats.skills + $stats.knowledge_files + $stats.prompts + $stats.workflows + $stats.scripts
+$total = $stats.rules + $stats.skills + $stats.knowledge_files + $stats.prompts + $stats.workflows + $stats.templates + $stats.scripts + $stats.hooks + $stats.commands
 Write-Log "  Total files: $total"
 
 # Get directory size

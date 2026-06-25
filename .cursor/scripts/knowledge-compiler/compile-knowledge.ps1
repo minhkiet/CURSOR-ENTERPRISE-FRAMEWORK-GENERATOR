@@ -8,7 +8,7 @@
 
 param(
     [string]$KnowledgePath = ".cursor/knowledge",
-    [string]$OutputPath = ".cursor/cache/compiled",
+    [string]$OutputPath = ".cursor/cache/knowledge",
     [string]$Format = "json",
     [switch]$Verbose
 )

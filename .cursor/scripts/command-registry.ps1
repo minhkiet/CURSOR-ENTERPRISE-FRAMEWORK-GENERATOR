@@ -3,8 +3,9 @@
 # ============================================================
 # Purpose: Register, link, and manage commands and hooks
 # Language: PowerShell
-# Framework: Cursor Enterprise Framework V4
+# Framework: Cursor Enterprise Framework V4.1
 # Created: 2026-06-24
+# Updated: 2026-06-24 - Added post-checkout, pre-rebase hooks; version 4.1.0
 # ============================================================
 
 param(
@@ -20,7 +21,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$FrameworkVersion = "4.0.0"
+$FrameworkVersion = "4.1.0"
 $CursorDir = ".cursor"
 $HooksDir = Join-Path $CursorDir "hooks"
 $CommandsDir = Join-Path $CursorDir "commands"
@@ -238,6 +239,20 @@ $HookRegistry = @{
         Category    = "Git"
         Path        = "$HooksDir/git-hooks/post-commit/hook.md"
         Trigger     = "git commit (sau)"
+    }
+    "git-post-checkout" = @{
+        Name        = "Post-Checkout"
+        Description = "Refresh memory va context sau khi checkout"
+        Category    = "Git"
+        Path        = "$HooksDir/git-hooks/post-checkout/hook.md"
+        Trigger     = "git checkout (sau)"
+    }
+    "git-pre-rebase" = @{
+        Name        = "Pre-Rebase"
+        Description = "Snapshot va warnings truoc khi rebase"
+        Category    = "Git"
+        Path        = "$HooksDir/git-hooks/pre-rebase/hook.md"
+        Trigger     = "git rebase (truoc)"
     }
 
     # CI/CD Hooks

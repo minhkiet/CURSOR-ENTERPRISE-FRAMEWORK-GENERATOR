@@ -8,7 +8,7 @@
 
 param(
     [string]$ProjectRoot = ".",
-    [string]$OutputPath = ".cursor/memory/project-index.json",
+    [string]$OutputPath = ".cursor/memory/project-index.md",
     [switch]$Verbose
 )
 

@@ -34,6 +34,7 @@ Commands là các slash commands cho Cursor IDE. Mỗi command được định 
 | `/bazi` | Domain | Tính Bát Tự |
 | `/tuvi` | Domain | Tính Tử Vi |
 | `/numerology` | Domain | Thần Số Học |
+| `/scrape` | Data | Web scraping và content extraction |
 
 ## Cách sử dụng
 

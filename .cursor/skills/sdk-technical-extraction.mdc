@@ -1,0 +1,411 @@
+---
+name: sdk-technical-extraction
+description: "Sử dụng khi cần trích xuất thông tin kỹ thuật SDK từ documentation sites. Tập trung vào installation, configuration, authentication, API methods, type definitions, và code examples."
+---
+
+# SDK Technical Extraction Skill
+
+Skill chuyên biệt để trích xuất thông tin kỹ thuật SDK từ các trang documentation.
+
+## Khi nào sử dụng
+
+- Khi user cần lấy SDK requirements cho integration
+- Khi cần extract installation/configuration instructions
+- Khi cần trích xuất API methods và type definitions
+- Khi cần thu thập code examples cho implementation
+
+## Target Content Types
+
+### 1. Installation & Setup
+- Package manager commands (npm, yarn, pnpm, pip, go, etc.)
+- Peer/optional dependencies
+- System requirements
+- Environment setup
+
+### 2. Configuration
+- Environment variables
+- Configuration files
+- Initialization options
+- Plugin registrations
+
+### 3. Authentication
+- API keys setup
+- OAuth flows
+- Token management
+- Permission scopes
+
+### 4. API Methods
+- Class/function signatures
+- Parameters và types
+- Return values
+- Error handling
+
+### 5. Type Definitions
+- Interfaces/classes
+- Enums/constants
+- Generic types
+- Union types
+
+### 6. Code Examples
+- Basic usage
+- Advanced patterns
+- Error handling
+- Best practices
+
+## Extraction Workflow
+
+### Phase 1: Initial Survey
+
+```bash
+# Mở SDK documentation page
+"$PWCLI" open https://docs.sdk-vendor.com/sdk/latest
+
+# Lấy overview
+"$PWCLI" snapshot
+"$PWCLI" eval "document.title"
+"$PWCLI" eval "document.querySelector('meta[name=description]')?.content"
+
+# Lấy table of contents/navigation
+"$PWCLI" eval "JSON.stringify(Array.from(document.querySelectorAll('nav a, [class*=sidebar] a')).map(a => ({text: a.textContent.trim(), href: a.getAttribute('href')}))"
+```
+
+### Phase 2: Installation Section
+
+```bash
+# Navigate to Installation section
+"$PWCLI" click e5  # Element ref cho Installation nav
+"$PWCLI" snapshot
+
+# Extract package install commands
+"$PWCLI" eval "Array.from(document.querySelectorAll('pre code')).filter(el => el.textContent.match(/(npm install|yarn add|pip install|go get)/)).map(el => el.textContent)"
+
+# Extract peer dependencies
+"$PWCLI" eval "Array.from(document.querySelectorAll('tr, li')).filter(el => el.textContent.match(/peer|depend/i)).map(el => el.textContent)"
+```
+
+### Phase 3: Configuration Section
+
+```bash
+# Navigate to Configuration
+"$PWCLI" click e7
+"$PWCLI" snapshot
+
+# Extract env variables
+"$PWCLI" eval "JSON.stringify(Array.from(document.querySelectorAll('[class*=env], [id*=env], table tr')).map(tr => ({name: tr.children[0]?.textContent, desc: tr.children[1]?.textContent, required: tr.children[2]?.textContent})))"
+
+# Extract config options
+"$PWCLI" eval "Array.from(document.querySelectorAll('pre code')).map(c => c.textContent)"
+```
+
+### Phase 4: Authentication Section
+
+```bash
+# Navigate to Auth section
+"$PWCLI" click e9
+"$PWCLI" snapshot
+
+# Extract auth setup code
+"$PWCLI" eval "Array.from(document.querySelectorAll('pre')).map(p => p.textContent)"
+
+# Extract auth parameters
+"$PWCLI" eval "Array.from(document.querySelectorAll('[class*=param], [class*=option]')).map(el => el.textContent)"
+```
+
+### Phase 5: API Reference
+
+```bash
+# Navigate to API Reference
+"$PWCLI" click e11
+"$PWCLI" snapshot
+
+# Extract method signatures
+"$PWCLI" eval "Array.from(document.querySelectorAll('[class*=signature], [class*=method], pre')).map(el => el.textContent)"
+
+# Extract parameter tables
+"$PWCLI" eval "JSON.stringify(Array.from(document.querySelectorAll('table')).map(t => ({headers: Array.from(t.querySelectorAll('th')).map(h => h.textContent), rows: Array.from(t.querySelectorAll('tbody tr')).map(r => Array.from(r.children).map(c => c.textContent))})))"
+```
+
+### Phase 6: Type Definitions
+
+```bash
+# Navigate to Types section
+"$PWCLI" click e13
+"$PWCLI" snapshot
+
+# Extract type definitions (TypeScript/Flow)
+"$PWCLI" eval "Array.from(document.querySelectorAll('pre code')).filter(el => el.textContent.match(/^(interface|type|class|enum)/)).map(el => el.textContent)"
+
+# Extract examples
+"$PWCLI" eval "Array.from(document.querySelectorAll('[class*=example]')).map(el => el.textContent)"
+```
+
+## Output Structure
+
+```
+.cursor/knowledge/{sdk-name}/
+├── README.md
+├── installation.md
+├── configuration.md
+├── authentication.md
+├── api-reference.md
+├── types.md
+└── examples/
+    ├── basic-usage.ts
+    ├── authentication.ts
+    ├── error-handling.ts
+    └── advanced-patterns.ts
+```
+
+## Markdown Output Templates
+
+### SDK README Template
+
+```markdown
+# {SDK Name} SDK
+
+> Version: {version} | Documentation: {docs_url}
+
+## Quick Links
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Authentication](#authentication)
+- [API Reference](#api-reference)
+- [Examples](#examples)
+
+## Overview
+{SDK description}
+
+## Installation
+
+### Package Manager
+\`\`\`bash
+npm install {package-name}
+\`\`\`
+
+### Requirements
+- Node.js >= {min_version}
+- Other SDKs: {dependencies}
+
+## Configuration
+See [configuration.md](./configuration.md)
+
+## Authentication
+See [authentication.md](./authentication.md)
+
+## API Reference
+See [api-reference.md](./api-reference.md)
+
+## Examples
+See [examples/README.md](./examples/README.md)
+```
+
+### Installation Template
+
+```markdown
+# Installation - {SDK Name}
+
+## Package Manager Installation
+
+### npm
+\`\`\`bash
+npm install {package-name}
+\`\`\`
+
+### yarn
+\`\`\`bash
+yarn add {package-name}
+\`\`\`
+
+### pnpm
+\`\`\`bash
+pnpm add {package-name}
+\`\`\`
+
+## Peer Dependencies
+
+| Package | Version | Required |
+|---------|---------|----------|
+| {dep} | {ver} | Yes/No |
+
+## System Requirements
+
+| Requirement | Minimum |
+|-------------|---------|
+| Node.js | {version} |
+| OS | {os} |
+| Memory | {ram} |
+
+## Environment Setup
+
+\`\`\`bash
+# Set environment variables
+export API_KEY=your_api_key
+export API_SECRET=your_api_secret
+\`\`\`
+```
+
+### API Reference Template
+
+```markdown
+# API Reference - {SDK Name}
+
+## Client Initialization
+
+### Constructor
+\`\`\`typescript
+new {ClientClass}(config: {ClientConfig})
+\`\`\`
+
+#### Parameters
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| apiKey | string | Yes | API key |
+| baseUrl | string | No | Custom base URL |
+| timeout | number | No | Request timeout (ms) |
+
+## Methods
+
+### {methodName}
+
+\`\`\`typescript
+async {methodName}(params: {MethodParams}): Promise<{ReturnType}>
+\`\`\`
+
+#### Parameters
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| param1 | string | Yes | Description |
+| param2 | number | No | Description |
+
+#### Returns
+`Promise<{ReturnType}>`
+
+#### Example
+\`\`\`typescript
+const result = await client.{methodName}({
+  param1: 'value'
+});
+\`\`\`
+
+#### Errors
+| Code | Type | Description |
+|------|------|-------------|
+| 400 | ValidationError | Invalid parameters |
+| 401 | AuthError | Invalid credentials |
+| 500 | ServerError | Internal error |
+```
+
+### Types Template
+
+```markdown
+# Type Definitions - {SDK Name}
+
+## Interfaces
+
+### {InterfaceName}
+\`\`\`typescript
+interface {InterfaceName} {
+  field1: string;
+  field2: number;
+  field3?: boolean;
+}
+\`\`\`
+
+## Types
+
+### {TypeName}
+\`\`\`typescript
+type {TypeName} = 'value1' | 'value2' | {other};
+\`\`\`
+
+## Enums
+
+### {EnumName}
+\`\`\`typescript
+enum {EnumName} {
+  Value1 = 'value1',
+  Value2 = 'value2'
+}
+\`\`\`
+```
+
+## Code Examples
+
+### Basic Usage (basic-usage.ts)
+
+```typescript
+import { Client } from '{package-name}';
+
+// Initialize client
+const client = new Client({
+  apiKey: process.env.API_KEY
+});
+
+// Make API call
+const result = await client.{method}({
+  param: 'value'
+});
+
+console.log(result);
+```
+
+### Authentication (authentication.ts)
+
+```typescript
+import { Client, AuthProvider } from '{package-name}';
+
+// API Key authentication
+const client = new Client({
+  apiKey: 'your_api_key'
+});
+
+// OAuth authentication
+const oauthClient = new Client({
+  authProvider: new AuthProvider.OAuth({
+    clientId: 'your_client_id',
+    clientSecret: 'your_client_secret',
+    redirectUri: 'your_redirect_uri'
+  })
+});
+```
+
+### Error Handling (error-handling.ts)
+
+```typescript
+import { Client, ValidationError, AuthError, ServerError } from '{package-name}';
+
+const client = new Client({ apiKey: process.env.API_KEY });
+
+try {
+  const result = await client.{method}(params);
+} catch (error) {
+  if (error instanceof ValidationError) {
+    console.error('Invalid parameters:', error.details);
+  } else if (error instanceof AuthError) {
+    console.error('Authentication failed:', error.message);
+  } else if (error instanceof ServerError) {
+    console.error('Server error:', error.message);
+  } else {
+    throw error;
+  }
+}
+```
+
+## Verification Checklist
+
+- [ ] Installation commands extracted
+- [ ] Peer dependencies documented
+- [ ] Environment variables listed
+- [ ] Configuration options complete
+- [ ] Authentication flows documented
+- [ ] All API methods captured
+- [ ] Type definitions complete
+- [ ] Code examples runnable
+- [ ] No placeholder content
+- [ ] Output formatted correctly
+
+## Related
+
+- [[../skills/playwright-web-scraper]] - Playwright Web Scraper Skill
+- [[../workflows/web-content-extraction]] - Web Content Extraction Workflow
+- [[../rules/coding-standards]] - Coding Standards
