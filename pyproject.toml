@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cursor-framework"
+version = "1.0.0"
+description = "Cursor Enterprise Framework - Python Library"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Cursor Enterprise Framework"}
+]
+keywords = ["cursor", "framework", "llm", "enterprise", "context", "memory", "skills"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+http = [
+    "requests>=2.31.0",
+]
+all = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "requests>=2.31.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/cursor-enterprise/framework"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cursor_framework*"]
+
+[tool.pytest.ini_options]
+testpaths = ["cursor_framework/tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]

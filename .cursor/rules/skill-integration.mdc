@@ -1,29 +1,466 @@
 ---
 description: Hướng dẫn skill auto-discovery và execution cho Cursor Enterprise Framework. Định tuyến tự động đến skills phù hợp với pre-review và post-review gates. Mọi task phải pass qua cả hai gates trước khi deliver.
 created: 2026-06-23
-version: 1.1.0
-tags: [skill, auto-discovery, frontend, review, quality, cursor, pre-review, post-review]
+version: 1.2.0
+tags: [skill, auto-discovery, frontend, review, quality, cursor, pre-review, post-review, skill-selection, intent-analysis]
 ---
 
 # Skill Auto-Discovery & Execution Protocol
 
 ## Mục tiêu & Tổng quan
 
-Hệ thống skill cho Cursor Enterprise Framework bao gồm **4 skills chính**, mỗi skill đều có:
+Hệ thống skill cho Cursor Enterprise Framework bao gồm **6 skills chính**, mỗi skill đều có:
 - **Pre-Review Gate** — chạy TRƯỚC khi viết code (lập kế hoạch, lock scope, declare design direction)
 - **Post-Review Gate** — chạy SAU KHI viết code, TRƯỚC KHI deliver (kiểm tra chất lượng)
 
 ```
 REQUEST → Skill Detection → Pre-Review Gate
-                                     ↓ (PASS)
-                              Implementation
-                                     ↓
-                              Post-Review Gate
-                                     ↓ (PASS)
-                                  Delivery
+                                    ↓ (PASS)
+                             Implementation
+                                    ↓
+                             Post-Review Gate
+                                    ↓ (PASS)
+                                 Delivery
 ```
 
 **Không có ngoại lệ.** Mọi task phải pass cả hai gates. Bypass dưới mọi hình thức đều bị cấm.
+
+---
+
+## PHẦN A: SKILL DETECTION ENGINE (Auto-Discovery)
+
+### A.1 Tổng quan Skill Detection
+
+Skill Detection Engine là bộ phân tích tự động phân loại yêu cầu của user và xác định skills cần áp dụng. Engine hoạt động theo 3 giai đoạn:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    SKILL DETECTION FLOW                             │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  1. REQUEST PARSING                                                 │
+│     ├── Extract raw text & intent signals                          │
+│     ├── Identify keywords (primary + secondary)                     │
+│     └── Detect domain context (frontend, backend, security)         │
+│                                                                     │
+│  2. SKILL MATCHING                                                  │
+│     ├── Match against Skill Keyword Matrix (Section A.2)           │
+│     ├── Calculate confidence scores (Section A.3)                   │
+│     └── Determine skill combination (Section A.4)                   │
+│                                                                     │
+│  3. SKILL ACTIVATION                                                │
+│     ├── Primary skill selected                                      │
+│     ├── Secondary skills identified                                 │
+│     ├── Review gates determined                                     │
+│     └── Load SKILL.md files                                        │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### A.2 Skill Keyword Matrix (Primary Triggers)
+
+| Keyword / Pattern | Primary Skill | Confidence | Notes |
+|---|---|---|---|
+| **FRONTEND - Landing Pages** ||||
+| `landing page` | frontend-taste | 0.95 | Landing/hero pages |
+| `portfolio` | frontend-taste | 0.95 | Personal/company portfolios |
+| `homepage` | frontend-taste | 0.90 | Website homepage |
+| `marketing site` | frontend-taste | 0.90 | Marketing/splash pages |
+| `SaaS landing` | frontend-taste | 0.95 | SaaS product landing |
+| `launch page` | frontend-taste | 0.90 | Product launch pages |
+| **FRONTEND - Redesign** ||||
+| `redesign` | frontend-redesign | 0.95 | Full redesign task |
+| `upgrade` | frontend-redesign | 0.85 | UI/UX upgrade |
+| `improve existing` | frontend-redesign | 0.90 | Improve current UI |
+| `modernize` | frontend-redesign | 0.90 | Make it modern |
+| `improve UI` | frontend-redesign | 0.85 | UI improvements |
+| `improve UX` | frontend-redesign | 0.85 | UX improvements |
+| `refresh` | frontend-redesign | 0.80 | Visual refresh |
+| **FRONTEND - Build/Create** ||||
+| `build` + `frontend` | frontend-taste | 0.90 | Build frontend |
+| `create` + `component` | frontend-taste | 0.85 | Create components |
+| `implement` + `UI` | frontend-taste | 0.85 | Implement UI |
+| **FULL OUTPUT - Output Quality** ||||
+| `full implementation` | full-output | 0.95 | Explicit full impl |
+| `complete` | full-output | 0.90 | Complete task |
+| `not skeleton` | full-output | 0.95 | No skeleton |
+| `no TODO` | full-output | 0.95 | No TODOs |
+| `not placeholder` | full-output | 0.95 | No placeholders |
+| `full code` | full-output | 0.90 | Full code output |
+| `not truncated` | full-output | 0.90 | No truncation |
+| `entire` + `file` | full-output | 0.90 | Full files |
+| `build from scratch` | full-output | 0.85 | Greenfield build |
+| **REVIEW - Quality Check** ||||
+| `review` | frontend-review | 0.95 | Code review request |
+| `quality check` | frontend-review | 0.95 | Quality audit |
+| `audit` | frontend-review | 0.90 | Audit request |
+| `check quality` | frontend-review | 0.90 | Quality check |
+| `taste check` | frontend-review | 0.90 | Design taste review |
+| **SECURITY - Security Tasks** ||||
+| `security` + `review` | security-review | 0.95 | Security review |
+| `vulnerability` | security-review | 0.95 | Vulnerability check |
+| `penetration test` | security-review | 0.95 | Pentest |
+| `OWASP` | security-review | 0.95 | OWASP compliance |
+| `XSS` | security-review | 0.95 | XSS vulnerability |
+| `SQL injection` | security-review | 0.95 | SQLi vulnerability |
+| `SSRF` | security-review | 0.95 | SSRF vulnerability |
+| `CSRF` | security-review | 0.95 | CSRF vulnerability |
+| `authentication` | security-review | 0.90 | Auth implementation |
+| `authorization` | security-review | 0.90 | Authz implementation |
+| `JWT` | security-review | 0.85 | JWT handling |
+| `OAuth` | security-review | 0.90 | OAuth implementation |
+| `API key` + `security` | security-review | 0.90 | API key security |
+| `secret` + `leak` | security-review | 0.95 | Secret exposure |
+| `CVE` | security-review | 0.95 | CVE vulnerability |
+| `exploit` | security-review | 0.95 | Exploit analysis |
+| `reverse engineer` | security-review | 0.90 | RE task |
+| `APK` + `decompile` | security-review | 0.95 | APK analysis |
+| `Frida` | security-review | 0.95 | Dynamic analysis |
+| `prompt injection` | security-review | 0.95 | LLM security |
+| `malware` | security-review | 0.95 | Malware analysis |
+| **PAYMENT - Vietnam Payment** ||||
+| `MoMo` | vietnam-payment-review | 0.95 | MoMo integration |
+| `SePay` | vietnam-payment-review | 0.95 | SePay integration |
+| `PayOS` | vietnam-payment-review | 0.95 | PayOS integration |
+| `ZaloPay` | vietnam-payment-review | 0.95 | ZaloPay integration |
+| `VNPay` | vietnam-payment-review | 0.95 | VNPay integration |
+| `VietQR` | vietnam-payment-review | 0.95 | VietQR integration |
+| `thanh toán` + `Việt Nam` | vietnam-payment-review | 0.95 | Vietnam payment |
+| `webhook` + `payment` | vietnam-payment-review | 0.90 | Payment webhook |
+| `payment gateway` | security-review | 0.85 | Payment security |
+
+### A.3 Confidence Scoring Algorithm
+
+Confidence score cho mỗi skill được tính dựa trên:
+
+```python
+# Confidence Calculation Formula
+def calculate_confidence(skill: str, request: str) -> float:
+    base_score = BASE_CONFIDENCE[skill]  # 0.70 - 0.80 base
+    keyword_matches = count_keyword_matches(skill, request)
+    context_bonus = assess_context_signals(request)
+    domain_penalty = apply_domain_penalty(skill, request)
+    
+    # Weighted formula
+    raw_score = (
+        keyword_matches * 0.15 +      # Keyword weight
+        context_bonus * 0.20 +        # Context bonus
+        base_score * 0.30 +           # Base skill confidence
+        domain_penalty * 0.35          # Domain fit
+    )
+    
+    # Normalize to 0-1 range
+    return min(1.0, max(0.0, raw_score))
+
+# Base Confidence by Skill
+BASE_CONFIDENCE = {
+    "frontend-taste": 0.75,
+    "frontend-redesign": 0.75,
+    "full-output": 0.80,        # Full output always applies
+    "frontend-review": 0.70,    # Review is fallback
+    "security-review": 0.80,    # Security is specialized
+    "vietnam-payment-review": 0.85  # Very specific domain
+}
+
+# Confidence Thresholds
+THRESHOLD_AUTO_SELECT = 0.75   # Auto-select if confidence >= this
+THRESHOLD_REVIEW_SUGGEST = 0.50  # Suggest review if confidence >= this
+THRESHOLD_AMBIGUOUS = 0.40    # Ambiguous if confidence < this
+```
+
+### A.4 Skill Combination Rules (Auto-Detected)
+
+Dựa trên keyword matching và confidence scores, skill combinations được xác định tự động:
+
+#### A.4.1 Frontend Combinations
+
+| Request Pattern | Primary | Secondary | Review Gates |
+|---|---|---|---|
+| Landing/Portfolio/Greenfield | frontend-taste | full-output + frontend-review | taste-pre + taste-post + fulloutput-pre + fulloutput-post + review-pre + review-post |
+| Redesign Existing | frontend-redesign | full-output + frontend-review | redesign-pre + redesign-post + fulloutput-pre + fulloutput-post + review-pre + review-post |
+| Build/Create Components | frontend-taste | full-output + frontend-review | taste-pre + fulloutput-pre + review-pre + all post |
+| Code Review Only | frontend-review | (standalone) | review-pre + review-post |
+| Quality Check Only | frontend-review | (standalone) | review-pre + review-post |
+
+#### A.4.2 Security Combinations
+
+| Request Pattern | Primary | Secondary | Review Gates |
+|---|---|---|---|
+| Security Vulnerability | security-review | (standalone) | security-pre + security-post |
+| Payment + Security | security-review | vietnam-payment-review | security-pre + payment-pre + security-post + payment-post |
+| Vietnam Payment Only | vietnam-payment-review | security-review | payment-pre + security-pre + payment-post + security-post |
+| API Security | security-review | (standalone) | security-pre + security-post |
+| Auth Implementation | security-review | frontend-review (if UI) | security-pre + [frontend-pre] + security-post + [frontend-post] |
+
+#### A.4.3 Full Output Combinations
+
+| Request Pattern | Primary | Secondary | Review Gates |
+|---|---|---|---|
+| Full Impl (Frontend) | full-output | frontend-review | fulloutput-pre + review-pre + fulloutput-post + review-post |
+| Full Impl (Backend) | full-output | security-review (if auth/payment) | fulloutput-pre + [security-pre] + fulloutput-post + [security-post] |
+| Full Impl (Multi-file) | full-output | frontend-review | fulloutput-pre + review-pre + all post |
+
+### A.5 Context Signals (Beyond Keywords)
+
+Ngoài keywords, các context signals sau được sử dụng để refine skill selection:
+
+#### A.5.1 Implicit Signals
+
+```yaml
+# Signal → Skill Inference Mapping
+
+Signal: "file extension in request"
+  - .vue, .tsx, .jsx → frontend-taste/frontend-redesign
+  - .py, .java, .go → backend (no frontend skill)
+
+Signal: "design system mentioned"
+  - Tailwind, shadcn, Radix → frontend-taste
+  - Fluent UI, Material → frontend-taste (official design system)
+
+Signal: "existing codebase reference"
+  - "current app", "existing site" → frontend-redesign
+  - "our website" → frontend-redesign
+  - "new project", "from scratch" → frontend-taste + full-output
+
+Signal: "quality/standard language"
+  - "enterprise", "production-ready" → full-output + frontend-review
+  - "shippable", "ready to deploy" → full-output
+
+Signal: "visual/aesthetic language"
+  - "beautiful", "premium", "polished" → frontend-taste
+  - "ugly", "outdated" → frontend-redesign
+  - "modern", "sleek" → frontend-redesign
+
+Signal: "security language"
+  - "protect", "secure", "encrypt" → security-review
+  - "leak", "breach", "vulnerable" → security-review
+```
+
+#### A.5.2 Anti-Signals (Skills to NOT Apply)
+
+```yaml
+# Negative Signals → Skill Exclusion
+
+Signal: "backend only" → Exclude frontend skills
+  - "API only", "REST endpoint", "database migration"
+  
+Signal: "infrastructure" → Exclude frontend/security skills
+  - "docker", "kubernetes", "CI/CD", "deployment"
+  
+Signal: "pure logic" → Exclude frontend-taste
+  - "algorithm", "data processing", "computation"
+  
+Signal: "documentation" → Exclude frontend skills
+  - "write docs", "API documentation", "README"
+```
+
+### A.6 Skill Detection Decision Tree
+
+```
+START: Request Received
+│
+├── Is request about PAYMENT (MoMo, SePay, PayOS, ZaloPay, VNPay, VietQR)?
+│   └── YES → Is request about SECURITY (vulnerability, auth, secrets)?
+│       ├── YES → security-review + vietnam-payment-review
+│       └── NO → vietnam-payment-review + [security-review if auth/payment]
+│
+├── Is request about SECURITY (vulnerability, pentest, OWASP, CVE, etc.)?
+│   └── YES → security-review
+│       └── Is task APK/binary RE?
+│           ├── YES → security-review + reverse-skill routing
+│           └── NO → security-review standalone
+│
+├── Is request about FRONTEND (UI, landing, redesign, component)?
+│   ├── YES → Is request about REDESIGN (existing site, improve, upgrade)?
+│   │   ├── YES → frontend-redesign + full-output + frontend-review
+│   │   └── NO → Is request about BUILD/CREATE (landing, portfolio, new)?
+│   │       ├── YES → frontend-taste + full-output + frontend-review
+│   │       └── NO → Is request about REVIEW (quality check, audit)?
+│   │           ├── YES → frontend-review (standalone)
+│   │           └── NO → frontend-taste + frontend-review
+│   └── NO → Is request about FULL OUTPUT (full implementation, complete)?
+│       ├── YES → full-output + [domain-specific review]
+│       └── NO → Apply default based on implicit signals
+│
+└── Is request AMBIGUOUS (low confidence for all skills)?
+    └── YES → Ask clarifying question, then apply based on response
+```
+
+### A.7 Skill Detection Examples
+
+#### Example 1: Landing Page Request
+
+```
+User: "Tạo một landing page cho startup AI của tôi với design hiện đại"
+
+Analysis:
+├── Keywords detected: "landing page" (0.95), "design" (0.80), "startup" (0.70)
+├── Context: New project, visual/aesthetic language
+├── Signals: greenfield, premium design language
+│
+├── Skill Match Scores:
+│   ├── frontend-taste: 0.92 ← HIGHEST
+│   ├── frontend-redesign: 0.15 (no existing site)
+│   ├── full-output: 0.80
+│   └── frontend-review: 0.70
+│
+├── Decision:
+│   ├── Primary: frontend-taste (0.92 >= 0.75)
+│   ├── Secondary: full-output + frontend-review
+│   └── Gates: taste-pre + fulloutput-pre + review-pre
+│
+└── Output:
+    ╔════════════════════════════════════════════════════╗
+    ║ [SKILL DETECTION COMPLETE]                         ║
+    ╠════════════════════════════════════════════════════╣
+    ║ Primary:    frontend-taste (0.92)                 ║
+    ║ Secondary:  full-output, frontend-review            ║
+    ║ Confidence: HIGH - Auto-selected                   ║
+    ╚════════════════════════════════════════════════════╝
+```
+
+#### Example 2: Security Review Request
+
+```
+User: "Review code này xem có SQL injection vulnerability không"
+
+Analysis:
+├── Keywords detected: "review" (0.95), "SQL injection" (0.95), "vulnerability" (0.95)
+├── Context: Security, vulnerability assessment
+├── Signals: security-focused language
+│
+├── Skill Match Scores:
+│   ├── security-review: 0.95 ← HIGHEST
+│   ├── frontend-review: 0.60 (review keyword, but security context)
+│   ├── frontend-taste: 0.20 (no frontend context)
+│   └── vietnam-payment-review: 0.30 (no payment context)
+│
+├── Decision:
+│   ├── Primary: security-review (0.95 >= 0.75)
+│   ├── Secondary: (none - standalone security)
+│   └── Gates: security-pre + security-post
+│
+└── Output:
+    ╔════════════════════════════════════════════════════╗
+    ║ [SKILL DETECTION COMPLETE]                         ║
+    ╠════════════════════════════════════════════════════╣
+    ║ Primary:    security-review (0.95)                ║
+    ║ Secondary:   (none - standalone security task)      ║
+    ║ Confidence:  HIGH - Auto-selected                  ║
+    ╚════════════════════════════════════════════════════╝
+```
+
+#### Example 3: Multi-Skill Detection
+
+```
+User: "Tích hợp thanh toán MoMo vào app, đảm bảo secure và không có vulnerability"
+
+Analysis:
+├── Keywords detected: 
+│   ├── "MoMo" (0.95), "payment" (0.95) → vietnam-payment-review
+│   ├── "secure" (0.90), "vulnerability" (0.95) → security-review
+│   └── "integration" (0.85) → full-output
+├── Context: Payment + Security + Implementation
+├── Signals: Both payment and security context
+│
+├── Skill Match Scores:
+│   ├── vietnam-payment-review: 0.93 ← HIGHEST (payment domain)
+│   ├── security-review: 0.90 ← HIGHEST (security domain)
+│   └── full-output: 0.85 (implementation requested)
+│
+├── Decision:
+│   ├── Primary: vietnam-payment-review (payment domain)
+│   ├── Secondary: security-review (security overlay)
+│   ├── Tertiary: full-output (implementation completeness)
+│   └── Gates: payment-pre + security-pre + payment-post + security-post
+│
+└── Output:
+    ╔════════════════════════════════════════════════════╗
+    ║ [SKILL DETECTION COMPLETE]                         ║
+    ╠════════════════════════════════════════════════════╣
+    ║ Primary:    vietnam-payment-review (0.93)         ║
+    ║ Secondary:  security-review (0.90)                ║
+    ║ Tertiary:   full-output (0.85)                    ║
+    ║ Confidence: HIGH - Multi-skill detected            ║
+    ║ Gates:      4 (payment-pre/post + security-pre/post)║
+    ╚════════════════════════════════════════════════════╝
+```
+
+#### Example 4: Ambiguous Request
+
+```
+User: "Cải thiện app này"
+
+Analysis:
+├── Keywords detected: "cải thiện" (improve) - ambiguous
+├── Context: Unclear - could be redesign, feature add, bug fix
+├── Signals: Existing project reference ("app này")
+│
+├── Skill Match Scores:
+│   ├── frontend-redesign: 0.55 (existing project, but "improve" vague)
+│   ├── frontend-taste: 0.40 (could be UI focus)
+│   ├── frontend-review: 0.50 (could be quality check)
+│   └── full-output: 0.45 (could be implementation)
+│
+├── Decision:
+│   ├── All scores < 0.75 (THRESHOLD_AUTO_SELECT)
+│   └── AMBIGUOUS - Need clarification
+│
+└── Output:
+    ╔════════════════════════════════════════════════════╗
+    ║ [SKILL DETECTION: AMBIGUOUS]                      ║
+    ╠════════════════════════════════════════════════════╣
+    ║ Best match:  frontend-redesign (0.55)            ║
+    ║ Confidence: LOW - Clarification needed            ║
+    ║                                                  ║
+    ║ Clarification needed:                             ║
+    ║ "Bạn muốn cải thiện điều gì cụ thể?"            ║
+    ║ - Thiết kế/UI (redesign)                         ║
+    ║ - Tính năng mới (implementation)                 ║
+    ║ - Chất lượng code (review)                       ║
+    ║ - Hiệu năng (performance review)                 ║
+    ╚════════════════════════════════════════════════════╝
+```
+
+### A.8 Auto-Detection Output Format
+
+Khi skill detection hoàn thành, output format chuẩn:
+
+```
+══════════════════════════════════════════════════════════════
+[SKILL DETECTION] — ANALYSIS COMPLETE
+══════════════════════════════════════════════════════════════
+
+Request Summary: [brief summary of what user wants]
+Primary Intent:  [main intent identified]
+Domain:          [frontend/backend/security/payment/etc.]
+
+──────────────────────────────────────────────────────────────
+SKILLS SELECTED
+──────────────────────────────────────────────────────────────
+
+  ★ PRIMARY:      [skill-name] (confidence: 0.XX)
+  ○ SECONDARY:    [skill-name] (confidence: 0.XX) [if applicable]
+  ○ TERTIARY:     [skill-name] (confidence: 0.XX) [if applicable]
+
+──────────────────────────────────────────────────────────────
+REVIEW GATES TO RUN
+──────────────────────────────────────────────────────────────
+
+  PRE-REVIEW (before code):
+    [ ] [Skill-1] Pre-Review Gate
+    [ ] [Skill-2] Pre-Review Gate
+    [ ] [Skill-N] Pre-Review Gate
+
+  POST-REVIEW (after code):
+    [ ] [Skill-1] Post-Review Gate
+    [ ] [Skill-2] Post-Review Gate
+    [ ] [Skill-N] Post-Review Gate
+
+──────────────────────────────────────────────────────────────
+NEXT ACTION: Load SKILL.md files and begin PRE-REVIEW
+══════════════════════════════════════════════════════════════
+```
 
 ---
 
@@ -78,16 +515,53 @@ REQUEST → Skill Detection → Pre-Review Gate
 
 ---
 
-## Execution Protocol (Chi tiết 6 Bước)
+## PHẦN D: EXECUTION PROTOCOL (Chi tiết 6 Bước)
 
-### Bước 1: Skill Detection
+### Bước 0: SKILL DETECTION (Auto-Discovery)
+
+**TRƯỚC KHI bất kỳ pre-review nào, luôn chạy Skill Detection Engine:**
+
+```
 Khi nhận request:
-1. Phân tích keywords trong request → match với Skill Registry
-2. Xác định primary + secondary skills
-3. Xác định tất cả review gates cần chạy (dựa vào bảng Combination Rules)
-4. Load tất cả SKILL.md files liên quan bằng Read tool
+1. Parse request → extract keywords, intent signals, domain context
+2. Match against Skill Keyword Matrix (Section A.2)
+3. Calculate confidence scores (Section A.3)
+4. Determine skill combination (Section A.4)
+5. Check context signals (Section A.5)
+6. Apply decision tree (Section A.6)
+7. Output: Skills Selected + Review Gates to Run
+8. Load SKILL.md files cho tất cả selected skills
+```
 
-### Bước 2: Pre-Review Gate(s) — TRƯỚC KHI VIẾT CODE
+**Output format cho Skill Detection:**
+```
+══════════════════════════════════════════════════════════════
+[SKILL DETECTION] — ANALYSIS COMPLETE
+══════════════════════════════════════════════════════════════
+
+Request Summary: [brief summary]
+Primary Intent:  [main intent]
+Domain:          [frontend/backend/security/payment]
+
+──────────────────────────────────────────────────────────────
+SKILLS SELECTED
+──────────────────────────────────────────────────────────────
+
+  ★ PRIMARY:      [skill-name] (confidence: 0.XX)
+  ○ SECONDARY:   [skill-name] (confidence: 0.XX)
+  ○ TERTIARY:    [skill-name] (confidence: 0.XX)
+
+──────────────────────────────────────────────────────────────
+REVIEW GATES TO RUN
+──────────────────────────────────────────────────────────────
+
+  PRE-REVIEW: [list all pre-review gates]
+  POST-REVIEW: [list all post-review gates]
+
+══════════════════════════════════════════════════════════════
+```
+
+### Bước 1: Pre-Review Gate(s) — TRƯỚC KHI VIẾT CODE
 
 Output header:
 ```
@@ -308,7 +782,7 @@ Items Verified:
 
 ---
 
-### Bước 3: Implementation — VIẾT CODE
+### Bước 2: Implementation — VIẾT CODE
 
 Sau khi tất cả pre-review gates PASS:
 
@@ -331,7 +805,7 @@ Sau khi tất cả pre-review gates PASS:
 
 ---
 
-### Bước 4: Post-Review Gate(s) — SAU KHI VIẾT CODE, TRƯỚC KHI DELIVER
+### Bước 3: Post-Review Gate(s) — SAU KHI VIẾT CODE, TRƯỚC KHI DELIVER
 
 Output header:
 ```
@@ -725,7 +1199,7 @@ Reviewer Notes:
 
 ---
 
-### Bước 5: Delivery
+### Bước 4: Delivery
 
 Sau khi tất cả post-review gates PASS:
 1. Gửi code cho user
@@ -733,7 +1207,7 @@ Sau khi tất cả post-review gates PASS:
 3. Nêu review notes nếu có items đã fix trong quá trình review
 4. Nêu rõ any intentional exceptions (documented và justified)
 
-### Bước 6: Long-Output Handling (PAUSE/RESUME)
+### Bước 5: Long-Output Handling (PAUSE/RESUME)
 
 Khi response tiệm cận token limit:
 
@@ -827,37 +1301,80 @@ Send "continue" to resume from: [next deliverable name]
 ║       │                                                      ║
 ║       ▼                                                      ║
 ║  ┌─────────────────────────┐                                 ║
-║  │ 1. SKILL DETECTION      │  Match keywords → Skill Registry║
-║  │    Load SKILL.md files  │  Identify primary + secondary    ║
+║  │ 0. SKILL DETECTION      │  Phase A: Auto-Discovery        ║
+║  │    [SKILL DETECTION]   │  - Parse keywords + signals     ║
+║  │    ─────────────────── │  - Match Skill Matrix            ║
+║  │    ★ PRIMARY: [skill]  │  - Calculate confidence         ║
+║  │    ○ SECONDARY: [...]  │  - Determine combination        ║
+║  │    Confidence: X%       │  - Load SKILL.md files         ║
 ║  └──────────┬──────────────┘                                 ║
 ║             ▼                                                 ║
 ║  ┌─────────────────────────┐                                 ║
-║  │ 2. PRE-REVIEW GATE      │  TRƯỚC KHI VIẾT CODE             ║
-║  │    [PRE-REVIEW] header  │  Run ALL pre-review checklists    ║
-║  │    ALL items PASS →     │  Lock scope + design direction    ║
-║  │    else STOP            │  Dial values + anti-default      ║
+║  │ 1. PRE-REVIEW GATE     │  TRƯỚC KHI VIẾT CODE           ║
+║  │    [PRE-REVIEW] header │  Run ALL pre-review checklists   ║
+║  │    ALL items PASS →    │  Lock scope + design direction  ║
+║  │    else STOP            │  Dial values + anti-default     ║
 ║  └──────────┬──────────────┘                                 ║
 ║             ▼                                                 ║
 ║  ┌─────────────────────────┐                                 ║
-║  │ 3. IMPLEMENTATION        │  Viết code theo skill guidelines ║
-║  │    Track deliverables   │  Full code, NO placeholders     ║
-║  │    If approaching limit  │  NO em-dashes, NO AI-slop       ║
-║  │    → PAUSE marker        │  Follow anti-default discipline  ║
+║  │ 2. IMPLEMENTATION      │  Viết code theo skill guidelines ║
+║  │    Track deliverables  │  Full code, NO placeholders      ║
+║  │    If approaching limit │  NO em-dashes, NO AI-slop      ║
+║  │    → PAUSE marker      │  Follow anti-default discipline  ║
 ║  └──────────┬──────────────┘                                 ║
 ║             ▼                                                 ║
 ║  ┌─────────────────────────┐                                 ║
-║  │ 4. POST-REVIEW GATE     │  SAU KHI VIẾT CODE               ║
-║  │    [POST-REVIEW] header │  Run ALL post-review checklists  ║
-║  │    ALL items PASS →     │  Design/Taste/Accessibility/Perf ║
-║  │    else FIX + re-run    │  Correctness/State/Testing       ║
+║  │ 3. POST-REVIEW GATE    │  SAU KHI VIẾT CODE             ║
+║  │    [POST-REVIEW] header│  Run ALL post-review checklists  ║
+║  │    ALL items PASS →    │  Design/Taste/Accessibility/Perf ║
+║  │    else FIX + re-run   │  Correctness/State/Testing      ║
 ║  └──────────┬──────────────┘                                 ║
 ║             ▼                                                 ║
 ║  ┌─────────────────────────┐                                 ║
-║  │ 5. DELIVERY             │  Code + review notes              ║
-║  │    + summary output     │  Files delivered + count         ║
+║  │ 4. DELIVERY            │  Code + review notes             ║
+║  │    + summary output    │  Files delivered + count         ║
 ║  └─────────────────────────┘                                 ║
 ║                                                              ║
 ╚══════════════════════════════════════════════════════════════╝
+
+SKILL DETECTION DECISION TREE:
+══════════════════════════════════════════════════════════════
+
+START: Request Received
+│
+├─► Is PAYMENT context? (MoMo, SePay, PayOS, ZaloPay, VNPay, VietQR)
+│   ├─► YES + SECURITY → security-review + vietnam-payment-review
+│   └─► YES → vietnam-payment-review + security-review (if auth)
+│
+├─► Is SECURITY context? (vulnerability, pentest, CVE, OWASP)
+│   └─► YES → security-review (standalone or + reverse-skill)
+│
+├─► Is FRONTEND context? (UI, landing, redesign, component)
+│   ├─► REDESIGN (existing site) → frontend-redesign + full-output + review
+│   ├─► BUILD/CREATE (new) → frontend-taste + full-output + review
+│   └─► REVIEW ONLY → frontend-review (standalone)
+│
+└─► Is FULL OUTPUT request? (full impl, complete, not skeleton)
+    └─► YES → full-output + [domain-specific skill]
+
+SKILL KEYWORD MATRIX:
+══════════════════════════════════════════════════════════════
+
+│ Pattern                    │ Primary Skill              │ Conf │
+├───────────────────────────┼───────────────────────────┼──────┤
+│ landing page, portfolio   │ frontend-taste            │ 0.95 │
+│ redesign, upgrade, improve │ frontend-redesign         │ 0.90 │
+│ full implementation        │ full-output               │ 0.95 │
+│ review, quality check     │ frontend-review           │ 0.95 │
+│ security, vulnerability   │ security-review           │ 0.95 │
+│ MoMo, SePay, PayOS, etc.  │ vietnam-payment-review    │ 0.95 │
+
+CONFIDENCE THRESHOLDS:
+══════════════════════════════════════════════════════════════
+
+  ≥ 0.75  → AUTO-SELECT (no confirmation needed)
+  0.50-0.74 → SUGGEST (offer to apply)
+  < 0.50  → AMBIGUOUS (ask for clarification)
 
 FRONTEND TASK?
   ├── Landing/Portfolio/Greenfield

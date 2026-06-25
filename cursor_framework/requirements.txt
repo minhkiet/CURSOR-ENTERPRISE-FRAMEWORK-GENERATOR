@@ -1,0 +1,8 @@
+# Cursor Enterprise Framework - Python Dependencies
+
+# Core dependencies (minimal)
+pydantic>=2.0.0
+
+# Optional dependencies for full functionality
+requests>=2.31.0        # For HTTP utilities
+python-dotenv>=1.0.0    # For environment management
