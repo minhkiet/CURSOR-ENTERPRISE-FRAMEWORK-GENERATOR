@@ -189,6 +189,70 @@ The framework implements **10 token optimization strategies**:
 
 ---
 
+## GitHub Installation
+
+### Quick Install (One Command)
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install-github.bat | iex
+```
+
+**Windows (CMD):**
+```cmd
+curl -LO https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install-github.bat && install-github.bat
+```
+
+### Using setup.bat with GitHub
+
+```cmd
+:: Clone from GitHub (default repo)
+setup.bat --github
+
+:: Clone with specific repo
+setup.bat --github https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR
+
+:: Clone with specific branch
+setup.bat --github https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR --branch main
+
+:: Download as ZIP (no Git required)
+setup.bat --zip https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR
+```
+
+### Using install-github.bat
+
+```cmd
+:: Default repo
+install-github.bat
+
+:: Custom repo
+install-github.bat https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR
+
+:: Custom repo + branch
+install-github.bat https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR main
+```
+
+### Using install-github.ps1 (PowerShell)
+
+```powershell
+# Default installation
+.\install-github.ps1
+
+# Custom repo and branch
+.\install-github.ps1 -RepoUrl "https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR" -Branch "main"
+
+# Check for updates
+.\install-github.ps1 -CheckUpdate
+
+# Dry run (preview)
+.\install-github.ps1 -DryRun
+
+# Force overwrite existing
+.\install-github.ps1 -Force
+```
+
+---
+
 ## License
 
 MIT License
@@ -391,6 +455,70 @@ Framework triển khai **10 chiến lược tối ưu token**:
 | PDF | Tạo và xử lý PDF |
 | Docker / Kubernetes | Container orchestration |
 | Cloudflare / AWS / Azure / GCP | Cloud platforms |
+
+---
+
+## Cài đặt từ GitHub
+
+### Cài đặt nhanh (Một lệnh)
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install-github.bat | iex
+```
+
+**Windows (CMD):**
+```cmd
+curl -LO https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install-github.bat && install-github.bat
+```
+
+### Sử dụng setup.bat với GitHub
+
+```cmd
+:: Clone từ GitHub (repo mặc định)
+setup.bat --github
+
+:: Clone với repo cụ thể
+setup.bat --github https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR
+
+:: Clone với branch cụ thể
+setup.bat --github https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR --branch main
+
+:: Download dạng ZIP (không cần Git)
+setup.bat --zip https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR
+```
+
+### Sử dụng install-github.bat
+
+```cmd
+:: Repo mặc định
+install-github.bat
+
+:: Repo tùy chỉnh
+install-github.bat https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR
+
+:: Repo + branch tùy chỉnh
+install-github.bat https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR main
+```
+
+### Sử dụng install-github.ps1 (PowerShell)
+
+```powershell
+# Cài đặt mặc định
+.\install-github.ps1
+
+# Repo và branch tùy chỉnh
+.\install-github.ps1 -RepoUrl "https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR" -Branch "main"
+
+# Kiểm tra cập nhật
+.\install-github.ps1 -CheckUpdate
+
+# Xem trước (dry run)
+.\install-github.ps1 -DryRun
+
+# Ghi đè file hiện có
+.\install-github.ps1 -Force
+```
 
 ---
 

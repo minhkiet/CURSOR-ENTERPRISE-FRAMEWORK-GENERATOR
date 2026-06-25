@@ -3,14 +3,17 @@ setlocal enabledelayedexpansion
 
 :: ============================================================
 :: Cursor Enterprise Framework Generator - Cross-Project Setup
-:: Framework Version: 4.1.0
+:: Framework Version: 4.2.0
 :: ============================================================
 :: Installs skills, rules, memory, knowledge, prompts, workflows,
 :: and templates into %USERPROFILE%\.cursor\ for cross-project
 :: use in Cursor IDE / Claude Code / Windsurf / Cline / Roo Code.
+:: Supports both local installation and GitHub remote installation.
 :: ============================================================
 
 set "SOURCE_DIR=%~dp0"
+set "GITHUB_REPO=https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR"
+set "GITHUB_BRANCH=main"
 set "USER_CURSOR_HOME=%USERPROFILE%\.cursor"
 set "USER_SKILLS=%USERPROFILE%\.cursor\skills"
 set "USER_RULES=%USERPROFILE%\.cursor\rules"
@@ -20,6 +23,11 @@ set "USER_PROMPTS=%USERPROFILE%\.cursor\prompts"
 set "USER_WORKFLOWS=%USERPROFILE%\.cursor\workflows"
 set "USER_TEMPLATES=%USERPROFILE%\.cursor\templates"
 
+:: GitHub installation settings
+set "GITHUB_INSTALL_DIR=%TEMP%\cursor-framework-github"
+set "GITHUB_REPO=https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR"
+set "GITHUB_BRANCH=main"
+
 :: Default mode is skip-if-exists; pass --force to overwrite.
 set "FORCE=0"
 if /i "%1"=="--force" set "FORCE=1"
@@ -28,18 +36,211 @@ set "SKIP_CURSOR_CHECK=0"
 if /i "%1"=="--no-cursor-check" set "SKIP_CURSOR_CHECK=1"
 if /i "%2"=="--no-cursor-check" set "SKIP_CURSOR_CHECK=1"
 
+:: GitHub mode flags
+set "GITHUB_MODE=0"
+set "GITHUB_URL="
+set "GITHUB_BRANCH_ARG="
+
+:: Parse GitHub-related arguments
+call :parse_github_args %*
+
+:: Parse GitHub-related arguments
+:parse_github_args
+if "%~1"=="" goto :eof
+if /i "%~1"=="--github" (
+    set "GITHUB_MODE=1"
+    if not "%~2"=="" (
+        set "GITHUB_URL=%~2"
+        shift
+    )
+    shift
+    goto :parse_github_args
+)
+if /i "%~1"=="--branch" (
+    if not "%~2"=="" (
+        set "GITHUB_BRANCH_ARG=%~2"
+        shift
+    )
+    shift
+    goto :parse_github_args
+)
+if /i "%~1"=="--clone" (
+    set "GITHUB_MODE=2"
+    if not "%~2"=="" (
+        set "GITHUB_URL=%~2"
+        shift
+    )
+    shift
+    goto :parse_github_args
+)
+if /i "%~1"=="--zip" (
+    set "GITHUB_MODE=3"
+    if not "%~2"=="" (
+        set "GITHUB_URL=%~2"
+        shift
+    )
+    shift
+    goto :parse_github_args
+)
+goto :eof
+
+:: ----------------------------------------------------------
+:: GitHub Installation Functions
+:: ----------------------------------------------------------
+
+:github_clone
+:: Clone repository from GitHub
+:: %~1 = repo URL, %~2 = branch (optional)
+echo.
+echo [GITHUB] Cloning repository...
+echo   URL: %~1
+if not "%~2"=="" echo   Branch: %~2
+
+:: Clean up existing temp directory
+if exist "%GITHUB_INSTALL_DIR%" (
+    rmdir /s /q "%GITHUB_INSTALL_DIR%" 2>nul
+)
+mkdir "%GITHUB_INSTALL_DIR%" 2>nul
+
+:: Check if git is available
+where git >nul 2>&1
+if !errorlevel! neq 0 (
+    echo [ERROR] Git is not installed or not in PATH.
+    echo   Please install Git from: https://git-scm.com/download/win
+    exit /b 1
+)
+
+:: Clone the repository
+if "%~2"=="" (
+    git clone --depth 1 "%~1" "%GITHUB_INSTALL_DIR%"
+) else (
+    git clone --branch "%~2" --depth 1 "%~1" "%GITHUB_INSTALL_DIR%"
+)
+
+if !errorlevel! neq 0 (
+    echo [ERROR] Failed to clone repository.
+    exit /b 1
+)
+
+echo [GITHUB] Clone successful.
+set "SOURCE_DIR=%GITHUB_INSTALL_DIR%"
+goto :eof
+
+:github_download_zip
+:: Download repository as ZIP from GitHub
+:: %~1 = repo URL, %~2 = branch (optional)
+echo.
+echo [GITHUB] Downloading repository as ZIP...
+echo   URL: %~1
+if not "%~2"=="" echo   Branch: %~2
+
+:: Parse GitHub URL to construct download URL
+set "REPO_PATH=%~1"
+set "BRANCH_NAME=%~2"
+if "%BRANCH_NAME%"=="" set "BRANCH_NAME=main"
+
+:: Convert https://github.com/user/repo to user/repo for API
+set "REPO_PATH=!REPO_PATH:https://github.com/=!"
+set "REPO_PATH=!REPO_PATH:http://github.com/=!"
+set "REPO_PATH=!REPO_PATH:github.com/=!"
+
+:: Construct ZIP URL
+set "ZIP_URL=https://github.com/%REPO_PATH%/archive/refs/heads/%BRANCH_NAME%.zip"
+echo   Download URL: !ZIP_URL!
+
+:: Clean up existing temp directory
+if exist "%GITHUB_INSTALL_DIR%" (
+    rmdir /s /q "%GITHUB_INSTALL_DIR%" 2>nul
+)
+mkdir "%GITHUB_INSTALL_DIR%" 2>nul
+
+:: Download ZIP file
+set "ZIP_FILE=%TEMP%\cursor-framework.zip"
+if exist "!ZIP_FILE!" del /f /q "!ZIP_FILE!" 2>nul
+
+echo   Downloading...
+powershell -Command "Invoke-WebRequest -Uri '!ZIP_URL!' -OutFile '!ZIP_FILE!'"
+if !errorlevel! neq 0 (
+    echo [ERROR] Failed to download ZIP file.
+    exit /b 1
+)
+
+:: Extract ZIP
+echo   Extracting...
+powershell -Command "Expand-Archive -Path '!ZIP_FILE!' -DestinationPath '%GITHUB_INSTALL_DIR%' -Force"
+if !errorlevel! neq 0 (
+    echo [ERROR] Failed to extract ZIP file.
+    exit /b 1
+)
+
+:: Find the extracted folder (GitHub creates a folder like repo-branch
+for /d %%D in ("%GITHUB_INSTALL_DIR%\*") do (
+    if not "%%~nxD"=="%GITHUB_INSTALL_DIR%" (
+        set "EXTRACTED_FOLDER=%%D"
+    )
+)
+
+if defined EXTRACTED_FOLDER (
+    set "SOURCE_DIR=!EXTRACTED_FOLDER!"
+) else (
+    set "SOURCE_DIR=%GITHUB_INSTALL_DIR%"
+)
+
+echo [GITHUB] Download and extraction successful.
+goto :eof
+
+:github_check_update
+:: Check for updates from GitHub
+:: %~1 = repo URL, %~2 = branch
+echo.
+echo [GITHUB] Checking for updates...
+echo   URL: %~1
+echo   Branch: %~2
+
+where git >nul 2>&1
+if !errorlevel! neq 0 (
+    echo   Git not available, skipping update check.
+    goto :eof
+)
+
+:: Create a temporary clone to check
+set "CHECK_DIR=%TEMP%\cursor-framework-check"
+if exist "!CHECK_DIR!" rmdir /s /q "!CHECK_DIR!" 2>nul
+mkdir "!CHECK_DIR!" 2>nul
+
+git clone --branch "%~2" --depth 1 "%~1" "!CHECK_DIR!" >nul 2>&1
+if !errorlevel! neq 0 (
+    echo   Failed to check for updates.
+    rmdir /s /q "!CHECK_DIR!" 2>nul
+    goto :eof
+)
+
+:: Compare versions
+if exist "!CHECK_DIR!\setup.bat" (
+    for %%A in ("!CHECK_DIR!\setup.bat") do set "REMOTE_VER=%%~tA"
+    for %%A in ("%SOURCE_DIR%\setup.bat") do set "LOCAL_VER=%%~tA"
+    echo   Local version: !LOCAL_VER!
+    echo   Remote version: !REMOTE_VER!
+)
+
+rmdir /s /q "!CHECK_DIR!" 2>nul
+goto :eof
+
 :: Normalize trailing backslash
 if "%SOURCE_DIR:~-1%"=="\" set "SOURCE_DIR=%SOURCE_DIR:~0,-1%"
 
 echo.
 echo ============================================================
-echo   Cursor Enterprise Framework v4.1.0 - Cross-Project Setup
+echo   Cursor Enterprise Framework v4.2.0 - Cross-Project Setup
 echo ============================================================
 echo.
 echo   Source:        %SOURCE_DIR%
 echo   User profile:  %USERPROFILE%
 echo   Mode:          %FORCE_MODE%
 if %FORCE%==1 (echo   Force mode:    ENABLED - will overwrite existing) else (echo   Force mode:    disabled - use --force to overwrite)
+if %GITHUB_MODE%==1 echo   GitHub mode:   Clone (SSH/HTTPS)
+if %GITHUB_MODE%==2 echo   GitHub mode:   Clone (explicit)
+if %GITHUB_MODE%==3 echo   GitHub mode:   ZIP Download
 echo.
 
 :: ----------------------------------------------------------
@@ -64,6 +265,47 @@ if %SKIP_CURSOR_CHECK%==1 (
         )
     )
     echo   OK.
+)
+
+:: ----------------------------------------------------------
+:: GitHub Installation Step (NEW Step 1.5)
+:: ----------------------------------------------------------
+if %GITHUB_MODE% gtr 0 (
+    echo [1.5/8] GitHub Remote Installation...
+    
+    :: If no URL provided, use default
+    if not defined GITHUB_URL set "GITHUB_URL=%GITHUB_REPO%"
+    if not defined GITHUB_BRANCH_ARG set "GITHUB_BRANCH_ARG=%GITHUB_BRANCH%"
+    
+    if %GITHUB_MODE%==1 (
+        :: Clone mode
+        call :github_clone "!GITHUB_URL!" "!GITHUB_BRANCH_ARG!"
+    ) else if %GITHUB_MODE%==2 (
+        :: Explicit clone mode
+        call :github_clone "!GITHUB_URL!" "!GITHUB_BRANCH_ARG!"
+    ) else if %GITHUB_MODE%==3 (
+        :: ZIP download mode
+        call :github_download_zip "!GITHUB_URL!" "!GITHUB_BRANCH_ARG!"
+    )
+    
+    if !errorlevel! neq 0 (
+        echo [ERROR] GitHub installation failed.
+        exit /b 1
+    )
+    
+    :: Update source directory with new path
+    set "SKILLS_SOURCE=%SOURCE_DIR%\.cursor\skills"
+    set "RULES_SOURCE=%SOURCE_DIR%\.cursor\rules"
+    set "MEMORY_SOURCE=%SOURCE_DIR%\.cursor\memory"
+    set "KNOWLEDGE_SOURCE=%SOURCE_DIR%\.cursor\knowledge"
+    set "PROMPTS_SOURCE=%SOURCE_DIR%\.cursor\prompts"
+    set "WORKFLOWS_SOURCE=%SOURCE_DIR%\.cursor\workflows"
+    set "TEMPLATES_SOURCE=%SOURCE_DIR%\.cursor\templates"
+    set "SCRIPTS_SOURCE=%SOURCE_DIR%\.cursor\scripts"
+    
+    echo   Using source: %SOURCE_DIR%
+) else (
+    echo [1.5/8] GitHub mode skipped (local installation).
 )
 
 :: ----------------------------------------------------------
@@ -475,7 +717,18 @@ echo   All components are now available globally across all
 echo   your Cursor / Claude Code / Windsurf / Cline / Roo Code
 echo   projects and workspaces.
 echo.
+if %GITHUB_MODE% gtr 0 (
+    echo   GitHub installation completed successfully.
+    echo   Temporary files have been cleaned up.
+    echo.
+)
 echo   Tip: Run 'setup.bat --force' to overwrite existing
 echo        components with the latest versions.
+echo.
+echo   GitHub Installation Options:
+echo   - setup.bat --github [repo-url]     Clone from GitHub
+echo   - setup.bat --clone [repo-url]      Clone from GitHub
+echo   - setup.bat --zip [repo-url]        Download as ZIP
+echo   - setup.bat --branch [branch-name]   Specify branch
 echo.
 exit /b 0
