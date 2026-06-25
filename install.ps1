@@ -1,10 +1,12 @@
 # One-liner installation for Cursor Enterprise Framework
 # Usage: irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1 | iex
+# Update: irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1 | iex -Update
 
 param(
     [string]$RepoUrl = "https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR",
     [string]$Branch = "main",
-    [switch]$Force
+    [switch]$Force,
+    [switch]$Update
 )
 
 $ErrorActionPreference = "Stop"
@@ -13,6 +15,38 @@ Write-Host "==================================================" -ForegroundColor
 Write-Host "  Cursor Enterprise Framework - Quick Install" -ForegroundColor Cyan
 Write-Host "==================================================" -ForegroundColor Cyan
 Write-Host ""
+
+# Update mode - pull latest from git if installed
+if ($Update) {
+    $cefDir = "$env:USERPROFILE\.cursor"
+    $gitDir = Join-Path $cefDir ".cursor"
+
+    if (Test-Path $gitDir) {
+        Write-Host "[UPDATE] Checking for updates..." -ForegroundColor Yellow
+        try {
+            Push-Location $gitDir
+            git fetch origin
+            $localHash = git rev-parse HEAD
+            $remoteHash = git rev-parse "origin/$Branch"
+
+            if ($localHash -ne $remoteHash) {
+                Write-Host "      New version available! Updating..." -ForegroundColor Cyan
+                git pull origin $Branch
+                Write-Host "      Update complete!" -ForegroundColor Green
+            } else {
+                Write-Host "      Already up to date." -ForegroundColor Green
+            }
+            Pop-Location
+            exit 0
+        } catch {
+            Pop-Location
+            Write-Host "      ERROR: Could not update. Run fresh install instead." -ForegroundColor Red
+            exit 1
+        }
+    } else {
+        Write-Host "      Framework not installed. Running fresh install..." -ForegroundColor Yellow
+    }
+}
 
 $parsed = $RepoUrl -replace 'https://github\.com/', '' -replace 'http://github\.com/', ''
 $repoPath = $parsed -replace '\.git$', '' -replace '/$', ''
