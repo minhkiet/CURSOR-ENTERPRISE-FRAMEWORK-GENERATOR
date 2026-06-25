@@ -193,9 +193,14 @@ The framework implements **10 token optimization strategies**:
 
 ### Quick Install (One Command)
 
-**Windows (PowerShell):**
+**Windows (PowerShell) - INSTALL:**
 ```powershell
 irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1 | iex
+```
+
+**Windows (PowerShell) - UPDATE (if already installed):**
+```powershell
+& {irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1} -Update
 ```
 
 **Windows (CMD):**

@@ -9,7 +9,7 @@ irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENER
 
 ### Windows (PowerShell) - UPDATE (if already installed)
 ```powershell
-irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1 | iex -Update
+& {irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1} -Update
 ```
 
 ### Windows (CMD)
