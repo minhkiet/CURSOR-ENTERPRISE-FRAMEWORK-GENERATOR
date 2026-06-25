@@ -246,7 +246,7 @@ echo.
 :: ----------------------------------------------------------
 :: Step 1: Detect if Cursor is running
 :: ----------------------------------------------------------
-echo [1/8] Checking for running Cursor instances...
+echo [1/9] Checking for running Cursor instances...
 
 if %SKIP_CURSOR_CHECK%==1 (
     echo   SKIPPED ^(--no-cursor-check^).
@@ -271,7 +271,7 @@ if %SKIP_CURSOR_CHECK%==1 (
 :: GitHub Installation Step (NEW Step 1.5)
 :: ----------------------------------------------------------
 if %GITHUB_MODE% gtr 0 (
-    echo [1.5/8] GitHub Remote Installation...
+    echo [1.5/9] GitHub Remote Installation...
     
     :: If no URL provided, use default
     if not defined GITHUB_URL set "GITHUB_URL=%GITHUB_REPO%"
@@ -305,14 +305,14 @@ if %GITHUB_MODE% gtr 0 (
     
     echo   Using source: %SOURCE_DIR%
 ) else (
-    echo [1.5/8] GitHub mode skipped (local installation).
+    echo [1.5/9] GitHub mode skipped (local installation).
 )
 
 :: ----------------------------------------------------------
 :: Step 2: Create destination directories
 :: ----------------------------------------------------------
 echo.
-echo [2/8] Creating destination directories...
+echo [2/9] Creating destination directories...
 
 for %%D in ("%USER_SKILLS%" "%USER_RULES%" "%USER_MEMORY%" "%USER_KNOWLEDGE%" "%USER_PROMPTS%" "%USER_WORKFLOWS%" "%USER_TEMPLATES%") do (
     if not exist %%D (
@@ -334,7 +334,7 @@ for %%D in ("%USER_SKILLS%" "%USER_RULES%" "%USER_MEMORY%" "%USER_KNOWLEDGE%" "%
 ::    Destination: %USERPROFILE%\.cursor\skills\
 :: ----------------------------------------------------------
 echo.
-echo [3/8] Syncing skills to ~/.cursor/skills/...
+echo [3/9] Syncing skills to ~/.cursor/skills/...
 
 set "SKILLS_SOURCE=%SOURCE_DIR%\.cursor\skills"
 if not exist "%SKILLS_SOURCE%" (
@@ -421,7 +421,7 @@ goto :eof
 ::    Destination: %USERPROFILE%\.cursor\rules\
 :: ----------------------------------------------------------
 echo.
-echo [4/8] Syncing rules to ~/.cursor/rules/...
+echo [4/9] Syncing rules to ~/.cursor/rules/...
 
 set "RULES_SOURCE=%SOURCE_DIR%\.cursor\rules"
 if not exist "%RULES_SOURCE%" (
@@ -473,7 +473,7 @@ goto :eof
 ::    Destination: %USERPROFILE%\.cursor\memory\*.md
 :: ----------------------------------------------------------
 echo.
-echo [5/8] Syncing memory files to ~/.cursor/memory/...
+echo [5/9] Syncing memory files to ~/.cursor/memory/...
 
 set "MEMORY_SOURCE=%SOURCE_DIR%\.cursor\memory"
 if not exist "%MEMORY_SOURCE%" (
@@ -548,7 +548,7 @@ goto :eof
 ::    Destination: %USERPROFILE%\.cursor\knowledge\
 :: ----------------------------------------------------------
 echo.
-echo [6/8] Syncing knowledge base to ~/.cursor/knowledge/...
+echo [6/9] Syncing knowledge base to ~/.cursor/knowledge/...
 
 set "KNOWLEDGE_SOURCE=%SOURCE_DIR%\.cursor\knowledge"
 if not exist "%KNOWLEDGE_SOURCE%" (
@@ -604,7 +604,7 @@ goto :eof
 ::    Destinations: corresponding ~/.cursor/ subdirs
 :: ----------------------------------------------------------
 echo.
-echo [7/8] Syncing prompts, workflows, and templates...
+echo [7/9] Syncing prompts, workflows, and templates...
 
 :: 7a. Prompts
 set "PROMPTS_SOURCE=%SOURCE_DIR%\.cursor\prompts"
@@ -657,7 +657,7 @@ if exist "%TEMPLATES_SOURCE%" (
 ::    Destination: %USERPROFILE%\.cursor\scripts\
 :: ----------------------------------------------------------
 echo.
-echo [8/8] Syncing automation scripts to ~/.cursor/scripts/...
+echo [9/9] Syncing automation scripts to ~/.cursor/scripts/...
 
 set "SCRIPTS_SOURCE=%SOURCE_DIR%\.cursor\scripts"
 if not exist "%SCRIPTS_SOURCE%" (
@@ -703,8 +703,64 @@ goto :eof
 :after_step8
 
 :: ----------------------------------------------------------
+:: Step 9: Build SQLite databases, compile knowledge, and index code
+:: ----------------------------------------------------------
+echo.
+echo [9/9] Building memory databases and indexes...
+
+set "BUILD_SUCCESS=0"
+
+:: 9a. Build memory (SQLite databases)
+set "BUILD_MEM=%USER_CURSOR_HOME%\scripts\memory-builder\build-memory.ps1"
+if exist "%BUILD_MEM%" (
+    echo   Building memory databases...
+    powershell -ExecutionPolicy Bypass -File "%BUILD_MEM%" >nul 2>&1
+    if !errorlevel! equ 0 (
+        echo   Memory databases: OK
+        set /a BUILD_SUCCESS+=1
+    ) else (
+        echo   Memory databases: SKIPPED ^(failed or not needed^)
+    )
+) else (
+    echo   build-memory.ps1 not found, skipping memory build
+)
+
+:: 9b. Compile knowledge
+set "BUILD_KNOW=%USER_CURSOR_HOME%\scripts\knowledge-compiler\compile-knowledge.ps1"
+if exist "%BUILD_KNOW%" (
+    echo   Compiling knowledge files...
+    powershell -ExecutionPolicy Bypass -File "%BUILD_KNOW%" >nul 2>&1
+    if !errorlevel! equ 0 (
+        echo   Knowledge compilation: OK
+        set /a BUILD_SUCCESS+=1
+    ) else (
+        echo   Knowledge compilation: SKIPPED ^(failed or not needed^)
+    )
+) else (
+    echo   compile-knowledge.ps1 not found, skipping knowledge compile
+)
+
+:: 9c. Build project index
+set "BUILD_IDX=%USER_CURSOR_HOME%\scripts\project-index-builder\build-index.ps1"
+if exist "%BUILD_IDX%" (
+    echo   Indexing code for fast search...
+    powershell -ExecutionPolicy Bypass -File "%BUILD_IDX%" >nul 2>&1
+    if !errorlevel! equ 0 (
+        echo   Project index: OK
+        set /a BUILD_SUCCESS+=1
+    ) else (
+        echo   Project index: SKIPPED ^(failed or not needed^)
+    )
+) else (
+    echo   build-index.ps1 not found, skipping index build
+)
+
+goto :done
+
+:: ----------------------------------------------------------
 :: Done
 :: ----------------------------------------------------------
+:done
 echo.
 echo ============================================================
 echo   Setup complete!
@@ -712,6 +768,9 @@ echo ============================================================
 echo.
 echo   Restart Cursor IDE to load the newly installed skills,
 echo   rules, memory, knowledge, prompts, workflows, and templates.
+echo.
+echo   SQLite memory databases, knowledge indexes, and project
+echo   code indexes have been built for fast context retrieval.
 echo.
 echo   All components are now available globally across all
 echo   your Cursor / Claude Code / Windsurf / Cline / Roo Code
