@@ -195,12 +195,12 @@ The framework implements **10 token optimization strategies**:
 
 **Windows (PowerShell):**
 ```powershell
-irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install-github.bat | iex
+irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1 | iex
 ```
 
 **Windows (CMD):**
 ```cmd
-curl -LO https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install-github.bat && install-github.bat
+curl -LO https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1 && powershell -ExecutionPolicy Bypass -File install.ps1 && del install.ps1
 ```
 
 ### Using setup.bat with GitHub
@@ -464,12 +464,12 @@ Framework triển khai **10 chiến lược tối ưu token**:
 
 **Windows (PowerShell):**
 ```powershell
-irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install-github.bat | iex
+irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1 | iex
 ```
 
 **Windows (CMD):**
 ```cmd
-curl -LO https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install-github.bat && install-github.bat
+curl -LO https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1 && powershell -ExecutionPolicy Bypass -File install.ps1 && del install.ps1
 ```
 
 ### Sử dụng setup.bat với GitHub

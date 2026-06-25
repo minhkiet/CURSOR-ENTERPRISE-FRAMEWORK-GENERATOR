@@ -2,14 +2,14 @@
 
 ## Quick Install (One Command)
 
-### Windows (PowerShell)
+### Windows (PowerShell) - RECOMMENDED
 ```powershell
-irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install-github.bat | iex
+irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1 | iex
 ```
 
 ### Windows (CMD)
 ```cmd
-curl -LO https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install-github.bat && install-github.bat
+curl -LO https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1 && powershell -ExecutionPolicy Bypass -File install.ps1 && del install.ps1
 ```
 
 ## Using setup.bat with GitHub
