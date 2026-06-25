@@ -81,42 +81,43 @@ onMounted(() => {
       </div>
 
       <div class="hero-cards">
-        <div
-          v-for="(stat, index) in stats"
-          :key="stat.title"
-          class="hc-card"
-          :style="{ transitionDelay: `${index * 80}ms` }"
-          :class="{ visible: isVisible }"
-        >
-          <div class="hc-card-header">
-            <div class="hc-card-icon" :class="{ cyan: stat.color === 'cyan', emerald: stat.color === 'emerald', violet: stat.color === 'violet' }">
-              <svg v-if="stat.icon === 'layers'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-              </svg>
-              <svg v-else-if="stat.icon === 'file'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <line x1="8" y1="13" x2="16" y2="13"/>
-                <line x1="8" y1="17" x2="16" y2="17"/>
-              </svg>
-              <svg v-else-if="stat.icon === 'search'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <circle cx="11" cy="11" r="8"/>
-                <path d="M21 21l-4.35-4.35"/>
-              </svg>
-              <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <polyline points="16 18 22 12 16 6"/>
-                <polyline points="8 6 2 12 8 18"/>
-              </svg>
+        <div class="hc-left" :class="{ visible: isVisible }">
+          <div
+            v-for="(stat, index) in stats"
+            :key="stat.title"
+            class="hc-card"
+            :style="{ transitionDelay: `${index * 80}ms` }"
+          >
+            <div class="hc-card-header">
+              <div class="hc-card-icon" :class="{ cyan: stat.color === 'cyan', emerald: stat.color === 'emerald', violet: stat.color === 'violet' }">
+                <svg v-if="stat.icon === 'layers'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                <svg v-else-if="stat.icon === 'file'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="8" y1="13" x2="16" y2="13"/>
+                  <line x1="8" y1="17" x2="16" y2="17"/>
+                </svg>
+                <svg v-else-if="stat.icon === 'search'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <circle cx="11" cy="11" r="8"/>
+                  <path d="M21 21l-4.35-4.35"/>
+                </svg>
+                <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <polyline points="16 18 22 12 16 6"/>
+                  <polyline points="8 6 2 12 8 18"/>
+                </svg>
+              </div>
+              <span class="hc-card-title">{{ stat.title }}</span>
+              <span class="hc-card-count" :class="{ cyan: stat.color === 'cyan', emerald: stat.color === 'emerald', violet: stat.color === 'violet' }">
+                {{ stat.count }}
+              </span>
             </div>
-            <span class="hc-card-title">{{ stat.title }}</span>
-            <span class="hc-card-count" :class="{ cyan: stat.color === 'cyan', emerald: stat.color === 'emerald', violet: stat.color === 'violet' }">
-              {{ stat.count }}
-            </span>
-          </div>
-          <div class="hc-card-items">
-            <div v-for="item in stat.items" :key="item" class="hc-item">
-              <span class="hc-dot" :class="{ 'hc-dot-cyan': stat.color === 'cyan', 'hc-dot-emerald': stat.color === 'emerald', 'hc-dot-violet': stat.color === 'violet' }"></span>
-              {{ item }}
+            <div class="hc-card-items">
+              <div v-for="item in stat.items" :key="item" class="hc-item">
+                <span class="hc-dot" :class="{ 'hc-dot-cyan': stat.color === 'cyan', 'hc-dot-emerald': stat.color === 'emerald', 'hc-dot-violet': stat.color === 'violet' }"></span>
+                {{ item }}
+              </div>
             </div>
           </div>
         </div>
@@ -196,15 +197,48 @@ onMounted(() => {
   background: #a78bfa;
 }
 
-.hc-card {
+.hc-left {
   opacity: 0;
   transform: translateY(16px);
   transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
 }
 
-.hc-card.visible {
+.hc-left.visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+.hc-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  text-align: left;
+  transition: border-color var(--t-base), box-shadow var(--t-base), transform var(--t-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.hc-card:hover {
+  border-color: var(--border-accent);
+  box-shadow: 0 0 32px rgba(120, 119, 232, 0.08);
+  transform: translateY(-1px);
+}
+
+.hc-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--gradient-primary);
+  opacity: 0;
+  transition: opacity var(--t-base);
+}
+
+.hc-card:hover::before {
+  opacity: 1;
 }
 
 .hc-right {

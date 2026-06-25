@@ -15,6 +15,7 @@ interface SkillItem {
   name: string
   platform: string
   initials: string
+  category: string
 }
 
 const explorerRef = ref<HTMLElement | null>(null)
@@ -24,61 +25,113 @@ const visibleItems = ref(new Set<string>())
 const activeCategory = ref('all')
 const activeFilter = ref('all')
 const searchQuery = ref('')
-const showRules = computed(() => activeCategory.value !== 'skills')
 
-const navItems = [
-  { id: 'all', label: 'Tất cả', count: 126, icon: 'grid' },
-  { id: 'rules', label: 'Rules', count: 79, icon: 'layers' },
-  { id: 'skills', label: 'Skills', count: 47, icon: 'file' }
+const rules: RuleItem[] = [
+  { id: 'r1', name: 'core-architecture.mdc', domain: 'core', tags: ['architecture', 'foundation'], icon: 'layers' },
+  { id: 'r2', name: 'memory-first.mdc', domain: 'core', tags: ['memory', 'context'], icon: 'grid' },
+  { id: 'r3', name: 'context-router.mdc', domain: 'core', tags: ['routing', 'intelligence'], icon: 'search' },
+  { id: 'r4', name: 'token-optimization.mdc', domain: 'core', tags: ['tokens', 'efficiency'], icon: 'zap' },
+  { id: 'r5', name: 'coding-standards.mdc', domain: 'core', tags: ['code', 'conventions'], icon: 'code' },
+  { id: 'r6', name: 'nextjs.mdc', domain: 'frontend', tags: ['next.js', 'react'], icon: 'monitor' },
+  { id: 'r7', name: 'vue.mdc', domain: 'frontend', tags: ['vue', 'nuxt'], icon: 'monitor' },
+  { id: 'r8', name: 'react.mdc', domain: 'frontend', tags: ['react', 'hooks'], icon: 'monitor' },
+  { id: 'r9', name: 'aspnet-core.mdc', domain: 'backend', tags: ['.net', 'api'], icon: 'server' },
+  { id: 'r10', name: 'nestjs.mdc', domain: 'backend', tags: ['nestjs', 'microservices'], icon: 'server' },
+  { id: 'r11', name: 'laravel.mdc', domain: 'backend', tags: ['laravel', 'php'], icon: 'server' },
+  { id: 'r12', name: 'database.mdc', domain: 'database', tags: ['postgres', 'mysql'], icon: 'database' },
+  { id: 'r13', name: 'postgres.mdc', domain: 'database', tags: ['postgres', 'rls'], icon: 'database' },
+  { id: 'r14', name: 'mysql.mdc', domain: 'database', tags: ['mysql', 'optimization'], icon: 'database' },
+  { id: 'r15', name: 'redis.mdc', domain: 'database', tags: ['redis', 'cache'], icon: 'database' },
+  { id: 'r16', name: 'openai.mdc', domain: 'ai', tags: ['gpt', 'api'], icon: 'bot' },
+  { id: 'r17', name: 'pgvector.mdc', domain: 'ai', tags: ['vector', 'embedding'], icon: 'box' },
+  { id: 'r18', name: 'rag.mdc', domain: 'ai', tags: ['rag', 'retrieval'], icon: 'bot' },
+  { id: 'r19', name: 'docker.mdc', domain: 'devops', tags: ['docker', 'containers'], icon: 'cloud' },
+  { id: 'r20', name: 'kubernetes.mdc', domain: 'devops', tags: ['k8s', 'orchestration'], icon: 'cloud' },
+  { id: 'r21', name: 'aws.mdc', domain: 'devops', tags: ['aws', 'cloud'], icon: 'cloud' },
+  { id: 'r22', name: 'security.mdc', domain: 'business', tags: ['security', 'auth'], icon: 'shield' },
+  { id: 'r23', name: 'multi-tenant.mdc', domain: 'business', tags: ['saas', 'isolation'], icon: 'users' },
+  { id: 'r24', name: 'billing.mdc', domain: 'business', tags: ['billing', 'subscription'], icon: 'creditcard' },
 ]
 
-const categoryItems = [
-  { id: 'frontend', label: 'Frontend', count: 8, icon: 'monitor' },
-  { id: 'backend', label: 'Backend', count: 11, icon: 'server' },
-  { id: 'database', label: 'Database', count: 7, icon: 'database' },
-  { id: 'ai', label: 'AI & RAG', count: 10, icon: 'bot' },
-  { id: 'devops', label: 'Cloud & DevOps', count: 14, icon: 'cloud' },
-  { id: 'business', label: 'Business', count: 9, icon: 'users' }
+const skills: SkillItem[] = [
+  { id: 's1', name: 'aspnet-core', platform: 'Cursor · Codex · Claude', initials: 'AS', category: 'backend' },
+  { id: 's2', name: 'vercel-deploy', platform: 'Cursor · Claude Plugins', initials: 'VE', category: 'devops' },
+  { id: 's3', name: 'playwright', platform: 'Cursor · Claude Code · Codex', initials: 'PW', category: 'testing' },
+  { id: 's4', name: 'figma', platform: 'Cursor · Claude Plugins', initials: 'FG', category: 'design' },
+  { id: 's5', name: 'cloudflare-deploy', platform: 'Cursor · Claude Code', initials: 'CF', category: 'devops' },
+  { id: 's6', name: 'docker', platform: 'Cursor · Claude Code', initials: 'DOC', category: 'devops' },
+  { id: 's7', name: 'kubernetes', platform: 'Cursor · Claude Code', initials: 'K8S', category: 'devops' },
+  { id: 's8', name: 'jupyter-notebook', platform: 'Claude Code · Claude Plugins', initials: 'JY', category: 'ai' },
+  { id: 's9', name: 'gh-address-comments', platform: 'Claude Code · Claude Plugins', initials: 'GHP', category: 'devops' },
+  { id: 's10', name: 'pdf', platform: 'Cursor · Claude Plugins', initials: 'PDF', category: 'utility' },
+  { id: 's11', name: 'netlify-deploy', platform: 'Cursor · Claude Plugins', initials: 'NET', category: 'devops' },
+  { id: 's12', name: 'screenshot', platform: 'Claude Plugins', initials: 'SCR', category: 'utility' },
+  { id: 's13', name: 'frontend-taste', platform: 'Cursor · Claude', initials: 'FT', category: 'frontend' },
+  { id: 's14', name: 'frontend-redesign', platform: 'Cursor · Claude', initials: 'FR', category: 'frontend' },
+  { id: 's15', name: 'frontend-review', platform: 'Cursor · Claude', initials: 'FVR', category: 'frontend' },
+  { id: 's16', name: 'security-review', platform: 'Cursor · Claude', initials: 'SEC', category: 'security' },
+  { id: 's17', name: 'full-output', platform: 'Cursor · Claude', initials: 'FO', category: 'utility' },
+  { id: 's18', name: 'vietnam-payment', platform: 'Cursor · Claude', initials: 'VP', category: 'business' },
 ]
+
+// Dynamic counts based on actual data
+const rulesCount = computed(() => rules.length)
+const skillsCount = computed(() => skills.length)
+const totalCount = computed(() => rulesCount.value + skillsCount.value)
+
+// Count by domain for rules
+const rulesByDomain = computed(() => {
+  const counts: Record<string, number> = {}
+  rules.forEach(r => {
+    counts[r.domain] = (counts[r.domain] || 0) + 1
+  })
+  return counts
+})
+
+// Count by category for skills
+const skillsByCategory = computed(() => {
+  const counts: Record<string, number> = {}
+  skills.forEach(s => {
+    counts[s.category] = (counts[s.category] || 0) + 1
+  })
+  return counts
+})
+
+const navItems = computed(() => [
+  { id: 'all', label: 'Tất cả', count: totalCount.value, icon: 'grid' },
+  { id: 'rules', label: 'Rules', count: rulesCount.value, icon: 'layers' },
+  { id: 'skills', label: 'Skills', count: skillsCount.value, icon: 'file' }
+])
+
+const categoryItems = computed(() => {
+  const cats = [
+    { id: 'core', label: 'Core', icon: 'layers' },
+    { id: 'frontend', label: 'Frontend', icon: 'monitor' },
+    { id: 'backend', label: 'Backend', icon: 'server' },
+    { id: 'database', label: 'Database', icon: 'database' },
+    { id: 'ai', label: 'AI & RAG', icon: 'bot' },
+    { id: 'devops', label: 'Cloud & DevOps', icon: 'cloud' },
+    { id: 'business', label: 'Business', icon: 'users' },
+  ]
+  return cats.map(c => ({
+    ...c,
+    count: (rulesByDomain.value[c.id] || 0) + (skillsByCategory.value[c.id] || 0)
+  }))
+})
 
 const filterTags = [
   { id: 'all', label: 'All' },
   { id: 'core', label: 'Core' },
   { id: 'frontend', label: 'Frontend' },
   { id: 'backend', label: 'Backend' },
+  { id: 'database', label: 'Database' },
   { id: 'ai', label: 'AI' },
-  { id: 'devops', label: 'DevOps' }
+  { id: 'devops', label: 'DevOps' },
+  { id: 'business', label: 'Business' }
 ]
 
-const rules: RuleItem[] = [
-  { id: '1', name: 'core-architecture.mdc', domain: 'core', tags: ['architecture', 'foundation'], icon: 'layers' },
-  { id: '2', name: 'memory-first.mdc', domain: 'core', tags: ['memory', 'context'], icon: 'grid' },
-  { id: '3', name: 'context-router.mdc', domain: 'core', tags: ['routing', 'intelligence'], icon: 'search' },
-  { id: '4', name: 'token-optimization.mdc', domain: 'core', tags: ['tokens', 'efficiency'], icon: 'zap' },
-  { id: '5', name: 'nextjs.mdc', domain: 'frontend', tags: ['next.js', 'react'], icon: 'monitor' },
-  { id: '6', name: 'aspnet-core.mdc', domain: 'backend', tags: ['.net', 'api'], icon: 'server' },
-  { id: '7', name: 'supabase.mdc', domain: 'database', tags: ['postgres', 'rls'], icon: 'database' },
-  { id: '8', name: 'openai.mdc', domain: 'ai', tags: ['gpt', 'api'], icon: 'bot' },
-  { id: '9', name: 'pgvector.mdc', domain: 'ai', tags: ['vector', 'embedding'], icon: 'box' },
-  { id: '10', name: 'cloudflare.mdc', domain: 'devops', tags: ['workers', 'cdn'], icon: 'cloud' },
-  { id: '11', name: 'multi-tenant.mdc', domain: 'business', tags: ['saas', 'isolation'], icon: 'users' },
-  { id: '12', name: 'billing.mdc', domain: 'business', tags: ['subscription', 'pricing'], icon: 'creditcard' }
-]
-
-const skills: SkillItem[] = [
-  { id: '1', name: 'aspnet-core', platform: 'Cursor · Codex · Claude', initials: 'AS' },
-  { id: '2', name: 'vercel-deploy', platform: 'Cursor · Claude Plugins', initials: 'VE' },
-  { id: '3', name: 'playwright', platform: 'Cursor · Claude Code · Codex', initials: 'PW' },
-  { id: '4', name: 'figma', platform: 'Cursor · Claude Plugins', initials: 'FG' },
-  { id: '5', name: 'cloudflare-deploy', platform: 'Cursor · Claude Code', initials: 'CF' },
-  { id: '6', name: 'docker', platform: 'Cursor · Claude Code', initials: 'DOC' },
-  { id: '7', name: 'kubernetes', platform: 'Cursor · Claude Code', initials: 'K8S' },
-  { id: '8', name: 'jupyter-notebook', platform: 'Claude Code · Claude Plugins', initials: 'JY' },
-  { id: '9', name: 'gh-address-comments', platform: 'Claude Code · Claude Plugins', initials: 'GHP' },
-  { id: '10', name: 'pdf', platform: 'Cursor · Claude Plugins', initials: 'PDF' },
-  { id: '11', name: 'netlify-deploy', platform: 'Cursor · Claude Plugins', initials: 'NET' },
-  { id: '12', name: 'screenshot', platform: 'Claude Plugins', initials: 'SCR' }
-]
+const showRules = computed(() => activeCategory.value === 'all' || activeCategory.value === 'rules')
+const showSkills = computed(() => activeCategory.value === 'all' || activeCategory.value === 'skills')
 
 const filteredRules = computed(() => {
   return rules.filter(rule => {
@@ -90,12 +143,28 @@ const filteredRules = computed(() => {
   })
 })
 
+const filteredSkills = computed(() => {
+  return skills.filter(skill => {
+    const matchesFilter = activeFilter.value === 'all' || skill.category === activeFilter.value
+    const matchesSearch = searchQuery.value === '' ||
+      skill.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      skill.platform.toLowerCase().includes(searchQuery.value.toLowerCase())
+    return matchesFilter && matchesSearch
+  })
+})
+
 function setCategory(category: string) {
   activeCategory.value = category
+  // Reset filter when switching main category
+  activeFilter.value = 'all'
 }
 
 function setFilter(filter: string) {
   activeFilter.value = filter
+}
+
+function clearSearch() {
+  searchQuery.value = ''
 }
 
 onMounted(() => {
@@ -119,7 +188,7 @@ onMounted(() => {
         <div class="section-label">Documentation</div>
         <h2 class="section-title">Rules & Skills Explorer</h2>
         <p class="section-desc">
-          79 MDC rules chuẩn hóa + 47 specialized skills. Mỗi rule định nghĩa tiêu chuẩn,
+          {{ rulesCount }} MDC rules chuẩn hóa + {{ skillsCount }} specialized skills. Mỗi rule định nghĩa tiêu chuẩn,
           mỗi skill cung cấp expertise chuyên sâu cho AI agent.
         </p>
       </div>
@@ -158,9 +227,13 @@ onMounted(() => {
               v-for="item in categoryItems"
               :key="item.id"
               class="explorer-nav-btn"
+              :class="{ active: activeFilter === item.id }"
               @click="setFilter(item.id)"
             >
-              <svg v-if="item.icon === 'monitor'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <svg v-if="item.icon === 'layers'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+              <svg v-else-if="item.icon === 'monitor'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
                 <line x1="8" y1="21" x2="16" y2="21"/>
                 <line x1="12" y1="17" x2="12" y2="21"/>
@@ -181,6 +254,9 @@ onMounted(() => {
               </svg>
               <svg v-else-if="item.icon === 'cloud'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/>
+              </svg>
+              <svg v-else-if="item.icon === 'shield'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
               </svg>
               <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
@@ -206,6 +282,12 @@ onMounted(() => {
                 type="text"
                 placeholder="Tìm kiếm rule hoặc skill..."
               />
+              <button v-if="searchQuery" class="search-clear" @click="clearSearch">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
               <span class="explorer-search-shortcut">Ctrl+K</span>
             </div>
             <div class="explorer-filter-tags">
@@ -219,6 +301,20 @@ onMounted(() => {
                 {{ tag.label }}
               </button>
             </div>
+          </div>
+
+          <!-- Results count -->
+          <div class="results-count">
+            <span v-if="showRules && filteredRules.length > 0">
+              {{ filteredRules.length }} rules
+            </span>
+            <span v-if="showRules && filteredSkills.length > 0"> · </span>
+            <span v-if="showSkills && filteredSkills.length > 0">
+              {{ filteredSkills.length }} skills
+            </span>
+            <span v-if="filteredRules.length === 0 && filteredSkills.length === 0">
+              Không tìm thấy kết quả
+            </span>
           </div>
 
           <!-- Rules list -->
@@ -240,6 +336,33 @@ onMounted(() => {
                 <svg v-else-if="rule.icon === 'search'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                   <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
                 </svg>
+                <svg v-else-if="rule.icon === 'code'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+                </svg>
+                <svg v-else-if="rule.icon === 'monitor'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+                </svg>
+                <svg v-else-if="rule.icon === 'server'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/>
+                </svg>
+                <svg v-else-if="rule.icon === 'database'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+                </svg>
+                <svg v-else-if="rule.icon === 'bot'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M12 2a4 4 0 014 4c0 1.1-.9 2-2 2h-4a4 4 0 01-4-4 4 4 0 014-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4z"/>
+                </svg>
+                <svg v-else-if="rule.icon === 'cloud'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/>
+                </svg>
+                <svg v-else-if="rule.icon === 'shield'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                <svg v-else-if="rule.icon === 'users'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                </svg>
+                <svg v-else-if="rule.icon === 'creditcard'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+                </svg>
                 <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                   <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
                 </svg>
@@ -253,6 +376,7 @@ onMounted(() => {
                   </div>
                 </div>
               </div>
+              <div class="rule-badge">Rule</div>
               <div class="rule-arrow">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M7 17l9.2-9.2M17 17V7H7"/>
@@ -260,24 +384,37 @@ onMounted(() => {
               </div>
             </div>
 
-            <div v-if="filteredRules.length === 0" class="explorer-empty">
-              Không tìm thấy kết quả phù hợp
+            <div v-if="filteredRules.length === 0 && activeCategory !== 'skills'" class="explorer-empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="M21 21l-4.35-4.35"/>
+              </svg>
+              <p>Không tìm thấy rules phù hợp</p>
             </div>
           </div>
 
           <!-- Skills grid -->
-          <div v-else class="skills-grid">
+          <div v-if="showSkills" class="skills-grid">
             <div
-              v-for="skill in skills"
+              v-for="skill in filteredSkills"
               :key="skill.id"
               class="skill-item"
               :class="{ visible: visibleItems.has(skill.id) }"
             >
               <div class="skill-icon">{{ skill.initials }}</div>
-              <div>
+              <div class="skill-info">
                 <div class="skill-name">{{ skill.name }}</div>
                 <div class="skill-platform">{{ skill.platform }}</div>
               </div>
+              <div class="skill-badge">Skill</div>
+            </div>
+
+            <div v-if="filteredSkills.length === 0 && activeCategory !== 'rules'" class="explorer-empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="M21 21l-4.35-4.35"/>
+              </svg>
+              <p>Không tìm thấy skills phù hợp</p>
             </div>
           </div>
         </div>
@@ -307,6 +444,8 @@ onMounted(() => {
   height: fit-content;
   position: sticky;
   top: 80px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
 }
 
 .explorer-nav-section {
@@ -335,6 +474,7 @@ onMounted(() => {
   transition: all var(--t-fast);
   text-align: left;
   cursor: pointer;
+  border: 1px solid transparent;
 }
 
 .explorer-nav-btn svg {
@@ -351,7 +491,7 @@ onMounted(() => {
 .explorer-nav-btn.active {
   background: var(--accent-glow);
   color: var(--accent-primary);
-  border: 1px solid var(--border-accent);
+  border-color: var(--border-accent);
 }
 
 .explorer-nav-count {
@@ -380,10 +520,12 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .explorer-search {
   flex: 1;
+  min-width: 200px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -419,6 +561,27 @@ onMounted(() => {
 
 .explorer-search input::placeholder {
   color: var(--text-muted);
+}
+
+.search-clear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: color var(--t-fast);
+}
+
+.search-clear:hover {
+  color: var(--text-primary);
+}
+
+.search-clear svg {
+  width: 14px;
+  height: 14px;
 }
 
 .explorer-search-shortcut {
@@ -461,6 +624,12 @@ onMounted(() => {
   background: var(--accent-glow);
   border-color: var(--border-accent);
   color: var(--accent-primary);
+}
+
+.results-count {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 4px 0;
 }
 
 .rules-list {
@@ -565,6 +734,18 @@ onMounted(() => {
   font-family: var(--font-mono);
 }
 
+.rule-badge {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--accent-primary);
+  background: var(--accent-glow);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
 .rule-arrow {
   color: var(--text-faint);
   transition: color var(--t-fast), transform var(--t-fast);
@@ -621,10 +802,15 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 800;
   color: var(--accent-tertiary);
   font-family: var(--font-mono);
+}
+
+.skill-info {
+  flex: 1;
+  min-width: 0;
 }
 
 .skill-name {
@@ -632,22 +818,52 @@ onMounted(() => {
   font-weight: 600;
   color: var(--text-secondary);
   font-family: var(--font-mono);
-}
-
-.skill-platform {
-  font-size: 10px;
-  color: var(--text-muted);
-  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .skill-item:hover .skill-name {
   color: var(--text-primary);
 }
 
+.skill-platform {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.skill-badge {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--accent-tertiary);
+  background: rgba(6, 182, 212, 0.08);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
 .explorer-empty {
   text-align: center;
   padding: 48px 0;
   color: var(--text-muted);
+  grid-column: 1 / -1;
+}
+
+.explorer-empty svg {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 12px;
+  opacity: 0.5;
+}
+
+.explorer-empty p {
+  font-size: 14px;
 }
 
 @media (max-width: 1024px) {

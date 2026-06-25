@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useIntersectionObserver } from '../composables/useIntersectionObserver'
 
 interface PromptExample {
@@ -27,8 +27,8 @@ interface TabItem {
 
 const tabs: TabItem[] = [
   { id: 'all', label: 'Tất cả', icon: 'grid' },
-  { id: 'skills', label: 'Skills', icon: 'zap' },
-  { id: 'rules', label: 'Rules', icon: 'layers' }
+  { id: 'skill', label: 'Skills', icon: 'zap' },
+  { id: 'rule', label: 'Rules', icon: 'layers' }
 ]
 
 const promptExamples: PromptExample[] = [
@@ -482,6 +482,12 @@ const filteredPrompts = computed(() => {
 
 function setTab(tabId: string) {
   activeTab.value = tabId
+  // Make all filtered items visible immediately
+  nextTick(() => {
+    filteredPrompts.value.forEach(prompt => {
+      visibleItems.value.add(prompt.id)
+    })
+  })
 }
 
 async function copyToClipboard(text: string) {
