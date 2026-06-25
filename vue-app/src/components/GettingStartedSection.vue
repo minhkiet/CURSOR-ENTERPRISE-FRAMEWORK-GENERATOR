@@ -29,7 +29,36 @@ const installOptions: InstallOption[] = [
   }
 ]
 
+interface InitCommand {
+  title: string
+  description: string
+  command: string
+  icon: string
+}
+
+const initCommands: InitCommand[] = [
+  {
+    title: 'Build Memory Database',
+    description: 'Khởi tạo SQLite databases cho context và code embeddings.',
+    command: '. .cursor/scripts/memory-builder/build-memory.ps1',
+    icon: 'database'
+  },
+  {
+    title: 'Compile Knowledge',
+    description: 'Compile và merge knowledge files thành context tối ưu.',
+    command: '. .cursor/scripts/knowledge-compiler/compile-knowledge.ps1',
+    icon: 'book'
+  },
+  {
+    title: 'Build Project Index',
+    description: 'Index toàn bộ code để search nhanh và context-aware.',
+    command: '. .cursor/scripts/project-index-builder/build-index.ps1',
+    icon: 'search'
+  }
+]
+
 const copiedIndex = ref<number | null>(null)
+const copiedInitIndex = ref<number | null>(null)
 
 function copyCommand(index: number, command: string) {
   navigator.clipboard.writeText(command).then(() => {
@@ -48,6 +77,27 @@ function copyCommand(index: number, command: string) {
     copiedIndex.value = index
     setTimeout(() => {
       copiedIndex.value = null
+    }, 2000)
+  })
+}
+
+function copyInitCommand(index: number, command: string) {
+  navigator.clipboard.writeText(command).then(() => {
+    copiedInitIndex.value = index
+    setTimeout(() => {
+      copiedInitIndex.value = null
+    }, 2000)
+  }).catch(() => {
+    const textarea = document.createElement('textarea')
+    textarea.value = command
+    textarea.style.cssText = 'position:fixed;opacity:0;'
+    document.body.appendChild(textarea)
+    textarea.select()
+    document.execCommand('copy')
+    document.body.removeChild(textarea)
+    copiedInitIndex.value = index
+    setTimeout(() => {
+      copiedInitIndex.value = null
     }, 2000)
   })
 }
@@ -108,6 +158,49 @@ onMounted(() => {
           <line x1="12" y1="8" x2="12.01" y2="8"/>
         </svg>
         <span>Script download từ GitHub official repository. Đảm bảo chạy PowerShell với quyền phù hợp.</span>
+      </div>
+
+      <!-- Initialization Commands -->
+      <div class="init-section">
+        <h3 class="init-title">Khởi tạo sau cài đặt</h3>
+        <p class="init-desc">Chạy các lệnh sau để khởi tạo context và database cho framework hoạt động tối ưu.</p>
+        <div class="init-grid">
+          <div v-for="(cmd, index) in initCommands" :key="index" class="init-card">
+            <div class="init-icon">
+              <svg v-if="cmd.icon === 'database'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+              </svg>
+              <svg v-else-if="cmd.icon === 'book'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+              </svg>
+              <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </div>
+            <div class="init-content">
+              <h4>{{ cmd.title }}</h4>
+              <p>{{ cmd.description }}</p>
+            </div>
+            <button
+              class="copy-btn-sm"
+              @click="copyInitCommand(index, cmd.command)"
+              :title="copiedInitIndex === index ? 'Đã copy!' : 'Copy command'"
+            >
+              <svg v-if="copiedInitIndex !== index" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+              </svg>
+              <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </button>
+            <code class="init-code">{{ cmd.command }}</code>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -280,6 +373,135 @@ onMounted(() => {
 
   .install-code code {
     font-size: 10px;
+  }
+}
+
+/* Initialization Section */
+.init-section {
+  margin-top: 64px;
+}
+
+.init-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.init-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.init-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.init-card {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 6px 14px;
+  padding: 18px 20px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  transition: all var(--t-fast);
+}
+
+.init-card:hover {
+  border-color: var(--border-accent);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.init-icon {
+  grid-row: span 2;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--radius-md);
+}
+
+.init-icon svg {
+  width: 18px;
+  height: 18px;
+  color: var(--color-primary);
+}
+
+.init-content h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.init-content p {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.copy-btn-sm {
+  grid-row: span 2;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--t-fast);
+  align-self: center;
+}
+
+.copy-btn-sm:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-soft);
+  color: var(--text-primary);
+}
+
+.copy-btn-sm svg {
+  width: 14px;
+  height: 14px;
+}
+
+.init-code {
+  grid-column: 2 / 4;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  background: rgba(4, 4, 14, 0.4);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  word-break: break-all;
+}
+
+@media (max-width: 640px) {
+  .init-card {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+
+  .init-icon {
+    display: none;
+  }
+
+  .copy-btn-sm {
+    grid-row: auto;
+    grid-column: auto;
+  }
+
+  .init-code {
+    grid-column: 1;
   }
 }
 </style>
