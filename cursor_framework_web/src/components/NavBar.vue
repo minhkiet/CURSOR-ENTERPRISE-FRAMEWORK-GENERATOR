@@ -10,6 +10,7 @@ const navLinks = [
   { href: '#architecture', label: 'Kiến trúc' },
   { href: '#components', label: 'Components' },
   { href: '#domains', label: 'Domains' },
+  { href: '#prompts', label: 'Prompts' },
   { href: '#getting-started', label: 'Bắt đầu' }
 ]
 

@@ -8,6 +8,7 @@ import ArchitectureSection from './components/ArchitectureSection.vue'
 import ComponentsSection from './components/ComponentsSection.vue'
 import DomainsSection from './components/DomainsSection.vue'
 import OptimizationSection from './components/OptimizationSection.vue'
+import PromptsSection from './components/PromptsSection.vue'
 import GettingStartedSection from './components/GettingStartedSection.vue'
 import FooterSection from './components/FooterSection.vue'
 </script>
@@ -24,6 +25,7 @@ import FooterSection from './components/FooterSection.vue'
       <ComponentsSection />
       <DomainsSection />
       <OptimizationSection />
+      <PromptsSection />
       <GettingStartedSection />
     </main>
     <FooterSection />

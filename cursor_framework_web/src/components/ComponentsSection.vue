@@ -89,7 +89,7 @@ onMounted(() => {
       </div>
 
       <!-- Badges -->
-      <div class="component-group">
+      <div class="component-group" :class="{ visible: isVisible }">
         <h3 class="component-group-title">Badges & Tags</h3>
         <div class="component-row">
           <div class="comp-item">
@@ -120,7 +120,7 @@ onMounted(() => {
       </div>
 
       <!-- Inputs -->
-      <div class="component-group">
+      <div class="component-group" :class="{ visible: isVisible }">
         <h3 class="component-group-title">Form Inputs</h3>
         <div class="component-row">
           <div class="comp-item">
@@ -194,7 +194,7 @@ onMounted(() => {
       </div>
 
       <!-- Cards -->
-      <div class="component-group">
+      <div class="component-group" :class="{ visible: isVisible }">
         <h3 class="component-group-title">Cards</h3>
         <div class="component-row">
           <div class="comp-item" style="width: 100%;">
@@ -230,7 +230,7 @@ onMounted(() => {
       </div>
 
       <!-- Alerts & Toasts -->
-      <div class="component-group">
+      <div class="component-group" :class="{ visible: isVisible }">
         <h3 class="component-group-title">Alerts & Toasts</h3>
         <div class="component-row">
           <div class="comp-item">
@@ -267,7 +267,7 @@ onMounted(() => {
       </div>
 
       <!-- Progress & Loading -->
-      <div class="component-group">
+      <div class="component-group" :class="{ visible: isVisible }">
         <h3 class="component-group-title">Progress & Loading</h3>
         <div class="component-row">
           <div class="comp-item">
@@ -299,7 +299,7 @@ onMounted(() => {
       </div>
 
       <!-- Tabs -->
-      <div class="component-group">
+      <div class="component-group" :class="{ visible: isVisible }">
         <h3 class="component-group-title">Tabs</h3>
         <div class="component-row">
           <div class="comp-item" style="width: 100%;">
@@ -323,7 +323,7 @@ onMounted(() => {
       </div>
 
       <!-- Extras -->
-      <div class="component-group">
+      <div class="component-group" :class="{ visible: isVisible }">
         <h3 class="component-group-title">Extras</h3>
         <div class="component-row">
           <div class="comp-item">
@@ -388,9 +388,14 @@ onMounted(() => {
   transform: translateY(0);
 }
 
-.component-group:nth-child(2) { transition-delay: 0.1s; }
-.component-group:nth-child(3) { transition-delay: 0.2s; }
-.component-group:nth-child(4) { transition-delay: 0.3s; }
+.component-group:nth-child(2) { transition-delay: 0.05s; }
+.component-group:nth-child(3) { transition-delay: 0.1s; }
+.component-group:nth-child(4) { transition-delay: 0.15s; }
+.component-group:nth-child(5) { transition-delay: 0.2s; }
+.component-group:nth-child(6) { transition-delay: 0.25s; }
+.component-group:nth-child(7) { transition-delay: 0.3s; }
+.component-group:nth-child(8) { transition-delay: 0.35s; }
+.component-group:nth-child(9) { transition-delay: 0.4s; }
 
 .component-group-title {
   font-size: 14px;

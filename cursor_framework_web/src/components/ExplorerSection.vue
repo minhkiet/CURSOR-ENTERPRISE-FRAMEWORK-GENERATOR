@@ -19,7 +19,7 @@ interface SkillItem {
 
 const explorerRef = ref<HTMLElement | null>(null)
 const { observe } = useIntersectionObserver()
-const visibleItems = ref(new Set<number>())
+const visibleItems = ref(new Set<string>())
 
 const activeCategory = ref('all')
 const activeFilter = ref('all')
@@ -101,8 +101,11 @@ function setFilter(filter: string) {
 onMounted(() => {
   if (explorerRef.value) {
     observe(explorerRef.value, () => {
-      rules.forEach((_, idx) => {
-        visibleItems.value.add(idx)
+      rules.forEach((rule) => {
+        visibleItems.value.add(rule.id)
+      })
+      skills.forEach((skill) => {
+        visibleItems.value.add(skill.id)
       })
     }, { threshold: 0.1 })
   }
@@ -224,6 +227,7 @@ onMounted(() => {
               v-for="rule in filteredRules"
               :key="rule.id"
               class="rule-item"
+              :class="{ visible: visibleItems.has(rule.id) }"
             >
               <div class="rule-icon">
                 <svg v-if="rule.icon === 'layers'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -267,6 +271,7 @@ onMounted(() => {
               v-for="skill in skills"
               :key="skill.id"
               class="skill-item"
+              :class="{ visible: visibleItems.has(skill.id) }"
             >
               <div class="skill-icon">{{ skill.initials }}</div>
               <div>
@@ -474,6 +479,13 @@ onMounted(() => {
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all var(--t-base);
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.rule-item.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .rule-item:hover {
@@ -584,6 +596,13 @@ onMounted(() => {
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all var(--t-base);
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.skill-item.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .skill-item:hover {

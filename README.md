@@ -28,7 +28,9 @@ The framework is built on **4 core principles**:
 | Rules | 55 | **79** | ✅ Complete |
 | Skills | 44 | **47** | ✅ Complete |
 | Knowledge Files | 200+ | **272** | ✅ Complete |
-| **Total Files** | **400+** | **463** | ✅ **+15.7%** |
+| Python Package | - | **12 modules** | ✅ New |
+| Web Interface | - | **Vue.js** | ✅ New |
+| **Total Files** | **400+** | **500+** | ✅ **+25%** |
 
 📦 **ZIP Package**: `cursor-enterprise-framework-v4.zip` — 1.02 MB
 
@@ -258,13 +260,67 @@ install-github.bat https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENER
 
 ---
 
+## Cursor Framework Python Package
+
+A Python library for integrating with the Cursor Enterprise Framework.
+
+```python
+# Quick Install
+pip install cursor-framework
+
+# Core Features
+from cursor_framework import ContextRouter, MemoryManager, SkillDiscovery
+
+# Initialize
+router = ContextRouter()
+memory = MemoryManager()
+skills = SkillDiscovery()
+```
+
+### Core Modules
+
+| Module | Description |
+|--------|-------------|
+| `context_router` | Smart context routing to handlers |
+| `memory_manager` | Memory system management |
+| `skill_discovery` | Auto-discover and execute skills |
+| `token_optimizer` | Token optimization strategies |
+| `rules_parser` | Parse and load MDC rules |
+| `skills_parser` | Parse skill definitions |
+| `integration` | Framework integration utilities |
+| `review.frontend_reviewer` | Frontend code review |
+
+### Utils
+
+`cursor_framework/utils/` — `code_utils`, `file_utils`, `http_utils`, `security_utils`, `text_utils`
+
+---
+
+## Cursor Framework Web
+
+A Vue.js web interface for the framework.
+
+```bash
+cd cursor_framework_web
+npm install
+npm run dev
+```
+
+Features:
+- Interactive dashboard
+- Rule and skill visualization
+- Knowledge browser
+- Performance metrics
+
+---
+
 ## License
 
 MIT License
 
 ## Version
 
-`4.0.0` — 2026-06-23
+`4.1.0` — 2026-06-25
 
 ---
 
@@ -302,7 +358,9 @@ Framework được xây dựng trên **4 nguyên tắc cốt lõi**:
 | Rules | 55 | **79** | ✅ Hoàn thành |
 | Skills | 44 | **47** | ✅ Hoàn thành |
 | Knowledge Files | 200+ | **272** | ✅ Hoàn thành |
-| **Tổng Files** | **400+** | **463** | ✅ **Vượt 15.7%** |
+| Python Package | - | **12 modules** | ✅ Mới |
+| Web Interface | - | **Vue.js** | ✅ Mới |
+| **Tổng Files** | **400+** | **500+** | ✅ **Vượt 25%** |
 
 📦 **Gói ZIP**: `cursor-enterprise-framework-v4.zip` — 1.02 MB
 
@@ -339,23 +397,40 @@ Cloudflare · AWS · Azure · GCP · Docker · Kubernetes · Coolify · Vercel �
 ## Kiến trúc
 
 ```
-.cursor/
-├── rules/         MDC Rules — Tiêu chuẩn & Nguyên tắc        (79 files)
-├── skills/        MDC Skills — Kỹ năng chuyên môn           (47 files)
-├── memory/        Memory System
-│   ├── schema/    SQLite schemas
-│   ├── session-summary/
-│   ├── architecture-history/
-│   ├── decision-history/
-│   ├── bug-history/
-│   └── *.json     Index files
-├── knowledge/     Knowledge Base (272 files, 35+ domains)
-├── prompts/       Prompt Templates
-├── workflows/     Standard Workflows
-├── templates/     Project Templates
-├── scripts/       Automation Scripts
-├── cache/        Compiled Cache
-└── vector-db/    Vector DB Configuration
+.cef/
+├── .cursor/
+│   ├── rules/         MDC Rules — Standards & Principles         (79 files)
+│   ├── skills/        MDC Skills — Specialized Expertise           (47 files)
+│   ├── memory/        Memory System
+│   │   ├── schema/    SQLite schemas
+│   │   ├── session-summary/
+│   │   ├── architecture-history/
+│   │   ├── decision-history/
+│   │   ├── bug-history/
+│   │   └── *.json     Index files
+│   ├── knowledge/     Knowledge Base (272 files, 35+ domains)
+│   ├── prompts/       Prompt Templates
+│   ├── workflows/     Standard Workflows
+│   ├── templates/     Project Templates
+│   ├── scripts/       Automation Scripts
+│   ├── cache/        Compiled Cache
+│   └── vector-db/    Vector DB Configuration
+├── cursor_framework/   Python Package
+│   ├── __init__.py
+│   ├── context_router.py
+│   ├── memory_manager.py
+│   ├── skill_discovery.py
+│   ├── token_optimizer.py
+│   ├── rules_parser.py
+│   ├── skills_parser.py
+│   ├── integration.py
+│   ├── review/        Frontend reviewer
+│   ├── utils/         Utility modules
+│   └── tests/         Unit tests
+└── cursor_framework_web/  Vue.js Web Interface
+    ├── src/
+    ├── dist/          Built assets
+    └── index.html
 ```
 
 ---
@@ -533,4 +608,4 @@ MIT License
 
 ## Phiên bản
 
-`4.0.0` — 2026-06-23
+`4.1.0` — 2026-06-25
