@@ -54,7 +54,7 @@ if ($isAdmin) {
 
 # Parse repo URL
 $parsed = $RepoUrl -replace 'https://github\.com/', '' -replace 'http://github\.com/', '' -replace 'git@github\.com:', ''
-$repoPath = $parsed.TrimEnd('.git', '/')
+$repoPath = $parsed.TrimEnd('.git').TrimEnd('/')
 $repoName = ($repoPath -split '/')[-1]
 
 Write-Info "Parsed repo: $repoPath"
