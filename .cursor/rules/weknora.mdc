@@ -1,0 +1,282 @@
+---
+description: Nguyên tắc và best practices cho WeKnora Integration trong Cursor Enterprise Framework - LLM Knowledge Platform với RAG, ReAct Agent, và Wiki Mode
+created: 2026-06-26
+version: 1.0.0
+tags: [weknora, rag, knowledge-base, react-agent, mcp, hybrid-search, graphrag, wiki, document-qa, llm]
+---
+
+# WeKnora Integration
+
+## Mục tiêu
+
+**WeKnora** là open-source LLM knowledge platform mạnh mẽ từ Tencent với 17.3k GitHub stars, cung cấp:
+
+- **RAG-based Quick Q&A** - Tra cứu kiến thức nhanh chóng từ documents
+- **ReAct Agent Mode** - Autonomous reasoning với multi-step planning
+- **Wiki Mode** - Tự động tạo interlinked Markdown wiki từ raw documents
+- **Hybrid Retrieval** - Vector Search + BM25 + GraphRAG + Knowledge Graph
+- **MCP Server** - Tích hợp MCP Tools cho Cursor agent
+
+Tích hợp WeKnora vào Cursor Enterprise Framework giúp:
+- Xây dựng Knowledge Base từ PDF, Word, Markdown, hình ảnh OCR
+- Sử dụng ReAct Agent cho complex multi-step reasoning
+- Tích hợp Web Search và MCP Tools mở rộng năng lực agent
+- Biến kho tài liệu thành hệ thống hỏi đáp nội bộ, trợ lý nghiên cứu, Wiki doanh nghiệp
+
+## Nguyên tắc
+
+**1. Document Processing Pipeline**
+
+WeKnora hỗ trợ 10+ document formats:
+- PDF / Word / Txt / Markdown / HTML
+- Images (OCR) / CSV / Excel / PPT / JSON
+
+Xây dựng pipeline theo thứ tự:
+```
+Document Upload → Parser → Chunking → Embedding → Vector Store → Knowledge Graph
+```
+
+**2. Knowledge Base Types**
+
+| Type | Use Case | Features |
+|------|----------|----------|
+| FAQ | Q&A systems | Structured Q&A pairs |
+| Document | General KB | Full document search |
+| Wiki | Self-maintaining KB | Auto-generated interlinked pages |
+
+**3. Retrieval Strategies**
+
+```python
+# Hybrid Retrieval kết hợp:
+1. Vector Search (semantic similarity)
+2. BM25 (keyword matching)
+3. GraphRAG (graph traversal)
+4. Knowledge Graph (entity relationships)
+```
+
+**4. ReAct Agent Architecture**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    ReAct Loop                               │
+├─────────────────────────────────────────────────────────────┤
+│  1. Think    → Reasoning about next action                 │
+│  2. Act      → Execute tool / retrieve / search           │
+│  3. Observe  → Get result from action                      │
+│  4. Repeat   → Continue until task complete               │
+└─────────────────────────────────────────────────────────────┘
+
+Tools available:
+- Built-in tools (knowledge retrieval, web search)
+- MCP tools (custom extensions)
+- Document parsing (PDF, Word, images)
+```
+
+**5. Wiki Mode Workflow**
+
+```
+Raw Documents → Agent Analysis → Entity Extraction → 
+Knowledge Graph Construction → Interlinked Markdown Generation → 
+Wiki Browser + Visual Graph
+```
+
+**6. MCP Server Integration**
+
+WeKnora cung cấp MCP server với multi-transport:
+- stdio (local CLI)
+- SSE (Server-Sent Events)
+- HTTP (remote API)
+
+## Checklist
+
+- [ ] WeKnora server deployed (Docker/local)
+- [ ] MCP server configured và running
+- [ ] Knowledge Base created (FAQ/Document/Wiki)
+- [ ] Document types supported: PDF, Word, Markdown, Images
+- [ ] LLM provider configured (OpenAI/DeepSeek/Ollama)
+- [ ] Vector store configured (pgvector/Elasticsearch/Milvus)
+- [ ] Retrieval strategy selected (Vector + BM25 + GraphRAG)
+- [ ] Web search integrated (DuckDuckGo/Bing/Google)
+- [ ] Langfuse tracing configured (optional)
+- [ ] Multi-tenant RBAC configured (optional)
+
+## Anti Pattern
+
+**1. Không sử dụng Hybrid Retrieval**
+
+Chỉ dùng vector search thuần túy sẽ miss keyword-based matches. Luôn kết hợp:
+- Vector search cho semantic similarity
+- BM25 cho exact keyword matching
+- GraphRAG cho relationship-based retrieval
+
+**2. Ignoring Document Structure**
+
+Không preserve metadata và structure khi chunking. Document structure (headings, tables, figures) chứa semantic meaning quan trọng.
+
+**3. Static Embeddings Only**
+
+Không update embeddings khi documents thay đổi. Set up incremental sync pipeline.
+
+**4. Single LLM Provider**
+
+Phụ thuộc vào một LLM duy nhất. WeKnora hỗ trợ 15+ providers - use fallback strategy.
+
+**5. No Evaluation**
+
+Không measure retrieval quality. Implement RAG metrics: Recall, Precision, MRR, NDCG.
+
+## Best Practice
+
+### 1. WeKnora Deployment
+
+```bash
+# Quick Start (Docker)
+git clone https://github.com/Tencent/WeKnora.git
+cd WeKnora
+cp .env.example .env  # Edit with your config
+docker compose up -d
+
+# With optional profiles
+docker compose --profile neo4j up -d    # Knowledge Graph
+docker compose --profile langfuse up -d # Tracing
+```
+
+### 2. MCP Server Configuration
+
+```json
+// .cursor/mcp.json
+{
+  "mcpServers": {
+    "weknora": {
+      "command": "weknora",
+      "args": ["mcp", "serve"],
+      "env": {
+        "WEKNORA_HOST": "http://localhost:8080",
+        "WEKNORA_API_KEY": "${WEKNORA_API_KEY}"
+      }
+    }
+  }
+}
+```
+
+### 3. CLI Usage
+
+```bash
+# Authentication
+weknora auth login --host https://kb.example.com
+
+# Knowledge Base Management
+weknora kb list
+weknora kb create --name "My Knowledge Base" --type document
+
+# Document Operations
+weknora doc upload document.pdf
+weknora doc list --kb "My Knowledge Base"
+
+# Chat with Knowledge
+weknora chat "What is the main topic of the documents?"
+```
+
+### 4. API Integration
+
+```typescript
+// typescript client
+import { WeKnoraClient } from '@weknora/client';
+
+const client = new WeKnoraClient({
+  host: process.env.WEKNORA_HOST,
+  apiKey: process.env.WEKNORA_API_KEY
+});
+
+// Create knowledge base
+const kb = await client.kb.create({
+  name: 'Enterprise Docs',
+  type: 'document'
+});
+
+// Upload documents
+await client.doc.upload('manual.pdf', { kbId: kb.id });
+
+// Chat with KB
+const response = await client.chat({
+  kbId: kb.id,
+  message: 'Summarize the key findings',
+  mode: 'agent' // or 'qa' for simple RAG
+});
+```
+
+### 5. Retrieval Configuration
+
+```yaml
+# Configurable per KB retrieval
+retrieval:
+  strategy: hybrid  # hybrid | vector | bm25 | graphrag
+  vector:
+    weight: 0.4
+    top_k: 20
+  bm25:
+    weight: 0.3
+    top_k: 20
+  graphrag:
+    weight: 0.3
+    depth: 3
+  rerank:
+    enabled: true
+    top_k: 10
+```
+
+## Workflow
+
+### Phase 1: Environment Setup
+
+1. Deploy WeKnora (Docker/Local)
+2. Configure environment variables
+3. Start WeKnora services
+4. Verify Web UI accessible
+
+### Phase 2: MCP Integration
+
+1. Install WeKnora CLI
+2. Configure MCP server in Cursor
+3. Authenticate with `weknora auth login`
+4. Test MCP tools connectivity
+
+### Phase 3: Knowledge Base Creation
+
+1. Create KB (FAQ/Document/Wiki type)
+2. Configure LLM provider
+3. Configure vector store
+4. Set up retrieval strategy
+
+### Phase 4: Document Ingestion
+
+1. Upload documents (PDF/Word/Markdown)
+2. Configure parsing options
+3. Set chunking strategy
+4. Trigger embedding generation
+5. Verify indexing complete
+
+### Phase 5: Agent Configuration
+
+1. Configure ReAct agent settings
+2. Add MCP tools (if needed)
+3. Configure web search provider
+4. Set up thinking mode (if supported)
+
+### Phase 6: Testing & Optimization
+
+1. Test Q&A accuracy
+2. Measure retrieval metrics
+3. Optimize chunking strategy
+4. Tune retrieval weights
+5. Set up monitoring (Langfuse)
+
+## Liên kết
+
+- [[rag]] - RAG Implementation Guidelines
+- [[vector-search]] - Vector Search Patterns
+- [[knowledge-graph]] - Knowledge Graph Construction
+- [[mcp]] - MCP Server Integration
+- [[openai]] - LLM Provider Configuration
+- [[pgvector]] - Vector Store Setup
+- [[weknora-knowledge]] - Detailed WeKnora Knowledge Base

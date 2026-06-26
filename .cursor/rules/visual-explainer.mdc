@@ -1,0 +1,17 @@
+---
+description: Visual Explainer skill for generating HTML diagrams, architecture overviews, diff reviews, and slide decks
+alwaysApply: false
+---
+
+# Visual Explainer
+
+Use the `visual-explainer` skill from `.cursor/skills/visual-explainer/SKILL.md` when user asks for:
+- Diagrams or architecture overviews
+- Diff reviews or plan reviews
+- Project recaps or comparisons
+- Slide decks
+- Complex tables (4+ rows or 3+ columns)
+
+Read `.cursor/skills/visual-explainer/SKILL.md` and follow its workflow.
+
+Write generated HTML to `~/.agent/diagrams/` with descriptive filenames. Open in browser when available.

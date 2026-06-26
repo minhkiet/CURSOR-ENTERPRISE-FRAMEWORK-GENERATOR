@@ -1,0 +1,1443 @@
+---
+description: Nguyên tắc và best practices cho UI/Visual Design trong Cursor Enterprise Framework - hướng dẫn tạo giao diện đẹp mắt, chuyên nghiệp như các theme thương mại cao cấp
+created: 2026-06-26
+version: 1.0.0
+tags: [ui, visual-design, ux, design-system, icons, typography, color, animation, theme]
+---
+
+# UI & Visual Design
+
+## Mục tiêu
+
+UI & Visual Design rule cung cấp các nguyên tắc và best practices để tạo ra giao diện người dùng đẹp mắt, ấn tượng và chuyên nghiệp, phù hợp với các theme thương mại phổ biến trên thị trường hiện nay. Rule này cover toàn bộ spectrum từ typography, color system, iconography, animation, đến layout patterns và responsive design.
+
+Mục tiêu chính là đảm bảo mọi giao diện được xây dựng trong Cursor Enterprise Framework đều có chất lượng visual cao, nhất quán, và mang lại trải nghiệm người dùng xuất sắc.
+
+## Nguyên tắc cốt lõi
+
+**1. Design Language thống nhất**
+
+Mọi thành phần visual phải tuân thủ một design language thống nhất xuyên suốt ứng dụng. Không pha trộn nhiều phong cách thiết kế khác nhau. Mỗi dự án chỉ có một ngôn ngữ thiết kế duy nhất.
+
+**2. Visual Hierarchy rõ ràng**
+
+Sử dụng size, weight, color, và spacing để tạo ra visual hierarchy rõ ràng. Người dùng phải có thể scan và hiểu layout trong vài giây.
+
+**3. Consistency trong mọi interaction**
+
+Mọi trạng thái tương tác (hover, active, disabled, loading, error) phải được design và implement nhất quán. Không có "orphan states".
+
+**4. Performance-aware Animation**
+
+Animation không chỉ đẹp mà còn phải performant. Chỉ animate `transform` và `opacity`. Luôn hỗ trợ `prefers-reduced-motion`.
+
+**5. Accessibility là mặc định**
+
+Mọi design decision phải pass WCAG AA compliance. Color contrast, keyboard navigation, screen reader support không phải là optional.
+
+## Typography System
+
+### Font Selection Principles
+
+**Primary Fonts (Khuyến nghị):**
+
+```css
+/* Premium Sans-Serif - Modern Tech */
+font-family: 'Geist', 'Outfit', 'Cabinet Grotesk', 'Satoshi', system-ui, sans-serif;
+
+/* Display - Headlines */
+font-family: 'Clash Display', 'General Sans', 'Beatrice', system-ui, sans-serif;
+
+/* Mono - Code/Data */
+font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+```
+
+**Quy tắc quan trọng:**
+
+```css
+/* 1. KHÔNG sử dụng Inter làm default */
+font-family: 'Inter', system-ui, sans-serif; /* TRÁNH: quá phổ biến, bị coi là "default" */
+
+/* 2. Serif KHÔNG phải default */
+font-family: 'Fraunces', 'Instrument Serif', Georgia, serif; 
+/* CHỈ dùng khi brief yêu cầu editorial/luxury/publication */
+
+/* 3. Mix đúng cách - chỉ italic/bold cùng font family */
+.headline {
+  font-family: 'Satoshi', sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.headline em {
+  font-family: 'Satoshi', sans-serif; /* Cùng family! */
+  font-style: italic;
+}
+```
+
+### Type Scale
+
+```css
+:root {
+  /* Display - Hero headlines */
+  --text-display-xl: clamp(3rem, 8vw, 6rem);
+  --text-display-lg: clamp(2.5rem, 6vw, 4rem);
+  --text-display-md: clamp(2rem, 4vw, 3rem);
+  
+  /* Headlines - Section titles */
+  --text-headline-xl: clamp(1.5rem, 3vw, 2rem);
+  --text-headline-lg: clamp(1.25rem, 2vw, 1.5rem);
+  --text-headline-md: clamp(1.125rem, 1.5vw, 1.25rem);
+  
+  /* Body */
+  --text-body-lg: 1.125rem;    /* 18px */
+  --text-body-md: 1rem;        /* 16px - default */
+  --text-body-sm: 0.875rem;    /* 14px */
+  
+  /* Labels & Captions */
+  --text-label-lg: 0.875rem;
+  --text-label-md: 0.75rem;
+  --text-label-sm: 0.625rem;
+}
+```
+
+### Typography Best Practices
+
+```css
+/* Display text - tight tracking, no leading */
+.display {
+  font-size: var(--text-display-lg);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+/* Body text - comfortable reading */
+.body {
+  font-size: var(--text-body-md);
+  line-height: 1.6; /* ~26px for 16px base */
+  max-width: 65ch; /* Optimal reading width */
+}
+
+/* Captions & Labels */
+.caption {
+  font-size: var(--text-label-md);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+}
+
+/* EM-DASH BAN - Sử dụng alternatives */
+.triggered {
+  /* TRÁNH: "We build — not just products" */
+  /* ĐÚNG: "We build, not just products" */
+  /* HOẶC: "We build: not just products" */
+  /* HOẶC: "We build (not just products)" */
+}
+```
+
+## Color System
+
+### Premium Color Palettes
+
+```css
+:root {
+  /* === NEUTRAL BASE SYSTEM === */
+  /* Sử dụng ONE neutral family per project - KHÔNG mix warm/cool */
+  
+  /* Zinc/Slate (Cool Neutrals) - Tech, SaaS */
+  --zinc-50: #fafafa;
+  --zinc-100: #f4f4f5;
+  --zinc-200: #e4e4e7;
+  --zinc-300: #d4d4d8;
+  --zinc-400: #a1a1aa;
+  --zinc-500: #71717a;
+  --zinc-600: #52525b;
+  --zinc-700: #3f3f46;
+  --zinc-800: #27272a;
+  --zinc-900: #18181b;
+  --zinc-950: #09090b;
+  
+  /* === ACCENT SYSTEM === */
+  /* Max 1 accent color. Saturation < 80% by default */
+  
+  /* Accent Examples - chọn 1 */
+  --accent-blue: #3b82f6;
+  --accent-violet: #8b5cf6;
+  --accent-emerald: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-rose: #f43f5e;
+  
+  /* === SEMANTIC COLORS === */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #3b82f6;
+}
+```
+
+### Premium Palette Themes
+
+```css
+/* === THEME 1: Cold Luxury (Silver-grey + Chrome) === */
+.theme-cold-luxury {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --bg-elevated: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --accent: #6366f1;
+  --border: #e2e8f0;
+}
+
+/* === THEME 2: Forest (Deep Green + Bone) === */
+.theme-forest {
+  --bg-primary: #faf9f6;
+  --bg-secondary: #f5f3ef;
+  --bg-elevated: #ffffff;
+  --text-primary: #1a2e1a;
+  --text-secondary: #4a5d4a;
+  --text-muted: #8b9a8b;
+  --accent: #2d5a3d;
+  --border: #d4d9d4;
+}
+
+/* === THEME 3: Pure Monochrome + Single Pop === */
+.theme-mono-pop {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-elevated: #ffffff;
+  --text-primary: #171717;
+  --text-secondary: #525252;
+  --text-muted: #a3a3a3;
+  --accent: #ff3b30; /* Single vibrant pop */
+  --border: #e5e5e5;
+}
+
+/* === THEME 4: Dark Tech (Off-black + Subtle Accent) === */
+.theme-dark-tech {
+  --bg-primary: #09090b;
+  --bg-secondary: #18181b;
+  --bg-elevated: #27272a;
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #52525b;
+  --accent: #22d3ee;
+  --border: #3f3f46;
+}
+```
+
+### Color Rules (AI Slop Prevention)
+
+```css
+/* === LILA RULE - NGHIÊM CẤM AI-purple/blue glow === */
+.triggers-ai-slop {
+  /* TRÁNH tuyệt đối: */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: radial-gradient(circle at 50% 50%, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+  box-shadow: 0 0 60px rgba(139, 92, 246, 0.3);
+}
+
+/* === PREMIUM-CONSUMER BAN === */
+/* TRÁNH palette kiểu: warm beige + brass + oxblood + espresso */
+/* Đây là default của nhiều "premium" template rẻ tiền */
+.warm-expensive-look {
+  /* TRÁNH: */
+  --bg: #f5f1ea;
+  --accent: #b08947;
+  --text: #1a1714;
+  --border: #d4c9b0;
+}
+
+/* === NEVER USE PURE BLACK/WHITE === */
+.bad-contrast {
+  color: #000000; /* TRÁNH */
+  background: #ffffff; /* TRÁNH */
+}
+
+.good-contrast {
+  color: #09090b; /* off-black */
+  background: #fafafa; /* off-white */
+}
+```
+
+### Contrast Requirements
+
+```css
+/* WCAG AA Compliance - BẮT BUỘC */
+
+/* Body text: min 4.5:1 */
+.accessible-text {
+  color: #1e293b; /* on white: ~12:1 */
+  color: #475569; /* on white: ~7:1 */
+  color: #64748b; /* on white: ~4.7:1 - OK for large text */
+}
+
+/* Large text (18px+): min 3:1 */
+.large-text {
+  color: #64748b; /* on white: ~4.7:1 */
+}
+
+/* UI components: min 3:1 */
+.ui-component {
+  background: #3b82f6; /* on white: ~4.8:1 */
+  border: 2px solid #2563eb; /* darker shade for focus */
+}
+```
+
+## Icon System
+
+### Icon Library Selection
+
+```typescript
+// Priority Order - chọn và stick với 1 library
+const ICON_LIBRARIES = {
+  // Ưu tiên 1: Phosphor Icons - đa dạng, consistent
+  RECOMMENDED: '@phosphor-icons/react',
+  
+  // Ưu tiên 2: Hugeicons - modern, clean
+  ALTERNATIVE: 'hugeicons-react',
+  
+  // Ưu tiên 3: Tabler - detailed, comprehensive
+  TABLER: '@tabler/icons-react',
+  
+  // Chỉ khi được yêu cầu/rất cần thiết
+  ACCEPTABLE: 'lucide-react',
+  
+  // Radix - primitive, lightweight
+  PRIMITIVE: '@radix-ui/react-icons',
+};
+
+// NGHIÊM CẤM: hand-roll SVG icons
+// NGHIÊM CẤM: mix nhiều icon libraries trong cùng project
+```
+
+### Icon Usage Standards
+
+```tsx
+// ĐÚNG: Import từ một library duy nhất
+import { 
+  House, 
+  User, 
+  Gear, 
+  Bell, 
+  MagnifyingGlass 
+} from '@phosphor-icons/react';
+
+// TRÁNH: Hand-roll SVG
+const BadIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    <path d="..." />
+  </svg>
+);
+
+// Standardize stroke width globally
+// Option 1: Regular (default)
+<Icon weight="regular" />
+
+// Option 2: Bold
+<Icon weight="bold" />
+
+// TRÁNH: Mix weights không có system
+```
+
+### Icon Sizing Scale
+
+```css
+:root {
+  --icon-xs: 12px;   /* Tight spaces, inline with small text */
+  --icon-sm: 16px;   /* Standard inline icons */
+  --icon-md: 20px;   /* Default for buttons, inputs */
+  --icon-lg: 24px;   /* Feature icons, cards */
+  --icon-xl: 32px;  /* Section icons, empty states */
+  --icon-2xl: 48px; /* Hero icons, large decorative */
+}
+
+/* Usage */
+.icon {
+  width: var(--icon-md);
+  height: var(--icon-md);
+  flex-shrink: 0;
+}
+```
+
+### Icon States
+
+```tsx
+<Button>
+  <Plus weight="bold" />
+  <span>Add Item</span>
+</Button>
+
+<Button variant="ghost">
+  <Gear weight="regular" />
+</Button>
+
+<Button variant="ghost" disabled>
+  <Gear weight="regular" className="opacity-50" />
+</Button>
+
+<Button variant="ghost" loading>
+  <Spinner className="animate-spin" />
+</Button>
+```
+
+## Image Strategy
+
+### Image Priority System
+
+```typescript
+const IMAGE_STRATEGY = {
+  // Ưu tiên 1: Image generation tool (DALL-E, Midjourney, etc.)
+  // Tạo section assets đúng aspect ratio
+  
+  // Ưu tiên 2: Real photography
+  // Sử dụng Picsum với descriptive seeds
+  'https://picsum.photos/seed/team-meeting/1200/800',
+  'https://picsum.photos/seed/product-dashboard/800/600',
+  
+  // Ưu tiên 3: Clear placeholder slots
+  // Đánh dấu rõ vị trí cần real images
+};
+```
+
+### Real Logo Strategy
+
+```typescript
+// Sử dụng Simple Icons CDN cho social proof logos
+const SOCIAL_PROOF_LOGOS = {
+  google: 'https://cdn.simpleicons.org/google/ffffff',
+  microsoft: 'https://cdn.simpleicons.org/microsoft/ffffff',
+  apple: 'https://cdn.simpleicons.org/apple/ffffff',
+  amazon: 'https://cdn.simpleicons.org/amazon/ffffff',
+  github: 'https://cdn.simpleicons.org/github/ffffff',
+};
+
+// NEVER: plain text wordmarks
+// NEVER: low-quality logo images
+```
+
+### Image Best Practices
+
+```css
+/* 1. Aspect Ratios - define upfront */
+.hero-image {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.product-card {
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.avatar {
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* 2. Lazy Loading */
+img {
+  loading: lazy;
+  decoding: async;
+}
+
+/* 3. Blur placeholder cho loading state */
+.image-wrapper {
+  position: relative;
+  background: var(--bg-secondary);
+}
+
+.image-wrapper img {
+  transition: opacity 0.3s ease;
+}
+
+.image-wrapper img.loading {
+  opacity: 0;
+}
+
+.image-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 0%,
+    var(--bg-primary) 50%,
+    var(--bg-secondary) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+```
+
+### Image Anti-Patterns
+
+```css
+/* TRÁNH: Fake screenshots bằng div */
+.fake-screenshot {
+  /* NGHIÊM CẤM */
+  background: linear-gradient(135deg, #1e293b, #334155);
+  border-radius: 12px;
+  padding: 20px;
+  /* Vv... */
+}
+
+/* TRÁNH: Decorative colored overlays on photos */
+.overlayed-image {
+  /* TRÁNH */
+  background-image: url('...');
+  background-color: rgba(99, 102, 241, 0.5); /* Color overlay */
+}
+
+/* TRÁNH: Generic stock photos cho testimonials */
+/* John Doe + "This product changed my life" = credibility killer */
+```
+
+## Component Design Patterns
+
+### Button System
+
+```tsx
+// Button variants - enterprise-grade
+const BUTTON_VARIANTS = {
+  primary: 'bg-accent text-white hover:bg-accent-dark',
+  secondary: 'bg-secondary text-primary border border-border',
+  ghost: 'bg-transparent hover:bg-secondary',
+  danger: 'bg-error text-white hover:bg-error-dark',
+  outline: 'bg-transparent border-2 border-accent text-accent',
+};
+
+// Button sizes
+const BUTTON_SIZES = {
+  sm: 'h-8 px-3 text-sm gap-1.5',
+  md: 'h-10 px-4 text-sm gap-2',
+  lg: 'h-12 px-6 text-base gap-2',
+  icon: 'h-10 w-10 p-0',
+};
+```
+
+```tsx
+// Full Button Component
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline';
+  size?: 'sm' | 'md' | 'lg' | 'icon';
+  isLoading?: boolean;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
+}
+
+export const Button: React.FC<ButtonProps> = ({
+  variant = 'primary',
+  size = 'md',
+  isLoading = false,
+  leftIcon,
+  rightIcon,
+  disabled,
+  children,
+  className,
+  ...props
+}) => {
+  return (
+    <button
+      className={cn(
+        'inline-flex items-center justify-center font-medium rounded-lg',
+        'transition-all duration-200',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2',
+        'disabled:opacity-50 disabled:pointer-events-none',
+        BUTTON_VARIANTS[variant],
+        BUTTON_SIZES[size],
+        className
+      )}
+      disabled={disabled || isLoading}
+      {...props}
+    >
+      {isLoading ? (
+        <Spinner className="animate-spin" />
+      ) : leftIcon ? (
+        leftIcon
+      ) : null}
+      <span>{children}</span>
+      {rightIcon && !isLoading && rightIcon}
+    </button>
+  );
+};
+```
+
+### Card System
+
+```css
+/* Card - chỉ dùng khi elevation communicate hierarchy */
+.card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* Alternative: Group với border-t hoặc divide-y */
+/* Khi không cần elevation, dùng spacing thay vì card */
+.card-group {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.card-group > * + * {
+  border-top: 1px solid var(--border);
+}
+```
+
+### Form Components
+
+```tsx
+// Input Component
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  error?: string;
+  hint?: string;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
+}
+
+export const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ label, error, hint, leftIcon, rightIcon, className, ...props }, ref) => {
+    return (
+      <div className="space-y-1.5">
+        {/* Label ALWAYS above input */}
+        {label && (
+          <label className="block text-sm font-medium text-primary">
+            {label}
+          </label>
+        )}
+        
+        <div className="relative">
+          {leftIcon && (
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted">
+              {leftIcon}
+            </div>
+          )}
+          
+          <input
+            ref={ref}
+            className={cn(
+              'w-full h-10 px-3 rounded-lg border bg-background',
+              'text-primary placeholder:text-muted',
+              'transition-colors duration-200',
+              'focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent',
+              leftIcon && 'pl-10',
+              rightIcon && 'pr-10',
+              error && 'border-error focus:ring-error',
+              className
+            )}
+            {...props}
+          />
+          
+          {rightIcon && (
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted">
+              {rightIcon}
+            </div>
+          )}
+        </div>
+        
+        {/* Error ALWAYS below input */
+        error && (
+          <p className="text-sm text-error">{error}</p>
+        )}
+        
+        {hint && !error && (
+          <p className="text-sm text-muted">{hint}</p>
+        )}
+      </div>
+    );
+  }
+);
+```
+
+### State Management
+
+```tsx
+// Loading State - Skeleton Loader
+const SkeletonLoader = ({ count = 3, height = 'h-4' }) => (
+  <div className="space-y-3">
+    {Array.from({ length: count }).map((_, i) => (
+      <div
+        key={i}
+        className={cn(
+          height,
+          'w-full bg-gradient-to-r from-secondary via-primary/10 to-secondary',
+          'bg-[length:200%_100%] animate-shimmer',
+          'rounded'
+        )}
+      />
+    ))}
+  </div>
+);
+
+// Empty State - Composed
+const EmptyState = ({ icon, title, description, action }) => (
+  <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+    {icon && (
+      <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
+        {icon}
+      </div>
+    )}
+    <h3 className="text-lg font-semibold text-primary mb-2">{title}</h3>
+    <p className="text-muted max-w-sm mb-6">{description}</p>
+    {action}
+  </div>
+);
+
+// Error State - Inline
+const ErrorState = ({ message, onRetry }) => (
+  <div className="flex items-center gap-3 p-4 rounded-lg bg-error/10 border border-error/20">
+    <AlertCircle className="w-5 h-5 text-error flex-shrink-0" />
+    <p className="text-sm text-error flex-1">{message}</p>
+    {onRetry && (
+      <Button variant="ghost" size="sm" onClick={onRetry}>
+        Retry
+      </Button>
+    )}
+  </div>
+);
+```
+
+## Layout System
+
+### Grid & Spacing
+
+```css
+:root {
+  /* Spacing Scale */
+  --space-0: 0;
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;    /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+  --space-24: 6rem;     /* 96px */
+  
+  /* Section Spacing */
+  --section-padding-y: var(--space-16);
+  --section-padding-x: var(--space-4);
+  
+  /* Container */
+  --container-max: 1280px;
+  --container-padding: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --section-padding-y: var(--space-24);
+    --container-padding: var(--space-6);
+  }
+}
+```
+
+### Layout Patterns
+
+```css
+/* 1. Section - Base layout unit */
+.section {
+  padding: var(--section-padding-y) var(--section-padding-x);
+}
+
+.section-inner {
+  max-width: var(--container-max);
+  margin: 0 auto;
+}
+
+/* 2. Grid Systems */
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-6); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6); }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-6); }
+
+@media (max-width: 1024px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+}
+
+/* 3. Bento Grid */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-4);
+}
+
+.bento-cell { aspect-ratio: 1; }
+.bento-cell.wide { grid-column: span 2; }
+.bento-cell.tall { grid-row: span 2; }
+
+/* 4. Asymmetric Split */
+.split-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-12);
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .split-hero {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+}
+```
+
+### Shape & Border Radius
+
+```css
+:root {
+  /* Border Radius System - CHỌN 1 system per project */
+  
+  /* System 1: Soft (12-16px) - Modern SaaS */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  
+  /* System 2: Pill (full) - Playful/Consumer */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 9999px;
+  
+  /* System 3: Sharp (0-8px) - Brutalist/Technical */
+  --radius-sm: 0;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+}
+
+/* TRÁNH: Mix radius systems */
+/* KHÔNG: button với radius-sm, card với radius-lg, input với radius-pill */
+```
+
+## Animation & Motion
+
+### Motion Intensity Levels
+
+```typescript
+const MOTION_LEVELS = {
+  // Level 1-3: Static
+  // Chỉ CSS hover/active, không auto-animations
+  STATIC: 'transition: all 0.15s ease',
+  
+  // Level 4-7: Fluid CSS
+  // Custom cubic-bezier transitions, staggered load-ins
+  FLUID: 'transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+  
+  // Level 8-10: Advanced
+  // GSAP ScrollTrigger, Motion hooks
+  ADVANCED: '/* GSAP/Motion patterns */',
+};
+
+const DIAL_SETTINGS = {
+  minimalist: { variance: 5, motion: 3, density: 2 },
+  standard: { variance: 8, motion: 6, density: 4 },
+  premium: { variance: 8, motion: 7, density: 3 },
+  experimental: { variance: 10, motion: 9, density: 4 },
+};
+```
+
+### Animation Patterns
+
+```css
+/* 1. Hover Feedback */
+.interactive {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.interactive:hover {
+  transform: translateY(-2px);
+}
+
+.interactive:active {
+  transform: scale(0.98);
+}
+
+/* 2. Staggered Reveal */
+.stagger-container > * {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: reveal 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.stagger-container > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-container > *:nth-child(2) { animation-delay: 100ms; }
+.stagger-container > *:nth-child(3) { animation-delay: 200ms; }
+.stagger-container > *:nth-child(4) { animation-delay: 300ms; }
+
+@keyframes reveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 3. Loading States */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 0%,
+    var(--bg-primary) 50%,
+    var(--bg-secondary) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+```
+
+### Animation Anti-Patterns
+
+```typescript
+// NGHIÊM CẤM TUYỆT ĐỐI
+
+const FORBIDDEN_ANIMATIONS = {
+  // 1. Scroll event listeners
+  BAD: `window.addEventListener('scroll', handler)`,
+  GOOD: `GSAP ScrollTrigger / Motion useScroll()`,
+  
+  // 2. RAF loops touching React state
+  BAD: `requestAnimationFrame(() => setState(...))`,
+  GOOD: `Motion values instead`,
+  
+  // 3. Animate non-GPU properties
+  BAD: `transition: top 0.3s, left 0.3s, width 0.3s`,
+  GOOD: `transition: transform 0.3s, opacity 0.3s`,
+  
+  // 4. Infinite loops không có meaning
+  BAD: `pulsing glow everywhere`,
+  GOOD: `loading spinner có purpose`,
+  
+  // 5. GSAP + Motion trong cùng tree
+  BAD: `GSAP ScrollTrigger + Framer Motion together`,
+  GOOD: `Stick với 1 library`,
+};
+```
+
+### Reduced Motion
+
+```tsx
+// BẮT BUỘC cho Motion > 3
+import { useReducedMotion } from 'motion/react';
+
+const AnimatedComponent = ({ children }) => {
+  const prefersReducedMotion = useReducedMotion();
+  
+  return (
+    <motion.div
+      initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ 
+        duration: prefersReducedMotion ? 0 : 0.5,
+        ease: [0.16, 1, 0.3, 1] 
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+// CSS fallback
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+```
+
+## Design Tokens
+
+### Token Architecture
+
+```typescript
+interface DesignTokens {
+  colors: {
+    // Semantic colors
+    background: {
+      primary: string;
+      secondary: string;
+      elevated: string;
+      inverse: string;
+    };
+    text: {
+      primary: string;
+      secondary: string;
+      tertiary: string;
+      inverse: string;
+    };
+    accent: {
+      DEFAULT: string;
+      hover: string;
+      active: string;
+      subtle: string;
+    };
+    border: {
+      DEFAULT: string;
+      strong: string;
+      subtle: string;
+    };
+    status: {
+      success: string;
+      warning: string;
+      error: string;
+      info: string;
+    };
+  };
+  
+  typography: {
+    fontFamily: {
+      sans: string;
+      mono: string;
+      display: string;
+    };
+    fontSize: {
+      xs: string;
+      sm: string;
+      base: string;
+      lg: string;
+      xl: string;
+      '2xl': string;
+      '3xl': string;
+      '4xl': string;
+    };
+    lineHeight: {
+      tight: number;
+      normal: number;
+      relaxed: number;
+    };
+    fontWeight: {
+      normal: number;
+      medium: number;
+      semibold: number;
+      bold: number;
+    };
+  };
+  
+  spacing: {
+    // 4px base scale
+    0: string;
+    1: string;
+    2: string;
+    3: string;
+    4: string;
+    6: string;
+    8: string;
+    12: string;
+    16: string;
+    20: string;
+    24: string;
+    32: string;
+  };
+  
+  radius: {
+    sm: string;
+    md: string;
+    lg: string;
+    xl: string;
+    full: string;
+  };
+  
+  shadow: {
+    sm: string;
+    md: string;
+    lg: string;
+    xl: string;
+    inner: string;
+  };
+  
+  animation: {
+    duration: {
+      fast: string;
+      normal: string;
+      slow: string;
+    };
+    easing: {
+      default: string;
+      spring: string;
+      bounce: string;
+    };
+  };
+}
+```
+
+### Token Usage
+
+```css
+/* CSS Variables */
+:root {
+  /* Colors */
+  --color-bg-primary: #ffffff;
+  --color-text-primary: #171717;
+  --color-accent: #3b82f6;
+  
+  /* Typography */
+  --font-sans: 'Satoshi', system-ui, sans-serif;
+  --text-base: 1rem;
+  --leading-normal: 1.6;
+  
+  /* Spacing */
+  --space-4: 1rem;
+  --space-8: 2rem;
+  
+  /* Border Radius */
+  --radius-md: 12px;
+  
+  /* Shadows */
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+/* Tailwind Integration */
+@layer base {
+  :root {
+    --background: var(--color-bg-primary);
+    --foreground: var(--color-text-primary);
+    --accent: var(--color-accent);
+  }
+}
+```
+
+## Dark Mode Implementation
+
+```css
+/* Strategy 1: Tailwind dark: variant */
+:root {
+  --bg: #ffffff;
+  --text: #171717;
+}
+
+.dark {
+  --bg: #09090b;
+  --text: #fafafa;
+}
+
+/* Strategy 2: CSS Variables - Single source of truth */
+:root {
+  color-scheme: light dark;
+}
+
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --text-primary: #171717;
+  --text-secondary: #525252;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #09090b;
+    --bg-secondary: #18181b;
+    --text-primary: #fafafa;
+    --text-secondary: #a1a1aa;
+  }
+}
+```
+
+```tsx
+// Tailwind Config
+const config = {
+  darkMode: ['class', '[data-theme="dark"]'],
+  theme: {
+    extend: {
+      colors: {
+        background: 'var(--bg)',
+        foreground: 'var(--text)',
+      },
+    },
+  },
+};
+```
+
+## Responsive Design
+
+### Breakpoints
+
+```css
+:root {
+  /* Mobile-first breakpoints */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}
+
+/* Usage */
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 var(--space-6);
+  }
+}
+```
+
+### Mobile-First Patterns
+
+```css
+/* Mobile first - base styles for mobile */
+
+/* Navigation */
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .nav {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+/* Grid */
+.grid-responsive {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .grid-responsive {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-responsive {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-6);
+  }
+}
+```
+
+## Accessibility Checklist
+
+```markdown
+### Color Contrast
+- [ ] Body text: min 4.5:1 (WCAG AA)
+- [ ] Large text (18px+): min 3:1
+- [ ] UI components: min 3:1
+- [ ] Focus indicators: min 3:1
+
+### Keyboard Navigation
+- [ ] All interactive elements focusable
+- [ ] Visible focus indicators
+- [ ] Logical tab order
+- [ ] Skip links for main content
+- [ ] Keyboard shortcuts documented
+
+### Screen Reader
+- [ ] Semantic HTML
+- [ ] ARIA labels where needed
+- [ ] Alt text for images
+- [ ] Live regions for dynamic content
+- [ ] Form labels properly associated
+
+### Motion
+- [ ] Respects prefers-reduced-motion
+- [ ] No flashing content
+- [ ] Animation can be disabled
+
+### Touch Targets
+- [ ] Min 44x44px for touch
+- [ ] Adequate spacing between targets
+```
+
+## Premium Theme Characteristics
+
+### Template Market Standards
+
+Các theme premium phổ biến trên ThemeForest, Creative Market, Webflow Templates thường có:
+
+```typescript
+const PREMIUM_CHARACTERISTICS = {
+  // 1. Sophisticated Typography
+  typography: [
+    'Custom display font cho headlines',
+    'High-quality Google Fonts hoặc self-hosted',
+    'Consistent type scale',
+    'Generous line-height (1.6+) cho body',
+  ],
+  
+  // 2. Refined Color Palette
+  colors: [
+    'Muted, sophisticated accents',
+    'High contrast for readability',
+    'Consistent across all states',
+    'Thoughtful dark mode (optional)',
+  ],
+  
+  // 3. Micro-interactions
+  interactions: [
+    'Smooth hover states',
+    'Loading skeletons (không phải spinner)',
+    'Subtle entrance animations',
+    'Tactile button feedback',
+  ],
+  
+  // 4. Premium Components
+  components: [
+    'High-quality icon set',
+    'Beautiful form inputs',
+    'Polished cards với hover effects',
+    'Elegant navigation',
+    'Sophisticated empty states',
+  ],
+  
+  // 5. Layout Sophistication
+  layout: [
+    'Varied section layouts',
+    'Strategic use of whitespace',
+    'Asymmetric compositions',
+    'Visual rhythm and pacing',
+  ],
+  
+  // 6. Attention to Detail
+  details: [
+    'Consistent border-radius',
+    'Thoughtful shadows',
+    'Smooth transitions',
+    'No generic placeholder content',
+  ],
+};
+```
+
+### Code Examples - Premium Patterns
+
+```tsx
+// Premium Card với hover effect
+const PremiumCard = ({ image, title, description, price }) => (
+  <div className="group relative overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:shadow-xl">
+    <div className="aspect-[4/3] overflow-hidden">
+      <img 
+        src={image} 
+        alt={title}
+        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+      />
+    </div>
+    <div className="p-6">
+      <h3 className="text-lg font-semibold text-gray-900 group-hover:text-accent transition-colors">
+        {title}
+      </h3>
+      <p className="mt-2 text-gray-600 line-clamp-2">
+        {description}
+      </p>
+      <div className="mt-4 flex items-center justify-between">
+        <span className="text-xl font-bold text-gray-900">${price}</span>
+        <Button variant="primary" size="sm">
+          Add to Cart
+        </Button>
+      </div>
+    </div>
+  </div>
+);
+
+// Premium Pricing Card
+const PricingCard = ({ tier, price, features, isPopular }) => (
+  <div className={cn(
+    "relative rounded-3xl p-8 transition-all duration-300 hover:-translate-y-2",
+    isPopular 
+      ? "bg-gradient-to-b from-accent to-accent-dark text-white shadow-2xl scale-105"
+      : "bg-white border border-gray-200 hover:shadow-xl"
+  )}>
+    {isPopular && (
+      <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-accent px-4 py-1 text-sm font-medium text-white">
+        Most Popular
+      </span>
+    )}
+    {/* Content */}
+  </div>
+);
+```
+
+## Anti-Patterns (AI Slop Markers)
+
+```typescript
+const AI_SLOP_PATTERNS = {
+  // 1. AI-purple gradients
+  gradient: 'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  
+  // 2. Three equal feature cards
+  featureCards: '3 cards, same icon, same text structure',
+  
+  // 3. Centered hero với dark mesh
+  darkMeshHero: 'dark background + purple/blue mesh + centered text',
+  
+  // 4. Generic names
+  names: ['John Doe', 'Sarah Chan', 'Acme Corp', 'Nexus'],
+  
+  // 5. Fake precision
+  numbers: '99.99% accuracy, 10x faster, #1 rated',
+  
+  // 6. Filler verbs
+  verbs: ['Elevate', 'Seamless', 'Unleash', 'Next-Gen', 'Game-changer'],
+  
+  // 7. Inter + Slate-900
+  fontCombo: "fontFamily: 'Inter' + color: slate-900 everywhere",
+  
+  // 8. Infinite loop micro-animations
+  infiniteLoops: 'floating elements, pulsing icons everywhere',
+  
+  // 9. Beige/brass/oxblood palette
+  warmPalette: 'background: #f5f1ea, accent: #b08947, text: #1a1714',
+  
+  // 10. Fake testimonials
+  testimonial: '"This product changed my life!" - John Doe, CEO at Acme',
+};
+```
+
+## Checklist
+
+- [ ] Font family selected (not Inter as default)
+- [ ] Color palette defined with semantic tokens
+- [ ] No AI-slop patterns detected
+- [ ] Icon library chosen and consistent
+- [ ] Type scale established
+- [ ] Border radius system consistent
+- [ ] Shadow scale defined
+- [ ] Animation patterns documented
+- [ ] Dark mode considered (if applicable)
+- [ ] Reduced motion supported
+- [ ] All states designed (hover, active, disabled, loading, error, empty)
+- [ ] Responsive breakpoints defined
+- [ ] Touch targets adequate (44px+)
+- [ ] Color contrast pass WCAG AA
+- [ ] Focus indicators visible
+
+## Liên kết
+
+- [[frontend-architecture]] - Frontend Architecture Principles
+- [[vue]] - Vue.js Best Practices
+- [[frontend-taste]] - Frontend Taste Skill (Anti-Slop)
+- [[frontend-review]] - Frontend Review Skill
+- [[frontend-redesign]] - Frontend Redesign Skill

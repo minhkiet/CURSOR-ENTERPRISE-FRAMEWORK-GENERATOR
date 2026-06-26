@@ -1,0 +1,47 @@
+{
+  "name": "open-design-integration",
+  "version": "1.0.0",
+  "description": "Open Design integration for Cursor Enterprise Framework",
+  "scripts": {
+    "install-mcp": "od mcp install cursor",
+    "setup": "od mcp install cursor && echo 'Open Design MCP installed successfully'",
+    "list-skills": "od skill list",
+    "list-design-systems": "od design-systems list",
+    "generate": "od plugin run"
+  },
+  "designSystems": {
+    "ai-llm": ["claude", "cohere", "mistral-ai", "ollama", "replicate", "runwayml", "elevenlabs"],
+    "developer-tools": ["cursor", "vercel", "linear-app", "framer", "expo", "clickhouse", "mongodb", "supabase", "posthog", "sentry", "warp", "webflow", "sanity", "mintlify"],
+    "productivity": ["notion", "figma", "miro", "airtable", "superhuman", "intercom", "zapier", "cal", "clay", "raycast"],
+    "fintech": ["stripe", "coinbase", "binance", "kraken", "mastercard", "revolut", "wise"],
+    "ecommerce": ["shopify", "airbnb", "uber", "nike", "starbucks", "pinterest"],
+    "media": ["spotify", "playstation", "wired", "theverge", "meta"],
+    "automotive": ["tesla", "bmw", "ferrari", "lamborghini", "bugatti", "renault"],
+    "other": ["apple", "ibm", "nvidia", "vodafone", "resend", "spacex"]
+  },
+  "skills": {
+    "prototype": {
+      "web-prototype": "Landing page / hero (default)",
+      "saas-landing": "SaaS marketing page",
+      "dashboard": "Admin / analytics",
+      "mobile-app": "Mobile prototype (iPhone/Pixel)",
+      "mobile-onboarding": "Onboarding flow",
+      "social-carousel": "Social media posts",
+      "email-marketing": "Email template",
+      "magazine-poster": "Magazine layout",
+      "motion-frames": "CSS animation"
+    },
+    "deck": {
+      "guizang-ppt": "Magazine-style web PPT",
+      "html-ppt-*": "15 templates × 36 themes"
+    },
+    "video": {
+      "hyperframes": "HTML → MP4 motion graphics"
+    }
+  },
+  "mcpCommands": {
+    "install": "od mcp install cursor",
+    "uninstall": "od mcp uninstall cursor",
+    "status": "od mcp status"
+  }
+}

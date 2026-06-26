@@ -1,0 +1,144 @@
+{
+  "name": "vietnam-address",
+  "description": "Vietnamese administrative units database - provinces, districts, wards",
+  "version": "4.0.0",
+  "data_source": "https://github.com/thanglequoc/vietnamese-provinces-database",
+  "license": "MIT",
+  "last_updated": "2026-06-26",
+  "gov_decree": "30/2026/QH16",
+  "data_formats": [
+    {
+      "format": "JSON",
+      "path": "json/",
+      "subfolders": ["full", "simplified", "vn_only_simplified"],
+      "use_case": "Frontend, Node.js applications"
+    },
+    {
+      "format": "PostgreSQL",
+      "path": "postgresql/",
+      "use_case": "Full-featured backend with PostGIS support"
+    },
+    {
+      "format": "MySQL",
+      "path": "mysql/",
+      "use_case": "Common backend database"
+    },
+    {
+      "format": "MongoDB",
+      "path": "mongodb/",
+      "use_case": "NoSQL projects"
+    },
+    {
+      "format": "Redis",
+      "path": "redis/",
+      "use_case": "Caching layer"
+    },
+    {
+      "format": "SQL Server",
+      "path": "sqlserver/",
+      "use_case": "Microsoft ecosystem"
+    },
+    {
+      "format": "Oracle",
+      "path": "oracle/",
+      "use_case": "Enterprise Oracle databases"
+    }
+  ],
+  "tables": [
+    {
+      "name": "administrative_regions",
+      "count": 8,
+      "description": "8 geographical regions of Vietnam",
+      "columns": ["id", "name", "name_en", "code_name", "code_name_en"],
+      "order": "North to South"
+    },
+    {
+      "name": "administrative_units",
+      "count": 5,
+      "description": "Administrative unit types",
+      "columns": ["id", "full_name", "full_name_en", "short_name", "short_name_en", "code_name", "code_name_en"],
+      "units": [
+        { "id": 1, "vi": "Thành phố trực thuộc trung ương", "en": "Municipality" },
+        { "id": 2, "vi": "Tỉnh", "en": "Province" },
+        { "id": 3, "vi": "Phường", "en": "Ward" },
+        { "id": 4, "vi": "Xã", "en": "Commune" },
+        { "id": 5, "vi": "Đặc khu tại hải đảo", "en": "Special administrative region" }
+      ]
+    },
+    {
+      "name": "provinces",
+      "count": 34,
+      "description": "Provincial level units (cities and provinces)",
+      "primary_key": "code",
+      "columns": ["code", "name", "name_en", "full_name", "full_name_en", "code_name", "administrative_unit_id"]
+    },
+    {
+      "name": "wards",
+      "count": 11000,
+      "description": "Commune level units (wards, communes, townships)",
+      "primary_key": "code",
+      "columns": ["code", "name", "name_en", "full_name", "full_name_en", "code_name", "province_code", "administrative_unit_id"]
+    }
+  ],
+  "regions": [
+    { "id": 1, "name": "Đông Bắc Bộ", "name_en": "Northeast", "code": "dong_bac_bo" },
+    { "id": 2, "name": "Tây Bắc Bộ", "name_en": "Northwest", "code": "tay_bac_bo" },
+    { "id": 3, "name": "Đồng bằng sông Hồng", "name_en": "Red River Delta", "code": "dong_bang_song_hong" },
+    { "id": 4, "name": "Bắc Trung Bộ", "name_en": "North Central Coast", "code": "bac_trung_bo" },
+    { "id": 5, "name": "Duyên hải Nam Trung Bộ", "name_en": "South Central Coast", "code": "duyen_hai_nam_trung_bo" },
+    { "id": 6, "name": "Tây Nguyên", "name_en": "Central Highlands", "code": "tay_nguyen" },
+    { "id": 7, "name": "Đông Nam Bộ", "name_en": "Southeast", "code": "dong_nam_bo" },
+    { "id": 8, "name": "Đồng bằng sông Cửu Long", "name_en": "Mekong River Delta", "code": "dong_bang_song_cuu_long" }
+  ],
+  "key_provinces": [
+    { "code": "01", "name": "Hà Nội", "type": "Thành phố trực thuộc trung ương" },
+    { "code": "79", "name": "Hồ Chí Minh", "type": "Thành phố trực thuộc trung ương" },
+    { "code": "48", "name": "Đà Nẵng", "type": "Thành phố trực thuộc trung ương" },
+    { "code": "56", "name": "Khánh Hòa", "type": "Tỉnh" },
+    { "code": "96", "name": "Cà Mau", "type": "Tỉnh" }
+  ],
+  "recent_changes": [
+    {
+      "version": "v4.0.0",
+      "date": "2026-06-21",
+      "changes": ["Added GIS dataset"]
+    },
+    {
+      "version": "v3.1.0",
+      "date": "2026-04-14",
+      "effective": "2026-04-30",
+      "changes": [
+        "30/2026/QH16: Thành lập thành phố Đồng Nai",
+        "237/NQ-UBTVQH16: Thành lập 10 phường thuộc Đồng Nai"
+      ]
+    },
+    {
+      "version": "v3.0.2",
+      "date": "2025-07-30",
+      "effective": "2025-07-01",
+      "changes": ["19/2025/QĐ-TTg: Updated administrative divisions"]
+    }
+  ],
+  "gis_addon": {
+    "available": true,
+    "formats": ["PostgreSQL/PostGIS", "MySQL", "SQL Server"],
+    "description": "Administrative boundary geometries"
+  },
+  "common_use_cases": [
+    "Shipping address forms",
+    "E-commerce checkout",
+    "Customer registration",
+    "Location-based services",
+    "Address autocomplete",
+    "Address validation",
+    "Geographic analysis",
+    "Delivery zone mapping"
+  ],
+  "sample_provinces": [
+    { "code": "01", "name": "Hà Nội", "name_en": "Ha Noi", "full_name": "Thành phố Hà Nội", "full_name_en": "Ha Noi City" },
+    { "code": "79", "name": "Hồ Chí Minh", "name_en": "Ho Chi Minh", "full_name": "Thành phố Hồ Chí Minh", "full_name_en": "Ho Chi Minh City" },
+    { "code": "48", "name": "Đà Nẵng", "name_en": "Da Nang", "full_name": "Thành phố Đà Nẵng", "full_name_en": "Da Nang City" },
+    { "code": "02", "name": "Hà Giang", "name_en": "Ha Giang", "full_name": "Tỉnh Hà Giang", "full_name_en": "Ha Giang Province" },
+    { "code": "20", "name": "Hải Phòng", "name_en": "Hai Phong", "full_name": "Thành phố Hải Phòng", "full_name_en": "Hai Phong City" }
+  ]
+}

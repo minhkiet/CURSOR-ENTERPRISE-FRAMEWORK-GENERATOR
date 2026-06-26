@@ -1,0 +1,463 @@
+{
+  "version": "1.0.0",
+  "description": "Skill Dependencies Manifest - Auto-install configuration for Cursor Enterprise Framework",
+  "lastUpdated": "2026-06-26",
+  "metadata": {
+    "totalSkills": 17,
+    "categories": {
+      "frontend": 2,
+      "review": 3,
+      "efficiency": 2,
+      "domain": 4,
+      "knowledge": 3,
+      "special": 3
+    },
+    "supportedLanguages": ["vi", "zh", "ja", "ko", "en"]
+  },
+  "skills": {
+    "frontend-taste": {
+      "name": "Frontend Taste",
+      "description": "Premium frontend design skill for landing pages and portfolios. Anti-slop frontend. Not for dashboards or data tables.",
+      "version": "1.0.0",
+      "keywords": {
+        "en": ["landing page", "portfolio", "homepage", "marketing site", "SaaS landing", "greenfield", "beautiful", "premium"],
+        "vi": ["trang đích", "danh mục", "trang chủ", "web marketing"],
+        "zh": ["落地页", "作品集", "主页", "营销网站"]
+      },
+      "gates": {
+        "pre": ["taste-pre"],
+        "post": ["taste-post"]
+      },
+      "dependencies": {
+        "npm": {
+          "required": false,
+          "packages": [
+            { "name": "tailwindcss", "description": "CSS framework" },
+            { "name": "@tailwindcss/typography", "description": "Typography plugin" },
+            { "name": "framer-motion", "description": "Animation library" },
+            { "name": "lucide-react", "description": "Icon library" }
+          ]
+        }
+      },
+      "autoApply": false,
+      "priority": "HIGH"
+    },
+    "frontend-redesign": {
+      "name": "Frontend Redesign",
+      "description": "Redesign existing frontend codebase. Upgrade UI without breaking functionality.",
+      "version": "1.0.0",
+      "keywords": {
+        "en": ["redesign", "upgrade", "improve existing", "modernize", "enhance", "refresh"],
+        "vi": ["cải thiện", "nâng cấp", "thiết kế lại", "hiện đại hóa"]
+      },
+      "gates": {
+        "pre": ["redesign-pre"],
+        "post": ["redesign-post"]
+      },
+      "dependencies": {
+        "npm": {
+          "required": false,
+          "packages": [
+            { "name": "tailwindcss", "description": "CSS framework" },
+            { "name": "prettier", "description": "Code formatter" },
+            { "name": "eslint", "description": "Linter" }
+          ]
+        }
+      },
+      "autoApply": false,
+      "priority": "HIGH"
+    },
+    "full-output": {
+      "name": "Full Output",
+      "description": "Ensure complete implementation without truncation. No skeletons, no TODOs.",
+      "version": "1.0.0",
+      "keywords": {
+        "en": ["full implementation", "complete", "not skeleton", "no TODO", "entire", "not placeholder"],
+        "vi": ["triển khai đầy đủ", "hoàn chỉnh", "toàn bộ", "không skeleton", "không TODO"]
+      },
+      "gates": {
+        "pre": ["fulloutput-pre"],
+        "post": ["fulloutput-post"]
+      },
+      "dependencies": {},
+      "autoApply": false,
+      "priority": "MANDATORY"
+    },
+    "frontend-review": {
+      "name": "Frontend Review",
+      "description": "Quality review for frontend tasks. Dual-gate system for correctness, design, accessibility, performance.",
+      "version": "1.0.0",
+      "keywords": {
+        "en": ["review", "quality check", "audit", "taste check", "quality assurance"],
+        "vi": ["kiểm tra", "đánh giá", "chất lượng", "review", "quaudit"]
+      },
+      "gates": {
+        "pre": ["review-pre"],
+        "post": ["review-post"]
+      },
+      "dependencies": {},
+      "autoApply": true,
+      "alwaysWithFrontend": true,
+      "priority": "MANDATORY"
+    },
+    "security-review": {
+      "name": "Security Review",
+      "description": "Security vulnerability assessment. OWASP Top 10, LLM/AI Security, Supply Chain, Cryptographic practices.",
+      "version": "1.0.0",
+      "keywords": {
+        "en": ["security", "vulnerability", "XSS", "SQL injection", "SSRF", "CSRF", "auth", "JWT", "OAuth", "pentest", "OWASP", "CVE", "exploit"],
+        "vi": ["bảo mật", "lỗ hổng", "auth", "mã hóa", "bảo vệ"]
+      },
+      "gates": {
+        "pre": ["security-pre"],
+        "post": ["security-post"]
+      },
+      "dependencies": {
+        "python": {
+          "required": false,
+          "packages": [
+            { "name": "bandit", "description": "Python security linter" },
+            { "name": "safety", "description": "Safety dependency checker" }
+          ]
+        },
+        "npm": {
+          "required": false,
+          "packages": [
+            { "name": "npm-audit", "description": "NPM security audit (built-in)" }
+          ]
+        }
+      },
+      "autoApply": false,
+      "priority": "HIGH"
+    },
+    "vietnam-payment-review": {
+      "name": "Vietnam Payment Review",
+      "description": "Vietnam payment integration review. MoMo, SePay, PayOS, ZaloPay, VNPay, VietQR.",
+      "version": "1.0.0",
+      "keywords": {
+        "en": ["MoMo", "SePay", "PayOS", "VNPay", "ZaloPay", "VietQR", "payment Vietnam"],
+        "vi": ["MoMo", "SePay", "PayOS", "VNPay", "ZaloPay", "VietQR", "thanh toán", "ví điện tử"]
+      },
+      "gates": {
+        "pre": ["payment-pre"],
+        "post": ["payment-post"]
+      },
+      "dependencies": {},
+      "autoApply": false,
+      "priority": "HIGH"
+    },
+    "karpathy-coding": {
+      "name": "Karpathy Coding",
+      "description": "Vibe coding discipline. Always overlay - runs with EVERY task. Think before coding, simplicity first, surgical changes.",
+      "version": "1.0.0",
+      "keywords": {
+        "en": ["vibe code", "just do it", "simple", "straightforward", "don't overthink", "minimal", "don't assume", "clarify first"],
+        "vi": ["vibe code", "cứ làm đi", "đơn giản thôi", "không cần suy nghĩ nhiều"]
+      },
+      "gates": {
+        "pre": ["karpathy-pre"],
+        "post": ["karpathy-post"]
+      },
+      "dependencies": {},
+      "autoApply": true,
+      "alwaysWithEveryTask": true,
+      "priority": "MANDATORY"
+    },
+    "ponytail": {
+      "name": "Ponytail",
+      "description": "Lazy Senior Dev mode. The best code is the code you never wrote. Minimal code, YAGNI, prevent over-engineering.",
+      "version": "1.0.0",
+      "keywords": {
+        "en": ["less code", "yagni", "over-engineering", "minimal", "simple", "boilerplate"],
+        "vi": ["đơn giản", "tối thiểu", "ít code", "không over-engineering"]
+      },
+      "gates": {
+        "pre": [],
+        "post": []
+      },
+      "dependencies": {},
+      "autoApply": false,
+      "priority": "MEDIUM"
+    },
+    "visual-explainer": {
+      "name": "Visual Explainer",
+      "description": "Generate HTML diagrams, architecture overviews, flowcharts, diff reviews, slide decks.",
+      "version": "1.0.0",
+      "keywords": {
+        "en": ["diagram", "architecture overview", "flowchart", "diff review", "visual plan", "slide deck", "comparison table"],
+        "vi": ["sơ đồ", "kiến trúc", "lưu đồ", "so sánh"]
+      },
+      "gates": {
+        "pre": [],
+        "post": []
+      },
+      "dependencies": {},
+      "autoApply": false,
+      "priority": "MEDIUM"
+    },
+    "open-design": {
+      "name": "Open Design",
+      "description": "Open Design system integration. Web prototype, mobile app, dashboard, deck, hyperframes.",
+      "version": "1.0.0",
+      "keywords": {
+        "en": ["open-design", "design system", "prototype", "brand-grade", "hyperframes", "Figma alternative"],
+        "vi": ["open-design", "design system", "prototype"]
+      },
+      "gates": {
+        "pre": ["od-pre"],
+        "post": ["od-post"]
+      },
+      "dependencies": {
+        "npm": {
+          "required": false,
+          "packages": []
+        }
+      },
+      "mcp": {
+        "required": ["open-design-mcp"],
+        "optional": true
+      },
+      "autoApply": false,
+      "priority": "MEDIUM"
+    },
+    "document-ocr": {
+      "name": "Document OCR",
+      "description": "Text extraction from images using Tesseract OCR. Vietnamese, English, Chinese support.",
+      "version": "1.0.0",
+      "keywords": {
+        "en": ["ocr", "text extraction", "image to text", "scanned document"],
+        "vi": ["ocr", "đọc text", "trích xuất text", "tài liệu scan"]
+      },
+      "gates": {
+        "pre": ["ocr-pre"],
+        "post": ["ocr-post"]
+      },
+      "dependencies": {
+        "python": {
+          "required": true,
+          "packages": [
+            { "name": "pytesseract", "description": "Python wrapper for Tesseract OCR" },
+            { "name": "Pillow", "description": "Image processing library" },
+            { "name": "opencv-python", "description": "Advanced image processing" }
+          ]
+        },
+        "system": {
+          "required": true,
+          "windows": {
+            "name": "Tesseract OCR",
+            "downloadUrl": "https://github.com/UB-Mannheim/tesseract/releases",
+            "verifyCommand": "tesseract --version"
+          },
+          "macos": {
+            "name": "Tesseract OCR",
+            "installCommand": "brew install tesseract tesseract-lang",
+            "verifyCommand": "tesseract --version"
+          },
+          "linux": {
+            "name": "Tesseract OCR",
+            "installCommand": "sudo apt install tesseract-ocr tesseract-ocr-vie",
+            "verifyCommand": "tesseract --version"
+          }
+        }
+      },
+      "autoApply": false,
+      "priority": "MEDIUM"
+    },
+    "bazi": {
+      "name": "Bazi Fortune Analysis",
+      "description": "Chinese Bazi fortune analysis. 四柱八字命理, birth chart, destiny reading.",
+      "version": "1.0.0",
+      "keywords": {
+        "en": ["bazi", "fortune", "birth chart"],
+        "zh": ["八字", "算命", "四柱", "命盘", "运势", "批八字", "排八字"]
+      },
+      "gates": {
+        "pre": [],
+        "post": []
+      },
+      "dependencies": {},
+      "autoApply": false,
+      "priority": "LOW"
+    },
+    "vietnam-address": {
+      "name": "Vietnam Address",
+      "description": "Vietnamese administrative units. 34 provinces, ~11,000 wards. Cascading dropdown, autocomplete.",
+      "version": "1.0.0",
+      "keywords": {
+        "en": ["vietnam address", "province", "district", "ward", "shipping address"],
+        "vi": ["địa chỉ Việt Nam", "tỉnh", "thành phố", "quận", "huyện", "phường", "xã"]
+      },
+      "gates": {
+        "pre": [],
+        "post": []
+      },
+      "dependencies": {
+        "data": {
+          "source": "vietnamese-provinces-database",
+          "formats": ["JSON", "PostgreSQL", "MySQL", "MongoDB", "Redis"],
+          "coverage": {
+            "provinces": 34,
+            "wards": 11000,
+            "regions": 8
+          }
+        }
+      },
+      "autoApply": false,
+      "priority": "MEDIUM"
+    },
+    "weknora-kb": {
+      "name": "WeKnora Knowledge Base",
+      "description": "WeKnora RAG knowledge platform. RAG-based Q&A, Wiki Mode, Hybrid Retrieval, Knowledge Graph.",
+      "version": "1.0.0",
+      "keywords": {
+        "en": ["knowledge base", "RAG", "document q&a", "wiki", "FAQ", "weknora", "rag", "hybrid search", "graphrag"],
+        "vi": ["cơ sở tri thức", "rag", "hỏi đáp tài liệu", "wiki"]
+      },
+      "gates": {
+        "pre": ["weknora-pre"],
+        "post": ["weknora-post"]
+      },
+      "dependencies": {
+        "system": {
+          "required": true,
+          "packages": [
+            { "name": "weknora-cli", "description": "WeKnora CLI tool" },
+            { "name": "docker", "description": "Docker for WeKnora server" }
+          ]
+        }
+      },
+      "mcp": {
+        "required": ["weknora"],
+        "setupScript": ".cursor/scripts/weknora/setup-mcp.ps1"
+      },
+      "autoApply": false,
+      "priority": "MEDIUM"
+    },
+    "weknora-agent": {
+      "name": "WeKnora Agent",
+      "description": "WeKnora ReAct Agent. Autonomous reasoning, multi-step planning, tool orchestration.",
+      "version": "1.0.0",
+      "keywords": {
+        "en": ["agent mode", "react agent", "autonomous reasoning", "agentic workflow", "tool calling"],
+        "vi": ["agent mode", "tự động", "suy luận"]
+      },
+      "gates": {
+        "pre": ["agent-pre"],
+        "post": ["agent-post"]
+      },
+      "dependencies": {
+        "system": {
+          "required": true,
+          "packages": [
+            { "name": "weknora-cli", "description": "WeKnora CLI tool" }
+          ]
+        }
+      },
+      "mcp": {
+        "required": ["weknora"]
+      },
+      "autoApply": false,
+      "priority": "MEDIUM"
+    },
+    "pixelrag": {
+      "name": "PixelRAG - Visual RAG",
+      "description": "Visual Retrieval-Augmented Generation. AI reads documents like humans. Screenshot-based RAG. 18.1% accuracy improvement vs Text RAG.",
+      "version": "1.0.0",
+      "keywords": {
+        "en": ["pixelrag", "visual rag", "screenshot rag", "table extraction", "chart extraction", "financial report analysis"],
+        "vi": ["pixelrag", "rag hình ảnh", "đọc bảng", "đọc biểu đồ"]
+      },
+      "gates": {
+        "pre": ["pixelrag-pre"],
+        "post": ["pixelrag-post"]
+      },
+      "dependencies": {
+        "python": {
+          "required": true,
+          "packages": [
+            { "name": "pixelrag", "description": "PixelRAG core", "extras": ["index", "embed", "serve"] },
+            { "name": "playwright", "description": "Browser automation" }
+          ]
+        },
+        "system": {
+          "required": false,
+          "packages": [
+            { "name": "chromium", "description": "Browser for screenshot capture" }
+          ]
+        }
+      },
+      "models": {
+        "vision_embedding": "Qwen/Qwen3-VL-Embedding-2B",
+        "url": "https://huggingface.co/Qwen/Qwen3-VL-Embedding-2B"
+      },
+      "autoApply": false,
+      "priority": "MEDIUM"
+    }
+  },
+  "autoInstallConfig": {
+    "enabled": true,
+    "promptBeforeInstall": true,
+    "installOptional": true,
+    "checkBeforeRun": true,
+    "verbose": true,
+    "continueOnError": true,
+    "autoSync": true,
+    "syncInterval": 3600
+  },
+  "skillCombinationMatrix": {
+    "landing_page": {
+      "description": "New landing page or portfolio",
+      "primary": "frontend-taste",
+      "required": ["frontend-taste", "full-output", "frontend-review", "karpathy-coding"],
+      "estimatedComplexity": "medium"
+    },
+    "redesign": {
+      "description": "Redesign existing site/app",
+      "primary": "frontend-redesign",
+      "required": ["frontend-redesign", "full-output", "frontend-review", "karpathy-coding"],
+      "estimatedComplexity": "high"
+    },
+    "security_review": {
+      "description": "Security vulnerability assessment",
+      "primary": "security-review",
+      "required": ["security-review", "karpathy-coding"],
+      "estimatedComplexity": "high"
+    },
+    "vietnam_payment": {
+      "description": "Vietnam payment integration",
+      "primary": "vietnam-payment-review",
+      "required": ["vietnam-payment-review", "security-review", "full-output", "karpathy-coding"],
+      "estimatedComplexity": "high"
+    },
+    "knowledge_base": {
+      "description": "Knowledge base with RAG",
+      "primary": "weknora-kb",
+      "required": ["weknora-kb", "karpathy-coding"],
+      "estimatedComplexity": "high"
+    },
+    "document_ocr": {
+      "description": "Text extraction from documents",
+      "primary": "document-ocr",
+      "required": ["document-ocr", "karpathy-coding"],
+      "estimatedComplexity": "low"
+    },
+    "visual_rag": {
+      "description": "Visual document understanding",
+      "primary": "pixelrag",
+      "required": ["pixelrag", "karpathy-coding"],
+      "estimatedComplexity": "medium"
+    },
+    "generic_build": {
+      "description": "Generic build/implement task",
+      "primary": null,
+      "required": ["karpathy-coding"],
+      "estimatedComplexity": "low"
+    },
+    "generic_review": {
+      "description": "Generic review/audit task",
+      "primary": "frontend-review",
+      "required": ["frontend-review", "karpathy-coding"],
+      "estimatedComplexity": "medium"
+    }
+  }
+}

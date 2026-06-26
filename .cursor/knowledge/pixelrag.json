@@ -1,0 +1,180 @@
+{
+  "$schema": "https://cursor.com/skill-knowledge-base-v1",
+  "name": "PixelRAG",
+  "version": "1.0.0",
+  "description": "Visual Retrieval-Augmented Generation - đọc tài liệu bằng hình ảnh",
+  "source": "https://github.com/StarTrail-org/PixelRAG",
+  "license": "Apache-2.0",
+  "stars": 5300,
+  "created": "2026-06-26",
+  
+  "architecture": {
+    "type": "Visual RAG",
+    "flow": "Render → Screenshot Tiles → Vision Embedding → FAISS → Retrieval → VLM Answer",
+    "key_innovation": "AI nhìn tài liệu như con người, không parse text trước"
+  },
+  
+  "performance": {
+    "retrieval_improvement": "+18.1% vs Text RAG",
+    "token_reduction": "~60%",
+    "table_comprehension": "Excellent",
+    "chart_diagram": "Full"
+  },
+  
+  "components": {
+    "render": {
+      "command": "pixelshot",
+      "description": "Document → image tiles (Playwright CDP, PDF)",
+      "input": "URL, PDF, local file",
+      "output": "Screenshot tiles"
+    },
+    "chunk": {
+      "command": "pixelrag chunk",
+      "description": "Tiles → chunks metadata",
+      "output": "Chunk metadata"
+    },
+    "embed": {
+      "command": "pixelrag embed",
+      "description": "Chunks → vectors (Qwen3-VL-Embedding)",
+      "model": "Qwen/Qwen3-VL-Embedding-2B",
+      "device": "auto (cuda/mps/cpu)"
+    },
+    "index": {
+      "command": "pixelrag build-index",
+      "description": "Vectors → FAISS index",
+      "output": "FAISS index files"
+    },
+    "serve": {
+      "command": "pixelrag serve",
+      "description": "FAISS search API (FastAPI)",
+      "port": 30001
+    }
+  },
+  
+  "installation": {
+    "full": "pip install 'pixelrag[index]'",
+    "serve_only": "pip install 'pixelrag[serve]'",
+    "cli_isolation": "uv tool install pixelrag"
+  },
+  
+  "use_cases": {
+    "primary": [
+      "Tài liệu có bảng biểu phức tạp",
+      "Báo cáo tài chính",
+      "PDF khoa học (hình vẽ, công thức)",
+      "Website có layout phức tạp"
+    ],
+    "secondary": [
+      "Knowledge base nội bộ",
+      "Trích xuất dữ liệu từ infographic",
+      "Document Q&A với visual content",
+      "AI Agent duyệt web"
+    ]
+  },
+  
+  "keywords": [
+    "pixelrag",
+    "visual rag",
+    "visual retrieval",
+    "screenshot rag",
+    "vision embedding",
+    "qwen3-vl",
+    "document visual",
+    "table extraction",
+    "chart extraction",
+    "diagram extraction",
+    "pdf analysis",
+    "financial report",
+    "screenshot search",
+    "pixel-native"
+  ],
+  
+  "languages": {
+    "vi": {
+      "keywords": [
+        "đọc file pdf",
+        "phân tích bảng",
+        "hỏi về biểu đồ",
+        "tài liệu có bảng",
+        "báo cáo tài chính"
+      ]
+    }
+  },
+  
+  "dependencies": {
+    "required": [
+      "python>=3.10",
+      "pixelrag",
+      "playwright"
+    ],
+    "optional": [
+      "chromium",
+      "cuda (for GPU)",
+      "mps (for Apple Silicon)"
+    ]
+  },
+  
+  "api": {
+    "hosted": "https://api.pixelrag.ai",
+    "wikipedia_index": "8.28M pages pre-indexed",
+    "local": {
+      "build": "pixelrag index build",
+      "serve": "pixelrag serve --index-dir ./index --port 30001"
+    }
+  },
+  
+  "comparison": {
+    "text_rag": {
+      "table_comprehension": "Poor - loses structure",
+      "chart_understanding": "None",
+      "layout_preservation": "Lost",
+      "use_case": "Pure text documents"
+    },
+    "pixelrag": {
+      "table_comprehension": "Excellent - native reading",
+      "chart_understanding": "Full - visual context",
+      "layout_preservation": "Intact - screenshot preserved",
+      "use_case": "Visual-heavy documents"
+    }
+  },
+  
+  "tutorials": [
+    {
+      "title": "Quick Start: Index a PDF",
+      "steps": [
+        "pip install 'pixelrag[index]'",
+        "curl -L -o paper.pdf <url>",
+        "cat > pixelrag.yaml << 'EOF'\nsource:\n  type: local\n  path: ./paper.pdf\nembed:\n  model: Qwen/Qwen3-VL-Embedding-2B\n  device: auto\noutput: ./paper_index\nEOF",
+        "pixelrag index build",
+        "pixelrag serve --index-dir ./paper_index --port 30001",
+        "curl -X POST http://localhost:30001/search -H 'Content-Type: application/json' -d '{\"queries\": [{\"text\": \"Overview and diagram\"}], \"n_docs\": 1}'"
+      ]
+    },
+    {
+      "title": "Website Screenshot",
+      "steps": [
+        "pixelshot https://en.wikipedia.org/wiki/Python -o ./tiles",
+        "# Use tiles for visual search"
+      ]
+    }
+  ],
+  
+  "references": [
+    {
+      "type": "paper",
+      "title": "PIXELRAG: Web Screenshots Beat Text for Retrieval-Augmented Generation",
+      "authors": "Yichuan Wang, Zhifei Li, Zirui Wang, Paul Teiletche, Lesheng Jin, Matei Zaharia, Joseph E. Gonzalez, Sewon Min",
+      "institution": "Berkeley SkyLab, BAIR, Berkeley NLP"
+    },
+    {
+      "type": "model",
+      "name": "Qwen3-VL-Embedding-2B",
+      "url": "https://huggingface.co/Qwen/Qwen3-VL-Embedding-2B"
+    },
+    {
+      "type": "pretrained_index",
+      "name": "Wikipedia FAISS Index",
+      "url": "https://huggingface.co/datasets/StarTrail-org/pixelrag-faiss-indexes"
+    }
+  ]
+}

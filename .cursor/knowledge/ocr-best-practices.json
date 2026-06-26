@@ -1,0 +1,173 @@
+{
+  "name": "ocr-best-practices",
+  "version": "1.0.0",
+  "description": "OCR Best Practices and Optimization Guide",
+  "category": "document-processing",
+  "tags": ["ocr", "tesseract", "text-extraction", "document", "image-processing"],
+  "domains": ["vibe-coding", "document-processing", "automation"],
+  "lastUpdated": "2026-06-26",
+  "content": {
+    "overview": "Best practices for OCR text extraction using Tesseract to maximize accuracy and performance",
+    
+    "prerequisites": {
+      "tesseract": {
+        "windows": "Download from https://github.com/UB-Mannheim/tesseract/wiki",
+        "macos": "brew install tesseract",
+        "linux": "sudo apt install tesseract-ocr"
+      },
+      "python": {
+        "packages": ["pytesseract", "Pillow", "opencv-python"],
+        "install": "pip install pytesseract pillow opencv-python"
+      }
+    },
+    
+    "image_quality": {
+      "resolution": {
+        "minimum": "150 DPI",
+        "recommended": "300 DPI",
+        "optimal": "600 DPI"
+      },
+      "contrast": {
+        "minimum_ratio": "3:1",
+        "recommended": "7:1"
+      },
+      "file_size": {
+        "optimal": "500KB - 5MB",
+        "maximum": "50MB"
+      }
+    },
+    
+    "preprocessing_pipeline": [
+      {
+        "step": 1,
+        "operation": "Grayscale conversion",
+        "reason": "Remove color noise, simplify processing"
+      },
+      {
+        "step": 2,
+        "operation": "Noise reduction",
+        "method": "Median filter or NLMeans",
+        "reason": "Remove salt-and-pepper noise"
+      },
+      {
+        "step": 3,
+        "operation": "Contrast enhancement",
+        "factor": "1.5-2.0x",
+        "reason": "Improve text visibility"
+      },
+      {
+        "step": 4,
+        "operation": "Sharpening",
+        "factor": "1.5-2.0x",
+        "reason": "Enhance text edges"
+      },
+      {
+        "step": 5,
+        "operation": "Binarization",
+        "method": "Otsu's thresholding",
+        "reason": "Separate text from background"
+      }
+    ],
+    
+    "language_optimization": {
+      "vietnamese": {
+        "code": "vie",
+        "improvements": [
+          "Increase contrast to 1.7x",
+          "Add extra sharpening",
+          "Increase brightness by 15%",
+          "Use MedianFilter twice"
+        ],
+        "accuracy_boost": "20-30%"
+      },
+      "multilingual": {
+        "codes": ["vie+eng", "eng+vie", "vie+eng+chi_sim"],
+        "recommendation": "List primary language first"
+      }
+    },
+    
+    "psm_modes": {
+      "auto": {"mode": 3, "use": "Default, most common"},
+      "osd": {"mode": 1, "use": "With orientation detection"},
+      "block": {"mode": 4, "use": "Uniform text blocks"},
+      "line": {"mode": 7, "use": "Single text line"},
+      "word": {"mode": 8, "use": "Single word recognition"},
+      "sparse": {"mode": 11, "use": "Mixed content with tables/diagrams"}
+    },
+    
+    "performance_tips": [
+      "Resize images to max 3000px before OCR",
+      "Use sparse mode for mixed content",
+      "Batch process similar images",
+      "Cache trained data files",
+      "Use worker threads for multiple images"
+    ],
+    
+    "error_prevention": [
+      "Check Tesseract installation: tesseract --version",
+      "Verify language data: tesseract --list-langs",
+      "Validate image format before processing",
+      "Handle empty results gracefully",
+      "Log confidence scores for quality monitoring"
+    ],
+    
+    "vibe_coding_workflows": {
+      "screenshot_to_code": {
+        "input": "Screenshot of UI/Design",
+        "output": "Extracted text for analysis",
+        "next_step": "Generate code from extracted structure"
+      },
+      "document_to_spec": {
+        "input": "Scanned document/PDF",
+        "output": "Text content for requirements",
+        "next_step": "Generate SPEC.md from requirements"
+      },
+      "diagram_to_components": {
+        "input": "Architecture diagram",
+        "output": "Component names and labels",
+        "next_step": "Map to existing codebase structure"
+      }
+    },
+    
+    "oss_documentscanner_integration": {
+      "description": "OSS-DocumentScanner provides excellent preprocessing",
+      "features": [
+        "Auto edge detection",
+        "Perspective correction",
+        "Automatic rotation",
+        "Image enhancement",
+        "Multi-page PDF support"
+      ],
+      "output_formats": ["PNG", "PDF", "TXT"],
+      "recommended_workflow": "OSS-DocumentScanner → Enhanced Image → Tesseract OCR"
+    },
+    
+    "confidence_thresholds": {
+      "excellent": {"min": 85, "action": "Use directly"},
+      "good": {"min": 70, "action": "Review few errors"},
+      "fair": {"min": 50, "action": "Manual review needed"},
+      "poor": {"min": 0, "action": "Reprocess with better settings"}
+    },
+    
+    "troubleshooting": {
+      "empty_output": [
+        "Check image is not blank",
+        "Verify language pack installed",
+        "Try different PSM mode",
+        "Check image contrast"
+      ],
+      "low_accuracy": [
+        "Increase image resolution",
+        "Apply preprocessing",
+        "Try OpenCV instead of PIL",
+        "Use language-specific settings"
+      ],
+      "performance_issues": [
+        "Reduce image size",
+        "Use batch processing",
+        "Disable unnecessary preprocessing",
+        "Use single PSM mode"
+      ]
+    }
+  }
+}

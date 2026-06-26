@@ -1,0 +1,1032 @@
+---
+description: Nguyên tắc Multi-Language Request Processing - phân tích và chuyển đổi yêu cầu từ các ngôn ngữ khác sang tiếng Anh, tự động xác định rules và skills để chạy vibe code. Tích hợp translation layer, intent detection, và skill auto-discovery.
+created: 2026-06-26
+version: 1.0.0
+tags: [multilingual, translation, vibe-code, auto-discovery, rules, skills, intent-analysis, language-processing]
+---
+
+# Multi-Language Request Processing & Vibe Code Protocol
+
+## Mục tiêu & Tổng quan
+
+Hệ thống này xử lý các yêu cầu từ **bất kỳ ngôn ngữ nào** (tiếng Việt, Trung Quốc, Nhật Bản, Hàn Quốc, Ả Rập, v.v.) và chuyển đổi chúng thành tiếng Anh để:
+
+1. **Phân tích ngôn ngữ** — tự động nhận diện ngôn ngữ đầu vào
+2. **Dịch và chuẩn hóa** — chuyển đổi nội dung sang tiếng Anh với semantic preservation
+3. **Intent detection** — xác định intent thực sự của user
+4. **Rule/Skill auto-discovery** — tự động xác định rules và skills cần áp dụng
+5. **Vibe code execution** — thực thi task với workflow tối ưu
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    MULTI-LANGUAGE VIBE CODE FLOW                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  1. REQUEST RECEIVED (Any Language)                                        │
+│     ├── Detect source language                                             │
+│     ├── Extract raw request text                                           │
+│     └── Identify language signals (Vietnamese, Chinese, Japanese, etc.)     │
+│                                                                             │
+│  2. TRANSLATION LAYER                                                       │
+│     ├── Translate to English (semantic-preserving)                          │
+│     ├── Normalize terminology to English tech vocabulary                    │
+│     └── Preserve cultural context and nuances                               │
+│                                                                             │
+│  3. INTENT ANALYSIS                                                        │
+│     ├── Classify primary intent (build, fix, redesign, review)               │
+│     ├── Identify domain context (frontend, backend, security)              │
+│     └── Extract key entities and constraints                                │
+│                                                                             │
+│  4. RULE/SKILL AUTO-DISCOVERY                                               │
+│     ├── Match against Rule Registry                                        │
+│     ├── Match against Skill Keyword Matrix                                 │
+│     ├── Calculate confidence scores                                        │
+│     └── Determine skill combination                                        │
+│                                                                             │
+│  5. VIBE CODE EXECUTION                                                    │
+│     ├── Pre-review gates (from detected skills)                            │
+│     ├── Implementation (with detected rules)                               │
+│     └── Post-review gates (quality verification)                           │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## PHẦN A: LANGUAGE DETECTION ENGINE
+
+### A.1 Supported Languages
+
+| Language | Code | Native Name | Tech Terms Pattern |
+|----------|------|-------------|-------------------|
+| Vietnamese | vi | Tiếng Việt | tạo, xây dựng, cải thiện, sửa lỗi, thiết kế |
+| Chinese | zh | 中文 | 创建, 构建, 改进, 修复, 设计 |
+| Japanese | ja | 日本語 | 作成, 構築, 改善, 修正, 設計 |
+| Korean | ko | 한국어 | 생성, 구축, 개선, 수정, 설계 |
+| Arabic | ar | العربية | إنشاء, بناء, تحسين, إصلاح, تصميم |
+| Russian | ru | Русский | создать, построить, улучшить, исправить |
+| German | de | Deutsch | erstellen, bauen, verbessern, reparieren |
+| French | fr | Français | créer, construire, améliorer, réparer |
+| Spanish | es | Español | crear, construir, mejorar, reparar |
+| Portuguese | pt | Português | criar, construir, melhorar, corrigir |
+| Hindi | hi | हिन्दी | बनाना, निर्माण, सुधार, मरम्मत |
+| Thai | th | ไทย | สร้าง, สร้างสรรค์, ปรับปรุง, ซ่อมแซม |
+| Indonesian | id | Bahasa Indonesia | membuat, membangun, meningkatkan |
+
+### A.2 Language Detection Patterns
+
+```yaml
+# Vietnamese Detection
+vietnamese_signals:
+  keywords: ["tạo", "xây dựng", "cải thiện", "sửa lỗi", "thiết kế", "app", "web", "trang", "trang web", "code", "lập trình", "phát triển", "component", "ứng dụng", "hệ thống", "api", "database", "backend", "frontend"]
+  patterns: ["^tạo ", "^xây ", "^cải ", "^sửa ", "^thiết kế"]
+  frequency_indicators: ["không", "có", "và", "hoặc", "với", "để", "của", "là", "được", "này", "đó"]
+
+# Chinese Detection
+chinese_signals:
+  keywords: ["创建", "构建", "改进", "修复", "设计", "应用", "网站", "代码", "编程", "开发", "组件", "系统", "接口", "数据库"]
+  character_set: "[\u4e00-\u9fff]"  # CJK Unified Ideographs
+  frequency_indicators: ["的", "是", "在", "有", "和", "与", "为", "了", "对", "中", "这", "那"]
+
+# Japanese Detection
+japanese_signals:
+  keywords: ["作成", "構築", "改善", "修正", "設計", "アプリ", "ウェブサイト", "コード", "プログラミング", "開発", "コンポーネント", "システム"]
+  character_set: "[\u3040-\u309f\u30a0-\u30ff]"  # Hiragana + Katakana
+  kanji_common: ["作成", "構築", "開発", "設計", "修正", "改善", "実装"]
+
+# Korean Detection
+korean_signals:
+  keywords: ["생성", "구축", "개선", "수정", "설계", "앱", "웹", "코드", "프로그래밍", "개발", "컴포넌트", "시스템"]
+  character_set: "[\uac00-\ud7af]"  # Hangul Syllables
+  frequency_indicators: ["의", "이", "가", "을", "를", "에", "와", "과", "는", "은"]
+
+# Arabic Detection
+arabic_signals:
+  keywords: ["إنشاء", "بناء", "تحسين", "إصلاح", "تصميم", "تطبيق", "موقع", "كود", "برمجة", "تطوير", "نظام"]
+  character_set: "[\u0600-\u06ff]"  # Arabic
+  rtl: true
+```
+
+### A.3 Language Detection Algorithm
+
+```python
+def detect_language(text: str) -> dict:
+    """
+    Detect source language with confidence score
+    Returns: { "language": str, "confidence": float, "indicators": list }
+    """
+    scores = {}
+    
+    # Check character set patterns
+    if re.search(r"[\u4e00-\u9fff]", text):  # Chinese
+        scores["zh"] = 0.95
+    if re.search(r"[\u3040-\u309f\u30a0-\u30ff]", text):  # Japanese
+        scores["ja"] = 0.90
+    if re.search(r"[\uac00-\ud7af]", text):  # Korean
+        scores["ko"] = 0.90
+    if re.search(r"[\u0600-\u06ff]", text):  # Arabic
+        scores["ar"] = 0.95
+        
+    # Check language-specific keywords
+    for lang, signals in LANGUAGE_SIGNALS.items():
+        keyword_matches = sum(1 for kw in signals["keywords"] if kw in text.lower())
+        pattern_matches = sum(1 for pattern in signals["patterns"] if re.search(pattern, text.lower()))
+        frequency_matches = sum(1 for fi in signals["frequency_indicators"] if fi in text)
+        
+        scores[lang] = (
+            keyword_matches * 2.0 +
+            pattern_matches * 3.0 +
+            frequency_matches * 0.5
+        ) / (len(signals["keywords"]) + len(signals["patterns"]) + len(signals["frequency_indicators"]))
+    
+    # Normalize and return
+    best_lang = max(scores, key=scores.get)
+    confidence = min(1.0, scores[best_lang])
+    
+    return {
+        "language": best_lang,
+        "confidence": confidence,
+        "all_scores": scores,
+        "detection_method": "hybrid" if len(scores) > 1 else "character_set"
+    }
+```
+
+---
+
+## PHẦN B: TRANSLATION LAYER
+
+### B.1 Vietnamese → English Translation Matrix
+
+```yaml
+vietnamese_to_english:
+  # Intent Verbs
+  "tạo": "create"
+  "xây dựng": "build"
+  "cải thiện": "improve"
+  "sửa lỗi": "fix bug"
+  "thiết kế": "design"
+  "phát triển": "develop"
+  "thêm": "add"
+  "xóa": "delete"
+  "sửa": "edit"
+  "thay đổi": "change"
+  "cập nhật": "update"
+  "nâng cấp": "upgrade"
+  "tối ưu": "optimize"
+  "debug": "debug"
+  
+  # Tech Terms
+  "trang web": "website"
+  "trang": "page"
+  "app": "app"
+  "ứng dụng": "application"
+  "hệ thống": "system"
+  "component": "component"
+  "thành phần": "component"
+  "chức năng": "feature"
+  "tính năng": "feature"
+  "api": "API"
+  "giao diện": "interface"
+  "database": "database"
+  "cơ sở dữ liệu": "database"
+  "backend": "backend"
+  "frontend": "frontend"
+  "code": "code"
+  "lập trình": "programming"
+  "mã nguồn": "source code"
+  "file": "file"
+  "folder": "folder"
+  "thư mục": "folder"
+  
+  # UI Terms
+  "nút": "button"
+  "nút bấm": "button"
+  "ô nhập": "input field"
+  "trường nhập": "input field"
+  "biểu mẫu": "form"
+  "form": "form"
+  "bảng": "table"
+  "menu": "menu"
+  "thanh điều hướng": "navigation bar"
+  "header": "header"
+  "footer": "footer"
+  "sidebar": "sidebar"
+  "popup": "popup"
+  "modal": "modal"
+  "toast": "toast notification"
+  "notification": "notification"
+  "thông báo": "notification"
+  
+  # Quality Terms
+  "đẹp": "beautiful"
+  "hiện đại": "modern"
+  "nhanh": "fast"
+  "chậm": "slow"
+  "bảo mật": "secure"
+  "an toàn": "safe"
+  "dễ sử dụng": "easy to use"
+  "thân thiện": "friendly"
+  "responsive": "responsive"
+  "tương thích": "compatible"
+  
+  # Project Types
+  "landing page": "landing page"
+  "trang đích": "landing page"
+  "portfolio": "portfolio"
+  "danh mục": "portfolio"
+  "blog": "blog"
+  "trang blog": "blog"
+  "dashboard": "dashboard"
+  "trang quản trị": "admin dashboard"
+  "cửa hàng": "store"
+  "shop": "shop"
+  "thương mại điện tử": "e-commerce"
+  
+  # Request Intensifiers
+  "càng đẹp càng tốt": "as beautiful as possible"
+  "tốt nhất": "best"
+  "hoàn hảo": "perfect"
+  "toàn bộ": "full"
+  "hoàn chỉnh": "complete"
+  "chi tiết": "detailed"
+  
+  # Question Words
+  "như thế nào": "how"
+  "làm sao": "how"
+  "cách nào": "which way"
+  "tại sao": "why"
+  "bao lâu": "how long"
+  "bao nhiêu": "how many"
+  "ở đâu": "where"
+  "khi nào": "when"
+  "là gì": "what is"
+  "có gì": "what"
+  
+  # Connectors
+  "với": "with"
+  "và": "and"
+  "hoặc": "or"
+  "để": "to"
+  "cho": "for"
+  "của": "of"
+  "là": "is"
+  "được": "is"
+  "này": "this"
+  "đó": "that"
+  "các": "these"
+  "những": "those"
+```
+
+### B.2 Translation Algorithm
+
+```python
+def translate_to_english(text: str, source_lang: str) -> str:
+    """
+    Translate request to English with semantic preservation
+    """
+    if source_lang == "vi":
+        return translate_vietnamese_to_english(text)
+    elif source_lang == "zh":
+        return translate_chinese_to_english(text)
+    elif source_lang == "ja":
+        return translate_japanese_to_english(text)
+    elif source_lang == "ko":
+        return translate_korean_to_english(text)
+    # ... other languages
+    
+def translate_vietnamese_to_english(text: str) -> str:
+    """Vietnamese to English with tech-term awareness"""
+    
+    # Step 1: Replace known tech terms
+    result = text
+    for vi_term, en_term in VI_TO_EN.items():
+        result = re.sub(
+            r'\b' + re.escape(vi_term) + r'\b',
+            en_term,
+            result,
+            flags=re.IGNORECASE
+        )
+    
+    # Step 2: Handle compound phrases
+    result = expand_compound_phrases(result)
+    
+    # Step 3: Normalize word order for English
+    result = normalize_word_order(result, "vi")
+    
+    # Step 4: Expand abbreviations
+    result = expand_abbreviations(result, "vi")
+    
+    # Step 5: Preserve code snippets (don't translate)
+    result = preserve_code_snippets(result)
+    
+    return result
+
+def expand_compound_phrases(text: str) -> str:
+    """Expand common Vietnamese compound phrases"""
+    compounds = {
+        "thiết kế web": "design website",
+        "xây dựng app": "build app",
+        "tạo landing page": "create landing page",
+        "cải thiện giao diện": "improve UI",
+        "sửa lỗi code": "fix code bug",
+        "phát triển tính năng": "develop feature",
+        "thêm chức năng": "add feature",
+        "tối ưu hiệu suất": "optimize performance",
+        "nâng cấp hệ thống": "upgrade system",
+    }
+    
+    for compound, expansion in compounds.items():
+        text = text.replace(compound, expansion)
+    
+    return text
+```
+
+### B.3 Example Translations
+
+| Vietnamese Input | English Output |
+|-----------------|---------------|
+| "Tạo một landing page cho startup AI của tôi" | "Create a landing page for my AI startup" |
+| "Cải thiện giao diện app thương mại điện tử" | "Improve UI of e-commerce app" |
+| "Xây dựng hệ thống quản lý kho hàng" | "Build warehouse management system" |
+| "Thêm tính năng thanh toán MoMo vào app" | "Add MoMo payment feature to app" |
+| "Sửa lỗi login trên trang admin" | "Fix login bug on admin page" |
+| "Thiết kế dashboard cho hệ thống CRM" | "Design CRM dashboard" |
+| "Tạo component button với nhiều variant" | "Create button component with multiple variants" |
+
+---
+
+## PHẦN C: INTENT ANALYSIS
+
+### C.1 Primary Intent Classification
+
+```yaml
+intents:
+  build:
+    keywords: ["create", "build", "make", "add", "implement", "develop", "generate", "set up", "configure"]
+    confidence_boost: 0.2
+    examples: ["create a landing page", "build an app", "make a component"]
+    
+  redesign:
+    keywords: ["improve", "upgrade", "redesign", "modernize", "enhance", "update", "refresh", "polish"]
+    confidence_boost: 0.2
+    examples: ["improve the UI", "upgrade the design", "redesign the homepage"]
+    
+  fix:
+    keywords: ["fix", "bug", "error", "issue", "problem", "repair", "debug", "patch"]
+    confidence_boost: 0.2
+    examples: ["fix the login bug", "debug the API", "repair the form"]
+    
+  review:
+    keywords: ["review", "check", "audit", "inspect", "analyze", "assess", "evaluate"]
+    confidence_boost: 0.2
+    examples: ["review the code", "check for security issues", "audit the implementation"]
+    
+  explain:
+    keywords: ["explain", "how", "what", "why", "understand", "clarify", "describe"]
+    confidence_boost: 0.2
+    examples: ["explain how it works", "what is this component", "how to implement"]
+```
+
+### C.2 Domain Classification
+
+```yaml
+domains:
+  frontend:
+    keywords: ["frontend", "UI", "UX", "interface", "landing", "page", "component", "button", "form", "layout", "responsive", "tailwind", "css", "react", "vue", "angular", "next", "nuxt"]
+    patterns: ["\.(tsx|jsx|vue|svelte)$", "\.(css|scss|tailwind)$"]
+    
+  backend:
+    keywords: ["backend", "API", "server", "database", "endpoint", "authentication", "authorization", "CRUD", "REST", "GraphQL"]
+    patterns: ["\.(py|java|go|ts|js)$"]
+    
+  security:
+    keywords: ["security", "auth", "login", "password", "JWT", "OAuth", "vulnerability", "XSS", "SQL injection", "encrypt", "HTTPS", "CORS", "CSRF"]
+    
+  payment:
+    keywords: ["payment", "checkout", "stripe", "paypal", "MoMo", "SePay", "PayOS", "VNPay", "ZaloPay", "VietQR", "invoice", "subscription"]
+    
+  mobile:
+    keywords: ["mobile", "app", "iOS", "Android", "react native", "flutter", "expo", "app store", "play store"]
+    
+  database:
+    keywords: ["database", "SQL", "PostgreSQL", "MySQL", "MongoDB", "migration", "schema", "query", "index", "ORM"]
+    
+  devops:
+    keywords: ["docker", "kubernetes", "CI/CD", "deployment", "AWS", "Azure", "GCP", "serverless", "lambda"]
+```
+
+### C.3 Intent Detection Algorithm
+
+```python
+def analyze_intent(english_request: str) -> dict:
+    """
+    Analyze translated request to determine intent and domain
+    Returns: {
+        "primary_intent": str,
+        "confidence": float,
+        "domains": list,
+        "entities": list,
+        "constraints": list
+    }
+    """
+    request_lower = english_request.lower()
+    
+    # Score each intent
+    intent_scores = {}
+    for intent_name, intent_data in INTENTS.items():
+        score = sum(1 for kw in intent_data["keywords"] if kw in request_lower)
+        intent_scores[intent_name] = score / len(intent_data["keywords"])
+    
+    # Get primary intent
+    primary_intent = max(intent_scores, key=intent_scores.get)
+    intent_confidence = intent_scores[primary_intent]
+    
+    # Detect domains
+    detected_domains = []
+    for domain_name, domain_data in DOMAINS.items():
+        score = sum(1 for kw in domain_data["keywords"] if kw in request_lower)
+        if score > 0:
+            detected_domains.append({
+                "domain": domain_name,
+                "score": score / len(domain_data["keywords"])
+            })
+    
+    # Extract entities (file names, component names, etc.)
+    entities = extract_entities(english_request)
+    
+    # Extract constraints (performance, security, etc.)
+    constraints = extract_constraints(english_request)
+    
+    return {
+        "primary_intent": primary_intent,
+        "intent_confidence": intent_confidence,
+        "intent_scores": intent_scores,
+        "domains": sorted(detected_domains, key=lambda x: x["score"], reverse=True),
+        "entities": entities,
+        "constraints": constraints
+    }
+```
+
+---
+
+## PHẦN D: RULE/SKILL AUTO-DISCOVERY
+
+### D.1 Rule Registry
+
+| Rule | Trigger Conditions | Confidence | Priority |
+|------|-------------------|------------|----------|
+| `frontend-taste` | landing, portfolio, greenfield, new build | 0.90+ | HIGH |
+| `frontend-redesign` | improve, upgrade, existing site, redesign | 0.85+ | HIGH |
+| `full-output` | full implementation, complete, not skeleton | 0.90+ | HIGH |
+| `frontend-review` | any frontend task | 1.0 | MANDATORY |
+| `security-review` | security, auth, payment, vulnerability | 0.90+ | HIGH |
+| `vietnam-payment-review` | MoMo, SePay, PayOS, VNPay, ZaloPay, VietQR | 0.95+ | HIGH |
+| `karpathy-coding` | ALL coding tasks | 1.0 | MANDATORY |
+| `ponytail` | simple, minimal, less code, vibe code | 0.85+ | MEDIUM |
+| `visual-explainer` | diagram, architecture, flowchart | 0.90+ | MEDIUM |
+| `open-design` | design system, prototype, mockup | 0.85+ | MEDIUM |
+| `document-ocr` | OCR, text extraction, image to text | 0.95+ | MEDIUM |
+| `bazi` | 四柱, 算命, bazi, fortune | 0.95+ | LOW |
+| `aws` | AWS, EC2, S3, Lambda, DynamoDB | 0.90+ | HIGH |
+| `azure` | Azure, App Service, Cosmos DB | 0.90+ | HIGH |
+| `gcp` | GCP, Cloud Functions, BigQuery | 0.90+ | HIGH |
+| `docker` | docker, container, image | 0.90+ | HIGH |
+| `kubernetes` | k8s, kubernetes, pod, deployment | 0.90+ | HIGH |
+| `database` | PostgreSQL, MySQL, MongoDB, Redis | 0.85+ | MEDIUM |
+| `testing` | test, jest, playwright, unit test | 0.85+ | MEDIUM |
+
+### D.2 Skill Auto-Discovery Matrix
+
+```yaml
+# Original from skill-integration.mdc - extended for multilingual support
+
+skill_matrix:
+  # Frontend Skills
+  frontend-taste:
+    en_keywords: ["landing page", "portfolio", "homepage", "marketing site", "create", "build", "new"]
+    vi_keywords: ["trang đích", "danh mục", "trang chủ", "web marketing", "tạo", "xây dựng", "mới"]
+    zh_keywords: ["落地页", "作品集", "主页", "营销网站", "创建", "构建"]
+    confidence_threshold: 0.75
+    
+  frontend-redesign:
+    en_keywords: ["improve", "upgrade", "redesign", "modernize", "enhance", "existing", "current"]
+    vi_keywords: ["cải thiện", "nâng cấp", "thiết kế lại", "hiện đại hóa", "nâng cao", "hiện tại"]
+    zh_keywords: ["改进", "升级", "重新设计", "现代化", "增强", "现有"]
+    confidence_threshold: 0.75
+    
+  full-output:
+    en_keywords: ["full implementation", "complete", "not skeleton", "no TODO", "entire", "whole"]
+    vi_keywords: ["triển khai đầy đủ", "hoàn chỉnh", "toàn bộ", "không skeleton", "không TODO"]
+    zh_keywords: ["完整实现", "完整", "全部", "不省略"]
+    confidence_threshold: 0.80
+    
+  frontend-review:
+    en_keywords: ["review", "check", "quality", "audit", "inspect"]
+    vi_keywords: ["kiểm tra", "đánh giá", "chất lượng", "review", "quaudit"]
+    zh_keywords: ["审查", "检查", "质量", "审计"]
+    confidence_threshold: 0.70  # Mandatory for frontend tasks
+    
+  # Security Skills
+  security-review:
+    en_keywords: ["security", "vulnerability", "XSS", "SQL injection", "auth", "encrypt", "JWT", "OAuth"]
+    vi_keywords: ["bảo mật", "lỗ hổng", "auth", "mã hóa", "bảo vệ"]
+    zh_keywords: ["安全", "漏洞", "认证", "加密", "授权"]
+    confidence_threshold: 0.85
+    
+  vietnam-payment-review:
+    en_keywords: ["MoMo", "SePay", "PayOS", "VNPay", "ZaloPay", "VietQR"]
+    vi_keywords: ["MoMo", "SePay", "PayOS", "VNPay", "ZaloPay", "VietQR", "thanh toán", "ví điện tử"]
+    zh_keywords: ["MoMo", "SePay", "PayOS", "VNPay", "ZaloPay", "VietQR", "支付", "电子钱包"]
+    confidence_threshold: 0.90
+    
+  # Efficiency Skills
+  ponytail:
+    en_keywords: ["simple", "minimal", "less code", "yagni", "over-engineering"]
+    vi_keywords: ["đơn giản", "tối thiểu", "ít code", "không over-engineering"]
+    zh_keywords: ["简单", "最小", "少代码", "不要过度设计"]
+    confidence_threshold: 0.80
+    
+  karpathy-coding:
+    en_keywords: ["vibe code", "just do it", "don't overthink", "simple", "straightforward"]
+    vi_keywords: ["vibe code", "cứ làm đi", "đơn giản thôi", "không cần suy nghĩ nhiều"]
+    zh_keywords: ["vibe code", "直接做", "简单", "不要想太多"]
+    confidence_threshold: 0.75  # Runs with ALL tasks
+```
+
+### D.3 Auto-Discovery Algorithm
+
+```python
+def auto_discover_rules_and_skills(english_request: str, intent_analysis: dict) -> dict:
+    """
+    Automatically discover applicable rules and skills
+    """
+    request_lower = english_request.lower()
+    results = {
+        "skills": [],
+        "rules": [],
+        "gates": [],
+        "confidence": {}
+    }
+    
+    # Mandatory: karpathy-coding always runs
+    results["skills"].append({
+        "name": "karpathy-coding",
+        "type": "overlay",
+        "confidence": 1.0
+    })
+    
+    # Check each skill in matrix
+    for skill_name, skill_data in SKILL_MATRIX.items():
+        scores = []
+        
+        # Check English keywords
+        for kw in skill_data.get("en_keywords", []):
+            if kw in request_lower:
+                scores.append(1.0)
+                
+        # Check Vietnamese keywords (if original was Vietnamese)
+        for kw in skill_data.get("vi_keywords", []):
+            if kw in request_lower:
+                scores.append(1.0)
+                
+        # Check Chinese keywords
+        for kw in skill_data.get("zh_keywords", []):
+            if kw in request_lower:
+                scores.append(1.0)
+        
+        # Calculate confidence
+        if scores:
+            confidence = sum(scores) / max(len(skill_data.get("en_keywords", [1])), 1)
+            
+            if confidence >= skill_data["confidence_threshold"]:
+                results["skills"].append({
+                    "name": skill_name,
+                    "type": "primary" if skill_name not in ["karpathy-coding", "frontend-review"] else "mandatory",
+                    "confidence": confidence,
+                    "scores": scores
+                })
+                results["confidence"][skill_name] = confidence
+    
+    # Determine gates based on skills
+    for skill in results["skills"]:
+        gates = get_skill_gates(skill["name"])
+        results["gates"].extend(gates)
+    
+    # Remove duplicate gates
+    results["gates"] = list(set(results["gates"]))
+    
+    # Add domain-specific rules
+    for domain in intent_analysis["domains"]:
+        if domain["domain"] == "frontend":
+            results["rules"].append("frontend-architecture")
+        elif domain["domain"] == "security":
+            results["rules"].append("web-security")
+        elif domain["domain"] == "payment":
+            results["rules"].append("billing")
+        elif domain["domain"] == "database":
+            results["rules"].append("database")
+    
+    return results
+
+def get_skill_gates(skill_name: str) -> list:
+    """Get required gates for a skill"""
+    gate_map = {
+        "frontend-taste": ["taste-pre", "taste-post"],
+        "frontend-redesign": ["redesign-pre", "redesign-post"],
+        "full-output": ["fulloutput-pre", "fulloutput-post"],
+        "frontend-review": ["review-pre", "review-post"],
+        "security-review": ["security-pre", "security-post"],
+        "vietnam-payment-review": ["payment-pre", "payment-post"],
+        "karpathy-coding": ["karpathy-pre", "karpathy-post"],
+    }
+    return gate_map.get(skill_name, [])
+```
+
+---
+
+## PHẦN E: VIBE CODE EXECUTION WORKFLOW
+
+### E.1 Complete Vibe Code Flow
+
+```
+═══════════════════════════════════════════════════════════════════════════════
+[VIBE CODE PROTOCOL] — MULTI-LANGUAGE → ENGLISH → AUTO-DISCOVERY → EXECUTE
+═══════════════════════════════════════════════════════════════════════════════
+
+STEP 1: LANGUAGE DETECTION
+─────────────────────────────────────────────────────────────────────────────
+  Input: "Tạo một landing page đẹp cho startup AI của tôi"
+  
+  Detection Result:
+    - Language: Vietnamese (vi)
+    - Confidence: 0.95
+    - Detection method: keyword + character patterns
+  
+  ✓ Language detected: Vietnamese
+
+STEP 2: TRANSLATION TO ENGLISH
+─────────────────────────────────────────────────────────────────────────────
+  Original: "Tạo một landing page đẹp cho startup AI của tôi"
+  
+  Translated: "Create a beautiful landing page for my AI startup"
+  
+  Tech Terms Normalized:
+    - "landing page" → "landing page" (preserved)
+    - "startup" → "startup" (preserved)
+    - "AI" → "AI" (preserved)
+  
+  ✓ Translated to English
+
+STEP 3: INTENT ANALYSIS
+─────────────────────────────────────────────────────────────────────────────
+  Translated Request: "Create a beautiful landing page for my AI startup"
+  
+  Intent Analysis:
+    - Primary Intent: build (0.85 confidence)
+    - Secondary Intent: design (0.70 confidence)
+    - Domains Detected:
+      1. frontend (0.90 confidence)
+      2. design (0.80 confidence)
+    
+  Entities Extracted:
+    - "landing page" (component type)
+    - "AI startup" (business context)
+    - "beautiful" (quality modifier)
+  
+  ✓ Intent analyzed
+
+STEP 4: RULE/SKILL AUTO-DISCOVERY
+─────────────────────────────────────────────────────────────────────────────
+  Request: "Create a beautiful landing page for my AI startup"
+  
+  Skills Detected:
+    ★ PRIMARY: frontend-taste (confidence: 0.92)
+    ○ SECONDARY: full-output (confidence: 0.85)
+    ○ MANDATORY: frontend-review (confidence: 1.0)
+    ○ OVERLAY: karpathy-coding (confidence: 1.0)
+  
+  Rules Matched:
+    - frontend-architecture
+    - ui-visual-design
+    - coding-standards
+  
+  Gates Required:
+    PRE-REVIEW: taste-pre, fulloutput-pre, review-pre, karpathy-pre
+    POST-REVIEW: taste-post, fulloutput-post, review-post, karpathy-post
+  
+  ✓ Skills and rules auto-discovered
+
+STEP 5: PRE-REVIEW GATES
+─────────────────────────────────────────────────────────────────────────────
+  [PRE-REVIEW GATE] — frontend-taste
+  
+  0.A Brief Inference:
+    - Page kind: landing (AI SaaS)
+    - Vibe: modern, premium, AI-focused
+    - Audience: technical buyers, investors
+    - Brand: startup, innovative
+  
+  0.B Design Read Declaration:
+    "Reading this as: [AI SaaS Landing] for [technical buyers and investors],
+     with a [modern tech aesthetic] language,
+     leaning toward [Tailwind + dark mode + subtle gradients]."
+  
+  0.D Anti-Default Discipline:
+    ✓ No AI-purple gradients in plan
+    ✓ No generic glassmorphism
+    ✓ No Inter font
+  
+  0.F Pre-Code Review Checklist:
+    ✓ Design read declared
+    ✓ No AI-default patterns
+    ✓ Design system: Tailwind v4
+    ✓ Dial values: VARIANCE=7, MOTION=5, DENSITY=5
+  
+  [PRE-REVIEW GATE] — karpathy-coding
+  
+  K.1 Think Before Coding:
+    ✓ State assumptions: assuming Next.js 14, Tailwind v4
+    ✓ Simplicity check: surgical scope defined
+    ✓ Scope: single landing page, no multi-page
+  
+  K.4 Goal Definition:
+    - Create landing page with hero, features, CTA
+    - Use AI-themed visual language
+    - Optimize for conversion
+  
+  ✓ PRE-REVIEW GATES PASS
+
+STEP 6: IMPLEMENTATION
+─────────────────────────────────────────────────────────────────────────────
+  Creating landing page with:
+  - Hero section (headline, subtext, CTA)
+  - Features section (3-4 key features)
+  - Social proof (logo wall)
+  - CTA section
+  
+  [Track deliverables: 4/4 complete]
+
+STEP 7: POST-REVIEW GATES
+─────────────────────────────────────────────────────────────────────────────
+  [POST-REVIEW GATE] — All Skills
+  
+  ✓ frontend-taste Post-Review: PASS
+    - Layout & Structure: PASS
+    - Typography & Content: PASS
+    - Animation & Motion: PASS
+  
+  ✓ full-output Post-Review: PASS
+    - No skeleton code
+    - All sections complete
+  
+  ✓ frontend-review Post-Review: PASS
+    - Correctness: PASS
+    - Design & Taste: PASS
+    - Accessibility: PASS
+    - Performance: PASS
+  
+  ✓ karpathy-coding Post-Review: PASS
+    - Surgical changes verified
+    - Simplicity maintained
+  
+  ✓ POST-REVIEW GATES PASS — DELIVERING
+
+═══════════════════════════════════════════════════════════════════════════════
+```
+
+### E.2 Simplified Flow (Quick Vibe Code)
+
+For simple requests, use streamlined flow:
+
+```
+INPUT (any language) → TRANSLATE → INTENT → SKILLS → EXECUTE → DELIVER
+```
+
+```python
+def quick_vibe_code(user_request: str) -> str:
+    """
+    Streamlined vibe code execution
+    """
+    # Step 1: Detect language
+    lang_detection = detect_language(user_request)
+    
+    # Step 2: Translate to English
+    english_request = translate_to_english(user_request, lang_detection["language"])
+    
+    # Step 3: Quick intent detection
+    intent = quick_intent_detection(english_request)
+    
+    # Step 4: Auto-discover skills
+    discovery = auto_discover_rules_and_skills(english_request, intent)
+    
+    # Step 5: Run pre-review gates
+    for gate in discovery["gates"]["pre"]:
+        run_gate(gate)
+    
+    # Step 6: Execute with karpathy-coding overlay
+    result = execute_with_karpathy_overlay(
+        english_request,
+        discovery["skills"],
+        discovery["rules"]
+    )
+    
+    # Step 7: Run post-review gates
+    for gate in discovery["gates"]["post"]:
+        run_gate(gate)
+    
+    return result
+```
+
+---
+
+## PHẦN F: INTEGRATION WITH SKILL-INTEGRATION.MDC
+
+### F.1 How This Rule Extends Skill-Integration
+
+This rule (`multi-language-vibe-code.mdc`) extends the existing `skill-integration.mdc` by adding:
+
+1. **Language Detection Layer** — before Skill Detection Engine runs
+2. **Translation Layer** — converts all requests to English for consistent processing
+3. **Cross-Language Keywords** — extends Skill Keyword Matrix for Vietnamese, Chinese, Japanese, etc.
+
+### F.2 Execution Order
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 1. REQUEST RECEIVED (any language)                         │
+└─────────────────────────────────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────────┐
+│ 2. LANGUAGE DETECTION (Section A)                          │
+│    - Detect Vietnamese, Chinese, Japanese, etc.            │
+└─────────────────────────────────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────────┐
+│ 3. TRANSLATION LAYER (Section B)                           │
+│    - Translate to English                                  │
+│    - Preserve tech terms                                   │
+│    - Normalize compound phrases                            │
+└─────────────────────────────────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────────┐
+│ 4. INTENT ANALYSIS (Section C) — from skill-integration.mdc│
+│    - Primary intent classification                         │
+│    - Domain detection                                      │
+│    - Entity extraction                                     │
+└─────────────────────────────────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────────┐
+│ 5. RULE/SKILL AUTO-DISCOVERY (Section D)                   │
+│    - Match against Rule Registry                           │
+│    - Match against Skill Matrix (now multilingual)         │
+│    - Calculate confidence scores                           │
+└─────────────────────────────────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────────┐
+│ 6. VIBE CODE EXECUTION (Section E)                         │
+│    - Run pre-review gates                                  │
+│    - Implement with karpathy-coding overlay                 │
+│    - Run post-review gates                                │
+└─────────────────────────────────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────────┐
+│ 7. DELIVERY                                               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### F.3 Cross-Language Skill Detection Examples
+
+| Input Language | Input Text | Detected Skills |
+|---------------|-----------|-----------------|
+| Vietnamese | "Tạo landing page cho startup AI" | frontend-taste, full-output, frontend-review, karpathy-coding |
+| Vietnamese | "Cải thiện giao diện app thương mại điện tử" | frontend-redesign, full-output, frontend-review, karpathy-coding |
+| Vietnamese | "Thêm thanh toán MoMo vào app" | vietnam-payment-review, security-review, full-output, karpathy-coding |
+| Chinese | "创建一个AI创业公司的落地页" | frontend-taste, full-output, frontend-review, karpathy-coding |
+| Chinese | "改进电子商务应用的界面" | frontend-redesign, full-output, frontend-review, karpathy-coding |
+| Chinese | "添加MoMo支付功能到应用" | vietnam-payment-review, security-review, full-output, karpathy-coding |
+| Japanese | "AIスタートアップのランディングページを作成" | frontend-taste, full-output, frontend-review, karpathy-coding |
+| Japanese | "电商应用的界面改进" | frontend-redesign, full-output, frontend-review, karpathy-coding |
+
+---
+
+## PHẦN G: QUICK REFERENCE
+
+### G.1 Language Detection Quick Reference
+
+```
+Signs of Vietnamese:
+  - "tạo", "xây dựng", "cải thiện", "sửa lỗi", "thiết kế"
+  - "trang web", "app", "component", "hệ thống"
+  - No CJK characters
+
+Signs of Chinese:
+  - CJK characters (中文)
+  - "创建", "构建", "改进", "修复", "设计"
+  - "应用", "网站", "代码", "系统"
+
+Signs of Japanese:
+  - Hiragana/Katakana characters
+  - "作成", "構築", "開発", "設計"
+  - "アプリ", "ウェブサイト", "コード"
+
+Signs of Korean:
+  - Hangul characters (한글)
+  - "생성", "구축", "개발", "설계"
+  - "앱", "웹", "코드", "시스템"
+```
+
+### G.2 Translation Quick Reference
+
+```
+VI → EN Quick Map:
+  tạo/create | xây dựng/build | cải thiện/improve
+  sửa lỗi/fix bug | thiết kế/design | phát triển/develop
+  app/app | trang web/website | landing page/landing page
+  giao diện/UI | component/component | tính năng/feature
+  thanh toán/payment | bảo mật/security | database/database
+
+ZH → EN Quick Map:
+  创建/create | 构建/build | 改进/improve
+  修复/fix | 设计/design | 开发/develop
+  应用/app | 网站/website | 落地页/landing page
+  界面/UI | 组件/component | 功能/feature
+  支付/payment | 安全/security | 数据库/database
+```
+
+### G.3 Vibe Code Decision Tree
+
+```
+REQUEST RECEIVED
+       │
+       ▼
+┌──────────────────┐
+│ Detect Language │
+└────────┬─────────┘
+         │
+    ┌────┴────┐
+    │ Is non- │
+    │ English?│
+    └────┬────┘
+     YES │ NO
+         │    │
+         ▼    │
+┌──────────────┐
+│ Translate to │
+│ English      │
+└──────────────┘
+         │
+         ▼
+┌──────────────────────────────────┐
+│ Analyze Intent (build/fix/      │
+│ redesign/review)                │
+└──────────────────────────────────┘
+         │
+         ▼
+┌──────────────────────────────────┐
+│ Auto-Discover Rules & Skills    │
+│ (Skill Matrix + Rule Registry) │
+└──────────────────────────────────┘
+         │
+         ▼
+┌──────────────────────────────────┐
+│ Add karpathy-coding (overlay)   │
+│ Add frontend-review (mandatory) │
+└──────────────────────────────────┘
+         │
+         ▼
+┌──────────────────────────────────┐
+│ Run PRE-REVIEW Gates            │
+│ (all selected skills)           │
+└──────────────────────────────────┘
+         │
+         ▼
+┌──────────────────────────────────┐
+│ IMPLEMENT (vibe code)           │
+│ (karpathy overlay active)       │
+└──────────────────────────────────┘
+         │
+         ▼
+┌──────────────────────────────────┐
+│ Run POST-REVIEW Gates          │
+│ (all selected skills)           │
+└──────────────────────────────────┘
+         │
+         ▼
+┌──────────────────────────────────┐
+│ DELIVER (if all gates pass)    │
+└──────────────────────────────────┘
+```
+
+---
+
+## Liên kết
+
+- [[skill-integration]] — Skill Auto-Discovery & Execution Protocol (base)
+- [[context-router]] — Context routing rules
+- [[memory-first]] — Memory context management
+- [[karpathy-coding]] — Vibe coding discipline (always overlay)
+- [[frontend-taste]] — Landing page & design skills
+- [[frontend-redesign]] — UI improvement skills
+- [[security-review]] — Security review skills
+- [[coding-standards]] — Coding standards
+- [[ui-visual-design]] — UI/Visual design principles
