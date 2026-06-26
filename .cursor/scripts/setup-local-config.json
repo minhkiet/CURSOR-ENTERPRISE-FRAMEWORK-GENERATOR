@@ -1,0 +1,78 @@
+{
+  "version": "1.0.0",
+  "description": "Local Setup Configuration - Manage .cursor installation across projects",
+  "lastUpdated": "2026-06-26",
+  "metadata": {
+    "sourceProject": "CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+    "author": "Cursor Enterprise Framework"
+  },
+  "source": {
+    "root": "${SCRIPT_DIR}/../../",
+    "cursorFolder": ".cursor"
+  },
+  "discovery": {
+    "enabled": true,
+    "searchPaths": [
+      "${HOME}/Documents",
+      "${HOME}/Desktop",
+      "D:/PROJECTS",
+      "C:/Projects",
+      "C:/Dev",
+      "D:/Dev",
+      "D:/Work",
+      "C:/Work"
+    ],
+    "excludePatterns": [
+      "node_modules",
+      ".git",
+      "dist",
+      "build",
+      "__pycache__",
+      ".venv",
+      "venv"
+    ]
+  },
+  "components": {
+    "rules": {
+      "name": "Rules",
+      "description": "Architecture and coding rules (.mdc files)",
+      "required": true,
+      "priority": 1
+    },
+    "skills": {
+      "name": "Skills",
+      "description": "Skill definitions and configurations",
+      "required": true,
+      "priority": 2
+    },
+    "scripts": {
+      "name": "Scripts",
+      "description": "Automation and setup scripts",
+      "required": false,
+      "priority": 3
+    },
+    "knowledge": {
+      "name": "Knowledge",
+      "description": "Knowledge base and documentation",
+      "required": false,
+      "priority": 4
+    }
+  },
+  "installOptions": {
+    "defaultBehavior": "prompt",
+    "autoBackup": true,
+    "createSymlink": false,
+    "overwriteExisting": false,
+    "verboseOutput": true,
+    "continueOnError": true
+  },
+  "projects": {
+    "localRegistry": []
+  },
+  "sync": {
+    "enabled": false,
+    "watchSource": false,
+    "autoUpdate": false,
+    "updateInterval": 3600
+  }
+}
