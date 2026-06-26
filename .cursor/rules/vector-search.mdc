@@ -820,5 +820,6 @@ Monitor quality. Update embeddings. Refresh indexes. Handle deletions.
 - [[rag]] - RAG systems
 - [[pinecone]] - Pinecone
 - [[weaviate]] - Weaviate
+- [[weknora]] - WeKnora (Enterprise Vector Search với Hybrid Retrieval + GraphRAG)
 - [[evaluation]] - Search evaluation
 - [[performance]] - Performance optimization

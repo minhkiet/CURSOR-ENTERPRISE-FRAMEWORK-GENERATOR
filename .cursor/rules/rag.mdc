@@ -879,3 +879,109 @@ Deploy pipeline. Set up monitoring. Configure updates. Maintain quality.
 - [[pgvector]] - pgvector
 - [[pinecone]] - Pinecone
 - [[evaluation]] - RAG evaluation
+- [[weknora]] - WeKnora Integration (Enterprise RAG với Hybrid Search + GraphRAG + ReAct Agent)
+- [[pixelrag]] - PixelRAG Integration (Visual RAG - Screenshot-based RAG cho documents với bảng biểu, sơ đồ, charts)
+
+## PixelRAG: Visual RAG Complementary
+
+PixelRAG là **bổ sung hoàn hảo** cho Text RAG truyền thống, đặc biệt khi:
+
+### Khi nào nên dùng PixelRAG
+
+| Use Case | Recommendation | Lý do |
+|----------|----------------|-------|
+| Tài liệu có bảng biểu | **PixelRAG** | Text RAG mất cấu trúc bảng |
+| Báo cáo tài chính | **PixelRAG** | Đọc số liệu chính xác |
+| PDF khoa học | **PixelRAG** | Hiểu hình vẽ, công thức |
+| Website phức tạp | **PixelRAG** | Giữ layout, hiểu visual context |
+| Tài liệu đơn giản | Text RAG | Nhanh hơn, đơn giản hơn |
+
+### Architecture Decision
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    HYBRID RAG ARCHITECTURE                  │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Document Source                                            │
+│       │                                                    │
+│       ├──► Text RAG ──► Semantic Search (keywords)        │
+│       │                                                      │
+│       └──► PixelRAG ──► Visual Search (tables, charts)    │
+│                                                             │
+│                    ┌─────────────────┐                      │
+│                    │  Result Merger │                      │
+│                    │  (RRF Fusion)  │                      │
+│                    └────────┬────────┘                      │
+│                             │                               │
+│                             ▼                               │
+│                    ┌─────────────────┐                      │
+│                    │   LLM Answer   │                      │
+│                    └─────────────────┘                      │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Integration Best Practice
+
+1. **Pure text documents** → Text RAG (faiss, bm25)
+2. **Visual-heavy documents** → PixelRAG (screenshots, vision embedding)
+3. **Mixed content** → Hybrid (Text RAG + PixelRAG)
+
+### Evaluation Comparison
+
+```python
+# Text RAG Evaluation
+text_rag_metrics = {
+    "retrieval_precision": 0.72,
+    "table_comprehension": "POOR",      # Loses structure
+    "chart_understanding": "NONE",     # Cannot process
+    "layout_preservation": "LOST",     # Text only
+    "token_efficiency": "BASELINE"
+}
+
+# PixelRAG Evaluation
+pixelrag_metrics = {
+    "retrieval_precision": 0.85,       # +18.1% improvement
+    "table_comprehension": "EXCELLENT", # Native table reading
+    "chart_understanding": "FULL",     # Visual context preserved
+    "layout_preservation": "INTACT",    # Screenshot preserves layout
+    "token_efficiency": "60%_REDUCED"  # Concise tiles vs full text
+}
+```
+
+### Quick Decision Guide
+
+```
+START: What type of document?
+│
+├── Pure text (articles, documentation)?
+│   └── Text RAG ✓
+│
+├── Contains tables?
+│   └── PixelRAG ✓ (Text RAG loses structure)
+│
+├── Contains charts/diagrams?
+│   └── PixelRAG ✓ (Text RAG cannot process)
+│
+├── Financial/scientific reports?
+│   └── PixelRAG ✓ (Precision matters)
+│
+└── Knowledge base (mixed content)?
+    └── Hybrid (Text RAG + PixelRAG) ✓
+```
+
+### Dependencies
+
+PixelRAG requires:
+- `pixelrag[full]` package
+- `playwright` for screenshot capture
+- `Qwen/Qwen3-VL-Embedding-2B` model (or hosted API)
+- Optional: GPU (CUDA/MPS) for faster embedding
+
+### Resources
+
+- [PixelRAG GitHub](https://github.com/StarTrail-org/PixelRAG) - Official implementation
+- [PixelRAG Paper](https://arxiv.org/) - Academic paper
+- [Qwen3-VL-Embedding](https://huggingface.co/Qwen/Qwen3-VL-Embedding-2B) - Vision embedding model
+

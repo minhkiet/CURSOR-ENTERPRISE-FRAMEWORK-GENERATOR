@@ -176,6 +176,15 @@ Skill Detection Engine là bộ phân tích tự động phân loại yêu cầu
 | `abstraction` + `utility` | ponytail | 0.85 | Over-abstraction |
 | `wrapper` + `class` | ponytail | 0.85 | Wrapper pattern |
 | `vibe code` | ponytail | 0.90 | Efficient coding |
+| **VIETNAM ADDRESS - Location Data** ||||
+| `địa chỉ` + `Việt Nam` | vietnam-address | 0.95 | Vietnamese address |
+| `tỉnh` + `thành phố` | vietnam-address | 0.90 | Province/city selection |
+| `quận` + `huyện` | vietnam-address | 0.90 | District selection |
+| `phường` + `xã` | vietnam-address | 0.90 | Ward/commune selection |
+| `shipping address` | vietnam-address | 0.90 | Shipping address |
+| `address autocomplete` | vietnam-address | 0.95 | Address search |
+| `province` + `district` + `ward` | vietnam-address | 0.95 | Full address hierarchy |
+| `vietnamese-provinces` | vietnam-address | 0.95 | Vietnam provinces data |
 | `simple` | karpathy-coding | 0.95 | Simple approach |
 | `straightforward` | karpathy-coding | 0.95 | Direct solution |
 | `not overthink` | karpathy-coding | 0.95 | Keep it simple |
@@ -193,6 +202,46 @@ Skill Detection Engine là bộ phân tích tự động phân loại yêu cầu
 | `screenshot text` | document-ocr | 0.90 | Extract from screenshot |
 | `scanned document` | document-ocr | 0.85 | Scanned PDF/image OCR |
 | `vietnamese ocr` | document-ocr | 0.95 | Vietnamese document OCR |
+| **KNOWLEDGE BASE - WeKnora RAG** |||||
+| `knowledge base` | weknora-kb | 0.95 | Knowledge base operations |
+| `rag` | weknora-kb | 0.95 | RAG implementation |
+| `document q&a` | weknora-kb | 0.95 | Document Q&A system |
+| `faq` + `system` | weknora-kb | 0.95 | FAQ knowledge base |
+| `enterprise wiki` | weknora-kb | 0.95 | Wiki knowledge base |
+| `weknora` | weknora-kb | 0.95 | WeKnora platform |
+| `hybrid search` | weknora-kb | 0.90 | Vector + BM25 search |
+| `graphrag` | weknora-kb | 0.90 | GraphRAG retrieval |
+| `knowledge graph` | weknora-kb | 0.85 | Knowledge graph |
+| `document ingestion` | weknora-kb | 0.90 | Document upload/process |
+| `pdf` + `knowledge` | weknora-kb | 0.85 | PDF knowledge extraction |
+| `internal q&a` | weknora-kb | 0.90 | Internal Q&A system |
+| `research assistant` | weknora-kb | 0.90 | Research automation |
+| **PIXELRAG - Visual RAG** |||||
+| `pixelrag` | pixelrag | 0.95 | PixelRAG visual RAG |
+| `visual rag` | pixelrag | 0.95 | Visual retrieval |
+| `screenshot` + `rag` | pixelrag | 0.95 | Screenshot-based RAG |
+| `visual search` | pixelrag | 0.90 | Visual content search |
+| `pixel-native` | pixelrag | 0.95 | Pixel-native search |
+| `read document` + `visual` | pixelrag | 0.90 | Visual document reading |
+| `pdf` + `table` | pixelrag | 0.90 | PDF table extraction |
+| `pdf` + `chart` | pixelrag | 0.90 | PDF chart extraction |
+| `pdf` + `diagram` | pixelrag | 0.90 | PDF diagram extraction |
+| `đọc file` + `pdf` | pixelrag | 0.95 | Đọc tài liệu PDF |
+| `phân tích` + `bảng` | pixelrag | 0.90 | Phân tích bảng biểu |
+| `hỏi về` + `biểu đồ` | pixelrag | 0.90 | Hỏi về biểu đồ |
+| `financial report` + `analysis` | pixelrag | 0.90 | Financial report analysis |
+| `document q&a` + `visual` | pixelrag | 0.90 | Visual document Q&A |
+| `website` + `screenshot` | pixelrag | 0.85 | Website screenshot |
+| `vision embedding` | pixelrag | 0.95 | Vision embedding |
+| `qwen3-vl` | pixelrag | 0.95 | Qwen3-VL model |
+| **AGENT MODE - ReAct Agent** |||||
+| `agent mode` | weknora-agent | 0.95 | Autonomous agent |
+| `react agent` | weknora-agent | 0.95 | ReAct reasoning |
+| `autonomous reasoning` | weknora-agent | 0.95 | Multi-step reasoning |
+| `agentic workflow` | weknora-agent | 0.95 | Autonomous workflow |
+| `tool calling` | weknora-agent | 0.90 | Tool orchestration |
+| `web search` + `agent` | weknora-agent | 0.90 | Web search agent |
+| `mcp tools` | weknora-agent | 0.90 | MCP integration |
 | **BAZI - Fortune Telling** ||||
 | `算八字` | bazi | 0.95 | Chinese Bazi fortune telling |
 | `看八字` | bazi | 0.95 | Bazi analysis |
@@ -618,6 +667,29 @@ NEXT ACTION: Load SKILL.md files and begin PRE-REVIEW
 **Kích hoạt khi:** 四柱八字命理分析，算八字，看八字，批八字，排八字，命盘，算命，运势分析，大运流年。当用户提到"算八字"、"看八字"、"批八字"、"排八字"、"四柱"、"命盘"、"算命"、"命理"、"运势"、"大运"、"流年"、"bazi"、"birth chart"、"fortune telling"时。
 **Mục đích:** Tích hợp [bazi-skill](https://github.com/jinchenma94/bazi-skill) (2k stars, MIT License) - 四柱八字命理分析工具。通过交互式对话收集出生信息，排出四柱八字，参照九本经典命理典籍（穷通宝典、三命通会、滴天髓、渊海子平、子平真诠等）进行专业分析。
 
+### 14. vietnam-address
+**Path:** `.cursor/skills/vietnam-address/SKILL.md`
+**Kích hoạt khi:** Vietnamese address, địa chỉ Việt Nam, tỉnh/thành phố, quận/huyện, phường/xã, shipping address, address autocomplete, cascading dropdown địa chỉ, form địa chỉ. Khi user nhắc đến "địa chỉ Việt Nam", "tỉnh/thành phố", "quận/huyện", "phường/xã", "shipping address", "address autocomplete", "province", "district", "ward", "vietnamese-provinces"
+**Mục đích:** Tích hợp [vietnamese-provinces-database](https://github.com/thanglequoc/vietnamese-provinces-database) (1.3k stars, MIT License) - dataset comprehensive về đơn vị hành chính Việt Nam với 34 tỉnh/thành phố, ~11,000 phường/xã. Hỗ trợ cascading dropdown, autocomplete, validation cho forms địa chỉ.
+
+### 15. weknora-kb
+**Path:** `.cursor/skills/weknora-kb/SKILL.md`
+**Kích hoạt khi:** Knowledge Base, RAG, document Q&A, FAQ system, wiki, enterprise knowledge, document search, knowledge retrieval, WeKnora, hybrid search, vector search, BM25, GraphRAG, Knowledge Graph, ReAct agent, autonomous reasoning, document ingestion, PDF/Word/Markdown OCR, knowledge management, internal Q&A system, research assistant, enterprise wiki, autonomous knowledge agent
+**Mục đích:** Tích hợp WeKnora (17.3k stars) - open-source LLM knowledge platform với RAG-based Q&A, ReAct Agent cho multi-step reasoning, Wiki Mode cho auto-generated interlinked pages, Hybrid Retrieval (Vector + BM25 + GraphRAG + Knowledge Graph). Biến kho tài liệu thành: hệ thống hỏi đáp nội bộ, trợ lý nghiên cứu, Wiki doanh nghiệp, Agent tri thức tự động. Tự động cài đặt MCP server cho Cursor integration.
+**Auto-Dependencies:** WeKnora CLI (`weknora`), Docker (cho WeKnora server), MCP configuration
+
+### 16. weknora-agent
+**Path:** `.cursor/skills/weknora-agent/SKILL.md`
+**Kích hoạt khi:** Agent mode, ReAct reasoning, autonomous agent, multi-step reasoning, complex task automation, agentic workflow, tool calling, web search agent, MCP tools agent, knowledge graph traversal, research automation, autonomous planning
+**Mục đích:** Tận dụng WeKnora ReAct Agent với khả năng lập kế hoạch và suy luận nhiều bước. Tích hợp Web Search và MCP Tools để mở rộng năng lực agent. Tự động orchestrate giữa knowledge retrieval, external tools, và LLM reasoning.
+**Auto-Dependencies:** WeKnora CLI với agent mode, MCP server configured
+
+### 17. pixelrag
+**Path:** `.cursor/skills/pixelrag/SKILL.md`
+**Kích hoạt khi:** PixelRAG, visual RAG, screenshot-based RAG, visual search, pixel-native search, đọc tài liệu PDF, phân tích bảng biểu, hỏi về biểu đồ, financial report analysis, visual document Q&A, website screenshot, vision embedding, Qwen3-VL model, tables, charts, diagrams trong documents
+**Mục đích:** Tích hợp [PixelRAG](https://github.com/StarTrail-org/PixelRAG) (5.3k stars) - Visual Retrieval-Augmented Generation cho phép AI "nhìn" tài liệu như con người. Cải thiện độ chính xác retrieval 18.1% so với Text RAG truyền thống. Đặc biệt hiệu quả cho: tài liệu có bảng biểu, báo cáo tài chính, PDF khoa học, website phức tạp, knowledge base nội bộ.
+**Auto-Dependencies:** pixelrag[full], playwright, chromium, Qwen3-VL-Embedding model
+
 ---
 
 ## Skill Combination Rules
@@ -640,6 +712,19 @@ NEXT ACTION: Load SKILL.md files and begin PRE-REVIEW
 | API security review | security-review | (standalone) | security-review-pre + security-review-post + API-specific checks |
 | APK/binary/JS reverse-engineering | security-review | reverse-skill routing | security-review-pre + RE skill gate + security-review-post |
 | Bazi fortune analysis | bazi | (standalone) | bazi-pre + bazi-post |
+| Vietnam address form | vietnam-address | (standalone) + full-output | address-pre + address-post + fulloutput-pre + fulloutput-post |
+| Knowledge base setup | weknora-kb | (standalone) + full-output | weknora-pre + weknora-post + fulloutput-pre + fulloutput-post |
+| RAG implementation | weknora-kb | rag + full-output | weknora-pre + rag-pre + weknora-post + rag-post |
+| FAQ system | weknora-kb | (standalone) | weknora-pre + weknora-post |
+| Enterprise wiki | weknora-kb | weknora-agent | weknora-pre + agent-pre + weknora-post + agent-post |
+| Document Q&A | weknora-kb | (standalone) | weknora-pre + weknora-post |
+| ReAct agent task | weknora-agent | (standalone) + weknora-kb | agent-pre + weknora-pre + agent-post + weknora-post |
+| Complex research task | weknora-agent | weknora-kb + web-search | agent-pre + weknora-pre + research-pre + agent-post + weknora-post |
+| **Visual Document Analysis** ||||
+| PDF/bảng/biểu/phức tạp | pixelrag | (standalone) + full-output | pixelrag-pre + pixelrag-post + fulloutput-pre + fulloutput-post |
+| Visual RAG setup | pixelrag | weknora-kb (hybrid) | pixelrag-pre + pixelrag-post + weknora-pre + weknora-post |
+| Financial report analysis | pixelrag | (standalone) | pixelrag-pre + pixelrag-post |
+| Knowledge base + visual | pixelrag + weknora-kb | full-output | pixelrag-pre + weknora-pre + pixelrag-post + weknora-post + fulloutput-pre |
 | Any coding task (vibe code) | karpathy-coding | (overlay - always runs with primary skill) | karpathy-pre + [primary skill gates] + karpathy-post |
 
 ---
@@ -1585,6 +1670,7 @@ SKILL KEYWORD MATRIX:
 │ less code, yagni, vibe   │ ponytail                  │ 0.95 │
 │ simple, minimal, don't assume │ karpathy-coding       │ 0.95 │
 │ bazi, 四柱, 算命, 命盘   │ bazi                     │ 0.95 │
+| Vietnam address, địa chỉ │ vietnam-address          │ 0.95 │
 
 CONFIDENCE THRESHOLDS:
 ══════════════════════════════════════════════════════════════
