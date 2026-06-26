@@ -2,8 +2,6 @@
 
 > A complete enterprise-grade framework for AI Coding Agents — Optimized Token, Memory, and Knowledge Reuse.
 
-![logo](logo.png)
-
 ---
 
 ## Overview
@@ -331,10 +329,6 @@ MIT License
 # Cursor Enterprise Framework Generator
 
 > Framework cấp Enterprise hoàn chỉnh cho AI Coding Agents — Tối ưu Token, Memory và Knowledge Reuse.
-
-![logo](logo.png)
-
----
 
 ## Tổng quan
 
