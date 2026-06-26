@@ -1,8 +1,8 @@
 ---
-description: Single Source of Truth cho tất cả skill definitions, triggers, confidence thresholds, và gate mappings. Được sử dụng bởi skill-integration, task-analyzer, và multi-language-vibe-code.
+description: Single Source of Truth cho tất cả skill definitions, triggers, confidence thresholds, và gate mappings. Được sử dụng bởi skill-integration, task-analyzer, và multi-language-vibe-code. Bao gồm Ponytail Lazy Senior Dev principles.
 created: 2026-06-26
-version: 1.0.0
-tags: [skill-registry, skills, auto-discovery, skills, mandatory, overlay]
+version: 1.1.0
+tags: [skill-registry, skills, auto-discovery, skills, mandatory, overlay, ponytail, lazy-senior, code-quality]
 ---
 
 # Skill Registry - Single Source of Truth
@@ -806,6 +806,139 @@ REVIEW GATES TO RUN
 
 ---
 
+## PHẦN 7: PONYTAIL - LAZY SENIOR DEV
+
+### 7.1 Giới thiệu
+
+**"He says nothing. He writes one line. It works."**
+
+Ponytail là nguyên tắc **lazy senior dev** — lazy có nghĩa là efficient, không phải careless. The best code is the code you never wrote. Zero abstraction until requested. Zero boilerplate nobody asked for. Zero new dependency if it can be avoided.
+
+### 7.2 The YAGNI Ladder
+
+Trước khi viết bất kỳ code nào, dừng lại ở bậc đầu tiên phù hợp:
+
+```
+1. Does this need to be built at all?   → no: skip it (YAGNI)
+2. Already in this codebase?             → reuse it, don't rewrite
+3. Stdlib does it?                       → use it
+4. Native platform feature?              → use it
+5. Installed dependency?                → use it
+6. One line?                            → one line
+7. Only then: the minimum that works
+```
+
+**The ladder runs AFTER you understand the problem, not instead of it.**
+
+### 7.3 Core Rules
+
+#### Code Reduction
+- **No abstractions that weren't explicitly requested.**
+- **No new dependency if it can be avoided.**
+- **No boilerplate nobody asked for.**
+- **Deletion over addition.**
+- **Boring over clever.**
+- **Fewest files possible.**
+- **Shortest working diff wins** — but only once you understand the problem.
+
+#### Trust-Boundary Validation (NEVER Skip)
+- Input validation at trust boundaries
+- Error handling that prevents data loss
+- Security controls
+- Accessibility (WCAG AA minimum)
+
+### 7.4 Ponytail Modes
+
+| Mode  | Intensity | Use Case |
+|-------|-----------|----------|
+| `lite` | Minimal hints | Senior devs who just need reminders |
+| `full` | Default | Most effective for vibe coding |
+| `ultra` | Maximum enforcement | Codebase has wronged you personally |
+| `off`  | Disabled | Disable temporarily |
+
+### 7.5 Anti-Patterns to Eliminate
+
+| Request | Over-Build | Ponytail Solution |
+|---------|-----------|-----------------|
+| Date picker | Install flatpickr + wrapper + stylesheet | `<input type="date">` |
+| Color picker | npm color library + custom UI | `<input type="color">` |
+| Debounce | Custom utility class | `setTimeout` in cleanup |
+| Local storage | Wrapper class with 200 lines | `localStorage.getItem/setItem` |
+| Form validation | Schema library + validators | Native HTML5 + JS check |
+| HTTP client | Axios wrapper + interceptors | Native fetch |
+
+### Red Flags (Over-Engineering Signals)
+- "Should I create a utility class for this?"
+- "Maybe we need an abstraction layer?"
+- "Let's make this configurable just in case"
+- "We might need this feature later"
+
+### Green Lights
+- `<input type="date">` for date pickers
+- `<input type="color">` for color pickers
+- `localStorage.getItem()` for simple storage
+- `Array.filter/map` for data processing
+- Native HTML5 form validation
+
+### 7.6 Marking Intentional Shortcuts
+
+Khi take shortcut, đánh dấu bằng comment:
+
+```javascript
+// ponytail: global lock, upgrade path = per-request mutex
+const globalLock = new Lock();
+
+// ponytail: O(n²) acceptable for n < 100
+for (const a of items) { /* ... */ }
+```
+
+### 7.7 Not Lazy About
+
+Những thứ KHÔNG BAO GIỜ bỏ qua:
+1. **Understanding the problem** — read it fully, trace the real flow
+2. **Input validation at trust boundaries** — always validate
+3. **Error handling that prevents data loss** — don't lose user data
+4. **Security** — never skip auth, encryption, sanitization
+5. **Accessibility** — WCAG AA minimum
+6. **Non-trivial logic** — leaves ONE runnable check behind
+
+### 7.8 Benchmark Results
+
+| Metric | vs No-Skill Baseline |
+|--------|---------------------|
+| Lines of Code | **-54%** |
+| Tokens | **-22%** |
+| Cost | **-20%** |
+| Time | **-27%** |
+| Safety | **100%** |
+
+### 7.9 Ponytail Commands
+
+| Command | Description |
+|---------|-------------|
+| `/ponytail` | Report current mode |
+| `/ponytail ultra` | Maximum enforcement |
+| `/ponytail-review` | Review diff for over-engineering |
+| `/ponytail-audit` | Audit whole repo |
+| `/ponytail-debt` | Harvest deferred shortcuts |
+
+### 7.10 Integration với Skill System
+
+Ponytail được tích hợp vào pre-review và post-review gates:
+
+```
+Task → Skill Detection → Pre-Review Gate(s)
+                              ↓
+                        Implementation
+                        (Ponytail: minimum code)
+                              ↓
+                        Post-Review Gate(s)
+                              ↓
+                           Delivery
+```
+
+---
+
 ## LIÊN KẾT
 
 - [[skill-integration]] — Skill auto-discovery và execution protocol
@@ -820,4 +953,5 @@ REVIEW GATES TO RUN
 
 | Date | Version | Changes |
 |------|---------|---------|
+| 2026-06-26 | 1.1.0 | Merged Ponytail Lazy Senior Dev section (§7) |
 | 2026-06-26 | 1.0.0 | Initial unified skill registry |
