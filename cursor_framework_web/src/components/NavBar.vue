@@ -125,6 +125,7 @@ onUnmounted(() => {
       </div>
 
       <button 
+        v-show="isMobileMode"
         class="navbar-mobile-toggle" 
         @click="toggleMobileMenu" 
         aria-label="Toggle menu"
