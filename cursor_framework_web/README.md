@@ -1,6 +1,6 @@
 # CEF Landing Vue 3 App
 
-Enterprise-grade Vue 3 landing page cho Cursor Enterprise Framework.
+> Enterprise-grade Vue 3 landing page cho **Cursor Enterprise Framework v5.0.0** — synced 2026-06-26.
 
 ## Tech Stack
 

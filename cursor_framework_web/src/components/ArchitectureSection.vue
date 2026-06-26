@@ -74,7 +74,7 @@ onMounted(() => {
                   <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
                 </svg>
                 rules
-                <span class="ft-count">79 files</span>
+                <span class="ft-count">40 files</span>
               </div>
               <div class="ft-sub">
                 <div class="ft-item ft-file">
@@ -98,7 +98,7 @@ onMounted(() => {
                   </svg>
                   context-router.mdc
                 </div>
-                <div class="ft-item ft-file" style="color: var(--text-faint); font-style: italic;">+76 more rules...</div>
+                <div class="ft-item ft-file" style="color: var(--text-faint); font-style: italic;">+37 more rules...</div>
               </div>
             </div>
 
@@ -108,7 +108,7 @@ onMounted(() => {
                   <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
                 </svg>
                 skills
-                <span class="ft-count">47 files</span>
+                <span class="ft-count">17 files</span>
               </div>
               <div class="ft-sub">
                 <div class="ft-item ft-file">
@@ -132,7 +132,7 @@ onMounted(() => {
                   </svg>
                   figma/
                 </div>
-                <div class="ft-item ft-file" style="color: var(--text-faint); font-style: italic;">+44 more skills...</div>
+                <div class="ft-item ft-file" style="color: var(--text-faint); font-style: italic;">+14 more skills...</div>
               </div>
             </div>
 
@@ -142,7 +142,7 @@ onMounted(() => {
                   <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
                 </svg>
                 knowledge
-                <span class="ft-count">272 files</span>
+                <span class="ft-count">36 directories</span>
               </div>
               <div class="ft-sub">
                 <div class="ft-item ft-folder" style="color: var(--text-secondary);">
@@ -163,7 +163,7 @@ onMounted(() => {
                   </svg>
                   ai-rag/
                 </div>
-                <div class="ft-item ft-file" style="color: var(--text-faint); font-style: italic;">+8 more domains...</div>
+                <div class="ft-item ft-file" style="color: var(--text-faint); font-style: italic;">+5 more domains...</div>
               </div>
             </div>
 
@@ -208,7 +208,7 @@ onMounted(() => {
               </svg>
             </div>
             <div class="arch-desc-text">
-              <h4>79 MDC Rules</h4>
+              <h4>40 MDC Rules</h4>
               <p>YAML frontmatter với metadata, tags, version. Mỗi rule định nghĩa tiêu chuẩn cho architecture, coding, security, performance.</p>
             </div>
           </div>
@@ -221,7 +221,7 @@ onMounted(() => {
               </svg>
             </div>
             <div class="arch-desc-text">
-              <h4>47 Specialized Skills</h4>
+              <h4>17 Specialized Skills</h4>
               <p>SKILL.md files cho Cursor, Claude Code, Codex, Claude Plugins. Mỗi skill cung cấp step-by-step expertise.</p>
             </div>
           </div>
@@ -234,8 +234,8 @@ onMounted(() => {
               </svg>
             </div>
             <div class="arch-desc-text">
-              <h4>272 Knowledge Files</h4>
-              <p>6 files/domain: architecture, best-practice, anti-pattern, faq, checklist, glossary. Chuẩn hóa, nhất quán.</p>
+              <h4>36 Knowledge Domains</h4>
+              <p>Mỗi domain đi kèm bộ knowledge chuẩn hóa: architecture, best-practice, anti-pattern, faq, checklist, glossary.</p>
             </div>
           </div>
 

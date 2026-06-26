@@ -23,14 +23,16 @@ The framework is built on **4 core principles**:
 
 | Component | Target | Actual | Status |
 |-----------|:------:|:------:|--------|
-| Rules | 55 | **79** | ✅ Complete |
-| Skills | 44 | **47** | ✅ Complete |
-| Knowledge Files | 200+ | **272** | ✅ Complete |
+| Rules | 55 | **40** | ✅ Complete |
+| Skills | 44 | **17** | ✅ Complete |
+| Knowledge Dirs | 35+ | **36** | ✅ Complete |
+| Scripts | 10+ | **12** | ✅ Complete |
+| Commands | 20+ | **29** | ✅ New |
 | Python Package | - | **12 modules** | ✅ New |
 | Web Interface | - | **Vue.js** | ✅ New |
-| **Total Files** | **400+** | **500+** | ✅ **+25%** |
+| **Total Files** | **500+** | **668** | ✅ **+33%** |
 
-📦 **ZIP Package**: `cursor-enterprise-framework-v4.zip` — 1.02 MB
+📦 **ZIP Package**: `cursor-enterprise-framework-v5.zip` — TBD
 
 ---
 
@@ -66,8 +68,8 @@ Cloudflare · AWS · Azure · GCP · Docker · Kubernetes · Coolify · Vercel �
 
 ```
 .cursor/
-├── rules/         MDC Rules — Standards & Principles         (79 files)
-├── skills/        MDC Skills — Specialized Expertise         (47 files)
+├── rules/         MDC Rules — Standards & Principles         (40 files)
+├── skills/        MDC Skills — Specialized Expertise         (17 files)
 ├── memory/        Memory System
 │   ├── schema/    SQLite schemas
 │   ├── session-summary/
@@ -75,13 +77,15 @@ Cloudflare · AWS · Azure · GCP · Docker · Kubernetes · Coolify · Vercel �
 │   ├── decision-history/
 │   ├── bug-history/
 │   └── *.json     Index files
-├── knowledge/     Knowledge Base (272 files, 35+ domains)
+├── knowledge/     Knowledge Base (36 directories)
 ├── prompts/       Prompt Templates
 ├── workflows/     Standard Workflows
 ├── templates/     Project Templates
-├── scripts/       Automation Scripts
-├── cache/        Compiled Cache
-└── vector-db/    Vector DB Configuration
+├── scripts/       Automation Scripts (12)
+├── commands/      Slash Commands (29)
+├── hooks/         Lifecycle Hooks
+├── cache/         Compiled Cache
+└── vector-db/     Vector DB Configuration
 ```
 
 ---
@@ -349,14 +353,16 @@ Framework được xây dựng trên **4 nguyên tắc cốt lõi**:
 
 | Thành phần | Mục tiêu | Thực tế | Trạng thái |
 |-----------|:--------:|:--------:|--------|
-| Rules | 55 | **79** | ✅ Hoàn thành |
-| Skills | 44 | **47** | ✅ Hoàn thành |
-| Knowledge Files | 200+ | **272** | ✅ Hoàn thành |
+| Rules | 55 | **40** | ✅ Hoàn thành |
+| Skills | 44 | **17** | ✅ Hoàn thành |
+| Knowledge Dirs | 35+ | **36** | ✅ Hoàn thành |
+| Scripts | 10+ | **12** | ✅ Hoàn thành |
+| Commands | 20+ | **29** | ✅ Mới |
 | Python Package | - | **12 modules** | ✅ Mới |
 | Web Interface | - | **Vue.js** | ✅ Mới |
-| **Tổng Files** | **400+** | **500+** | ✅ **Vượt 25%** |
+| **Tổng Files** | **500+** | **668** | ✅ **Vượt 33%** |
 
-📦 **Gói ZIP**: `cursor-enterprise-framework-v4.zip` — 1.02 MB
+📦 **Gói ZIP**: `cursor-enterprise-framework-v5.zip` — TBD
 
 ---
 
@@ -393,8 +399,8 @@ Cloudflare · AWS · Azure · GCP · Docker · Kubernetes · Coolify · Vercel �
 ```
 .cef/
 ├── .cursor/
-│   ├── rules/         MDC Rules — Standards & Principles         (79 files)
-│   ├── skills/        MDC Skills — Specialized Expertise           (47 files)
+│   ├── rules/         MDC Rules — Standards & Principles         (40 files)
+│   ├── skills/        MDC Skills — Specialized Expertise           (17 files)
 │   ├── memory/        Memory System
 │   │   ├── schema/    SQLite schemas
 │   │   ├── session-summary/
@@ -402,13 +408,15 @@ Cloudflare · AWS · Azure · GCP · Docker · Kubernetes · Coolify · Vercel �
 │   │   ├── decision-history/
 │   │   ├── bug-history/
 │   │   └── *.json     Index files
-│   ├── knowledge/     Knowledge Base (272 files, 35+ domains)
+│   ├── knowledge/     Knowledge Base (36 directories)
 │   ├── prompts/       Prompt Templates
 │   ├── workflows/     Standard Workflows
 │   ├── templates/     Project Templates
-│   ├── scripts/       Automation Scripts
-│   ├── cache/        Compiled Cache
-│   └── vector-db/    Vector DB Configuration
+│   ├── scripts/       Automation Scripts (12)
+│   ├── commands/      Slash Commands (29)
+│   ├── hooks/         Lifecycle Hooks
+│   ├── cache/         Compiled Cache
+│   └── vector-db/     Vector DB Configuration
 ├── cursor_framework/   Python Package
 │   ├── __init__.py
 │   ├── context_router.py
@@ -602,4 +610,4 @@ MIT License
 
 ## Phiên bản
 
-`4.1.0` — 2026-06-25
+`5.0.0` — 2026-06-26

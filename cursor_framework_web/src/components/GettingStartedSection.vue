@@ -54,6 +54,12 @@ const initCommands: InitCommand[] = [
     description: 'Index toàn bộ code để search nhanh và context-aware.',
     command: '. .cursor/scripts/project-index-builder/build-index.ps1',
     icon: 'search'
+  },
+  {
+    title: 'Build Embeddings',
+    description: 'Tạo vector embeddings cho RAG và semantic search.',
+    command: '. .cursor/scripts/embedding-builder/build-embeddings.ps1',
+    icon: 'cube'
   }
 ]
 
@@ -175,6 +181,11 @@ onMounted(() => {
               <svg v-else-if="cmd.icon === 'book'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
                 <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+              </svg>
+              <svg v-else-if="cmd.icon === 'cube'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                <line x1="12" y1="22.08" x2="12" y2="12"/>
               </svg>
               <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="11" cy="11" r="8"/>

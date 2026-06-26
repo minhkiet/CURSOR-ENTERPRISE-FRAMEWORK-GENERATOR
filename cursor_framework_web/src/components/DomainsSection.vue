@@ -94,7 +94,7 @@ onMounted(() => {
     <div class="container">
       <div class="section-header">
         <div class="section-label">Supported</div>
-        <h2 class="section-title">35+ Domains được hỗ trợ</h2>
+        <h2 class="section-title">36 Domains được hỗ trợ</h2>
         <p class="section-desc">
           Mỗi domain đi kèm bộ knowledge chuẩn hóa: Architecture, Best Practices,
           Anti-Patterns, FAQ, Checklist, Glossary. Framework bao phủ toàn bộ stack.

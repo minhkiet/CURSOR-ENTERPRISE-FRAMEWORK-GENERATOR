@@ -6,11 +6,11 @@ const statsBarRef = ref<HTMLElement | null>(null)
 const isVisible = ref(false)
 
 const stats = [
-  { target: 463, label: 'Files', sublabel: '463 total (vượt 15.7%)' },
-  { target: 79, label: 'Rules', sublabel: 'MDC rules & principles' },
-  { target: 47, label: 'Skills', sublabel: 'Specialized expertise' },
-  { target: 272, label: 'Knowledge', sublabel: 'Files across 35+ domains' },
-  { target: 35, label: 'Domains', sublabel: 'Covered tech domains' }
+  { target: 668, label: 'Files', sublabel: '668 total in framework' },
+  { target: 40, label: 'Rules', sublabel: 'MDC rules & principles' },
+  { target: 17, label: 'Skills', sublabel: 'Specialized expertise' },
+  { target: 36, label: 'Knowledge', sublabel: 'Directories across domains' },
+  { target: 12, label: 'Scripts', sublabel: 'Automation & build tools' }
 ]
 
 const displayValues = ref(stats.map(() => 0))
