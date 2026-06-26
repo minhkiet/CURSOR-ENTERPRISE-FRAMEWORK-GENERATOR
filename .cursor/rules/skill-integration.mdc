@@ -90,6 +90,14 @@ Skill Detection Engine là bộ phân tích tự động phân loại yêu cầu
 | `build` + `frontend` | frontend-taste | 0.90 | Build frontend |
 | `create` + `component` | frontend-taste | 0.85 | Create components |
 | `implement` + `UI` | frontend-taste | 0.85 | Implement UI |
+|| **OPEN DESIGN - Design Automation** ||||
+| `open-design` | open-design | 0.95 | Open Design integration |
+| `design system` + `UI` | open-design + frontend-taste | 0.90 | Brand-grade design |
+| `prototype` | open-design (web-prototype) | 0.90 | Web prototype |
+| `mobile app` | open-design (mobile-app) | 0.90 | Mobile prototype |
+| `dashboard` | open-design (dashboard) | 0.90 | Admin/analytics dashboard |
+| `deck` / `presentation` | open-design (guizang-ppt) | 0.90 | Presentation deck |
+| `hyperframes` | open-design (hyperframes) | 0.95 | HTML to MP4 motion |
 | **FULL OUTPUT - Output Quality** ||||
 | `full implementation` | full-output | 0.95 | Explicit full impl |
 | `complete` | full-output | 0.90 | Complete task |
@@ -539,13 +547,23 @@ NEXT ACTION: Load SKILL.md files and begin PRE-REVIEW
 **Kích hoạt khi:** VIBE CODE - tất cả task coding đều nên tuân thủ nguyên tắc này. Đặc biệt quan trọng khi: simple/straightforward request, minimal code request, "don't overthink", "just do it", reduce cognitive load, don't assume, clarify first, surgical changes needed
 **Mục đích:** Tích hợp từ [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) (182k stars) - giảm LLM coding mistakes: think before coding, simplicity first, surgical changes, goal-driven execution. Luôn chạy song song với các skill khác như overlay discipline.
 
+### 10. open-design
+**Path:** `.cursor/skills/open-design/SKILL.md`
+**Kích hoạt khi:** Thiết kế UI với design system có sẵn, tạo prototype, landing page, mobile app, dashboard, deck, hyperframes. Khi user nhắc đến "open-design", "design system", "brand-grade design", "prototype generation"
+**Mục đích:** Tích hợp [nexu-io/open-design](https://github.com/nexu-io/open-design) (71k stars, Apache-2.0) - open-source Claude Design alternative với 100+ skills, 150 design systems, 261 plugins. Cung cấp artifact generation: web prototype, mobile app, dashboard, deck (PPTX), hyperframes (MP4). Hỗ trợ MCP server cho Cursor.
+
 ---
 
 ## Skill Combination Rules
 
 | Task Type | Primary Skill | Secondary Skill | Review Gates Applied |
 |---|---|---|---|
-| Landing page mới | frontend-taste | full-output + frontend-review | taste-pre + taste-post + fulloutput-pre + fulloutput-post + review-pre + review-post |
+| Landing page mới | frontend-taste + open-design | full-output + frontend-review | taste-pre + od-pre + fulloutput-pre + review-pre |
+| Prototype với design system | open-design | frontend-taste + full-output | od-pre + taste-pre + fulloutput-pre + review-pre |
+| Mobile app prototype | open-design (mobile-app) | full-output + frontend-review | od-pre + fulloutput-pre + review-pre |
+| Dashboard với design system | open-design (dashboard) | frontend-review | od-pre + review-pre + review-post |
+| Presentation deck | open-design (guizang-ppt) | full-output | od-pre + fulloutput-pre + fulloutput-post |
+| Redesign với design system | open-design + frontend-redesign | full-output + frontend-review | od-pre + redesign-pre + fulloutput-pre + review-pre |
 | Redesign existing site | frontend-redesign | full-output + frontend-review | redesign-pre + redesign-post + fulloutput-pre + fulloutput-post + review-pre + review-post |
 | Greenfield frontend build | frontend-taste | full-output + frontend-review | taste-pre + taste-post + fulloutput-pre + fulloutput-post + review-pre + review-post |
 | Multi-file implementation | full-output | frontend-review | fulloutput-pre + fulloutput-post + review-pre + review-post |
