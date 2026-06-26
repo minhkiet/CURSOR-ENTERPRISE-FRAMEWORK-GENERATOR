@@ -3,6 +3,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 
 const isScrolled = ref(false)
 const isMobileMenuOpen = ref(false)
+const isMobileMode = ref(false)
 
 const navLinks = [
   { href: '#explorer', label: 'Rules & Skills' },
@@ -26,6 +27,25 @@ function closeMobileMenu() {
   isMobileMenuOpen.value = false
 }
 
+function checkMobileMode() {
+  const inner = document.querySelector('.navbar-inner') as HTMLElement | null
+  const nav = document.querySelector('.navbar-nav') as HTMLElement | null
+  
+  if (inner) {
+    const isNarrowContainer = inner.offsetWidth < 1024
+    
+    let isNavWrapped = false
+    if (nav) {
+      const firstLink = nav.querySelector('.nav-link') as HTMLElement | null
+      const lineHeight = firstLink ? parseInt(getComputedStyle(firstLink).lineHeight) || 28 : 28
+      const navHeight = nav.offsetHeight
+      isNavWrapped = navHeight > lineHeight * 1.2
+    }
+    
+    isMobileMode.value = isNarrowContainer || isNavWrapped
+  }
+}
+
 function smoothScroll(e: Event, href: string): void {
   e.preventDefault()
   const target = document.querySelector(href)
@@ -38,12 +58,24 @@ function smoothScroll(e: Event, href: string): void {
 }
 
 onMounted(() => {
+  queueMicrotask(() => {
+    checkMobileMode()
+  })
+  
   window.addEventListener('scroll', handleScroll, { passive: true })
+  window.addEventListener('resize', checkMobileMode)
   handleScroll()
+  
+  const inner = document.querySelector('.navbar-inner')
+  if (inner) {
+    const observer = new ResizeObserver(checkMobileMode)
+    observer.observe(inner)
+  }
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('resize', checkMobileMode)
 })
 </script>
 
@@ -64,7 +96,7 @@ onUnmounted(() => {
         <span class="navbar-badge">v4.0</span>
       </a>
 
-      <nav class="navbar-nav">
+      <nav class="navbar-nav" :class="{ 'mobile-trigger': isMobileMode }">
         <a
           v-for="link in navLinks"
           :key="link.href"
@@ -92,14 +124,18 @@ onUnmounted(() => {
         </a>
       </div>
 
-      <button class="navbar-mobile-toggle" @click="toggleMobileMenu" aria-label="Toggle menu">
+      <button 
+        class="navbar-mobile-toggle" 
+        @click="toggleMobileMenu" 
+        aria-label="Toggle menu"
+      >
         <span></span>
         <span></span>
         <span></span>
       </button>
     </div>
 
-    <div class="mobile-menu" :class="{ open: isMobileMenuOpen }">
+    <div v-show="isMobileMode" class="mobile-menu" :class="{ open: isMobileMenuOpen }">
       <nav class="mobile-nav">
         <a
           v-for="link in navLinks"
