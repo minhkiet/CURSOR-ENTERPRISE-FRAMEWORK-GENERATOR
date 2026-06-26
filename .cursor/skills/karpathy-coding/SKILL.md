@@ -1,8 +1,8 @@
 ---
-description: Karpathy Coding Discipline - Giảm LLM coding mistakes thông qua think before coding, simplicity first, surgical changes, và goal-driven execution. Overlay skill cho mọi coding task.
+description: Karpathy Coding Discipline - Think Before Coding, simplicity, surgical changes, goal-driven execution. Mandatory overlay for all coding tasks. Complements ponytail for YAGNI optimization.
 created: 2026-06-26
-version: 1.0.0
-tags: [karpathy, coding-discipline, vibe-code, simplicity, minimal, goal-driven, surgical]
+version: 1.1.0
+tags: [karpathy, coding-discipline, vibe-code, simplicity, minimal, goal-driven, surgical, think-first]
 ---
 
 # Karpathy Coding Discipline
@@ -11,7 +11,33 @@ tags: [karpathy, coding-discipline, vibe-code, simplicity, minimal, goal-driven,
 
 Skill này tích hợp nguyên tắc từ [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) - 182k stars GitHub repo của Andrej Karpathy về cách giảm LLM coding mistakes.
 
-**Đây là OVERLAY SKILL** — chạy song song với primary skill, không thay thế. Luôn áp dụng cho mọi coding task.
+**Đây là MANDATORY OVERLAY SKILL** — luôn chạy với mọi coding task. Think Before Coding, sau đó implement surgical.
+
+## Complementarity with Ponytail
+
+| Phase | Skill | Focus |
+|-------|-------|-------|
+| **THINK FIRST** | karpathy-coding | What to build? What are the options? What's the minimal scope? |
+| **THEN BUILD** | ponytail (optional) | How to build it with least code? Use platform features? Skip YAGNI? |
+
+**Flow:**
+```
+User Request
+    ↓
+karpathy-pre [K.1-K.4]  ← Think: assumptions, scope, goals
+    ↓
+[ponytail-pre]          ← YAGNI Ladder (if enabled)
+    ↓
+IMPLEMENT               ← Minimal code that solves the problem
+    ↓
+[ponytail-post]         ← Code reduction check (if enabled)
+    ↓
+karpathy-post [K.5-K.7] ← Verify surgical + goals achieved
+    ↓
+DELIVER
+```
+
+> **Note:** Ponytail enhances karpathy-coding by adding YAGNI optimization. They are complementary, not conflicting.
 
 ## Nguyên tắc cốt lõi
 

@@ -1,0 +1,40 @@
+# Cursor Enterprise Framework - Root Rules
+
+## Framework Overview
+This project uses Cursor Enterprise Framework - a comprehensive development framework with:
+- 39 specialized rules
+- 17 skills with dual-gate system
+- 36 knowledge bases
+- Automated task analysis
+
+## Quick Reference
+
+### Essential Skills (Auto-loaded)
+- **karpathy-coding**: Vibe coding - "just do it", think first
+- **ponytail**: Lazy Senior - minimal code, YAGNI
+- **full-output**: No skeletons, complete implementation
+- **frontend-review**: Quality gate for all frontend work
+
+### Core Protocols
+- Read `.cursor/rules/skill-registry.mdc` - skill definitions
+- Read `.cursor/rules/skill-integration.mdc` - how skills work
+- Read `.cursor/rules/task-analyzer.mdc` - task analysis
+
+### Architecture
+- `.cursor/rules/architecture-patterns.mdc` - Design patterns
+- `.cursor/rules/enterprise-patterns.mdc` - System architecture
+- `.cursor/rules/frontend-frameworks.mdc` - Frontend guides
+
+### Quality Gates
+All tasks should pass:
+1. Pre-review gates (before implementation)
+2. Post-review gates (after implementation)
+
+## Skills Navigation
+See `.cursor/INDEX.md` for complete skill list and descriptions.
+
+## Development Guidelines
+- Follow coding standards in `.cursor/rules/coding-standards.mdc`
+- Use appropriate skills for the task
+- Run frontend-review for UI changes
+- Use karpathy-coding + ponytail for efficient coding

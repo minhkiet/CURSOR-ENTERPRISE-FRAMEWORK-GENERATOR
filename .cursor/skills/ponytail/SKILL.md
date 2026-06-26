@@ -1,7 +1,7 @@
 ---
-description: Ponytail Skill - Lazy Senior Dev Mode for Cursor Enterprise Framework. Based on DietrichGebert/ponytail (58k stars)
-version: 1.0.0
-tags: [ponytail, yagni, minimalist, efficient, senior-dev, lazy-coding]
+description: Ponytail Skill - Lazy Senior Dev Mode for Cursor Enterprise Framework. YAGNI optimization, minimal code. Complementary to karpathy-coding (think first, then minimize).
+version: 1.1.0
+tags: [ponytail, yagni, minimalist, efficient, senior-dev, lazy-coding, code-reduction]
 ---
 
 # Ponytail Skill - Lazy Senior Dev Mode
@@ -21,6 +21,21 @@ Ponytail brings the wisdom of the lazy senior developer to Cursor Enterprise Fra
 | Cost | **-20%** |
 | Time | **-27%** |
 | Safety | **100%** |
+
+## Complementarity with Karpathy-Coding
+
+| Phase | Skill | Focus |
+|-------|-------|-------|
+| **THINK FIRST** | karpathy-coding | What to build? What are the options? Define success criteria? |
+| **THEN MINIMIZE** | ponytail | How to build with least code? Use platform features? Skip YAGNI? |
+
+**Why both?**
+- **karpathy-coding** prevents building wrong things (wrong scope, wrong direction)
+- **ponytail** prevents building things too verbosely (too much code)
+
+Together they ensure: **Right thing, right size, no waste.**
+
+**Important:** Ponytail runs AFTER karpathy gates. Don't skip thinking to save code - that's not lazy, that's careless.
 
 ---
 

@@ -1,0 +1,9 @@
+# Cursor build artifacts
+.cursor/scripts/build/
+.cursor/scripts/dist/
+.cursor/scripts/**/*.pyc
+.cursor/scripts/**/*.pyz
+.cursor/scripts/*.zip
+.cursor/scripts/*.pkg
+.cursor/scripts/*.exe
+.cursor/scripts/*.toc

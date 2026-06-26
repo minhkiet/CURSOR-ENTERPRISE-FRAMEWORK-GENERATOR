@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Skill Dependencies Manifest - Auto-install configuration for Cursor Enterprise Framework",
   "lastUpdated": "2026-06-26",
   "metadata": {
@@ -148,8 +148,8 @@
     },
     "karpathy-coding": {
       "name": "Karpathy Coding",
-      "description": "Vibe coding discipline. Always overlay - runs with EVERY task. Think before coding, simplicity first, surgical changes.",
-      "version": "1.0.0",
+      "description": "Vibe coding discipline. ALWAYS overlay for ALL tasks. Think before coding, simplicity first, surgical changes. Complements ponytail (think first, then minimize).",
+      "version": "1.1.0",
       "keywords": {
         "en": ["vibe code", "just do it", "simple", "straightforward", "don't overthink", "minimal", "don't assume", "clarify first"],
         "vi": ["vibe code", "cứ làm đi", "đơn giản thôi", "không cần suy nghĩ nhiều"]
@@ -161,23 +161,25 @@
       "dependencies": {},
       "autoApply": true,
       "alwaysWithEveryTask": true,
-      "priority": "MANDATORY"
+      "priority": "MANDATORY",
+      "complements": ["ponytail"]
     },
     "ponytail": {
       "name": "Ponytail",
-      "description": "Lazy Senior Dev mode. The best code is the code you never wrote. Minimal code, YAGNI, prevent over-engineering.",
-      "version": "1.0.0",
+      "description": "Lazy Senior Dev mode. YAGNI optimization, minimal code. Optional overlay - complements karpathy-coding (think first, then minimize).",
+      "version": "1.1.0",
       "keywords": {
         "en": ["less code", "yagni", "over-engineering", "minimal", "simple", "boilerplate"],
         "vi": ["đơn giản", "tối thiểu", "ít code", "không over-engineering"]
       },
       "gates": {
-        "pre": [],
-        "post": []
+        "pre": ["ponytail-pre"],
+        "post": ["ponytail-post"]
       },
       "dependencies": {},
       "autoApply": false,
-      "priority": "MEDIUM"
+      "priority": "MEDIUM",
+      "complements": ["karpathy-coding"]
     },
     "visual-explainer": {
       "name": "Visual Explainer",

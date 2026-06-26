@@ -646,6 +646,23 @@ ANY CODING TASK
 **ponytail là OPTIONAL overlay:**
 - Enable khi user nhắc: simple, minimal, less code, yagni
 - Có thể disable với: `/ponytail off`
+- Chạy SAU karpathy gates
+
+**Karpathy + Ponytail Relationship:**
+
+| Phase | Skill | Question |
+|-------|-------|----------|
+| THINK FIRST | karpathy-coding | What to build? Scope? Options? |
+| MINIMIZE CODE | ponytail | How to build with least code? |
+
+They are **complementary**:
+- karpathy-coding: Prevents building **wrong things** (wrong scope, wrong direction)
+- ponytail: Prevents building things **too verbosely** (too much code)
+
+**Execution Order:**
+```
+karpathy-pre (MANDATORY) → [ponytail-pre if enabled] → IMPLEMENT → [ponytail-post if enabled] → karpathy-post (MANDATORY)
+```
 
 ---
 
@@ -692,18 +709,27 @@ DOMAIN GATES (based on detected skills)
      └── etc.
      │
      ▼
-SKILL GATES (specific to skill)
-     ├── All skills → karpathy-pre (MANDATORY)
-     └── ponytail → ponytail-pre (if enabled)
+KARPATHY GATES (MANDATORY - run for ALL coding tasks)
+     ├── karpathy-pre (K.1-K.4)
+     │
+     ▼
+PONYTAIL GATES (OPTIONAL - only if ponytail enabled)
+     └── ponytail-pre (YAGNI Ladder)
      │
      ▼
 [ IMPLEMENTATION ]
      │
      ▼
-POST GATES (reverse order)
-     ├── Skill gates → karpathy-post
-     ├── Domain gates → taste-post, security-post, etc.
-     └── Universal gates (implicit)
+PONYTAIL POST (if enabled)
+     └── ponytail-post (Code reduction check)
+     │
+     ▼
+KARPATHY POST (MANDATORY)
+     └── karpathy-post (K.5-K.7)
+     │
+     ▼
+DOMAIN POST GATES (reverse order)
+     ├── taste-post, security-post, etc.
      │
      ▼
 DELIVERY

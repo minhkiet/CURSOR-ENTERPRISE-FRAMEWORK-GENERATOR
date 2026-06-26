@@ -1,0 +1,477 @@
+{
+  "generated_at": "2026-06-25T15:31:50.8855371+07:00",
+  "total_files": 301,
+  "domains": {
+    "azure": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md"
+      ],
+      "file_count": 7
+    },
+    "marketing": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md"
+      ],
+      "file_count": 7
+    },
+    "monitoring": {
+      "files": [
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md"
+      ],
+      "file_count": 6
+    },
+    "pgvector": {
+      "files": [
+        "ann-evaluation.md",
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "embedding-storage.md",
+        "faq.md",
+        "glossary.md",
+        "hybrid-search.md",
+        "production-deployment.md",
+        "rag-pgvector.md",
+        "similarity-metrics.md",
+        "vector-indexing.md"
+      ],
+      "file_count": 14
+    },
+    "claude": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "claude-3-models.md",
+        "claude-api-integration.md",
+        "context-window-management.md",
+        "decision-tree.md",
+        "enterprise-security.md",
+        "faq.md",
+        "glossary.md",
+        "prompt-engineering-claude.md",
+        "structured-outputs.md",
+        "tool-use-extended.md"
+      ],
+      "file_count": 14
+    },
+    "numerology": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md"
+      ],
+      "file_count": 7
+    },
+    "tuvi": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md"
+      ],
+      "file_count": 7
+    },
+    "kubernetes": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md"
+      ],
+      "file_count": 7
+    },
+    "docker": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md"
+      ],
+      "file_count": 7
+    },
+    "rag": {
+      "files": [
+        "advanced-retrieval.md",
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "chunking-strategies.md",
+        "decision-tree.md",
+        "embedding-pipeline.md",
+        "evaluation-metrics.md",
+        "faq.md",
+        "glossary.md",
+        "multi-modal-rag.md",
+        "query-processing.md",
+        "reranking-strategies.md"
+      ],
+      "file_count": 14
+    },
+    "nextjs": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md"
+      ],
+      "file_count": 7
+    },
+    "aws": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "cloudwatch-observability.md",
+        "decision-tree.md",
+        "ec2-deployment.md",
+        "ecs-fargate.md",
+        "eks-kubernetes.md",
+        "faq.md",
+        "glossary.md",
+        "lambda-serverless.md",
+        "rds-postgres.md",
+        "s3-storage.md"
+      ],
+      "file_count": 14
+    },
+    "performance": {
+      "files": [
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md"
+      ],
+      "file_count": 6
+    },
+    "mysql": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "backup-recovery-mysql.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md",
+        "index-optimization.md",
+        "innodb-deep-dive.md",
+        "mysql-8-features.md",
+        "performance-schema.md",
+        "replication-topology.md",
+        "sharding-patterns.md"
+      ],
+      "file_count": 14
+    },
+    "redis": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "caching-patterns.md",
+        "checklist.md",
+        "data-structures.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md",
+        "persistence-rdb-aof.md",
+        "pub-sub-streams.md",
+        "rate-limiting.md",
+        "redis-cluster.md",
+        "redis-om-nodejs.md"
+      ],
+      "file_count": 14
+    },
+    "bazi": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md"
+      ],
+      "file_count": 7
+    },
+    "crm": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md"
+      ],
+      "file_count": 7
+    },
+    "aspnet-core": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md"
+      ],
+      "file_count": 7
+    },
+    "vue": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md"
+      ],
+      "file_count": 7
+    },
+    "rls": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md"
+      ],
+      "file_count": 7
+    },
+    "pdf": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md"
+      ],
+      "file_count": 7
+    },
+    "supabase": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md"
+      ],
+      "file_count": 7
+    },
+    "openai": {
+      "files": [
+        "anti-pattern.md",
+        "api-integration.md",
+        "architecture.md",
+        "Assistants-api-v2.md",
+        "best-practice.md",
+        "chat-completion.md",
+        "checklist.md",
+        "decision-tree.md",
+        "embeddings-search.md",
+        "faq.md",
+        "fine-tuning.md",
+        "glossary.md",
+        "prompt-engineering.md",
+        "vision-multimodal.md"
+      ],
+      "file_count": 14
+    },
+    "sql-server": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md"
+      ],
+      "file_count": 7
+    },
+    "billing": {
+      "files": [
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md"
+      ],
+      "file_count": 6
+    },
+    "multi-tenant": {
+      "files": [
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md"
+      ],
+      "file_count": 6
+    },
+    "gemini": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "batch-generation.md",
+        "best-practice.md",
+        "checklist.md",
+        "context-window.md",
+        "decision-tree.md",
+        "embedding-models.md",
+        "faq.md",
+        "function-calling-gemini.md",
+        "gemini-api-setup.md",
+        "glossary.md",
+        "multimodal-inputs.md",
+        "safety-filtering.md"
+      ],
+      "file_count": 14
+    },
+    "laravel": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md"
+      ],
+      "file_count": 7
+    },
+    "nestjs": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md"
+      ],
+      "file_count": 7
+    },
+    "nuxt": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md"
+      ],
+      "file_count": 7
+    },
+    "security": {
+      "files": [
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "glossary.md"
+      ],
+      "file_count": 5
+    },
+    "postgres": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "backup-recovery.md",
+        "best-practice.md",
+        "checklist.md",
+        "connection-pooling.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md",
+        "partitioning-scaling.md",
+        "performance-tuning.md",
+        "pgvector-ml.md",
+        "replication-ha.md",
+        "security-privileges.md"
+      ],
+      "file_count": 14
+    },
+    "vector-search": {
+      "files": [
+        "anti-pattern.md",
+        "application-patterns.md",
+        "approximate-nearest-neighbor.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md",
+        "indexing-algorithms.md",
+        "metadata-filtering.md",
+        "quantization-techniques.md",
+        "serving-architecture.md",
+        "vector-db-comparison.md"
+      ],
+      "file_count": 13
+    },
+    "cloudflare": {
+      "files": [
+        "anti-pattern.md",
+        "architecture.md",
+        "best-practice.md",
+        "checklist.md",
+        "decision-tree.md",
+        "faq.md",
+        "glossary.md"
+      ],
+      "file_count": 7
+    }
+  }
+}

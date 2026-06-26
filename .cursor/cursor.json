@@ -1,0 +1,39 @@
+{
+  "version": "1.0.0",
+  "name": "Cursor Enterprise Framework",
+  "description": "Enterprise development framework with skills, rules, and knowledge bases",
+  "rules": {
+    "root": ".cursorrules",
+    "directory": ".cursor/rules",
+    "totalRules": 39,
+    "autoLoad": true
+  },
+  "skills": {
+    "registry": ".cursor/rules/skill-registry.mdc",
+    "dependencies": ".cursor/scripts/skill-dependencies.json",
+    "totalSkills": 17,
+    "alwaysEnabled": ["karpathy-coding", "full-output"]
+  },
+  "knowledge": {
+    "directory": ".cursor/knowledge",
+    "totalDirs": 36
+  },
+  "index": ".cursor/INDEX.md",
+  "mcp": {
+    "servers": [
+      "cursor-ide-browser",
+      "user-vercel",
+      "user-browsermcp",
+      "user-typeui",
+      "user-shadcn",
+      "user-codegraph"
+    ]
+  },
+  "features": {
+    "taskAnalyzer": true,
+    "contextRouter": true,
+    "memoryFirst": true,
+    "multiLanguageProcessing": true
+  },
+  "lastUpdated": "2026-06-26"
+}

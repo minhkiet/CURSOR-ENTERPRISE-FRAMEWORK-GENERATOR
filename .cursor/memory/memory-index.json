@@ -1,0 +1,26 @@
+{
+  "version": "1.0.0",
+  "components": {
+    "bug_history": {
+      "count": 0
+    },
+    "decision_history": {
+      "count": 0
+    },
+    "session_summary": {
+      "count": 0
+    },
+    "sqlite_databases": [
+      "decisions",
+      "bugs",
+      "prompt-cache",
+      "knowledge",
+      "embeddings",
+      "sessions"
+    ],
+    "architecture_history": {
+      "count": 0
+    }
+  },
+  "built_at": "2026-06-25T15:31:33.1922927+07:00"
+}
