@@ -128,6 +128,14 @@ Skill Detection Engine là bộ phân tích tự động phân loại yêu cầu
 | `thanh toán` + `Việt Nam` | vietnam-payment-review | 0.95 | Vietnam payment |
 | `webhook` + `payment` | vietnam-payment-review | 0.90 | Payment webhook |
 | `payment gateway` | security-review | 0.85 | Payment security |
+| **PONYTAIL - Efficiency** ||||
+| `less code` | ponytail | 0.95 | Minimize code |
+| `yagni` | ponytail | 0.95 | YAGNI principle |
+| `over-engineering` | ponytail | 0.95 | Prevent over-build |
+| `boilerplate` | ponytail | 0.90 | Avoid boilerplate |
+| `abstraction` + `utility` | ponytail | 0.85 | Over-abstraction |
+| `wrapper` + `class` | ponytail | 0.85 | Wrapper pattern |
+| `vibe code` | ponytail | 0.90 | Efficient coding |
 
 ### A.3 Confidence Scoring Algorithm
 
@@ -495,6 +503,11 @@ NEXT ACTION: Load SKILL.md files and begin PRE-REVIEW
 **Path:** `.cursor/skills/security-review/SKILL.md`
 **Kích hoạt khi:** security review, vulnerability, penetration test, OWASP, XSS, SQL injection, SSRF, CSRF, XXE, authentication, authorization, RBAC, API key, secret, webhook, LLM/AI security, prompt injection, APK decompile, binary analysis, firmware, reverse engineer, malware, CVE, exploit, payload, SSL pinning bypass, Frida hooking, supply chain audit, dependency scan, npm audit, secrets management, JWT, OAuth, CSRF, CORS, CSP, HSTS, encryption, hashing, brute force, brute-force, credential stuffing
 **Mục đích:** Comprehensive security review với layered approach: Static Analysis, OWASP Top 10 + ASVS, LLM/AI Security (ASI Top 10), API/Webhook Security, Supply Chain & Secrets, Cryptographic Practices, và Advanced RE (tich hợp reverse-skill). Tich hợp [reverse-skill](https://github.com/zhaoxuya520/reverse-skill) cho APK/JS/binary/firmware reverse-engineering workflows.
+
+### 7. ponytail
+**Path:** `.cursor/skills/ponytail/SKILL.md`
+**Kích hoạt khi:** vibe code, efficient coding, minimize code, less code, yagni, over-engineering, boilerplate, abstraction, utility class, wrapper, overkill, simple task
+**Mục đích:** Lazy Senior Dev mode - viết code tối thiểu, hiệu quả. "The best code is the code you never wrote." Giảm 54% LOC, 20% cost, 27% faster, 100% safe. Check YAGNI ladder trước khi viết code.
 
 ---
 
@@ -1364,10 +1377,11 @@ SKILL KEYWORD MATRIX:
 ├───────────────────────────┼───────────────────────────┼──────┤
 │ landing page, portfolio   │ frontend-taste            │ 0.95 │
 │ redesign, upgrade, improve │ frontend-redesign         │ 0.90 │
-│ full implementation        │ full-output               │ 0.95 │
+│ full implementation      │ full-output               │ 0.95 │
 │ review, quality check     │ frontend-review           │ 0.95 │
 │ security, vulnerability   │ security-review           │ 0.95 │
-│ MoMo, SePay, PayOS, etc.  │ vietnam-payment-review    │ 0.95 │
+│ MoMo, SePay, PayOS, etc. │ vietnam-payment-review   │ 0.95 │
+│ less code, yagni, vibe   │ ponytail                  │ 0.95 │
 
 CONFIDENCE THRESHOLDS:
 ══════════════════════════════════════════════════════════════
