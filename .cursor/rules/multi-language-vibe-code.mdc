@@ -1,8 +1,8 @@
 ---
-description: Nguyên tắc Multi-Language Request Processing - phân tích và chuyển đổi yêu cầu từ các ngôn ngữ khác sang tiếng Anh, tự động xác định rules và skills để chạy vibe code. Tích hợp translation layer, intent detection, và skill auto-discovery.
+description: Nguyên tắc Multi-Language Request Processing - phân tích và chuyển đổi yêu cầu từ các ngôn ngữ khác sang tiếng Anh, tự động xác định rules và skills để chạy vibe code. Tích hợp translation layer, intent detection, skill auto-discovery, clarification flow, pre-execution validation, auth handling, dynamic thresholds, và retry logic.
 created: 2026-06-26
-version: 1.0.0
-tags: [multilingual, translation, vibe-code, auto-discovery, rules, skills, intent-analysis, language-processing]
+version: 2.0.0
+tags: [multilingual, translation, vibe-code, auto-discovery, rules, skills, intent-analysis, language-processing, clarification, validation, auth, retry]
 ---
 
 # Multi-Language Request Processing & Vibe Code Protocol
@@ -644,9 +644,159 @@ def get_skill_gates(skill_name: str) -> list:
 
 ---
 
-## PHẦN E: VIBE CODE EXECUTION WORKFLOW
+## PHẦN E: VIBE CODE EXECUTION WORKFLOW (UPDATED)
 
-### E.1 Complete Vibe Code Flow
+### E.1 Complete Vibe Code Flow với Clarification & Validation
+
+```
+═══════════════════════════════════════════════════════════════════════════════
+                    [VIBE CODE PROTOCOL v2.0] 
+        MULTI-LANGUAGE → CLARIFICATION → VALIDATION → EXECUTE
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 1: REQUEST RECEIVED (Any Language)                                    │
+│   • Extract raw request text                                               │
+│   • Identify language signals                                              │
+│   • Preserve original formatting                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 2: LANGUAGE DETECTION + TRANSLATION                                   │
+│   • Detect source language (vi/zh/ja/ko/en/etc.)                          │
+│   • Translate to English with semantic preservation                        │
+│   • Preserve tech terms and code snippets                                  │
+│   • Normalize compound phrases                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 3: INTENT ANALYSIS                                                     │
+│   • Classify primary intent (build/fix/redesign/review)                    │
+│   • Calculate intent confidence score                                     │
+│   • Detect multi-intent conflicts                                           │
+│   • Identify domain context                                                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 4: RULE/SKILL AUTO-DISCOVERY                                           │
+│   • Match against Rule Registry                                           │
+│   • Match against Skill Keyword Matrix (multilingual)                      │
+│   • Calculate dynamic confidence thresholds                                │
+│   • Determine skill combination                                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 5: AMBIGUITY DETECTION ◄──────────────────────────────────────────────┐
+│   • Check request clarity (word count, vagueness)                        │ │
+│   • Check intent confidence threshold                                     │ │ ◄── NEW
+│   • Check multi-intent conflicts                                           │ │     CLARIFICATION
+│   • Check domain coverage                                                  │ │     FLOW
+│   • Check tech stack validity                                              │ │
+│   • Check file reference existence                                         │ │
+└─────────────────────────────────────────┬───────────────────────────────────┘
+                                          │
+                              ┌───────────┴───────────┐
+                              │   Is ambiguous?       │
+                              │   (confidence < 0.6) │
+                              └───────────┬───────────┘
+                                  YES     │     NO
+                                          ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 5A: CLARIFICATION FLOW                                                 │
+│   • Generate structured questions based on ambiguity reasons               │
+│   • Present to user with examples and options                             │
+│   • Process clarification response                                         │
+│   • Merge clarified info with original request                            │
+│   • Re-run intent analysis and skill discovery                            │
+│   • Resume from STEP 5                                                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                          │
+                                          ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 6: PRE-EXECUTION VALIDATION GATE ◄────────────────────────────────────┐
+│   • Validate request clarity                                               │ │
+│   • Validate intent confidence (>= 0.5)                                   │ │ ◄── NEW
+│   • Validate skills matched (>= 1)                                       │ │     VALIDATION
+│   • Validate domain consistency                                           │ │     GATE
+│   • Validate tech stack                                                   │ │
+│   • Validate file references                                              │ │
+└─────────────────────────────────────────┬───────────────────────────────────┘
+                                          │
+                              ┌───────────┴───────────┐
+                              │   Can proceed?        │
+                              │   (no blocking issues)│
+                              └───────────┬───────────┘
+                                  NO      │     YES
+                                          ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 6A: VALIDATION FAILURE HANDLING                                        │
+│   • Identify blocking issues                                               │
+│   • Generate remediation suggestions                                       │
+│   • Present to user with specific fixes                                   │
+│   • Request correction                                                    │
+│   • Retry validation                                                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                          │
+                                          ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 7: AUTH/PAYMENT SPECIAL HANDLING ◄────────────────────────────────────┐
+│   • Detect auth-related tasks (login/register/OAuth)                       │ │
+│   • Detect Vietnam payment providers (MoMo/SePay/PayOS/etc.)              │ │ ◄── NEW
+│   • Force security-review skill for critical tasks                        │ │     AUTH
+│   • Generate tech stack clarification questions                           │ │     HANDLING
+│   • Add security checklist for auth tasks                                 │ │
+└─────────────────────────────────────────┬───────────────────────────────────┘
+                                          │
+                                          ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 8: RUN PRE-REVIEW GATES                                               │
+│   • Run all pre-review gates from detected skills                         │
+│   • Execute karpathy-coding pre-gate                                       │
+│   • Execute frontend-taste pre-gate (if applicable)                        │
+│   • Execute security-review pre-gate (if applicable)                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 9: IMPLEMENTATION                                                     │
+│   • Execute with karpathy-coding overlay                                   │
+│   • Apply detected skills and rules                                       │
+│   • Track deliverables                                                     │
+│   • Monitor execution health                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 10: RUN POST-REVIEW GATES                                              │
+│   • Run all post-review gates from detected skills                        │
+│   • Verify all deliverables complete                                       │
+│   • Quality checks                                                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 11: DELIVERY                                                           │
+│   • If all gates pass → Deliver result                                    │
+│   • If execution failed → Retry with fallback strategy                     │
+│   • Log execution for continuous improvement                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+                          EXECUTION SUMMARY
+═══════════════════════════════════════════════════════════════════════════════
+
+  Request: "Tạo landing page đẹp cho startup AI"
+  
+  ┌─ LANGUAGE: Vietnamese (95% confidence)
+  ├─ TRANSLATED: "Create beautiful landing page for AI startup"
+  ├─ INTENT: build (85% confidence)
+  ├─ DOMAINS: frontend (90%), design (80%)
+  ├─ SKILLS: frontend-taste, full-output, frontend-review, karpathy-coding
+  ├─ AMBIGUITY: low (passes all checks)
+  ├─ VALIDATION: ✅ PASS
+  ├─ PRE-REVIEW: ✅ PASS
+  ├─ IMPLEMENTATION: ✅ SUCCESS
+  └─ POST-REVIEW: ✅ PASS
+
+═══════════════════════════════════════════════════════════════════════════════
+```
 
 ```
 ═══════════════════════════════════════════════════════════════════════════════
@@ -796,16 +946,18 @@ STEP 7: POST-REVIEW GATES
 
 ### E.2 Simplified Flow (Quick Vibe Code)
 
-For simple requests, use streamlined flow:
+For simple requests with clear intent, use streamlined flow:
 
 ```
-INPUT (any language) → TRANSLATE → INTENT → SKILLS → EXECUTE → DELIVER
+INPUT (any language) → TRANSLATE → INTENT → SKILLS → VALIDATE → EXECUTE → DELIVER
+                                                    ↓
+                                            (Clarification if needed)
 ```
 
 ```python
 def quick_vibe_code(user_request: str) -> str:
     """
-    Streamlined vibe code execution
+    Streamlined vibe code execution with validation
     """
     # Step 1: Detect language
     lang_detection = detect_language(user_request)
@@ -819,20 +971,122 @@ def quick_vibe_code(user_request: str) -> str:
     # Step 4: Auto-discover skills
     discovery = auto_discover_rules_and_skills(english_request, intent)
     
-    # Step 5: Run pre-review gates
+    # Step 4.5: Ambiguity check (quick version)
+    ambiguity = quick_ambiguity_check(english_request, intent, discovery)
+    if ambiguity["is_ambiguous"]:
+        return generate_clarification_prompt(ambiguity)
+    
+    # Step 5: Pre-execution validation (quick version)
+    validation = quick_validation(english_request, intent, discovery)
+    if not validation["can_proceed"]:
+        return generate_validation_summary(validation)
+    
+    # Step 5.5: Auth/Payment special handling
+    if is_auth_task(english_request) or is_vietnam_payment(english_request):
+        discovery = apply_security_overlay(discovery)
+    
+    # Step 6: Run pre-review gates
     for gate in discovery["gates"]["pre"]:
         run_gate(gate)
     
-    # Step 6: Execute with karpathy-coding overlay
+    # Step 7: Execute with karpathy-coding overlay
     result = execute_with_karpathy_overlay(
         english_request,
         discovery["skills"],
         discovery["rules"]
     )
     
-    # Step 7: Run post-review gates
+    # Step 8: Run post-review gates
     for gate in discovery["gates"]["post"]:
         run_gate(gate)
+    
+    # Step 9: Retry logic if failed
+    if not result["success"]:
+        result = execute_with_fallback(english_request, result)
+    
+    return result
+```
+
+### E.3 Full Flow (Complex Requests)
+
+For complex requests with potential ambiguity:
+
+```
+INPUT → LANGUAGE → TRANSLATE → INTENT → SKILLS → 
+  → AMBIGUITY_FULL → CLARIFICATION (if needed) → 
+  → VALIDATION_FULL → FIX (if needed) → 
+  → AUTH/PAYMENT → PRE-GATES → IMPLEMENT → POST-GATES → DELIVER
+```
+
+```python
+def full_vibe_code(user_request: str) -> str:
+    """
+    Full vibe code execution with all validation gates
+    """
+    # Full ambiguity detection
+    lang_detection = detect_language(user_request)
+    english_request = translate_to_english(user_request, lang_detection["language"])
+    intent = analyze_intent(english_request)
+    discovery = auto_discover_rules_and_skills(english_request, intent)
+    
+    # Full ambiguity detection
+    ambiguity = detect_ambiguity(
+        english_request,
+        intent,
+        discovery["domains"],
+        discovery
+    )
+    
+    if ambiguity["is_ambiguous"]:
+        prompt = generate_clarification_prompt(ambiguity)
+        # Present to user and wait for response
+        # On response, merge and re-analyze
+        clarified = process_clarification_response(
+            user_request, 
+            get_user_response(), 
+            ambiguity
+        )
+        # Re-run with clarified request
+        english_request = translate_to_english(clarified, lang_detection["language"])
+        intent = analyze_intent(english_request)
+        discovery = auto_discover_rules_and_skills(english_request, intent)
+    
+    # Full validation gate
+    validation = pre_execution_validation(
+        english_request,
+        intent,
+        discovery,
+        discovery["domains"],
+        get_context()
+    )
+    
+    if not validation["can_proceed"]:
+        # Generate fix suggestions
+        return generate_fix_prompt(validation)
+    
+    # Auth/Payment handling
+    auth_check = detect_auth_intent(english_request)
+    payment_check = detect_vietnam_payment(english_request)
+    
+    if auth_check["is_auth_task"]:
+        discovery = apply_auth_handling(discovery, auth_check)
+    
+    if payment_check["is_payment_task"]:
+        discovery = apply_payment_handling(discovery, payment_check)
+    
+    # Apply dynamic thresholds
+    discovery = apply_dynamic_threshold(
+        discovery,
+        english_request,
+        get_context()
+    )
+    
+    # Execute with retry logic
+    result = execute_with_retry(
+        english_request,
+        {**discovery, **get_context()},
+        max_retries=2
+    )
     
     return result
 ```
@@ -953,14 +1207,14 @@ ZH → EN Quick Map:
   支付/payment | 安全/security | 数据库/database
 ```
 
-### G.3 Vibe Code Decision Tree
+### G.3 Vibe Code Decision Tree (Updated)
 
 ```
 REQUEST RECEIVED
        │
        ▼
 ┌──────────────────┐
-│ Detect Language │
+│ Detect Language  │
 └────────┬─────────┘
          │
     ┌────┴────┐
@@ -972,54 +1226,1600 @@ REQUEST RECEIVED
          ▼    │
 ┌──────────────┐
 │ Translate to │
-│ English      │
+│ English     │
 └──────────────┘
          │
          ▼
 ┌──────────────────────────────────┐
-│ Analyze Intent (build/fix/      │
-│ redesign/review)                │
+│ Analyze Intent                   │
+│ (build/fix/redesign/review)      │
 └──────────────────────────────────┘
          │
          ▼
 ┌──────────────────────────────────┐
-│ Auto-Discover Rules & Skills    │
-│ (Skill Matrix + Rule Registry) │
+│ Auto-Discover Rules & Skills     │
 └──────────────────────────────────┘
          │
          ▼
 ┌──────────────────────────────────┐
-│ Add karpathy-coding (overlay)   │
-│ Add frontend-review (mandatory) │
-└──────────────────────────────────┘
-         │
-         ▼
-┌──────────────────────────────────┐
-│ Run PRE-REVIEW Gates            │
-│ (all selected skills)           │
-└──────────────────────────────────┘
-         │
-         ▼
-┌──────────────────────────────────┐
-│ IMPLEMENT (vibe code)           │
-│ (karpathy overlay active)       │
-└──────────────────────────────────┘
-         │
-         ▼
-┌──────────────────────────────────┐
-│ Run POST-REVIEW Gates          │
-│ (all selected skills)           │
-└──────────────────────────────────┘
-         │
-         ▼
-┌──────────────────────────────────┐
-│ DELIVER (if all gates pass)    │
-└──────────────────────────────────┘
+│ AMBIGUITY DETECTION ◄── NEW     │
+│ Check: length, vagueness,        │
+│ confidence, multi-intent,        │
+│ tech context                     │
+└─────────────┬────────────────────┘
+              │
+       ┌──────┴──────┐
+       │ Is ambiguous?│
+       └──────┬──────┘
+        YES   │   NO
+          │   │
+          ▼   │
+┌─────────────────┐    ┌─────────────────────────────────┐
+│ ASK CLARIFY ◄───┼────│ PRE-EXECUTION VALIDATION ◄──NEW│
+│ Questions       │    │ Validate: clarity, confidence,  │
+│ (structured)    │    │ skills, domains, tech stack     │
+└────────┬────────┘    └─────────────┬───────────────────┘
+         │                           │
+         │                    ┌──────┴──────┐
+         │                    │ Can proceed?│
+         │                    └──────┬──────┘
+         │                     NO   │   YES
+         │                       │   │
+         │                       ▼   │
+         │              ┌─────────────────┐
+         │              │ FIX / CLARIFY   │
+         │              └─────────────────┘
+         │                           │
+         └───────────────────────────┘
+                        │
+                        ▼
+         ┌─────────────────────────────┐
+         │ AUTH/PAYMENT HANDLING ◄──NEW│
+         │ Detect: login, register,    │
+         │ OAuth, MoMo, PayOS, etc.     │
+         └─────────────┬───────────────┘
+                       │
+         ┌─────────────┴─────────────┐
+         │ Add security-review skill   │
+         │ for critical tasks          │
+         └─────────────┬───────────────┘
+                       │
+                       ▼
+         ┌─────────────────────────────┐
+         │ Run PRE-REVIEW Gates       │
+         └─────────────┬───────────────┘
+                       │
+                       ▼
+         ┌─────────────────────────────┐
+         │ IMPLEMENT (vibe code)      │
+         │ karpathy overlay active    │
+         └─────────────┬───────────────┘
+                       │
+                       ▼
+         ┌─────────────────────────────┐
+         │ Run POST-REVIEW Gates      │
+         └─────────────┬───────────────┘
+                       │
+              ┌────────┴────────┐
+              │ Success?        │
+              └────────┬────────┘
+               NO      │   YES
+                │      │
+                ▼      │
+         ┌─────────────────┐    ┌─────────────────────────┐
+         │ RETRY ◄────┬────┼────│ DELIVER (if all gates │
+         │ Fallback   │    │    │ pass)                  │
+         │ Strategy   │    │    └─────────────────────────┘
+         └────────────┘    │
+                │          │
+                ▼          ▼
+         ┌─────────────────┐
+         │ Exhausted?      │
+         └────────┬────────┘
+                  │
+          YES     │    NO
+           │      │
+           ▼      │
+    ┌─────────────┐
+    │ REPORT ERROR│
+    └─────────────┘
+```
+
+### G.4 Clarification Quick Reference
+
+```
+═══════════════════════════════════════════════════════════════
+WHEN TO ASK CLARIFICATION
+═══════════════════════════════════════════════════════════════
+
+❌ DO ASK when:
+   • Word count < 3 (e.g., "tạo app")
+   • Contains vague words: "something", "cái gì đó"
+   • Intent confidence < 0.5
+   • Multiple strong intents (build=0.45, fix=0.40)
+   • No domain detected
+   • Critical task (security/payment) without tech context
+
+✓ DON'T ASK when:
+   • Clear action + target (e.g., "tạo landing page cho startup")
+   • Intent confidence >= 0.7
+   • Specific component/file mentioned
+   • Tech stack explicitly stated
+
+═══════════════════════════════════════════════════════════════
+CLARIFICATION QUESTION TYPES
+═══════════════════════════════════════════════════════════════
+
+1. SCOPE: "What specifically do you want to create?"
+2. TARGET: "What is the target of this task?"
+3. INTENT: "Do you want to create, fix, improve, or review?"
+4. DOMAIN: "Is this frontend, backend, or full-stack?"
+5. TECH: "What framework/stack are you using?"
+6. AUTH: "Login method? (email, OAuth, SSO)"
+7. PAYMENT: "Payment provider? (Stripe, MoMo, PayOS)"
+```
+
+### G.5 Validation Quick Reference
+
+```
+═══════════════════════════════════════════════════════════════
+PRE-EXECUTION VALIDATION CHECKLIST
+═══════════════════════════════════════════════════════════════
+
+BLOCK (must fix before proceeding):
+  ☐ Request clarity: word_count >= 3, has_action, has_target
+  ☐ Intent confidence: >= 0.5
+  ☐ Skills matched: >= 1 skill
+
+WARN (can proceed but should note):
+  ⚠ Domain consistency: no conflicting domains
+  ⚠ Tech stack: known or not specified
+  ⚠ File references: files exist or none referenced
+
+═══════════════════════════════════════════════════════════════
+VALIDATION FAILURE → ACTION
+═══════════════════════════════════════════════════════════════
+
+❌ Request too vague → Ask for specificity
+❌ Intent unclear → Ask for clarification
+❌ No skills matched → Ask task type
+⚠ Domain conflict → Ask for priority
+⚠ Unknown tech → Ask for tech stack
+⚠ File not found → Ask to verify path
+```
+
+### G.6 Auth Task Quick Reference
+
+```
+═══════════════════════════════════════════════════════════════
+AUTH TASKS REQUIRING SECURITY-REVIEW
+═══════════════════════════════════════════════════════════════
+
+🔐 ALWAYS require security-review:
+   • Login/Authentication
+   • Registration/Sign up
+   • Password Reset
+   • OAuth/Social Login
+   • MFA Setup
+   • Session Management
+
+═══════════════════════════════════════════════════════════════
+AUTH CLARIFICATION QUESTIONS
+═══════════════════════════════════════════════════════════════
+
+1. Auth Method:
+   - Email + Password
+   - OAuth (Google, GitHub, Facebook)
+   - Phone/SMS OTP
+   - Enterprise SSO
+   - Passwordless (magic link)
+
+2. Tech Stack:
+   - JWT vs Session
+   - Framework-specific auth library
+   - Database schema needs
+
+3. MFA Required?
+   - TOTP (Google Authenticator)
+   - SMS
+   - Email
+
+4. Password Requirements:
+   - Standard (8+ chars)
+   - Strong (upper, lower, number, symbol)
+```
+
+### G.7 Vietnam Payment Quick Reference
+
+```
+═══════════════════════════════════════════════════════════════
+VIETNAM PAYMENT PROVIDERS
+═══════════════════════════════════════════════════════════════
+
+💳 MoMo
+   Keywords: momo, ví momo, thanh toán momo
+   Skill: vietnam-payment-review, security-review
+
+💳 SePay
+   Keywords: sepay, sepay
+   Skill: vietnam-payment-review
+
+💳 PayOS
+   Keywords: payos, pay os
+   Skill: vietnam-payment-review, security-review
+
+💳 VNPay
+   Keywords: vnpay, vn pay
+   Skill: vietnam-payment-review, security-review
+
+💳 ZaloPay
+   Keywords: zalopay, zalo pay
+   Skill: vietnam-payment-review, security-review
+
+💳 VietQR
+   Keywords: vietqr, viet qr
+   Skill: vietnam-payment-review
+
+═══════════════════════════════════════════════════════════════
+PAYMENT INTEGRATION CHECKLIST
+═══════════════════════════════════════════════════════════════
+
+☐ Sandbox testing first
+☐ Webhook security (signature verification)
+☐ Idempotency handling
+☐ Error handling & retry logic
+☐ Transaction status tracking
+☐ Refund flow
+☐ Payment notification to user
+```
+
+### G.8 Retry Strategy Quick Reference
+
+```
+═══════════════════════════════════════════════════════════════
+EXECUTION STRATEGIES & FALLBACK ORDER
+═══════════════════════════════════════════════════════════════
+
+1. PRIMARY (attempt 1):
+   • Full implementation with all detected skills
+   • aggressive = HIGH
+   • If failed → try fallback
+
+2. FALLBACK CONSERVATIVE (attempt 2):
+   • Simplified implementation
+   • Only karpathy-coding + essential rules
+   • If failed → try minimal
+
+3. FALLBACK MINIMAL (attempt 3):
+   • Minimal working implementation
+   • Only karpathy-coding overlay
+   • If failed → report error
+
+═══════════════════════════════════════════════════════════════
+WHEN TO USE FALLBACK
+═══════════════════════════════════════════════════════════════
+
+🔄 Retry with fallback when:
+   • Validation fails after clarification
+   • Implementation throws exception
+   • Skills/rules conflict detected mid-execution
+   • Timeout or resource exhaustion
+
+🚫 DON'T retry (report immediately):
+   • Security vulnerability detected
+   • Authentication failure (wrong credentials context)
+   • User explicitly cancelled
+   • Invalid request after clarification
 ```
 
 ---
 
-## Liên kết
+## PHẦN G: CLARIFICATION FLOW (AMBIGUITY DETECTION)
+
+### G.1 Khi nào cần Clarification
+
+Request được coi là **ambiguous** khi:
+
+```yaml
+ambiguity_conditions:
+  # 1. Request quá ngắn
+  short_request:
+    max_words: 3
+    example: "Tạo app" → "Create app"
+    
+  # 2. Thiếu target rõ ràng
+  missing_target:
+    patterns: ["^create ", "^build ", "^add "]
+    without_target: true
+    example: "Create something" → missing target
+    
+  # 3. Thiếu action verb
+  missing_action:
+    required_keywords: ["create", "build", "fix", "add", "update", "delete", "remove"]
+    example: "The login page" → no action verb
+    
+  # 4. Intent confidence thấp
+  low_intent_confidence:
+    threshold: 0.5
+    example: intent_confidence < 0.5
+    
+  # 5. Multiple intents mạnh (conflict)
+  multi_intent_conflict:
+    score_gap: 0.15
+    example: build=0.45, fix=0.40 (gap < 0.15)
+    
+  # 6. Không có domain được detect
+  no_domain:
+    min_domains: 1
+    example: domain list empty
+    
+  # 7. Domain quan trọng nhưng thiếu context
+  critical_domain_without_context:
+    domains: ["security", "payment", "auth"]
+    missing_tech_stack: true
+```
+
+### G.2 Ambiguity Detection Algorithm
+
+```python
+def detect_ambiguity(
+    request: str,
+    intent_analysis: dict,
+    domain_detection: dict,
+    skill_discovery: dict
+) -> dict:
+    """
+    Detect if request is ambiguous and needs clarification
+    Returns: {
+        "is_ambiguous": bool,
+        "reasons": list,
+        "clarification_questions": list,
+        "confidence": float
+    }
+    """
+    request_lower = request.lower()
+    word_count = len(request.split())
+    reasons = []
+    questions = []
+    
+    # 1. Check request length
+    if word_count < 3:
+        reasons.append("request_too_short")
+        questions.append({
+            "type": "scope",
+            "question": "What specifically do you want to create/build/fix?",
+            "examples": [
+                "a landing page for my AI startup",
+                "a login component with email and password",
+                "a REST API for user management"
+            ]
+        })
+    
+    # 2. Check for missing target
+    has_target = bool(re.search(
+        r'\b(this|that|file|folder|app|page|component|'
+        r'button|form|api|database|system|feature)\w*',
+        request_lower
+    ))
+    if not has_target and word_count < 10:
+        reasons.append("missing_target")
+        questions.append({
+            "type": "target",
+            "question": "What is the target of this task?",
+            "examples": [
+                "a new React component",
+                "an existing API endpoint",
+                "the user dashboard"
+            ]
+        })
+    
+    # 3. Check intent confidence
+    intent_confidence = intent_analysis.get("intent_confidence", 0)
+    if intent_confidence < 0.5:
+        reasons.append("low_intent_confidence")
+        questions.append({
+            "type": "intent",
+            "question": "I noticed you want something done, but I'm not sure what action. "
+                       "Do you want to:",
+            "options": [
+                "CREATE something new",
+                "FIX an existing issue",
+                "IMPROVE/upgrade current implementation",
+                "REVIEW/audit current code"
+            ]
+        })
+    
+    # 4. Check multi-intent conflict
+    intent_scores = intent_analysis.get("intent_scores", {})
+    if len(intent_scores) >= 2:
+        sorted_scores = sorted(intent_scores.values(), reverse=True)
+        if len(sorted_scores) >= 2:
+            gap = sorted_scores[0] - sorted_scores[1]
+            if gap < 0.15 and sorted_scores[1] > 0.25:
+                reasons.append("multi_intent_conflict")
+                top_intents = sorted(intent_scores.items(), key=lambda x: x[1], reverse=True)[:2]
+                questions.append({
+                    "type": "priority",
+                    "question": f"I detected two possible intents: "
+                               f"'{top_intents[0][0]}' and '{top_intents[1][0]}'. "
+                               f"Which is your priority?",
+                    "options": [f"{i[0]} (priority)" for i in top_intents]
+                })
+    
+    # 5. Check domain detection
+    if not domain_detection.get("detected_domains"):
+        reasons.append("no_domain_detected")
+        questions.append({
+            "type": "domain",
+            "question": "What type of task is this?",
+            "options": [
+                "Frontend (UI/UX/Components)",
+                "Backend (API/Database/Server)",
+                "Full-stack (both frontend and backend)",
+                "DevOps (deployment/CI-CD)"
+            ]
+        })
+    
+    # 6. Check critical domains without tech context
+    critical_domains = ["security", "payment"]
+    detected_critical = [d for d in domain_detection.get("detected_domains", [])
+                        if d.get("domain") in critical_domains]
+    
+    if detected_critical:
+        tech_context = detect_tech_context(request)
+        if not tech_context:
+            reasons.append("critical_domain_no_tech_context")
+            questions.append({
+                "type": "tech_stack",
+                "question": f"For this {detected_critical[0]['domain']} task, "
+                           f"what technology are you using?",
+                "examples": [
+                    "React + Node.js",
+                    "Next.js + Prisma",
+                    "Vue + Laravel"
+                ]
+            })
+    
+    # 7. Special check for "vague" keywords
+    vague_keywords = ["something", "stuff", "things", "it", "this", "that"]
+    if any(kw in request_lower for kw in vague_keywords) and word_count < 8:
+        reasons.append("contains_vague_keywords")
+        questions.append({
+            "type": "specificity",
+            "question": "Can you be more specific about what you mean?",
+            "hint": "Instead of 'something', please name the actual component/file/feature."
+        })
+    
+    # Calculate overall ambiguity
+    is_ambiguous = len(reasons) > 0
+    ambiguity_confidence = min(1.0, len(reasons) * 0.25)
+    
+    return {
+        "is_ambiguous": is_ambiguous,
+        "reasons": reasons,
+        "clarification_questions": questions,
+        "ambiguity_confidence": ambiguity_confidence,
+        "severity": "high" if len(reasons) >= 2 else "medium" if len(reasons) == 1 else "low"
+    }
+```
+
+### G.3 Clarification Question Generation
+
+```python
+def generate_clarification_prompt(ambiguity_result: dict) -> str:
+    """
+    Generate user-friendly clarification prompt
+    """
+    if not ambiguity_result["is_ambiguous"]:
+        return None
+    
+    lines = []
+    lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    lines.append("📋 CLARIFICATION NEEDED")
+    lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    lines.append("")
+    lines.append("I need some additional information to proceed accurately:")
+    lines.append("")
+    
+    for i, question in enumerate(ambiguity_result["clarification_questions"], 1):
+        lines.append(f"{i}. **{question['type'].upper()}**: {question['question']}")
+        
+        if question.get("options"):
+            for opt in question["options"]:
+                lines.append(f"   - {opt}")
+        
+        if question.get("examples"):
+            lines.append("   Examples:")
+            for ex in question["examples"]:
+                lines.append(f"   • {ex}")
+        
+        if question.get("hint"):
+            lines.append(f"   💡 Hint: {question['hint']}")
+        
+        lines.append("")
+    
+    lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    lines.append("")
+    lines.append("Your clarification will help me:")
+    lines.append("  • Select the correct skills and rules")
+    lines.append("  • Choose the right approach")
+    lines.append("  • Execute the task correctly on first attempt")
+    
+    return "\n".join(lines)
+
+
+def process_clarification_response(
+    original_request: str,
+    user_response: str,
+    question_type: str
+) -> dict:
+    """
+    Process user's clarification response and merge with original request
+    """
+    # Update request with clarified information
+    clarified_request = {
+        "original": original_request,
+        "clarification": user_response,
+        "question_type": question_type,
+        "merged": f"{original_request} {user_response}"
+    }
+    
+    return clarified_request
+```
+
+### G.4 Clarification Flow Integration
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        CLARIFICATION FLOW                                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  1. REQUEST RECEIVED                                                        │
+│     ↓                                                                       │
+│  2. LANGUAGE DETECTION + TRANSLATION                                       │
+│     ↓                                                                       │
+│  3. INTENT ANALYSIS                                                         │
+│     ↓                                                                       │
+│  4. RULE/SKILL AUTO-DISCOVERY                                               │
+│     ↓                                                                       │
+│  5. ┌─────────────────────────────────────┐                                │
+│     │  AMBIGUITY DETECTION                 │                                │
+│     │  Check all ambiguity conditions     │                                │
+│     └─────────────┬───────────────────────┘                                │
+│                   │                                                         │
+│            ┌──────┴──────┐                                                  │
+│            │ Is ambiguous?│                                                  │
+│            └──────┬──────┘                                                  │
+│              YES  │    NO                                                   │
+│              ↓    ↓                                                         │
+│  ┌───────────────────┐    ┌──────────────────┐                            │
+│  │ GENERATE CLARIFY  │    │ CONTINUE TO      │                            │
+│  │ QUESTIONS         │    │ VALIDATION       │                            │
+│  │                   │    │ (Pre-Exec Gate)  │                            │
+│  └─────────┬─────────┘    └──────────────────┘                            │
+│            │                                                                │
+│            ↓                                                                │
+│  ┌───────────────────┐                                                     │
+│  │ ASK USER          │                                                     │
+│  │ (structured form) │                                                     │
+│  └─────────┬─────────┘                                                     │
+│            │                                                                │
+│            ↓                                                                │
+│  ┌───────────────────┐                                                     │
+│  │ PROCESS RESPONSE  │                                                     │
+│  │ Merge clarified   │                                                     │
+│  │ info into request │                                                     │
+│  └─────────┬─────────┘                                                     │
+│            │                                                                │
+│            ↓                                                                │
+│  ┌───────────────────┐                                                     │
+│  │ RE-ANALYZE       │                                                     │
+│  │ (Intent, Skills)  │                                                     │
+│  └─────────┬─────────┘                                                     │
+│            │                                                                │
+│            ↓                                                                │
+│  ┌───────────────────┐                                                     │
+│  │ CONTINUE TO       │                                                     │
+│  │ PRE-EXECUTION     │                                                     │
+│  │ VALIDATION        │                                                     │
+│  └───────────────────┘                                                     │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### G.5 Quick Clarification Templates
+
+```yaml
+clarification_templates:
+  # Short vague requests
+  too_short:
+    triggers: ["tạo app", "xây web", "fix bug", "làm gì đó", "cái gì đó"]
+    template: |
+      Your request is quite brief. To help you better:
+      
+      Please specify:
+      1. **What** - The target (component, page, feature)?
+      2. **Action** - Create, fix, improve, or add?
+      3. **Context** - Any specific requirements?
+      
+      Example: "Create a login page with email/password using React"
+
+  # Missing tech context
+  no_tech_stack:
+    triggers: ["bảo mật", "thanh toán", "auth", "login", "payment", "security"]
+    template: |
+      This task involves security/payment functionality.
+      
+      Please clarify:
+      1. **Framework** - React, Vue, Next.js, Nuxt, etc.?
+      2. **Backend** - Node.js, Python, .NET, etc.?
+      3. **Auth Method** - JWT, Session, OAuth, SSO?
+      4. **Payment Provider** - Stripe, MoMo, PayOS, etc.?
+
+  # Missing target
+  no_target:
+    triggers: ["tạo", "thêm", "sửa", "cải thiện"]
+    with_keywords: ["đẹp", "tốt", "mới", "nhanh", "tốt hơn"]
+    template: |
+      I understand you want to create/improve something.
+      
+      Please specify the **target**:
+      - File path: `src/components/Button.tsx`
+      - Component name: `UserProfile`
+      - Feature: `payment checkout flow`
+      - Page: `landing page for AI startup`
+```
+
+---
+
+## PHẦN H: PRE-EXECUTION VALIDATION GATE
+
+### H.1 Validation Gate Overview
+
+Trước khi execute, hệ thống phải pass qua validation gate để đảm bảo:
+
+1. **Request Clarity** - Request đủ rõ ràng
+2. **Intent Confidence** - Intent có confidence đủ cao
+3. **Skills Matched** - Có ít nhất 1 skill được match
+4. **Domain Consistency** - Domains detected không conflict
+5. **Tech Stack Valid** - Tech stack hợp lệ
+6. **File References Exist** - Các file được refer tồn tại
+
+### H.2 Validation Rules
+
+```python
+VALIDATION_RULES = {
+    "request_clarity": {
+        "check": "word_count >= 3 AND has_action AND has_target",
+        "fail_message": "Request is too vague. Please provide more details.",
+        "severity": "block"  # Block execution if failed
+    },
+    
+    "intent_confidence": {
+        "check": "primary_intent_confidence >= 0.5",
+        "fail_message": "Intent is unclear. Can you rephrase or clarify?",
+        "severity": "block"
+    },
+    
+    "skills_matched": {
+        "check": "matched_skills_count >= 1",
+        "fail_message": "Could not determine appropriate skills. "
+                       "Please specify the task type.",
+        "severity": "block"
+    },
+    
+    "domain_consistency": {
+        "check": "NOT (frontend AND backend AND mobile) OR has_clarification",
+        "fail_message": "Detected conflicting domains. Please clarify scope.",
+        "severity": "warn"  # Warn but allow execution
+    },
+    
+    "tech_stack_valid": {
+        "check": "tech_stack IN known_stacks OR tech_stack IS empty",
+        "fail_message": "Unknown technology stack detected. "
+                       "Please specify the tech stack.",
+        "severity": "warn"
+    },
+    
+    "file_references_exist": {
+        "check": "all(file_exists(ref) for ref in file_references)",
+        "fail_message": "Some referenced files do not exist.",
+        "severity": "warn"
+    }
+}
+
+KNOWN_TECH_STACKS = [
+    "react", "vue", "angular", "next", "nuxt", "svelte",
+    "node", "python", "django", "flask", "fastapi",
+    "dotnet", "java", "spring", "go", "rust",
+    "postgresql", "mysql", "mongodb", "redis",
+    "docker", "kubernetes", "aws", "azure", "gcp"
+]
+```
+
+### H.3 Pre-Execution Validation Algorithm
+
+```python
+def pre_execution_validation(
+    request: str,
+    intent_analysis: dict,
+    skill_discovery: dict,
+    domain_detection: dict,
+    context: dict
+) -> dict:
+    """
+    Run all pre-execution validations
+    Returns: {
+        "can_proceed": bool,
+        "passed": list,
+        "failed": list,
+        "warnings": list,
+        "validation_summary": str
+    }
+    """
+    results = {
+        "can_proceed": True,
+        "passed": [],
+        "failed": [],
+        "warnings": [],
+        "blocking_issues": []
+    }
+    
+    # 1. Request Clarity
+    clarity_check = validate_request_clarity(request)
+    if clarity_check["passed"]:
+        results["passed"].append("request_clarity")
+    else:
+        results["failed"].append({
+            "rule": "request_clarity",
+            "message": clarity_check["message"],
+            "suggestion": clarity_check["suggestion"]
+        })
+        results["blocking_issues"].append("request_clarity")
+    
+    # 2. Intent Confidence
+    intent_check = validate_intent_confidence(intent_analysis)
+    if intent_check["passed"]:
+        results["passed"].append("intent_confidence")
+    else:
+        results["warnings"].append({
+            "rule": "intent_confidence",
+            "message": intent_check["message"]
+        })
+        if intent_check["severity"] == "block":
+            results["blocking_issues"].append("intent_confidence")
+    
+    # 3. Skills Matched
+    skills_check = validate_skills_matched(skill_discovery)
+    if skills_check["passed"]:
+        results["passed"].append("skills_matched")
+    else:
+        results["failed"].append({
+            "rule": "skills_matched",
+            "message": skills_check["message"],
+            "suggestion": skills_check["suggestion"]
+        })
+        results["blocking_issues"].append("skills_matched")
+    
+    # 4. Domain Consistency
+    domain_check = validate_domain_consistency(domain_detection)
+    if domain_check["passed"]:
+        results["passed"].append("domain_consistency")
+    else:
+        results["warnings"].append({
+            "rule": "domain_consistency",
+            "message": domain_check["message"]
+        })
+    
+    # 5. Tech Stack Valid
+    tech_check = validate_tech_stack(request, context)
+    if tech_check["passed"]:
+        results["passed"].append("tech_stack_valid")
+    else:
+        results["warnings"].append({
+            "rule": "tech_stack",
+            "message": tech_check["message"]
+        })
+    
+    # 6. File References
+    file_check = validate_file_references(request)
+    if file_check["passed"]:
+        results["passed"].append("file_references_exist")
+    else:
+        results["warnings"].append({
+            "rule": "file_references",
+            "message": file_check["message"],
+            "missing_files": file_check["missing"]
+        })
+    
+    # Determine if can proceed
+    results["can_proceed"] = len(results["blocking_issues"]) == 0
+    
+    # Generate summary
+    results["validation_summary"] = generate_validation_summary(results)
+    
+    return results
+
+
+def validate_request_clarity(request: str) -> dict:
+    """Check if request has sufficient clarity"""
+    word_count = len(request.split())
+    request_lower = request.lower()
+    
+    # Check for action verb
+    has_action = bool(re.search(
+        r'\b(create|build|add|fix|update|delete|remove|change|'
+        r'improve|design|develop|implement|configure)\w*',
+        request_lower
+    ))
+    
+    # Check for target
+    has_target = bool(re.search(
+        r'\b(this|that|file|folder|app|page|component|'
+        r'button|form|api|system|feature|the|my|an?)\w*',
+        request_lower
+    ))
+    
+    # Check for vagueness
+    vague_words = ["something", "stuff", "things", "whatever", "gì đó", "cái gì"]
+    has_vague = any(vw in request_lower for vw in vague_words)
+    
+    passed = word_count >= 3 and has_action and has_target and not has_vague
+    
+    return {
+        "passed": passed,
+        "word_count": word_count,
+        "has_action": has_action,
+        "has_target": has_target,
+        "has_vague": has_vague,
+        "message": "Request clarity check " + ("PASSED" if passed else "FAILED"),
+        "suggestion": None if passed else "Please provide more specific details about what you want to do."
+    }
+
+
+def validate_intent_confidence(intent_analysis: dict) -> dict:
+    """Check if intent confidence is sufficient"""
+    confidence = intent_analysis.get("intent_confidence", 0)
+    threshold = 0.5
+    
+    passed = confidence >= threshold
+    
+    return {
+        "passed": passed,
+        "confidence": confidence,
+        "threshold": threshold,
+        "message": f"Intent confidence: {confidence:.0%} "
+                  + ("(PASSED)" if passed else f"(below {threshold:.0%})"),
+        "severity": "block" if confidence < threshold else "pass"
+    }
+
+
+def validate_skills_matched(skill_discovery: dict) -> dict:
+    """Check if at least one skill was matched"""
+    skills = skill_discovery.get("skills", [])
+    
+    # Filter out only mandatory skills
+    primary_skills = [s for s in skills if s.get("type") != "mandatory"]
+    
+    passed = len(primary_skills) >= 1
+    
+    return {
+        "passed": passed,
+        "matched_count": len(primary_skills),
+        "matched_skills": [s["name"] for s in primary_skills],
+        "message": f"Matched {len(primary_skills)} skills: {', '.join([s['name'] for s in primary_skills])}"
+                  if passed else "No skills matched",
+        "suggestion": None if passed else "Try specifying the task type (e.g., 'create landing page', 'fix login bug')."
+    }
+
+
+def validate_domain_consistency(domain_detection: dict) -> dict:
+    """Check if detected domains are consistent"""
+    domains = domain_detection.get("detected_domains", [])
+    
+    # Check for conflicting domains
+    domain_names = [d.get("domain") for d in domains]
+    
+    conflicts = []
+    if "frontend" in domain_names and "mobile" in domain_names:
+        conflicts.append("frontend + mobile")
+    if "backend" in domain_names and "frontend" not in domain_names and len(domain_names) > 1:
+        # Multiple backend technologies might indicate confusion
+        pass
+    
+    passed = len(conflicts) == 0
+    
+    return {
+        "passed": passed,
+        "conflicts": conflicts,
+        "message": "Domain consistency " + ("PASSED" if passed else f"CONFLICT: {conflicts}")
+    }
+
+
+def validate_tech_stack(request: str, context: dict) -> dict:
+    """Check if tech stack is valid/known"""
+    request_lower = request.lower()
+    
+    detected_stacks = []
+    for stack in KNOWN_TECH_STACKS:
+        if stack in request_lower:
+            detected_stacks.append(stack)
+    
+    # If detected stacks are subset of known, it's valid
+    passed = len(detected_stacks) == 0 or all(
+        s in KNOWN_TECH_STACKS for s in detected_stacks
+    )
+    
+    return {
+        "passed": passed,
+        "detected": detected_stacks,
+        "message": f"Tech stack: {', '.join(detected_stacks) if detected_stacks else 'Not specified'}"
+    }
+
+
+def validate_file_references(request: str) -> dict:
+    """Check if referenced files exist"""
+    # Extract file paths from request
+    file_patterns = [
+        r'\b[\w\-/\\]+\.(tsx?|jsx?|vue|svelte|css|scss|py|js|ts|json|md)\b',
+        r'\bsrc/[\w\-/\\]+\b',
+        r'\bcomponents/[\w\-/\\]+\b',
+        r'\bapp/[\w\-/\\]+\b'
+    ]
+    
+    references = []
+    for pattern in file_patterns:
+        matches = re.findall(pattern, request)
+        references.extend(matches)
+    
+    # For now, just return passed - actual file existence check
+    # would need filesystem access
+    return {
+        "passed": True,
+        "references": references,
+        "missing": [],
+        "message": f"Found {len(references)} file references"
+    }
+
+
+def generate_validation_summary(results: dict) -> str:
+    """Generate human-readable validation summary"""
+    lines = []
+    lines.append("📋 PRE-EXECUTION VALIDATION SUMMARY")
+    lines.append("━" * 50)
+    lines.append(f"Status: {'✅ CAN PROCEED' if results['can_proceed'] else '❌ BLOCKED'}")
+    lines.append("")
+    
+    if results["passed"]:
+        lines.append("✅ Passed Checks:")
+        for check in results["passed"]:
+            lines.append(f"   • {check}")
+    
+    if results["warnings"]:
+        lines.append("")
+        lines.append("⚠️ Warnings:")
+        for warn in results["warnings"]:
+            lines.append(f"   • {warn['rule']}: {warn['message']}")
+    
+    if results["failed"]:
+        lines.append("")
+        lines.append("❌ Failed Checks:")
+        for fail in results["failed"]:
+            lines.append(f"   • {fail['rule']}: {fail['message']}")
+            if fail.get("suggestion"):
+                lines.append(f"     → {fail['suggestion']}")
+    
+    if results["blocking_issues"]:
+        lines.append("")
+        lines.append("🚫 Blocking Issues:")
+        for issue in results["blocking_issues"]:
+            lines.append(f"   • {issue}")
+    
+    return "\n".join(lines)
+```
+
+### H.4 Validation Gate in Vibe Code Flow
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      UPDATED VIBE CODE EXECUTION FLOW                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  1. REQUEST RECEIVED (Any Language)                                        │
+│     ↓                                                                       │
+│  2. LANGUAGE DETECTION + TRANSLATION                                       │
+│     ↓                                                                       │
+│  3. INTENT ANALYSIS                                                         │
+│     ↓                                                                       │
+│  4. RULE/SKILL AUTO-DISCOVERY                                               │
+│     ↓                                                                       │
+│  5. AMBIGUITY DETECTION ◄─────────────┐                                     │
+│     │                                 │                                     │
+│     ├─── Is ambiguous? ──── YES ────┼──► ASK CLARIFICATION ──┐             │
+│     │                                │                        │             │
+│     │                                NO                       │             │
+│     │                                ↓                        │             │
+│     ↓                                ↓                        │             │
+│  6. PRE-EXECUTION VALIDATION ◄──────┴────────────────────────┘             │
+│     │                                 │                                     │
+│     ├─── Can proceed? ──── NO ───────┼──► FIX ISSUES / ASK ──┐             │
+│     │                                │                        │             │
+│     │                                YES                       │             │
+│     │                                ↓                        │             │
+│     ↓                                ↓                        │             │
+│  7. RUN PRE-REVIEW GATES             └────────────────────────┘             │
+│     ↓                                                                       │
+│  8. IMPLEMENTATION                                                          │
+│     ↓                                                                       │
+│  9. RUN POST-REVIEW GATES                                                   │
+│     ↓                                                                       │
+│ 10. DELIVERY                                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## PHẦN I: AUTH-SPECIFIC HANDLING
+
+### I.1 Auth Task Detection
+
+```python
+AUTH_PATTERNS = {
+    "login": {
+        "vi_keywords": ["đăng nhập", "login", "đăng nhập", "xác thực"],
+        "en_keywords": ["login", "sign in", "signin", "authenticate", "authentication"],
+        "zh_keywords": ["登录", "登陆", "认证"],
+        "ja_keywords": ["ログイン", "認証"],
+        "intent": "login",
+        "criticality": "HIGH",
+        "required_skills": ["security-review"],
+        "required_context": ["frontend", "backend"]
+    },
+    
+    "register": {
+        "vi_keywords": ["đăng ký", "register", "tạo tài khoản", "signup"],
+        "en_keywords": ["register", "sign up", "signup", "registration", "create account"],
+        "zh_keywords": ["注册", "注册账号"],
+        "ja_keywords": ["登録", "サインアップ"],
+        "intent": "register",
+        "criticality": "HIGH",
+        "required_skills": ["security-review"],
+        "required_context": ["frontend", "backend"]
+    },
+    
+    "password_reset": {
+        "vi_keywords": ["quên mật khẩu", "reset mật khẩu", "khôi phục mật khẩu"],
+        "en_keywords": ["forgot password", "reset password", "password reset", "recover password"],
+        "zh_keywords": ["忘记密码", "重置密码"],
+        "ja_keywords": ["パスワードを忘れた", "パスワードリセット"],
+        "intent": "password_reset",
+        "criticality": "HIGH",
+        "required_skills": ["security-review"],
+        "required_context": ["frontend", "backend", "email"]
+    },
+    
+    "oauth": {
+        "vi_keywords": ["đăng nhập google", "đăng nhập facebook", "oauth", "sso"],
+        "en_keywords": ["oauth", "sso", "google login", "facebook login", "social login", "single sign on"],
+        "zh_keywords": ["OAuth登录", "第三方登录", "SSO"],
+        "ja_keywords": ["OAuthログイン", "SNSログイン"],
+        "intent": "oauth",
+        "criticality": "HIGH",
+        "required_skills": ["security-review"],
+        "required_context": ["frontend", "backend"]
+    }
+}
+
+
+def detect_auth_intent(request: str, language: str = "en") -> dict:
+    """
+    Detect authentication-related intent
+    Returns: {
+        "is_auth_task": bool,
+        "auth_type": str | None,
+        "criticality": str,
+        "required_skills": list,
+        "clarification_questions": list
+    }
+    """
+    request_lower = request.lower()
+    
+    for auth_type, pattern in AUTH_PATTERNS.items():
+        # Check keywords in all supported languages
+        keywords = (
+            pattern.get("vi_keywords", []) +
+            pattern.get("en_keywords", []) +
+            pattern.get("zh_keywords", []) +
+            pattern.get("ja_keywords", [])
+        )
+        
+        if any(kw.lower() in request_lower for kw in keywords):
+            return {
+                "is_auth_task": True,
+                "auth_type": auth_type,
+                "criticality": pattern["criticality"],
+                "required_skills": pattern["required_skills"],
+                "required_context": pattern["required_context"],
+                "clarification_questions": generate_auth_clarification_questions(auth_type)
+            }
+    
+    return {
+        "is_auth_task": False,
+        "auth_type": None,
+        "criticality": None,
+        "required_skills": [],
+        "required_context": [],
+        "clarification_questions": []
+    }
+
+
+def generate_auth_clarification_questions(auth_type: str) -> list:
+    """Generate clarification questions for auth tasks"""
+    questions = []
+    
+    common_questions = [
+        {
+            "type": "auth_method",
+            "question": "What authentication method?",
+            "options": [
+                "Email + Password (traditional)",
+                "OAuth/Social Login (Google, Facebook, GitHub)",
+                "Phone/SMS OTP",
+                "Enterprise SSO (SAML, OIDC)",
+                "Passwordless (magic link, passkey)"
+            ]
+        },
+        {
+            "type": "tech_stack",
+            "question": "What's your tech stack?",
+            "examples": [
+                "React + Node.js + JWT",
+                "Next.js + NextAuth",
+                "Vue + Laravel + Sanctum"
+            ]
+        }
+    ]
+    
+    type_specific_questions = {
+        "login": [
+            {
+                "type": "mfa",
+                "question": "Do you need MFA (Multi-Factor Authentication)?",
+                "options": ["Yes (TOTP, SMS, Email)", "No MFA required"]
+            },
+            {
+                "type": "remember_me",
+                "question": "Remember me functionality?",
+                "options": ["Yes", "No"]
+            }
+        ],
+        
+        "register": [
+            {
+                "type": "email_verification",
+                "question": "Email verification required?",
+                "options": ["Yes (verification email)", "No verification"]
+            },
+            {
+                "type": "password_requirements",
+                "question": "Password requirements?",
+                "options": [
+                    "Standard (8+ chars)",
+                    "Strong (upper, lower, number, symbol)",
+                    "Custom requirements"
+                ]
+            }
+        ],
+        
+        "password_reset": [
+            {
+                "type": "reset_method",
+                "question": "Password reset method?",
+                "options": [
+                    "Email link",
+                    "SMS OTP",
+                    "Security questions"
+                ]
+            }
+        ],
+        
+        "oauth": [
+            {
+                "type": "oauth_providers",
+                "question": "Which OAuth providers?",
+                "options": [
+                    "Google",
+                    "GitHub",
+                    "Facebook",
+                    "Microsoft/Azure AD",
+                    "Apple"
+                ]
+            }
+        ]
+    }
+    
+    questions.extend(common_questions)
+    questions.extend(type_specific_questions.get(auth_type, []))
+    
+    return questions
+```
+
+### I.2 Auth Task Security Checklist
+
+```python
+AUTH_SECURITY_CHECKLIST = {
+    "login": [
+        "✅ Password hashed (bcrypt/argon2)",
+        "✅ Rate limiting on login attempts",
+        "✅ Account lockout after failed attempts",
+        "✅ Secure HTTP-only cookies or JWT storage",
+        "✅ CSRF protection",
+        "✅ Input validation (SQL injection, XSS prevention)",
+        "✅ Timing attack prevention",
+        "✅ MFA support (optional but recommended)"
+    ],
+    
+    "register": [
+        "✅ Email validation (format + uniqueness)",
+        "✅ Password strength validation",
+        "✅ Password hashing",
+        "✅ Email verification flow",
+        "✅ Duplicate account prevention",
+        "✅ Input sanitization",
+        "✅ Rate limiting on registration",
+        "✅ GDPR/Privacy compliance considerations"
+    ],
+    
+    "password_reset": [
+        "✅ Token-based secure reset links",
+        "✅ Token expiration (15-30 minutes)",
+        "✅ Single-use tokens",
+        "✅ Token rotation on use",
+        "✅ Email verification for reset",
+        "✅ Notification of password change",
+        "✅ Secure token generation (cryptographically random)"
+    ],
+    
+    "oauth": [
+        "✅ State parameter validation (CSRF protection)",
+        "✅ Redirect URI validation",
+        "✅ Token storage security",
+        "✅ Scope minimization",
+        "✅ PKCE for public clients",
+        "✅ Secure token exchange",
+        "✅ Provider reputation check"
+    ]
+}
+
+
+def get_auth_security_checklist(auth_type: str) -> list:
+    """Get security checklist for auth type"""
+    return AUTH_SECURITY_CHECKLIST.get(auth_type, [])
+```
+
+### I.3 Vietnam Payment Task Handling
+
+```python
+VIETNAM_PAYMENT_PATTERNS = {
+    "momo": {
+        "keywords": ["momo", "ví momo", "thanh toán momo"],
+        "provider": "MoMo",
+        "required_skills": ["vietnam-payment-review", "security-review"],
+        "sandbox_url": "https://developers.momo.vn/",
+        "production_url": "https://business.momo.vn/"
+    },
+    
+    "sepay": {
+        "keywords": ["sepay", "sepay", "thanh toán sepay"],
+        "provider": "SePay",
+        "required_skills": ["vietnam-payment-review"],
+        "sandbox_url": "https://docs.sepay.vn/"
+    },
+    
+    "payos": {
+        "keywords": ["payos", "pay os", "thanh toán payos"],
+        "provider": "PayOS",
+        "required_skills": ["vietnam-payment-review", "security-review"],
+        "sandbox_url": "https://payos.vn/docs/"
+    },
+    
+    "vnpay": {
+        "keywords": ["vnpay", "vn pay", "thanh toán vnpay"],
+        "provider": "VNPay",
+        "required_skills": ["vietnam-payment-review", "security-review"],
+        "sandbox_url": "https://sandbox.vnpayment.vn/"
+    },
+    
+    "zalopay": {
+        "keywords": ["zalopay", "zalo pay", "thanh toán zalopay"],
+        "provider": "ZaloPay",
+        "required_skills": ["vietnam-payment-review", "security-review"],
+        "sandbox_url": "https://developers.zalopay.vn/"
+    },
+    
+    "vietqr": {
+        "keywords": ["vietqr", "viet qr", "viet qr code", "qr code"],
+        "provider": "VietQR",
+        "required_skills": ["vietnam-payment-review"],
+        "sandbox_url": "https://vietqr.net/"
+    }
+}
+
+
+def detect_vietnam_payment(request: str) -> dict:
+    """Detect Vietnam payment provider in request"""
+    request_lower = request.lower()
+    
+    for provider, pattern in VIETNAM_PAYMENT_PATTERNS.items():
+        if any(kw.lower() in request_lower for kw in pattern["keywords"]):
+            return {
+                "is_payment_task": True,
+                "provider": pattern["provider"],
+                "required_skills": pattern["required_skills"],
+                "sandbox_url": pattern["sandbox_url"],
+                "documentation_url": pattern["production_url"]
+            }
+    
+    return {
+        "is_payment_task": False,
+        "provider": None,
+        "required_skills": [],
+        "sandbox_url": None,
+        "documentation_url": None
+    }
+```
+
+---
+
+## PHẦN J: DYNAMIC CONFIDENCE & RETRY LOGIC
+
+### J.1 Dynamic Confidence Thresholds
+
+```python
+BASE_CONFIDENCE_THRESHOLDS = {
+    "frontend-taste": 0.75,
+    "frontend-redesign": 0.75,
+    "full-output": 0.80,
+    "frontend-review": 0.70,
+    "security-review": 0.85,
+    "vietnam-payment-review": 0.90,
+    "karpathy-coding": 0.75,
+    "ponytail": 0.80,
+    "visual-explainer": 0.85
+}
+
+
+def calculate_dynamic_threshold(
+    skill_name: str,
+    request: str,
+    context: dict
+) -> float:
+    """
+    Calculate dynamic confidence threshold based on context
+    """
+    base = BASE_CONFIDENCE_THRESHOLDS.get(skill_name, 0.7)
+    
+    word_count = len(request.split())
+    adjustments = []
+    
+    # Short requests need lower threshold (harder to detect)
+    if word_count < 5:
+        adjustments.append(-0.10)
+    elif word_count < 10:
+        adjustments.append(-0.05)
+    
+    # Technical requests can use higher threshold
+    if context.get("has_technical_context"):
+        adjustments.append(0.05)
+    
+    # Mixed language - harder to detect
+    if context.get("is_mixed_language"):
+        adjustments.append(-0.05)
+    
+    # Has explicit keywords - easier to detect
+    if context.get("has_explicit_keywords"):
+        adjustments.append(0.10)
+    
+    # Critical domains need higher threshold
+    if skill_name in ["security-review", "vietnam-payment-review"]:
+        adjustments.append(0.05)
+    
+    # Auth tasks are critical
+    if context.get("is_auth_task"):
+        adjustments.append(0.05)
+    
+    final_threshold = base + sum(adjustments)
+    
+    # Clamp to reasonable range
+    return max(0.50, min(0.95, final_threshold))
+
+
+def apply_dynamic_threshold(
+    skill_discovery: dict,
+    request: str,
+    context: dict
+) -> dict:
+    """
+    Re-evaluate skills with dynamic thresholds
+    """
+    updated_skills = []
+    
+    for skill in skill_discovery.get("skills", []):
+        skill_name = skill["name"]
+        base_confidence = skill.get("confidence", 0)
+        
+        dynamic_threshold = calculate_dynamic_threshold(
+            skill_name, request, context
+        )
+        
+        # Check if skill still passes with dynamic threshold
+        passes_threshold = base_confidence >= dynamic_threshold
+        
+        updated_skills.append({
+            **skill,
+            "dynamic_threshold": dynamic_threshold,
+            "passes_dynamic": passes_threshold,
+            "threshold_applied": "dynamic",
+            "original_threshold": skill_discovery.get("thresholds", {}).get(skill_name, dynamic_threshold)
+        })
+    
+    return {
+        **skill_discovery,
+        "skills": updated_skills,
+        "context_applied": True
+    }
+```
+
+### J.2 Retry Logic with Fallback
+
+```python
+EXECUTION_STRATEGIES = {
+    "primary": {
+        "name": "Full Implementation",
+        "description": "Complete implementation with all detected skills and rules",
+        "aggressiveness": "HIGH"
+    },
+    
+    "fallback_conservative": {
+        "name": "Conservative Fallback",
+        "description": "Simplified implementation focusing on core functionality",
+        "aggressiveness": "MEDIUM",
+        "rules": ["karpathy-coding"],  # Only essential rules
+        "skills": ["karpathy-coding"]
+    },
+    
+    "fallback_minimal": {
+        "name": "Minimal Fallback",
+        "description": "Minimal working implementation",
+        "aggressiveness": "LOW",
+        "rules": [],
+        "skills": ["karpathy-coding"]
+    }
+}
+
+
+def execute_with_retry(
+    request: str,
+    context: dict,
+    max_retries: int = 2
+) -> dict:
+    """
+    Execute with retry logic and fallback strategies
+    """
+    execution_log = []
+    current_strategy = "primary"
+    
+    for attempt in range(max_retries + 1):
+        execution_log.append({
+            "attempt": attempt + 1,
+            "strategy": current_strategy,
+            "timestamp": datetime.now().isoformat()
+        })
+        
+        try:
+            # Run pre-execution validation
+            validation = pre_execution_validation(
+                request, context
+            )
+            
+            if not validation["can_proceed"]:
+                if attempt < max_retries:
+                    # Try more conservative approach
+                    current_strategy = get_next_strategy(current_strategy)
+                    execution_log[-1]["reason"] = "validation_failed_switching_strategy"
+                    continue
+                else:
+                    return {
+                        "success": False,
+                        "error": "validation_failed",
+                        "failed_checks": validation["blocking_issues"],
+                        "execution_log": execution_log
+                    }
+            
+            # Execute with current strategy
+            result = execute_with_strategy(
+                request, context, current_strategy
+            )
+            
+            if result["success"]:
+                return {
+                    **result,
+                    "execution_log": execution_log,
+                    "final_strategy": current_strategy,
+                    "attempts_used": attempt + 1
+                }
+            
+            # On failure, try fallback
+            if attempt < max_retries:
+                current_strategy = get_next_strategy(current_strategy)
+                execution_log[-1]["reason"] = "execution_failed_switching_strategy"
+                execution_log[-1]["error"] = result.get("error")
+                
+        except Exception as e:
+            execution_log[-1]["error"] = str(e)
+            execution_log[-1]["exception"] = True
+            
+            if attempt < max_retries:
+                current_strategy = get_next_strategy(current_strategy)
+            else:
+                return {
+                    "success": False,
+                    "error": str(e),
+                    "execution_log": execution_log,
+                    "exhausted_fallbacks": True
+                }
+    
+    return {
+        "success": False,
+        "error": "all_strategies_exhausted",
+        "execution_log": execution_log
+    }
+
+
+def get_next_strategy(current: str) -> str:
+    """Get next fallback strategy"""
+    strategy_order = ["primary", "fallback_conservative", "fallback_minimal"]
+    current_idx = strategy_order.index(current) if current in strategy_order else 0
+    
+    if current_idx < len(strategy_order) - 1:
+        return strategy_order[current_idx + 1]
+    
+    return "fallback_minimal"
+
+
+def execute_with_strategy(
+    request: str,
+    context: dict,
+    strategy: str
+) -> dict:
+    """
+    Execute vibe code with specific strategy
+    """
+    strategy_config = EXECUTION_STRATEGIES.get(strategy, EXECUTION_STRATEGIES["primary"])
+    
+    # Limit rules and skills based on strategy
+    active_rules = strategy_config.get("rules", context.get("active_rules", []))
+    active_skills = strategy_config.get("skills", context.get("active_skills", []))
+    
+    # Execute implementation
+    result = execute_vibe_code(
+        request,
+        {
+            **context,
+            "active_rules": active_rules,
+            "active_skills": active_skills,
+            "strategy": strategy,
+            "aggressiveness": strategy_config["aggressiveness"]
+        }
+    )
+    
+    return result
+```
+
+---
+
+## PHẦN K: LIÊN KẾT
 
 - [[skill-integration]] — Skill Auto-Discovery & Execution Protocol (base)
 - [[context-router]] — Context routing rules
@@ -1028,5 +2828,6 @@ REQUEST RECEIVED
 - [[frontend-taste]] — Landing page & design skills
 - [[frontend-redesign]] — UI improvement skills
 - [[security-review]] — Security review skills
+- [[vietnam-payment-review]] — Vietnam payment integration skills
 - [[coding-standards]] — Coding standards
 - [[ui-visual-design]] — UI/Visual design principles
