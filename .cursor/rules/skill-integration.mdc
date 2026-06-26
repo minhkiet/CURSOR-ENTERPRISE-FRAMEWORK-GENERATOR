@@ -1701,6 +1701,41 @@ breakpoint, resume on "continue". No recap, no repetition.
 
 ---
 
+## Mixed Domain Gate Ordering
+
+Khi task có cả frontend + backend, áp dụng gate ordering:
+
+1. **Backend gates** chạy TRƯỚC (security_pre, security_post)
+2. **Frontend gates** chạy SAU (frontend-review-pre/post)
+3. **karpathy gates** bao trùm toàn bộ
+4. **Common gates** (full-output, ponytail) chạy xuyên suốt
+
+Execution Order:
+```
+karpathy-pre → security-pre → frontend-review-pre → IMPLEMENT
+            → full-output-post → frontend-review-post → security-post → karpathy-post
+```
+
+---
+
+## Skill Conflict Resolution
+
+Priority khi 2 primary skills conflict:
+
+| Priority | Skill | Lý do |
+|----------|-------|-------|
+| 1 | security-review | Bảo mật quan trọng nhất |
+| 2 | vietnam-payment-review | Liên quan tiền |
+| 3 | frontend-review | Chất lượng UI |
+| 4 | frontend-taste | Design premium |
+| 5 | full-output | Implementation |
+| 6 | karpathy-coding | Efficiency (always overlay) |
+| 7 | ponytail | Minimize code (always overlay) |
+
+**Rule:** Khi conflict, skill có priority cao hơn trigger gates trước.
+
+---
+
 ## Liên kết
 
 - [[skill-registry]] — **Single Source of Truth** cho tất cả skill definitions

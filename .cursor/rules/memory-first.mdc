@@ -235,6 +235,24 @@ Personal Knowledge Graph:
 New project inherits general patterns while allowing project-specific overrides.
 ```
 
+---
+
+## Memory TTL Configuration
+
+| Type | TTL | Max Size | Compression |
+|------|-----|----------|-------------|
+| Session | 4 hours | 100KB | None |
+| Project Graph | 30 days | 10MB | Gzip |
+| Workspace | 7 days | 5MB | Gzip |
+| Persistent | 365 days | 50MB | LZ4 |
+
+**Invalidation triggers:**
+- File modified → invalidate related cache
+- User logout → clear session
+- TTL expired → lazy reload
+
+---
+
 ## Liên kết
 
 - [[context-router]] - Context Router: Định tuyến context thông minh đến đúng handlers

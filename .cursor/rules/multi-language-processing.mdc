@@ -405,8 +405,6 @@ ZH → EN Quick Map:
 
 ## LIÊN KẾT
 
-- [[intent-detection]] — Intent Analysis, Skill Discovery, Clarification Flow
-- [[vibe-code-protocol]] — Vibe Code Execution, Validation, Auth/Payment Handling
 - [[skill-integration]] — Skill Auto-Discovery & Execution Protocol (base)
 - [[skill-registry]] — Single source of truth cho skills
 - [[context-router]] — Context routing rules

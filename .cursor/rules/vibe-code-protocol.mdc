@@ -1408,8 +1408,6 @@ def execute_with_strategy(
 
 - [[skill-registry]] — Single source of truth cho skills
 - [[skill-integration]] — Skill Auto-Discovery & Execution Protocol (base)
-- [[intent-detection]] — Intent Analysis & Skill Discovery
-- [[multi-language-processing]] — Translation Layer và Language Detection
 - [[context-router]] — Context routing rules
 - [[memory-first]] — Memory context management
 - [[security-review]] — Security review skills

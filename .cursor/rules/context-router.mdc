@@ -252,6 +252,24 @@ Routing Decision:
 User receives: Clarification request instead of blind debugging attempt
 ```
 
+---
+
+## MCP Fallback Strategy
+
+Khi MCP server unavailable:
+
+1. **Detect failure** (timeout 5s)
+2. **Log warning + notification**
+3. **Fallback to alternative:**
+   - `user-vercel` → Direct curl/API
+   - `user-browsermcp` → `cursor-ide-browser`
+   - `user-codegraph` → Read tool
+   - `user-shadcn` → WebFetch
+   - `user-typeui` → Manual UI review
+4. **Continue** với degraded mode
+
+---
+
 ## Liên kết
 
 - [[memory-first]] - Memory First: Memory context management

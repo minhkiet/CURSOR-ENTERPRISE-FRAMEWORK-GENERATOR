@@ -1,16 +1,16 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Skill Dependencies Manifest - Auto-install configuration for Cursor Enterprise Framework",
   "lastUpdated": "2026-06-26",
   "metadata": {
-    "totalSkills": 17,
+    "totalSkills": 18,
     "categories": {
       "frontend": 2,
       "review": 3,
       "efficiency": 2,
       "domain": 4,
       "knowledge": 3,
-      "special": 3
+      "special": 4
     },
     "supportedLanguages": ["vi", "zh", "ja", "ko", "en"]
   },
@@ -180,6 +180,22 @@
       "autoApply": false,
       "priority": "MEDIUM",
       "complements": ["karpathy-coding"]
+    },
+    "skill-installer": {
+      "name": "Skill Installer",
+      "description": "Auto-install missing skill dependencies. Manages npm, python, and system packages required by skills.",
+      "version": "1.0.0",
+      "keywords": {
+        "en": ["install", "setup", "dependencies", "missing package", "npm install", "pip install"],
+        "vi": ["cài đặt", "thiết lập", "thư viện", "thiếu package"]
+      },
+      "gates": {
+        "pre": ["install-pre"],
+        "post": ["install-post"]
+      },
+      "dependencies": {},
+      "autoApply": true,
+      "priority": "HIGH"
     },
     "visual-explainer": {
       "name": "Visual Explainer",
