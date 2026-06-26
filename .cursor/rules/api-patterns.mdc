@@ -1,25 +1,132 @@
 ---
-description: Nguyên tắc và best practices cho GraphQL API Design trong Cursor Enterprise Framework
-created: 2026-06-23
-version: 1.0.0
+description: API Patterns - hợp nhất từ GraphQL, API Gateway, Service Mesh, REST API trong Cursor Enterprise Framework
+created: 2026-06-26
+merged_from:
+  - graphql.mdc
+  - api-gateway.mdc
+  - service-mesh.mdc
+  - restful-api.mdc
+  - api.mdc
+version: 2.0.0
 tags:
-  - graphql
   - api
-  - query-language
-  - schema
+  - graphql
+  - api-gateway
+  - service-mesh
+  - rest
+  - grpc
+  - microservices
 ---
 
-# GraphQL API Design Guidelines
+# API Patterns
 
-## Mục tiêu
+## Tổng quan So sánh
+
+| Aspect | REST | GraphQL | gRPC |
+|--------|------|---------|------|
+| Query | HTTP GET | POST | Protocol Buffers |
+| Flexibility | Fixed | Flexible | Fixed |
+| Performance | Good | Good | Excellent |
+| Use Case | General | Flexible queries | High performance |
+
+---
+
+## 0. Core API Principles
+
+Các nguyên tắc cơ bản áp dụng cho tất cả API styles (REST, GraphQL, gRPC).
+
+### Nguyên tắc thiết kế
+
+**1. API First Development**
+
+Thiết kế API contract trước khi implement. Sử dụng OpenAPI/Swagger hoặc AsyncAPI để define contracts. Review contracts với stakeholders trước khi coding. Contracts become documentation và contract tests. API-first giúp parallel development giữa teams.
+
+**2. Consistent Naming Conventions**
+
+Sử dụng consistent naming cho resources, actions, và parameters. RESTful URLs nên use nouns không phải verbs. Use kebab-case cho multi-word paths. Use camelCase cho query parameters. Consistent naming improves discoverability và reduces cognitive load.
+
+**3. Proper HTTP Method Usage**
+
+GET cho resource retrieval. POST cho resource creation. PUT cho full resource update. PATCH cho partial updates. DELETE cho resource removal. Response codes phản ánh operation result. Improper method usage leads to confusion và bugs.
+
+**4. Pagination for Large Datasets**
+
+Tất cả list endpoints phải support pagination. Use cursor-based pagination cho large datasets. Offset-based acceptable cho small, stable datasets. Return pagination metadata (total, page, limit). Allow clients to specify page size within limits.
+
+**5. Versioning Strategy**
+
+Version APIs để enable evolution without breaking clients. URL versioning (/v1/users) là simplest approach. Header versioning offers cleaner URLs nhưng less discoverable. Maintain multiple versions simultaneously. Deprecate old versions with clear timeline.
+
+**6. Error Response Standards**
+
+Use standard error response format across all APIs. Include error code, message, và details. Use appropriate HTTP status codes. Include request ID for debugging. Error responses must be consistent format.
+
+**7. Rate Limiting và Throttling**
+
+Implement rate limiting để protect APIs from abuse. Return rate limit headers (X-RateLimit-Limit, X-RateLimit-Remaining). Use standard HTTP 429 for rate limit exceeded. Implement different limits for different tiers. Consider client-specific limits.
+
+**8. Security Best Practices**
+
+Authenticate all API requests. Authorize based on permissions. Validate all inputs. Sanitize outputs. Use HTTPS everywhere. Implement CORS properly. Rotate API keys regularly.
+
+**9. Documentation First**
+
+Documentation is not afterthought - it's product. Use OpenAPI/Swagger for REST docs. Include request/response examples. Document error codes và meanings. Keep docs in sync with implementation. Interactive documentation improves developer experience.
+
+**10. API Monitoring và Analytics**
+
+Track API usage patterns. Monitor response times và error rates. Track which endpoints are popular. Analyze client behavior. Use analytics to guide API evolution.
+
+### Checklist
+
+- [ ] API contract defined in OpenAPI format
+- [ ] Consistent naming conventions established
+- [ ] HTTP methods used correctly
+- [ ] Pagination implemented for list endpoints
+- [ ] Versioning strategy defined và implemented
+- [ ] Error responses standardized
+- [ ] Rate limiting configured
+- [ ] Authentication và authorization implemented
+- [ ] Documentation complete và accurate
+- [ ] Monitoring và analytics setup
+- [ ] API tests written
+- [ ] Breaking changes review performed
+
+### Anti Patterns
+
+**1. Chatty APIs**
+
+Multiple round trips needed to complete simple operations. Force clients to make many requests. Solution: Use bulk endpoints, composite resources, và field selection.
+
+**2. Exposing Database Schema**
+
+Database schema directly exposed as API. Tight coupling between DB và API. Schema changes break clients. Solution: Create separate API models from database models.
+
+**3. No Error Standards**
+
+Different error formats across endpoints. Inconsistent HTTP status codes. Missing error details. Solution: Standardize error response format system-wide.
+
+**4. Versioning After the Fact**
+
+API released without versioning. Changes require breaking existing clients. Solution: Version from day one. Plan for evolution.
+
+**5. Ignoring Backwards Compatibility**
+
+Making breaking changes without notice. No deprecation policy. Clients suddenly break. Solution: Follow semver principles. Maintain backwards compatibility. Provide migration guides.
+
+---
+
+## 1. GraphQL
+
+### Mục tiêu
 
 Tài liệu này định nghĩa các nguyên tắc và best practices cho việc thiết kế GraphQL APIs trong Cursor Enterprise Framework. Mục tiêu là đảm bảo API consistency, performance, security, và developer experience tối ưu cho các ứng dụng sử dụng GraphQL.
 
-GraphQL là một query language và runtime cho APIs, cho phép clients request chính xác data mà họ cần. Việc tuân thủ các nguyên tắc trong tài liệu này sẽ giúp team xây dựng GraphQL APIs mạnh mẽ, maintainable, và scalable.
+GraphQL là một query language và runtime cho APIs, cho phép clients request chính xác data mà họ cần.
 
-## Nguyên tắc cơ bản
+### Nguyên tắc cơ bản
 
-### 1. Schema-First Design
+#### 1.1 Schema-First Design
 
 Thiết kế schema trước khi implement logic.
 
@@ -122,7 +229,7 @@ type PageInfo {
 }
 ```
 
-### 2. Query Design
+#### 1.2 Query Design
 
 Thiết kế queries theo hierarchical và nested structure.
 
@@ -165,7 +272,7 @@ type User implements Node {
 }
 ```
 
-### 3. Mutation Design
+#### 1.3 Mutation Design
 
 Tổ chức mutations theo action patterns.
 
@@ -268,7 +375,7 @@ enum AuthErrorCode {
 }
 ```
 
-### 4. Subscription Design
+#### 1.4 Subscription Design
 
 Implement subscriptions cho real-time features.
 
@@ -319,7 +426,7 @@ enum MutationType {
 }
 ```
 
-### 5. DataLoader Pattern
+#### 1.5 DataLoader Pattern
 
 Sử dụng DataLoader để prevent N+1 queries.
 
@@ -403,7 +510,7 @@ const resolvers = {
 };
 ```
 
-### 6. Input Validation
+#### 1.6 Input Validation
 
 Implement comprehensive input validation.
 
@@ -479,7 +586,7 @@ const resolvers = {
 };
 ```
 
-### 7. Error Handling
+#### 1.7 Error Handling
 
 Standardized error handling pattern.
 
@@ -559,7 +666,7 @@ export const graphqlConfig = {
 };
 ```
 
-### 8. Performance Optimization
+#### 1.8 Performance Optimization
 
 Query complexity analysis và response caching.
 
@@ -604,7 +711,7 @@ const depthLimitRule = createDepthLimitRule(10, {
 });
 ```
 
-### 9. Authorization
+#### 1.9 Authorization
 
 Implement authorization at multiple levels.
 
@@ -667,7 +774,7 @@ const resolvers = {
 };
 ```
 
-### 10. Rate Limiting
+#### 1.10 Rate Limiting
 
 Implement rate limiting cho GraphQL API.
 
@@ -722,7 +829,7 @@ const resolvers = {
 };
 ```
 
-## Checklist
+### GraphQL Checklist
 
 - [ ] Design schema trước khi implement
 - [ ] Use DataLoader cho N+1 prevention
@@ -740,9 +847,9 @@ const resolvers = {
 - [ ] Implement field-level resolvers
 - [ ] Add subscriptions for real-time features
 
-## Anti Patterns
+### GraphQL Anti Patterns
 
-### 1. Exposing Entire Database Schema
+#### 1. Exposing Entire Database Schema
 
 ```graphql
 # Không nên - expose internal database structure
@@ -755,7 +862,7 @@ type User {
 }
 ```
 
-### 2. N+1 Query Problem
+#### 2. N+1 Query Problem
 
 ```typescript
 // Không nên - querying in loop
@@ -781,7 +888,7 @@ const resolvers = {
 };
 ```
 
-### 3. Over-fetching without Pagination
+#### 3. Over-fetching without Pagination
 
 ```graphql
 # Không nên - return all posts without pagination
@@ -798,7 +905,7 @@ type User {
 }
 ```
 
-### 4. Missing Error Handling
+#### 4. Missing Error Handling
 
 ```typescript
 // Không nên
@@ -824,7 +931,7 @@ const resolvers = {
 };
 ```
 
-### 5. Mutations returning only boolean
+#### 5. Mutations returning only boolean
 
 ```graphql
 # Không nên - insufficient response
@@ -844,9 +951,9 @@ type DeletePayload {
 }
 ```
 
-## Best Practices
+### GraphQL Best Practices
 
-### 1. Schema Design Best Practices
+#### 1. Schema Design Best Practices
 
 ```graphql
 # Use meaningful naming conventions
@@ -899,7 +1006,7 @@ interface Timestamped {
 }
 ```
 
-### 2. Naming Conventions
+#### 2. Naming Conventions
 
 ```graphql
 # Operations
@@ -929,7 +1036,7 @@ type Subscription {
 }
 ```
 
-### 3. Relay Connection Pattern
+#### 3. Relay Connection Pattern
 
 ```graphql
 type PostConnection {
@@ -951,7 +1058,7 @@ type PageInfo {
 }
 ```
 
-### 4. Federation-ready Schema
+#### 4. Federation-ready Schema
 
 ```graphql
 # User service - schema.graphql
@@ -968,7 +1075,7 @@ extend type Post @key(fields: "id") {
 }
 ```
 
-### 5. Context Management
+#### 5. Context Management
 
 ```typescript
 import { PrismaClient } from '@prisma/client';
@@ -995,9 +1102,9 @@ export async function createContext({ req, res }): Promise<GraphQLContext> {
 }
 ```
 
-## Workflow
+### GraphQL Workflow
 
-### 1. Schema Design
+#### 1. Schema Design
 
 1. Gather requirements từ stakeholders
 2. Identify entities và relationships
@@ -1007,7 +1114,7 @@ export async function createContext({ req, res }): Promise<GraphQLContext> {
 6. Review và refine schema
 7. Document schema
 
-### 2. Implementation
+#### 2. Implementation
 
 1. Generate types from schema
 2. Implement resolvers
@@ -1017,7 +1124,7 @@ export async function createContext({ req, res }): Promise<GraphQLContext> {
 6. Implement authorization
 7. Write tests
 
-### 3. Testing
+#### 3. Testing
 
 1. Unit tests cho resolvers
 2. Integration tests
@@ -1025,7 +1132,7 @@ export async function createContext({ req, res }): Promise<GraphQLContext> {
 4. Performance tests
 5. Security tests
 
-### 4. Deployment
+#### 4. Deployment
 
 1. Deploy schema registry
 2. Configure monitoring
@@ -1033,336 +1140,562 @@ export async function createContext({ req, res }): Promise<GraphQLContext> {
 4. Configure caching
 5. Document breaking changes
 
-## Ví dụ
+---
 
-### Ví dụ 1: Complete Schema Definition
+## 2. API Gateway
 
-```graphql
-# schema.graphql
+### Mục tiêu
 
-scalar DateTime
-scalar JSON
+Tài liệu này định nghĩa các nguyên tắc và best practices cho việc implement API Gateway trong Cursor Enterprise Framework. Mục tiêu là đảm bảo secure, scalable, và efficient API management.
 
-interface Node {
-    id: ID!
-}
+API Gateway là single entry point cho microservices, cung cấp routing, authentication, và other cross-cutting concerns.
 
-interface Timestamped {
-    createdAt: DateTime!
-    updatedAt: DateTime!
-}
+### Nguyên tắc cơ bản
 
-interface Content {
-    title: String!
-    body: String!
-}
+#### 2.1 Gateway Responsibilities
 
-type User implements Node & Timestamped {
-    id: ID!
-    email: String!
-    name: String!
-    avatar: String
-    bio: String
-    role: UserRole!
-    posts: PostConnection!
-    comments: CommentConnection!
-    followers: UserConnection!
-    following: UserConnection!
-    createdAt: DateTime!
-    updatedAt: DateTime!
-}
+Core gateway functions.
 
-enum UserRole {
-    ADMIN
-    USER
-    MODERATOR
-}
-
-type Post implements Node & Timestamped & Content {
-    id: ID!
-    title: String!
-    body: String!
-    published: Boolean!
-    author: User!
-    comments: CommentConnection!
-    tags: [Tag!]!
-    createdAt: DateTime!
-    updatedAt: DateTime!
-}
-
-type Comment implements Node & Timestamped {
-    id: ID!
-    body: String!
-    author: User!
-    post: Post!
-    createdAt: DateTime!
-}
-
-type Tag implements Node {
-    id: ID!
-    name: String!
-    slug: String!
-    posts: PostConnection!
-}
-
-type UserConnection {
-    edges: [UserEdge!]!
-    pageInfo: PageInfo!
-    totalCount: Int!
-}
-
-type UserEdge {
-    node: User!
-    cursor: String!
-}
-
-type PostConnection {
-    edges: [PostEdge!]!
-    pageInfo: PageInfo!
-    totalCount: Int!
-}
-
-type PostEdge {
-    node: Post!
-    cursor: String!
-}
-
-type CommentConnection {
-    edges: [CommentEdge!]!
-    pageInfo: PageInfo!
-    totalCount: Int!
-}
-
-type CommentEdge {
-    node: Comment!
-    cursor: String!
-}
-
-type PageInfo {
-    hasNextPage: Boolean!
-    hasPreviousPage: Boolean!
-    startCursor: String
-    endCursor: String
-}
-
-type AuthPayload {
-    token: String!
-    refreshToken: String!
-    user: User!
-}
-
-type DeletePayload {
-    deletedId: ID!
-    success: Boolean!
-}
-
-input CreateUserInput {
-    email: String!
-    name: String!
-    password: String!
-    bio: String
-}
-
-input UpdateUserInput {
-    name: String
-    avatar: String
-    bio: String
-}
-
-input CreatePostInput {
-    title: String!
-    body: String!
-    tags: [String!]
-    published: Boolean = false
-}
-
-input UpdatePostInput {
-    title: String
-    body: String
-    tags: [String!]
-    published: Boolean
-}
-
-input UserFilterInput {
-    search: String
-    role: UserRole
-    createdAfter: DateTime
-    createdBefore: DateTime
-}
-
-input PostFilterInput {
-    search: String
-    tags: [String!]
-    authorId: ID
-    published: Boolean
-}
-
-input PaginationInput {
-    first: Int = 20
-    after: String
-    last: Int
-    before: String
-}
-
-type Query {
-    node(id: ID!): Node
-    
-    me: User
-    
-    user(id: ID!): User
-    users(
-        filter: UserFilterInput
-        pagination: PaginationInput
-    ): UserConnection!
-    
-    post(id: ID!): Post
-    posts(
-        filter: PostFilterInput
-        pagination: PaginationInput
-    ): PostConnection!
-    
-    tag(slug: String!): Tag
-    tags: [Tag!]!
-}
-
-type Mutation {
-    login(email: String!, password: String!): AuthPayload!
-    register(input: CreateUserInput!): AuthPayload!
-    refreshToken(token: String!): AuthPayload!
-    logout: Boolean!
-    
-    createUser(input: CreateUserInput!): UserPayload!
-    updateUser(id: ID!, input: UpdateUserInput!): UserPayload!
-    deleteUser(id: ID!): DeletePayload!
-    
-    createPost(input: CreatePostInput!): PostPayload!
-    updatePost(id: ID!, input: UpdatePostInput!): PostPayload!
-    deletePost(id: ID!): DeletePayload!
-    publishPost(id: ID!): PostPayload!
-    unpublishPost(id: ID!): PostPayload!
-}
-
-type Subscription {
-    postCreated: Post!
-    postUpdated(id: ID): Post!
-    postDeleted: Post!
-    commentCreated(postId: ID!): Comment!
-}
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    API Gateway Responsibilities                      │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐            │
+│  │  Routing   │  │    Auth     │  │ Rate Limit │            │
+│  └─────────────┘  └─────────────┘  └─────────────┘            │
+│                                                                  │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐            │
+│  │   Load     │  │    Cache    │  │    Logs    │            │
+│  │  Balance   │  │             │  │             │            │
+│  └─────────────┘  └─────────────┘  └─────────────┘            │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-### Ví dụ 2: Resolver Implementation
+#### 2.2 Route Configuration
 
-```typescript
-import { ApolloServer } from '@apollo/server';
-import { expressMiddleware } from '@apollo/server/express4';
-import express from 'express';
-import { makeExecutableSchema } from '@graphql-tools/schema';
-import { typeDefs } from './schema';
-import { resolvers } from './resolvers';
-import { createContext, GraphQLContext } from './context';
-import { createDataLoaders } from './loaders';
-import { formatError } from './errors';
-import { rateLimitRule } from 'graphql-rate-limit';
+API routing setup.
 
-const schema = makeExecutableSchema({ typeDefs, resolvers });
+```yaml
+# Kong gateway configuration
+_format_version: "3.0"
+services:
+  - name: user-service
+    url: http://user-service:3000
+    routes:
+      - name: user-route
+        paths:
+          - /api/users
+        methods:
+          - GET
+          - POST
+        strip_path: false
 
-async function startServer() {
-    const app = express();
-    
-    const server = new ApolloServer<GraphQLContext>({
-        schema,
-        formatError,
-        plugins: [
-            {
-                async requestDidStart() {
-                    return {
-                        async willSendResponse({ response }) {
-                            // Add headers
-                            response.http?.headers.set(
-                                'X-Response-Time',
-                                Date.now().toString()
-                            );
-                        }
-                    };
-                }
-            }
-        ]
-    });
-    
-    await server.start();
-    
-    app.use('/graphql', 
-        express.json(),
-        expressMiddleware(server, {
-            context: async ({ req }) => {
-                const context = await createContext({ req });
-                const loaders = createDataLoaders(context);
-                return { ...context, loaders };
-            }
-        })
-    );
-    
-    app.listen(4000, () => {
-        console.log('Server ready at http://localhost:4000/graphql');
-    });
-}
+  - name: order-service
+    url: http://order-service:3000
+    routes:
+      - name: order-route
+        paths:
+          - /api/orders
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
 
-startServer();
+  - name: product-service
+    url: http://product-service:3000
+    routes:
+      - name: product-route
+        paths:
+          - /api/products
+        methods:
+          - GET
+        strip_path: false
+
+plugins:
+  - name: rate-limiting
+    config:
+      minute: 100
+      policy: redis
+
+  - name: cors
+    config:
+      origins:
+        - https://example.com
+      methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+      headers:
+        - Authorization
+      credentials: true
+      max_age: 3600
 ```
 
-### Ví dụ 3: Integration với Existing REST APIs
+#### 2.3 Authentication Integration
 
-```typescript
-// REST to GraphQL adapter
-export class RESTAdapter {
-    constructor(private baseUrl: string, private apiKey: string) {}
-    
-    async get<T>(endpoint: string, params?: Record<string, string>): Promise<T> {
-        const url = new URL(endpoint, this.baseUrl);
-        if (params) {
-            Object.entries(params).forEach(([key, value]) => {
-                url.searchParams.set(key, value);
-            });
-        }
-        
-        const response = await fetch(url.toString(), {
-            headers: {
-                'Authorization': `Bearer ${this.apiKey}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        if (!response.ok) {
-            throw new Error(`REST API error: ${response.status}`);
-        }
-        
-        return response.json();
-    }
-}
+Gateway authentication.
 
-// GraphQL resolver using REST adapter
-const resolvers = {
-    Query: {
-        externalData: async (_, { id }, { restAdapter }) => {
-            const data = await restAdapter.get(`/api/external/${id}`);
-            
-            // Transform to GraphQL format
-            return {
-                id: data.externalId,
-                title: data.name,
-                description: data.description,
-                metadata: data.meta
-            };
-        }
-    }
-};
+```yaml
+# JWT authentication plugin
+plugins:
+  - name: jwt
+    config:
+      uri_param_names:
+        - jwt
+      header_names:
+        - Authorization
+      claims_to_verify:
+        - exp
+        - nbf
+      maximum_expiration: 3600
+
+# Key authentication
+plugins:
+  - name: key-auth
+    config:
+      key_names:
+        - X-API-Key
+      key_in_body: false
+      hide_credentials: true
+
+# OAuth 2.0
+plugins:
+  - name: oauth2
+    config:
+      scopes:
+        - read
+        - write
+      scopes_grant_type: client_credentials
+      mandatoryScopes: true
 ```
+
+#### 2.4 Rate Limiting Configuration
+
+Gateway rate limiting.
+
+```yaml
+# Rate limiting policies
+plugins:
+  # Global rate limit
+  - name: rate-limiting
+    config:
+      minute: 1000
+      hour: 10000
+      policy: local
+
+  # Per-consumer rate limit
+  - name: rate-limiting
+    config:
+      minute: 100
+      policy: redis
+      redis_host: redis
+      redis_port: 6379
+      fault_tolerant: true
+      hide_client_headers: false
+
+# Advanced rate limiting
+rate_limit_by:
+  consumer: true     # Per API consumer
+  header: X-API-Key # Per header value
+  ip: true          # Per IP address
+
+# Response headers
+limit_by: consumer
+limits:
+  second: 10
+  minute: 100
+  hour: 1000
+  day: 10000
+```
+
+#### 2.5 Caching Strategy
+
+Response caching at gateway.
+
+```yaml
+# Cache configuration
+plugins:
+  - name: proxy-cache
+    config:
+      response_code:
+        - 200
+      request_method:
+        - GET
+        - HEAD
+      content_type:
+        - application/json
+      cache_ttl: 300
+      strategy: memory
+      memory:
+        dictionary_name: kong_cache
+
+  - name: proxy-cache-advanced
+    config:
+      response_code:
+        - 200
+      request_method:
+        - GET
+      content_type:
+        - application/json
+      cache_ttl: 60
+      strategy: redis
+      redis_host: redis
+      redis_port: 6379
+
+# Cache invalidation
+plugins:
+  - name: cache-invalidation
+    config:
+      on_request: true
+      strategies:
+        - name: redis
+          host: redis
+          port: 6379
+```
+
+#### 2.6 Circuit Breaker
+
+Failure handling.
+
+```yaml
+# Circuit breaker configuration
+plugins:
+  - name: circuit-breaker
+    config:
+      fault_threshold: 50       # Error percentage to trip
+      health_threshold: 20     # Recovery threshold
+      timeout: 60              # Probe timeout (seconds)
+      request_timeout: 30      # Request timeout (seconds)
+      failure_count: 3          # Consecutive failures to trip
+      success_count: 3          # Successes to close circuit
+      period: 10               # Health check period (seconds)
+```
+
+#### 2.7 Logging và Monitoring
+
+Gateway observability.
+
+```yaml
+# Access logging
+plugins:
+  - name: access-log
+    config:
+      logging_fields:
+        - request.method
+        - request.url
+        - request.headers
+        - response.status
+        - latency
+        - consumer
+      log_payloads: false
+
+# Prometheus metrics
+plugins:
+  - name: prometheus
+    config:
+      per_consumer: true
+      metrics:
+        - name: kong_request_latency_ms
+          type: histogram
+        - name: kong_request_size
+          type: counter
+        - name: kong_response_size
+          type: counter
+        - name: kong_upstream_latency_ms
+          type: histogram
+```
+
+#### 2.8 Load Balancing
+
+Gateway load balancing.
+
+```yaml
+# Upstream configuration
+upstreams:
+  - name: user-service
+    algorithm: round-robin
+    healthchecks:
+      active:
+        type: https
+        http_path: /health
+        healthy:
+          interval: 5
+          successes: 2
+        unhealthy:
+          interval: 5
+          http_failures: 3
+      passive:
+        type: http
+        healthy:
+          successes: 3
+        unhealthy:
+          http_failures: 3
+    targets:
+      - target: user-service-1:3000
+        weight: 100
+      - target: user-service-2:3000
+        weight: 100
+      - target: user-service-3:3000
+        weight: 100
+```
+
+---
+
+## 3. Service Mesh
+
+### Mục tiêu
+
+Tài liệu này định nghĩa các nguyên tắc và best practices cho việc implement Service Mesh trong Cursor Enterprise Framework. Mục tiêu là đảm bảo secure, observable, và reliable service-to-service communication.
+
+Service Mesh cung cấp infrastructure layer cho handling service communications, tách biệt cross-cutting concerns khỏi application code.
+
+### Nguyên tắc cơ bản
+
+#### 3.1 Service Mesh Architecture
+
+Core mesh concepts.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                   Service Mesh Architecture                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Control Plane                                                  │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  Configuration, Discovery, Policy                      │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                              │                                    │
+│  Data Plane (Sidecar Proxies)                                   │
+│  ┌─────┐     ┌─────┐     ┌─────┐                           │
+│  │ S1  │────▶│ S2  │────▶│ S3  │                           │
+│  │proxy│◀────│proxy│◀────│proxy│                           │
+│  └─────┘     └─────┘     └─────┘                           │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+#### 3.2 Istio Configuration
+
+Istio service mesh setup.
+
+```yaml
+# Istio VirtualService
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: api-service
+spec:
+  hosts:
+    - api-service
+  http:
+    - match:
+        - uri:
+            prefix: /api/v1
+      route:
+        - destination:
+            host: api-service
+            subset: v1
+          weight: 90
+        - destination:
+            host: api-service
+            subset: v2
+          weight: 10
+      retries:
+        attempts: 3
+        perTryTimeout: 2s
+      timeout: 10s
+
+# DestinationRule
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: api-service
+spec:
+  host: api-service
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 100
+      http:
+        h2UpgradePolicy: UPGRADE
+        http1MaxPendingRequests: 100
+    loadBalancer:
+      simple: ROUND_ROBIN
+    outlierDetection:
+      consecutiveGatewayErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+```
+
+#### 3.3 mTLS Configuration
+
+Service-to-service encryption.
+
+```yaml
+# PeerAuthentication
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: production
+spec:
+  mtls:
+    mode: STRICT
+
+# Per-namespace MTLS
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: permissive-mtls
+  namespace: staging
+spec:
+  mtls:
+    mode: PERMISSIVE
+
+# Workload-specific
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: legacy-service
+  namespace: production
+spec:
+  selector:
+    matchLabels:
+      app: legacy-service
+  mtls:
+    mode: DISABLE
+```
+
+#### 3.4 Traffic Management
+
+Advanced routing.
+
+```yaml
+# Canary deployment
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: api-service
+spec:
+  hosts:
+    - api-service
+  http:
+    - match:
+        - headers:
+            x-canary:
+              exact: "true"
+      route:
+        - destination:
+            host: api-service
+            subset: v2
+    - route:
+        - destination:
+            host: api-service
+            subset: v1
+
+# Circuit breaker
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: api-service
+spec:
+  host: api-service
+  trafficPolicy:
+    outlierDetection:
+      consecutive5xxErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+```
+
+#### 3.5 Observability
+
+Mesh telemetry.
+
+```yaml
+# Telemetry configuration
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: mesh-default
+  namespace: production
+spec:
+  tracing:
+    - providers:
+        - name: jaeger
+      randomSamplingPercentage: 10.0
+  metrics:
+    - providers:
+        - name: prometheus
+      overrides:
+        - tagOverrides:
+            request_operation:
+              operation: ADD
+              value: request.path
+  accessLogging:
+    - providers:
+        - name: envoy
+```
+
+---
+
+## API Pattern Selection Guide
+
+### Khi nào nên dùng REST?
+
+- CRUD operations đơn giản
+- Fixed data structures
+- Caching với HTTP standards
+- Public APIs
+- Low complexity requirements
+
+### Khi nào nên dùng GraphQL?
+
+- Flexible queries từ clients
+- Multiple data sources aggregation
+- Mobile apps (bandwidth optimization)
+- Complex nested relationships
+- Rapid iteration needed
+
+### Khi nào nên dùng gRPC?
+
+- High performance requirements
+- Internal microservices communication
+- Strong typing với Protocol Buffers
+- Bi-directional streaming
+- Low latency critical systems
+
+### Khi nào nên dùng API Gateway?
+
+- Multiple microservices
+- Centralized authentication/authorization
+- Rate limiting across services
+- Request routing và transformation
+- API versioning
+
+### Khi nào nên dùng Service Mesh?
+
+- Complex microservice topology
+- Service-to-service encryption needed
+- Advanced traffic management
+- Distributed tracing requirements
+- mTLS enforcement needed
+
+---
 
 ## Liên kết
 
 - [GraphQL Official Documentation](https://graphql.org/)
 - [Apollo GraphQL](https://www.apollographql.com/)
 - [GraphQL Code Generator](https://www.graphql-code-generator.com/)
-- API Guidelines: `.cursor/rules/api.mdc`
-- RESTful API: `.cursor/rules/restful-api.mdc`
+- [Kong Gateway](https://docs.konghq.com/)
+- [NGINX Plus API Gateway](https://www.nginx.com/)
+- [Istio Documentation](https://istio.io/latest/docs/)
+- [Linkerd](https://linkerd.io/)
 - Security: `.cursor/rules/security.mdc`
+- Microservices: `.cursor/rules/microservices.mdc`

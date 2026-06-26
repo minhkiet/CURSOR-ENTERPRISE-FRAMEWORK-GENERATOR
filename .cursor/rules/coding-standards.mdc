@@ -249,7 +249,7 @@ function processUser(user: User): string {
 
 ## Liên kết
 
-- [[core-architecture]] - Core Architecture: System design principles
+- [[enterprise-patterns]] - Core Architecture: System design principles
 - [[performance]] - Performance: Performance optimization guidelines
 - [[testing]] - Testing: Comprehensive testing strategies
 - [[security]] - Security: Security best practices

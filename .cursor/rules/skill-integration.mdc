@@ -1,59 +1,40 @@
 ---
 description: Hướng dẫn skill auto-discovery và execution cho Cursor Enterprise Framework. Định tuyến tự động đến skills phù hợp với pre-review và post-review gates. Mọi task phải pass qua cả hai gates trước khi deliver.
 created: 2026-06-23
-version: 1.2.0
+version: 1.3.0
+updated: 2026-06-26
 tags: [skill, auto-discovery, frontend, review, quality, cursor, pre-review, post-review, skill-selection, intent-analysis]
+depends: [skill-registry]
 ---
 
 # Skill Auto-Discovery & Execution Protocol
 
 ## Mục tiêu & Tổng quan
 
-Hệ thống skill cho Cursor Enterprise Framework bao gồm **6 skills chính**, mỗi skill đều có:
+Hệ thống skill cho Cursor Enterprise Framework bao gồm **17 skills**, mỗi skill đều có:
 - **Pre-Review Gate** — chạy TRƯỚC khi viết code (lập kế hoạch, lock scope, declare design direction)
 - **Post-Review Gate** — chạy SAU KHI viết code, TRƯỚC KHI deliver (kiểm tra chất lượng)
 
-**Multi-Language Support:**
-Hệ thống hỗ trợ **bất kỳ ngôn ngữ nào** (tiếng Việt, Trung Quốc, Nhật Bản, Hàn Quốc, v.v.) thông qua [[multi-language-vibe-code]] protocol. Mọi request sẽ được:
-1. Detect ngôn ngữ đầu vào
-2. Translate sang tiếng Anh
-3. Analyze intent và auto-discover skills
-4. Execute vibe code với đầy đủ gates
+**Single Source of Truth:** Tất cả skill definitions, trigger matrices, confidence thresholds, và gate mappings được quản lý tập trung trong [[skill-registry]].
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│  MULTI-LANGUAGE VIBE CODE FLOW                                      │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                     │
-│  1. REQUEST (Any Language: vi, zh, ja, ko, ...)                    │
-│     └── Language Detection → Translation → Intent Analysis            │
-│                                                                     │
-│  2. SKILL MATCHING                                                  │
-│     ├── Match against Skill Keyword Matrix (multi-language)         │
-│     ├── Calculate confidence scores                                  │
-│     └── Determine skill combination                                 │
-│                                                                     │
-│  3. SKILL ACTIVATION                                                │
-│     ├── Primary skill selected                                       │
-│     ├── Secondary skills identified                                  │
-│     ├── Review gates determined                                     │
-│     └── Load SKILL.md files                                         │
-│                                                                     │
-│  4. EXECUTION                                                       │
-│     └── Pre-Review → Implementation → Post-Review → Delivery       │
-│                                                                     │
-└─────────────────────────────────────────────────────────────────────┘
-```
+**Multi-Language Support:**
+Hệ thống hỗ trợ **bất kỳ ngôn ngữ nào** (tiếng Việt, Trung Quốc, Nhật Bản, Hàn Quốc, v.v.) thông qua [[multi-language-vibe-code]] protocol.
 
 **Không có ngoại lệ.** Mọi task phải pass cả hai gates. Bypass dưới mọi hình thức đều bị cấm.
 
 ---
 
-## PHẦN A: SKILL DETECTION ENGINE (Auto-Discovery)
+## PHẦN A: SKILL DETECTION ENGINE
 
-### A.1 Tổng quan Skill Detection
+> **Xem [[skill-registry]] §1-§6 cho đầy đủ:**
+> - Skill Definitions (§1)
+> - Trigger Matrix (§2)
+> - Confidence Thresholds (§3)
+> - Skill Combinations (§4)
+> - Gate Mappings (§5)
+> - Decision Tree (§6)
 
-Skill Detection Engine là bộ phân tích tự động phân loại yêu cầu của user và xác định skills cần áp dụng. Engine hoạt động theo 3 giai đoạn:
+### A.1 Skill Detection Flow
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -61,25 +42,37 @@ Skill Detection Engine là bộ phân tích tự động phân loại yêu cầu
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
 │  1. REQUEST PARSING                                                 │
-│     ├── Extract raw text & intent signals                          │
-│     ├── Identify keywords (primary + secondary)                     │
-│     └── Detect domain context (frontend, backend, security)         │
+│     └── Extract keywords, intent signals, domain context           │
 │                                                                     │
 │  2. SKILL MATCHING                                                  │
-│     ├── Match against Skill Keyword Matrix (Section A.2)           │
-│     ├── Calculate confidence scores (Section A.3)                   │
-│     └── Determine skill combination (Section A.4)                   │
+│     └── Match against [[skill-registry]] §2 Trigger Matrix         │
 │                                                                     │
-│  3. SKILL ACTIVATION                                                │
+│  3. CONFIDENCE SCORING                                              │
+│     └── Calculate scores using §3 thresholds                         │
+│                                                                     │
+│  4. SKILL ACTIVATION                                                │
 │     ├── Primary skill selected                                      │
 │     ├── Secondary skills identified                                 │
-│     ├── Review gates determined                                     │
-│     └── Load SKILL.md files                                        │
+│     ├── karpathy-coding (MANDATORY OVERLAY)                        │
+│     └── Gates determined from §5                                    │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### A.2 Skill Keyword Matrix (Primary Triggers)
+### A.2 Confidence Thresholds
+
+| Threshold | Value | Action |
+|-----------|-------|--------|
+| `AUTO_SELECT` | >= 0.75 | Auto-select (no confirmation needed) |
+| `SUGGEST` | 0.50-0.74 | Suggest to user |
+| `AMBIGUOUS` | < 0.40 | Ask for clarification |
+
+### A.3 Mandatory Skills
+
+| Skill | Role | Always Runs |
+|-------|------|-------------|
+| karpathy-coding | **mandatory_overlay** | Yes (all coding tasks) |
+| frontend-review | **mandatory** | Yes (all frontend tasks) |
 
 | Keyword / Pattern | Primary Skill | Confidence | Notes |
 |---|---|---|---|
@@ -601,100 +594,47 @@ NEXT ACTION: Load SKILL.md files and begin PRE-REVIEW
 
 ## Skill Registry
 
-### 1. frontend-taste
-**Path:** `.cursor/skills/frontend-taste/SKILL.md`
-**Kích hoạt khi:** landing page, portfolio, marketing site, greenfield frontend build, aesthetic keywords (minimalist, Awwwards, Apple-y, Linear-style, brutalist, editorial)
-**Mục đích:** Anti-slop frontend cho landing pages và portfolios. Không phải dashboard, không phải data table.
+> **Đầy đủ: [[skill-registry]] §1 - §7**
+> File này là single source of truth cho tất cả skill definitions.
 
-### 2. frontend-redesign
-**Path:** `.cursor/skills/frontend-redesign/SKILL.md`
-**Kích hoạt khi:** cải thiện/redesign website/app hiện có, apply premium quality vào codebase có sẵn
-**Mục đích:** Upgrade UI hiện tại mà không phá vỡ functionality.
+### Quick Reference
 
-### 3. full-output
-**Path:** `.cursor/skills/full-output/SKILL.md`
-**Kích hoạt khi:** task nhiều file/component, user nhắc "full implementation", "complete", "not skeleton", "no TODO"
-**Mục đích:** Chống truncation, placeholder, skeleton. Đảm bảo output đầy đủ.
+| ID | Path | Role | Threshold | Pre-Gates | Post-Gates |
+|----|------|------|-----------|------------|------------|
+| frontend-taste | `frontend-taste/SKILL.md` | primary | 0.75 | §0.A-0.F | §6.A-6.H |
+| frontend-redesign | `frontend-redesign/SKILL.md` | primary | 0.75 | §0.A-0.E | §4.A-4.E |
+| full-output | `full-output/SKILL.md` | secondary | 0.80 | §0.A-0.B | §5.A-5.C |
+| frontend-review | `frontend-review/SKILL.md` | **mandatory** | 0.50 | A.1-A.3 | B.1-B.7 |
+| security-review | `security-review/SKILL.md` | primary | 0.85 | S.1-S.3 | Security-1-9 |
+| vietnam-payment-review | `vietnam-payment-review/SKILL.md` | primary | 0.90 | payment-pre | payment-post |
+| ponytail | `ponytail/SKILL.md` | overlay | 0.85 | YAGNI Ladder | Checklist |
+| karpathy-coding | `karpathy-coding/SKILL.md` | **mandatory_overlay** | 1.0 | K.1-K.4 | K.5-K.7 |
+| visual-explainer | `visual-explainer/SKILL.md` | secondary | 0.90 | (standalone) | (standalone) |
+| open-design | `open-design/SKILL.md` | secondary | 0.85 | (standalone) | (standalone) |
+| document-ocr | `document-ocr/SKILL.md` | secondary | 0.90 | ocr-pre | ocr-post |
+| bazi | `bazi/SKILL.md` | secondary | 0.95 | bazi-pre | bazi-post |
+| vietnam-address | `vietnam-address/SKILL.md` | secondary | 0.90 | address-pre | address-post |
+| weknora-kb | `weknora-kb/SKILL.md` | primary | 0.90 | weknora-pre | weknora-post |
+| weknora-agent | `weknora-agent/SKILL.md` | primary | 0.90 | agent-pre | agent-post |
+| pixelrag | `pixelrag/SKILL.md` | secondary | 0.90 | pixelrag-pre | pixelrag-post |
 
-### 4. frontend-review
-**Path:** `.cursor/skills/frontend-review/SKILL.md`
-**Kích hoạt khi:** review chất lượng, audit, quality check, hoặc là quality gate cuối cùng cho mọi frontend task
-**Mục đích:** Dual-gate review system cho correctness, design, accessibility, performance, state, testing.
+### Overlay Rules
 
-### 5. vietnam-payment-review
-**Path:** `.cursor/skills/vietnam-payment-review/SKILL.md`
-**Kích hoạt khi:** thanh toán MoMo, SePay, PayOS, ZaloPay, VNPay, VietQR, payment integration Việt Nam, webhook thanh toán nội địa, review mã thanh toán online
-**Mục đích:** Comprehensive review framework cho các payment provider phổ biến tại Việt Nam. Evaluate API integration, webhook security, signature validation, payment flow, error handling, và reconciliation.
+**karpathy-coding LUÔN chạy như mandatory overlay với mọi coding task.**
 
-### 6. security-review
-**Path:** `.cursor/skills/security-review/SKILL.md`
-**Kích hoạt khi:** security review, vulnerability, penetration test, OWASP, XSS, SQL injection, SSRF, CSRF, XXE, authentication, authorization, RBAC, API key, secret, webhook, LLM/AI security, prompt injection, APK decompile, binary analysis, firmware, reverse engineer, malware, CVE, exploit, payload, SSL pinning bypass, Frida hooking, supply chain audit, dependency scan, npm audit, secrets management, JWT, OAuth, CSRF, CORS, CSP, HSTS, encryption, hashing, brute force, brute-force, credential stuffing
-**Mục đích:** Comprehensive security review với layered approach: Static Analysis, OWASP Top 10 + ASVS, LLM/AI Security (ASI Top 10), API/Webhook Security, Supply Chain & Secrets, Cryptographic Practices, và Advanced RE (tich hợp reverse-skill). Tich hợp [reverse-skill](https://github.com/zhaoxuya520/reverse-skill) cho APK/JS/binary/firmware reverse-engineering workflows.
-
-### 7. ponytail
-**Path:** `.cursor/skills/ponytail/SKILL.md`
-**Kích hoạt khi:** vibe code, efficient coding, minimize code, less code, yagni, over-engineering, boilerplate, abstraction, utility class, wrapper, overkill, simple task
-**Mục đích:** Lazy Senior Dev mode - viết code tối thiểu, hiệu quả. "The best code is the code you never wrote." Giảm 54% LOC, 20% cost, 27% faster, 100% safe. Check YAGNI ladder trước khi viết code.
-
-### 8. visual-explainer
-**Path:** `.cursor/skills/visual-explainer/SKILL.md`
-**Kích hoạt khi:** diagram, architecture overview, flowchart, diff review, plan review, slide deck, project recap, visual plan, comparison table, visual explanation, HTML diagram, generate slides
-**Mục đích:** Generate self-contained HTML visual explanations for systems, code changes, plans, data, and technical concepts. Tích hợp từ [visual-explainer](https://github.com/nicobailon/visual-explainer) (9k stars, MIT License).
-
-### 9. karpathy-coding
-**Path:** `.cursor/skills/karpathy-coding/SKILL.md`
-**Kích hoạt khi:** VIBE CODE - tất cả task coding đều nên tuân thủ nguyên tắc này. Đặc biệt quan trọng khi: simple/straightforward request, minimal code request, "don't overthink", "just do it", reduce cognitive load, don't assume, clarify first, surgical changes needed
-**Mục đích:** Tích hợp từ [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) (182k stars) - giảm LLM coding mistakes: think before coding, simplicity first, surgical changes, goal-driven execution. Luôn chạy song song với các skill khác như overlay discipline.
-
-### 10. open-design
-**Path:** `.cursor/skills/open-design/SKILL.md`
-**Kích hoạt khi:** Thiết kế UI với design system có sẵn, tạo prototype, landing page, mobile app, dashboard, deck, hyperframes. Khi user nhắc đến "open-design", "design system", "brand-grade design", "prototype generation"
-**Mục đích:** Tích hợp [nexu-io/open-design](https://github.com/nexu-io/open-design) (71k stars, Apache-2.0) - open-source Claude Design alternative với 100+ skills, 150 design systems, 261 plugins. Cung cấp artifact generation: web prototype, mobile app, dashboard, deck (PPTX), hyperframes (MP4). Hỗ trợ MCP server cho Cursor.
-
-### 11. document-ocr
-**Path:** `.cursor/skills/document-ocr/SKILL.md`
-**Kích hoạt khi:** OCR text extraction, đọc text từ ảnh, screenshots, scanned documents, Vietnamese OCR, image to text conversion, document scanning. Khi user nhắc đến "ocr", "text extraction", "image to text", "read text from image", "screenshot text", "scanned document", "document scanner"
-**Mục đích:** Tích hợp Tesseract OCR vào workflow vibe coding để tự động đọc text từ ảnh, file scanned, và documents. Hỗ trợ nhiều ngôn ngữ (Vietnamese, English, Chinese, etc.). Cải thiện khả năng đọc hiểu khi phân tích screenshots, diagrams, và mockups. Based on [OSS-DocumentScanner](https://github.com/ossappscollective/OSS-DocumentScanner) methodology.
-**Auto-Dependencies:** pytesseract, Pillow, opencv-python, Tesseract OCR system
-
-### 12. skill-installer
-**Path:** `.cursor/skills/skill-installer/SKILL.md`
-**Kích hoạt khi:** Khi bất kỳ skill nào được kích hoạt mà chưa có dependencies. Tự động check và install dependencies trước khi chạy skill.
-**Mục đích:** Auto-Dependency Installation cho tất cả skills. Đảm bảo môi trường sẵn sàng trước khi chạy skill tasks.
-
-### 13. bazi
-**Path:** `.cursor/skills/bazi/SKILL.md`
-**Kích hoạt khi:** 四柱八字命理分析，算八字，看八字，批八字，排八字，命盘，算命，运势分析，大运流年。当用户提到"算八字"、"看八字"、"批八字"、"排八字"、"四柱"、"命盘"、"算命"、"命理"、"运势"、"大运"、"流年"、"bazi"、"birth chart"、"fortune telling"时。
-**Mục đích:** Tích hợp [bazi-skill](https://github.com/jinchenma94/bazi-skill) (2k stars, MIT License) - 四柱八字命理分析工具。通过交互式对话收集出生信息，排出四柱八字，参照九本经典命理典籍（穷通宝典、三命通会、滴天髓、渊海子平、子平真诠等）进行专业分析。
-
-### 14. vietnam-address
-**Path:** `.cursor/skills/vietnam-address/SKILL.md`
-**Kích hoạt khi:** Vietnamese address, địa chỉ Việt Nam, tỉnh/thành phố, quận/huyện, phường/xã, shipping address, address autocomplete, cascading dropdown địa chỉ, form địa chỉ. Khi user nhắc đến "địa chỉ Việt Nam", "tỉnh/thành phố", "quận/huyện", "phường/xã", "shipping address", "address autocomplete", "province", "district", "ward", "vietnamese-provinces"
-**Mục đích:** Tích hợp [vietnamese-provinces-database](https://github.com/thanglequoc/vietnamese-provinces-database) (1.3k stars, MIT License) - dataset comprehensive về đơn vị hành chính Việt Nam với 34 tỉnh/thành phố, ~11,000 phường/xã. Hỗ trợ cascading dropdown, autocomplete, validation cho forms địa chỉ.
-
-### 15. weknora-kb
-**Path:** `.cursor/skills/weknora-kb/SKILL.md`
-**Kích hoạt khi:** Knowledge Base, RAG, document Q&A, FAQ system, wiki, enterprise knowledge, document search, knowledge retrieval, WeKnora, hybrid search, vector search, BM25, GraphRAG, Knowledge Graph, ReAct agent, autonomous reasoning, document ingestion, PDF/Word/Markdown OCR, knowledge management, internal Q&A system, research assistant, enterprise wiki, autonomous knowledge agent
-**Mục đích:** Tích hợp WeKnora (17.3k stars) - open-source LLM knowledge platform với RAG-based Q&A, ReAct Agent cho multi-step reasoning, Wiki Mode cho auto-generated interlinked pages, Hybrid Retrieval (Vector + BM25 + GraphRAG + Knowledge Graph). Biến kho tài liệu thành: hệ thống hỏi đáp nội bộ, trợ lý nghiên cứu, Wiki doanh nghiệp, Agent tri thức tự động. Tự động cài đặt MCP server cho Cursor integration.
-**Auto-Dependencies:** WeKnora CLI (`weknora`), Docker (cho WeKnora server), MCP configuration
-
-### 16. weknora-agent
-**Path:** `.cursor/skills/weknora-agent/SKILL.md`
-**Kích hoạt khi:** Agent mode, ReAct reasoning, autonomous agent, multi-step reasoning, complex task automation, agentic workflow, tool calling, web search agent, MCP tools agent, knowledge graph traversal, research automation, autonomous planning
-**Mục đích:** Tận dụng WeKnora ReAct Agent với khả năng lập kế hoạch và suy luận nhiều bước. Tích hợp Web Search và MCP Tools để mở rộng năng lực agent. Tự động orchestrate giữa knowledge retrieval, external tools, và LLM reasoning.
-**Auto-Dependencies:** WeKnora CLI với agent mode, MCP server configured
-
-### 17. pixelrag
-**Path:** `.cursor/skills/pixelrag/SKILL.md`
-**Kích hoạt khi:** PixelRAG, visual RAG, screenshot-based RAG, visual search, pixel-native search, đọc tài liệu PDF, phân tích bảng biểu, hỏi về biểu đồ, financial report analysis, visual document Q&A, website screenshot, vision embedding, Qwen3-VL model, tables, charts, diagrams trong documents
-**Mục đích:** Tích hợp [PixelRAG](https://github.com/StarTrail-org/PixelRAG) (5.3k stars) - Visual Retrieval-Augmented Generation cho phép AI "nhìn" tài liệu như con người. Cải thiện độ chính xác retrieval 18.1% so với Text RAG truyền thống. Đặc biệt hiệu quả cho: tài liệu có bảng biểu, báo cáo tài chính, PDF khoa học, website phức tạp, knowledge base nội bộ.
-**Auto-Dependencies:** pixelrag[full], playwright, chromium, Qwen3-VL-Embedding model
+**ponytail là optional overlay** - enable khi user nhắc: simple, minimal, less code, yagni.
 
 ---
 
 ## Skill Combination Rules
 
-| Task Type | Primary Skill | Secondary Skill | Review Gates Applied |
+> **Đầy đủ: [[skill-registry]] §4 Skill Combinations**
+
+Xem skill-registry cho đầy đủ task combinations và gate mappings.
+
+---
+
+## Quick Reference Card
 |---|---|---|---|
 | Landing page mới | frontend-taste + open-design | full-output + frontend-review | taste-pre + od-pre + fulloutput-pre + review-pre |
 | Prototype với design system | open-design | frontend-taste + full-output | od-pre + taste-pre + fulloutput-pre + review-pre |
@@ -1763,10 +1703,10 @@ breakpoint, resume on "continue". No recap, no repetition.
 
 ## Liên kết
 
+- [[skill-registry]] — **Single Source of Truth** cho tất cả skill definitions
 - [[context-router]] — Context routing rules
 - [[memory-first]] — Memory context management
 - [[multi-language-vibe-code]] — Multi-language request processing & vibe code protocol
-- [[frontend-architecture]] — Frontend architecture patterns
 - [[coding-standards]] — Coding standards
 - [[frontend-taste]] — `.cursor/skills/frontend-taste/SKILL.md`
 - [[frontend-redesign]] — `.cursor/skills/frontend-redesign/SKILL.md`

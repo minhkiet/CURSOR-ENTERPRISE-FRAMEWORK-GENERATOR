@@ -1,0 +1,1199 @@
+---
+description: Operations - hợp nhất từ Alerting và Incident Response trong Cursor Enterprise Framework
+created: 2026-06-23
+version: 1.0.0
+merged_from:
+  - alerting.mdc
+  - incident-response.mdc
+tags:
+  - operations
+  - alerting
+  - incident-response
+  - on-call
+  - postmortem
+  - sre
+  - sla
+  - reliability
+---
+
+# Operations
+
+Hợp nhất từ Alerting Patterns và Incident Response. Tài liệu này định nghĩa các nguyên tắc và best practices cho việc vận hành hệ thống trong Cursor Enterprise Framework, bao gồm proactive issue detection, incident response, và continuous improvement.
+
+## 1. Alerting Patterns
+
+### 1.1 Alert Severity Levels
+
+Define clear severity levels.
+
+```yaml
+# Alert severity levels
+severity_levels:
+  P1_CRITICAL:
+    description: "Complete service outage or data loss"
+    response_time: 15 minutes
+    notification: Phone call + SMS + Slack
+    escalation: Immediate
+
+  P2_HIGH:
+    description: "Major functionality impaired"
+    response_time: 30 minutes
+    notification: SMS + Slack
+    escalation: 30 minutes
+
+  P3_MEDIUM:
+    description: "Minor functionality affected"
+    response_time: 4 hours
+    notification: Slack
+    escalation: 4 hours
+
+  P4_LOW:
+    description: "Cosmetic or non-urgent issue"
+    response_time: Next business day
+    notification: Email + ticket
+```
+
+### 1.2 Alerting Rules
+
+Prometheus-style alerting rules.
+
+```yaml
+# prometheus/alerts.yml
+groups:
+  - name: api-service-alerts
+    interval: 30s
+    rules:
+      # Critical alerts
+      - alert: ServiceDown
+        expr: up{job="api-service"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "API service is down"
+          description: "Instance {{ $labels.instance }} has been down for more than 1 minute"
+          runbook_url: "https://wiki.example.com/runbooks/service-down"
+
+      - alert: HighErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{status_code=~"5.."}[5m]))
+            / sum(rate(http_requests_total[5m]))
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High HTTP 5xx error rate"
+          description: "Error rate is {{ $value | humanizePercentage }} (threshold: 5%)"
+          runbook_url: "https://wiki.example.com/runbooks/high-error-rate"
+
+      # Warning alerts
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(http_request_duration_seconds_bucket[5m])) by (le)
+          ) > 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High API latency detected"
+          description: "95th percentile latency is {{ $value }}s (threshold: 1s)"
+
+      - alert: HighMemoryUsage
+        expr: |
+          (container_memory_usage_bytes / container_memory_limit_bytes) > 0.85
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage at {{ $value | humanizePercentage }}"
+
+      # Database alerts
+      - alert: DatabaseConnectionsHigh
+        expr: |
+          pg_stat_activity_count / pg_settings_max_connections > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High database connection usage"
+          description: "Connection usage at {{ $value | humanizePercentage }}"
+
+      - alert: DatabaseSlowQueries
+        expr: |
+          rate(pg_stat_statements_mean_exec_time[5m]) > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow database queries detected"
+          description: "Average query execution time is {{ $value }}ms"
+```
+
+### 1.3 SLO-Based Alerts
+
+Alert based on service level objectives.
+
+```yaml
+# SLO-based alerting
+slo_alerts:
+  availability:
+    name: "API Availability SLO"
+    target: 99.9  # 99.9% availability
+    window: 30d
+    alert_on_budget_consumption: true
+    budget:
+      total: 100
+      thresholds:
+        - percent: 50
+          severity: warning
+          message: "Availability budget 50% consumed"
+        - percent: 75
+          severity: critical
+          message: "Availability budget 75% consumed - taking action required"
+        - percent: 90
+          severity: p1
+          message: "Availability budget exhausted - immediate action required"
+
+  latency:
+    name: "API Latency SLO"
+    target: 99  # 99% of requests under 500ms
+    window: 30d
+    alert_on_budget_consumption: true
+
+# Burn rate alerts
+burn_rate_alerts:
+  - alert: FastburnAlert
+    expr: |
+      sum(slo:error-budget-remaining:ratio{slo="api-availability"} < 1)
+      and
+      (sum(rate(slo:errors-total:slo="api-availability"[1h]))
+      / sum(rate(slo:total:slo="api-availability"[1h]))) > 0.1
+    for: 15m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Fast burn rate detected"
+      description: "Error budget is burning fast - 10% of budget in 1 hour"
+
+  - alert: SlowburnAlert
+    expr: |
+      sum(slo:error-budget-remaining:ratio{slo="api-availability"} < 1)
+      and
+      (sum(rate(slo:errors-total:slo="api-availability"[6h]))
+      / sum(rate(slo:total:slo="api-availability"[6h]))) > 0.01
+    for: 1h
+    labels:
+      severity: warning
+```
+
+### 1.4 Alert Routing
+
+Route alerts to appropriate channels.
+
+```yaml
+# AlertManager configuration
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ['alertname', 'severity', 'service']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  receiver: 'default-receiver'
+  routes:
+    # Critical alerts - immediate phone call
+    - match:
+        severity: critical
+      receiver: 'pagerduty-critical'
+      group_wait: 0s
+      repeat_interval: 1h
+
+    # Database alerts
+    - match:
+        component: database
+      receiver: 'database-team'
+      routes:
+        - match:
+            severity: critical
+          receiver: 'database-oncall'
+
+    # API alerts
+    - match:
+        component: api
+      receiver: 'api-team'
+      routes:
+        - match:
+            alertname: 'ServiceDown'
+          receiver: 'pagerduty-critical'
+
+    # Security alerts - dedicated channel
+    - match:
+        category: security
+      receiver: 'security-team'
+      routes:
+        - match:
+            severity: critical
+          receiver: 'security-oncall'
+
+receivers:
+  - name: 'default-receiver'
+    slack_configs:
+      - channel: '#alerts-default'
+        send_resolved: true
+
+  - name: 'pagerduty-critical'
+    pagerduty_configs:
+      - service_key: '${PAGERDUTY_SERVICE_KEY}'
+        severity: critical
+        send_resolved: true
+        client: 'Prometheus'
+        client_url: '{{ .CommonLabels.alertmanagerUrl }}'
+
+  - name: 'database-team'
+    slack_configs:
+      - channel: '#alerts-database'
+        send_resolved: true
+
+  - name: 'security-oncall'
+    slack_configs:
+      - channel: '#alerts-security-critical'
+    pagerduty_configs:
+      - service_key: '${SECURITY_PAGERDUTY_KEY}'
+        severity: critical
+```
+
+### 1.5 Alert Suppression
+
+Prevent alert storms và noise.
+
+```yaml
+# Alert suppression rules
+suppression:
+  # Suppress during maintenance window
+  - name: "maintenance-window"
+    condition: |
+      maintenance_mode == true
+    affected_alerts:
+      - "HighMemoryUsage"
+      - "HighCPUUsage"
+      - "HighLatency"
+
+  # Suppress after auto-scaling
+  - name: "auto-scaling-in-progress"
+    condition: |
+      kube_deployment_spec_replicas > kube_deployment_status_replicas
+    affected_alerts:
+      - "HighCPUUsage"
+      - "HighMemoryUsage"
+    duration: 10m
+
+  # Acknowledgement based suppression
+  - name: "acknowledged-alerts"
+    condition: |
+      alert_state == "acknowledged"
+    affected_alerts:
+      - all
+    duration: 1h
+
+# Mute schedules
+mute_schedules:
+  - name: "weekly-maintenance"
+    time_intervals:
+      - time_range: "saturday 22:00 - sunday 06:00"
+        weekdays: ['saturday']
+      - time_range: "sunday 00:00 - sunday 06:00"
+        weekdays: ['sunday']
+
+  - name: "holiday-mode"
+    time_intervals:
+      - dates: ['2024-12-25', '2024-12-26', '2024-01-01']
+```
+
+### 1.6 Alert Tuning
+
+Reduce noise và improve signal.
+
+```yaml
+# Alert tuning process
+tuning_guidelines:
+  # Too many alerts?
+  - check: "Alert frequency > 10/day"
+    action: "Review if alerts are actionable"
+    possible_issues:
+      - "Thresholds too sensitive"
+      - "Missing for: clause"
+      - "No aggregation"
+
+  # Too few alerts?
+  - check: "No alerts for days"
+    action: "Review coverage"
+    possible_gaps:
+      - "Missing SLO-based alerts"
+      - "No capacity alerts"
+      - "Missing dependency alerts"
+
+# Common tuning adjustments
+tuning_examples:
+  # Add for clause to prevent flapping
+  - before: "alert: HighErrorRate\n  expr: error_rate > 0.01"
+    after: "alert: HighErrorRate\n  expr: error_rate > 0.01\n  for: 5m"
+
+  # Aggregate to reduce noise
+  - before: "alert: HighErrorRate\n  expr: error_rate{instance=~'.+'}"
+    after: "alert: HighErrorRate\n  expr: avg(error_rate) by (service) > 0.01"
+
+  # Add severity-appropriate thresholds
+  - before: "alert: HighLatency\n  expr: latency > 500"
+    after: |
+      alert: HighLatencyWarning
+        expr: latency > 500
+        for: 5m
+        labels: { severity: warning }
+      alert: HighLatencyCritical
+        expr: latency > 2000
+        for: 2m
+        labels: { severity: critical }
+```
+
+### 1.7 Alert Metrics
+
+Track alerting health.
+
+```yaml
+# Alert effectiveness metrics
+alert_metrics:
+  # Volume metrics
+  - name: "alerts_total"
+    query: sum(rate(alerts_total[5m]))
+    description: "Rate of alerts firing"
+
+  - name: "alerts_by_severity"
+    query: sum by (severity) (rate(alerts_total[5m]))
+    description: "Alerts by severity level"
+
+  # Quality metrics
+  - name: "alert_noise_ratio"
+    query: |
+      sum(rate(alerts_resolved_without_action[5m]))
+      / sum(rate(alerts_total[5m]))
+    description: "Ratio of noise alerts"
+
+  - name: "mean_time_to_acknowledge"
+    query: |
+      avg by (alertname) (
+        rate(alert_acknowledge_duration_seconds_sum[1h])
+        / rate(alert_acknowledge_duration_seconds_count[1h])
+      )
+    description: "Average time to acknowledge"
+
+  - name: "mean_time_to_resolve"
+    query: |
+      avg by (alertname) (
+        rate(incident_duration_seconds_sum[1h])
+        / rate(incident_duration_seconds_count[1h])
+      )
+    description: "Average time to resolve"
+
+  # SLO metrics
+  - name: "error_budget_remaining"
+    query: slo:error-budget-remaining:ratio
+    description: "Remaining error budget"
+
+  - name: "burn_rate"
+    query: slo:current-burn-rate:ratio
+    description: "Current error budget burn rate"
+```
+
+## 2. Incident Response
+
+### 2.1 Nguyên tắc cơ bản
+
+**1. Blameless Culture**
+
+Focus on systems, not individuals. Learn from incidents. Psychological safety. Continuous improvement.
+
+**2. Clear Roles**
+
+Incident Commander. Technical Lead. Communications Lead. Clear responsibilities. Defined authority.
+
+**3. Structured Response**
+
+Detect. Triage. Respond. Resolve. Review. Clear phases.
+
+**4. Communication**
+
+Internal updates. Customer communication. Status page. Stakeholder updates. Clear channels.
+
+**5. Escalation Path**
+
+Define escalation criteria. Time-based escalation. Severity levels. Clear contacts.
+
+**6. Runbooks**
+
+Pre-defined procedures. Step-by-step guides. Tested regularly. Kept current.
+
+**7. Postmortems**
+
+Blame-free review. Root cause analysis. Action items. Follow-up tracking.
+
+**8. On-Call**
+
+Fair rotation. Reasonable load. Tools and access. Support and compensation.
+
+**9. Severity Levels**
+
+P1: Complete outage. P2: Major degradation. P3: Minor issue. P4: Low impact.
+
+**10. Continuous Improvement**
+
+Track metrics. Identify trends. Improve processes. Update runbooks.
+
+### 2.2 Incident Severity Matrix
+
+| Severity | Description | Response Time | Update Frequency | Example |
+|----------|-------------|---------------|-----------------|---------|
+| SEV1 | Complete outage affecting all users | Immediate | Every 15 min | API down, payment failed |
+| SEV2 | Major feature degraded, >25% users affected | 15 min | Every 30 min | Login broken, checkout failed |
+| SEV3 | Minor feature degraded, <25% users affected | 1 hour | Hourly | Slow search, email delayed |
+| SEV4 | Cosmetic issue, no user impact | Next business day | Daily | UI bug, minor typo |
+
+Escalation Criteria:
+- No progress in 30 min → Escalate
+- Multiple teams affected → Escalate
+- Customer data at risk → Escalate immediately
+- Media/social attention → Escalate immediately
+
+### 2.3 Incident Commander Role
+
+```typescript
+// incident-commander responsibilities
+interface IncidentCommander {
+  // Take command of the incident
+  takeCommand(): void;
+  
+  // Coordinate response
+  coordinate(): void;
+  
+  // Make decisions
+  makeDecision(): void;
+  
+  // Communicate status
+  communicate(): void;
+  
+  // Delegate tasks
+  delegate(): void;
+  
+  // Close incident
+  closeIncident(): void;
+}
+
+// Responsibilities
+// 1. Declare incident severity
+// 2. Assemble response team
+// 3. Ensure communication
+// 4. Make critical decisions
+// 5. Authorize escalations
+// 6. Declare resolution
+// 7. Coordinate postmortem
+```
+
+### 2.4 Incident Response Workflow
+
+#### 1. DETECTION (T+0:00)
+
+**Who**: Anyone detecting the issue
+
+**Actions**:
+- Verify the issue is real (not false positive)
+- Note initial symptoms and impact
+- Check if already known/being worked
+
+**Output**:
+- Issue confirmed
+- Initial severity assessment
+- Created incident channel (#inc-YYYY-MM-DD-XXX)
+
+#### 2. TRIAGE (T+0:15)
+
+**Who**: First responder / On-call engineer
+
+**Actions**:
+- Assign severity (P1-P4)
+- Page incident commander for P1/P2
+- Start incident channel
+- Begin logging timeline
+- Initial investigation
+
+**Communication**:
+- Post initial message to #incidents
+- Update status page if customer-visible
+- Notify stakeholders if P1/P2
+
+**Output**:
+- Severity assigned
+- IC assigned (P1/P2)
+- Response team assembled
+- Timeline started
+
+#### 3. RESPONSE (T+0:15 to T+Resolution)
+
+**Who**: Response team led by IC
+
+**Actions**:
+- Follow runbooks
+- Investigate root cause
+- Implement mitigation
+- Test fix
+- Coordinate across teams
+- Regular updates
+
+**Communication**:
+- Updates every 15-30 min to #incidents
+- Status page updates
+- Stakeholder notifications
+- Customer comms if needed
+
+**Output**:
+- Root cause identified
+- Fix implemented
+- Service restored
+
+#### 4. RESOLUTION (T+Resolution)
+
+**Who**: IC with team
+
+**Actions**:
+- Verify fix is working
+- Confirm metrics are normal
+- Declare resolution
+- Plan follow-up actions
+
+**Communication**:
+- Resolution message to #incidents
+- Update status page
+- Notify stakeholders
+- Cancel any active pages
+
+**Output**:
+- Incident resolved
+- Follow-up items documented
+- Postmortem scheduled
+
+#### 5. POSTMORTEM (Within 48-72 hours)
+
+**Who**: Response team + IC + stakeholders
+
+**Actions**:
+- Timeline review
+- Root cause analysis (5 Whys, Fishbone)
+- Impact assessment
+- Action items creation
+- Process improvements
+
+**Output**:
+- Postmortem document
+- Action items with owners
+- Process improvements
+- Updated runbooks
+
+## 3. On-Call Best Practices
+
+### 3.1 On-Call Rotation
+
+Effective on-call practices.
+
+```yaml
+# On-call schedule
+oncall:
+  schedule:
+    rotation_type: weekly
+    handoff_time: "09:00 UTC"
+    participants:
+      - name: Alice
+        email: alice@example.com
+      - name: Bob
+        email: bob@example.com
+      - name: Charlie
+        email: charlie@example.com
+
+  rotations:
+    - name: primary
+      current: alice
+      schedule: weekly
+      escalation_delay: 30m
+
+    - name: secondary
+      current: bob
+      schedule: weekly
+      escalation_delay: 1h
+
+  escalation:
+    - level: 1
+      timeout: 30m
+      contacts: [primary_oncall]
+    - level: 2
+      timeout: 1h
+      contacts: [secondary_oncall, team_lead]
+    - level: 3
+      contacts: [engineering_manager, vp_engineering]
+
+  policies:
+    max_hours_per_week: 40
+    min_days_between_shifts: 7
+    compensation:
+      on_call_stipend: $100/day
+      incident_response: $50/incident
+```
+
+### 3.2 Escalation Policy
+
+```yaml
+# escalation.yaml
+escalation:
+  policy: "immediate_escalation"
+  
+  levels:
+    - level: 1
+      responders:
+        - team: "on-call-engineer"
+          timeout: 15m
+      escalate_to: 2
+      
+    - level: 2
+      responders:
+        - team: "team-lead"
+          timeout: 15m
+        - team: "sre-on-call"
+          timeout: 30m
+      escalate_to: 3
+      
+    - level: 3
+      responders:
+        - team: "engineering-manager"
+          timeout: 15m
+        - team: "platform-lead"
+          timeout: 30m
+      escalate_to: 4
+      
+    - level: 4
+      responders:
+        - team: "vp-engineering"
+          timeout: 15m
+        - team: "cto"
+          timeout: 30m
+      notify: ["c-level", "comms-lead"]
+
+  rules:
+    - condition: "user_impact > 50%"
+      severity: "SEV1"
+      auto_escalate: true
+      
+    - condition: "revenue_impact > $10k/hour"
+      severity: "SEV1"
+      auto_escalate: true
+      
+    - condition: "data_loss"
+      severity: "SEV1"
+      auto_escalate: true
+      
+    - condition: "security_breach"
+      severity: "SEV1"
+      auto_escalate: true
+```
+
+## 4. Communication Templates
+
+### 4.1 Initial Notification (P1/P2)
+
+```
+🚨 [SEV1] Incident Declared - <Brief Description>
+
+Impact: <Who/what is affected>
+Duration: <How long ongoing>
+Status: Investigating
+
+IC: @name
+Team: @team
+
+We are investigating reports of <issue>.
+Status page: <link>
+Incident channel: #inc-YYYY-MM-DD-XXX
+
+Updates every 15 minutes.
+```
+
+### 4.2 Status Update
+
+```
+📊 [SEV1] Status Update - <Brief>
+
+Current Status: Investigating / Identified / Mitigating
+Duration: <X hours Y minutes>
+
+What we know:
+- <Known facts>
+
+What we're doing:
+- <Actions being taken>
+
+ETA for resolution: <Estimate or "Unknown">
+
+Next update: <Time>
+```
+
+### 4.3 Resolution
+
+```
+✅ [SEV1] RESOLVED - <Brief Description>
+
+Resolved At: <Time>
+Total Duration: <X hours Y minutes>
+Root Cause: <Brief cause>
+
+What happened:
+<Brief explanation>
+
+What we did:
+<How it was fixed>
+
+What we'll do next:
+- <Follow-up items>
+
+Postmortem: <Link>
+
+Thank you for your patience.
+```
+
+### 4.4 Customer Communication
+
+```
+Subject: Service Issue Resolution - [Service Name]
+
+Dear Customer,
+
+We experienced a service interruption affecting [service/feature] 
+from [start time] to [end time] (UTC).
+
+Impact: <What was affected>
+
+The issue has been resolved and all services are now operating normally.
+
+We apologize for any inconvenience this may have caused. 
+A detailed post-incident report will be published on our status page.
+
+Thank you for your patience and understanding.
+
+[Company] Team
+```
+
+## 5. Runbooks
+
+### 5.1 Runbook Template
+
+```yaml
+# Runbook structure
+runbook_template: |
+  # {{ .AlertName }}
+
+  ## Summary
+  {{ .AlertDescription }}
+
+  ## Severity
+  {{ .Severity }}
+
+  ## Impact
+  - What is affected?
+  - Who is impacted?
+  - What is the user-visible symptom?
+
+  ## Immediate Actions
+  1. Check dashboards: [link]
+  2. Verify if this is a real issue
+  3. Check recent deployments
+  4. Identify affected components
+
+  ## Troubleshooting Steps
+  ```bash
+  # Check pod status
+  kubectl get pods -n {{ .Namespace }}
+
+  # Check pod logs
+  kubectl logs -n {{ .Namespace }} {{ .PodName }}
+
+  # Check recent events
+  kubectl describe pod -n {{ .Namespace }} {{ .PodName }}
+  ```
+
+  ## Possible Causes
+  - High traffic
+  - Memory leak
+  - Database slow queries
+  - External dependency failure
+
+  ## Remediation Steps
+  1. Scale up if capacity issue
+  2. Restart pods if transient issue
+  3. Rollback if deployment-related
+  4. Engage relevant team
+
+  ## Escalation
+  - Primary: {{ .TeamSlack }}
+  - Secondary: {{ .OnCall }}
+```
+
+### 5.2 Example Runbook: Database Connection Pool Exhaustion
+
+```markdown
+# Runbook: Database Connection Pool Exhaustion
+
+## Symptoms
+- High latency on all API requests
+- Connection timeout errors
+- Database connection errors in logs
+- Error: "too many connections"
+
+## Severity
+SEV1 if: >50% of users affected
+SEV2 if: <50% of users affected
+
+## Diagnosis
+
+### 1. Verify the issue
+```bash
+# Check database connections
+SELECT count(*) FROM pg_stat_activity;
+
+# Check for long-running queries
+SELECT pid, now() - pg_stat_activity.query_start AS duration, query
+FROM pg_stat_activity
+WHERE state != 'idle'
+ORDER BY duration DESC;
+
+# Check connection limits
+SHOW max_connections;
+```
+
+### 2. Identify the source
+```bash
+# Check which service is using most connections
+SELECT application_name, count(*)
+FROM pg_stat_activity
+GROUP BY application_name;
+
+# Check for connection leaks
+# Look for connections in 'idle in transaction' state
+SELECT * FROM pg_stat_activity 
+WHERE state = 'idle in transaction';
+```
+
+## Mitigation
+
+### Immediate Actions
+
+**Option 1: Kill long-running queries**
+```sql
+SELECT pg_terminate_backend(pid)
+FROM pg_stat_activity
+WHERE state = 'active'
+AND query_start < now() - interval '5 minutes';
+```
+
+**Option 2: Kill idle connections**
+```sql
+SELECT pg_terminate_backend(pid)
+FROM pg_stat_activity
+WHERE state = 'idle'
+AND state_change < now() - interval '30 minutes';
+```
+
+**Option 3: Reduce application connection pool**
+```bash
+kubectl scale deployment api --replicas=1 -n production
+```
+
+### Medium-term Actions
+
+**Option 1: Increase connection limit (temporary)**
+```sql
+ALTER SYSTEM SET max_connections = '500';
+SELECT pg_reload_conf();
+```
+
+**Option 2: Enable connection pooling**
+- Deploy PgBouncer
+- Reduce application connection pool size
+
+## Resolution Verification
+```bash
+# Verify connections are healthy
+watch 'psql -c "SELECT count(*) FROM pg_stat_activity;"'
+
+# Verify API is responding
+curl -s https://api.example.com/health
+```
+
+## Follow-up Actions
+- [ ] Investigate root cause of connection leak
+- [ ] Review connection pool settings
+- [ ] Add monitoring for connection pool usage
+- [ ] Schedule database maintenance window for PgBouncer deployment
+
+## Related Documents
+- Database Architecture
+- Connection Pooling Strategy
+- Monitoring Dashboards
+```
+
+## 6. Post-Incident Review
+
+### 6.1 Postmortem Template
+
+```markdown
+# Postmortem: <Incident Title>
+
+**Date**: YYYY-MM-DD  
+**Duration**: X hours Y minutes  
+**Severity**: SEV1/SEV2/SEV3  
+**Status**: Completed
+
+## Summary
+
+One paragraph summary of what happened, impact, and resolution.
+
+## Impact
+
+| Metric | Value |
+|--------|-------|
+| Users Affected | ~X |
+| Revenue Impact | ~$Y |
+| Error Rate | Z% |
+| Duration | X hours |
+
+## Timeline (All times UTC)
+
+| Time | Event |
+|------|-------|
+| 14:00 | Alert triggered: High error rate |
+| 14:02 | On-call paged |
+| 14:05 | Initial investigation started |
+| 14:15 | Root cause identified |
+| 14:20 | Mitigation deployed |
+| 14:30 | Service restored |
+| 14:35 | Incident resolved |
+
+## Root Cause
+
+Detailed explanation of the root cause.
+
+**Root Cause Category**: [Configuration / Code / Hardware / Third-party / Process]
+
+## Contributing Factors
+
+- Factor 1
+- Factor 2
+
+## Resolution
+
+How the issue was fixed.
+
+## Lessons Learned
+
+### What went well?
+- Point 1
+- Point 2
+
+### What could be improved?
+- Point 1
+- Point 2
+
+## Action Items
+
+| Action | Owner | Due Date | Status |
+|--------|-------|----------|--------|
+| Add monitoring for X | @name | YYYY-MM-DD | In Progress |
+| Update runbook for Z | @name | YYYY-MM-DD | Done |
+| Implement circuit breaker | @name | YYYY-MM-DD | Pending |
+
+## Supporting Data
+
+- Charts showing impact
+- Relevant logs
+- Metrics before/during/after
+```
+
+### 6.2 Incident Management Code
+
+```typescript
+// Incident management
+interface Incident {
+    id: string;
+    title: string;
+    severity: 'P1' | 'P2' | 'P3' | 'P4';
+    status: 'triggered' | 'acknowledged' | 'resolved';
+    createdAt: Date;
+    acknowledgedAt?: Date;
+    resolvedAt?: Date;
+    assignee?: string;
+    alerts: string[];
+    runbook?: string;
+    timeline: IncidentEvent[];
+}
+
+class IncidentManager {
+    async createIncident(alert: Alert): Promise<Incident> {
+        const incident: Incident = {
+            id: generateIncidentId(),
+            title: alert.annotations.summary,
+            severity: this.mapSeverity(alert.labels.severity),
+            status: 'triggered',
+            createdAt: new Date(),
+            alerts: [alert.fingerprint],
+            runbook: alert.annotations.runbook_url,
+            timeline: [{
+                timestamp: new Date(),
+                event: 'incident_created',
+                details: alert
+            }]
+        };
+
+        await this.incidentStore.save(incident);
+
+        // Auto-assign based on routing
+        await this.autoAssign(incident);
+
+        // Send notifications
+        await this.notify(incident);
+
+        return incident;
+    }
+
+    async acknowledge(incidentId: string, user: string): Promise<void> {
+        const incident = await this.incidentStore.findById(incidentId);
+        incident.status = 'acknowledged';
+        incident.acknowledgedAt = new Date();
+        incident.assignee = user;
+        incident.timeline.push({
+            timestamp: new Date(),
+            event: 'incident_acknowledged',
+            details: { user }
+        });
+
+        await this.incidentStore.save(incident);
+
+        // Update PagerDuty
+        await this.pagerduty.acknowledge(incidentId);
+    }
+
+    async resolve(incidentId: string, user: string, resolution: string): Promise<void> {
+        const incident = await this.incidentStore.findById(incidentId);
+        incident.status = 'resolved';
+        incident.resolvedAt = new Date();
+        incident.timeline.push({
+            timestamp: new Date(),
+            event: 'incident_resolved',
+            details: { user, resolution }
+        });
+
+        await this.incidentStore.save(incident);
+
+        // Send resolution notification
+        await this.notifyResolution(incident);
+
+        // Close PagerDuty
+        await this.pagerduty.resolve(incidentId);
+    }
+}
+```
+
+## Checklist
+
+### Alerting
+- [ ] Define alert severity levels
+- [ ] Create alerting rules
+- [ ] Set up SLO-based alerts
+- [ ] Configure alert routing
+- [ ] Implement alert suppression
+- [ ] Create runbooks
+- [ ] Set up on-call rotation
+- [ ] Define escalation policies
+- [ ] Track alert metrics
+- [ ] Tune alerts regularly
+- [ ] Document incident procedures
+- [ ] Train on-call engineers
+
+### Incident Response
+- [ ] On-call rotation defined
+- [ ] Escalation paths documented
+- [ ] Runbooks written for common issues
+- [ ] Communication templates prepared
+- [ ] Status page configured
+- [ ] Incident channel created
+- [ ] Postmortem template ready
+- [ ] Action item tracking set up
+- [ ] Team trained on process
+- [ ] Tools and access verified
+
+## Anti Patterns
+
+### Alerting Anti-Patterns
+
+**1. Alerting Everything**
+
+```yaml
+# Không nên - too many alerts
+alert: EverythingIsAnAlert
+  expr: up == 1  # Fires constantly!
+```
+
+**2. No Thresholds**
+
+```yaml
+# Không nên - no context
+alert: HighCPU
+  expr: node_cpu_usage > 0
+```
+
+**3. No Severity**
+
+```yaml
+# Không nên - all alerts same severity
+alert: SomeAlert
+  expr: some_metric > threshold
+# No labels for severity!
+```
+
+### Incident Response Anti-Patterns
+
+**1. Blame Culture**
+
+Punishing individuals. Hiding incidents. No learning. Fear of reporting.
+
+**2. No Runbooks**
+
+Improvising during incidents. Missing steps. Wasted time. Inconsistent responses.
+
+**3. Poor Communication**
+
+No updates. Conflicting messages. Missing stakeholders. Status unknown.
+
+**4. Ignoring Postmortems**
+
+No reviews. Same incidents repeat. No improvements. Lost learnings.
+
+**5. Undefined Severity**
+
+Treating everything as P1. Alert fatigue. Resource waste. Priority confusion.
+
+## Liên kết
+
+- [Alertmanager Documentation](https://prometheus.io/docs/alerting/latest/alertmanager/)
+- [PagerDuty Best Practices](https://www.pagerduty.com/resources/learn/alert-management/)
+- [SRE Alerting Practices](https://sre.google/sre-book/monitoring-distributed-systems/)
+- [[observability]] - Monitoring and alerting
+- [[monitoring]] - System monitoring

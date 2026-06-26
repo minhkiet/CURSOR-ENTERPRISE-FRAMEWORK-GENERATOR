@@ -1,0 +1,1104 @@
+---
+description: Container Orchestration - hợp nhất từ Docker và Kubernetes trong Cursor Enterprise Framework
+created: 2026-06-26
+version: 1.0.0
+merged_from: [docker.mdc, kubernetes.mdc]
+tags: [docker, kubernetes, k8s, container, orchestration, dockerfile, docker-compose, helm, gitops]
+---
+
+# Container Orchestration
+
+## Mục tiêu
+
+Container Orchestration là sự kết hợp giữa Docker và Kubernetes để cung cấp giải pháp đóng gói và triển khai ứng dụng toàn diện. Docker cung cấp nền tảng containerization cho development và đóng gói, trong khi Kubernetes cung cấp orchestration, scaling, và quản lý production deployments.
+
+**Docker** cho phép đóng gói applications và dependencies thành portable containers với consistency từ development đến production.
+
+**Kubernetes** tự động hóa deployment, scaling, và quản lý containerized applications trên production clusters.
+
+---
+
+## 1. Docker
+
+### Nguyên tắc
+
+**1. Small Images**
+
+Use minimal base images. Alpine for size. Distroless for security. Multi-stage builds. Remove unnecessary files.
+
+**2. Single Responsibility**
+
+One process per container. Microservices pattern. Easier scaling. Simpler debugging. Better resource usage.
+
+**3. Security First**
+
+Run as non-root. Use specific image versions. Scan for vulnerabilities. Minimize attack surface. Keep images updated.
+
+**4. Layer Caching**
+
+Order Dockerfile instructions wisely. Frequently changed layers last. Dependencies first. Use .dockerignore.
+
+**5. Environment Configuration**
+
+Use environment variables. No hardcoded secrets. Default values for dev. Override in production.
+
+**6. Health Checks**
+
+Define HEALTHCHECK in Dockerfile. Use proper endpoints. Fast feedback. Auto-recovery.
+
+**7. Logging**
+
+Log to stdout/stderr. Structured logging. No file logging. Use logging drivers.
+
+**8. Resource Limits**
+
+Set memory limits. Set CPU limits. Prevent resource exhaustion. Monitor usage.
+
+**9. Dependency Management**
+
+Pin exact versions. Use lock files. Regular updates. Security patches.
+
+**10. Testing in CI/CD**
+
+Build in CI. Scan for vulnerabilities. Push to registry. Pull in deployment.
+
+### Docker Checklist
+
+- [ ] Dockerfile optimized
+- [ ] Multi-stage builds used
+- [ ] Security scanning configured
+- [ ] Health checks added
+- [ ] Resource limits set
+- [ ] .dockerignore configured
+- [ ] Docker Compose for local dev
+- [ ] Registry configured
+- [ ] CI/CD pipeline set up
+- [ ] Monitoring configured
+
+### Docker Anti Patterns
+
+**1. Root User**
+
+Running containers as root. Security vulnerability. Create non-root user. Use USER directive.
+
+**2. Latest Tag**
+
+Using latest tag. Unpredictable builds. Pin versions. Use specific tags.
+
+**3. Large Images**
+
+Big base images. Included debug tools. Slow deployments. Use minimal images.
+
+**4. Secret in Image**
+
+Secrets baked into image. Exposed in layers. Use secrets management. Environment variables.
+
+**5. No Health Check**
+
+No way to verify health. Container marked healthy when not. Define proper checks.
+
+---
+
+## 2. Kubernetes
+
+### Nguyên tắc
+
+**1. Resource Management**
+
+Set resource requests and limits. Prevent resource starvation. Enable autoscaling. Monitor resource usage.
+
+**2. Health Checks**
+
+Configure liveness probes. Configure readiness probes. Configure startup probes. Proper failure handling.
+
+**3. Security Contexts**
+
+Run as non-root. Disable privilege escalation. Use read-only root filesystem. Drop capabilities.
+
+**4. Network Policies**
+
+Define network policies. Isolate namespaces. Restrict ingress/egress. Zero trust networking.
+
+**5. Pod Disruption Budgets**
+
+Define PDBs for availability. Control pod eviction. Ensure minimum availability.
+
+**6. Rolling Deployments**
+
+Use rolling update strategy. Configure update parameters. Test deployments. Rollback capability.
+
+**7. Service Mesh Integration**
+
+Use service mesh for observability. Configure mTLS. Implement circuit breakers. Traffic management.
+
+**8. Secret Management**
+
+Use Kubernetes secrets. External secrets management. Encrypt secrets at rest. RBAC for secrets.
+
+**9. Monitoring và Logging**
+
+Centralized logging. Metrics collection. Distributed tracing. Alert management.
+
+**10. GitOps Deployment**
+
+Use GitOps workflow. ArgoCD hoặc Flux. Declarative configurations. Drift detection.
+
+### Kubernetes Checklist
+
+- [ ] Resource limits configured
+- [ ] Health checks implemented
+- [ ] Security contexts set
+- [ ] Network policies defined
+- [ ] PDBs configured
+- [ ] Rolling deployment strategy
+- [ ] Secrets management set up
+- [ ] Monitoring configured
+- [ ] GitOps workflow established
+- [ ] Disaster recovery planned
+
+### Kubernetes Anti Patterns
+
+**1. Running as Root**
+
+Containers running as root. Security vulnerability. Use security contexts.
+
+**2. No Resource Limits**
+
+No resource requests/limits. Resource contention. Unpredictable performance.
+
+**3. Bare Pods**
+
+Pods without Deployments. No restarts. No scaling. Use workload resources.
+
+**4. Default Namespaces**
+
+Using default namespaces. No isolation. Security risks. Use custom namespaces.
+
+**5. Long Running Jobs**
+
+Jobs not completing. Resource leaks. Use CronJobs or batch processing.
+
+---
+
+## 3. Best Practices
+
+### 3.1 Optimized Dockerfile (Node.js)
+
+```dockerfile
+# Dockerfile - Node.js Service
+
+# Stage 1: Build
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci --only=production && \
+    npm cache clean --force
+
+# Copy source
+COPY src ./src
+COPY tsconfig.json ./
+
+# Build
+RUN npm run build
+
+# Stage 2: Production
+FROM node:20-alpine AS production
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+
+WORKDIR /app
+
+# Copy only production files
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
+COPY --from=builder --chown=nodejs:nodejs /app/package.json ./
+
+# Set environment
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Switch to non-root user
+USER nodejs
+
+# Expose port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD node -e "require('http').get('http://localhost:3000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
+
+# Start application
+CMD ["node", "dist/main.js"]
+```
+
+### 3.2 Multi-Stage Dockerfile (Go)
+
+```dockerfile
+# Dockerfile - Go Service
+
+# Build stage
+FROM golang:1.21-alpine AS builder
+
+WORKDIR /app
+
+# Install dependencies
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source
+COPY . .
+
+# Build binary
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+
+# Runtime stage
+FROM alpine:3.19
+
+WORKDIR /app
+
+# Install certificates for HTTPS
+RUN apk --no-cache add ca-certificates
+
+# Copy binary from builder
+COPY --from=builder /app/main .
+
+# Create non-root user
+RUN adduser -D -u 1001 appuser
+
+USER appuser
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
+
+EXPOSE 8080
+
+ENTRYPOINT ["./main"]
+```
+
+### 3.3 Docker Compose for Development
+
+```yaml
+# docker-compose.yml
+version: '3.9'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/app
+      - REDIS_URL=redis://cache:6379
+      - LOG_LEVEL=debug
+    volumes:
+      - ./src:/app/src:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=app
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  cache:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+  migrate:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    command: npm run migrate
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/app
+
+volumes:
+  postgres_data:
+  redis_data:
+```
+
+### 3.4 .dockerignore
+
+```dockerignore
+# Dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Build outputs
+dist
+build
+*.js.map
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Tests
+coverage
+.nyc_output
+*.test.js
+*.spec.js
+__tests__
+
+# Documentation
+docs
+*.md
+!README.md
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+Jenkinsfile
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Misc
+*.bak
+*.tmp
+*.temp
+```
+
+### 3.5 Kubernetes Deployment Configuration
+
+```yaml
+# kubernetes/deployments/api-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+  namespace: production
+  labels:
+    app: api
+    version: v1
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+        version: v1
+    spec:
+      serviceAccountName: api-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: api
+          image: api-service:v1.0.0
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: api-config
+            - secretRef:
+                name: api-secrets
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 10"]
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: api
+                topologyKey: kubernetes.io/hostname
+      tolerations:
+        - key: "node-type"
+          operator: "Equal"
+          value: "application"
+          effect: "NoSchedule"
+```
+
+### 3.6 Kubernetes Service Configuration
+
+```yaml
+# kubernetes/services/api-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+  namespace: production
+  labels:
+    app: api
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
+    prometheus.io/path: "/metrics"
+spec:
+  type: ClusterIP
+  selector:
+    app: api
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      protocol: TCP
+    - name: grpc
+      port: 50051
+      targetPort: 50051
+      protocol: TCP
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+```
+
+### 3.7 Network Policies
+
+```yaml
+# kubernetes/network-policies/allow-rules.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api-network-policy
+  namespace: production
+spec:
+  podSelector:
+    matchLabels:
+      app: api
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+        - podSelector:
+            matchLabels:
+              app: ingress
+      ports:
+        - protocol: TCP
+          port: 8080
+    - from:
+        - podSelector:
+            matchLabels:
+              app: api
+      ports:
+        - protocol: TCP
+          port: 8080
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: postgres
+      ports:
+        - protocol: TCP
+          port: 5432
+    - to:
+        - podSelector:
+            matchLabels:
+              app: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+```
+
+### 3.8 Pod Disruption Budget
+
+```yaml
+# kubernetes/pdb/api-pdb.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: api-pdb
+  namespace: production
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: api
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: critical-pdb
+  namespace: production
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      tier: critical
+```
+
+### 3.9 Horizontal Pod Autoscaler
+
+```yaml
+# kubernetes/hpa/api-hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api-hpa
+  namespace: production
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api-deployment
+  minReplicas: 3
+  maxReplicas: 20
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60
+        - type: Percent
+          value: 10
+          periodSeconds: 60
+      selectPolicy: Min
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        - type: Pods
+          value: 4
+          periodSeconds: 15
+        - type: Percent
+          value: 100
+          periodSeconds: 15
+```
+
+### 3.10 Helm Chart Structure
+
+```yaml
+# api-service/Chart.yaml
+apiVersion: v2
+name: api-service
+description: API Service Helm Chart
+type: application
+version: 1.0.0
+appVersion: "v1.0.0"
+keywords:
+  - api
+  - microservice
+maintainers:
+  - name: Platform Team
+    email: platform@example.com
+
+# api-service/values.yaml
+replicaCount: 3
+
+image:
+  repository: registry.example.com/api-service
+  tag: v1.0.0
+  pullPolicy: IfNotPresent
+  pullSecrets:
+    - name: registry-secret
+
+service:
+  type: ClusterIP
+  ports:
+    http: 80
+    grpc: 50051
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: api.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: api-tls
+      hosts:
+        - api.example.com
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 70
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  fsGroup: 1001
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+nodeSelector:
+  node-type: application
+
+tolerations:
+  - key: "node-type"
+    operator: "Equal"
+    value: "application"
+    effect: "NoSchedule"
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app: api
+          topologyKey: kubernetes.io/hostname
+```
+
+### 3.11 ArgoCD Application
+
+```yaml
+# argocd/api-service-app.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: api-service
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: production
+  source:
+    repoURL: https://github.com/example/k8s-config
+    targetRevision: HEAD
+    path: api-service
+    helm:
+      valueFiles:
+        - values-production.yaml
+      parameters:
+        - name: image.tag
+          value: v1.0.0
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: production
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+```
+
+### 3.12 RBAC Configuration
+
+```yaml
+# kubernetes/rbac/service-account.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: api-sa
+  namespace: production
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: api-role
+  namespace: production
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: api-role-binding
+  namespace: production
+subjects:
+  - kind: ServiceAccount
+    name: api-sa
+    namespace: production
+roleRef:
+  kind: Role
+  name: api-role
+  apiGroup: rbac.authorization.k8s.io
+```
+
+### 3.13 Security Scanning in CI/CD
+
+```yaml
+# .github/workflows/docker.yml
+name: Docker Build and Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          load: true
+          tags: app:${{ github.sha }}
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'app:${{ github.sha }}'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+      
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+      
+      - name: Scan for secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+      
+      - name: Docker Scout
+        uses: docker/scout-action@v1
+        with:
+          command: cves
+          image: app:${{ github.sha }}
+          only-fixed: true
+          exit-code: '1'
+```
+
+### 3.14 Docker Registry Configuration
+
+```yaml
+# docker-compose.yml - Registry
+services:
+  registry:
+    image: registry:2
+    ports:
+      - "5000:5000"
+    environment:
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+    volumes:
+      - registry_data:/var/lib/registry
+      - ./auth:/auth
+
+  registry-ui:
+    image: joxit/docker-registry-ui:latest
+    ports:
+      - "8080:80"
+    environment:
+      REGISTRY_URL: http://registry:5000
+    depends_on:
+      - registry
+
+volumes:
+  registry_data:
+```
+
+```bash
+# Generate htpasswd credentials
+docker run --rm \
+  -v $(pwd)/auth:/auth \
+  alpine sh -c "apk add --no-cache apache2-utils && htpasswd -Bc /auth/htpasswd admin"
+
+# Push to registry
+docker login registry.example.com
+docker tag app:latest registry.example.com/app:v1.0.0
+docker push registry.example.com/app:v1.0.0
+```
+
+---
+
+## 4. Docker vs Kubernetes
+
+| Aspect | Docker | Kubernetes |
+|--------|--------|------------|
+| **Use Case** | Local dev, packaging | Production orchestration |
+| **Scope** | Single host | Multi-node cluster |
+| **Scaling** | Manual | Automated (HPA) |
+| **Service Discovery** | Docker DNS | CoreDNS + Services |
+| **Load Balancing** | Port mapping | ClusterIP, NodePort, LoadBalancer |
+| **Rolling Updates** | docker-compose rebuild | RollingUpdate strategy |
+| **Secrets** | Env vars, volumes | Native Secrets API |
+| **Storage** | Volumes | PersistentVolumes, PVC |
+| **Monitoring** | docker stats | Metrics Server, Prometheus |
+
+### When to Use Docker Alone
+
+- Local development environment
+- Single container applications
+- CI/CD build pipelines
+- Small scale testing
+
+### When to Use Kubernetes
+
+- Production deployments
+- Multi-container microservices
+- Auto-scaling requirements
+- High availability needs
+- Multi-node clusters
+- Complex networking requirements
+
+---
+
+## 5. Migration Path: Docker → Kubernetes
+
+### Phase 1: Containerize (Docker)
+
+1. Create optimized Dockerfile
+2. Use multi-stage builds
+3. Add health checks
+4. Configure resource limits
+5. Set up Docker Compose for local dev
+
+### Phase 2: Kubernetes Preparation
+
+1. Create Kubernetes manifests (Deployment, Service)
+2. Add security contexts
+3. Configure resource requests/limits
+4. Add liveness/readiness probes
+5. Create ConfigMaps and Secrets
+
+### Phase 3: Cluster Configuration
+
+1. Set up namespaces
+2. Configure RBAC
+3. Define Network Policies
+4. Set up storage (PV/PVC)
+5. Configure Ingress
+
+### Phase 4: GitOps Setup
+
+1. Set up Helm charts or Kustomize
+2. Configure ArgoCD or Flux
+3. Set up CI/CD pipeline
+4. Configure automated deployments
+
+### Phase 5: Production Hardening
+
+1. Configure HPA
+2. Set up Pod Disruption Budgets
+3. Configure autoscaling behavior
+4. Set up monitoring and alerting
+5. Document runbooks
+
+---
+
+## 6. Workflow
+
+### Docker Workflow
+
+**Phase 1: Dockerfile Creation**
+
+Create optimized Dockerfile. Use multi-stage builds. Add security best practices. Configure health checks.
+
+**Phase 2: Docker Compose Setup**
+
+Create development environment. Configure services. Set up networking. Add dependencies.
+
+**Phase 3: Security Hardening**
+
+Add security scanning. Configure secrets. Set resource limits. Enable audit logging.
+
+**Phase 4: CI/CD Integration**
+
+Set up build pipeline. Add security scanning. Configure registry. Set up deployments.
+
+**Phase 5: Monitoring**
+
+Configure logging driver. Set up metrics. Add health checks. Monitor resource usage.
+
+### Kubernetes Workflow
+
+**Phase 1: Cluster Setup**
+
+Set up cluster. Configure networking. Set up RBAC. Configure storage.
+
+**Phase 2: Application Configuration**
+
+Create manifests. Configure resources. Set up health checks. Add security contexts.
+
+**Phase 3: Deployment**
+
+Deploy applications. Verify health. Configure autoscaling. Set up PDBs.
+
+**Phase 4: Monitoring**
+
+Set up metrics. Configure logging. Set up tracing. Configure alerts.
+
+**Phase 5: GitOps**
+
+Set up ArgoCD/Flux. Configure repositories. Set up sync policies.
+
+**Phase 6: Operations**
+
+Monitor deployments. Handle incidents. Optimize resources. Update regularly.
+
+---
+
+## Liên kết
+
+- [[deployment]] - Deployment strategies
+- [[microservices]] - Microservices architecture
+- [[service-mesh]] - Service mesh patterns
+- [[observability]] - Monitoring and logging
+- [[security]] - Container security
+- [[ci-cd]] - CI/CD pipelines
+- [[gitops]] - GitOps workflow

@@ -1,8 +1,8 @@
 ---
-description: Nguyên tắc và best practices cho bảo mật trong Cursor Enterprise Framework
+description: Security - hợp nhất từ security.mdc, web-security.mdc, secrets-management.mdc. Nguyên tắc và best practices cho bảo mật trong Cursor Enterprise Framework
 created: 2026-06-23
-version: 1.0.0
-tags: [security, authentication, authorization, encryption, vulnerability]
+version: 1.1.0
+tags: [security, web-security, secrets, authentication, authorization, encryption, vulnerability, merged]
 ---
 
 # Security
@@ -816,9 +816,456 @@ function securityHeadersMiddleware(
 ## Liên kết
 
 - [[api]] - API security
-- [[secrets-management]] - Secrets management
 - [[database]] - Database security
 - [[monitoring]] - Security monitoring
 - [[incident-response]] - Security incident response
 - [[oauth]] - OAuth and OpenID Connect
 - [[jwt]] - JWT security patterns
+
+---
+
+## Web Security
+
+### OWASP Top 10
+
+Common web vulnerabilities.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    OWASP Top 10 (2021)                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  1. Broken Access Control                                        │
+│  2. Cryptographic Failures                                      │
+│  3. Injection                                                   │
+│  4. Insecure Design                                             │
+│  5. Security Misconfiguration                                    │
+│  6. Vulnerable Components                                         │
+│  7. Auth Failures                                               │
+│  8. Data Integrity Failures                                       │
+│  9. Logging Failures                                             │
+│  10. SSRF (Server-Side Request Forgery)                          │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### HTTPS Configuration
+
+```typescript
+import helmet from 'helmet';
+
+// Security headers
+app.use(helmet());
+
+// HSTS (HTTP Strict Transport Security)
+app.use(helmet.hsts({
+    maxAge: 31536000,        // 1 year
+    includeSubDomains: true,
+    preload: true
+}));
+
+// Content Security Policy
+app.use(helmet.contentSecurityPolicy({
+    directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'nonce-{generated-nonce}'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "https:"],
+        connectSrc: ["'self'", "https://api.example.com"],
+        frameAncestors: ["'none'"],
+        upgradeInsecureRequests: []
+    }
+}));
+
+// X-Frame Options
+app.use(helmet.frameguard({ action: 'deny' }));
+
+// X-Content-Type-Options
+app.use(helmet.noSniff());
+
+// Referrer Policy
+app.use(helmet.referrerPolicy({ policy: 'strict-origin-when-cross-origin' }));
+```
+
+### SQL Injection Prevention
+
+```typescript
+// Parameterized queries (safe)
+async function getUserById(id: string) {
+    const result = await db.query(
+        'SELECT * FROM users WHERE id = $1',
+        [id]
+    );
+    return result.rows[0];
+}
+
+// ORM usage (safe by default)
+const user = await prisma.user.findUnique({
+    where: { id: userId }
+});
+
+// Avoid this - string concatenation (dangerous!)
+const query = `SELECT * FROM users WHERE id = '${id}'`; // SQL INJECTION!
+
+// Input sanitization for NoSQL
+function sanitizeMongoQuery(input: any): any {
+    if (typeof input === 'string') {
+        return input.replace(/[$]/g, '\\$');
+    }
+    return input;
+}
+```
+
+### XSS Prevention
+
+```typescript
+// Content Security Policy
+const csp = `
+    default-src 'self';
+    script-src 'self' 'nonce-{nonce}';
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' data: https://images.example.com;
+    frame-ancestors 'none';
+`;
+
+// HTTPOnly cookies
+res.cookie('sessionId', sessionId, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'strict',
+    maxAge: 86400000
+});
+
+// React automatically escapes output
+// function UserProfile({ user }) {
+//     <div>{user.name}</div>  // Automatically escaped!
+// }
+
+// For dangerouslySetInnerHTML, sanitize first
+import DOMPurify from 'isomorphic-dompurify';
+
+function renderMarkdown(content: string): string {
+    const html = marked.parse(content);
+    return DOMPurify.sanitize(html);
+}
+```
+
+### CSRF Protection
+
+```typescript
+import csrf from 'csurf';
+
+const csrfProtection = csrf({
+    cookie: {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict'
+    }
+});
+
+// Generate token for forms
+app.get('/form', csrfProtection, (req, res) => {
+    res.json({ csrfToken: req.csrfToken() });
+});
+
+// Validate token
+app.post('/form', csrfProtection, (req, res) => {
+    res.json({ success: true });
+});
+
+// Double Submit Cookie Pattern
+function csrfMiddleware(req: Request, res: Response, next: NextFunction) {
+    const cookieToken = req.cookies['csrf-token'];
+    const headerToken = req.headers['x-csrf-token'];
+
+    if (!cookieToken || !headerToken) {
+        return res.status(403).json({ error: 'CSRF token missing' });
+    }
+
+    if (cookieToken !== headerToken) {
+        return res.status(403).json({ error: 'CSRF token mismatch' });
+    }
+
+    next();
+}
+```
+
+### Security Headers Configuration
+
+```yaml
+# Security headers configuration
+security_headers:
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: "1; mode=block"
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: |
+    geolocation=(),
+    microphone=(),
+    camera=(),
+    payment=(self "https://payments.example.com")
+  Content-Security-Policy: |
+    default-src 'self';
+    script-src 'self';
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'none';
+  Strict-Transport-Security: |
+    max-age=31536000;
+    includeSubDomains;
+    preload
+```
+
+### File Upload Security
+
+```typescript
+import multer from 'multer';
+import path from 'path';
+
+const storage = multer.diskStorage({
+    destination: '/tmp/uploads',
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+    const allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+    if (allowedMimes.includes(file.mimetype)) {
+        cb(null, true);
+    } else {
+        cb(new Error('Invalid file type'));
+    }
+};
+
+const upload = multer({
+    storage,
+    fileFilter,
+    limits: { fileSize: 5 * 1024 * 1024, files: 1 }
+});
+
+import sanitize from 'sanitize-filename';
+
+function sanitizeFilename(filename: string): string {
+    return sanitize(filename, { replacement: '_' });
+}
+```
+
+### Security Monitoring
+
+```typescript
+interface SecurityEvent {
+    type: 'INTRUSION' | 'BRUTE_FORCE' | 'XSS' | 'SQL_INJECTION';
+    severity: 'low' | 'medium' | 'high' | 'critical';
+    ip: string;
+    userAgent: string;
+    timestamp: Date;
+    details: Record<string, any>;
+}
+
+function logSecurityEvent(event: SecurityEvent) {
+    logger.warn({ ...event, eventType: 'security_event' });
+    if (event.severity === 'critical') {
+        alertSecurityTeam(event);
+    }
+}
+
+function detectSQLInjection(input: string): boolean {
+    const sqlPatterns = [
+        /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION)\b/i,
+        /(--|;|'|\/\*|\*\/|xp_|sp_)/,
+        /(OR|AND)\s+\d+\s*=\s*\d+/
+    ];
+    return sqlPatterns.some(pattern => pattern.test(input));
+}
+
+function detectXSS(input: string): boolean {
+    const xssPatterns = [
+        /<script/i, /javascript:/i, /on\w+\s*=/i, /<iframe/i, /<object/i
+    ];
+    return xssPatterns.some(pattern => pattern.test(input));
+}
+```
+
+---
+
+## Secrets Management
+
+### Nguyên tắc
+
+- **Centralized Storage**: Store secrets in dedicated system (Vault, AWS Secrets Manager). No hardcoding. No config files in repo.
+- **Least Privilege**: Grant minimum access needed. Role-based access. Regular reviews. Revoke unused access.
+- **Encryption**: Encrypt at rest. Encrypt in transit. Use proper key management. Rotate encryption keys.
+- **Rotation**: Rotate secrets regularly. Automate rotation. Short-lived credentials.
+- **Auditing**: Log all access. Track changes. Alert on anomalies. Compliance reporting.
+- **No Secrets in Code**: No hardcoded secrets. No in comments. No in logs. Externalize all secrets.
+
+### HashiCorp Vault Configuration
+
+```yaml
+# vault/config.hcl
+ui = true
+cluster_addr = "https://vault.internal:8201"
+api_addr = "https://vault.internal:8200"
+
+storage "consul" {
+  address = "consul.internal:8500"
+  path    = "vault/"
+}
+
+listener "tcp" {
+  address       = "[::]:8200"
+  cluster_address  = "[::]:8201"
+  tls_cert_file = "/etc/vault/tls/vault.crt"
+  tls_key_file  = "/etc/vault/tls/vault.key"
+  tls_min_version = "tls12"
+}
+
+audit "file" {
+  file_path = "/var/log/vault/audit.log"
+  log_raw = true
+}
+```
+
+### Vault Policies
+
+```hcl
+# vault-policy-engineer.hcl
+path "sys/mounts/*" { capabilities = ["read"] }
+path "database/creds/engineer-*" { capabilities = ["read"] }
+path "secret/data/services/*" { capabilities = ["read"] }
+path "pki/certs/*" { capabilities = ["read"] }
+path "*" { capabilities = ["deny"] }
+```
+
+### Kubernetes Secrets with External Secrets Operator
+
+```yaml
+apiVersion: external-secrets.io/v1beta1
+kind: ClusterExternalSecret
+metadata:
+  name: production-secrets
+spec:
+  secretStoreRef:
+    name: vault-backend
+    kind: ClusterSecretStore
+  refreshInterval: 1h
+  externalSecretSpec:
+    secretDeletionPolicy: Delete
+    target:
+      name: production-secrets
+      creationPolicy: Owner
+    data:
+      - secretKey: DATABASE_URL
+        remoteRef:
+          key: secret/data/production/database
+          property: url
+---
+apiVersion: external-secrets.io/v1beta1
+kind: ClusterSecretStore
+metadata:
+  name: vault-backend
+spec:
+  provider:
+    vault:
+      server: "https://vault.internal:8200"
+      path: "secret"
+      version: "v2"
+      auth:
+        kubernetes:
+          mountPath: "kubernetes"
+          role: "external-secrets-operator"
+```
+
+### Application Integration
+
+```typescript
+import Vault from 'node-vault';
+
+const vault = Vault({
+  endpoint: process.env.VAULT_ADDR,
+  token: process.env.VAULT_TOKEN
+});
+
+export class SecretsClient {
+  private cache = new Map<string, { value: string; expires: number }>();
+
+  async getSecret(path: string, ttl = 300): Promise<string> {
+    const cached = this.cache.get(path);
+    if (cached && cached.expires > Date.now()) return cached.value;
+
+    const secret = await vault.read(path);
+    this.cache.set(path, {
+      value: JSON.stringify(secret.data.data),
+      expires: Date.now() + ttl * 1000
+    });
+    return JSON.stringify(secret.data.data);
+  }
+
+  async getDynamicCredential(engine: string, role: string) {
+    const result = await vault.read(`${engine}/creds/${role}`);
+    return {
+      username: result.data.username,
+      password: result.data.password,
+      lease_id: result.lease_id
+    };
+  }
+}
+```
+
+### AWS Secrets Manager Integration
+
+```typescript
+import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
+
+const client = new SecretsManagerClient({ region: 'us-east-1' });
+
+export class AWSSecretsClient {
+  async getSecret(secretName: string): Promise<Record<string, string>> {
+    const command = new GetSecretValueCommand({ SecretId: secretName });
+    const response = await client.send(command);
+    return response.SecretString ? JSON.parse(response.SecretString) : {};
+  }
+}
+```
+
+### Secret Scanning
+
+```yaml
+# .github/workflows/secret-scanning.yml
+name: Secret Scanning
+on: [push, pull_request]
+jobs:
+  detect-secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan for secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+```
+
+### Secrets Management Checklist
+
+- [ ] Secrets store configured (Vault, AWS Secrets Manager, etc.)
+- [ ] Access controls defined
+- [ ] Rotation policy established
+- [ ] Encryption configured
+- [ ] Auditing enabled
+- [ ] Secrets in code removed
+- [ ] Environment separation configured
+- [ ] Emergency procedures documented
+- [ ] Team trained on practices
+- [ ] Compliance requirements met
+
+### Anti Pattern - Secrets
+
+- **Hardcoded Secrets**: API keys in code, passwords in config, secrets in git
+- **Shared Accounts**: Generic passwords, shared credentials, no accountability
+- **No Rotation**: Same passwords for years, no key rotation
+- **Over-Permission**: Admin access for everyone, too many permissions
+- **Secrets in Logs**: Passwords in logs, tokens in requests, sensitive data exposure

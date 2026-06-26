@@ -1,8 +1,8 @@
 ---
-description: Nguyên tắc và best practices cho Observability trong Cursor Enterprise Framework
+description: Observability - hợp nhất từ observability, monitoring, logging. Bao gồm metrics, logs, traces, health checks, alerting, và dashboards.
 created: 2026-06-23
-version: 1.0.0
-tags: [observability, monitoring, logging, tracing, metrics, opentelemetry]
+version: 2.0.0
+tags: [observability, monitoring, logging, metrics, traces, health-checks, alerting, dashboards, merged, opentelemetry]
 ---
 
 # Observability
@@ -597,6 +597,377 @@ dashboards:
 - Escalate to Engineering Manager if not resolved in 1 hour
 ```
 
+## Monitoring
+
+### Mục tiêu
+
+Monitoring là window vào health và behavior của production systems. Không có monitoring, teams operate blind - không biết systems đang hoạt động tốt hay đang gặp vấn đề cho đến khi users report.
+
+### Health Checks
+
+```typescript
+// Health check registry
+class HealthCheckRegistry {
+  private checks: Map<string, HealthCheck> = new Map();
+
+  register(name: string, check: HealthCheck) {
+    this.checks.set(name, check);
+  }
+
+  async getHealth(): Promise<HealthStatus> {
+    const results = await Promise.allSettled(
+      Array.from(this.checks.entries()).map(
+        async ([name, check]) => {
+          const result = await check();
+          return { name, ...result };
+        }
+      )
+    );
+
+    const checks = results.map(r => {
+      if (r.status === 'fulfilled') return r.value;
+      return {
+        name: 'unknown',
+        status: 'unknown',
+        error: r.reason?.message || 'Check failed'
+      };
+    });
+
+    const allHealthy = checks.every(c => c.status === 'healthy');
+    const anyDegraded = checks.some(c => c.status === 'degraded');
+
+    return {
+      status: allHealthy ? 'healthy' : anyDegraded ? 'degraded' : 'unhealthy',
+      timestamp: new Date().toISOString(),
+      version: process.env.APP_VERSION,
+      checks
+    };
+  }
+}
+
+// Database health check
+healthChecks.register('database', async () => {
+  try {
+    const result = await db.query('SELECT 1');
+    return { status: 'healthy' };
+  } catch (error) {
+    return { status: 'unhealthy', error: error.message };
+  }
+});
+
+// Redis health check
+healthChecks.register('redis', async () => {
+  try {
+    const start = Date.now();
+    await redis.ping();
+    const latency = Date.now() - start;
+    return {
+      status: latency < 100 ? 'healthy' : 'degraded',
+      latency,
+      message: latency < 100 ? 'OK' : 'Slow response'
+    };
+  } catch (error) {
+    return { status: 'unhealthy', error: error.message };
+  }
+});
+
+// Health endpoints
+app.get('/health/live', (request, response) => {
+  response.json({ status: 'alive' });
+});
+
+app.get('/health/ready', async (request, response) => {
+  const health = await healthChecks.getHealth();
+  const dbCheck = health.checks.find(c => c.name === 'database');
+  const isReady = dbCheck?.status === 'healthy';
+  response.status(isReady ? 200 : 503).json({ ready: isReady, checks: health.checks });
+});
+```
+
+### Alert Configuration
+
+```typescript
+// Alert rule definitions
+const alertRules: AlertRule[] = [
+  {
+    name: 'High Error Rate',
+    condition: {
+      metric: 'http_requests_total',
+      filters: { status: '5xx' },
+      aggregation: 'rate',
+      window: '5m',
+      operator: '>',
+      threshold: 0.01 // 1%
+    },
+    severity: 'critical',
+    summary: 'HTTP error rate exceeds 1%',
+    runbook: '/runbooks/high-error-rate'
+  },
+  {
+    name: 'High Latency P99',
+    condition: {
+      metric: 'http_request_duration_seconds',
+      percentile: 99,
+      aggregation: 'histogram_quantile',
+      window: '5m',
+      operator: '>',
+      threshold: 2 // 2 seconds
+    },
+    severity: 'warning',
+    summary: 'P99 latency exceeds 2 seconds',
+    runbook: '/runbooks/high-latency'
+  }
+];
+```
+
+### Monitoring Checklist
+
+- [ ] Logging framework configured
+- [ ] Structured logging implemented
+- [ ] Metrics collection setup
+- [ ] Distributed tracing configured
+- [ ] Health checks implemented
+- [ ] SLOs defined for critical services
+- [ ] Alerts configured with runbooks
+- [ ] Dashboards created
+- [ ] On-call rotation established
+- [ ] Incident response process documented
+
+## Logging
+
+### Nguyên tắc cơ bản
+
+Logging là phần quan trọng của observability, cung cấp detailed records của system behavior.
+
+### Log Levels
+
+```typescript
+// Log levels hierarchy
+enum LogLevel {
+    TRACE = 0,    // Most detailed - framework internals
+    DEBUG = 1,     // Debugging information
+    INFO = 2,      // Normal operations
+    WARN = 3,      // Warnings, non-critical issues
+    ERROR = 4,     // Errors
+    FATAL = 5      // Critical failures
+}
+
+// Usage guidelines
+logger.trace('Entering function', { functionName: 'processOrder' });
+logger.debug('Processing item', { itemId: '123', index: 0 });
+logger.info('Order created', { orderId: '456', total: 99.99 });
+logger.warn('Rate limit approaching', { current: 95, max: 100 });
+logger.error('Database connection failed', { error: err.message });
+logger.fatal('System shutting down', { reason: 'Out of memory' });
+```
+
+### Structured Logging Format
+
+```typescript
+// Structured log format
+{
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "level": "info",
+    "message": "Order created",
+    "service": "order-service",
+    "version": "1.2.0",
+    "environment": "production",
+    "correlationId": "req-abc-123",
+    "userId": "user-456",
+    "orderId": "order-789",
+    "duration": 150,
+    "metadata": {}
+}
+```
+
+### Request Logging
+
+```typescript
+// Request logging middleware
+export function requestLoggingMiddleware(req: Request, res: Response, next: NextFunction) {
+    const startTime = Date.now();
+    const requestId = req.headers['x-request-id'] as string || generateRequestId();
+
+    req.headers['x-request-id'] = requestId;
+
+    logger.info({
+        requestId,
+        method: req.method,
+        url: req.originalUrl,
+        path: req.path,
+        event: 'request_started'
+    }, 'Incoming request');
+
+    res.on('finish', () => {
+        const duration = Date.now() - startTime;
+        const logData = {
+            requestId,
+            method: req.method,
+            url: req.originalUrl,
+            statusCode: res.statusCode,
+            duration,
+            event: 'request_completed'
+        };
+
+        if (res.statusCode >= 500) {
+            logger.error(logData, 'Request completed with server error');
+        } else if (res.statusCode >= 400) {
+            logger.warn(logData, 'Request completed with client error');
+        } else {
+            logger.info(logData, 'Request completed');
+        }
+    });
+
+    next();
+}
+```
+
+### Sensitive Data Handling
+
+```typescript
+// Sensitive data filtering
+const SENSITIVE_FIELDS = [
+    'password', 'token', 'secret', 'apiKey', 'api_key',
+    'accessToken', 'refreshToken', 'creditCard', 'cardNumber', 'cvv'
+];
+
+function sanitizeObject(obj: any, depth = 0): any {
+    if (depth > 10) return '[MAX_DEPTH]';
+    if (typeof obj !== 'object' || obj === null) return obj;
+
+    if (Array.isArray(obj)) {
+        return obj.map(item => sanitizeObject(item, depth + 1));
+    }
+
+    const sanitized: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+        if (SENSITIVE_FIELDS.some(f => key.toLowerCase().includes(f))) {
+            sanitized[key] = '[REDACTED]';
+        } else {
+            sanitized[key] = sanitizeObject(value, depth + 1);
+        }
+    }
+    return sanitized;
+}
+```
+
+### Log Aggregation
+
+```typescript
+// Winston with Elasticsearch transport
+import winston from 'winston';
+import { ElasticsearchTransport } from 'winston-elasticsearch';
+
+const logger = winston.createLogger({
+    level: process.env.LOG_LEVEL || 'info',
+    format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json()
+    ),
+    transports: [
+        new winston.transports.Console({
+            format: winston.format.combine(
+                winston.format.colorize(),
+                winston.format.simple()
+            )
+        }),
+        new ElasticsearchTransport({
+            level: 'info',
+            clientOpts: { node: process.env.ELASTICSEARCH_URL },
+            indexPrefix: 'logs-service',
+            indexSuffixPattern: 'YYYY.MM.DD'
+        }),
+        new winston.transports.DailyRotateFile({
+            filename: 'logs/application-%DATE%.log',
+            datePattern: 'YYYY-MM-DD',
+            maxSize: '100m',
+            maxFiles: '30d'
+        })
+    ]
+});
+```
+
+### Audit Logging
+
+```typescript
+// Audit logger
+class AuditLogger {
+    private logger: pino.Logger;
+
+    constructor() {
+        this.logger = baseLogger.child({ component: 'audit', audit: true });
+    }
+
+    log(event: AuditEvent): void {
+        this.logger.info({
+            timestamp: new Date().toISOString(),
+            event: event.type,
+            actorId: event.actorId,
+            resourceType: event.resourceType,
+            resourceId: event.resourceId,
+            action: event.action,
+            result: event.result
+        });
+    }
+
+    login(userId: string, success: boolean, ip: string): void {
+        this.log({ type: 'AUTHENTICATION', actorId: userId, actorType: 'USER',
+            resourceType: 'SESSION', resourceId: undefined,
+            action: success ? 'LOGIN_SUCCESS' : 'LOGIN_FAILED',
+            result: 'SUCCESS', ip });
+    }
+
+    dataAccess(userId: string, resource: string, resourceId: string, action: string): void {
+        this.log({ type: 'DATA_ACCESS', actorId: userId, actorType: 'USER',
+            resourceType: resource, resourceId, action, result: 'SUCCESS' });
+    }
+}
+```
+
+### Log Retention
+
+```yaml
+# Production - long retention with archiving
+production:
+  retention:
+    hot: 90    # days in hot storage
+    warm: 180  # days in warm storage
+    cold: 365  # days in cold storage
+  rotation:
+    maxSize: 10GB
+    maxFiles: 100
+  archive:
+    enabled: true
+    destination: s3://logs-archive/
+```
+
+### Logging Checklist
+
+- [ ] Use structured logging format
+- [ ] Implement proper log levels
+- [ ] Add correlation IDs
+- [ ] Sanitize sensitive data
+- [ ] Log all security events
+- [ ] Configure log rotation
+- [ ] Set up log aggregation
+- [ ] Define retention policies
+
+### Logging Anti Patterns
+
+```typescript
+// Không nên - unstructured logging
+console.log('User ' + userId + ' created order ' + orderId);
+
+// Nên - structured logging
+logger.info({ userId, orderId }, 'User created order');
+
+// Không nên - logging sensitive data
+logger.info('User login', { password: req.body.password });
+
+// Nên - sanitize
+logger.info('User login', { email: req.body.email });
+```
+
 ## Workflow
 
 **Phase 1: Design**
@@ -625,8 +996,9 @@ Monitor alerts. Update dashboards. Refine SLOs. Train team.
 
 ## Liên kết
 
-- [[monitoring]] - Monitoring practices
-- [[logging]] - Logging best practices
+- [[opentelemetry]] - OpenTelemetry integration
+- [[alerting]] - Alerting patterns
+- [[performance]] - Performance optimization
 - [[tracing]] - Distributed tracing
 - [[alerting]] - Alert management
 - [[incident-response]] - Incident response

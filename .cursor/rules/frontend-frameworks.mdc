@@ -1,0 +1,444 @@
+---
+description: Frontend Frameworks - hợp nhất từ Next.js, Nuxt.js, Vue.js, Frontend Architecture trong Cursor Enterprise Framework
+created: 2026-06-23
+version: 1.0.0
+tags: [frontend, nextjs, nuxt, vue, react, framework, architecture, ssr, ssg]
+---
+
+# Frontend Frameworks
+
+## Tổng quan So sánh
+
+| Aspect | Next.js | Nuxt.js | Vue.js |
+|--------|---------|---------|--------|
+| Framework | React | Vue | Vue (Core) |
+| SSR | Yes (built-in) | Yes (built-in) | SPA / SSR (via Nuxt) |
+| Routing | File-based (App Router) | File-based | Vue Router |
+| Data Fetching | Server Components, fetch | useFetch, useAsyncData | Composables |
+| State | React Query, Context, Zustand | Pinia, useState | Pinia, Composition API |
+| Ecosystem | Vercel, large community | Nuxt modules | Vue ecosystem |
+
+---
+
+## 1. Next.js (React Framework)
+
+### Mục tiêu
+
+Next.js là React framework được sử dụng rộng rãi cho việc xây dựng các web applications hiện đại với features như Server-Side Rendering (SSR), Static Site Generation (SSG), và API routes. Trong Cursor Enterprise Framework, Next.js đóng vai trò là primary frontend framework cho các dự án cần SEO tốt, performance cao, và developer experience tuyệt vời.
+
+### Nguyên tắc
+
+**1. Rendering Strategy Selection**
+
+SSG cho static content (homepage, blog posts). SSR cho dynamic, personalized content. ISR cho content that changes but can be cached. CSR cho highly interactive, user-specific content.
+
+**2. App Router vs Pages Router**
+
+Use App Router for new projects. It's the future of Next.js. Better data fetching with Server Components. Built-in layouts and nested routing.
+
+**3. Server Components by Default**
+
+Start with Server Components. Move to Client Components only when needed: Interactive UI (useState, useEffect), Browser APIs, Real-time data.
+
+**4. Data Fetching Patterns**
+
+Use async/await in Server Components. Fetch data close to where it's used. Use React `cache()` for request deduplication.
+
+**5. Route Organization**
+
+Group related routes together. Use route groups for layout organization. Use dynamic routes for parameterized URLs.
+
+**6. API Routes for BFF**
+
+Use API routes as Backend-For-Frontend. Aggregate data from multiple sources. Keep API routes thin.
+
+### Checklist
+
+- [ ] Next.js version selected (latest stable)
+- [ ] Rendering strategy defined per page
+- [ ] App Router structure established
+- [ ] Data fetching patterns implemented
+- [ ] Image optimization configured
+- [ ] Metadata management setup
+- [ ] Error handling implemented
+- [ ] Loading states designed
+- [ ] Testing strategy defined
+- [ ] Deployment configuration ready
+
+### Anti Pattern
+
+**1. Overusing Client Components** - Marking everything as 'use client' increases bundle size unnecessarily.
+
+**2. Data Fetching in Client Components** - Fetching data on client when server fetch is possible.
+
+**3. Ignoring Loading States** - Not implementing proper loading UI causes layout shifts.
+
+**4. Large Bundle Sizes** - Importing entire libraries without tree shaking.
+
+### Best Practice
+
+```typescript
+// app/
+// ├── (marketing)/
+// │   ├── layout.tsx
+// │   ├── page.tsx
+// │   ├── about/
+// │   └── pricing/
+// ├── (dashboard)/
+// │   ├── layout.tsx
+// │   ├── dashboard/
+// │   └── settings/
+// ├── api/
+// │   ├── users/
+// │   └── orders/
+// ├── layout.tsx
+// └── not-found.tsx
+```
+
+```typescript
+// Server Component Data Fetching
+export default async function OrdersPage() {
+  const [orders, user] = await Promise.all([
+    getOrders(),
+    getUser()
+  ]);
+  
+  return (
+    <div>
+      <h1>Orders for {user.name}</h1>
+      <Suspense fallback={<OrderListSkeleton />}>
+        <OrderList orders={orders} />
+      </Suspense>
+    </div>
+  );
+}
+```
+
+---
+
+## 2. Nuxt.js (Vue Framework)
+
+### Mục tiêu
+
+Nuxt.js là full-stack framework được xây trên Vue.js, cung cấp Server-Side Rendering (SSR), Static Site Generation (SSG), và nhiều features khác giúp đơn giản hóa việc xây dựng các Vue applications. Nuxt.js là lựa chọn lý tưởng cho các projects cần SEO tốt, performance cao, và unified developer experience.
+
+### Nguyên tắc
+
+**1. Nuxt 3 First**
+
+Use Nuxt 3 for all new projects. Vue 3 + Vite based. Better performance and TypeScript support.
+
+**2. Auto-Imports**
+
+Components, composables, và utils được auto-imported. Don't manually import common items. Reduce boilerplate significantly.
+
+**3. File-Based Routing**
+
+Routes được tự động tạo từ file structure. layouts/, pages/, middleware/. Dynamic routes với [id].ext.
+
+**4. Server Routes**
+
+Implement API endpoints in server/ directory. H3 (unjs/h3) under the hood. Type-safe request handling.
+
+**5. Data Fetching Composables**
+
+useFetch cho SSR-friendly fetching. useAsyncData cho cached requests. $fetch cho client-side only.
+
+**6. State Management**
+
+useState for SSR-safe shared state. Pinia integration available.
+
+**7. Rendering Modes**
+
+SSG cho marketing sites. SSR cho dynamic content. SPA mode cho pure client apps. Hybrid rendering với route rules.
+
+### Checklist
+
+- [ ] Nuxt 3 project initialized
+- [ ] TypeScript configured
+- [ ] Rendering mode selected
+- [ ] Nuxt modules installed
+- [ ] Server routes organized
+- [ ] Data fetching patterns established
+- [ ] State management configured
+- [ ] Error handling implemented
+- [ ] SEO metadata configured
+- [ ] Testing setup complete
+
+### Anti Pattern
+
+**1. Manual Imports When Auto-Import Works** - Adds unnecessary boilerplate.
+
+**2. Blocking Async Data** - Not awaiting async data causes SSR hydration mismatches.
+
+**3. Mixing Client và Server State** - Not understanding where state lives causes hydration issues.
+
+**4. Heavy Client-Side Rendering** - Overusing client-only components impacts SEO.
+
+### Best Practice
+
+```typescript
+// nuxt.config.ts
+export default defineNuxtConfig({
+  modules: [
+    '@nuxtjs/tailwindcss',
+    '@pinia/nuxt',
+    '@vueuse/nuxt',
+    '@nuxt/image'
+  ],
+  
+  routeRules: {
+    '/': { prerender: true },
+    '/blog/**': { swr: 3600 },
+    '/dashboard/**': { ssr: true },
+    '/admin/**': { ssr: false }
+  }
+});
+```
+
+```typescript
+// Data Fetching
+const { data: post } = await useAsyncData(
+  `post-${route.params.slug}`,
+  () => $fetch<BlogPost>(`/api/blog/${route.params.slug}`)
+);
+
+useSeoMeta({
+  title: () => post.value?.title,
+  description: () => post.value?.excerpt
+});
+```
+
+---
+
+## 3. Vue.js (Core Framework)
+
+### Mục tiêu
+
+Vue.js là một progressive JavaScript framework được thiết kế để xây dựng user interfaces. Nổi tiếng với developer experience tuyệt vời và gentle learning curve, Vue được sử dụng rộng rãi trong các enterprise projects từ simple SPAs đến complex dashboards.
+
+### Nguyên tắc
+
+**1. Composition API First**
+
+Sử dụng Composition API cho tất cả new code. Better TypeScript support. Better code organization.
+
+**2. Single File Components**
+
+Mỗi component trong một file (.vue). Template, script, và styles trong cùng file.
+
+**3. Script Setup Syntax**
+
+Use `<script setup>` for cleaner components. Less boilerplate. Better performance.
+
+**4. Reactive Data**
+
+Use `ref()` cho primitive values. Use `reactive()` cho objects.
+
+**5. Computed Properties**
+
+Use computed properties for derived state. Automatic caching.
+
+**6. Composables for Reusability**
+
+Extract reusable logic into composables. Use `use` prefix convention.
+
+### Checklist
+
+- [ ] Vue 3 installed (latest stable)
+- [ ] TypeScript configured
+- [ ] Project structure established
+- [ ] Pinia for state management
+- [ ] Vue Router configured
+- [ ] Component naming conventions
+- [ ] Composables organized
+- [ ] Error handling setup
+- [ ] Testing configured
+- [ ] Build optimization done
+
+### Anti Pattern
+
+**1. Mutating Props Directly** - Breaks one-way data flow.
+
+**2. Overusing Pinia** - Using global store for everything creates unnecessary coupling.
+
+**3. Big Components** - Components doing too much are hard to maintain.
+
+**4. Ignoring Performance** - Not using v-memo or v-once.
+
+### Best Practice
+
+```typescript
+// Project Structure
+// src/
+// ├── assets/
+// ├── components/
+// │   ├── common/     # Base components
+// │   ├── layout/     # Layout components
+// │   └── features/    # Feature-specific
+// ├── composables/    # Reusable composition functions
+// ├── views/          # Route views
+// ├── stores/         # Pinia stores
+// ├── router/
+// ├── services/
+// └── types/
+```
+
+```vue
+<!-- Component with Composition API -->
+<script setup lang="ts">
+interface Props {
+  userId: string;
+  showActions?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  showActions: true
+});
+
+const emit = defineEmits<{
+  (e: 'update', user: User): void;
+}>();
+
+const user = ref<User | null>(null);
+const fullName = computed(() => 
+  user.value ? `${user.value.firstName} ${user.value.lastName}` : ''
+);
+</script>
+```
+
+---
+
+## 4. Frontend Architecture
+
+### Mục tiêu
+
+Frontend Architecture là cách tổ chức và design frontend applications để đảm bảo scalability, maintainability, và performance. Focus trên component design, state management, routing, và user experience.
+
+### Nguyên tắc
+
+**1. Component Architecture** - Atomic design principles. Reusable components. Composable patterns.
+
+**2. State Management** - Single source of truth. Predictable state updates. Separation of concerns.
+
+**3. Routing** - Client-side routing. Lazy loading. Nested routes. Route guards.
+
+**4. Data Fetching** - Server state vs client state. Caching strategies. Optimistic updates.
+
+**5. Performance** - Code splitting. Lazy loading. Memoization. Virtual scrolling.
+
+**6. Accessibility** - Semantic HTML. ARIA attributes. Keyboard navigation.
+
+**7. Error Handling** - Error boundaries. Graceful degradation. User feedback.
+
+### Checklist
+
+- [ ] Project structure defined
+- [ ] Component library established
+- [ ] State management configured
+- [ ] Routing implemented
+- [ ] Data fetching strategy defined
+- [ ] Error handling implemented
+- [ ] Testing strategy defined
+- [ ] Accessibility reviewed
+- [ ] Performance optimized
+- [ ] Documentation created
+
+### Best Practice
+
+```typescript
+// Feature-based structure
+// features/
+// ├── auth/
+// │   ├── components/
+// │   ├── hooks/
+// │   ├── services/
+// │   └── types/
+// ├── orders/
+// │   ├── components/
+// │   ├── hooks/
+// │   └── types/
+// └── products/
+```
+
+```typescript
+// State Management with React Query
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+      retry: 3,
+    }
+  }
+});
+
+// Zustand Store
+export const useCartStore = create<CartState>()(
+  persist(
+    (set, get) => ({
+      items: [],
+      addItem: (item) => { /* ... */ },
+      removeItem: (id) => { /* ... */ },
+    }),
+    { name: 'cart-storage' }
+  )
+);
+```
+
+---
+
+## Framework Selection Guide
+
+| Use Case | Recommended Framework |
+|----------|----------------------|
+| SEO-focused marketing site | Next.js (SSG) hoặc Nuxt (SSG) |
+| Complex dashboard | Next.js hoặc Vue + Nuxt |
+| Simple SPA | Vue.js trực tiếp |
+| Full-stack with API | Nuxt (server routes) hoặc Next.js (API routes) |
+| Team familiar with React | Next.js |
+| Team familiar with Vue | Nuxt.js |
+| Quick prototyping | Vue.js (Vite) |
+
+---
+
+## Skill Integration for Frontend Development
+
+### Frontend Taste Skill
+
+Cho landing pages, portfolios, marketing sites, và greenfield builds. Include:
+- **Pre-Review Gate:** Brief inference, design read declaration, dial setting (VARIANCE/MOTION/DENSITY)
+- **3 Dials System:** DESIGN_VARIANCE, MOTION_INTENSITY, VISUAL_DENSITY (1-10)
+- **Post-Review Gate:** 60+ checklist items across correctness, design, a11y, performance
+
+### Frontend Redesign Skill
+
+Cho việc upgrade website/app hiện có:
+- **Design Audit:** 50+ checklist items across typography, color, layout, interactivity
+- **Fix Priority:** Font swap > Color cleanup > Hover states > Layout > Generic components
+
+### Full Output Skill
+
+- **Pre-Generation Scope Lock:** Count deliverables, lock the list
+- **Banned Patterns:** `// TODO`, skeleton when full impl requested, "continue later"
+
+### Frontend Review Skill
+
+Mandatory dual-gate review cho mọi frontend task:
+- **Pre-Review Gate:** Scope analysis, quality plan, checklist
+- **Post-Review Gate:** 60+ items across correctness, design, accessibility, performance
+
+---
+
+## Liên kết
+
+- [[ui-visual-design]] - UI/Visual Design principles
+- [[typescript]] - TypeScript best practices
+- [[testing]] - Testing frontend components
+- [[performance]] - Performance optimization
+- [[deployment]] - Frontend deployment
+- [[state-management]] - State management patterns
+- .cursor/skills/frontend-taste/ - Taste skill
+- .cursor/skills/frontend-redesign/ - Redesign skill
+- .cursor/skills/full-output/ - Full output enforcement
+- .cursor/skills/frontend-review/ - Dual-gate review system

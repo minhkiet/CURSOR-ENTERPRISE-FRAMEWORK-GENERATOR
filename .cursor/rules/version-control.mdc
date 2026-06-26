@@ -1,8 +1,8 @@
 ---
-description: Nguyên tắc và best practices cho Version Control trong Cursor Enterprise Framework
+description: Version Control - bao gồm Git, GitHub, Git workflow
 created: 2026-06-23
-version: 1.0.0
-tags: [git, version-control, branching-strategy, commit-messages, code-review]
+version: 1.1.0
+tags: [git, version-control, branching-strategy, commit-messages, code-review, workflow, merged]
 ---
 
 # Version Control
@@ -480,9 +480,290 @@ Merge using squash or regular. Delete branch. Verify CI/CD.
 
 Create release branch. Test thoroughly. Tag release. Deploy.
 
+## Git Workflow
+
+Detailed Git workflow guidelines for Cursor Enterprise Framework.
+
+### 1. Branching Strategy (GitFlow)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    GitFlow Strategy                               │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Main Branch:                                                    │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  main ────────────────────────────────────────────────────│
+│  └─────────────────────────────────────────────────────────┘   │
+│                              │                                    │
+│  Release Branches:                                                │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  release/1.0 ──────────────────────────────────────────│  │
+│  └─────────────────────────────────────────────────────────┘   │
+│                              │                                    │
+│  Development:                                                   │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  develop ───────────────────────────────────────────────│  │
+│  └─────────────────────────────────────────────────────────┘   │
+│         │           │           │                               │
+│  Feature Branches:                                            │
+│  ┌──────▼──┐ ┌──────▼──┐ ┌──────▼──┐                         │
+│  │ feature │ │ feature │ │ feature │                          │
+│  │   /A   │ │   /B   │ │   /C   │                           │
+│  └─────────┘ └─────────┘ └─────────┘                            │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 2. Branch Naming Conventions
+
+```bash
+# Branch naming patterns
+# Pattern: <type>/<ticket-id>-<short-description>
+
+# Feature branches
+feature/PROJ-123-add-user-authentication
+feature/PROJ-456-implement-order-history
+feature/PROJ-789-fix-payment-bug
+
+# Bugfix branches
+bugfix/PROJ-101-fix-login-error
+bugfix/PROJ-102-correct-calculation-bug
+
+# Hotfix branches
+hotfix/PROJ-200-security-patch
+hotfix/PROJ-201-critical-bug-fix
+
+# Release branches
+release/v1.0.0
+release/v1.1.0
+
+# Changelog convention
+# feat: new feature
+# fix: bug fix
+# docs: documentation
+# style: formatting
+# refactor: code refactoring
+# test: adding tests
+# chore: maintenance
+```
+
+### 3. Merging Strategies
+
+```bash
+# Merge strategy for feature branches
+git checkout develop
+git pull origin develop
+git merge --no-ff feature/PROJ-123-user-auth
+
+# No fast-forward to preserve branch history
+# --no-ff creates a merge commit even for fast-forward
+
+# Rebase before merge (cleaner history)
+git checkout feature/PROJ-123-user-auth
+git fetch origin
+git rebase origin/develop
+
+# Resolve conflicts
+# Edit conflicting files
+git add .
+git rebase --continue
+
+# After rebase, force push
+git push --force-with-lease
+
+# Hotfix workflow
+git checkout main
+git pull
+git checkout -b hotfix/PROJ-200-security
+# Make changes
+git commit -m "fix(security): patch vulnerability"
+git checkout main
+git merge --no-ff hotfix/PROJ-200-security
+git tag v1.0.1
+git push origin main --tags
+git push origin hotfix/PROJ-200-security  # For merge to develop
+```
+
+### 4. GitOps Workflow
+
+Infrastructure as code approach.
+
+```bash
+# GitOps directory structure
+repository/
+├── apps/
+│   └── api/
+│       ├── src/
+│       └── Dockerfile
+├── infrastructure/
+│   ├── terraform/
+│   │   ├── modules/
+│   │   ├── environments/
+│   │   │   ├── dev/
+│   │   │   ├── staging/
+│   │   │   └── prod/
+│   │   └── main.tf
+│   └── k8s/
+│       ├── base/
+│       └── overlays/
+│           ├── dev/
+│           ├── staging/
+│           └── prod/
+└── .github/
+    └── workflows/
+```
+
+### 5. Complete Feature Workflow Example
+
+```bash
+# Start feature
+git checkout develop
+git pull origin develop
+git checkout -b feature/PROJ-123-user-authentication
+
+# Work on feature
+git add src/auth/
+git commit -m "feat(auth): add authentication module structure"
+
+git add src/auth/login/
+git commit -m "feat(auth): implement login endpoint"
+
+git add src/auth/register/
+git commit -m "feat(auth): implement registration endpoint"
+
+# Update with latest develop
+git fetch origin
+git rebase origin/develop
+
+# Push feature branch
+git push -u origin feature/PROJ-123-user-authentication
+
+# Create PR via GitHub/GitLab
+# Address review comments
+git add .
+git commit -m "fix(auth): address PR feedback"
+git push
+
+# After approval, squash and merge
+# Via GitHub UI or CLI
+```
+
+### 6. Hotfix Workflow Example
+
+```bash
+# Critical bug in production
+git checkout main
+git pull origin main
+git checkout -b hotfix/PROJ-200-critical-bug
+
+# Implement fix
+git add src/
+git commit -m "fix: resolve critical data race condition"
+
+# Test locally
+npm run test
+npm run test:integration
+
+# Push and create PR
+git push -u origin hotfix/PROJ-200-critical-bug
+
+# After review, merge to main
+git checkout main
+git pull origin main
+git merge --no-ff hotfix/PROJ-200-critical-bug
+
+# Tag the release
+git tag -a v1.0.1 -m "Hotfix: resolve critical bug PROJ-200"
+git push origin main --tags
+
+# Merge to develop
+git checkout develop
+git merge --no-ff hotfix/PROJ-200-critical-bug
+git push origin develop
+
+# Clean up
+git branch -d hotfix/PROJ-200-critical-bug
+```
+
+### 7. Release Workflow Example
+
+```bash
+# Prepare release
+git checkout develop
+git pull origin develop
+git checkout -b release/v1.1.0
+
+# Update version
+npm version minor --no-git-tag-version
+git add package.json
+git commit -m "chore: bump version to 1.1.0"
+
+# Run release tests
+npm run test
+npm run test:integration
+npm run test:e2e
+
+# If issues found
+git commit -m "fix(release): resolve test failures"
+git push
+
+# Merge to main
+git checkout main
+git pull origin main
+git merge --no-ff release/v1.1.0
+
+# Tag release
+git tag -a v1.1.0 -m "Release version 1.1.0"
+git push origin main --tags
+
+# Merge back to develop
+git checkout develop
+git merge --no-ff release/v1.1.0
+git push origin develop
+
+# Clean up
+git branch -d release/v1.1.0
+```
+
+### 8. Tagging Strategy
+
+```bash
+# Semantic versioning tags
+# v<major>.<minor>.<patch>
+
+# Create lightweight tag
+git tag v1.0.0
+
+# Create annotated tag (recommended)
+git tag -a v1.0.0 -m "Release version 1.0.0"
+
+# Create tag with signature
+git tag -s v1.0.0 -m "Release version 1.0.0"
+
+# Tag after commit
+git tag -a v1.0.0 <commit-sha>
+
+# Push tags
+git push origin v1.0.0
+git push origin --tags
+
+# List tags
+git tag -l
+git tag -l "v1.*"
+
+# Delete tags
+git tag -d v1.0.0           # Local
+git push origin :refs/tags/v1.0.0  # Remote
+```
+
 ## Liên kết
 
 - [[git-flow]] - GitFlow strategy
 - [[ci-cd]] - CI/CD integration
 - [[code-review]] - Code review practices
 - [[deployment]] - Deployment process
+- [Git Documentation](https://git-scm.com/doc)
+- [Conventional Commits](https://www.conventionalcommits.org/)
+- [Git Flow](https://nvie.com/posts/a-successful-git-branching-model/)
+- [Trunk Based Development](https://trunkbaseddevelopment.com/)

@@ -239,6 +239,6 @@ New project inherits general patterns while allowing project-specific overrides.
 
 - [[context-router]] - Context Router: Định tuyến context thông minh đến đúng handlers
 - [[token-optimization]] - Token Optimization: Tối ưu hóa token usage
-- [[core-architecture]] - Core Architecture: Kiến trúc tổng thể của framework
+- [[enterprise-patterns]] - Core Architecture: Kiến trúc tổng thể của framework
 - [[rag]] - RAG: Retrieval-Augmented Generation cho knowledge retrieval
 - [[vector-search]] - Vector Search: Semantic search capabilities

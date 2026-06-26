@@ -1,8 +1,8 @@
 ---
-description: Nguyên tắc và best practices cho deployment trong Cursor Enterprise Framework
+description: Deployment & CI/CD - hợp nhất từ deployment.mdc và ci-cd.mdc
 created: 2026-06-23
-version: 1.0.0
-tags: [deployment, ci-cd, release, rollback, infrastructure]
+version: 1.1.0
+tags: [deployment, ci-cd, release, rollback, infrastructure, merged, continuous-integration, continuous-delivery, devops, automation]
 ---
 
 # Deployment
@@ -55,6 +55,374 @@ Development should mirror production. Use same infrastructure. Same configuratio
 
 Verify deployments automatically. Health checks. Smoke tests. Synthetic monitoring. Alert on deployment failures. Automated rollback on failure.
 
+## CI/CD Pipeline
+
+### 1. CI/CD Pipeline Stages
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    CI/CD Pipeline Stages                           │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐          │
+│  │  Code   │─▶│  Build  │─▶│  Test   │─▶│ Security│          │
+│  │ Commit  │  │         │  │         │  │ Scan    │          │
+│  └─────────┘  └─────────┘  └─────────┘  └─────────┘          │
+│                                                  │              │
+│                                                  ▼              │
+│  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐        │
+│  │ Deploy  │◀─│ Staging │◀─│ Publish │◀─│ Package │        │
+│  │  Prod   │  │   Test  │  │  Artif. │  │   Build │        │
+│  └─────────┘  └─────────┘  └─────────┘  └─────────┘        │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 2. Pipeline Configuration
+
+```yaml
+# .github/workflows/ci-cd.yml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '18'
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  lint:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run TypeScript
+        run: npm run type-check
+
+  test:
+    name: Unit & Integration Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Tests
+        run: npm run test:ci
+        env:
+          DATABASE_URL: postgres://test:test@localhost:5432/test
+          REDIS_URL: redis://localhost:6379
+          NODE_ENV: test
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/lcov.info
+          flags: unittests
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: lint
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: [test, security]
+    if: github.ref == 'refs/heads/main'
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=sha,prefix=
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: staging
+      url: https://staging.example.com
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Kubernetes
+        uses: azure/k8s-deploy@v4
+        with:
+          namespace: 'staging'
+          manifests: |
+            k8s/staging/
+          images: |
+            ${{ needs.build.outputs.image-tag }}
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: https://example.com
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Production
+        uses: azure/k8s-deploy@v4
+        with:
+          namespace: 'production'
+          manifests: |
+            k8s/production/
+          images: |
+            ${{ needs.build.outputs.image-tag }}
+```
+
+### 3. Docker Build Configuration
+
+```dockerfile
+# Multi-stage Dockerfile
+# syntax=docker/dockerfile:1
+
+# Build stage
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# Install dependencies first for better caching
+COPY package*.json ./
+RUN npm ci --only=production
+
+COPY . .
+
+RUN npm run build
+
+# Production stage
+FROM node:18-alpine AS production
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+
+WORKDIR /app
+
+ENV NODE_ENV=production \
+    PORT=3000
+
+# Copy dependencies
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
+
+USER nodejs
+
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD node healthcheck.js || exit 1
+
+CMD ["node", "dist/main.js"]
+```
+
+### 4. Testing in Pipeline
+
+```yaml
+# Test stages
+test:
+  stages:
+    - unit
+    - integration
+    - e2e
+
+  unit_tests:
+    stage: unit
+    script:
+      - npm ci
+      - npm run test:unit -- --coverage
+    coverage: '/Coverage: \d+\.\d+%/'
+    artifacts:
+      reports:
+        junit: junit.xml
+        coverage_report:
+          coverage_format: cobertura
+          path: coverage/cobertura-coverage.xml
+
+  integration_tests:
+    stage: integration
+    services:
+      - postgres:15-alpine
+      - redis:7-alpine
+    script:
+      - npm ci
+      - npm run test:integration
+    artifacts:
+      reports:
+        junit: junit-integration.xml
+
+  e2e_tests:
+    stage: e2e
+    before_script:
+      - npm ci
+      - npm run build
+      - docker-compose up -d
+    script:
+      - npm run test:e2e
+    after_script:
+      - docker-compose down
+```
+
+### 5. Environment Configuration
+
+```yaml
+# GitOps structure
+├── environments/
+│   ├── development/
+│   │   ├── kustomization.yaml
+│   │   ├── deployment.yaml
+│   │   └── configmap.yaml
+│   ├── staging/
+│   │   ├── kustomization.yaml
+│   │   ├── deployment.yaml
+│   │   └── configmap.yaml
+│   └── production/
+│       ├── kustomization.yaml
+│       ├── deployment.yaml
+│       └── configmap.yaml
+```
+
+### 6. Notification Integration
+
+```yaml
+# GitHub Actions notification step
+- name: Notify Slack
+  if: always()
+  uses: slackapi/slack-github-action@v1
+  with:
+    channel-id: 'C0123456789'
+    slack-message: |
+      ${{ job.status == 'success' && '✅' || '❌' }} Build ${{ job.status }}
+      <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View details>
+  env:
+    SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+```
+
+### 7. Pipeline Metrics
+
+```yaml
+# Pipeline metrics
+metrics:
+  - name: pipeline_duration
+    type: gauge
+    help: "Duration of pipeline in seconds"
+    
+  - name: deployment_frequency
+    type: counter
+    help: "Number of deployments"
+    
+  - name: change_failure_rate
+    type: gauge
+    help: "Percentage of deployments causing failures"
+    
+  - name: mean_time_to_recovery
+    type: gauge
+    help: "Average time to recover from failures"
+```
+
 ## Checklist
 
 - [ ] CI/CD pipeline configured
@@ -69,6 +437,12 @@ Verify deployments automatically. Health checks. Smoke tests. Synthetic monitori
 - [ ] Deployment runbooks complete
 - [ ] On-call trained on deployments
 - [ ] Database migration strategy defined
+- [ ] Configure automated build triggers
+- [ ] Automated testing pipeline (unit, integration, e2e)
+- [ ] Container registry configured
+- [ ] Artifact management in place
+- [ ] Environment secrets management
+- [ ] Pipeline notifications configured
 
 ## Anti Pattern
 

@@ -471,7 +471,35 @@ def analyze_intent(english_request: str) -> dict:
 
 ## PHẦN D: RULE/SKILL AUTO-DISCOVERY
 
-### D.1 Rule Registry
+> **Đầy đủ: [[skill-registry]] §1-§6**
+> Tất cả skill definitions, triggers, confidence thresholds, và combinations được quản lý tập trung trong skill-registry.
+
+### D.1 Quick Reference
+
+| Skill | Role | Threshold | Mandatory |
+|-------|------|-----------|-----------|
+| frontend-taste | primary | 0.75 | No |
+| frontend-redesign | primary | 0.75 | No |
+| full-output | secondary | 0.80 | No |
+| frontend-review | mandatory | 0.50 | **Yes** |
+| security-review | primary | 0.85 | No |
+| vietnam-payment-review | primary | 0.90 | No |
+| karpathy-coding | mandatory_overlay | 1.0 | **Yes** |
+| ponytail | overlay | 0.85 | Optional |
+
+### D.2 Multi-Language Keywords
+
+| Vietnamese | English | Skill |
+|-----------|---------|-------|
+| `trang đích`, `landing page` | landing page | frontend-taste |
+| `thiết kế lại`, `cải thiện` | redesign, improve | frontend-redesign |
+| `bảo mật`, `lỗ hổng` | security, vulnerability | security-review |
+| `thanh toán` | payment | vietnam-payment-review |
+| `đơn giản`, `ít code` | simple, minimal | ponytail |
+
+---
+
+## PHẦN E: VIBE CODE EXECUTION WORKFLOW
 
 | Rule | Trigger Conditions | Confidence | Priority |
 |------|-------------------|------------|----------|
@@ -644,9 +672,7 @@ def get_skill_gates(skill_name: str) -> list:
 
 ---
 
-## PHẦN E: VIBE CODE EXECUTION WORKFLOW (UPDATED)
-
-### E.1 Complete Vibe Code Flow với Clarification & Validation
+## PHẦN E: VIBE CODE EXECUTION WORKFLOW
 
 ```
 ═══════════════════════════════════════════════════════════════════════════════

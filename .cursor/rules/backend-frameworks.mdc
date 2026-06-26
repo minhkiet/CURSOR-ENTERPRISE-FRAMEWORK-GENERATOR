@@ -1,0 +1,1091 @@
+---
+description: Backend Frameworks - hợp nhất từ NestJS, Laravel, ASP.NET Core trong Cursor Enterprise Framework
+created: 2026-06-23
+version: 1.0.0
+tags: [backend, nestjs, laravel, aspnet-core, api, framework, nodejs, php, dotnet]
+---
+
+# Backend Frameworks
+
+Hướng dẫn sử dụng các backend framework phổ biến trong Cursor Enterprise Framework: NestJS (Node.js/TypeScript), Laravel (PHP), và ASP.NET Core (C#/.NET).
+
+---
+
+## Tổng quan So sánh
+
+| Aspect | NestJS | Laravel | ASP.NET Core |
+|--------|--------|---------|--------------|
+| Language | TypeScript | PHP | C# |
+| Pattern | Modular/Decorator | MVC | Controller/Clean Arch |
+| ORM | TypeORM/Prisma | Eloquent | Entity Framework Core |
+| Ecosystem | Node.js/npm | PHP/Composer | .NET/NuGet |
+| Learning Curve | Medium | Low | Medium-High |
+| Performance | High | High | Very High |
+| Best For | Microservices, Real-time | Rapid dev, MVPs | Enterprise, Microsoft stack |
+
+---
+
+## 1. NestJS (Node.js/TypeScript)
+
+### Mục tiêu
+
+NestJS là một progressive Node.js framework để xây dựng efficient, reliable, và scalable server-side applications. Xây trên Express (hoặc Fastify), NestJS cung cấp out-of-the-box application architecture với dependency injection, modular organization, và comprehensive tooling. Trong Cursor Enterprise Framework, NestJS là lựa chọn mạnh cho các dự án cần structure rõ ràng, TypeScript-first development, và enterprise-grade features.
+
+### Nguyên tắc
+
+**1. Modular Architecture**
+
+Organize code into modules. Each module encapsulates its functionality. Modules should be cohesive. Limit module dependencies. Use feature-based modules.
+
+**2. Dependency Injection**
+
+Use constructor injection. Define proper providers. Use @Inject decorator when needed. Consider scopes (Default, Request, Transient). Proper lifetime management.
+
+**3. Controllers for Routing**
+
+Controllers handle HTTP requests. Define routes with decorators. Validate inputs with class-validator. Return appropriate responses. Keep controllers thin.
+
+**4. Services for Business Logic**
+
+Services contain business logic. Inject repositories and other services. Services are stateless. Return DTOs, not entities.
+
+**5. Data Transfer Objects (DTOs)**
+
+Use DTOs for input validation. Use TypeScript interfaces or classes. Define validation rules with decorators. Separate Create vs Update DTOs.
+
+**6. Pipes for Transformation**
+
+Use built-in pipes for validation. Create custom pipes when needed. Use ValidationPipe globally. Handle transformation logic in pipes.
+
+**7. Guards for Authorization**
+
+Guards handle authentication/authorization. Return boolean or throw exception. Use for route protection. Create custom guards.
+
+**8. Interceptors for Cross-Cutting**
+
+Interceptors handle cross-cutting concerns. Add headers, transform responses. Handle caching. Implement logging.
+
+**9. Exception Filters for Errors**
+
+Use built-in exceptions. Create custom exception filters. Return consistent error format. Handle different error types.
+
+**10. Database Integration**
+
+Use TypeORM or Prisma. Define entities properly. Use repositories for data access. Implement migrations. Use transactions.
+
+### Checklist
+
+- [ ] NestJS CLI installed
+- [ ] Project structure defined
+- [ ] Modules organized
+- [ ] Controllers implemented
+- [ ] Services created
+- [ ] DTOs defined
+- [ ] Validation configured
+- [ ] Database connection set up
+- [ ] Authentication implemented
+- [ ] Tests written
+
+### Anti Pattern
+
+**1. Fat Controllers**
+
+Controllers doing too much. Business logic in controllers. Hard to test. Violates single responsibility.
+
+**2. Circular Dependencies**
+
+Modules depending on each other. Import cycle issues. Hard to maintain. Break cycles with interfaces.
+
+**3. Not Using DTOs**
+
+Passing raw objects. No validation. Type safety issues. Use DTOs consistently.
+
+**4. Global Scope Abuse**
+
+Overusing request-scoped providers. Memory leaks. Performance issues. Use appropriately.
+
+**5. No Error Handling**
+
+Unhandled exceptions. Inconsistent responses. Missing error logging. Use exception filters.
+
+### Best Practice
+
+**1. Project Structure**
+
+```typescript
+// src/
+// ├── main.ts
+// ├── app.module.ts
+// ├── common/
+// │   ├── decorators/
+// │   ├── filters/
+// │   ├── guards/
+// │   ├── interceptors/
+// │   ├── pipes/
+// │   └── dto/
+// ├── config/
+// ├── modules/
+// │   ├── auth/
+// │   ├── users/
+// │   ├── orders/
+// │   └── products/
+// └── shared/
+```
+
+**2. Controllers**
+
+```typescript
+// modules/orders/orders.controller.ts
+import {
+  Controller, Get, Post, Patch, Delete,
+  Body, Param, Query, UseGuards, HttpCode, HttpStatus
+} from '@nestjs/common';
+import { OrdersService } from './orders.service';
+import { CreateOrderDto, UpdateOrderDto, OrderQueryDto } from './dto';
+import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
+
+@Controller('orders')
+@UseGuards(JwtAuthGuard, RolesGuard)
+export class OrdersController {
+  constructor(private readonly ordersService: OrdersService) {}
+
+  @Get()
+  @Roles('admin', 'manager')
+  async findAll(@Query() query: OrderQueryDto) {
+    return this.ordersService.findAll(query);
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.ordersService.findById(id);
+  }
+
+  @Post()
+  @Roles('customer', 'admin')
+  async create(@Body() createOrderDto: CreateOrderDto) {
+    return this.ordersService.create(createOrderDto);
+  }
+
+  @Patch(':id')
+  @Roles('admin')
+  async update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
+    return this.ordersService.update(id, updateOrderDto);
+  }
+
+  @Delete(':id')
+  @Roles('admin')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(@Param('id') id: string) {
+    await this.ordersService.delete(id);
+  }
+}
+```
+
+**3. Services**
+
+```typescript
+// modules/orders/orders.service.ts
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Order } from './entities/order.entity';
+import { CreateOrderDto, UpdateOrderDto, OrderQueryDto } from './dto';
+
+@Injectable()
+export class OrdersService {
+  constructor(
+    @InjectRepository(Order)
+    private readonly orderRepository: Repository<Order>,
+  ) {}
+
+  async findAll(query: OrderQueryDto) {
+    const { page = 1, limit = 20, status } = query;
+    
+    const queryBuilder = this.orderRepository
+      .createQueryBuilder('order')
+      .leftJoinAndSelect('order.items', 'items')
+      .leftJoinAndSelect('order.customer', 'customer');
+    
+    if (status) {
+      queryBuilder.andWhere('order.status = :status', { status });
+    }
+    
+    queryBuilder
+      .orderBy('order.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit);
+    
+    const [data, total] = await queryBuilder.getManyAndCount();
+    
+    return {
+      data,
+      meta: { page, limit, total, totalPages: Math.ceil(total / limit) }
+    };
+  }
+
+  async findById(id: string): Promise<Order | null> {
+    return this.orderRepository.findOne({
+      where: { id },
+      relations: ['items', 'customer', 'payments']
+    });
+  }
+
+  async create(createOrderDto: CreateOrderDto): Promise<Order> {
+    const order = this.orderRepository.create(createOrderDto);
+    return this.orderRepository.save(order);
+  }
+
+  async update(id: string, updateOrderDto: UpdateOrderDto): Promise<Order> {
+    const order = await this.findById(id);
+    if (!order) throw new NotFoundException(`Order with ID ${id} not found`);
+    Object.assign(order, updateOrderDto);
+    return this.orderRepository.save(order);
+  }
+
+  async delete(id: string): Promise<void> {
+    const result = await this.orderRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+  }
+}
+```
+
+**4. DTOs với Validation**
+
+```typescript
+// modules/orders/dto/create-order.dto.ts
+import { Type } from 'class-transformer';
+import {
+  IsArray, IsEnum, IsNotEmpty, IsNumber, IsObject,
+  IsOptional, IsString, IsUUID, Max, Min, ValidateNested
+} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
+export class CreateOrderItemDto {
+  @ApiProperty()
+  @IsUUID()
+  @IsNotEmpty()
+  productId!: string;
+
+  @ApiProperty({ minimum: 1, maximum: 100 })
+  @IsNumber()
+  @Min(1)
+  @Max(100)
+  quantity!: number;
+
+  @ApiProperty()
+  @IsNumber()
+  @Min(0)
+  price!: number;
+}
+
+export class CreateOrderDto {
+  @ApiProperty()
+  @IsUUID()
+  @IsNotEmpty()
+  customerId!: string;
+
+  @ApiProperty({ type: [CreateOrderItemDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateOrderItemDto)
+  items!: CreateOrderItemDto[];
+
+  @ApiProperty()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => CreateOrderItemDto)
+  shippingAddress!: any;
+}
+```
+
+**5. Guards**
+
+```typescript
+// common/guards/jwt-auth.guard.ts
+import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
+@Injectable()
+export class JwtAuthGuard extends AuthGuard('jwt') {
+  canActivate(context: ExecutionContext) {
+    return super.canActivate(context);
+  }
+
+  handleRequest<TUser = any>(err: any, user: TUser, info: any): TUser {
+    if (err || !user) throw err || new UnauthorizedException('Invalid or expired token');
+    return user;
+  }
+}
+
+// common/decorators/roles.decorator.ts
+import { SetMetadata } from '@nestjs/common';
+
+export const ROLES_KEY = 'roles';
+export const Roles = (...roles: string[]) => SetMetadata(ROLES_KEY, roles);
+```
+
+**6. Event-Driven Architecture**
+
+```typescript
+// modules/orders/orders.events.ts
+export class OrderCreatedEvent {
+  constructor(
+    public readonly orderId: string,
+    public readonly customerId: string,
+    public readonly total: number,
+    public readonly timestamp: Date = new Date()
+  ) {}
+}
+
+// modules/notifications/notifications.listener.ts
+import { Injectable } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
+
+@Injectable()
+export class OrdersEventListener {
+  @OnEvent('order.created', { async: true })
+  async handleOrderCreated(event: OrderCreatedEvent) {
+    // Send confirmation email, notify admins, etc.
+  }
+}
+```
+
+### Workflow
+
+**Phase 1: Project Setup**
+
+Install NestJS CLI. Create project. Install dependencies. Configure TypeScript. Set up folder structure.
+
+**Phase 2: Core Modules**
+
+Create config module. Set up database. Create auth module. Set up logging.
+
+**Phase 3: Feature Modules**
+
+Create feature modules. Implement controllers. Implement services. Add DTOs and validation.
+
+**Phase 4: Cross-Cutting**
+
+Add guards. Add interceptors. Add pipes. Add exception filters.
+
+**Phase 5: Testing**
+
+Set up testing utilities. Write unit tests. Write e2e tests. Set up coverage.
+
+**Phase 6: Deployment**
+
+Build for production. Configure environment. Deploy. Set up monitoring.
+
+---
+
+## 2. Laravel (PHP)
+
+### Mục tiêu
+
+Laravel là một PHP framework mạnh mẽ cho việc xây dựng web applications với syntax elegant và developer experience tuyệt vời. Trong Cursor Enterprise Framework, Laravel đóng vai trò là một trong những lựa chọn chính cho backend development, đặc biệt cho các dự án cần rapid development, robust ORM, built-in authentication, và comprehensive ecosystem.
+
+### Nguyên tắc
+
+**1. Follow MVC Architecture**
+
+Models cho data và business logic. Views cho presentation. Controllers cho request handling. Keep concerns separated. Don't bloat any layer.
+
+**2. Use Eloquent Effectively**
+
+Define relationships clearly. Use eager loading to avoid N+1. Use scopes for reusable queries. Use accessors và mutators. Leverage polymorphic relationships when needed.
+
+**3. Service Layer Pattern**
+
+Extract business logic to services. Keep controllers thin. Services are reusable. Better testability. Clear dependency injection.
+
+**4. Repository Pattern for Data Access**
+
+Abstract data access. Use interfaces for testability. Repositories handle queries. Services use repositories. Easy to swap implementations.
+
+**5. Form Request Validation**
+
+Use Form Request classes. Define validation rules clearly. Reuse across controllers. Type-hint in controller methods. Custom validation rules when needed.
+
+**6. API Resource Classes**
+
+Transform models consistently. Use API Resources. Include relationships properly. Pagination handling. Sparse fieldsets for performance.
+
+**7. Queue Jobs for Async Work**
+
+Move heavy work to queues. Email sending. Image processing. External API calls. Keep requests fast. Proper job retry logic.
+
+**8. Database Migrations**
+
+Version control database. Each migration reversible. Small, focused changes. Don't modify committed migrations. Use seeder for test data.
+
+**9. Event-Driven Architecture**
+
+Use Laravel Events. Decouple components. Queue event listeners. Easy audit trail. Clean extensibility.
+
+**10. Testing First**
+
+Write tests before code. Use feature tests for workflows. Use unit tests for logic. Test at appropriate level. Continuous integration.
+
+### Checklist
+
+- [ ] Laravel version selected
+- [ ] Project structure defined
+- [ ] Database migrations planned
+- [ ] Eloquent models created
+- [ ] Routes organized
+- [ ] Controllers thin
+- [ ] Services implemented
+- [ ] API Resources created
+- [ ] Jobs queued
+- [ ] Tests written
+
+### Anti Pattern
+
+**1. Fat Controllers**
+
+Putting too much logic in controllers. Hard to test. Duplicated logic. Violates single responsibility.
+
+**2. N+1 Query Problems**
+
+Not eager loading relationships. Too many queries. Poor performance. Always check with query log.
+
+**3. Hardcoded Configuration**
+
+Using env() everywhere. Hard to test. Configuration should be injectable. Use config files properly.
+
+**4. Ignoring Queues**
+
+Doing heavy work synchronously. Slow responses. User experience suffers. Queue non-critical work.
+
+**5. Skipping Tests**
+
+No tests or minimal tests. Bugs slip to production. Fear of refactoring. Technical debt accumulates.
+
+### Best Practice
+
+**1. Project Structure**
+
+```php
+// app/
+// ├── Console/Commands/
+// ├── Events/
+// ├── Http/
+// │   ├── Controllers/Api/
+// │   ├── Middleware/
+// │   ├── Requests/
+// │   └── Resources/
+// ├── Jobs/
+// ├── Listeners/
+// ├── Mail/
+// ├── Models/
+// ├── Notifications/
+// ├── Policies/
+// ├── Repositories/
+// │   ├── Contracts/
+// │   └── Eloquent/
+// └── Services/
+```
+
+**2. Eloquent Models**
+
+```php
+<?php
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
+
+class Order extends Model
+{
+    use HasFactory;
+
+    protected $fillable = ['customer_id', 'status', 'total', 'shipping_address', 'notes'];
+    protected $casts = ['total' => 'decimal:2', 'shipping_address' => 'array'];
+
+    // Relationships
+    public function customer(): BelongsTo { return $this->belongsTo(Customer::class); }
+    public function items(): HasMany { return $this->hasMany(OrderItem::class); }
+    public function payments(): HasMany { return $this->hasMany(Payment::class); }
+
+    // Scopes
+    public function scopePending($query) { return $query->where('status', 'pending'); }
+    public function scopeCompleted($query) { return $query->where('status', 'completed'); }
+
+    // Accessors
+    public function getFormattedTotalAttribute(): string { return number_format($this->total, 2); }
+
+    // Methods
+    public function calculateTotal(): float { return $this->items->sum(fn($i) => $i->price * $i->quantity); }
+    public function canBeCancelled(): bool { return in_array($this->status, ['pending', 'confirmed']); }
+}
+```
+
+**3. Service Layer**
+
+```php
+<?php
+namespace App\Services;
+
+use App\Models\Order;
+use App\Repositories\Contracts\OrderRepositoryInterface;
+use Illuminate\Pagination\LengthAwarePaginator;
+
+class OrderService
+{
+    public function __construct(
+        private OrderRepositoryInterface $orderRepository,
+        private PaymentService $paymentService,
+    ) {}
+
+    public function createOrder(array $data): Order
+    {
+        $order = $this->orderRepository->create([
+            'customer_id' => $data['customer_id'],
+            'status' => 'pending',
+            'shipping_address' => $data['shipping_address'],
+        ]);
+
+        foreach ($data['items'] as $item) {
+            $order->items()->create($item);
+        }
+
+        $order->update(['total' => $order->calculateTotal()]);
+        return $order;
+    }
+
+    public function getOrders(array $filters = [], int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->orderRepository->paginate($filters, $perPage);
+    }
+
+    public function getOrderById(int $id): ?Order
+    {
+        return $this->orderRepository->findById($id);
+    }
+
+    public function cancelOrder(Order $order): bool
+    {
+        if (!$order->canBeCancelled()) return false;
+        $order->update(['status' => 'cancelled']);
+        return true;
+    }
+}
+```
+
+**4. API Controllers**
+
+```php
+<?php
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\CreateOrderRequest;
+use App\Http\Resources\OrderResource;
+use App\Http\Resources\OrderCollection;
+use App\Services\OrderService;
+use Illuminate\Http\JsonResponse;
+
+class OrderController extends Controller
+{
+    public function __construct(private OrderService $orderService) {}
+
+    public function index(): OrderCollection
+    {
+        return new OrderCollection($this->orderService->getOrders(request()->all()));
+    }
+
+    public function store(CreateOrderRequest $request): JsonResponse
+    {
+        $order = $this->orderService->createOrder($request->validated());
+        return response()->json(['message' => 'Order created', 'data' => new OrderResource($order)], 201);
+    }
+
+    public function show(int $id): JsonResponse
+    {
+        $order = $this->orderService->getOrderById($id);
+        if (!$order) return response()->json(['message' => 'Order not found'], 404);
+        return response()->json(['data' => new OrderResource($order)]);
+    }
+}
+```
+
+**5. API Resources**
+
+```php
+<?php
+namespace App\Http\Resources;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class OrderResource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->id,
+            'status' => $this->status,
+            'total' => $this->total,
+            'formatted_total' => $this->formatted_total,
+            'customer' => new CustomerResource($this->whenLoaded('customer')),
+            'items' => OrderItemResource::collection($this->whenLoaded('items')),
+            'created_at' => $this->created_at->toIso8601String(),
+        ];
+    }
+}
+```
+
+**6. Form Request Validation**
+
+```php
+<?php
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class CreateOrderRequest extends FormRequest
+{
+    public function authorize(): bool { return true; }
+
+    public function rules(): array
+    {
+        return [
+            'customer_id' => ['required', 'integer', 'exists:customers,id'],
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.product_id' => ['required', 'integer', 'exists:products,id'],
+            'items.*.quantity' => ['required', 'integer', 'min:1', 'max:100'],
+            'items.*.price' => ['required', 'numeric', 'min:0'],
+            'shipping_address' => ['required', 'array'],
+            'shipping_address.street' => ['required', 'string', 'max:500'],
+            'shipping_address.city' => ['required', 'string', 'max:100'],
+            'notes' => ['nullable', 'string', 'max:1000'],
+        ];
+    }
+}
+```
+
+**7. Queue Jobs**
+
+```php
+<?php
+namespace App\Jobs;
+
+use App\Models\Order;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
+
+class ProcessOrderPayment implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable;
+
+    public int $tries = 3;
+    public int $backoff = 60;
+
+    public function __construct(public Order $order) {}
+
+    public function handle(): void
+    {
+        // Process payment logic
+        Log::info('Order payment processed', ['order_id' => $this->order->id]);
+    }
+
+    public function failed(\Throwable $exception): void
+    {
+        Log::error('Order payment failed', ['order_id' => $this->order->id]);
+    }
+}
+```
+
+### Workflow
+
+**Phase 1: Project Setup**
+
+Install Laravel. Configure environment. Set up database. Create migrations. Set up auth scaffolding.
+
+**Phase 2: Database Design**
+
+Design migrations. Create models. Define relationships. Add indexes. Create seeders.
+
+**Phase 3: API Development**
+
+Set up API routes. Create controllers. Define resources. Implement services. Add validation.
+
+**Phase 4: Business Logic**
+
+Implement services. Add events/listeners. Create jobs. Set up policies. Configure queues.
+
+**Phase 5: Testing**
+
+Write unit tests. Write feature tests. Test API endpoints. Set up CI/CD.
+
+**Phase 6: Optimization**
+
+Add indexes. Optimize queries. Configure caching. Set up queues.
+
+---
+
+## 3. ASP.NET Core (C#/.NET)
+
+### Mục tiêu
+
+ASP.NET Core là một cross-platform, high-performance framework từ Microsoft cho việc xây dựng modern, cloud-enabled web applications. Trong Cursor Enterprise Framework, ASP.NET Core đóng vai trò là một trong những lựa chọn chính cho backend development, đặc biệt cho các dự án enterprise cần strong typing, performance cao, và deep integration với Microsoft ecosystem.
+
+### Nguyên tắc
+
+**1. Clean Architecture**
+
+Separate into layers: Presentation, Application, Domain, Infrastructure. Dependencies point inward. Domain has no external dependencies. Clear boundaries between layers.
+
+**2. Dependency Injection**
+
+Use built-in DI container. Register services properly. Consider lifetimes (Singleton, Scoped, Transient). Avoid Service Locator pattern. Constructor injection preferred.
+
+**3. Minimal APIs vs Controllers**
+
+Use Minimal APIs for simple endpoints. Use Controllers for complex scenarios. Controllers provide more structure. Both can coexist in same project.
+
+**4. CQRS Pattern**
+
+Separate read và write operations. Use Commands for writes. Use Queries for reads. Different models for different purposes. Better optimization options.
+
+**5. Entity Framework Core Best Practices**
+
+Use navigation properties properly. Configure relationships in Fluent API. Use eager loading wisely (avoid N+1). Use AsNoTracking for read-only. Proper index configuration.
+
+**6. Middleware Pipeline**
+
+Use middleware for cross-cutting concerns. Keep middleware in order. Short-circuit when possible. Don't do heavy work in middleware. Use exception handling middleware.
+
+**7. Configuration Management**
+
+Use IOptions pattern. Environment-specific settings. User secrets for development. Azure Key Vault for production. Strongly typed configuration.
+
+**8. API Versioning**
+
+Version APIs from the start. Use URL path versioning. Maintain multiple versions. Deprecate gracefully. Document breaking changes.
+
+**9. Health Checks**
+
+Implement health checks. Check dependencies. Use for load balancer. Include in monitoring. Different health checks for different purposes.
+
+**10. Performance Considerations**
+
+Use async/await throughout. Configure response compression. Use caching appropriately. Configure connection pooling. Monitor memory usage.
+
+### Checklist
+
+- [ ] .NET version selected
+- [ ] Project structure designed
+- [ ] Solution organized
+- [ ] DI configured properly
+- [ ] Logging set up
+- [ ] Health checks implemented
+- [ ] API versioning planned
+- [ ] Error handling configured
+- [ ] Testing project set up
+- [ ] CI/CD configured
+
+### Anti Pattern
+
+**1. Fat Controllers**
+
+Putting all logic in controllers. Hard to test. Duplicated code. Violates single responsibility.
+
+**2. N+1 Queries**
+
+Not using Include for navigation properties. Too many database queries. Poor performance. Always check generated SQL.
+
+**3. Synchronous Over Async**
+
+Using synchronous methods where async is better. Blocks thread pool threads. Poor scalability. Use async by default.
+
+**4. Ignoring Logging**
+
+No structured logging. Missing context. Hard to debug. Use ILogger throughout.
+
+**5. Singleton Scoped Confusion**
+
+Using Scoped as Singleton. Captures stale data. Memory leaks. Understand DI lifetimes.
+
+### Best Practice
+
+**1. Project Structure**
+
+```
+Solution/
+├── src/
+│   ├── Presentation/Api/Controllers/
+│   ├── Application/Commands/Queries/
+│   ├── Domain/Entities/ValueObjects/
+│   ├── Infrastructure/Data/Repositories/
+│   └── Shared/Common/Extensions/
+└── tests/Unit/Integration/
+```
+
+**2. Clean Architecture Layers**
+
+```csharp
+// Domain/Entities/Order.cs
+namespace Domain.Entities;
+
+public class Order : BaseEntity
+{
+    public Guid CustomerId { get; private set; }
+    public OrderStatus Status { get; private set; }
+    public decimal Total { get; private set; }
+    
+    private readonly List<OrderItem> _items = new();
+    public IReadOnlyCollection<OrderItem> Items => _items.AsReadOnly();
+
+    public static Order Create(Guid customerId)
+    {
+        var order = new Order { Id = Guid.NewGuid(), CustomerId = customerId, Status = OrderStatus.Pending };
+        order.AddDomainEvent(new OrderCreatedEvent(order));
+        return order;
+    }
+
+    public void AddItem(Product product, int quantity, decimal price)
+    {
+        _items.Add(OrderItem.Create(this.Id, product, quantity, price));
+        RecalculateTotal();
+    }
+
+    private void RecalculateTotal() => Total = _items.Sum(i => i.Subtotal);
+    public bool CanBeCancelled() => Status == OrderStatus.Pending || Status == OrderStatus.Confirmed;
+}
+```
+
+**3. CQRS Commands**
+
+```csharp
+// Application/Commands/CreateOrder/CreateOrderCommand.cs
+namespace Application.Commands.CreateOrder;
+
+public record CreateOrderCommand(
+    Guid CustomerId,
+    List<CreateOrderItemDto> Items,
+    ShippingAddressDto ShippingAddress
+) : IRequest<Result<OrderDto>>;
+
+public record CreateOrderItemDto(Guid ProductId, int Quantity, decimal Price);
+public record ShippingAddressDto(string Street, string City, string Country, string? PostalCode);
+
+// CreateOrderCommandHandler.cs
+public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Result<OrderDto>>
+{
+    private readonly IOrderRepository _orderRepository;
+    private readonly IUnitOfWork _unitOfWork;
+
+    public async Task<Result<OrderDto>> Handle(CreateOrderCommand request, CancellationToken ct)
+    {
+        var order = Order.Create(request.CustomerId);
+        foreach (var item in request.Items)
+            order.AddItem(/* get product */, item.Quantity, item.Price);
+
+        await _orderRepository.AddAsync(order);
+        await _unitOfWork.SaveChangesAsync(ct);
+
+        return Result.Success(_mapper.Map<OrderDto>(order));
+    }
+}
+```
+
+**4. API Controllers**
+
+```csharp
+// Presentation/Api/Controllers/OrdersController.cs
+namespace Presentation.Api.Controllers;
+
+[ApiController]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/orders")]
+public class OrdersController : ControllerBase
+{
+    private readonly IMediator _mediator;
+
+    [HttpGet]
+    public async Task<ActionResult<OrderListResponse>> GetOrders([FromQuery] GetOrdersQuery query)
+    {
+        var result = await _mediator.Send(query);
+        return result.Match(Ok, error => Problem(error));
+    }
+
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<OrderDto>> GetOrder(Guid id) { /* ... */ }
+
+    [HttpPost]
+    public async Task<ActionResult<OrderDto>> CreateOrder([FromBody] CreateOrderCommand command)
+    {
+        var result = await _mediator.Send(command);
+        return result.Match(order => CreatedAtAction(nameof(GetOrder), new { id = order.Id }, order), BadRequest);
+    }
+
+    [HttpPost("{id:guid}/cancel")]
+    public async Task<IActionResult> CancelOrder(Guid id)
+    {
+        var result = await _mediator.Send(new CancelOrderCommand(id));
+        return result.Match(_ => NoContent(), error => Problem(error));
+    }
+}
+```
+
+**5. Entity Framework Configuration**
+
+```csharp
+// Infrastructure/Data/Configurations/OrderConfiguration.cs
+namespace Infrastructure.Data.Configurations;
+
+public class OrderConfiguration : IEntityTypeConfiguration<Order>
+{
+    public void Configure(EntityTypeBuilder<Order> builder)
+    {
+        builder.ToTable("orders");
+        builder.HasKey(o => o.Id);
+        
+        builder.Property(o => o.Status)
+            .HasConversion<string>()
+            .HasMaxLength(50);
+
+        builder.Property(o => o.Total)
+            .HasColumnType("decimal(18,2)");
+
+        builder.HasIndex(o => o.CustomerId).HasDatabaseName("ix_orders_customer_id");
+        builder.HasIndex(o => o.Status).HasDatabaseName("ix_orders_status");
+
+        builder.HasMany(o => o.Items)
+            .WithOne(i => i.Order)
+            .HasForeignKey(i => i.OrderId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasQueryFilter(o => !o.IsDeleted);
+    }
+}
+```
+
+**6. Middleware Pipeline**
+
+```csharp
+// Program.cs
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddApiVersioning();
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<ApplicationDbContext>();
+
+var app = builder.Build();
+
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+        var (statusCode, response) = exception switch
+        {
+            ValidationException ve => (400, new ErrorResponse(ve.Errors)),
+            NotFoundException nf => (404, new ErrorResponse(nf.Message)),
+            _ => (500, new ErrorResponse("An unexpected error occurred"))
+        };
+        context.Response.StatusCode = statusCode;
+        await context.Response.WriteAsJsonAsync(response);
+    });
+});
+
+app.UseCors("AllowAll");
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+app.MapHealthChecks("/health");
+app.Run();
+```
+
+**7. Health Checks**
+
+```csharp
+// Infrastructure/HealthChecks/ExternalServiceHealthCheck.cs
+public class ExternalServiceHealthCheck : IHealthCheck
+{
+    private readonly IHttpClientFactory _httpClientFactory;
+
+    public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken ct)
+    {
+        try
+        {
+            using var client = _httpClientFactory.CreateClient("ExternalApi");
+            var response = await client.GetAsync("/health", ct);
+            return response.IsSuccessStatusCode
+                ? HealthCheckResult.Healthy()
+                : HealthCheckResult.Degraded($"Status: {response.StatusCode}");
+        }
+        catch (Exception ex)
+        {
+            return HealthCheckResult.Unhealthy("External service unreachable", ex);
+        }
+    }
+}
+```
+
+### Workflow
+
+**Phase 1: Solution Setup**
+
+Create solution structure. Add projects. Set up dependencies. Configure build configurations.
+
+**Phase 2: Domain Layer**
+
+Create entities. Define value objects. Implement domain logic. Add domain events.
+
+**Phase 3: Application Layer**
+
+Create commands/queries. Implement handlers. Add DTOs. Configure AutoMapper.
+
+**Phase 4: Infrastructure Layer**
+
+Configure EF Core. Create repositories. Implement services. Add external integrations.
+
+**Phase 5: Presentation Layer**
+
+Create controllers. Add middleware. Configure routing. Implement filters.
+
+**Phase 6: Testing**
+
+Write unit tests. Write integration tests. Test API endpoints. Set up CI/CD.
+
+---
+
+## Framework Selection Guide
+
+| Scenario | Recommended Framework |
+|----------|---------------------|
+| Microservices, Real-time apps | NestJS |
+| Rapid prototyping, MVPs | Laravel |
+| Enterprise, Microsoft stack | ASP.NET Core |
+| TypeScript-first team | NestJS |
+| PHP expertise | Laravel |
+| Strong typing required | ASP.NET Core |
+| Low learning curve | Laravel |
+| Maximum performance | ASP.NET Core |
+| Cloud-native, containers | NestJS / ASP.NET Core |
+| Legacy PHP migration | Laravel |
+
+---
+
+## Liên kết
+
+- [[api]] - API design patterns
+- [[database]] - Database integration
+- [[microservices]] - Microservices architecture
+- [[testing]] - Testing best practices
+- [[performance]] - Performance optimization
+- [[clean-architecture]] - Clean architecture principles
+- [[cqrs]] - CQRS pattern

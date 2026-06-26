@@ -256,6 +256,6 @@ User receives: Clarification request instead of blind debugging attempt
 
 - [[memory-first]] - Memory First: Memory context management
 - [[token-optimization]] - Token Optimization: Optimize token usage
-- [[core-architecture]] - Core Architecture: System architecture
+- [[enterprise-patterns]] - Core Architecture: System architecture
 - [[api]] - API Design: API request handling patterns
 - [[security]] - Security: Security-specific routing considerations

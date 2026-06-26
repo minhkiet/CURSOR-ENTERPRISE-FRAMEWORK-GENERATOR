@@ -1,8 +1,8 @@
 ---
-description: Nguyên tắc và best practices cho Cloudflare trong Cursor Enterprise Framework
+description: Cloudflare & CDN - hợp nhất từ cloudflare.mdc và cdn.mdc. Nguyên tắc và best practices cho Cloudflare edge platform và CDN content delivery trong Cursor Enterprise Framework
 created: 2026-06-23
-version: 1.0.0
-tags: [cloudflare, cdn, workers, edge-computing, dns, ssl]
+version: 1.1.0
+tags: [cloudflare, cdn, merged, workers, edge-computing, dns, ssl, content-delivery, caching, performance]
 ---
 
 # Cloudflare
@@ -54,6 +54,134 @@ Use Cloudflare Images. Optimize on-the-fly. Resize automatically. Modern formats
 **10. Access Policies**
 
 Zero Trust Access. SSO integration. Device posture checks. Policy enforcement.
+
+## CDN Overview
+
+### 1. CDN Architecture
+
+Edge caching concepts.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     CDN Caching Layers                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  User Request ──▶ CDN Edge ──▶ Origin Server                      │
+│                       │                                          │
+│                       ▼                                          │
+│                 ┌───────────┐                                   │
+│                 │   Cache   │                                   │
+│                 │   HIT     │                                   │
+│                 └───────────┘                                   │
+│                       │                                          │
+│                 ┌───────────┐                                   │
+│                 │  Cache   │                                   │
+│                 │  MISS    │                                   │
+│                 └─────┬─────┘                                   │
+│                       │                                          │
+│                       ▼                                          │
+│               Origin Server                                      │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 2. Cache Headers
+
+Proper caching configuration.
+
+```yaml
+# CloudFront cache behavior
+cache_behavior:
+  viewer_protocol_policy: redirect-to-https
+  allowed_methods:
+    - GET
+    - HEAD
+    - OPTIONS
+  cached_methods:
+    - GET
+    - HEAD
+  min_ttl: 0
+  default_ttl: 3600      # 1 hour
+  max_ttl: 86400        # 24 hours
+
+  # Cache policy
+  cache_policy_id: managed-caching-optimized
+
+  # Origin request policy
+  origin_request_policy_id: managed-allviewer
+
+# Lambda@Edge for dynamic cache key
+function:
+  event_type: viewer-request
+  function_arn: cache-key-function
+```
+
+### 3. Static Asset Caching
+
+Optimize static content.
+
+```yaml
+# S3 + CloudFront configuration
+s3_bucket:
+  website:
+    index_document: index.html
+    error_document: error.html
+
+  # Versioning for cache busting
+  versioning:
+    enabled: true
+
+  # Lifecycle for cost optimization
+  lifecycle_rules:
+    - id: archive-logs
+      status: enabled
+      prefix: logs/
+      expiration:
+        days: 30
+
+# CloudFront distribution
+cloudfront:
+  origins:
+    - domain_name: bucket.s3.amazonaws.com
+      custom_origin_config:
+        origin_protocol_policy: https-only
+      # OAI for security
+      s3_origin_access_identity:
+        enabled: true
+
+  # Default root object
+  default_root_object: index.html
+
+  # Custom error pages
+  custom_error_responses:
+    - error_code: 404
+      response_page_path: /404.html
+      response_code: 404
+      min_ttl: 0
+```
+
+### 4. Image Optimization
+
+CDN for images.
+
+```yaml
+# CloudFront Function for image optimization
+function viewer_request {
+  // Add responsive image headers
+}
+
+# CloudFront Response Headers Policy
+response_headers_policy:
+  name: cache-security-headers
+  custom_headers:
+    - header: Cache-Control
+      value: public, max-age=31536000, immutable
+      override: true
+
+    - header: ETag
+      value: '"{{computed.etag}}"'
+      override: true
+```
 
 ## Checklist
 
@@ -502,8 +630,8 @@ Monitor traffic. Review analytics. Adjust configurations. Optimize performance.
 ## Liên kết
 
 - [[deployment]] - Deployment
-- [[cdn]] - CDN best practices
 - [[edge-computing]] - Edge computing
 - [[security]] - Security configuration
 - [[workers]] - Cloudflare Workers
 - [[r2]] - R2 storage
+- [[performance]] - Performance optimization

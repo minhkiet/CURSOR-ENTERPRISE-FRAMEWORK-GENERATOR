@@ -232,7 +232,7 @@ export class DatePicker {
 
 ## Links
 
-- [[core-architecture]] - Kiến trúc cốt lõi
+- [[enterprise-patterns]] - Kiến trúc cốt lõi
 - [[coding-standards]] - Tiêu chuẩn viết code
 - [[skill-integration]] - Skill auto-discovery
 - [Ponytail GitHub](https://github.com/DietrichGebert/ponytail) - Original 58k stars project

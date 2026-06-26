@@ -1,8 +1,8 @@
 ---
-description: Nguyên tắc và best practices cho Redis Cache và Data Store
+description: Redis Cache & Caching Strategy - hợp nhất từ redis.mdc và caching-strategy.mdc
 created: 2026-06-23
-version: 1.0.0
-tags: [redis, cache, session, performance, nosql]
+version: 1.1.0
+tags: [redis, cache, session, performance, nosql, caching, strategy, memory-cache, distributed-cache, merged]
 ---
 
 # Redis
@@ -39,6 +39,258 @@ Use efficient serializers. JSON for generic objects. MessagePack/Protobuf for ef
 
 Cache-Aside: Read through cache, update on miss. Write-Through: Update cache and DB together. Write-Behind: Update cache, async DB write. Refresh-Ahead: Proactively refresh expiring cache. Choose pattern based on consistency needs. Implement cache invalidation carefully.
 
+### Cache Hierarchy
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Cache Hierarchy                          │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Level 1: Application Cache (In-Memory)                    │
+│  ├── Fastest access (< 1ms)                                │
+│  ├── Limited size (MB)                                      │
+│  └── Process-specific                                      │
+│                                                             │
+│  Level 2: Distributed Cache (Redis/Memcached)              │
+│  ├── Fast access (1-10ms)                                  │
+│  ├── Larger size (GB)                                      │
+│  └── Shared across instances                               │
+│                                                             │
+│  Level 3: Database Cache                                   │
+│  ├── Query cache                                           │
+│  ├── Buffer pool                                           │
+│  └── Connection pool                                       │
+│                                                             │
+│  Level 4: CDN Cache                                        │
+│  ├── Static assets                                         │
+│  ├── Edge locations                                        │
+│  └── Geographic distribution                               │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Cache Key Design
+
+```typescript
+// Cache key conventions
+class CacheKeyBuilder {
+    static readonly SEPARATOR = ':';
+
+    static resource(resource: string, id: string): string {
+        return `${resource}${this.SEPARATOR}${id}`;
+    }
+
+    static resourceList(resource: string, params?: Record<string, any>): string {
+        const sortedParams = params ? Object.keys(params).sort().map(
+            k => `${k}=${params[k]}`
+        ).join('&') : '';
+        return `${resource}${this.SEPARATOR}list${sortedParams ? this.SEPARATOR + sortedParams : ''}`;
+    }
+
+    static userResource(userId: string, resource: string, id: string): string {
+        return `user${this.SEPARATOR}${userId}${this.SEPARATOR}${resource}${this.SEPARATOR}${id}`;
+    }
+
+    static versioned(key: string, version: number): string {
+        return `${key}${this.SEPARATOR}v${version}`;
+    }
+
+    static pagination(
+        resource: string,
+        params: { page?: number; limit?: number; sort?: string }
+    ): string {
+        return `${resource}${this.SEPARATOR}p${params.page || 1}${this.SEPARATOR}l${params.limit || 20}`;
+    }
+}
+
+// Usage
+const userKey = CacheKeyBuilder.resource('user', '123');                    // user:123
+const userListKey = CacheKeyBuilder.resourceList('users', { role: 'admin' }); // users:list&role=admin
+const userPostKey = CacheKeyBuilder.userResource('123', 'post', '456');       // user:123:post:456
+```
+
+### TTL Configuration
+
+```typescript
+// TTL configuration by data type
+const TTL_CONFIG = {
+    // Static reference data - long TTL
+    'country': 86400 * 30,           // 30 days
+    'language': 86400 * 30,          // 30 days
+    'category': 86400 * 7,          // 7 days
+
+    // User-specific data - medium TTL
+    'user:profile': 3600,           // 1 hour
+    'user:settings': 3600 * 6,      // 6 hours
+    'user:permissions': 3600,       // 1 hour
+
+    // Session data - short TTL
+    'session': 1800,                // 30 minutes
+    'token': 900,                  // 15 minutes
+    'rate_limit': 60,              // 1 minute
+
+    // Content - variable TTL
+    'post': 3600,                  // 1 hour
+    'post:popular': 300,           // 5 minutes
+    'comment': 1800,               // 30 minutes
+
+    // Metrics - very short TTL
+    'metrics:daily': 3600,         // 1 hour
+    'metrics:realtime': 60,       // 1 minute
+    'leaderboard': 300,           // 5 minutes
+};
+
+// TTL Strategy
+class TTLStrategy {
+    static forResource(type: string): number {
+        return TTL_CONFIG[type] || 3600;
+    }
+
+    static withJitter(ttl: number): number {
+        const jitter = ttl * 0.1;
+        return ttl + Math.floor((Math.random() * 2 - 1) * jitter);
+    }
+}
+```
+
+### Cache Invalidation
+
+```typescript
+// Event-driven invalidation
+class EventDrivenCacheInvalidator {
+    constructor(
+        private cache: CacheClient,
+        private eventBus: EventBus
+    ) {
+        this.subscribeToEvents();
+    }
+
+    private subscribeToEvents(): void {
+        this.eventBus.subscribe('user.updated', async (event) => {
+            const { userId } = event.data;
+            await Promise.all([
+                this.cache.del(`user:${userId}`),
+                this.cache.del(`user:${userId}:profile`),
+                this.cache.invalidateByPrefix(`users:list*`)
+            ]);
+        });
+    }
+}
+```
+
+### Distributed Caching
+
+```typescript
+// Redis cache client
+class RedisCacheClient implements CacheClient {
+    async get<T>(key: string): Promise<T | null> {
+        const value = await this.redis.get(key);
+        return value ? JSON.parse(value) : null;
+    }
+
+    async set(key: string, value: any, ttl?: number): Promise<void> {
+        const serialized = JSON.stringify(value);
+        if (ttl) {
+            await this.redis.setex(key, ttl, serialized);
+        } else {
+            await this.redis.set(key, serialized);
+        }
+    }
+}
+
+// Distributed locking
+class DistributedLock {
+    async acquire(key: string, ttl: number = 10000): Promise<string | null> {
+        const lockKey = `lock:${key}`;
+        const lockValue = nanoid();
+
+        const acquired = await this.redis.set(lockKey, lockValue, 'PX', ttl, 'NX');
+        return acquired ? lockValue : null;
+    }
+
+    async release(key: string, value: string): Promise<boolean> {
+        const script = `
+            if redis.call("get", KEYS[1]) == ARGV[1] then
+                return redis.call("del", KEYS[1])
+            else
+                return 0
+            end
+        `;
+        const result = await this.redis.eval(script, 1, `lock:${key}`, value);
+        return result === 1;
+    }
+}
+```
+
+### Multi-Layer Caching
+
+```typescript
+class MultiLayerCache {
+    constructor(
+        private l1: MemoryCache,  // In-memory
+        private l2: RedisCache,   // Redis
+        private l3: Database      // Database
+    ) {}
+
+    async get<T>(key: string): Promise<T | null> {
+        let value = await this.l1.get<T>(key);
+        if (value !== null) return value;
+
+        value = await this.l2.get<T>(key);
+        if (value !== null) {
+            await this.l1.set(key, value, 60);
+            return value;
+        }
+
+        return null;
+    }
+
+    async set<T>(key: string, value: T, l1Ttl: number, l2Ttl: number): Promise<void> {
+        await Promise.all([
+            this.l1.set(key, value, l1Ttl),
+            this.l2.set(key, value, l2Ttl)
+        ]);
+    }
+
+    async invalidate(key: string): Promise<void> {
+        await Promise.all([
+            this.l1.invalidate(key),
+            this.l2.invalidate(key)
+        ]);
+    }
+}
+```
+
+### Query Caching
+
+```typescript
+class QueryCache {
+    async getQuery<T>(
+        query: string,
+        params: any[],
+        fetcher: () => Promise<T>
+    ): Promise<T> {
+        const cacheKey = this.buildCacheKey(query, params);
+        const cached = await this.cache.get<T>(cacheKey);
+        if (cached !== null) return cached;
+
+        const result = await fetcher();
+        await this.cache.set(cacheKey, result, this.defaultTTL);
+        return result;
+    }
+
+    private buildCacheKey(query: string, params: any[]): string {
+        const normalizedQuery = query.replace(/\s+/g, ' ').trim();
+        const paramsHash = crypto.createHash('md5')
+            .update(JSON.stringify(params))
+            .digest('hex');
+        return `query:${crypto.createHash('md5')
+            .update(normalizedQuery)
+            .digest('hex')}:${paramsHash}`;
+    }
+}
+```
+
 **7. Rate Limiting**
 
 Use sliding window with sorted sets. Lua scripts for atomic operations. Key: `ratelimit:<user>:<endpoint>`. Store timestamps as scores. Remove old entries on each check. Combine with IP-based limits. Consider distributed rate limiting.
@@ -63,6 +315,11 @@ Bind to internal interfaces only. Use AUTH password. Enable TLS in production. D
 - [ ] Connection pooling configured
 - [ ] Serialization strategy chosen
 - [ ] Cache patterns implemented
+- [ ] Cache hierarchy planned (L1/L2/L3)
+- [ ] Cache key design documented
+- [ ] Cache invalidation strategy defined
+- [ ] Multi-layer caching implemented if needed
+- [ ] Query caching configured
 - [ ] Rate limiting configured
 - [ ] Security hardening applied
 - [ ] Monitoring setup
@@ -317,7 +574,6 @@ async function invalidateSession(sessionId: string): Promise<void> {
 ## Liên kết
 
 - [[database]] - Database: General database principles
-- [[cache]] - Cache: General caching strategies
 - [[performance]] - Performance: Performance optimization
 - [[security]] - Security: Security best practices
 - [[queue]] - Queue: Message queue patterns

@@ -1,8 +1,8 @@
 ---
-description: Nguyên tắc và best practices cho Cost Optimization trong Cursor Enterprise Framework
+description: Cost & Token Optimization - hợp nhất từ cost-optimization.mdc và token-optimization.mdc
 created: 2026-06-23
-version: 1.0.0
-tags: [cost, optimization, cloud, aws, gcp, azure]
+version: 1.1.0
+tags: [cost, optimization, cloud, aws, gcp, azure, token, llm-cost, merged]
 ---
 
 # Cost Optimization
@@ -799,6 +799,186 @@ Automate cost controls. Set up auto-scaling. Implement cleanup jobs. Configure b
 
 Track savings. Monitor trends. Review alerts. Iterate improvements.
 
+## Token Optimization
+
+Token Optimization tập trung vào việc tối đa hóa giá trị thông tin trong mỗi token và giảm thiểu chi phí LLM interactions. Với chi phí API tính theo token, việc tối ưu hóa này trực tiếp ảnh hưởng đến operational costs và user experience.
+
+### Nguyên tắc Token
+
+**1. Context Window Budgeting**
+
+Mọi LLM interaction phải operate within a defined context budget. Budget được calculated dựa trên model limits, available budget, và task requirements. Priorities được established cho different context types: task-specific context cao nhất, project context medium, general context thấp nhất.
+
+**2. Semantic Context Selection**
+
+Context được selected dựa trên semantic relevance thay vì proximity hoặc recency. Semantic selection sử dụng embeddings để find truly relevant content. Relevance scoring considers query intent, current task, và historical patterns.
+
+**3. Intelligent Summarization**
+
+Long content được summarized trước khi include trong context. Different summarization strategies cho different content types: code vs. documentation vs. conversations. Summaries enable representing large amounts of content với fewer tokens.
+
+**4. Progressive Context Loading**
+
+Context được loaded progressively, starting với most likely needed và expanding as needed. Initial context is minimal và targeted. System can request additional context if initial context insufficient.
+
+**5. Cross-Reference Compression**
+
+Multiple references to same information được compressed to avoid duplication. If same function is mentioned in multiple places, reference it once with context.
+
+**6. Token-Efficient Formatting**
+
+Output formats được designed cho token efficiency. Structured formats like JSON vs. natural language based on use case. Abbreviations được used appropriately.
+
+**7. Caching Intermediate Results**
+
+Frequently used context chunks được cached để avoid regeneration. Cache key based on content hash và query pattern. Cache invalidation based on source changes.
+
+**8. Batch Similar Requests**
+
+Multiple similar requests được batched together when possible. Batching amortizes context preparation overhead. Batch processing enables cross-request context sharing.
+
+**9. Model-Specific Optimization**
+
+Token strategies được optimized for specific models being used. Different models have different token limits và pricing. Multi-model routing can optimize cost-effectiveness.
+
+**10. Cost-Performance Profiling**
+
+Track cost vs. performance metrics for different context strategies. Profile different summarization approaches. Establish optimal budget allocations.
+
+### Token Checklist
+
+- [ ] Context window limits được defined cho each model
+- [ ] Budget allocation strategy được implemented
+- [ ] Semantic search for context selection được enabled
+- [ ] Summarization pipeline được deployed
+- [ ] Progressive loading support được implemented
+- [ ] Cross-reference compression được active
+- [ ] Caching layer được implemented
+- [ ] Batching optimization được configured
+- [ ] Token usage reports được generated regularly
+
+### Token Anti Patterns
+
+**1. Include Everything Mentality**
+
+Cố gắng include tất cả context dẫn đến context overflow và wasted tokens. Important context gets lost in noise. Costs escalate without quality improvement. Solution: Implement strict prioritization.
+
+**2. Zero-Context Optimization**
+
+Không include any context, relying purely on model's training. This results in generic, potentially incorrect responses. Solution: Balance context inclusion with efficiency.
+
+**3. Fixed Context Allocation**
+
+Using same context budget for all requests regardless of complexity. Solution: Implement dynamic budget allocation based on task analysis.
+
+**4. Ignoring Token Costs**
+
+Not considering token costs in context decisions leads to budget overruns. Solution: Make token cost a first-class consideration.
+
+### Token Best Practices
+
+**1. Implement Context Triage**
+
+Prioritize context into tiers: essential, important, nice-to-have. Triage criteria based on task requirements và historical patterns.
+
+**2. Use Adaptive Chunk Sizing**
+
+Context chunks sized based on content characteristics. Related content grouped together. Semantic boundaries respected in chunking.
+
+**3. Implement Relevance Scoring**
+
+Score all potential context for relevance to current query. Use multiple signals: semantic similarity, recency, frequency.
+
+**4. Design Token-Efficient Prompts**
+
+Prompts được designed với token efficiency in mind. Avoid redundant phrasing. Use structured formats when appropriate.
+
+**5. Monitor Token Utilization**
+
+Track actual token usage vs. model limits. Identify patterns in waste và underutilization. Set alerts for anomalous usage.
+
+**6. Implement Smart Truncation**
+
+When context must be truncated, prioritize recent và relevant content. Use semantic truncation over simple cut-off.
+
+**7. Use Compression for Long Contexts**
+
+Apply compression techniques for long documents. Semantic compression preserves meaning. Encoder-based compression for code.
+
+**8. Optimize Repetitive Patterns**
+
+Identify repetitive patterns in context preparation. Templates for common request types. Shared context across similar requests.
+
+**9. Implement Token Budget Alerts**
+
+Alert when token usage approaches limits. Proactive warnings enable optimization. Budget monitoring prevents overages.
+
+**10. Regular Efficiency Reviews**
+
+Conduct regular reviews of token efficiency. Analyze cost vs. value metrics. Identify new optimization opportunities.
+
+### Token Workflow
+
+**Step 1: Request Analysis** - Analyze incoming request to determine token needs. Estimate base context requirements.
+
+**Step 2: Budget Allocation** - Allocate token budget across context categories. Reserve tokens for system instructions.
+
+**Step 3: Context Retrieval** - Retrieve context using semantic search. Apply priority filters. Score retrieved context.
+
+**Step 4: Context Preparation** - Apply compression if needed. Resolve cross-references. Format for token efficiency.
+
+**Step 5: Context Assembly** - Assemble final context within budget. Verify all essential elements included.
+
+**Step 6: Prompt Construction** - Build final prompt with context. Apply prompt optimization techniques.
+
+**Step 7: Response Processing** - Cache useful responses. Track token usage. Update optimization models.
+
+**Step 8: Usage Analysis** - Analyze token usage for the request. Compare actual vs. estimated. Update strategies.
+
+### Token Ví dụ
+
+**Ví dụ 1: Codebase Context Selection**
+
+```
+Task: Add pagination to user list API endpoint
+
+Token Budget: 2000 tokens
+
+Budget Allocation:
+- System instructions: 200 tokens
+- Task description: 100 tokens
+- User endpoint code: 300 tokens
+- Related database schema: 200 tokens
+- Pagination pattern example: 400 tokens
+- API conventions: 300 tokens
+- Error handling patterns: 300 tokens
+- Adaptive: 200 tokens
+
+Context Selected:
+1. userController.ts (current implementation)
+2. userService.ts (business logic)
+3. database schema (relevant tables)
+4. pagination pattern (from codebase examples)
+```
+
+**Ví dụ 2: Documentation Question**
+
+```
+Question: "How do I configure the authentication middleware?"
+
+Token Budget: 1500 tokens
+
+Context Strategy:
+- Summarized authentication docs: 400 tokens
+- Middleware configuration example: 300 tokens
+- Related environment variables: 200 tokens
+- Troubleshooting section: 200 tokens
+- Quick start guide excerpt: 300 tokens
+- Link to full docs: 100 tokens
+
+Response: Concise answer với relevant context
+```
+
 ## Liên kết
 
 - [[aws]] - AWS cost optimization
@@ -807,3 +987,6 @@ Track savings. Monitor trends. Review alerts. Iterate improvements.
 - [[cloudflare]] - CDN costs
 - [[database]] - Database cost optimization
 - [[monitoring]] - Cost monitoring
+- [[memory-first]] - Memory First: Memory context management
+- [[context-router]] - Context Router: Intelligent request routing
+- [[llm-providers]] - LLM Providers: Model selection và pricing

@@ -1,0 +1,1890 @@
+---
+description: Workflow Engines - hợp nhất từ n8n, Trigger.dev, Temporal
+created: 2026-06-23
+version: 1.0.0
+tags: [workflow, automation, n8n, trigger-dev, temporal, background-jobs]
+---
+
+# Workflow Engines
+
+## Tổng quan So sánh
+
+| Feature | n8n | Trigger.dev | Temporal |
+|---------|-----|-------------|----------|
+| Type | Visual Workflow | TypeScript SDK | Code-first |
+| Use Case | No-code | Developer | Enterprise |
+| Execution | Cloud/Self-hosted | Cloud | Self-hosted |
+| Pricing | Free tier | Free tier | Self-hosted free |
+
+---
+
+## 1. n8n (No-code Automation)
+
+### Mục tiêu
+
+n8n là workflow automation platform cho phép connect apps và automate tasks mà không cần code. Trong Cursor Enterprise Framework, n8n được sử dụng cho business process automation, integration workflows, và data synchronization. Mục tiêu của rule này là hướng dẫn developers trong việc implement và manage n8n workflows một cách hiệu quả và maintainable.
+
+n8n bridges gap giữa no-code tools và custom code, cho phép business users create workflows trong khi developers can extend capabilities when needed.
+
+### Nguyên tắc
+
+**1. Workflow Design**
+
+Clear objectives. Simple flow. Error handling. Idempotent operations.
+
+**2. Node Organization**
+
+Group related nodes. Use sub-nodes for reusability. Clear naming. Proper documentation.
+
+**3. Error Handling**
+
+Try-catch blocks. Retry on failure. Dead letter queues. Alert on errors.
+
+**4. Data Transformation**
+
+Use expressions. Map fields clearly. Validate data. Handle nulls.
+
+**5. Authentication**
+
+Store credentials securely. Rotate tokens. Use OAuth when possible. Avoid hardcoding.
+
+**6. Trigger Design**
+
+Choose appropriate triggers. Webhook for sync. Cron for schedule. Event for async.
+
+**7. Scalability**
+
+Heavy workflows in queue. Batch processing. Avoid long-running workflows. Use pagination.
+
+**8. Version Control**
+
+Export workflows as JSON. Version in Git. Document changes. Use environments.
+
+**9. Monitoring**
+
+Set up execution logs. Monitor success rate. Track metrics. Alert on failures.
+
+**10. Security**
+
+Webhook secrets. Input validation. Rate limiting. Audit logging.
+
+### Checklist
+
+- [ ] Workflow requirements defined
+- [ ] Node structure designed
+- [ ] Error handling implemented
+- [ ] Credentials configured
+- [ ] Testing completed
+- [ ] Monitoring set up
+- [ ] Documentation created
+- [ ] Version control established
+- [ ] Rollback plan defined
+- [ ] Security reviewed
+
+### Anti Pattern
+
+**1. Monolithic Workflows**
+
+Everything in one workflow. Hard to debug. Hard to maintain. Split into smaller.
+
+**2. No Error Handling**
+
+Ignoring errors. Silent failures. Data loss. Proper error handling.
+
+**3. Hardcoded Values**
+
+Values in workflow. Environment changes break. Use variables. Externalize.
+
+**4. Over-Complex Logic**
+
+Complex expressions. Nested conditions. Hard to read. Simplify or use Code nodes.
+
+### Best Practice
+
+**1. Workflow Structure**
+
+```json
+{
+  "name": "Order Processing Workflow",
+  "nodes": [
+    {
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "order-webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "orders",
+        "responseMode": "onReceived",
+        "options": {
+          "rawBody": false
+        }
+      }
+    },
+    {
+      "name": "Validate Order",
+      "type": "n8n-nodes-base.code",
+      "position": [500, 300],
+      "parameters": {
+        "jsCode": "const order = $json;\n\nif (!order.items || order.items.length === 0) {\n  throw new Error('Order must have at least one item');\n}\n\nif (!order.customerId) {\n  throw new Error('Customer ID is required');\n}\n\nreturn { json: { valid: true, order } };"
+      }
+    },
+    {
+      "name": "Create Database Record",
+      "type": "n8n-nodes-base.postgres",
+      "position": [750, 300],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO orders (id, customer_id, status, data) VALUES ($1, $2, $3, $4)",
+        "options": {
+          "values": {
+            "values": [
+              { "name": "id", "value": "={{ $json.order.id }}" },
+              { "name": "customer_id", "value": "={{ $json.order.customerId }}" },
+              { "name": "status", "value": "pending" },
+              { "name": "data", "value": "={{ JSON.stringify($json.order) }}" }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "Notify Customer",
+      "type": "n8n-nodes-base.email",
+      "position": [1000, 200],
+      "parameters": {
+        "to": "={{ $json.customer.email }}",
+        "subject": "Order Confirmation",
+        "body": "Your order {{ $json.order.id }} has been received.",
+        "options": {}
+      }
+    },
+    {
+      "name": "Update Inventory",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1000, 400],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.INVENTORY_API_URL }}/reserve",
+        "bodyParameters": {
+          "items": "={{ $json.order.items }}"
+        },
+        "options": {}
+      }
+    },
+    {
+      "name": "Handle Error",
+      "type": "n8n-nodes-base.errorTrigger",
+      "position": [1250, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [[{ "node": "Validate Order", "type": "main", "index": 0 }]]
+    },
+    "Validate Order": {
+      "main": [[{ "node": "Create Database Record", "type": "main", "index": 0 }]]
+    },
+    "Create Database Record": {
+      "main": [
+        [{ "node": "Notify Customer", "type": "main", "index": 0 }],
+        [{ "node": "Update Inventory", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
+```
+
+**2. Reusable Sub-Workflows**
+
+```json
+{
+  "name": "Send Email Template",
+  "nodes": [
+    {
+      "name": "Workflow Input",
+      "type": "n8n-nodes-base.workflowTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "name": "Load Template",
+      "type": "n8n-nodes-base.code",
+      "position": [500, 300],
+      "parameters": {
+        "jsCode": "const templates = {\n  welcome: {\n    subject: 'Welcome to {{ company }}!',\n    body: 'Hello {{ name }},\\n\\nWelcome to our platform.'\n  },\n  orderConfirmation: {\n    subject: 'Order {{ orderId }} Confirmed',\n    body: 'Your order is confirmed. Order ID: {{ orderId }}'\n  }\n};\n\nconst template = templates[$input.first().json.template];\nif (!template) {\n  throw new Error(`Template ${$input.first().json.template} not found`);\n}\n\nreturn { json: { ...template, data: $input.first().json } };"
+      }
+    },
+    {
+      "name": "Render Template",
+      "type": "n8n-nodes-base.handlebars",
+      "position": [750, 300],
+      "parameters": {
+        "operation": "renderTemplate",
+        "template": "={{ $json.subject }}",
+        "data": "={{ $json.data }}"
+      }
+    }
+  ]
+}
+```
+
+**3. Batch Processing Workflow**
+
+```json
+{
+  "name": "Batch Customer Sync",
+  "nodes": [
+    {
+      "name": "Cron Trigger",
+      "type": "n8n-nodes-base.cron",
+      "position": [250, 300],
+      "parameters": {
+        "rule": {
+          "interval": [
+            { "triggerAtHour": 2 }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Fetch Customers",
+      "type": "n8n-nodes-base.postgres",
+      "position": [500, 300],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, email, name, updated_at FROM customers WHERE updated_at > NOW() - INTERVAL '24 hours'"
+      }
+    },
+    {
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [750, 300],
+      "parameters": {
+        "batchSize": 100
+      }
+    },
+    {
+      "name": "Process Batch",
+      "type": "n8n-nodes-base.code",
+      "position": [1000, 300],
+      "parameters": {
+        "jsCode": "// Process batch of customers\nconst customers = $input.all().map(i => i.json);\n\n// Transform for external system\nreturn customers.map(customer => ({\n  json: {\n    external_id: customer.id,\n    email: customer.email,\n    full_name: customer.name,\n    last_updated: customer.updated_at\n  }\n}));"
+      }
+    },
+    {
+      "name": "Sync to CRM",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1250, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CRM_API_URL }}/contacts/batch",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer {{ $env.CRM_API_KEY }}" }
+          ]
+        },
+        "bodyParameters": {
+          "contacts": "={{ $json }}"
+        }
+      }
+    },
+    {
+      "name": "Log Results",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [1500, 300],
+      "parameters": {
+        "operation": "append",
+        "sheetId": "={{ $env.SHEET_ID }}",
+        "range": "A1",
+        "options": {
+          "valueInputMode": "USER_ENTERED"
+        }
+      }
+    }
+  ]
+}
+```
+
+**4. Error Handling Pattern**
+
+```json
+{
+  "name": "API Integration with Error Handling",
+  "nodes": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 300]
+    },
+    {
+      "name": "Try Block",
+      "type": "n8n-nodes-base.wait",
+      "position": [500, 300],
+      "parameters": {
+        "amount": 1,
+        "unit": "seconds"
+      }
+    },
+    {
+      "name": "API Call",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [750, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.API_URL }}/process",
+        "options": {
+          "timeout": 30000,
+          "retry": {
+            "maxRetries": 3,
+            "retryWaitMax": 10000
+          }
+        }
+      }
+    },
+    {
+      "name": "Success Path",
+      "type": "n8n-nodes-base.noOp",
+      "position": [1000, 200],
+      "parameters": {}
+    },
+    {
+      "name": "Retry Handler",
+      "type": "n8n-nodes-base.errorTrigger",
+      "position": [1000, 400],
+      "parameters": {}
+    },
+    {
+      "name": "Send Alert",
+      "type": "n8n-nodes-base.slack",
+      "position": [1250, 400],
+      "parameters": {
+        "channel": "#alerts",
+        "text": "=: Execution failed: {{ $json.execution.id }}"
+      }
+    },
+    {
+      "name": "Queue for Retry",
+      "type": "n8n-nodes-base.redis",
+      "position": [1250, 600],
+      "parameters": {
+        "operation": "lpush",
+        "key": "retry-queue",
+        "value": "={{ JSON.stringify($json.execution) }}"
+      }
+    }
+  ]
+}
+```
+
+**5. Environment-Specific Configuration**
+
+```json
+{
+  "nodes": [
+    {
+      "name": "Get Environment Config",
+      "type": "n8n-nodes-base.code",
+      "position": [250, 300],
+      "parameters": {
+        "jsCode": "const env = $env.NODE_ENV || 'development';\n\nconst configs = {\n  development: {\n    dbHost: 'localhost',\n    apiUrl: 'http://localhost:3000',\n    logLevel: 'debug'\n  },\n  staging: {\n    dbHost: 'staging-db.internal',\n    apiUrl: 'https://staging.api.example.com',\n    logLevel: 'info'\n  },\n  production: {\n    dbHost: 'prod-db.internal',\n    apiUrl: 'https://api.example.com',\n    logLevel: 'warn'\n  }\n};\n\nreturn { json: configs[env] || configs.development };"
+      }
+    }
+  ]
+}
+```
+
+**6. n8n Docker Setup**
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=${N8N_USER}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
+      - N8N_HOST=${N8N_HOST}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - NODE_ENV=production
+      - EXECUTIONS_DATA_SAVE_ON_ERROR=all
+      - EXECUTIONS_DATA_SAVE_ON_SUCCESS=all
+      - EXECUTIONS_DATA_SAVE_ON_PROGRESS=true
+      - EXECUTIONS_DATA_TIMEOUT=600
+      - GENERIC_TIMEZONE=Asia/Ho_Chi_Minh
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - N8N_LOG_LEVEL=info
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./workflows:/home/node/workflow-folder
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - n8n-network
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: n8n-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=n8n
+      - POSTGRES_MAX_CONNECTIONS=200
+    volumes:
+      - postgres_n8n:/var/lib/postgresql/data
+    networks:
+      - n8n-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: n8n-redis
+    restart: unless-stopped
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_n8n:/data
+    networks:
+      - n8n-network
+
+volumes:
+  n8n_data:
+  postgres_n8n:
+  redis_n8n:
+
+networks:
+  n8n-network:
+    driver: bridge
+```
+
+**7. Production Configuration**
+
+```yaml
+# n8n/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: n8n-config
+data:
+  N8N_LOG_LEVEL: "info"
+  N8N_METRICS: "true"
+  N8N_QUEUE_BULL_MESSAGES_TIMEOUT: "300"
+  N8N_EXECUTIONS_TIMEOUT: "600"
+  N8N_EXECUTIONS_TIMEOUT_MAX: "3600"
+  N8N_DEFAULT_BINARY_DATA_MODE: "filesystem"
+  N8N_ENCRYPTION_KEY: "${N8N_ENCRYPTION_KEY}"
+  N8N_PAYLOAD_SIZE_MAX: "16"
+  N8N_DISABLE_PRODUCTION_MAIN_PROCESS: "false"
+  WEBHOOK_URL: "https://n8n.example.com"
+  N8N_USER_FOLDERS: "/home/node/workflow-folder"
+
+---
+# n8n/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: n8n
+  template:
+    metadata:
+      labels:
+        app: n8n
+    spec:
+      containers:
+        - name: n8n
+          image: n8nio/n8n:1.0.0
+          ports:
+            - containerPort: 5678
+          envFrom:
+            - configMapRef:
+                name: n8n-config
+            - secretRef:
+                name: n8n-secrets
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 2Gi
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5678
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 5678
+          volumeMounts:
+            - name: n8n-data
+              mountPath: /home/node/.n8n
+            - name: workflows
+              mountPath: /home/node/workflow-folder
+      volumes:
+        - name: n8n-data
+          persistentVolumeClaim:
+            claimName: n8n-pvc
+        - name: workflows
+          persistentVolumeClaim:
+            claimName: workflows-pvc
+```
+
+### Workflow
+
+**Phase 1: Requirements Gathering**
+
+Identify automation needs. Map current process. Define success criteria. Estimate impact.
+
+**Phase 2: Workflow Design**
+
+Design flow. Identify triggers. Map data transformations. Plan error handling.
+
+**Phase 3: Implementation**
+
+Create workflow. Add nodes. Configure credentials. Test thoroughly.
+
+**Phase 4: Testing**
+
+Unit test nodes. Integration test. Error scenarios. Load test.
+
+**Phase 5: Deployment**
+
+Deploy to production. Monitor executions. Set up alerts. Train users.
+
+**Phase 6: Maintenance**
+
+Monitor performance. Optimize. Update. Document changes.
+
+---
+
+## 2. Trigger.dev (TypeScript)
+
+### Mục tiêu
+
+Trigger.dev là open-source platform cho background jobs và webhook processing với focus trên developer experience và reliability. Trong Cursor Enterprise Framework, Trigger.dev được sử dụng cho serverless background job processing, webhook handling, và scheduled tasks. Mục tiêu của rule này là hướng dẫn developers trong việc implement Trigger.dev workflows một cách hiệu quả và scalable.
+
+Trigger.dev provides a TypeScript-first approach to background jobs với built-in observability và retry mechanisms, làm cho nó ideal cho modern serverless architectures.
+
+### Nguyên tắc
+
+**1. Job Design**
+
+Define clear job responsibilities. Small, focused jobs. Composable tasks. Reusable job templates.
+
+**2. Trigger Selection**
+
+Choose appropriate triggers. Webhooks for events. Schedules for cron. Manual for on-demand.
+
+**3. Payload Handling**
+
+Validate payloads. Transform data. Handle idempotency. Store for debugging.
+
+**4. Error Handling**
+
+Use try-catch blocks. Define retry policies. Implement dead letter handling. Log errors clearly.
+
+**5. Concurrency Control**
+
+Set concurrency limits. Batch processing. Rate limiting. Resource management.
+
+**6. Observability**
+
+Use logging. Track metrics. Monitor success rates. Alert on failures.
+
+**7. Testing**
+
+Test jobs in isolation. Mock external services. Test retry logic. Integration tests.
+
+**8. Security**
+
+Validate webhooks. Use secrets. Rate limiting. Input sanitization.
+
+**9. Monitoring**
+
+Track job execution. Monitor latency. Alert on errors. Dashboard for overview.
+
+**10. Versioning**
+
+Version job definitions. Handle migrations. Maintain backwards compatibility. Document changes.
+
+### Checklist
+
+- [ ] Job requirements defined
+- [ ] Trigger types selected
+- [ ] Error handling implemented
+- [ ] Retry policies configured
+- [ ] Testing strategy defined
+- [ ] Monitoring set up
+- [ ] Documentation created
+- [ ] Security reviewed
+- [ ] Deployment configured
+
+### Anti Pattern
+
+**1. Large Monolithic Jobs**
+
+Everything in one job. Hard to test. Hard to maintain. Break into smaller jobs.
+
+**2. No Error Handling**
+
+Ignoring failures. Silent errors. Data loss. Proper error handling.
+
+**3. Blocking Operations**
+
+Long-running synchronous operations. Timeout issues. Async when possible.
+
+**4. Hardcoded Secrets**
+
+Secrets in code. Exposed credentials. Use environment variables.
+
+### Best Practice
+
+**1. Project Structure**
+
+```
+trigger/
+├── jobs/
+│   ├── index.ts
+│   ├── user/
+│   │   ├── welcome-email.job.ts
+│   │   ├── user-sync.job.ts
+│   │   └── user-deactivation.job.ts
+│   ├── order/
+│   │   ├── order-confirmation.job.ts
+│   │   ├── inventory-check.job.ts
+│   │   └── order-fulfillment.job.ts
+│   └── reporting/
+│       ├── daily-report.job.ts
+│       └── metrics-aggregation.job.ts
+│
+├── triggers/
+│   ├── webhook/
+│   │   ├── github.trigger.ts
+│   │   ├── stripe.trigger.ts
+│   │   └── slack.trigger.ts
+│   └── schedule/
+│       └── cron.triggers.ts
+│
+├── lib/
+│   ├── email.ts
+│   ├── database.ts
+│   └── integrations.ts
+│
+├── middleware/
+│   ├── logging.ts
+│   └── error-handler.ts
+│
+├── tests/
+│   ├── jobs/
+│   │   └── order-confirmation.test.ts
+│   └── triggers/
+│       └── webhook.test.ts
+│
+└── trigger.config.ts
+```
+
+**2. Job Definitions**
+
+```typescript
+// jobs/order/order-confirmation.job.ts
+import { eventTrigger, interval, Job } from '@trigger.dev/sdk';
+import { z } from 'zod';
+import { Resend } from '@trigger.dev/resend';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+export const orderConfirmationJob = new Job({
+  id: 'order-confirmation',
+  name: 'Send Order Confirmation',
+  version: '1.0.0',
+  trigger: eventTrigger({
+    name: 'order.created',
+    schema: z.object({
+      orderId: z.string(),
+      customerId: z.string(),
+      email: z.string().email(),
+      items: z.array(z.object({
+        productId: z.string(),
+        name: z.string(),
+        quantity: z.number(),
+        price: z.number()
+      })),
+      total: z.number(),
+      shippingAddress: z.object({
+        street: z.string(),
+        city: z.string(),
+        country: z.string(),
+        postalCode: z.string()
+      })
+    })
+  }),
+  
+  async run(trigger, io) {
+    const { orderId, customerId, email, items, total, shippingAddress } = trigger.payload;
+
+    await io.logger.info('Processing order confirmation', { orderId, customerId });
+
+    // Generate order details
+    const orderDetails = await io.runTask('generate-order-details', async () => {
+      return {
+        orderId,
+        items,
+        total,
+        estimatedDelivery: calculateDeliveryDate(),
+        trackingUrl: `https://tracking.example.com/${orderId}`
+      };
+    }, { 
+      name: 'Generate Order Details',
+      timeout: '10s'
+    });
+
+    // Send confirmation email
+    await io.runTask('send-confirmation-email', async () => {
+      await resend.emails.send({
+        from: 'orders@example.com',
+        to: email,
+        subject: `Order Confirmation - ${orderId}`,
+        html: generateConfirmationEmailHtml({
+          orderId,
+          items,
+          total,
+          ...orderDetails
+        })
+      });
+    }, {
+      name: 'Send Email',
+      timeout: '30s',
+      retry: {
+        maxAttempts: 3,
+        minTimeout: '10s',
+        maxTimeout: '5m',
+        factor: 2
+      }
+    });
+
+    // Update database
+    await io.runTask('update-order-status', async () => {
+      await prisma.order.update({
+        where: { id: orderId },
+        data: { 
+          confirmationSentAt: new Date(),
+          status: 'confirmed'
+        }
+      });
+    }, {
+      name: 'Update Database',
+      timeout: '5s'
+    });
+
+    await io.logger.info('Order confirmation completed', { orderId });
+  }
+});
+
+// Helper function
+function calculateDeliveryDate(): string {
+  const delivery = new Date();
+  delivery.setDate(delivery.getDate() + 5);
+  return delivery.toLocaleDateString('en-US', { 
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric'
+  });
+}
+
+function generateConfirmationEmailHtml(data: any): string {
+  return `
+    <h1>Order Confirmation</h1>
+    <p>Thank you for your order!</p>
+    <p><strong>Order ID:</strong> ${data.orderId}</p>
+    <p><strong>Total:</strong> $${data.total.toFixed(2)}</p>
+    <p><strong>Estimated Delivery:</strong> ${data.estimatedDelivery}</p>
+  `;
+}
+```
+
+**3. Scheduled Jobs**
+
+```typescript
+// jobs/reporting/daily-report.job.ts
+import { scheduleEvent, Job } from '@trigger.dev/sdk';
+import { z } from 'zod';
+
+export const dailyReportJob = new Job({
+  id: 'daily-report',
+  name: 'Generate Daily Report',
+  version: '1.0.0',
+  trigger: scheduleEvent({
+    cron: '0 8 * * *',  // Daily at 8 AM UTC
+    timezone: 'UTC'
+  }),
+  
+  async run(trigger, io) {
+    const reportDate = new Date().toISOString().split('T')[0];
+    
+    await io.logger.info('Starting daily report generation', { reportDate });
+
+    // Fetch metrics from various sources
+    const salesData = await io.runTask('fetch-sales-data', async () => {
+      return await fetch(`${process.env.API_URL}/reports/sales?date=${reportDate}`)
+        .then(res => res.json());
+    }, { name: 'Fetch Sales', timeout: '30s' });
+
+    const userMetrics = await io.runTask('fetch-user-metrics', async () => {
+      return await fetch(`${process.env.API_URL}/reports/users?date=${reportDate}`)
+        .then(res => res.json());
+    }, { name: 'Fetch Users', timeout: '30s' });
+
+    const operationalMetrics = await io.runTask('fetch-operational-metrics', async () => {
+      return await fetch(`${process.env.API_URL}/reports/operations?date=${reportDate}`)
+        .then(res => res.json());
+    }, { name: 'Fetch Operations', timeout: '30s' });
+
+    // Generate report
+    const report = await io.runTask('generate-report', async () => {
+      return {
+        date: reportDate,
+        summary: {
+          totalSales: salesData.total,
+          totalOrders: salesData.orderCount,
+          newUsers: userMetrics.newUsers,
+          activeUsers: userMetrics.activeUsers,
+          avgResponseTime: operationalMetrics.avgResponseTime,
+          errorRate: operationalMetrics.errorRate
+        },
+        generatedAt: new Date().toISOString()
+      };
+    }, { name: 'Generate Report', timeout: '10s' });
+
+    // Send report via Slack
+    await io.runTask('send-slack-notification', async () => {
+      await fetch(process.env.SLACK_WEBHOOK_URL!, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          blocks: [
+            { type: 'header', text: { type: 'plain_text', text: 'Daily Report' } },
+            { type: 'section', fields: [
+              { type: 'mrkdwn', text: `*Sales:* $${report.summary.totalSales}` },
+              { type: 'mrkdwn', text: `*Orders:* ${report.summary.totalOrders}` },
+              { type: 'mrkdwn', text: `*New Users:* ${report.summary.newUsers}` },
+              { type: 'mrkdwn', text: `*Active Users:* ${report.summary.activeUsers}` }
+            ]}
+          ]
+        })
+      });
+    }, {
+      name: 'Send Slack',
+      timeout: '10s',
+      retry: { maxAttempts: 3 }
+    });
+
+    await io.logger.info('Daily report completed', { reportDate, report });
+  }
+});
+```
+
+**4. Webhook Triggers**
+
+```typescript
+// triggers/webhook/stripe.trigger.ts
+import { Job } from '@trigger.dev/sdk';
+import { z } from 'zod';
+import Stripe from 'stripe';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
+export const stripeWebhookJob = new Job({
+  id: 'stripe-webhook',
+  name: 'Stripe Webhook Handler',
+  version: '1.0.0',
+  trigger: {
+    // Custom webhook endpoint
+    schema: z.object({
+      type: z.string(),
+      data: z.object({
+        object: z.any()
+      })
+    })
+  },
+  
+  async run(trigger, io) {
+    const { type, data } = trigger.payload;
+
+    await io.logger.info('Processing Stripe webhook', { type, eventId: data.object.id });
+
+    switch (type) {
+      case 'payment_intent.succeeded':
+        await handlePaymentSuccess(data.object, io);
+        break;
+        
+      case 'payment_intent.payment_failed':
+        await handlePaymentFailure(data.object, io);
+        break;
+        
+      case 'customer.subscription.created':
+        await handleSubscriptionCreated(data.object, io);
+        break;
+        
+      case 'customer.subscription.deleted':
+        await handleSubscriptionDeleted(data.object, io);
+        break;
+        
+      case 'invoice.payment_succeeded':
+        await handleInvoicePaid(data.object, io);
+        break;
+        
+      default:
+        await io.logger.info('Unhandled Stripe event type', { type });
+    }
+  }
+});
+
+async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, io: any) {
+  await io.runTask('update-order-status', async () => {
+    // Update order status to paid
+    await db.order.update({
+      where: { stripePaymentId: paymentIntent.id },
+      data: { 
+        status: 'paid',
+        paidAt: new Date()
+      }
+    });
+  }, { name: 'Update Order', timeout: '10s' });
+
+  await io.logger.info('Payment succeeded', { 
+    paymentIntentId: paymentIntent.id,
+    amount: paymentIntent.amount 
+  });
+}
+
+async function handlePaymentFailure(paymentIntent: Stripe.PaymentIntent, io: any) {
+  await io.runTask('handle-payment-failure', async () => {
+    await db.order.update({
+      where: { stripePaymentId: paymentIntent.id },
+      data: { 
+        status: 'payment_failed',
+        failureMessage: paymentIntent.last_payment_error?.message
+      }
+    });
+    
+    // Send notification to customer
+    await emailService.sendPaymentFailureNotification(
+      paymentIntent.metadata.customerId,
+      paymentIntent.last_payment_error?.message || 'Payment failed'
+    );
+  }, { name: 'Handle Failure', timeout: '10s' });
+
+  await io.logger.warn('Payment failed', { 
+    paymentIntentId: paymentIntent.id,
+    error: paymentIntent.last_payment_error 
+  });
+}
+```
+
+**5. Batch Processing**
+
+```typescript
+// jobs/user/user-sync.job.ts
+import { Job } from '@trigger.dev/sdk';
+import { z } from 'zod';
+
+export const userSyncJob = new Job({
+  id: 'user-sync',
+  name: 'Sync Users to External CRM',
+  version: '1.0.0',
+  trigger: {
+    schema: z.object({
+      batchId: z.string().optional()
+    })
+  },
+  
+  async init() {
+    return { apiKey: process.env.CRM_API_KEY };
+  },
+  
+  async run(trigger, io, init) {
+    await io.logger.info('Starting user sync', { batchId: trigger.payload.batchId });
+
+    // Get users to sync
+    const users = await io.runTask('fetch-users', async () => {
+      return await db.user.findMany({
+        where: { 
+          syncedAt: null,
+          status: 'active'
+        },
+        take: 1000
+      });
+    }, { name: 'Fetch Users', timeout: '30s' });
+
+    if (users.length === 0) {
+      await io.logger.info('No users to sync');
+      return { synced: 0 };
+    }
+
+    // Process in batches
+    const batchSize = 50;
+    let syncedCount = 0;
+
+    for (let i = 0; i < users.length; i += batchSize) {
+      const batch = users.slice(i, i + batchSize);
+      
+      await io.runTask(`sync-batch-${i / batchSize}`, async () => {
+        // Call CRM API
+        const response = await fetch(`${process.env.CRM_API_URL}/contacts/batch`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${init.apiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            contacts: batch.map(user => ({
+              email: user.email,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              externalId: user.id
+            }))
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`CRM API failed: ${response.status}`);
+        }
+
+        const result = await response.json();
+        
+        // Update synced status
+        await db.user.updateMany({
+          where: { id: { in: batch.map(u => u.id) } },
+          data: { syncedAt: new Date() }
+        });
+
+        return { synced: batch.length, result };
+      }, {
+        name: `Sync Batch ${i / batchSize}`,
+        timeout: '60s',
+        retry: { maxAttempts: 3 }
+      });
+
+      syncedCount += batch.length;
+      
+      await io.logger.info('Batch synced', { 
+        batchIndex: i / batchSize, 
+        syncedCount 
+      });
+    }
+
+    return { synced: syncedCount };
+  }
+});
+```
+
+**6. Trigger Configuration**
+
+```typescript
+// trigger.config.ts
+import { TriggerClient, verifyWebhookSignature } from '@trigger.dev/sdk';
+
+export const client = new TriggerClient({
+  id: 'app-production',
+  apiKey: process.env.TRIGGER_API_KEY,
+  apiUrl: process.env.TRIGGER_API_URL,
+  verbose: process.env.NODE_ENV !== 'production',
+  logger: {
+    debug: (...args) => console.debug('[Trigger]', ...args),
+    info: (...args) => console.info('[Trigger]', ...args),
+    warn: (...args) => console.warn('[Trigger]', ...args),
+    error: (...args) => console.error('[Trigger]', ...args),
+  }
+});
+
+// Register jobs
+import { orderConfirmationJob } from './jobs/order/order-confirmation.job';
+import { dailyReportJob } from './jobs/reporting/daily-report.job';
+import { userSyncJob } from './jobs/user/user-sync.job';
+
+client.define(job);
+
+// Webhook verification
+export async function handleWebhook(req: Request): Promise<Response> {
+  const signature = req.headers.get('x-trigger-signature');
+  const body = await req.text();
+  
+  if (!verifyWebhookSignature(body, signature!, process.env.TRIGGER_WEBHOOK_SECRET!)) {
+    return new Response('Invalid signature', { status: 401 });
+  }
+  
+  return client.handleWebhook(req);
+}
+
+// Start the worker
+if (process.env.TRIGGER_WORKER === 'true') {
+  client.start();
+}
+```
+
+**7. Express Integration**
+
+```typescript
+// api/webhooks.ts
+import express, { Request, Response, NextFunction } from 'express';
+import { verifyWebhookSignature } from '@trigger.dev/sdk';
+
+const router = express.Router();
+
+// GitHub webhook
+router.post('/github', async (req: Request, res: Response) => {
+  const signature = req.headers['x-hub-signature-256'] as string;
+  
+  if (!verifyGitHubSignature(req.body, signature, process.env.GITHUB_WEBHOOK_SECRET!)) {
+    return res.status(401).json({ error: 'Invalid signature' });
+  }
+  
+  // Trigger job
+  await triggerClient.sendEvent({
+    name: 'github.push',
+    payload: req.body
+  });
+  
+  res.status(200).json({ ok: true });
+});
+
+// Stripe webhook
+router.post('/stripe', async (req: Request, res: Response) => {
+  const signature = req.headers['stripe-signature'] as string;
+  
+  if (!verifyStripeSignature(req.body, signature, process.env.STRIPE_WEBHOOK_SECRET!)) {
+    return res.status(400).json({ error: 'Invalid signature' });
+  }
+  
+  await triggerClient.sendEvent({
+    name: req.body.type,
+    payload: req.body.data.object
+  });
+  
+  res.status(200).json({ received: true });
+});
+
+// Custom webhook endpoint
+router.post('/trigger', async (req: Request, res: Response) => {
+  const signature = req.headers['x-trigger-signature'] as string;
+  
+  if (!verifyWebhookSignature(JSON.stringify(req.body), signature, process.env.TRIGGER_WEBHOOK_SECRET!)) {
+    return res.status(401).json({ error: 'Invalid signature' });
+  }
+  
+  const { eventName, payload } = req.body;
+  
+  await triggerClient.sendEvent({
+    name: eventName,
+    payload
+  });
+  
+  res.status(202).json({ queued: true });
+});
+```
+
+### Workflow
+
+**Phase 1: Job Design**
+
+Identify background tasks. Design job structure. Define triggers. Plan error handling.
+
+**Phase 2: Implementation**
+
+Create job definitions. Implement handlers. Configure retries. Add logging.
+
+**Phase 3: Testing**
+
+Test jobs in isolation. Mock external services. Test error scenarios.
+
+**Phase 4: Deployment**
+
+Deploy to production. Configure environment. Monitor executions.
+
+**Phase 5: Operations**
+
+Monitor job execution. Handle failures. Optimize performance. Update jobs.
+
+---
+
+## 3. Temporal (Code-first)
+
+### Mục tiêu
+
+Temporal là workflow engine cho durable execution, cho phép xây dựng reliable distributed applications với built-in support cho retries, timeouts, và compensating transactions. Trong Cursor Enterprise Framework, Temporal được sử dụng cho complex business workflows, long-running processes, và systems requiring high reliability. Mục tiêu của rule này là hướng dẫn developers trong việc design và implement Temporal workflows một cách effective và scalable.
+
+Temporal's key insight là separating workflow logic từ execution concerns, cho phép developers focus on business logic trong khi Temporal handles reliability.
+
+### Nguyên tắc
+
+**1. Workflow as Code**
+
+Workflows are code. Version control. Testable. Deterministic execution. No external side effects in workflow code.
+
+**2. Activity Design**
+
+Activities are where side effects happen. Idempotent activities. Timeout handling. Retry policies.
+
+**3. Signal-Based Communication**
+
+Use signals for external input. Define signal handlers. Handle concurrent signals. Keep signals simple.
+
+**4. Query Pattern**
+
+Use queries for state. Read-only operations. No side effects. Efficient queries.
+
+**5. Child Workflows**
+
+Break complex workflows. Reusable components. Independent versioning. Proper cancellation.
+
+**6. Saga Pattern**
+
+For distributed transactions. Compensating actions. Forward recovery or backward recovery. Clear saga steps.
+
+**7. Workflow Versioning**
+
+Handle workflow changes. Worker versioning. Default version. Migration strategies.
+
+**8. Observability**
+
+Use SDK tracing. Custom metrics. Workflow history. Visibility API.
+
+**9. Failure Handling**
+
+Activity retries. Workflow timeouts. Continue-as-new. Dead letter detection.
+
+**10. Testing**
+
+Test workflows in isolation. Mock activities. Test failure scenarios. Integration tests.
+
+### Checklist
+
+- [ ] Workflow design complete
+- [ ] Activity definitions created
+- [ ] Retry policies configured
+- [ ] Error handling implemented
+- [ ] Testing strategy defined
+- [ ] Monitoring set up
+- [ ] Deployment configured
+- [ ] Versioning strategy planned
+- [ ] Rollback procedures documented
+- [ ] Team training completed
+
+### Anti Pattern
+
+**1. Side Effects in Workflow**
+
+Making API calls in workflow. Non-deterministic behavior. Use activities.
+
+**2. Large Workflows**
+
+Monolithic workflows. Hard to test. Hard to version. Break into child workflows.
+
+**3. No Idempotency**
+
+Activities not idempotent. Data duplication. Idempotency keys.
+
+**4. Ignoring Timeouts**
+
+No activity timeouts. Stuck workflows. Set appropriate timeouts.
+
+**5. Complex Conditionals**
+
+Complex if-else chains. Hard to reason about. Simplify workflow logic.
+
+### Best Practice
+
+**1. Project Structure**
+
+```
+temporal/
+├── workflows/
+│   ├── order.workflow.ts
+│   ├── payment.workflow.ts
+│   ├── notification.workflow.ts
+│   └── types.ts
+│
+├── activities/
+│   ├── order.activities.ts
+│   ├── payment.activities.ts
+│   ├── notification.activities.ts
+│   └── external/
+│       ├── inventory.service.ts
+│       ├── email.service.ts
+│       └── payment.gateway.ts
+│
+├── workers/
+│   ├── order.worker.ts
+│   ├── payment.worker.ts
+│   └── shared/
+│       ├── worker.ts
+│       └── connection.ts
+│
+├── clients/
+│   ├── order.client.ts
+│   └── payment.client.ts
+│
+├── tests/
+│   ├── workflows/
+│   │   ├── order.workflow.test.ts
+│   │   └── payment.workflow.test.ts
+│   └── activities/
+│       └── order.activities.test.ts
+│
+└── temporal/
+    ├── docker-compose.yml
+    └── config/
+        └── development.yaml
+```
+
+**2. Workflow Definitions**
+
+```typescript
+// workflows/order.workflow.ts
+import { proxyActivities, startChild, continueAsNew, log, workflowInfo } from '@temporalio/workflow';
+import type * as activities from '../activities/order.activities';
+
+const { 
+  createOrderRecord,
+  reserveInventory,
+  processPayment,
+  sendOrderConfirmation,
+  releaseInventory,
+  refundPayment,
+  sendOrderFailedNotification
+} = proxyActivities<typeof activities>({
+  startToCloseTimeout: '5 minutes',
+  retry: {
+    initialInterval: '1 second',
+    backoffCoefficient: 2,
+    maximumAttempts: 3
+  }
+});
+
+export interface OrderWorkflowInput {
+  orderId: string;
+  customerId: string;
+  items: Array<{
+    productId: string;
+    quantity: number;
+    price: number;
+  }>;
+  paymentMethod: string;
+  shippingAddress: {
+    street: string;
+    city: string;
+    country: string;
+    postalCode: string;
+  };
+}
+
+export interface OrderWorkflowResult {
+  success: boolean;
+  orderId: string;
+  transactionId?: string;
+  error?: string;
+}
+
+// Saga workflow for order processing
+export async function processOrder(input: OrderWorkflowInput): Promise<OrderWorkflowResult> {
+  const { orderId, customerId, items, paymentMethod, shippingAddress } = input;
+  
+  log.info('Starting order processing', { orderId, customerId });
+  
+  // Step 1: Create order record
+  let orderRecordId: string;
+  try {
+    orderRecordId = await createOrderRecord({
+      orderId,
+      customerId,
+      items,
+      shippingAddress
+    });
+    log.info('Order record created', { orderId, orderRecordId });
+  } catch (error) {
+    log.error('Failed to create order record', { orderId, error });
+    return { success: false, orderId, error: 'Failed to create order' };
+  }
+
+  // Step 2: Reserve inventory (saga step)
+  let inventoryReservationId: string;
+  try {
+    inventoryReservationId = await reserveInventory({
+      orderId,
+      items
+    });
+    log.info('Inventory reserved', { orderId, inventoryReservationId });
+  } catch (error) {
+    log.error('Failed to reserve inventory', { orderId, error });
+    // Compensating action: none needed for inventory
+    return { success: false, orderId, error: 'Inventory unavailable' };
+  }
+
+  // Step 3: Process payment (saga step)
+  let paymentTransactionId: string;
+  try {
+    const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    paymentTransactionId = await processPayment({
+      orderId,
+      customerId,
+      amount: total,
+      paymentMethod
+    });
+    log.info('Payment processed', { orderId, paymentTransactionId });
+  } catch (error) {
+    log.error('Payment failed', { orderId, error });
+    // Compensating action: release inventory
+    await releaseInventory({ reservationId: inventoryReservationId });
+    log.info('Inventory released after payment failure', { orderId });
+    
+    return { success: false, orderId, error: 'Payment failed' };
+  }
+
+  // Step 4: Send confirmation
+  try {
+    await sendOrderConfirmation({
+      orderId,
+      customerId,
+      items,
+      transactionId: paymentTransactionId
+    });
+    log.info('Confirmation sent', { orderId });
+  } catch (error) {
+    // Non-critical: log but don't fail
+    log.warn('Failed to send confirmation', { orderId, error });
+  }
+
+  return {
+    success: true,
+    orderId,
+    transactionId: paymentTransactionId
+  };
+}
+```
+
+**3. Activity Definitions**
+
+```typescript
+// activities/order.activities.ts
+import { Context } from '@temporalio/activity';
+
+export interface CreateOrderRecordInput {
+  orderId: string;
+  customerId: string;
+  items: Array<{
+    productId: string;
+    quantity: number;
+    price: number;
+  }>;
+  shippingAddress: {
+    street: string;
+    city: string;
+    country: string;
+    postalCode: string;
+  };
+}
+
+export interface ReserveInventoryInput {
+  orderId: string;
+  items: Array<{
+    productId: string;
+    quantity: number;
+  }>;
+}
+
+export interface ProcessPaymentInput {
+  orderId: string;
+  customerId: string;
+  amount: number;
+  paymentMethod: string;
+}
+
+export async function createOrderRecord(input: CreateOrderRecordInput): Promise<string> {
+  const ctx = Context.current();
+  ctx.info('Creating order record', { orderId: input.orderId });
+  
+  const order = await db.orders.create({
+    id: input.orderId,
+    customerId: input.customerId,
+    status: 'pending',
+    items: input.items,
+    shippingAddress: input.shippingAddress,
+    createdAt: new Date()
+  });
+  
+  return order.id;
+}
+
+export async function reserveInventory(input: ReserveInventoryInput): Promise<string> {
+  const ctx = Context.current();
+  ctx.info('Reserving inventory', { orderId: input.orderId });
+  
+  // Check availability first (idempotency)
+  const existing = await ctx.session.get(`inventory:${input.orderId}`);
+  if (existing) {
+    return existing;
+  }
+  
+  // Reserve in inventory service
+  const result = await inventoryService.reserveItems(input.items, {
+    orderId: input.orderId,
+    idempotencyKey: `reserve:${input.orderId}`
+  });
+  
+  // Cache reservation ID for idempotency
+  await ctx.session.set(`inventory:${input.orderId}`, result.reservationId);
+  
+  return result.reservationId;
+}
+
+export async function releaseInventory(input: { reservationId: string }): Promise<void> {
+  const ctx = Context.current();
+  ctx.info('Releasing inventory', { reservationId: input.reservationId });
+  
+  await inventoryService.releaseReservation(input.reservationId);
+}
+
+export async function processPayment(input: ProcessPaymentInput): Promise<string> {
+  const ctx = Context.current();
+  ctx.info('Processing payment', { orderId: input.orderId, amount: input.amount });
+  
+  // Idempotency check
+  const existing = await ctx.session.get(`payment:${input.orderId}`);
+  if (existing) {
+    return existing;
+  }
+  
+  const transaction = await paymentGateway.charge({
+    customerId: input.customerId,
+    amount: input.amount,
+    currency: 'USD',
+    paymentMethod: input.paymentMethod,
+    idempotencyKey: `payment:${input.orderId}`
+  });
+  
+  await ctx.session.set(`payment:${input.orderId}`, transaction.id);
+  
+  return transaction.id;
+}
+
+export async function refundPayment(input: { transactionId: string }): Promise<void> {
+  const ctx = Context.current();
+  ctx.info('Refunding payment', { transactionId: input.transactionId });
+  
+  await paymentGateway.refund(input.transactionId);
+}
+
+export async function sendOrderConfirmation(input: {
+  orderId: string;
+  customerId: string;
+  items: Array<{ productId: string; quantity: number; price: number }>;
+  transactionId: string;
+}): Promise<void> {
+  const ctx = Context.current();
+  ctx.info('Sending order confirmation', { orderId: input.orderId });
+  
+  const customer = await customerService.getById(input.customerId);
+  const emailHtml = renderOrderConfirmationEmail({
+    customerName: customer.name,
+    orderId: input.orderId,
+    items: input.items,
+    transactionId: input.transactionId
+  });
+  
+  await emailService.send({
+    to: customer.email,
+    subject: `Order Confirmation - ${input.orderId}`,
+    html: emailHtml
+  });
+}
+```
+
+**4. Worker Configuration**
+
+```typescript
+// workers/order.worker.ts
+import { Worker, NativeConnection } from '@temporalio/worker';
+import { InjectedSinks } from '@temporalio/worker/lib//workflow';
+import * as activities from '../activities/order.activities';
+import { processOrder } from '../workflows/order.workflow';
+
+async function run() {
+  const connection = await NativeConnection.connect({
+    address: process.env.TEMPORAL_HOST || 'localhost:7233',
+    tls: process.env.TEMPORAL_TLS ? {
+      serverNameOverride: 'temporal',
+      rootCA: process.env.TEMPORAL_TLS_CERT
+    } : undefined
+  });
+
+  const worker = await Worker.create({
+    workflowsPath: require.resolve('../workflows/order.workflow'),
+    workflowHttpPort: 7233,
+    activities,
+    taskQueue: 'order-processing',
+    namespace: 'default',
+    identity: `${process.pid()}-${require('os').hostname()}`,
+    maxConcurrentWorkflowTaskExecutions: 100,
+    maxConcurrentActivityTaskExecutions: 50,
+    maxConcurrentLocalActivities: 20,
+    maxCachedWorkflows: 1000,
+    stickyScheduleToStartTimeout: '10s',
+    workflowTerminationTimeout: '30s',
+    workflowTasks: {
+      type: 'local',
+    },
+    enableSDKInstrumentation: true,
+    sinks: {
+      exporter: {
+        export: async (metrics) => {
+          for (const metric of metrics) {
+            await prometheusClient.record(metric);
+          }
+        }
+      }
+    }
+  });
+
+  await worker.run();
+}
+
+run().catch((err) => {
+  console.error('Worker failed to start', err);
+  process.exit(1);
+});
+```
+
+**5. Client Usage**
+
+```typescript
+// clients/order.client.ts
+import { Connection, Client } from '@temporalio/client';
+import { v4 as uuidv4 } from 'uuid';
+import { processOrder, OrderWorkflowInput, OrderWorkflowResult } from '../workflows/order.workflow';
+
+export class OrderWorkflowClient {
+  private client: Client;
+
+  constructor() {
+    this.client = new Client({
+      connection: Connection.connect({
+        address: process.env.TEMPORAL_HOST || 'localhost:7233'
+      })
+    });
+  }
+
+  async startOrderWorkflow(input: OrderWorkflowInput): Promise<{ workflowId: string }> {
+    const workflowId = `order-${input.orderId}`;
+    
+    const handle = await this.client.workflow.start(processOrder, {
+      taskQueue: 'order-processing',
+      workflowId,
+      args: [input],
+      idempotencyKey: `start-order:${input.orderId}`,
+      retry: {
+        maximumAttempts: 3,
+        initialInterval: '1s'
+      }
+    });
+
+    return { workflowId: handle.workflowId };
+  }
+
+  async getOrderStatus(workflowId: string): Promise<OrderWorkflowResult | undefined> {
+    const handle = this.client.workflow.getHandle(workflowId);
+    return handle.query(() => ({ status: 'getOrderStatus' } as any));
+  }
+
+  async cancelOrder(workflowId: string, reason: string): Promise<void> {
+    const handle = this.client.workflow.getHandle(workflowId);
+    await handle.signal('cancel', { reason });
+  }
+
+  async sendOrderUpdate(workflowId: string, update: any): Promise<void> {
+    const handle = this.client.workflow.getHandle(workflowId);
+    await handle.signal('update', update);
+  }
+
+  // For waiting on long-running workflows
+  async waitForCompletion(
+    workflowId: string,
+    timeoutMs: number = 60000
+  ): Promise<OrderWorkflowResult> {
+    const handle = this.client.workflow.getHandle(workflowId);
+    return handle.result({ timeoutMs });
+  }
+}
+```
+
+**6. Saga Implementation**
+
+```typescript
+// workflows/saga/saga.workflow.ts
+import { proxyActivities, log } from '@temporalio/workflow';
+
+type ActivityFn = (...args: any[]) => Promise<any>;
+
+interface SagaStep<TInput, TOutput, TCompensation> {
+  id: string;
+  execute: ActivityFn;
+  compensate: ActivityFn;
+}
+
+export async function executeSaga<TContext>(
+  steps: SagaStep<any, any, any>[],
+  context: TContext
+): Promise<{ success: boolean; context: TContext; completedSteps: string[]; error?: string }> {
+  const completedSteps: Array<{ id: string; result: any }> = [];
+
+  try {
+    for (const step of steps) {
+      log.info(`Executing saga step: ${step.id}`);
+      
+      try {
+        const result = await step.execute(context);
+        completedSteps.push({ id: step.id, result });
+        context = { ...context, [step.id]: result };
+      } catch (error) {
+        log.error(`Saga step ${step.id} failed, initiating compensation`, { error });
+        
+        // Compensate in reverse order
+        for (const completed of [...completedSteps].reverse()) {
+          const stepDef = steps.find(s => s.id === completed.id);
+          if (stepDef) {
+            try {
+              log.info(`Compensating step: ${completed.id}`);
+              await stepDef.compensate(completed.result);
+            } catch (compensationError) {
+              log.error(`Compensation failed for step ${completed.id}`, { compensationError });
+            }
+          }
+        }
+        
+        return {
+          success: false,
+          context,
+          completedSteps: completedSteps.map(s => s.id),
+          error: error instanceof Error ? error.message : 'Unknown error'
+        };
+      }
+    }
+
+    return { success: true, context, completedSteps: completedSteps.map(s => s.id) };
+  } catch (error) {
+    return {
+      success: false,
+      context,
+      completedSteps: completedSteps.map(s => s.id),
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
+  }
+}
+```
+
+**7. Docker Compose for Development**
+
+```yaml
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: temporal
+      POSTGRES_PASSWORD: temporal
+      POSTGRES_DB: temporal
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  elasticsearch:
+    image: elasticsearch:7.16.2
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+
+  temporal:
+    image: temporalio/auto-setup:1.21.0
+    depends_on:
+      - postgres
+      - elasticsearch
+    environment:
+      - DB=postgres
+      - DB_PORT=5432
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=temporal
+      - POSTGRES_SEEDS=postgres
+      - ENABLE_EXPERIMENTAL_DEBUG_LOGGER=true
+    ports:
+      - "7233:7233"
+    volumes:
+      - ./config:/etc/temporal/config
+
+volumes:
+  postgres_data:
+  elasticsearch_data:
+```
+
+### Workflow
+
+**Phase 1: Requirements Analysis**
+
+Identify workflows. Map to Temporal. Define triggers. Plan state.
+
+**Phase 2: Workflow Design**
+
+Design workflow structure. Define activities. Plan error handling. Design saga compensation.
+
+**Phase 3: Implementation**
+
+Implement workflows. Implement activities. Configure workers. Add monitoring.
+
+**Phase 4: Testing**
+
+Unit test workflows. Mock activities. Integration tests. Failure scenarios.
+
+**Phase 5: Deployment**
+
+Deploy Temporal server. Configure workers. Set up monitoring. Deploy workflows.
+
+**Phase 6: Operations**
+
+Monitor executions. Handle failures. Optimize performance. Version workflows.
+
+---
+
+## Liên kết
+
+- [[queue]] - Message queues
+- [[event-driven]] - Event-driven patterns
+- [[saga-pattern]] - Saga pattern
+- [[enterprise-patterns]] - Microservices
+- [[cqrs]] - CQRS integration

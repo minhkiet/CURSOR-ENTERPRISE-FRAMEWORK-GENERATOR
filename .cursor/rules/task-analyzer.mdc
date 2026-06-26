@@ -357,15 +357,15 @@ skill_detection:
 
 ### 3.4 Skill Combination Rules
 
-| Request Type | Primary | Secondary | Required Gates |
-|-------------|---------|-----------|----------------|
-| Landing/Portfolio | frontend-taste | full-output, frontend-review | taste-pre/post, fulloutput-pre/post, review-pre/post |
-| Redesign Existing | frontend-redesign | full-output, frontend-review | redesign-pre/post, fulloutput-pre/post, review-pre/post |
-| Security Review | security-review | (standalone) | security-pre/post |
-| Vietnam Payment | vietnam-payment-review | security-review, full-output | payment-pre/post, security-pre/post |
-| Knowledge Base | weknora-kb | karpathy-coding | weknora-pre/post |
-| Document OCR | document-ocr | karpathy-coding | ocr-pre/post |
-| Generic Build | (none) | karpathy-coding | karpathy-pre/post |
+> **Đầy đủ: [[skill-registry]] §4**
+
+| Request Type | Primary | Mandatory Overlay |
+|-------------|---------|------------------|
+| Landing/Portfolio | frontend-taste | karpathy-coding |
+| Redesign Existing | frontend-redesign | karpathy-coding |
+| Security Review | security-review | karpathy-coding |
+| Vietnam Payment | vietnam-payment-review | karpathy-coding |
+| Knowledge Base | weknora-kb | karpathy-coding |
 
 ---
 

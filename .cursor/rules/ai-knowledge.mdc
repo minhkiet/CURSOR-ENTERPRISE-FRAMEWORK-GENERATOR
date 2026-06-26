@@ -1,0 +1,1396 @@
+---
+description: AI Knowledge Stack - hợp nhất từ RAG, Vector Search, WeKnora, pgvector
+created: 2026-06-26
+merged_from: [rag.mdc, vector-search.mdc, weknora.mdc, pgvector.mdc]
+version: 1.0.0
+tags: [ai, rag, vector-search, weknora, pgvector, knowledge-base, llm, embeddings, similarity, machine-learning]
+---
+
+# AI Knowledge Stack
+
+Hợp nhất từ:
+- [[rag]] - RAG Implementation
+- [[vector-search]] - Vector Search Patterns
+- [[weknora]] - WeKnora Integration (Enterprise RAG với Hybrid Search + GraphRAG + ReAct Agent)
+- [[pgvector]] - pgvector PostgreSQL Extension
+
+## Tổng quan
+
+AI Knowledge Stack cung cấp các nguyên tắc và best practices cho việc xây dựng hệ thống AI-powered knowledge retrieval, bao gồm:
+
+- **RAG (Retrieval-Augmented Generation)** - Kết hợp retrieval systems với LLMs
+- **Vector Search** - Semantic search sử dụng embeddings
+- **pgvector** - PostgreSQL extension cho vector storage
+- **WeKnora** - Enterprise RAG platform với Hybrid Search, GraphRAG, và ReAct Agent
+
+---
+
+## 1. RAG (Retrieval-Augmented Generation)
+
+### Mục tiêu
+
+Retrieval-Augmented Generation (RAG) là một pattern kết hợp retrieval systems với LLMs để generate responses dựa trên retrieved information. RAG giúp LLMs access current information, reduce hallucinations, và provide cited answers.
+
+### Nguyên tắc
+
+**1. Document Processing Pipeline**
+
+Clean and normalize documents. Split into appropriate chunks. Preserve metadata. Handle various formats. Quality control.
+
+**2. Chunking Strategy**
+
+Choose chunk size carefully. 512-1024 tokens typical. Overlap for continuity. Consider semantic boundaries. Test different strategies.
+
+**3. Embedding Quality**
+
+Use appropriate embedding model. Match model to use case. Consider multilingual needs. Evaluate embedding quality. Update embeddings when needed.
+
+**4. Vector Storage**
+
+Choose appropriate vector database. Optimize for retrieval speed. Consider hybrid search. Index for performance. Monitor index health.
+
+**5. Retrieval Strategy**
+
+Use appropriate similarity metric. Combine with keyword search. Implement reranking. Consider user context. Optimize for recall/precision.
+
+**6. Context Assembly**
+
+Assemble retrieved context. Manage token budget. Prioritize relevant chunks. Add citations. Format for LLM.
+
+**7. Generation with RAG**
+
+Craft prompts with context. Instruct LLM to cite sources. Handle contradictions. Set appropriate temperature. Validate responses.
+
+**8. Evaluation**
+
+Measure retrieval quality. Evaluate generation quality. Use RAG metrics. A/B test strategies. Gather user feedback.
+
+**9. Maintenance**
+
+Update documents. Refresh embeddings. Monitor drift. Handle deletions. Maintain data quality.
+
+**10. Scalability**
+
+Design for document volume. Batch processing. Incremental updates. Distributed retrieval. Cost optimization.
+
+### Checklist
+
+- [ ] Document processing pipeline designed
+- [ ] Chunking strategy selected
+- [ ] Embedding model chosen
+- [ ] Vector database configured
+- [ ] Retrieval logic implemented
+- [ ] Reranking strategy defined
+- [ ] Prompt template designed
+- [ ] Evaluation metrics set up
+- [ ] Monitoring configured
+- [ ] Update pipeline implemented
+
+### Anti Pattern
+
+**1. Poor Chunking** - Too large/small chunks, breaking semantic units, no overlap
+
+**2. Single Retrieval** - No reranking, no hybrid search, no context weighting
+
+**3. Ignoring Token Limits** - No context budget, exceeding LLM limits
+
+**4. Stale Knowledge** - No update pipeline, outdated embeddings
+
+**5. No Evaluation** - No retrieval/generation metrics
+
+### Best Practice - Document Processing
+
+```typescript
+// services/document-processor.service.ts
+import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
+import { PDFLoader } from 'langchain/document_loaders/fs/pdf';
+import { DocxLoader } from 'langchain/document_loaders/fs/docx';
+
+interface ProcessedDocument {
+  id: string;
+  chunks: DocumentChunk[];
+  metadata: DocumentMetadata;
+}
+
+interface DocumentChunk {
+  id: string;
+  content: string;
+  embedding?: number[];
+  metadata: ChunkMetadata;
+}
+
+interface DocumentMetadata {
+  source: string;
+  title?: string;
+  author?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  type: 'pdf' | 'docx' | 'txt' | 'html';
+}
+
+interface ChunkMetadata {
+  chunkIndex: number;
+  totalChunks: number;
+  charCount: number;
+  tokenEstimate: number;
+}
+
+class DocumentProcessor {
+  private textSplitter: RecursiveCharacterTextSplitter;
+  private embeddingService: EmbeddingService;
+
+  constructor(
+    chunkSize: number = 1000,
+    chunkOverlap: number = 200
+  ) {
+    this.textSplitter = new RecursiveCharacterTextSplitter({
+      chunkSize,
+      chunkOverlap,
+      separators: ['\n\n', '\n', '. ', ' ', ''],
+    });
+    this.embeddingService = new EmbeddingService();
+  }
+
+  async processDocument(
+    filePath: string,
+    metadata: Partial<DocumentMetadata>
+  ): Promise<ProcessedDocument> {
+    const extension = filePath.split('.').pop()?.toLowerCase();
+    let loader;
+
+    switch (extension) {
+      case 'pdf':
+        loader = new PDFLoader(filePath);
+        break;
+      case 'docx':
+        loader = new DocxLoader(filePath);
+        break;
+      default:
+        loader = new TextLoader(filePath);
+    }
+
+    const docs = await loader.load();
+    const fullText = docs.map(d => d.pageContent).join('\n\n');
+
+    const chunks = await this.textSplitter.splitText(fullText);
+    const embeddings = await this.embeddingService.createBatchEmbeddings(chunks);
+
+    const processedChunks: DocumentChunk[] = chunks.map((content, index) => {
+      const tokenEstimate = Math.ceil(content.length / 4);
+      
+      return {
+        id: `${metadata.source}-chunk-${index}`,
+        content,
+        embedding: embeddings[index],
+        metadata: {
+          chunkIndex: index,
+          totalChunks: chunks.length,
+          charCount: content.length,
+          tokenEstimate,
+        },
+      };
+    });
+
+    return {
+      id: metadata.source || crypto.randomUUID(),
+      chunks: processedChunks,
+      metadata: {
+        source: metadata.source || 'unknown',
+        title: metadata.title,
+        author: metadata.author,
+        createdAt: metadata.createdAt || new Date(),
+        updatedAt: new Date(),
+        type: (extension || 'txt') as any,
+      },
+    };
+  }
+
+  async processText(
+    text: string,
+    source: string,
+    additionalMetadata: Record<string, any> = {}
+  ): Promise<ProcessedDocument> {
+    const chunks = await this.textSplitter.splitText(text);
+    const embeddings = await this.embeddingService.createBatchEmbeddings(chunks);
+
+    const processedChunks: DocumentChunk[] = chunks.map((content, index) => ({
+      id: `${source}-chunk-${index}`,
+      content,
+      embedding: embeddings[index],
+      metadata: {
+        chunkIndex: index,
+        totalChunks: chunks.length,
+        charCount: content.length,
+        tokenEstimate: Math.ceil(content.length / 4),
+      },
+    }));
+
+    return {
+      id: source,
+      chunks: processedChunks,
+      metadata: {
+        source,
+        ...additionalMetadata,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        type: 'txt' as const,
+      },
+    };
+  }
+}
+```
+
+### Best Practice - Vector Storage
+
+```typescript
+// services/vector-store.service.ts
+import { Pinecone } from '@pinecone-database/pinecone';
+import { supabase } from '@/lib/supabase';
+
+interface VectorRecord {
+  id: string;
+  values: number[];
+  metadata?: Record<string, any>;
+}
+
+interface RetrievalResult {
+  id: string;
+  score: number;
+  content: string;
+  metadata: Record<string, any>;
+}
+
+class VectorStore {
+  private pinecone: Pinecone;
+  private indexName: string;
+  private useSupabase: boolean;
+
+  constructor(useSupabase: boolean = false) {
+    this.pinecone = new Pinecone({
+      apiKey: process.env.PINECONE_API_KEY!,
+    });
+    this.useSupabase = useSupabase;
+    this.indexName = process.env.PINECONE_INDEX || 'knowledge-base';
+  }
+
+  async upsertChunks(chunks: DocumentChunk[]): Promise<void> {
+    if (this.useSupabase) {
+      await this.upsertToSupabase(chunks);
+    } else {
+      await this.upsertToPinecone(chunks);
+    }
+  }
+
+  private async upsertToPinecone(chunks: DocumentChunk[]): Promise<void> {
+    const index = this.pinecone.Index(this.indexName);
+
+    const vectors: VectorRecord[] = chunks.map(chunk => ({
+      id: chunk.id,
+      values: chunk.embedding || [],
+      metadata: {
+        content: chunk.content,
+        ...chunk.metadata,
+      },
+    }));
+
+    const batchSize = 100;
+    for (let i = 0; i < vectors.length; i += batchSize) {
+      const batch = vectors.slice(i, i + batchSize);
+      await index.upsert(batch);
+    }
+  }
+
+  private async upsertToSupabase(chunks: DocumentChunk[]): Promise<void> {
+    const records = chunks.map(chunk => ({
+      id: chunk.id,
+      content: chunk.content,
+      embedding: chunk.embedding,
+      metadata: chunk.metadata,
+    }));
+
+    const { error } = await supabase
+      .from('document_chunks')
+      .upsert(records, { onConflict: 'id' });
+
+    if (error) throw error;
+  }
+
+  async retrieve(
+    queryEmbedding: number[],
+    options: {
+      topK?: number;
+      filter?: Record<string, any>;
+      namespace?: string;
+    } = {}
+  ): Promise<RetrievalResult[]> {
+    if (this.useSupabase) {
+      return this.retrieveFromSupabase(queryEmbedding, options);
+    } else {
+      return this.retrieveFromPinecone(queryEmbedding, options);
+    }
+  }
+
+  private async retrieveFromPinecone(
+    queryEmbedding: number[],
+    options: { topK?: number; filter?: Record<string, any>; namespace?: string }
+  ): Promise<RetrievalResult[]> {
+    const index = this.pinecone.Index(this.indexName);
+    
+    const queryResponse = await index.query({
+      vector: queryEmbedding,
+      topK: options.topK || 10,
+      filter: options.filter,
+      namespace: options.namespace,
+      includeMetadata: true,
+    });
+
+    return (queryResponse.matches || []).map(match => ({
+      id: match.id,
+      score: match.score || 0,
+      content: match.metadata?.content || '',
+      metadata: match.metadata || {},
+    }));
+  }
+
+  private async retrieveFromSupabase(
+    queryEmbedding: number[],
+    options: { topK?: number; filter?: Record<string, any> }
+  ): Promise<RetrievalResult[]> {
+    const { data, error } = await supabase.rpc('match_documents', {
+      query_embedding: queryEmbedding,
+      match_threshold: 0.7,
+      match_count: options.topK || 10,
+    });
+
+    if (error) throw error;
+
+    return (data || []).map(row => ({
+      id: row.id,
+      score: row.similarity,
+      content: row.content,
+      metadata: row.metadata || {},
+    }));
+  }
+
+  async deleteBySource(source: string): Promise<void> {
+    if (this.useSupabase) {
+      await supabase
+        .from('document_chunks')
+        .delete()
+        .eq('metadata->>source', source);
+    } else {
+      const index = this.pinecone.Index(this.indexName);
+      await index.deleteMany({ filter: { source } });
+    }
+  }
+}
+```
+
+### Best Practice - RAG Generation
+
+```typescript
+// services/rag.service.ts
+interface RAGOptions {
+  query: string;
+  maxContextTokens?: number;
+  temperature?: number;
+  model?: string;
+  filters?: Record<string, any>;
+}
+
+interface RAGResponse {
+  answer: string;
+  sources: Array<{
+    id: string;
+    content: string;
+    score: number;
+    metadata: Record<string, any>;
+  }>;
+  tokensUsed: {
+    prompt: number;
+    completion: number;
+  };
+}
+
+class RAGService {
+  constructor(
+    private retrievalService: RetrievalService,
+    private llmService: ClaudeService | OpenAIService,
+    private embeddingService: EmbeddingService,
+    private maxContextTokens: number = 150000
+  ) {}
+
+  async query(options: RAGOptions): Promise<RAGResponse> {
+    const {
+      query,
+      maxContextTokens = 120000,
+      temperature = 0.3,
+      model = 'claude-sonnet-4',
+      filters
+    } = options;
+
+    const queryEmbedding = await this.embeddingService.createEmbedding(query);
+
+    const retrieved = await this.retrievalService.retrieve({
+      query,
+      queryEmbedding,
+      filters,
+      maxResults: 20,
+      rerank: true,
+      rerankTopK: 10,
+    });
+
+    const context = this.assembleContext(retrieved, maxContextTokens - 2000);
+
+    const systemPrompt = `You are a helpful AI assistant. Use the provided context to answer the user's question. Follow these rules:
+
+1. Only use information from the provided context
+2. If the context doesn't contain enough information, say so
+3. Always cite your sources using [Source N] notation
+4. Be concise but thorough
+5. If you're uncertain, acknowledge it`;
+
+    const userPrompt = `Context:
+${context}
+
+Question: ${query}
+
+Answer the question based on the context above.`;
+
+    const response = await this.llmService.createMessage(
+      [
+        { role: 'user', content: userPrompt }
+      ],
+      systemPrompt,
+      { model, temperature, maxTokens: 2048 }
+    );
+
+    return {
+      answer: response.content[0].text || response.choices?.[0]?.message?.content || '',
+      sources: retrieved.slice(0, 5).map((r, i) => ({
+        id: r.id,
+        content: r.content.slice(0, 500) + (r.content.length > 500 ? '...' : ''),
+        score: r.score,
+        metadata: r.metadata,
+      })),
+      tokensUsed: {
+        prompt: response.usage?.input_tokens || 0,
+        completion: response.usage?.output_tokens || 0,
+      },
+    };
+  }
+
+  private assembleContext(
+    results: RetrievalResult[],
+    maxTokens: number
+  ): string {
+    const chunks: string[] = [];
+    let totalTokens = 0;
+
+    for (const result of results) {
+      const tokenEstimate = Math.ceil(result.content.length / 4);
+      
+      if (totalTokens + tokenEstimate > maxTokens) {
+        break;
+      }
+
+      chunks.push(`[Source ${chunks.length + 1}]: ${result.content}`);
+      totalTokens += tokenEstimate;
+    }
+
+    return chunks.join('\n\n');
+  }
+}
+```
+
+### PixelRAG: Visual RAG Complementary
+
+PixelRAG là **bổ sung hoàn hảo** cho Text RAG truyền thống, đặc biệt khi:
+
+| Use Case | Recommendation | Lý do |
+|----------|----------------|-------|
+| Tài liệu có bảng biểu | **PixelRAG** | Text RAG mất cấu trúc bảng |
+| Báo cáo tài chính | **PixelRAG** | Đọc số liệu chính xác |
+| PDF khoa học | **PixelRAG** | Hiểu hình vẽ, công thức |
+| Website phức tạp | **PixelRAG** | Giữ layout, hiểu visual context |
+| Tài liệu đơn giản | Text RAG | Nhanh hơn, đơn giản hơn |
+
+---
+
+## 2. Vector Search
+
+### Mục tiêu
+
+Vector search là kỹ thuật tìm kiếm sử dụng vector representations (embeddings) để tìm items tương tự dựa trên semantic meaning thay vì keyword matching.
+
+### Nguyên tắc
+
+**1. Embedding Model Selection**
+
+Choose appropriate embedding model. Consider dimension requirements. Match to content type. Evaluate quality. Consider multilingual needs.
+
+**2. Distance Metrics**
+
+Cosine similarity for normalized vectors. Euclidean distance for geometric similarity. Dot product for recommendation. Match to use case.
+
+**3. Indexing Strategy**
+
+HNSW for high quality. IVFFlat for large datasets. Consider memory usage. Balance speed vs accuracy. Test with real data.
+
+**4. Hybrid Search**
+
+Combine vector and keyword search. Use late fusion or early fusion. Consider BM25. Optimize for both. Test relevance.
+
+**5. Reranking**
+
+Use cross-encoder reranking. Combine with vector scores. Optimize rerank count. Balance quality vs speed.
+
+**6. Chunking Strategy**
+
+Chunk size affects recall. Consider semantic boundaries. Add overlap. Match chunk size to query complexity.
+
+**7. Filtering**
+
+Pre-filter vs post-filter. Impact on recall. Optimize with filtered indexes. Consider metadata indexing.
+
+**8. Evaluation**
+
+Measure recall. Measure latency. Test different configurations. Use A/B testing. Monitor quality.
+
+**9. Scalability**
+
+Design for data growth. Consider sharding. Batch processing. Incremental updates. Cost management.
+
+**10. Maintenance**
+
+Refresh embeddings. Update indexes. Monitor drift. Handle deletions. Maintain quality.
+
+### Checklist
+
+- [ ] Embedding model selected
+- [ ] Vector database configured
+- [ ] Index strategy defined
+- [ ] Distance metric chosen
+- [ ] Hybrid search implemented
+- [ ] Reranking strategy set
+- [ ] Filtering configured
+- [ ] Evaluation metrics set up
+- [ ] Scaling plan defined
+- [ ] Monitoring configured
+
+### Best Practice - Embedding Generation
+
+```typescript
+// services/embedding.service.ts
+import OpenAI from 'openai';
+import { CohereClient } from 'cohere-ai';
+
+interface EmbeddingConfig {
+  provider: 'openai' | 'cohere' | 'huggingface';
+  model: string;
+  dimensions?: number;
+  normalize?: boolean;
+}
+
+class EmbeddingService {
+  private openai: OpenAI;
+  private cohere: CohereClient;
+  private config: EmbeddingConfig;
+
+  constructor(config: EmbeddingConfig) {
+    this.config = config;
+    this.openai = new OpenAI();
+    this.cohere = new CohereClient();
+  }
+
+  async createEmbedding(
+    text: string,
+    options?: { normalize?: boolean }
+  ): Promise<number[]> {
+    switch (this.config.provider) {
+      case 'openai':
+        return this.createOpenAIEmbedding(text, options);
+      case 'cohere':
+        return this.createCohereEmbedding(text, options);
+      default:
+        return this.createOpenAIEmbedding(text, options);
+    }
+  }
+
+  private async createOpenAIEmbedding(
+    text: string,
+    options?: { normalize?: boolean }
+  ): Promise<number[]> {
+    const response = await this.openai.embeddings.create({
+      model: this.config.model || 'text-embedding-3-small',
+      input: text,
+      ...(this.config.dimensions && { dimensions: this.config.dimensions }),
+      encoding_format: 'float',
+    });
+
+    let embedding = response.data[0].embedding;
+
+    if (options?.normalize || this.config.normalize) {
+      embedding = this.normalizeVector(embedding);
+    }
+
+    return embedding;
+  }
+
+  private normalizeVector(vector: number[]): number[] {
+    const magnitude = Math.sqrt(
+      vector.reduce((sum, val) => sum + val * val, 0)
+    );
+    return vector.map(val => val / magnitude);
+  }
+
+  async createBatchEmbeddings(
+    texts: string[],
+    batchSize: number = 100
+  ): Promise<number[][]> {
+    const results: number[][] = [];
+
+    for (let i = 0; i < texts.length; i += batchSize) {
+      const batch = texts.slice(i, i + batchSize);
+      const batchResults = await this.createOpenAIEmbedding(batch.join('\n'));
+      results.push(batchResults);
+    }
+
+    return results;
+  }
+}
+```
+
+### Best Practice - Hybrid Search
+
+```typescript
+// services/hybrid-search.service.ts
+interface HybridSearchOptions {
+  query: string;
+  queryEmbedding: number[];
+  vectorWeight?: number;
+  keywordWeight?: number;
+  limit?: number;
+  filters?: Record<string, any>;
+}
+
+interface HybridSearchResult {
+  id: string;
+  content: string;
+  score: number;
+  vectorScore: number;
+  keywordScore: number;
+  metadata: Record<string, any>;
+}
+
+class HybridSearchService {
+  constructor(
+    private vectorStore: PGVectorService | PineconeService,
+    private keywordIndex: KeywordSearchService
+  ) {}
+
+  async search(options: HybridSearchOptions): Promise<HybridSearchResult[]> {
+    const {
+      query,
+      queryEmbedding,
+      vectorWeight = 0.7,
+      keywordWeight = 0.3,
+      limit = 10,
+      filters
+    } = options;
+
+    const [vectorResults, keywordResults] = await Promise.all([
+      this.vectorStore.search(queryEmbedding, { limit: limit * 2, filter }),
+      this.keywordIndex.search(query, { limit: limit * 2, filters }),
+    ]);
+
+    const vectorScores = new Map(
+      vectorResults.map(r => [r.id, r.score])
+    );
+
+    const keywordScores = new Map(
+      keywordResults.map(r => [r.id, r.score])
+    );
+
+    const allIds = new Set([
+      ...vectorResults.map(r => r.id),
+      ...keywordResults.map(r => r.id),
+    ]);
+
+    const combinedResults: HybridSearchResult[] = [];
+
+    for (const id of allIds) {
+      const vectorScore = vectorScores.get(id) || 0;
+      const keywordScore = keywordScores.get(id) || 0;
+
+      const normalizedVector = vectorScore;
+      const normalizedKeyword = keywordScore / (keywordResults[0]?.score || 1);
+
+      const combinedScore = 
+        normalizedVector * vectorWeight + 
+        normalizedKeyword * keywordWeight;
+
+      const vectorResult = vectorResults.find(r => r.id === id);
+      const keywordResult = keywordResults.find(r => r.id === id);
+
+      combinedResults.push({
+        id,
+        content: vectorResult?.content || keywordResult?.content || '',
+        score: combinedScore,
+        vectorScore: normalizedVector,
+        keywordScore: normalizedKeyword,
+        metadata: vectorResult?.metadata || keywordResult?.metadata || {},
+      });
+    }
+
+    return combinedResults
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit);
+  }
+
+  // Late fusion using Reciprocal Rank Fusion
+  async searchRRF(
+    options: HybridSearchOptions
+  ): Promise<HybridSearchResult[]> {
+    const { query, queryEmbedding, limit = 10, filters } = options;
+
+    const [vectorResults, keywordResults] = await Promise.all([
+      this.vectorStore.search(queryEmbedding, { limit: limit * 2, filter: filters }),
+      this.keywordIndex.search(query, { limit: limit * 2, filters }),
+    ]);
+
+    const rrfScores = new Map<string, number>();
+    const k = 60;
+
+    vectorResults.forEach((r, i) => {
+      const current = rrfScores.get(r.id) || 0;
+      rrfScores.set(r.id, current + 1 / (k + i + 1));
+    });
+
+    keywordResults.forEach((r, i) => {
+      const current = rrfScores.get(r.id) || 0;
+      rrfScores.set(r.id, current + 1 / (k + i + 1));
+    });
+
+    const vectorScores = new Map(vectorResults.map(r => [r.id, r.score]));
+    const keywordScores = new Map(keywordResults.map(r => [r.id, r.score]));
+
+    const results: HybridSearchResult[] = [];
+
+    for (const [id, rrfScore] of rrfScores) {
+      const vectorResult = vectorResults.find(r => r.id === id);
+      const keywordResult = keywordResults.find(r => r.id === id);
+
+      results.push({
+        id,
+        content: vectorResult?.content || keywordResult?.content || '',
+        score: rrfScore,
+        vectorScore: vectorScores.get(id) || 0,
+        keywordScore: keywordScores.get(id) || 0,
+        metadata: vectorResult?.metadata || keywordResult?.metadata || {},
+      });
+    }
+
+    return results
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit);
+  }
+}
+```
+
+---
+
+## 3. pgvector (PostgreSQL Vector Extension)
+
+### Mục tiêu
+
+pgvector là một PostgreSQL extension cho phép store và query vector embeddings trực tiếp trong database. pgvector enable developers để xây dựng AI features mà không cần separate vector database.
+
+### Nguyên tắc
+
+**1. Vector Dimension Planning**
+
+Choose appropriate dimensions. 768 for text-embedding-3. 1536 for text-embedding-ada-002. 384-1024 for small models. Consider storage vs accuracy.
+
+**2. Index Selection**
+
+HNSW for best quality. IVFFlat for faster inserts. Consider memory usage. Test with real data. Choose based on use case.
+
+**3. Distance Metrics**
+
+Cosine similarity for normalized vectors. L2 distance for geometric similarity. Inner product for recommendation. Match to embedding model.
+
+**4. Hybrid Search**
+
+Combine vector and keyword search. Use pre-filtering. Consider late filtering. Balance relevance. Optimize for both.
+
+**5. Data Consistency**
+
+Synchronize embeddings with source data. Handle updates carefully. Delete orphaned embeddings. Use transactions. Monitor consistency.
+
+**6. Performance Optimization**
+
+Batch embedding generation. Use connection pooling. Index maintenance. Monitor query performance. Optimize batch size.
+
+**7. Schema Design**
+
+Co-locate vectors with source data. Use proper data types. Add metadata columns. Index appropriately. Consider partitioning.
+
+**8. Embedding Management**
+
+Use consistent embedding model. Version embeddings. Monitor embedding quality. Regenerate when needed. Document model choices.
+
+### Checklist
+
+- [ ] pgvector extension installed
+- [ ] Schema designed for vectors
+- [ ] Indexes created
+- [ ] Embedding pipeline implemented
+- [ ] Hybrid search configured
+- [ ] Performance tested
+- [ ] Monitoring set up
+- [ ] Backup strategy defined
+
+### Best Practice - Schema Design
+
+```sql
+-- Enable extension
+CREATE EXTENSION IF NOT EXISTS vector;
+
+-- Documents table with vectors
+CREATE TABLE documents (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  metadata JSONB DEFAULT '{}',
+  embedding vector(1536),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Create index for vector search (HNSW)
+CREATE INDEX idx_documents_embedding_hnsw ON documents 
+  USING hnsw (embedding vector_cosine_ops)
+  WITH (m = 16, ef_construction = 64);
+
+-- Create index for metadata filtering
+CREATE INDEX idx_documents_tenant ON documents(tenant_id);
+CREATE INDEX idx_documents_updated ON documents(updated_at DESC);
+
+-- Knowledge base with categories
+CREATE TABLE knowledge_base (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  category TEXT NOT NULL,
+  question TEXT NOT NULL,
+  answer TEXT NOT NULL,
+  embedding vector(1536),
+  usage_count INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_kb_embedding_hnsw ON knowledge_base 
+  USING hnsw (embedding vector_cosine_ops)
+  WITH (m = 16, ef_construction = 64);
+
+CREATE INDEX idx_kb_category ON knowledge_base(category);
+CREATE INDEX idx_kb_usage ON knowledge_base(usage_count DESC);
+```
+
+### Best Practice - Vector Search Functions
+
+```sql
+-- Similarity search function
+CREATE OR REPLACE FUNCTION search_documents(
+  p_query_embedding vector(1536),
+  p_tenant_id UUID,
+  p_limit INTEGER DEFAULT 10,
+  p_min_similarity FLOAT DEFAULT 0.7
+)
+RETURNS TABLE (
+  id UUID,
+  title TEXT,
+  content TEXT,
+  metadata JSONB,
+  similarity FLOAT
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    d.id,
+    d.title,
+    d.content,
+    d.metadata,
+    1 - (d.embedding <=> p_query_embedding) AS similarity
+  FROM documents d
+  WHERE d.tenant_id = p_tenant_id
+    AND d.embedding IS NOT NULL
+    AND 1 - (d.embedding <=> p_query_embedding) >= p_min_similarity
+  ORDER BY d.embedding <=> p_query_embedding
+  LIMIT p_limit;
+END;
+$$ LANGUAGE plpgsql STABLE;
+
+-- Hybrid search (vector + keyword)
+CREATE OR REPLACE FUNCTION hybrid_search_documents(
+  p_query_embedding vector(1536),
+  p_tenant_id UUID,
+  p_search_query TEXT,
+  p_limit INTEGER DEFAULT 10,
+  p_similarity_threshold FLOAT DEFAULT 0.5
+)
+RETURNS TABLE (
+  id UUID,
+  title TEXT,
+  content TEXT,
+  metadata JSONB,
+  rank_score FLOAT
+) AS $$
+BEGIN
+  RETURN QUERY
+  WITH vector_results AS (
+    SELECT
+      d.id,
+      d.title,
+      d.content,
+      d.metadata,
+      (1 - (d.embedding <=> p_query_embedding)) AS similarity
+    FROM documents d
+    WHERE d.tenant_id = p_tenant_id
+      AND d.embedding IS NOT NULL
+  ),
+  text_results AS (
+    SELECT
+      id,
+      ts_rank(to_tsvector('english', title || ' ' || content), 
+               plainto_tsquery('english', p_search_query)) AS text_score
+    FROM documents
+    WHERE tenant_id = p_tenant_id
+      AND to_tsvector('english', title || ' ' || content) @@ 
+          plainto_tsquery('english', p_search_query)
+  ),
+  combined AS (
+    SELECT
+      v.id,
+      v.title,
+      v.content,
+      v.metadata,
+      v.similarity,
+      COALESCE(t.text_score, 0) AS text_score,
+      (v.similarity * 0.7 + COALESCE(t.text_score, 0) * 0.3) AS rank_score
+    FROM vector_results v
+    LEFT JOIN text_results t ON v.id = t.id
+    WHERE v.similarity >= p_similarity_threshold
+  )
+  SELECT
+    id,
+    title,
+    content,
+    metadata,
+    rank_score
+  FROM combined
+  ORDER BY rank_score DESC
+  LIMIT p_limit;
+END;
+$$ LANGUAGE plpgsql STABLE;
+
+-- RAG retrieval function
+CREATE OR REPLACE FUNCTION retrieve_for_rag(
+  p_query_embedding vector(1536),
+  p_tenant_id UUID,
+  p_max_results INTEGER DEFAULT 5,
+  p_max_total_chars INTEGER DEFAULT 4000
+)
+RETURNS TABLE (
+  id UUID,
+  content TEXT,
+  source TEXT,
+  similarity FLOAT
+) AS $$
+DECLARE
+  v_result RECORD;
+  v_total_chars INTEGER := 0;
+BEGIN
+  FOR v_result IN (
+    SELECT
+      id,
+      content,
+      title AS source,
+      1 - (embedding <=> p_query_embedding) AS similarity
+    FROM knowledge_base
+    WHERE tenant_id = p_tenant_id
+      AND is_active = TRUE
+      AND embedding IS NOT NULL
+    ORDER BY embedding <=> p_query_embedding
+    LIMIT p_max_results
+  ) LOOP
+    IF v_total_chars + LENGTH(v_result.content) <= p_max_total_chars THEN
+      id := v_result.id;
+      content := v_result.content;
+      source := v_result.source;
+      similarity := v_result.similarity;
+      v_total_chars := v_total_chars + LENGTH(v_result.content);
+      RETURN NEXT;
+    ELSE
+      RETURN;
+    END IF;
+  END LOOP;
+END;
+$$ LANGUAGE plpgsql STABLE;
+```
+
+### Best Practice - Performance Tuning
+
+```sql
+-- Monitor vector index usage
+SELECT 
+  schemaname,
+  tablename,
+  indexname,
+  idx_scan,
+  idx_tup_read,
+  idx_tup_fetch
+FROM pg_stat_user_indexes
+WHERE indexname LIKE '%embedding%';
+
+-- Check index size
+SELECT 
+  pg_size_pretty(pg_relation_size('idx_documents_embedding_hnsw'));
+
+-- Rebuild index if fragmented
+REINDEX INDEX CONCURRENTLY idx_documents_embedding_hnsw;
+
+-- Analyze table for query planner
+ANALYZE documents;
+
+-- High recall (quality):
+CREATE INDEX idx_docs_emb ON documents 
+  USING hnsw (embedding vector_cosine_ops)
+  WITH (m = 32, ef_construction = 128);
+
+-- High speed:
+CREATE INDEX idx_docs_emb ON documents 
+  USING hnsw (embedding vector_cosine_ops)
+  WITH (m = 8, ef_construction = 32);
+```
+
+---
+
+## 4. WeKnora (RAG Platform)
+
+### Mục tiêu
+
+**WeKnora** là open-source LLM knowledge platform mạnh mẽ từ Tencent với 17.3k GitHub stars, cung cấp:
+
+- **RAG-based Quick Q&A** - Tra cứu kiến thức nhanh chóng từ documents
+- **ReAct Agent Mode** - Autonomous reasoning với multi-step planning
+- **Wiki Mode** - Tự động tạo interlinked Markdown wiki từ raw documents
+- **Hybrid Retrieval** - Vector Search + BM25 + GraphRAG + Knowledge Graph
+- **MCP Server** - Tích hợp MCP Tools cho Cursor agent
+
+### Nguyên tắc
+
+**1. Document Processing Pipeline**
+
+WeKnora hỗ trợ 10+ document formats:
+- PDF / Word / Txt / Markdown / HTML
+- Images (OCR) / CSV / Excel / PPT / JSON
+
+Xây dựng pipeline theo thứ tự:
+```
+Document Upload → Parser → Chunking → Embedding → Vector Store → Knowledge Graph
+```
+
+**2. Knowledge Base Types**
+
+| Type | Use Case | Features |
+|------|----------|----------|
+| FAQ | Q&A systems | Structured Q&A pairs |
+| Document | General KB | Full document search |
+| Wiki | Self-maintaining KB | Auto-generated interlinked pages |
+
+**3. Retrieval Strategies**
+
+```python
+# Hybrid Retrieval kết hợp:
+1. Vector Search (semantic similarity)
+2. BM25 (keyword matching)
+3. GraphRAG (graph traversal)
+4. Knowledge Graph (entity relationships)
+```
+
+**4. ReAct Agent Architecture**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    ReAct Loop                               │
+├─────────────────────────────────────────────────────────────┤
+│  1. Think    → Reasoning about next action                 │
+│  2. Act      → Execute tool / retrieve / search           │
+│  3. Observe  → Get result from action                      │
+│  4. Repeat   → Continue until task complete               │
+└─────────────────────────────────────────────────────────────┘
+
+Tools available:
+- Built-in tools (knowledge retrieval, web search)
+- MCP tools (custom extensions)
+- Document parsing (PDF, Word, images)
+```
+
+**5. Wiki Mode Workflow**
+
+```
+Raw Documents → Agent Analysis → Entity Extraction → 
+Knowledge Graph Construction → Interlinked Markdown Generation → 
+Wiki Browser + Visual Graph
+```
+
+**6. MCP Server Integration**
+
+WeKnora cung cấp MCP server với multi-transport:
+- stdio (local CLI)
+- SSE (Server-Sent Events)
+- HTTP (remote API)
+
+### Checklist
+
+- [ ] WeKnora server deployed (Docker/local)
+- [ ] MCP server configured và running
+- [ ] Knowledge Base created (FAQ/Document/Wiki)
+- [ ] Document types supported: PDF, Word, Markdown, Images
+- [ ] LLM provider configured (OpenAI/DeepSeek/Ollama)
+- [ ] Vector store configured (pgvector/Elasticsearch/Milvus)
+- [ ] Retrieval strategy selected (Vector + BM25 + GraphRAG)
+- [ ] Web search integrated (DuckDuckGo/Bing/Google)
+- [ ] Langfuse tracing configured (optional)
+- [ ] Multi-tenant RBAC configured (optional)
+
+### Best Practice - WeKnora Deployment
+
+```bash
+# Quick Start (Docker)
+git clone https://github.com/Tencent/WeKnora.git
+cd WeKnora
+cp .env.example .env  # Edit with your config
+docker compose up -d
+
+# With optional profiles
+docker compose --profile neo4j up -d    # Knowledge Graph
+docker compose --profile langfuse up -d # Tracing
+```
+
+### Best Practice - MCP Server Configuration
+
+```json
+// .cursor/mcp.json
+{
+  "mcpServers": {
+    "weknora": {
+      "command": "weknora",
+      "args": ["mcp", "serve"],
+      "env": {
+        "WEKNORA_HOST": "http://localhost:8080",
+        "WEKNORA_API_KEY": "${WEKNORA_API_KEY}"
+      }
+    }
+  }
+}
+```
+
+### Best Practice - CLI Usage
+
+```bash
+# Authentication
+weknora auth login --host https://kb.example.com
+
+# Knowledge Base Management
+weknora kb list
+weknora kb create --name "My Knowledge Base" --type document
+
+# Document Operations
+weknora doc upload document.pdf
+weknora doc list --kb "My Knowledge Base"
+
+# Chat with Knowledge
+weknora chat "What is the main topic of the documents?"
+```
+
+### Best Practice - API Integration
+
+```typescript
+// typescript client
+import { WeKnoraClient } from '@weknora/client';
+
+const client = new WeKnoraClient({
+  host: process.env.WEKNORA_HOST,
+  apiKey: process.env.WEKNORA_API_KEY
+});
+
+// Create knowledge base
+const kb = await client.kb.create({
+  name: 'Enterprise Docs',
+  type: 'document'
+});
+
+// Upload documents
+await client.doc.upload('manual.pdf', { kbId: kb.id });
+
+// Chat with KB
+const response = await client.chat({
+  kbId: kb.id,
+  message: 'Summarize the key findings',
+  mode: 'agent' // or 'qa' for simple RAG
+});
+```
+
+### Best Practice - Retrieval Configuration
+
+```yaml
+# Configurable per KB retrieval
+retrieval:
+  strategy: hybrid  # hybrid | vector | bm25 | graphrag
+  vector:
+    weight: 0.4
+    top_k: 20
+  bm25:
+    weight: 0.3
+    top_k: 20
+  graphrag:
+    weight: 0.3
+    depth: 3
+  rerank:
+    enabled: true
+    top_k: 10
+```
+
+---
+
+## Implementation Patterns
+
+### Complete RAG Pipeline
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│                    AI KNOWLEDGE STACK                          │
+├────────────────────────────────────────────────────────────────┤
+│                                                                │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐   │
+│  │   Document   │───►│   Parser &   │───►│   Chunking   │   │
+│  │   Sources    │    │   Cleaner    │    │   Strategy   │   │
+│  └──────────────┘    └──────────────┘    └──────┬───────┘   │
+│                                                  │            │
+│                                                  ▼            │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐   │
+│  │    RAG        │◄───│    LLM       │◄───│   Context    │   │
+│  │   Response    │    │   Generation │    │   Assembly   │   │
+│  └──────┬───────┘    └──────────────┘    └──────┬───────┘   │
+│         │                                         │            │
+│         │          ┌──────────────┐              │            │
+│         └────────►│   Retrieval  │◄─────────────┘            │
+│                   │   & Rerank   │                           │
+│                   └──────┬───────┘                           │
+│                          │                                    │
+│         ┌────────────────┼────────────────┐                   │
+│         │                │                │                   │
+│         ▼                ▼                ▼                   │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
+│  │    Vector    │  │    BM25      │  │   GraphRAG   │     │
+│  │    Search    │  │    Search    │  │   Retrieval  │     │
+│  └──────┬───────┘  └──────────────┘  └──────┬───────┘     │
+│         │                                     │              │
+│         └─────────────────┬───────────────────┘              │
+│                           │                                  │
+│                           ▼                                  │
+│                   ┌──────────────┐                           │
+│                   │   Vector /   │                           │
+│                   │   Graph DB   │                           │
+│                   └──────────────┘                           │
+│                                                                │
+└────────────────────────────────────────────────────────────────┘
+```
+
+### Technology Selection Guide
+
+| Use Case | Recommended | Notes |
+|----------|-------------|-------|
+| Simple RAG | pgvector | Built-in, no extra DB |
+| Enterprise RAG | WeKnora | Hybrid Search, GraphRAG, Wiki Mode |
+| High-scale Vector Search | Pinecone/Milvus | Managed, scalable |
+| Semantic + Keyword | Hybrid (pgvector + BM25) | Best of both worlds |
+| Knowledge Graph | WeKnora + Neo4j | Entity relationships |
+
+### Evaluation Metrics
+
+```typescript
+interface RAGEvaluationResult {
+  retrieval: {
+    precision: number;
+    recall: number;
+    f1: number;
+    mrr: number;
+    ndcg: number;
+  };
+  generation: {
+    faithfulness: number;
+    answerRelevancy: number;
+    contextPrecision: number;
+  };
+  overall: number;
+}
+```
+
+---
+
+## Workflow Summary
+
+### Phase 1: Planning
+- Choose embedding model
+- Select vector database
+- Define data schema
+- Plan indexing strategy
+
+### Phase 2: Implementation
+- Set up vector database
+- Implement embedding pipeline
+- Create search service
+- Add filtering
+
+### Phase 3: Optimization
+- Configure indexes
+- Add reranking
+- Implement hybrid search
+- Optimize queries
+
+### Phase 4: Evaluation
+- Create test set
+- Measure metrics
+- Compare strategies
+- Iterate
+
+### Phase 5: Scaling
+- Plan for growth
+- Implement batching
+- Configure sharding
+- Monitor costs
+
+### Phase 6: Maintenance
+- Monitor quality
+- Update embeddings
+- Refresh indexes
+- Handle deletions
+
+---
+
+## Liên kết
+
+- [[postgres]] - PostgreSQL best practices
+- [[openai]] - OpenAI integration
+- [[claude]] - Claude integration
+- [[pinecone]] - Pinecone
+- [[knowledge-graph]] - Knowledge Graph Construction
+- [[mcp]] - MCP Server Integration
+- [[evaluation]] - Search evaluation
+- [[performance]] - Performance optimization
+- [[pixelrag]] - PixelRAG (Visual RAG for documents with tables, charts)

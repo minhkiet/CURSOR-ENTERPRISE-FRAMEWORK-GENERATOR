@@ -1,0 +1,1251 @@
+---
+description: LLM Providers - hợp nhất từ OpenAI, Gemini, Claude trong Cursor Enterprise Framework
+created: 2026-06-26
+version: 1.0.0
+merged_from: [openai.mdc, gemini.mdc, claude.mdc]
+tags: [llm, openai, gemini, claude, ai, gpt, anthropic, vertex-ai, azure-openai]
+---
+
+# LLM Providers
+
+## Tổng quan So sánh
+
+| Aspect | OpenAI | Gemini | Claude |
+|--------|--------|--------|--------|
+| **Models** | GPT-4, GPT-4o, GPT-3.5 | Gemini Pro/Ultra/Flash | Claude 3.5 (Opus/Sonnet/Haiku) |
+| **API Endpoint** | chat.completions | generativeLanguage | messages |
+| **Context Window** | 128K tokens | Up to 2M tokens | 200K tokens |
+| **Multimodal** | Yes (Vision) | Yes (Native) | Yes (Vision) |
+| **Pricing** | per token | per character | per token |
+| **Function Calling** | Native | Native | Native (Tools) |
+| **Free Tier** | Limited | Yes | Limited |
+
+## 1. OpenAI
+
+### Mục tiêu
+
+OpenAI cung cấp các Large Language Models (LLMs) mạnh mẽ như GPT-4 và GPT-3.5, cùng với các tools như DALL-E, Whisper, và Embeddings. Trong Cursor Enterprise Framework, OpenAI integration được sử dụng cho features như AI assistants, content generation, code assistance, và RAG systems.
+
+### Nguyên tắc
+
+**1. API Key Security**
+
+Never expose API keys in frontend code. Use server-side API calls. Rotate keys regularly. Monitor usage for anomalies. Use environment variables.
+
+**2. Prompt Engineering**
+
+Structure prompts clearly. Use system messages effectively. Provide examples (few-shot). Keep prompts focused. Iterate and test prompts.
+
+**3. Response Parsing**
+
+Parse responses reliably. Handle streaming responses. Validate response structure. Handle edge cases. Use type-safe parsing.
+
+**4. Error Handling**
+
+Handle API errors gracefully. Implement retries with backoff. Handle rate limits. Handle timeout errors. Provide user feedback.
+
+**5. Cost Optimization**
+
+Minimize token usage. Use appropriate model sizes. Cache responses when possible. Monitor costs closely. Set usage limits.
+
+**6. Function Calling**
+
+Use function calling for structured outputs. Define schemas carefully. Handle function results. Chain calls when needed. Validate function inputs.
+
+**7. Streaming Responses**
+
+Use streaming for better UX. Handle stream interruptions. Display progressively. Handle partial responses. Manage stream lifecycle.
+
+**8. Context Management**
+
+Manage conversation history. Implement context window limits. Truncate old messages. Consider summarization. Balance context vs cost.
+
+**9. Rate Limiting**
+
+Implement rate limit handling. Use exponential backoff. Queue requests. Monitor rate limits. Plan for scale.
+
+**10. Testing và Monitoring**
+
+Test prompts thoroughly. Monitor API latency. Track token usage. A/B test prompts. Gather user feedback.
+
+### Checklist
+
+- [ ] OpenAI API keys secured
+- [ ] Server-side API implementation
+- [ ] Error handling implemented
+- [ ] Rate limiting configured
+- [ ] Cost monitoring set up
+- [ ] Prompt templates documented
+- [ ] Response parsing implemented
+- [ ] Streaming support added
+- [ ] Function calling defined
+- [ ] Testing strategy established
+
+### Anti Pattern
+
+**1. Exposing API Keys**
+
+Storing API keys in frontend. Exposing in environment variables accessible to client. Keys in version control. Leads to unauthorized usage.
+
+**2. Ignoring Token Limits**
+
+Not tracking token usage. Exceeding context limits. Poor prompt truncation. Wasted tokens.
+
+**3. No Retry Logic**
+
+Single API call attempt. No handling of transient failures. Poor user experience. API errors cause failures.
+
+**4. Overly Long Prompts**
+
+Including unnecessary context. No token budget. High costs. Poor performance. Be concise.
+
+**5. No Response Validation**
+
+Assuming perfect responses. No handling of malformed output. Code breaks. Poor user experience.
+
+### Best Practice
+
+**1. OpenAI Client Setup**
+
+```typescript
+// lib/openai.ts
+import OpenAI from 'openai';
+import { OpenAIError, RateLimitError, APIError } from 'openai/error';
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+  timeout: 60000,
+  maxRetries: 3,
+});
+
+openai.maxRetries = 3;
+
+export async function withRetry<T>(
+  fn: () => Promise<T>,
+  options: {
+    maxRetries?: number;
+    initialDelay?: number;
+    maxDelay?: number;
+  } = {}
+): Promise<T> {
+  const {
+    maxRetries = 3,
+    initialDelay = 1000,
+    maxDelay = 30000
+  } = options;
+
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error as Error;
+
+      if (error instanceof RateLimitError) {
+        const delay = Math.min(initialDelay * Math.pow(2, attempt), maxDelay);
+        await sleep(delay);
+      } else if (error instanceof APIError && error.status >= 500) {
+        const delay = initialDelay * Math.pow(2, attempt);
+        await sleep(delay);
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  throw lastError;
+}
+
+const response = await withRetry(() =>
+  openai.chat.completions.create({
+    model: 'gpt-4',
+    messages: [{ role: 'user', content: 'Hello!' }]
+  })
+);
+```
+
+**2. Chat Completions**
+
+```typescript
+// services/chat.service.ts
+interface ChatMessage {
+  role: 'system' | 'user' | 'assistant' | 'function';
+  content: string | null;
+  name?: string;
+  function_call?: { name: string; arguments: string };
+}
+
+interface ChatOptions {
+  model?: 'gpt-4' | 'gpt-4-turbo' | 'gpt-3.5-turbo';
+  temperature?: number;
+  maxTokens?: number;
+}
+
+class ChatService {
+  async createChat(
+    messages: ChatMessage[],
+    options: ChatOptions = {}
+  ): Promise<OpenAI.Chat.ChatCompletion> {
+    const {
+      model = 'gpt-4-turbo',
+      temperature = 0.7,
+      maxTokens = 4096,
+    } = options;
+
+    return withRetry(() =>
+      openai.chat.completions.create({
+        model,
+        messages,
+        temperature,
+        max_tokens: maxTokens,
+      })
+    );
+  }
+
+  async createStreamingChat(
+    messages: ChatMessage[],
+    options: ChatOptions = {},
+    onChunk: (chunk: string) => void
+  ): Promise<string> {
+    const stream = await openai.chat.completions.create({
+      model: options.model || 'gpt-4-turbo',
+      messages,
+      temperature: options.temperature || 0.7,
+      max_tokens: options.maxTokens || 4096,
+      stream: true,
+    });
+
+    let fullResponse = '';
+
+    for await (const chunk of stream) {
+      const content = chunk.choices[0]?.delta?.content;
+      if (content) {
+        fullResponse += content;
+        onChunk(content);
+      }
+    }
+
+    return fullResponse;
+  }
+}
+```
+
+**3. Function Calling**
+
+```typescript
+const functions = [
+  {
+    name: 'get_weather',
+    description: 'Get the current weather in a given location',
+    parameters: {
+      type: 'object',
+      properties: {
+        location: { type: 'string', description: 'City name' },
+        unit: { type: 'string', enum: ['celsius', 'fahrenheit'] },
+      },
+      required: ['location'],
+    },
+  },
+] as const;
+
+class FunctionCallingService {
+  async chatWithFunctions(
+    userMessage: string,
+    context: ChatMessage[] = []
+  ): Promise<string> {
+    const messages: ChatMessage[] = [...context, { role: 'user', content: userMessage }];
+
+    const response = await withRetry(() =>
+      openai.chat.completions.create({
+        model: 'gpt-4-turbo',
+        messages,
+        functions,
+        function_call: 'auto',
+      })
+    );
+
+    const message = response.choices[0].message;
+
+    if (message.function_call) {
+      const functionName = message.function_call.name;
+      const args = JSON.parse(message.function_call.arguments);
+
+      let functionResult: any;
+      switch (functionName) {
+        case 'get_weather':
+          functionResult = await this.getWeather(args.location, args.unit);
+          break;
+      }
+
+      messages.push(message);
+      messages.push({
+        role: 'function',
+        name: functionName,
+        content: JSON.stringify(functionResult),
+      });
+
+      const finalResponse = await this.createChat(messages);
+      return finalResponse.choices[0].message.content || '';
+    }
+
+    return message.content || '';
+  }
+
+  async getWeather(location: string, unit?: string) {
+    return { location, temperature: '22', unit: unit || 'celsius', condition: 'Sunny' };
+  }
+}
+```
+
+**4. Embeddings**
+
+```typescript
+// services/embedding.service.ts
+const openai = new OpenAI();
+
+class EmbeddingService {
+  async createEmbedding(
+    input: string,
+    options: {
+      model?: 'text-embedding-3-small' | 'text-embedding-3-large';
+      dimensions?: number;
+    } = {}
+  ): Promise<number[]> {
+    const { model = 'text-embedding-3-small', dimensions } = options;
+
+    const response = await withRetry(() =>
+      openai.embeddings.create({
+        model,
+        input,
+        ...(dimensions && { dimensions }),
+      })
+    );
+
+    return response.data[0].embedding;
+  }
+
+  cosineSimilarity(a: number[], b: number[]): number {
+    const dotProduct = a.reduce((sum, val, i) => sum + val * b[i], 0);
+    const magnitudeA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
+    const magnitudeB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0));
+    return dotProduct / (magnitudeA * magnitudeB);
+  }
+}
+```
+
+**5. Cost Management**
+
+```typescript
+// services/cost-tracking.service.ts
+const PRICING: Record<string, { prompt: number; completion: number }> = {
+  'gpt-4-turbo': { prompt: 10, completion: 30 },
+  'gpt-4': { prompt: 30, completion: 60 },
+  'gpt-3.5-turbo': { prompt: 0.5, completion: 1.5 },
+};
+
+class CostTrackingService {
+  private usage: UsageRecord[] = [];
+  private dailyLimit: number;
+  private monthlyLimit: number;
+
+  constructor(dailyLimit: number = 100, monthlyLimit: number = 2000) {
+    this.dailyLimit = dailyLimit;
+    this.monthlyLimit = monthlyLimit;
+  }
+
+  recordUsage(usage: any, model: string) {
+    const pricing = PRICING[model] || PRICING['gpt-4-turbo'];
+    const promptCost = (usage.prompt_tokens / 1_000_000) * pricing.prompt;
+    const completionCost = (usage.completion_tokens / 1_000_000) * pricing.completion;
+    this.usage.push({ timestamp: new Date(), model, tokens: usage, cost: promptCost + completionCost });
+    this.checkLimits();
+  }
+
+  getTodayCost(): number {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    return this.usage.filter(u => u.timestamp >= today).reduce((sum, u) => sum + u.cost, 0);
+  }
+
+  getMonthCost(): number {
+    const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
+    return this.usage.filter(u => u.timestamp >= monthStart).reduce((sum, u) => sum + u.cost, 0);
+  }
+
+  canMakeRequest(): boolean {
+    return this.getTodayCost() < this.dailyLimit && this.getMonthCost() < this.monthlyLimit;
+  }
+}
+```
+
+### Workflow
+
+**Phase 1: Requirements Analysis**
+
+Define AI use case. Choose appropriate model. Plan prompt strategy. Estimate costs.
+
+**Phase 2: Implementation**
+
+Set up OpenAI client. Implement API calls. Add error handling. Configure retries.
+
+**Phase 3: Prompt Development**
+
+Design initial prompts. Test with various inputs. Iterate on prompts. Document prompt templates.
+
+**Phase 4: Integration**
+
+Integrate with application. Add caching. Implement streaming. Set up monitoring.
+
+**Phase 5: Testing**
+
+Test with edge cases. Measure latency. Verify responses. User acceptance testing.
+
+**Phase 6: Deployment**
+
+Deploy to production. Set up alerting. Monitor costs. Gather feedback.
+
+---
+
+## 2. Google Gemini
+
+### Mục tiêu
+
+Google Gemini là một family of multimodal AI models từ Google, bao gồm Ultra, Pro, và Nano variants với capabilities từ text generation đến image understanding, code generation, và reasoning. Trong Cursor Enterprise Framework, Gemini integration cung cấp alternative cho OpenAI với unique advantages như native multimodal support, longer context windows, và tight integration với Google Cloud ecosystem.
+
+### Nguyên tắc
+
+**1. Model Selection**
+
+Choose appropriate Gemini model. Ultra for complex reasoning. Pro for general use. Flash for fast tasks. Nano for on-device/edge. Match capabilities to needs.
+
+**2. Multimodal Capabilities**
+
+Leverage native multimodal support. Combine text, images, audio. Process documents seamlessly. Use for complex analysis. Consider input size limits.
+
+**3. Context Window Management**
+
+Use long context windows wisely. Optimize token usage. Implement smart truncation. Consider summarization. Balance context vs cost.
+
+**4. Vertex AI Integration**
+
+Use Vertex AI for production. Better security và compliance. IAM integration. Regional endpoints. Managed infrastructure.
+
+**5. Safety Settings**
+
+Configure safety filters appropriately. Balance safety vs utility. Custom safety settings. Monitor safety scores. Handle safety blocks gracefully.
+
+**6. API Optimization**
+
+Batch requests when possible. Use streaming for better UX. Implement caching. Optimize token usage. Monitor latency.
+
+**7. Error Handling**
+
+Handle quota exceeded. Handle safety blocks. Handle timeout errors. Implement retries. Provide user feedback.
+
+**8. Cost Efficiency**
+
+Choose right model tier. Optimize prompts. Use context caching. Monitor usage. Set budget alerts.
+
+**9. Testing Strategy**
+
+Test with various inputs. Verify safety settings. Test multimodal scenarios. Measure latency. A/B test prompts.
+
+**10. Production Readiness**
+
+Implement rate limiting. Set up monitoring. Configure logging. Plan for scaling. Document integration.
+
+### Checklist
+
+- [ ] Google Cloud project configured
+- [ ] API credentials secured
+- [ ] Vertex AI setup complete
+- [ ] Model selected appropriately
+- [ ] Safety settings configured
+- [ ] Error handling implemented
+- [ ] Cost monitoring set up
+- [ ] Streaming support added
+- [ ] Multimodal tested
+- [ ] Production deployment planned
+
+### Anti Pattern
+
+**1. Using Production API for Development**
+
+Hitting production quotas during testing. Higher costs. Unnecessary latency. Separate dev and prod.
+
+**2. Ignoring Safety Blocks**
+
+Assuming safety blocks won't happen. Poor user experience. Brand risk. Handle gracefully.
+
+**3. No Token Budget**
+
+Unlimited prompt lengths. High costs. Poor performance. Always set limits.
+
+**4. Wrong Model Selection**
+
+Using Ultra for simple tasks. Wasted cost. Using Nano for complex tasks. Poor results.
+
+**5. No Caching**
+
+Regenerating same responses. Wasted API calls. Higher costs. Cache strategic responses.
+
+### Best Practice
+
+**1. Vertex AI Client Setup**
+
+```typescript
+// lib/gemini.ts
+import { VertexAI } from '@google-cloud/vertexai';
+
+const vertexai = new VertexAI({
+  project: process.env.GCP_PROJECT_ID!,
+  location: 'us-central1',
+});
+
+const textModel = vertexai.getGenerativeModel({
+  model: 'gemini-1.5-pro',
+  systemInstruction: {
+    role: 'system',
+    parts: [{ text: 'You are a helpful AI assistant.' }],
+  },
+  generationConfig: {
+    maxOutputTokens: 2048,
+    temperature: 0.7,
+    topP: 0.95,
+    topK: 40,
+  },
+  safetySettings: [
+    { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+    { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+  ],
+});
+
+const visionModel = vertexai.getGenerativeModel({ model: 'gemini-1.5-pro-vision' });
+const flashModel = vertexai.getGenerativeModel({ model: 'gemini-1.5-flash' });
+```
+
+**2. Text Generation**
+
+```typescript
+// services/gemini-text.service.ts
+class GeminiTextService {
+  async generateText(
+    prompt: string,
+    options: {
+      model?: 'gemini-1.5-pro' | 'gemini-1.5-flash';
+      temperature?: number;
+      maxTokens?: number;
+    } = {}
+  ): Promise<string> {
+    const model = options.model === 'gemini-1.5-flash' ? flashModel : textModel;
+
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: {
+        maxOutputTokens: options.maxTokens || 2048,
+        temperature: options.temperature || 0.7,
+      },
+    });
+
+    return result.response.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  }
+
+  async generateStreaming(
+    prompt: string,
+    onChunk: (chunk: string) => void
+  ): Promise<string> {
+    const streamingResult = await textModel.generateContentStream({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    });
+
+    let fullResponse = '';
+    for await (const chunk of streamingResult.stream) {
+      const text = chunk.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (text) { fullResponse += text; onChunk(text); }
+    }
+    return fullResponse;
+  }
+}
+```
+
+**3. Multimodal Generation**
+
+```typescript
+// services/gemini-vision.service.ts
+class GeminiVisionService {
+  async analyzeImage(
+    imageData: Buffer,
+    mimeType: string = 'image/jpeg',
+    prompt?: string
+  ): Promise<string> {
+    const result = await visionModel.generateContent({
+      contents: [{
+        role: 'user',
+        parts: [
+          { inlineData: { mimeType, data: imageData.toString('base64') } },
+          { text: prompt || 'Describe this image in detail.' },
+        ],
+      }],
+    });
+
+    return result.response.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  }
+
+  async extractTextFromImage(imageData: Buffer, mimeType: string = 'image/png'): Promise<string> {
+    return this.analyzeImage(imageData, mimeType, 'Extract all text from this image.');
+  }
+
+  async analyzeDocument(
+    imageData: Buffer,
+    mimeType: string = 'image/png',
+    analysisType: 'table' | 'form' | 'mixed' = 'mixed'
+  ): Promise<any> {
+    const prompt = analysisType === 'table'
+      ? 'Return JSON representation of the table.'
+      : analysisType === 'form'
+      ? 'Extract data as JSON with field names and values.'
+      : 'Analyze and return structured JSON.';
+
+    const response = await this.analyzeImage(imageData, mimeType, prompt);
+    try { return JSON.parse(response); } catch { return { raw: response }; }
+  }
+}
+```
+
+**4. Context Caching**
+
+```typescript
+// services/gemini-cache.service.ts
+class GeminiCacheService {
+  async createContextCache(
+    content: string,
+    model: string = 'gemini-1.5-pro',
+    ttlSeconds: number = 3600
+  ): Promise<string> {
+    const response = await fetch(
+      `https://${process.env.GCP_LOCATION}-aiplatform.googleapis.com/v1beta1/projects/${process.env.GCP_PROJECT_ID}/locations/${process.env.GCP_LOCATION}/cachedContents`,
+      {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${await getAccessToken()}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: `models/${model}`, contents: [{ role: 'user', parts: [{ text: content }] }], config: { cachedContentTTL: `${ttlSeconds}s` } }),
+      }
+    );
+    return (await response.json()).name;
+  }
+}
+```
+
+**5. Function Calling**
+
+```typescript
+// services/gemini-function.service.ts
+const functionDeclarations = [
+  {
+    name: 'get_weather',
+    description: 'Get current weather for a location',
+    parameters: {
+      type: 'object',
+      properties: {
+        location: { type: 'string', description: 'City name' },
+        unit: { type: 'string', enum: ['celsius', 'fahrenheit'] },
+      },
+      required: ['location'],
+    },
+  },
+];
+
+class GeminiFunctionService {
+  async chatWithFunctions(userMessage: string): Promise<string> {
+    const model = vertexai.getGenerativeModel({
+      model: 'gemini-1.5-pro',
+      tools: [{ functionDeclarations }],
+    });
+
+    const chat = model.startChat();
+    const result = await chat.sendMessage(userMessage);
+    const functionCalls = result.response.functionCalls();
+
+    if (functionCalls) {
+      const results = [];
+      for (const call of functionCalls) {
+        const result = await this.executeFunction(call);
+        results.push({ functionResponse: { name: call.name, response: result } });
+      }
+      const finalResult = await chat.sendMessage(results);
+      return finalResult.response.text();
+    }
+
+    return result.response.text();
+  }
+
+  private async executeFunction(call: any): Promise<any> {
+    const { name, args } = call;
+    switch (name) {
+      case 'get_weather': return { location: args.location, temperature: '22', condition: 'Sunny' };
+      default: throw new Error(`Unknown function: ${name}`);
+    }
+  }
+}
+```
+
+**6. Batch Processing**
+
+```typescript
+// services/gemini-batch.service.ts
+class GeminiBatchService {
+  async processBatch(
+    items: { id: string; prompt: string }[],
+    options: { maxConcurrency?: number } = {}
+  ): Promise<any[]> {
+    const { maxConcurrency = 5 } = options;
+    const results: any[] = [];
+    const queue = [...items];
+    const executing: Promise<void>[] = [];
+
+    const executeItem = async (item: any) => {
+      try {
+        const service = new GeminiTextService();
+        return { id: item.id, response: await service.generateText(item.prompt), success: true };
+      } catch (error) {
+        return { id: item.id, success: false, error: (error as Error).message };
+      }
+    };
+
+    const processNext = async () => {
+      const item = queue.shift();
+      if (!item) return;
+      const promise = executeItem(item).then(result => { results.push(result); return processNext(); });
+      executing.push(promise);
+    };
+
+    for (let i = 0; i < Math.min(maxConcurrency, items.length); i++) processNext();
+    await Promise.all(executing);
+    return results;
+  }
+}
+```
+
+### Workflow
+
+**Phase 1: Setup**
+
+Create Google Cloud project. Enable Vertex AI API. Set up authentication. Configure billing.
+
+**Phase 2: Model Selection**
+
+Evaluate model capabilities. Choose appropriate model. Plan for different use cases. Test models.
+
+**Phase 3: Implementation**
+
+Set up client. Implement basic generation. Add multimodal support. Configure safety settings.
+
+**Phase 4: Optimization**
+
+Implement caching. Add streaming. Optimize prompts. Configure retries.
+
+**Phase 5: Testing**
+
+Test with various inputs. Verify safety settings. Measure latency. Test multimodal scenarios.
+
+**Phase 6: Deployment**
+
+Deploy to production. Set up monitoring. Configure alerts. Document integration.
+
+---
+
+## 3. Anthropic Claude
+
+### Mục tiêu
+
+Claude là một AI assistant từ Anthropic, được biết đến với khả năng reasoning xuất sắc, instruction-following, và safety alignment. Claude excels at complex reasoning, writing, analysis, và coding tasks. Trong Cursor Enterprise Framework, Claude integration cung cấp alternative với unique strengths nhất định, đặc biệt cho tasks yêu cầu careful reasoning và nuanced understanding.
+
+### Nguyên tắc
+
+**1. Anthropic API Setup**
+
+Use official Anthropic SDK. Secure API keys properly. Configure timeouts. Set up retry logic. Monitor usage.
+
+**2. Model Selection**
+
+Choose appropriate Claude model. Opus for complex tasks. Sonnet for balanced use. Haiku for fast tasks. Match to use case.
+
+**3. Prompt Design**
+
+Write clear, specific prompts. Use system prompts effectively. Structure prompts for tasks. Include examples when helpful. Iterate based on results.
+
+**4. Tool Use**
+
+Leverage tool use capabilities. Define tools clearly. Handle tool results. Chain tool calls. Use for complex workflows.
+
+**5. Extended Context**
+
+Use 200K context window effectively. Organize long context. Summarize when needed. Optimize token usage. Avoid context overflow.
+
+**6. Vision Capabilities**
+
+Process images with Claude. Use appropriate image formats. Balance quality vs size. Handle vision errors. Test image inputs.
+
+**7. Safety và Alignment**
+
+Respect Claude's guidelines. Don't attempt to bypass. Handle refusals gracefully. Use for appropriate tasks. Follow usage policies.
+
+**8. Cost Optimization**
+
+Track token usage. Use smaller models when possible. Optimize prompts. Implement caching. Set budget limits.
+
+**9. Error Handling**
+
+Handle API errors. Handle rate limits. Handle timeout errors. Handle safety refusals. Provide user feedback.
+
+**10. Testing và Iteration**
+
+Test with various inputs. Verify responses. Iterate prompts. Gather feedback. Measure performance.
+
+### Checklist
+
+- [ ] Anthropic API key secured
+- [ ] SDK installed and configured
+- [ ] Model selected appropriately
+- [ ] System prompts designed
+- [ ] Tool definitions created
+- [ ] Error handling implemented
+- [ ] Cost monitoring set up
+- [ ] Vision support added
+- [ ] Testing strategy defined
+- [ ] Production deployment planned
+
+### Anti Pattern
+
+**1. Ignoring Token Count**
+
+Not tracking token usage. Unexpected high costs. Context overflow. Poor performance.
+
+**2. Poor Prompt Structure**
+
+Vague instructions. Missing context. Conflicting requests. Poor results.
+
+**3. Overusing Opus**
+
+Using Opus for simple tasks. High costs. Slower responses. Wasted capability.
+
+**4. Ignoring Safety**
+
+Attempting to bypass guidelines. Misusing Claude. Poor results. Policy violations.
+
+**5. No Retry Logic**
+
+Single API attempts. Poor reliability. User frustration. Inconsistent experience.
+
+### Best Practice
+
+**1. Claude SDK Setup**
+
+```typescript
+// lib/claude.ts
+import Anthropic from '@anthropic-ai/sdk';
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+  timeout: 120000,
+  maxRetries: 3,
+});
+
+async function withClaudeRetry<T>(fn: () => Promise<T>, maxRetries: number = 3): Promise<T> {
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error: any) {
+      lastError = error;
+      if (error.status === 429 || error.status >= 500) {
+        await sleep(Math.pow(2, attempt) * 1000);
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  throw lastError;
+}
+```
+
+**2. Message Creation**
+
+```typescript
+// services/claude-text.service.ts
+class ClaudeTextService {
+  async createMessage(
+    messages: { role: 'user' | 'assistant'; content: string }[],
+    systemPrompt?: string,
+    options: {
+      model?: 'claude-opus-4' | 'claude-sonnet-4' | 'claude-haiku-3';
+      maxTokens?: number;
+      temperature?: number;
+    } = {}
+  ): Promise<any> {
+    const { model = 'claude-sonnet-4', maxTokens = 4096, temperature = 0.7 } = options;
+
+    const request: any = {
+      model,
+      messages,
+      max_tokens: maxTokens,
+      temperature,
+    };
+
+    if (systemPrompt) request.system = systemPrompt;
+
+    return withClaudeRetry(() => anthropic.messages.create(request));
+  }
+
+  async generateText(prompt: string, systemPrompt?: string, options: any = {}): Promise<string> {
+    const response = await this.createMessage([{ role: 'user', content: prompt }], systemPrompt, options);
+    return response.content[0].text || '';
+  }
+
+  async chat(messages: { role: string; content: string }[], systemPrompt?: string, options: any = {}): Promise<string> {
+    const claudeMessages = messages.map(msg => ({
+      role: msg.role === 'assistant' ? 'assistant' : 'user',
+      content: msg.content,
+    }));
+    const response = await this.createMessage(claudeMessages, systemPrompt, options);
+    return response.content[0].text || '';
+  }
+}
+```
+
+**3. Tool Use**
+
+```typescript
+// services/claude-tool.service.ts
+const tools = [
+  {
+    name: 'get_weather',
+    description: 'Get the current weather for a location',
+    input_schema: {
+      type: 'object',
+      properties: {
+        location: { type: 'string', description: 'City name' },
+        unit: { type: 'string', enum: ['celsius', 'fahrenheit'] },
+      },
+      required: ['location'],
+    },
+  },
+];
+
+class ClaudeToolService {
+  async chatWithTools(userMessage: string, systemPrompt?: string, maxIterations: number = 5): Promise<string> {
+    const messages: any[] = [{ role: 'user', content: userMessage }];
+
+    for (let iterations = 0; iterations < maxIterations; iterations++) {
+      const response = await anthropic.messages.create({
+        model: 'claude-opus-4',
+        max_tokens: 4096,
+        messages,
+        system: systemPrompt,
+        tools,
+      });
+
+      messages.push({ role: 'assistant', content: response.content });
+
+      if (response.stop_reason === 'end_turn') return response.content[0].text || '';
+
+      if (response.stop_reason === 'tool_use') {
+        for (const block of response.content) {
+          if (block.type === 'tool_use') {
+            const result = await this.executeTool(block.name, block.input);
+            messages.push({
+              role: 'user',
+              content: [{ type: 'tool_result', tool_use_id: block.id, content: JSON.stringify(result) }],
+            });
+          }
+        }
+      }
+    }
+
+    return 'Maximum iterations reached';
+  }
+
+  private async executeTool(name: string, args: any): Promise<any> {
+    switch (name) {
+      case 'get_weather': return { location: args.location, temperature: '22°C', condition: 'Sunny' };
+      default: return { error: `Unknown tool: ${name}` };
+    }
+  }
+}
+```
+
+**4. Vision Support**
+
+```typescript
+// services/claude-vision.service.ts
+class ClaudeVisionService {
+  async analyzeImage(
+    imageSource: { type: 'base64' | 'url'; media_type?: string; data: string },
+    prompt: string,
+    options: { model?: 'claude-opus-4' | 'claude-sonnet-4'; maxTokens?: number } = {}
+  ): Promise<string> {
+    const content: any[] = [{ type: 'text', text: prompt }];
+
+    if (imageSource.type === 'base64') {
+      content.push({
+        type: 'image',
+        source: { type: 'base64', media_type: imageSource.media_type || 'image/jpeg', data: imageSource.data },
+      });
+    } else {
+      content.push({ type: 'image', source: { type: 'url', url: imageSource.data } });
+    }
+
+    const response = await anthropic.messages.create({
+      model: options.model || 'claude-sonnet-4',
+      max_tokens: options.maxTokens || 1024,
+      messages: [{ role: 'user', content }],
+    });
+
+    return response.content[0].text || '';
+  }
+
+  async extractTextFromImage(imageData: string, mimeType: string = 'image/jpeg'): Promise<string> {
+    return this.analyzeImage({ type: 'base64', media_type: mimeType, data: imageData }, 'Extract all text.');
+  }
+}
+```
+
+**5. Cost Tracking**
+
+```typescript
+// services/claude-cost.service.ts
+const PRICING: Record<string, { input: number; output: number }> = {
+  'claude-opus-4': { input: 15, output: 75 },
+  'claude-sonnet-4': { input: 3, output: 15 },
+  'claude-haiku-3': { input: 0.8, output: 4 },
+};
+
+class ClaudeCostService {
+  private records: any[] = [];
+  private dailyBudget: number;
+  private monthlyBudget: number;
+
+  constructor(dailyBudget: number = 100, monthlyBudget: number = 2000) {
+    this.dailyBudget = dailyBudget;
+    this.monthlyBudget = monthlyBudget;
+  }
+
+  recordUsage(usage: { input_tokens: number; output_tokens: number }, model: string) {
+    const pricing = PRICING[model] || PRICING['claude-sonnet-4'];
+    const cost = (usage.input_tokens / 1_000_000) * pricing.input + (usage.output_tokens / 1_000_000) * pricing.output;
+    this.records.push({ timestamp: new Date(), model, ...usage, cost });
+    this.checkBudgets();
+    return cost;
+  }
+
+  getTodayCost(): number {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    return this.records.filter(r => r.timestamp >= today).reduce((sum, r) => sum + r.cost, 0);
+  }
+
+  getMonthCost(): number {
+    const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
+    return this.records.filter(r => r.timestamp >= monthStart).reduce((sum, r) => sum + r.cost, 0);
+  }
+
+  canMakeRequest(): boolean {
+    return this.getTodayCost() < this.dailyBudget && this.getMonthCost() < this.monthlyBudget;
+  }
+}
+```
+
+**6. Streaming Responses**
+
+```typescript
+// services/claude-stream.service.ts
+class ClaudeStreamService {
+  async *streamMessage(
+    messages: any[],
+    systemPrompt?: string,
+    options: any = {}
+  ): AsyncGenerator<string> {
+    const stream = await anthropic.messages.stream({
+      model: options.model || 'claude-sonnet-4',
+      max_tokens: options.maxTokens || 4096,
+      messages,
+      system: systemPrompt,
+      temperature: options.temperature || 0.7,
+    });
+
+    for await (const event of stream) {
+      if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+        yield event.delta.text;
+      }
+    }
+  }
+
+  async chatStream(messages: any[], onChunk: (chunk: string) => void, systemPrompt?: string): Promise<string> {
+    let fullResponse = '';
+    for await (const chunk of this.streamMessage(messages, systemPrompt)) {
+      fullResponse += chunk;
+      onChunk(chunk);
+    }
+    return fullResponse;
+  }
+}
+```
+
+### Workflow
+
+**Phase 1: Setup**
+
+Get Anthropic API key. Install SDK. Configure authentication. Set up billing.
+
+**Phase 2: Implementation**
+
+Set up client. Implement basic generation. Add tool support. Configure safety.
+
+**Phase 3: Prompt Engineering**
+
+Design system prompts. Test various prompts. Iterate on results. Document best prompts.
+
+**Phase 4: Integration**
+
+Integrate with application. Add streaming. Implement caching. Set up monitoring.
+
+**Phase 5: Testing**
+
+Test with various inputs. Verify responses. Measure latency. User acceptance testing.
+
+**Phase 6: Deployment**
+
+Deploy to production. Set up cost alerts. Configure rate limits. Document integration.
+
+---
+
+## Multi-Provider Strategy
+
+### Khi nào sử dụng Provider nào
+
+| Use Case | Recommended Provider |
+|----------|---------------------|
+| Code generation, assistance | **Claude** (Opus/Sonnet) |
+| Fast, cost-effective tasks | **Gemini Flash** hoặc **GPT-3.5** |
+| Complex reasoning, analysis | **Claude Opus** hoặc **GPT-4** |
+| Multimodal (native vision) | **Gemini** |
+| Long context (1M+ tokens) | **Gemini** |
+| Enterprise GCP integration | **Gemini via Vertex AI** |
+| Simple chat/completion | **GPT-3.5** hoặc **Haiku** |
+| Function calling (structured) | **OpenAI** hoặc **Gemini** |
+
+### Multi-Provider Abstraction
+
+```typescript
+// lib/llm-factory.ts
+interface LLMConfig {
+  provider: 'openai' | 'gemini' | 'claude';
+  model?: string;
+  temperature?: number;
+  maxTokens?: number;
+}
+
+interface LLMResponse {
+  content: string;
+  provider: string;
+  model: string;
+  usage?: { input: number; output: number };
+}
+
+class LLMFactory {
+  private openaiService = new ChatService();
+  private geminiService = new GeminiTextService();
+  private claudeService = new ClaudeTextService();
+
+  async complete(prompt: string, config: LLMConfig): Promise<LLMResponse> {
+    switch (config.provider) {
+      case 'openai': {
+        const response = await this.openaiService.createChat([
+          { role: 'user', content: prompt, name: undefined, function_call: undefined }
+        ], { model: config.model as any, temperature: config.temperature, maxTokens: config.maxTokens });
+        return {
+          content: response.choices[0].message.content || '',
+          provider: 'openai',
+          model: response.model,
+          usage: { input: response.usage?.prompt_tokens || 0, output: response.usage?.completion_tokens || 0 }
+        };
+      }
+      case 'gemini': {
+        const content = await this.geminiService.generateText(prompt, { model: config.model as any, maxTokens: config.maxTokens });
+        return { content, provider: 'gemini', model: config.model || 'gemini-1.5-pro' };
+      }
+      case 'claude': {
+        const content = await this.claudeService.generateText(prompt, undefined, { model: config.model as any, maxTokens: config.maxTokens, temperature: config.temperature });
+        return { content, provider: 'claude', model: config.model || 'claude-sonnet-4' };
+      }
+    }
+  }
+
+  async chat(messages: any[], config: LLMConfig): Promise<LLMResponse> {
+    switch (config.provider) {
+      case 'openai': {
+        const response = await this.openaiService.createChat(messages, { model: config.model as any });
+        return { content: response.choices[0].message.content || '', provider: 'openai', model: response.model };
+      }
+      case 'gemini': {
+        const content = await this.geminiService.generateText(messages[messages.length - 1].content);
+        return { content, provider: 'gemini', model: config.model || 'gemini-1.5-pro' };
+      }
+      case 'claude': {
+        const content = await this.claudeService.chat(messages);
+        return { content, provider: 'claude', model: config.model || 'claude-sonnet-4' };
+      }
+    }
+  }
+}
+```
+
+### Fallback Strategy
+
+```typescript
+// lib/llm-fallback.ts
+class LLMWithFallback {
+  constructor(
+    private primary: LLMFactory,
+    private fallback: LLMFactory,
+    private costTracker: CostTrackingService
+  ) {}
+
+  async complete(prompt: string, config: LLMConfig): Promise<LLMResponse> {
+    try {
+      if (!this.costTracker.canMakeRequest()) {
+        console.warn('Primary provider budget exceeded, using fallback');
+        return this.fallback.complete(prompt, config);
+      }
+      return await this.primary.complete(prompt, config);
+    } catch (error) {
+      console.warn('Primary provider failed, using fallback:', error);
+      return this.fallback.complete(prompt, config);
+    }
+  }
+}
+```
+
+### Cost Comparison
+
+| Provider | Model | Input Cost | Output Cost |
+|----------|-------|------------|-------------|
+| OpenAI | GPT-4-turbo | $10/1M | $30/1M |
+| OpenAI | GPT-4 | $30/1M | $60/1M |
+| OpenAI | GPT-3.5-turbo | $0.50/1M | $1.50/1M |
+| Google | Gemini 1.5 Pro | $1.25/1M* | $5/1M* |
+| Google | Gemini 1.5 Flash | $0.075/1M* | $0.30/1M* |
+| Anthropic | Claude Opus | $15/1M | $75/1M |
+| Anthropic | Claude Sonnet | $3/1M | $15/1M |
+| Anthropic | Claude Haiku | $0.80/1M | $4/1M |
+
+*Gemini pricing varies by region and usage tier.
+
+## Liên kết
+
+- [[llm]] - LLM best practices
+- [[rag]] - RAG implementation
+- [[vector-search]] - Vector search
+- [[pgvector]] - pgvector integration
+- [[cost-optimization]] - Cost management
+- [[ai-prompting]] - Prompt engineering

@@ -1,0 +1,596 @@
+---
+description: Cloud Providers - hợp nhất từ AWS, Azure, GCP trong Cursor Enterprise Framework
+created: 2026-06-26
+version: 1.0.0
+tags: [cloud, aws, azure, gcp, multi-cloud, cloud-providers]
+---
+
+# Cloud Providers
+
+## Tổng quan So sánh
+
+| Category | AWS | Azure | GCP |
+|----------|-----|-------|-----|
+| **Compute** | EC2 | Virtual Machines | Compute Engine |
+| **Serverless** | Lambda | Azure Functions | Cloud Functions |
+| **Containers** | ECS/EKS | AKS | GKE |
+| **Database** | RDS, DynamoDB | SQL Database, Cosmos DB | Cloud SQL, Firestore |
+| **Storage** | S3 | Blob Storage | Cloud Storage |
+| **CDN** | CloudFront | Azure CDN | Cloud CDN |
+| **AI/ML** | SageMaker | Azure AI | Vertex AI |
+| **Analytics** | Redshift | Synapse | BigQuery |
+| **Monitoring** | CloudWatch | Azure Monitor | Cloud Monitoring |
+
+---
+
+## 1. Amazon Web Services (AWS)
+
+### Mục tiêu
+
+Amazon Web Services (AWS) là cloud platform lớn nhất với comprehensive suite của services cho mọi use case. Trong Cursor Enterprise Framework, AWS được sử dụng rộng rãi với strengths đặc biệt trong scalability, machine learning services, và ecosystem maturity.
+
+### Nguyên tắc
+
+**1. Well-Architected Framework**
+
+Follow AWS Well-Architected. Five pillars: Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization, Sustainability.
+
+**2. IAM Best Practices**
+
+Principle of least privilege. Use IAM roles. Enable MFA. Rotate credentials. Use service control policies.
+
+**3. Multi-Tier Architecture**
+
+Use VPC. Public and private subnets. NAT Gateway. Application tiers. Database tier in private.
+
+**4. Scalability Design**
+
+Design for scaling. Use Auto Scaling. Stateless applications. Distributed data.
+
+**5. High Availability**
+
+Multi-AZ deployments. Load balancing. Route 53 for DNS. Failover strategies.
+
+**6. Cost Optimization**
+
+Use cost explorer. Right-sizing. Reserved capacity. Savings plans. Spot instances.
+
+**7. Serverless First**
+
+Consider Lambda. API Gateway. DynamoDB. Event-driven. Pay per use.
+
+**8. Container Strategy**
+
+ECS for Docker. EKS for Kubernetes. Fargate for serverless containers. ECR for images.
+
+**9. Data Storage**
+
+S3 for objects. RDS for relational. DynamoDB for NoSQL. ElastiCache for caching. S3 Glacier for archives.
+
+**10. Monitoring and Observability**
+
+CloudWatch. X-Ray for tracing. CloudTrail for auditing. Config for compliance.
+
+### Checklist
+
+- [ ] AWS account structure designed
+- [ ] VPC architecture defined
+- [ ] IAM policies configured
+- [ ] Compute service selected
+- [ ] Storage architecture designed
+- [ ] Database deployment planned
+- [ ] Monitoring set up
+- [ ] Cost management established
+- [ ] Security controls implemented
+- [ ] Disaster recovery planned
+
+### Anti Pattern
+
+**1. Using Root Account** - Daily operations with root. Security risk. Use IAM users/roles.
+
+**2. Public S3 Buckets** - S3 buckets public. Data exposure. Use policies and bucket policies.
+
+**3. Single AZ Deployment** - All resources one AZ. Availability risk. Multi-AZ deployments.
+
+**4. No Backup Strategy** - No backups. Data loss risk. Enable versioning. Automated backups.
+
+### Best Practice
+
+#### VPC Architecture
+
+```yaml
+# terraform/vpc/main.tf
+resource "aws_vpc" "main" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
+  enable_dns_support  = true
+  tags = {
+    Name        = "production-vpc"
+    Environment = "production"
+  }
+}
+
+resource "aws_subnet" "public_1a" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "us-east-1a"
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "public-subnet-1a"
+    Tier = "public"
+  }
+}
+
+resource "aws_subnet" "private_1a" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.2.0/24"
+  availability_zone       = "us-east-1a"
+  map_public_ip_on_launch = false
+  tags = {
+    Name = "private-subnet-1a"
+    Tier = "application"
+  }
+}
+```
+
+#### Lambda Functions
+
+```typescript
+// aws/lambda/api-handler.ts
+import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
+
+export const handler = async (
+  event: APIGatewayProxyEvent,
+  context: Context
+): Promise<APIGatewayProxyResult> => {
+  try {
+    const method = event.httpMethod;
+    const path = event.path;
+
+    switch (`${method} ${path}`) {
+      case 'GET /users':
+        return await getUsers(event);
+      case 'GET /users/{id}':
+        return await getUser(event);
+      case 'POST /users':
+        return await createUser(event);
+      default:
+        return { statusCode: 404, body: JSON.stringify({ error: 'Not found' }) };
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Internal server error' })
+    };
+  }
+};
+```
+
+#### RDS Configuration
+
+```yaml
+# terraform/rds/main.tf
+resource "aws_db_instance" "production" {
+  identifier             = "production-db"
+  engine                 = "postgres"
+  engine_version         = "15.3"
+  instance_class         = "db.r6g.large"
+  allocated_storage      = 100
+  max_allocated_storage  = 500
+  storage_type           = "gp3"
+  storage_encrypted      = true
+  multi_az               = true
+  backup_retention_period = 7
+  performance_insights_enabled = true
+  monitoring_interval = 60
+}
+```
+
+#### S3 Configuration
+
+```typescript
+// aws/s3/bucket-configuration.ts
+import { S3 } from 'aws-sdk';
+
+const s3 = new S3();
+
+// Create S3 Bucket with configuration
+await s3.createBucket({
+  Bucket: 'app-production-static',
+  ObjectOwnership: 'BucketOwnerPreferred',
+  ACL: 'private'
+}).promise();
+
+// Enable versioning
+await s3.putBucketVersioning({
+  Bucket: 'app-production-static',
+  VersioningConfiguration: {
+    Status: 'Enabled',
+    MFADelete: 'Disabled'
+  }
+}).promise();
+
+// Lifecycle rules
+await s3.putBucketLifecycleConfiguration({
+  Bucket: 'app-production-static',
+  LifecycleConfiguration: {
+    Rules: [{
+      ID: 'archive-old-logs',
+      Status: 'Enabled',
+      Filter: { Prefix: 'logs/' },
+      Transitions: [
+        { Days: 30, StorageClass: 'STANDARD_IA' },
+        { Days: 90, StorageClass: 'GLACIER' }
+      ]
+    }]
+  }
+}).promise();
+```
+
+---
+
+## 2. Microsoft Azure
+
+### Mục tiêu
+
+Tài liệu này định nghĩa các nguyên tắc và best practices cho việc sử dụng Microsoft Azure trong Cursor Enterprise Framework. Mục tiêu là đảm bảo secure, scalable, và cost-effective deployments trên Azure platform.
+
+### Nguyên tắc cơ bản
+
+**1. Azure Architecture Center**
+
+Reference architectures.
+
+**2. Resource Organization**
+
+Resource groups và management.
+
+```bash
+# Resource naming convention
+# Format: <Environment>-<Service>-<Region>-<Instance>
+
+# Tags
+tags:
+  Environment: production
+  Service: api
+  Owner: platform-team
+  CostCenter: engineering
+  ManagedBy: terraform
+```
+
+**3. App Service Best Practices**
+
+Web application hosting.
+
+```yaml
+# App Service configuration
+app_service:
+  plan:
+    name: asp-production
+    tier: PremiumV3
+    size: P3V3
+    capacity: 3
+    autoscale:
+      enabled: true
+      rules:
+        - condition: CPUPercentage > 70
+          direction: Increase
+          step: 2
+          min: 3
+          max: 10
+
+  webapp:
+    name: api-prod-weu-001
+    runtime: nodejs18-lts
+    always_on: true
+    min_tls_version: "1.2"
+    vnet_integration: true
+    private_endpoint: true
+```
+
+**4. Azure Functions Best Practices**
+
+Serverless compute.
+
+```yaml
+# Azure Functions configuration
+functions:
+  app_service_plan:
+    name: func-consumption-plan
+    tier: Premium
+    max_burst: 200
+
+  function_app:
+    name: api-functions-prod
+    runtime: node
+    version: 18
+    function_scale:
+      dynamic: true
+      max_instances: 200
+    vnet_integration:
+      enabled: true
+      subnet: functions-subnet
+    durable_functions:
+      enabled: true
+      task_hub:
+        type: AzureStorage
+```
+
+**5. Cosmos DB Best Practices**
+
+NoSQL database.
+
+```yaml
+# Cosmos DB configuration
+cosmos_db:
+  account:
+    name: app-cosmos-prod
+    type: GlobalDocumentDB
+    consistency_level: Session
+    automatic_failover: true
+
+  containers:
+    - name: users
+      partition_key: /userId
+      throughput: 1000
+      indexes:
+        - paths: [/email]
+          unique: true
+    - name: orders
+      partition_key: /userId
+      throughput: 2000
+      ttl: 2592000  # 30 days
+
+  geo_replication:
+    enabled: true
+    regions:
+      - location: westeurope
+        is_write_region: true
+```
+
+**6. Azure SQL Best Practices**
+
+Managed database services.
+
+```yaml
+# Azure SQL configuration
+azure_sql:
+  server:
+    name: sql-app-prod
+    version: "12.0"
+    minimal_tls_version: "1.2"
+
+  database:
+    name: appdb
+    tier: GeneralPurpose
+    capacity: 4
+    storage:
+      size: 50GB
+      max_size: 100GB
+      auto_growth: true
+    read_scale: true
+
+  security:
+    enable_va: true
+    tde_encryption: true
+```
+
+---
+
+## 3. Google Cloud Platform (GCP)
+
+### Mục tiêu
+
+Google Cloud Platform (GCP) là cloud platform với strengths đặc biệt trong data analytics, machine learning, và container-native workloads. Trong Cursor Enterprise Framework, GCP được sử dụng như một option với advantages trong BigQuery, Kubernetes (GKE), và serverless computing.
+
+### Nguyên tắc
+
+**1. Project Organization**
+
+Use projects for isolation. Folder hierarchy. Resource labels. Quota management.
+
+**2. Identity and Access**
+
+Use Workload Identity. Service accounts carefully. Cloud IAM. Organization policies.
+
+**3. Network Architecture**
+
+Use VPC. Private Google Access. Cloud NAT. Shared VPCs. Firewall rules.
+
+**4. Cloud Run for Serverless**
+
+Prefer Cloud Run for containers. Fast scaling. Pay per use. No cluster management.
+
+**5. GKE for Containers**
+
+Use GKE for complex workloads. Autopilot for managed. Standard for control. Anthos for hybrid.
+
+**6. Data Services**
+
+BigQuery for analytics. Cloud SQL for transactional. Firestore for NoSQL. Spanner for global.
+
+**7. Serverless Options**
+
+Cloud Functions for simple tasks. Cloud Run for containers. App Engine for apps.
+
+**8. Machine Learning**
+
+Vertex AI for ML. AutoML for no-code. AI Platform for custom. Pre-trained APIs.
+
+**9. Operations Suite**
+
+Cloud Monitoring. Cloud Logging. Cloud Trace. Error Reporting. Debugger.
+
+**10. Cost Management**
+
+Committed use discounts. Sustained use discounts. Budget alerts. Labels for tracking.
+
+### Checklist
+
+- [ ] Project structure defined
+- [ ] VPC configured
+- [ ] IAM policies set
+- [ ] Cloud Run/GKE deployed
+- [ ] Database selected
+- [ ] Monitoring configured
+- [ ] Logging set up
+- [ ] Cost management enabled
+- [ ] Security controls implemented
+- [ ] Backup strategy planned
+
+### Anti Pattern
+
+**1. Default Project Usage** - Using default project. No isolation. Security risks. Use dedicated projects.
+
+**2. Overly Permissive IAM** - Editor or owner roles. Least privilege violated. Use specific roles.
+
+**3. No VPC** - Resources in default VPC. Network security weak. Create custom VPC.
+
+**4. Manual Deployments** - Manual infrastructure. Not repeatable. Use Infrastructure as Code.
+
+### Best Practice
+
+#### Project Structure
+
+```bash
+# Project naming: {env}-{product}-{number}
+# Example: prod-app-001, staging-app-001
+
+# Folder structure
+# organization/
+#   ├── departments/
+#   │   ├── engineering/
+#   │   │   └── projects/
+#   │   │       ├── prod-app-001/
+#   │   │       └── staging-app-001/
+```
+
+```yaml
+# terraform/project/main.tf
+resource "google_project" "app" {
+  project_id = "prod-app-001"
+  name       = "Production App"
+  org_id     = var.organization_id
+  
+  labels = {
+    environment = "production"
+    team        = "engineering"
+    cost-center = "app"
+  }
+}
+```
+
+#### Cloud Run Configuration
+
+```yaml
+# cloudrun/service.yaml
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: api-service
+  namespace: production
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
+        autoscaling.knative.dev/maxScale: "100"
+        run.googleapis.com/execution-environment: gen2
+    spec:
+      serviceAccountName: api-sa@project.iam.gserviceaccount.com
+      containerConcurrency: 80
+      timeoutSeconds: 300
+      containers:
+        - image: gcr.io/project-id/api-service:v1.0.0
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: "2"
+              memory: 1Gi
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 30
+```
+
+#### GKE Configuration
+
+```yaml
+# gke/cluster.yaml
+apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerCluster
+metadata:
+  name: production-cluster
+spec:
+  location: us-central1
+  networkPolicy:
+    enabled: true
+    provider: CALICO
+  releaseChannel:
+    channel: REGULAR
+  workloadIdentityConfig:
+    workloadPool: ${projectId}.svc.id.goog
+  nodePools:
+    - name: general
+      config:
+        machineType: n2-standard-4
+        nodeCount: 3
+      autoscaling:
+        minNodeCount: 3
+        maxNodeCount: 10
+```
+
+---
+
+## Multi-Cloud Strategy
+
+### Khi nào sử dụng Multi-Cloud
+
+- **Vendor diversification** - Giảm dependency vào single vendor
+- **Best-of-breed** - Chọn best service từ mỗi provider
+- **Geographic coverage** - Tận dụng regional strengths
+- **Compliance** - Data residency requirements khác nhau
+- **Cost optimization** - Compare pricing across providers
+
+### Nguyên tắc Multi-Cloud
+
+**1. Abstraction Layer**
+
+Use Terraform, Pulumi, hoặc Crossplane để manage multi-cloud infrastructure.
+
+**2. Portability Design**
+
+Design applications để portable giữa các clouds. Avoid vendor-specific services khi possible.
+
+**3. Unified Monitoring**
+
+Sử dụng unified monitoring như Datadog, New Relic thay vì vendor-specific tools.
+
+**4. Consistent Security**
+
+Implement consistent security policies across all clouds.
+
+### Service Mapping
+
+| Use Case | AWS | Azure | GCP |
+|----------|-----|-------|-----|
+| Compute | EC2, Lambda | VM, Functions | Compute Engine, Cloud Functions |
+| Containers | ECS, EKS | AKS | GKE, Cloud Run |
+| Database | RDS, DynamoDB | SQL DB, Cosmos DB | Cloud SQL, Firestore |
+| Storage | S3 | Blob | Cloud Storage |
+| CDN | CloudFront | Azure CDN | Cloud CDN |
+| AI/ML | SageMaker | Azure ML | Vertex AI |
+| Monitoring | CloudWatch | Azure Monitor | Cloud Monitoring |
+
+### Migration Considerations
+
+1. **Assessment** - Catalog existing services và dependencies
+2. **Prioritization** - Start với less complex, less critical workloads
+3. **Testing** - Thorough testing trước khi migrate production
+4. **Rollback** - Luôn có rollback plan
+5. **Training** - Ensure team có skills cho target cloud

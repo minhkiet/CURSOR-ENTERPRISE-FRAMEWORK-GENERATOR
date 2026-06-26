@@ -1,8 +1,8 @@
 ---
-description: Nguyên tắc và best practices cho tối ưu hóa hiệu suất trong Cursor Enterprise Framework
+description: Performance & Rate Limiting - hợp nhất từ performance.mdc và rate-limiting.mdc
 created: 2026-06-23
-version: 1.0.0
-tags: [performance, optimization, latency, throughput, scalability]
+version: 1.1.0
+tags: [performance, optimization, latency, throughput, scalability, rate-limiting, merged]
 ---
 
 # Performance
@@ -314,6 +314,161 @@ async function processBatchEmails(tasks: Task[]) {
 }
 ```
 
+## Rate Limiting
+
+Rate limiting control traffic flow to protect systems from overload và abuse.
+
+### Nguyên tắc cơ bản
+
+**1. Rate Limiting Strategies**
+
+Common approaches.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                  Rate Limiting Strategies                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Fixed Window                                                   │
+│  ┌─────┬─────┬─────┬─────┐                                      │
+│  │ 100 │ 100 │ 100 │ 100 │  requests per hour                 │
+│  └─────┴─────┴─────┴─────┘                                      │
+│                                                                  │
+│  Sliding Window                                                 │
+│  ┌─────────────────────────────────┐                            │
+│  │  Rolling count over time window  │                            │
+│  └─────────────────────────────────┘                            │
+│                                                                  │
+│  Token Bucket                                                   │
+│  ┌─────┐                                                       │
+│  │Token│ ───▶ Request ───▶ Refill                              │
+│  └─────┘                                                       │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**2. Implementation**
+
+Rate limiter examples.
+
+```typescript
+// Token bucket algorithm
+class TokenBucketRateLimiter {
+    private tokens: number;
+    private lastRefill: number;
+
+    constructor(
+        private capacity: number,
+        private refillRate: number, // tokens per second
+        private refillInterval: number = 1000
+    ) {
+        this.tokens = capacity;
+        this.lastRefill = Date.now();
+    }
+
+    async consume(tokens: number = 1): Promise<boolean> {
+        this.refill();
+
+        if (this.tokens >= tokens) {
+            this.tokens -= tokens;
+            return true;
+        }
+
+        return false;
+    }
+
+    private refill(): void {
+        const now = Date.now();
+        const elapsed = now - this.lastRefill;
+        const tokensToAdd = Math.floor((elapsed / this.refillInterval) * this.refillRate);
+
+        this.tokens = Math.min(this.capacity, this.tokens + tokensToAdd);
+        this.lastRefill = now;
+    }
+
+    getRemainingTokens(): number {
+        this.refill();
+        return this.tokens;
+    }
+}
+
+// Usage with middleware
+const limiter = new TokenBucketRateLimiter(
+    capacity: 100,      // 100 requests
+    refillRate: 10,    // 10 per second
+    refillInterval: 1000
+);
+
+app.use('/api', async (req, res, next) => {
+    const allowed = await limiter.consume();
+
+    if (!allowed) {
+        return res.status(429).json({
+            error: {
+                code: 'RATE_LIMIT_EXCEEDED',
+                message: 'Too many requests',
+                retryAfter: 1
+            }
+        });
+    }
+
+    res.setHeader('X-RateLimit-Remaining', limiter.getRemainingTokens());
+    next();
+});
+```
+
+**3. Distributed Rate Limiting**
+
+Scale across instances.
+
+```typescript
+// Redis-based distributed rate limiter
+import Redis from 'ioredis';
+
+class RedisRateLimiter {
+    constructor(private redis: Redis) {}
+
+    async consume(key: string, limit: number, window: number): Promise<boolean> {
+        const now = Date.now();
+        const windowKey = `ratelimit:${key}:${Math.floor(now / window)}`;
+
+        const multi = this.redis.multi();
+
+        // Increment counter
+        multi.incr(windowKey);
+
+        // Set expiry
+        multi.pexpire(windowKey, window);
+
+        // Execute atomically
+        const results = await multi.exec();
+
+        if (!results) return false;
+
+        const count = results[0][1] as number;
+
+        return count <= limit;
+    }
+}
+
+// Usage
+const limiter = new RedisRateLimiter(redis);
+
+app.use('/api', async (req, res, next) => {
+    const userId = req.user?.id || req.ip;
+    const allowed = await limiter.consume(`user:${userId}`, 100, 60000);
+
+    if (!allowed) {
+        res.setHeader('Retry-After', 60);
+        return res.status(429).json({
+            error: 'Rate limit exceeded'
+        });
+    }
+
+    next();
+});
+```
+
 ## Liên kết
 
 - [[database]] - Database optimization principles
@@ -321,5 +476,5 @@ async function processBatchEmails(tasks: Task[]) {
 - [[queue]] - Async processing và message queues
 - [[monitoring]] - Performance monitoring và metrics
 - [[api]] - API performance best practices
-- [[microservice]] - Performance trong microservices
+- [[enterprise-patterns]] - Performance trong microservices
 - [[cost-optimization]] - Performance vs cost trade-offs

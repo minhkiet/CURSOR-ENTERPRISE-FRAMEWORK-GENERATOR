@@ -1,0 +1,740 @@
+---
+description: Databases - hợp nhất từ Database Overview, PostgreSQL, MySQL, SQL Server
+created: 2026-06-26
+version: 2.0.0
+merged_from: [database.mdc, postgres.mdc, mysql.mdc, sql-server.mdc]
+tags: [database, postgres, mysql, sql-server, sql, rdbms, enterprise]
+---
+
+# Databases
+
+## Tổng quan So sánh
+
+| Feature | PostgreSQL | MySQL | SQL Server |
+|---------|-----------|-------|------------|
+| ACID Compliance | Full | Full | Full |
+| JSON Support | Excellent (JSONB) | Good (MySQL 8.0+) | Good |
+| Full-Text Search | Built-in (tsvector) | Full-text indexes | Built-in |
+| Replication | Streaming, Logical | Binlog, GTID | Log Shipping, AGs |
+| Scalability | Vertical + Extensions | Vertical | Vertical |
+| License | PostgreSQL License | GPL/Commercial | Commercial |
+| Primary Key | UUID, Serial, etc. | BIGINT AUTO_INCREMENT | INT IDENTITY |
+| JSON Storage | JSONB (binary, indexed) | JSON (text) | NVARCHAR/JSON |
+| Connection Pool | PgBouncer, pgpool | mysql2 pool | Built-in |
+| Best For | Complex queries, analytics | Web apps, LAMP stack | .NET, Enterprise |
+
+## 1. Database Overview
+
+### Mục tiêu
+
+Database rule tổng quát định nghĩa các nguyên tắc nền tảng áp dụng cho tất cả các loại database trong Cursor Enterprise Framework, bất kể đó là SQL hay NoSQL, relational hay document-based. Mục tiêu chính là đảm bảo data integrity, performance tối ưu, security vững chắc, và khả năng mở rộng cho toàn bộ hệ thống lưu trữ dữ liệu.
+
+### Nguyên tắc Cơ bản
+
+**1. Single Source of Truth**
+
+Mỗi piece of data phải có một nguồn duy nhất trong hệ thống database. Việc duplicate data phải được minimize và có clear ownership. Khi data được replicated cho performance purposes, eventual consistency model phải được documented. Cross-database references phải được handle cẩn thận với appropriate consistency guarantees.
+
+**2. Data Integrity as First-Class Concern**
+
+Data integrity không được compromise vì performance hoặc convenience. Constraints (primary key, foreign key, unique, check) được defined at database level không chỉ application level. Transactions được sử dụng cho operations cần atomicity. Audit trail được maintained cho sensitive data modifications.
+
+**3. Schema Design Principles**
+
+Schema được thiết kế với normalization appropriate cho use case. OLTP systems sử dụng normalized forms (3NF or higher). OLAP systems có thể benefit từ denormalization. Table names sử dụng singular nouns, column names mô tả content rõ ràng. Indexes được added strategically dựa trên query patterns.
+
+**4. Query Optimization Mindset**
+
+Every query phải be analyzed for performance implications. Query plans được reviewed cho complex queries. N+1 query patterns được avoided through JOINs or batch operations. Index usage được verified through EXPLAIN ANALYZE. Large result sets được paginated.
+
+**5. Security at Database Level**
+
+Database access được controlled at multiple layers. Principle of least privilege được applied cho all user accounts. Sensitive columns được encrypted at rest. SQL injection được prevented through parameterized queries. Connection strings không được hardcoded.
+
+**6. Backup và Recovery Readiness**
+
+Automated backups được scheduled và tested regularly. Backup strategy bao gồm full, incremental, và point-in-time recovery options. Recovery procedures được documented và tested. Backup encryption được implemented for sensitive data.
+
+**7. Connection Management**
+
+Connection pools được used với appropriate sizing. Connection timeout limits được configured. Long-running connections được monitored và cleaned up. Connection string configurations được externalized.
+
+**8. Migration Management**
+
+Database migrations được version controlled cùng với application code. Migrations được designed để be forward-only when possible. Large table migrations được planned carefully với minimal downtime strategy.
+
+**9. Monitoring và Alerting**
+
+Database metrics được collected continuously. Key metrics: query latency, connection pool usage, storage utilization, replication lag. Alert thresholds được configured cho abnormal patterns.
+
+**10. Capacity Planning**
+
+Storage capacity được monitored và forecasted. Growth patterns được analyzed để predict future needs. Archive strategies được implemented cho old data. Partitioning strategies được considered for large tables.
+
+### Checklist
+
+- [ ] Data model được reviewed cho normalization và appropriate design
+- [ ] All constraints được defined at database level
+- [ ] Index strategy được documented cho all tables
+- [ ] Backup procedures được tested
+- [ ] Security audit được conducted
+- [ ] Query performance được analyzed
+- [ ] Connection pooling được configured appropriately
+- [ ] Migration strategy được defined
+- [ ] Monitoring dashboards được setup
+- [ ] Alert thresholds được configured
+- [ ] Capacity planning được performed
+- [ ] Recovery procedures được documented
+
+### Anti Patterns
+
+**1. One-Size-Fits-All Database**
+
+Using same database type for all data despite different characteristics. Solution: Match database type to data characteristics.
+
+**2. Ignore Index Maintenance**
+
+Creating indexes without ongoing maintenance. Unused indexes consume storage và slow writes. Solution: Regular index review và maintenance.
+
+**3. Store Everything in Database**
+
+Treating database as filesystem for binary data. Large blobs degrade backup/restore times. Solution: Store references, keep data in object storage.
+
+**4. Manual Schema Changes**
+
+Making schema changes directly in production. No migration tracking. No rollback capability. Solution: Use version-controlled migrations.
+
+**5. No Connection Pooling**
+
+Creating new connection for each operation. Connection overhead significant. Solution: Use connection pooling appropriate for load.
+
+### Best Practices
+
+**1. Multi-Tier Caching Strategy**
+
+Implement caching at multiple levels: application, database, external cache. Cache invalidation strategies must be robust.
+
+**2. Read Replicas for Scalability**
+
+Use read replicas to offload read traffic. Replica lag được monitored. Read/write splitting được implemented carefully.
+
+**3. Connection String Secrets**
+
+Never commit connection strings. Use environment variables hoặc secrets management. Rotate credentials regularly.
+
+**4. Comprehensive Logging**
+
+Log slow queries automatically. Log schema changes. Log security events. Centralize logs for analysis.
+
+**5. Database Code Review**
+
+Require database code review. Check query plans. Review index implications. Verify constraint behavior.
+
+### Ví dụ Chung
+
+```sql
+-- Normalized design cho e-commerce (PostgreSQL syntax)
+CREATE TABLE users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email VARCHAR(255) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE orders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id),
+  status VARCHAR(50) NOT NULL DEFAULT 'pending',
+  total_amount DECIMAL(12,2) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX idx_orders_user_id ON orders(user_id);
+CREATE INDEX idx_orders_status ON orders(status);
+```
+
+```typescript
+// Connection pool configuration (generic)
+const pool = new Pool({
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+  maxUses: 10000,
+});
+```
+
+---
+
+## 2. PostgreSQL
+
+### Mục tiêu
+
+PostgreSQL là một object-relational database system nổi tiếng với tính năng phong phú, extensibility xuất sắc, và compliance với SQL standards. Trong Cursor Enterprise Framework, PostgreSQL là lựa chọn ưu tiên cho các ứng dụng enterprise đòi hỏi ACID compliance nghiêm ngặt, advanced data types, và khả năng mở rộng linh hoạt.
+
+PostgreSQL rule tập trung vào các features đặc trưng như JSONB data type, Full-Text Search, Window Functions, CTEs, Advanced Indexing (GIN, GiST, BRIN), PostGIS extension cho spatial data, và pgvector extension cho vector similarity search.
+
+### Nguyên tắc PostgreSQL
+
+**1. Schema Design Principles**
+
+Sử dụng appropriate data types cho columns. VARCHAR(n) cho variable length strings với known maximum. TEXT cho unlimited length text. BOOLEAN thay vì INTEGER flags. ARRAY cho collections of homogeneous items. JSONB cho semi-structured data. UUID thay vì serial integers cho distributed systems. ENUM được defined as types for reusable sets.
+
+**2. Index Strategy**
+
+- B-tree indexes cho equality và range queries
+- GIN indexes cho JSONB, arrays, và full-text search
+- GiST indexes cho geometric data và range types
+- BRIN indexes cho sequential data (time-series)
+- Partial indexes cho subsets of rows
+- Covering indexes với INCLUDED columns
+- Expression indexes cho computed columns
+
+**3. Query Optimization**
+
+EXPLAIN (ANALYZE, BUFFERS) cho detailed query analysis. Statistics được updated via ANALYZE. JOIN order impacts performance significantly. Subqueries in FROM được flatten automatically. Window functions replace many subqueries. CTEs improve readability.
+
+**4. JSON/JSONB Usage**
+
+JSONB for frequently accessed JSON data (binary, indexed). JSON for archival data rarely queried. GIN index on JSONB columns for search. JSONPath for querying (PostgreSQL 13+). Use operators: -> vs ->> vs #>. jsonb_each for unnesting.
+
+**5. Connection Management**
+
+Use connection pooler: PgBouncer or pgpool-II. Transaction pooling vs session pooling based on needs. max_connections configured based on memory. connection_idle_timeout for cleanup.
+
+**6. Performance Tuning**
+
+- shared_buffers: 25% of RAM for dedicated DB
+- effective_cache_size: 75% of RAM
+- work_mem: memory for sorting/hashing
+- maintenance_work_mem: for VACUUM, CREATE INDEX
+- random_page_cost: 1.1 for SSD, 4.0 for HDD
+
+**7. Concurrency Control**
+
+MVCC handles concurrent access automatically. VACUUM runs regularly to reclaim space. Autovacuum tuned for workload characteristics. Row-level locking for UPDATE/DELETE. Advisory locks for application-level locking.
+
+**8. Full-Text Search**
+
+tsvector column with trigger for automatic updates. GIN index on tsvector. tsquery for search expressions. Configurations: english, simple, or custom.
+
+**9. Backup và Recovery**
+
+pg_dump for logical backups. pg_basebackup for physical. Point-in-time recovery via WAL archiving. Continuous archiving to object storage. pgBackRest for advanced backup management.
+
+**10. Replication Setup**
+
+Streaming replication for read replicas. Logical replication for cross-database. Synchronous vs asynchronous replication. Replication slots prevent WAL accumulation.
+
+### PostgreSQL Checklist
+
+- [ ] Data types được selected appropriately
+- [ ] Index strategy được documented
+- [ ] Query analysis performed với EXPLAIN
+- [ ] Connection pooling configured
+- [ ] Autovacuum tuned
+- [ ] Full-text search indexed
+- [ ] Backup strategy implemented
+- [ ] Replication configured if needed
+- [ ] Monitoring setup
+- [ ] Security configured
+
+### PostgreSQL Anti Patterns
+
+**1. Serial Primary Keys in Distributed Systems**
+
+Serial integers don't scale across regions. Solution: Use UUID v7 hoặc other time-ordered identifiers.
+
+**2. Storing JSON in TEXT Column**
+
+Treating JSON as blob without querying it. Solution: Use JSONB with GIN index.
+
+**3. Ignoring VACUUM**
+
+Bloat accumulates, performance degrades. Solution: Proper autovacuum configuration và monitoring.
+
+**4. Over-indexing**
+
+Many indexes on write-heavy tables. Solution: Regular index review và removal of unused.
+
+### PostgreSQL Best Practices
+
+**1. Generated Columns**
+
+```sql
+CREATE TABLE t (a int, b int, sum int GENERATED ALWAYS AS (a + b) STORED);
+```
+
+**2. Partition Large Tables**
+
+```sql
+CREATE TABLE sales (...) PARTITION BY RANGE (created_at);
+```
+
+**3. Materialized Views**
+
+```sql
+CREATE MATERIALIZED VIEW monthly_sales AS SELECT ...;
+-- Refresh on schedule or on demand
+REFRESH MATERIALIZED VIEW CONCURRENTLY monthly_sales;
+```
+
+**4. Row-Level Security**
+
+```sql
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_orders ON orders
+  FOR ALL
+  TO authenticated
+  USING (tenant_id = current_setting('app.tenant_id')::int);
+```
+
+**5. Advisory Locks**
+
+```sql
+SELECT pg_advisory_lock(123456789);
+-- Release after use
+SELECT pg_advisory_unlock(123456789);
+```
+
+### PostgreSQL Ví dụ
+
+```sql
+-- Advanced Schema with JSONB
+CREATE TYPE order_status AS ENUM ('pending', 'processing', 'shipped', 'delivered', 'cancelled');
+
+CREATE TABLE orders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID NOT NULL REFERENCES customers(id),
+  order_number VARCHAR(50) NOT NULL UNIQUE,
+  status order_status NOT NULL DEFAULT 'pending',
+  items JSONB NOT NULL DEFAULT '[]',
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX idx_orders_customer ON orders(customer_id);
+CREATE INDEX idx_orders_status ON orders(status);
+CREATE INDEX idx_orders_created ON orders(created_at DESC);
+CREATE INDEX idx_orders_items ON orders USING GIN (items);
+```
+
+```sql
+-- Full-Text Search
+ALTER TABLE articles ADD COLUMN search_vector tsvector;
+CREATE INDEX idx_articles_search ON articles USING GIN(search_vector);
+
+CREATE OR REPLACE FUNCTION articles_search_trigger()
+RETURNS trigger AS $$
+BEGIN
+  NEW.search_vector := 
+    setweight(to_tsvector('english', coalesce(NEW.title, '')), 'A') ||
+    setweight(to_tsvector('english', coalesce(NEW.content, '')), 'B');
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER articles_search_update
+  BEFORE INSERT OR UPDATE ON articles
+  FOR EACH ROW EXECUTE FUNCTION articles_search_trigger();
+```
+
+---
+
+## 3. MySQL
+
+### Mục tiêu
+
+MySQL là một trong những relational database được sử dụng rộng rãi nhất trên thế giới. Trong Cursor Enterprise Framework, nó đóng vai trò là lựa chọn chính cho các ứng dụng cần reliability, performance tốt, và ecosystem phong phú. Các nguyên tắc áp dụng cho cả MySQL Community Edition lẫn MySQL Enterprise, với các optimizations cụ thể cho MySQL 8.0+.
+
+### Nguyên tắc MySQL
+
+**1. InnoDB as Default Storage Engine**
+
+InnoDB phải là storage engine mặc định cho tất cả tables trong production. InnoDB cung cấp ACID compliance, row-level locking, và superior performance. MyISAM chỉ được sử dụng cho specialized read-heavy tables với specific requirements.
+
+**2. Primary Key Design**
+
+Mỗi table phải có một primary key được defined rõ ràng. UUID primary keys có hậu quả về performance và storage. Sử dụng BIGINT AUTO_INCREMENT cho most tables với high insert volume. Composite primary keys được limit to 2-3 columns.
+
+**3. VARCHAR vs CHAR**
+
+Sử dụng VARCHAR cho variable-length data với reasonable maximum length. VARCHAR(255) phù hợp cho most string data như emails, usernames. CHAR(n) chỉ for truly fixed-length data như country codes.
+
+**4. Index Strategy for MySQL**
+
+Primary key columns đã được indexed automatically. Too many indexes slow down writes và increase storage. Composite indexes có ordering implications - put most selective column first. Covering indexes có thể eliminate table lookups.
+
+**5. Query Patterns và Optimization**
+
+EXPLAIN ANALYZE được used để analyze query execution plans. OR conditions được restructured to UNION or IN for better index usage. JOINs được limited in complexity. Batch operations được used for bulk inserts/updates.
+
+**6. Transaction Management**
+
+Transactions được kept short to reduce lock contention. Long transactions prevent purge of undo logs. Deadlocks được handled gracefully với retry logic. Isolation levels được set appropriately.
+
+**7. Connection Management**
+
+Max_connections được set based on available memory và expected load. Connection pooling được implemented at application layer. Connection timeout values được configured appropriately.
+
+**8. Configuration Tuning**
+
+InnoDB buffer pool size được set to 70-80% of available memory. innodb_log_file_size được sized for reasonable crash recovery time. innodb_flush_log_at_trx_commit được configured based on durability requirements.
+
+**9. Backup và Point-in-Time Recovery**
+
+mysqldump cho logical backups của small-medium databases. Percona XtraBackup cho large databases với minimal downtime. Point-in-time recovery enabled through binary logs.
+
+**10. Replication Configuration**
+
+Binlog format ROW hoặc MIXED for data integrity. GTID-based replication được preferred over position-based. Semi-synchronous replication cho critical data.
+
+### MySQL Checklist
+
+- [ ] InnoDB engine được set as default
+- [ ] Primary keys được designed appropriately
+- [ ] Index strategy được documented
+- [ ] Slow query log được enabled
+- [ ] Buffer pool sizing được configured
+- [ ] Connection limits được set
+- [ ] Binary logging được configured
+- [ ] Backup strategy được implemented
+- [ ] Replication được set up nếu cần
+- [ ] Monitoring dashboards được created
+- [ ] Security hardening được applied
+
+### MySQL Anti Patterns
+
+**1. VARCHAR(255) Everywhere**
+
+Not every string is 255 characters. Country codes should be CHAR(2). Status fields should be ENUM or shorter VARCHAR.
+
+**2. SELECT ***
+
+Avoid SELECT * in application code. It fetches unnecessary data. Column order changes break code. It prevents covering index usage.
+
+**3. No Primary Key**
+
+Tables without primary keys cause issues with replication và data integrity. Duplicates can occur unnoticed.
+
+**4. Ignoring NULL**
+
+Treating NULL same as empty string or zero. NULL has special meaning in SQL.
+
+**5. Timestamp Mismanagement**
+
+Using DATETIME without timezone awareness. TIMESTAMP limited to 1970-2038. Solution: Use TIMESTAMP WITH TIME ZONE or store UTC values explicitly.
+
+### MySQL Best Practices
+
+**1. Generated Columns**
+
+```sql
+CREATE TABLE users (..., age INT GENERATED ALWAYS AS (DATEDIFF...) STORED);
+```
+
+**2. Optimize for Bulk Operations**
+
+```sql
+LOAD DATA INFILE for bulk imports.
+Batch INSERT with multiple VALUES.
+Disable indexes before bulk load, re-enable after.
+```
+
+**3. Partitioning for Large Tables**
+
+Partition by date/range for time-series data. Partition pruning eliminates irrelevant partitions.
+
+**4. JSON Data Type Usage**
+
+MySQL 8.0 JSON functions are powerful. Use JSON_TABLE for extracting data. Add virtual columns indexed for JSON paths.
+
+**5. Window Functions**
+
+MySQL 8.0+ supports window functions. Use ROW_NUMBER() for deduplication. Running totals with SUM() OVER().
+
+### MySQL Ví dụ
+
+```sql
+CREATE TABLE orders (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  customer_id BIGINT UNSIGNED NOT NULL,
+  order_number VARCHAR(50) NOT NULL,
+  status ENUM('pending', 'processing', 'shipped', 'delivered', 'cancelled') NOT NULL DEFAULT 'pending',
+  total_amount DECIMAL(12,2) NOT NULL,
+  currency_code CHAR(3) NOT NULL DEFAULT 'USD',
+  shipping_address JSON,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_order_number (order_number),
+  KEY idx_customer_id (customer_id),
+  KEY idx_status_created (status, created_at),
+  CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES customers(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+```typescript
+import mysql from 'mysql2/promise';
+
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT || '3306'),
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+  enableKeepAlive: true,
+});
+```
+
+---
+
+## 4. SQL Server
+
+### Mục tiêu
+
+SQL Server là hệ quản trị cơ sở dữ liệu quan hệ của Microsoft, được sử dụng rộng rãi trong các doanh nghiệp, đặc biệt trong môi trường Windows và các ứng dụng .NET. Trong Cursor Enterprise Framework, SQL Server đóng vai trò là lựa chọn cho các tổ chức đã đầu tư vào hệ sinh thái Microsoft hoặc cần các tính năng enterprise như Advanced Analytics và Always On Availability Groups.
+
+### Nguyên tắc SQL Server
+
+**1. Object Naming Conventions**
+
+- Table names: PascalCase, singular nouns (Customer, Order, Product)
+- Column names: PascalCase, descriptive
+- Stored procedures: usp_<Entity>_<Action> pattern
+- Functions: fn_<Purpose> pattern
+- Views: vw_<Description> pattern
+- Indexes: IX_<Table>_<Columns> pattern
+- Always use two-part names: schema.object (dbo.Customer)
+
+**2. Data Type Selection**
+
+Use appropriate data types: INT for integers, BIGINT for large values. VARCHAR(MAX) for large text, not TEXT. NVARCHAR(MAX) for Unicode large text. DECIMAL(p,s) for precise decimals. DATETIME2 for new development. ROWVERSION for concurrency control. UNIQUEIDENTIFIER for GUIDs with NEWSEQUENTIALID() default.
+
+**3. Schema Design**
+
+Always use schemas for logical grouping (dbo, sales, inventory). Default to Third Normal Form, denormalize based on performance. Primary keys: INT IDENTITY for small tables, BIGINT for large. Foreign keys enforce referential integrity.
+
+**4. Indexing Strategy**
+
+Clustered index on primary key (usually). Non-clustered indexes for query optimization. Covering indexes with INCLUDE for specific queries. Filtered indexes for subsets of data. Columnstore indexes for analytical workloads.
+
+**5. T-SQL Best Practices**
+
+Use SET NOCOUNT ON in stored procedures. Always qualify column names in joins. Use ANSI JOIN syntax (INNER/LEFT/RIGHT JOIN). Avoid SELECT *, specify columns. Use TRY...CATCH for error handling. Use OFFSET/FETCH for pagination.
+
+**6. Stored Procedures Guidelines**
+
+One purpose per stored procedure. Use input/output parameters properly. Implement error handling and logging. Keep procedural logic minimal, use set-based operations.
+
+**7. Performance Tuning**
+
+Use execution plans (Actual vs Estimated). Update statistics regularly. Rebuild/reorganize indexes based on fragmentation. Monitor wait statistics. Use query store for troubleshooting.
+
+**8. Security Implementation**
+
+Use contained databases for portability. Windows authentication when possible. Principle of least privilege. Schemas as security boundaries. Encrypt sensitive columns (Always Encrypted). Dynamic data masking for PII.
+
+**9. Backup Strategy**
+
+Full backup daily minimum. Differential backups every few hours. Transaction log backups every 15 minutes. Test restore procedures regularly. Store backups on separate storage. Consider backup compression.
+
+**10. High Availability**
+
+Always On Availability Groups for enterprise HA. Failover clustering for instance-level HA. Log shipping for disaster recovery. Read-scaleout with readable secondaries.
+
+### SQL Server Checklist
+
+- [ ] Naming conventions documented và enforced
+- [ ] Data types selected appropriately
+- [ ] Schema design reviewed
+- [ ] Index strategy documented
+- [ ] T-SQL code reviewed
+- [ ] Stored procedures documented
+- [ ] Performance tuning applied
+- [ ] Security hardening complete
+- [ ] Backup tested
+- [ ] HA/DR configured
+- [ ] Monitoring setup
+
+### SQL Server Anti Patterns
+
+**1. SELECT * in Production**
+
+Fetches unnecessary data over network. Breaks when columns change. Prevents index optimization.
+
+**2. Scalar Functions in WHERE Clauses**
+
+Functions prevent index usage. Called once per row. Solution: Use APPLY, CROSS JOIN, or rewrite.
+
+**3. Implicit Conversions**
+
+Data type mismatches cause table scans. Always happens with string/number comparisons.
+
+**4. Cursor-Based Processing**
+
+Row-by-row processing very slow. Use set-based operations instead.
+
+**5. No Error Handling**
+
+Errors propagate unexpectedly. Transactions left open.
+
+### SQL Server Best Practices
+
+**1. Table Variables vs Temp Tables**
+
+Table variables: smaller data, no statistics. Temp tables: larger data, statistics available.
+
+**2. OPTIMIZE FOR UNKNOWN**
+
+Parameter sniffing can cause bad plans. Use OPTIMIZE FOR UNKNOWN or RECOMPILE.
+
+**3. Memory-Optimized Tables**
+
+In-Memory OLTP for high-throughput tables. Natively compiled procedures.
+
+**4. Temporal Tables**
+
+System-versioned tables track history. Point-in-time queries. Audit trail automatically.
+
+**5. Columnstore Indexes**
+
+Massively parallel processing. Batch mode execution. Compression reduces storage.
+
+**6. Query Store**
+
+Captures query performance over time. Plan regression detection. Force good plans.
+
+### SQL Server Ví dụ
+
+```sql
+CREATE SCHEMA Sales;
+GO
+
+CREATE TABLE Sales.Customers (
+    CustomerID INT IDENTITY(1,1) PRIMARY KEY,
+    CustomerNumber VARCHAR(20) NOT NULL UNIQUE,
+    FirstName NVARCHAR(100) NOT NULL,
+    LastName NVARCHAR(100) NOT NULL,
+    Email NVARCHAR(255) NOT NULL,
+    Phone NVARCHAR(20),
+    IsActive BIT NOT NULL DEFAULT 1,
+    CreatedDate DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+    ModifiedDate DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME()
+);
+
+CREATE NONCLUSTERED INDEX IX_Orders_CustomerID 
+    ON Sales.Orders(CustomerID);
+CREATE NONCLUSTERED INDEX IX_Orders_OrderDate 
+    ON Sales.Orders(OrderDate DESC) INCLUDE (TotalAmount);
+```
+
+```sql
+-- Stored Procedure with Error Handling
+CREATE OR ALTER PROCEDURE Sales.usp_Order_Create
+    @CustomerID INT,
+    @OrderDate DATE,
+    @OrderID BIGINT OUTPUT,
+    @ErrorMessage NVARCHAR(MAX) OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+    
+    BEGIN TRY
+        BEGIN TRANSACTION;
+        
+        IF NOT EXISTS (SELECT 1 FROM Sales.Customers WHERE CustomerID = @CustomerID)
+        BEGIN
+            THROW 50001, 'Customer not found', 16;
+        END
+        
+        INSERT INTO Sales.Orders (CustomerID, OrderDate, StatusID, TotalAmount)
+        VALUES (@CustomerID, @OrderDate, 1, 0);
+        
+        SET @OrderID = SCOPE_IDENTITY();
+        COMMIT TRANSACTION;
+        RETURN 0;
+        
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+        SET @ErrorMessage = ERROR_MESSAGE();
+        RETURN ERROR_NUMBER();
+    END CATCH
+END;
+```
+
+```sql
+-- Pagination with CTE
+;WITH OrderCTE AS (
+    SELECT 
+        OrderID,
+        OrderNumber,
+        CustomerID,
+        TotalAmount,
+        COUNT(*) OVER() AS TotalCount,
+        ROW_NUMBER() OVER (ORDER BY OrderDate DESC, OrderID DESC) AS RowNum
+    FROM Sales.Orders
+    WHERE (@CustomerID IS NULL OR CustomerID = @CustomerID)
+)
+SELECT * FROM OrderCTE
+WHERE RowNum BETWEEN ((@PageNumber - 1) * @PageSize + 1) AND (@PageNumber * @PageSize);
+```
+
+---
+
+## Database Selection Guide
+
+### When to Use PostgreSQL
+
+- Complex queries và advanced analytics
+- JSONB data với frequent querying
+- Full-text search requirements
+- Geospatial data (PostGIS)
+- Vector similarity search (pgvector)
+- Multi-tenant applications với Row-Level Security
+- Enterprise applications requiring strict ACID
+- Distributed systems requiring UUID primary keys
+
+### When to Use MySQL
+
+- Web applications, especially LAMP/LEMP stack
+- High write throughput requirements
+- Simple CRUD operations
+- Applications already in PHP/LAMP ecosystem
+- Medium-scale applications
+- When ecosystem and community support is priority
+
+### When to Use SQL Server
+
+- .NET applications và Windows environment
+- Deep integration với Microsoft ecosystem
+- Enterprise features required (SSRS, SSAS, SSIS)
+- Always On Availability Groups requirement
+- Temporal tables for audit trails
+- In-Memory OLTP for high-throughput
+- organizations already invested in Microsoft stack
+
+### Hybrid/Multi-Database Strategy
+
+Consider using multiple databases for different purposes:
+- PostgreSQL: Primary application database, complex queries
+- Redis: Caching, sessions, real-time features
+- MySQL: Legacy data, read-heavy analytics
+- SQL Server: Specific enterprise integrations
+
+## Liên kết
+
+- [[redis]] - Redis: Caching và session management
+- [[supabase]] - Supabase: PostgreSQL-based backend-as-a-service
+- [[rls]] - Row Level Security: Multi-tenant security
+- [[performance]] - Performance: General performance guidelines
+- [[security]] - Security: Database security practices
+- [[backup]] - Backup: Backup strategies
+- [[pgvector]] - pgvector: Vector similarity search (PostgreSQL)
