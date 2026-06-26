@@ -13,14 +13,36 @@ Hệ thống skill cho Cursor Enterprise Framework bao gồm **6 skills chính**
 - **Pre-Review Gate** — chạy TRƯỚC khi viết code (lập kế hoạch, lock scope, declare design direction)
 - **Post-Review Gate** — chạy SAU KHI viết code, TRƯỚC KHI deliver (kiểm tra chất lượng)
 
+**Multi-Language Support:**
+Hệ thống hỗ trợ **bất kỳ ngôn ngữ nào** (tiếng Việt, Trung Quốc, Nhật Bản, Hàn Quốc, v.v.) thông qua [[multi-language-vibe-code]] protocol. Mọi request sẽ được:
+1. Detect ngôn ngữ đầu vào
+2. Translate sang tiếng Anh
+3. Analyze intent và auto-discover skills
+4. Execute vibe code với đầy đủ gates
+
 ```
-REQUEST → Skill Detection → Pre-Review Gate
-                                    ↓ (PASS)
-                             Implementation
-                                    ↓
-                             Post-Review Gate
-                                    ↓ (PASS)
-                                 Delivery
+┌─────────────────────────────────────────────────────────────────────┐
+│  MULTI-LANGUAGE VIBE CODE FLOW                                      │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  1. REQUEST (Any Language: vi, zh, ja, ko, ...)                    │
+│     └── Language Detection → Translation → Intent Analysis            │
+│                                                                     │
+│  2. SKILL MATCHING                                                  │
+│     ├── Match against Skill Keyword Matrix (multi-language)         │
+│     ├── Calculate confidence scores                                  │
+│     └── Determine skill combination                                 │
+│                                                                     │
+│  3. SKILL ACTIVATION                                                │
+│     ├── Primary skill selected                                       │
+│     ├── Secondary skills identified                                  │
+│     ├── Review gates determined                                     │
+│     └── Load SKILL.md files                                         │
+│                                                                     │
+│  4. EXECUTION                                                       │
+│     └── Pre-Review → Implementation → Post-Review → Delivery       │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
 **Không có ngoại lệ.** Mọi task phải pass cả hai gates. Bypass dưới mọi hình thức đều bị cấm.
@@ -163,6 +185,34 @@ Skill Detection Engine là bộ phân tích tự động phân loại yêu cầu
 | `trading` + `cognitive` | karpathy-coding | 0.90 | Reduce mental load |
 | `don’t assume` | karpathy-coding | 0.90 | Ask before assuming |
 | `clarify first` | karpathy-coding | 0.90 | Ask before coding |
+| **DOCUMENT OCR - Text Extraction** ||||
+| `ocr` | document-ocr | 0.95 | OCR text extraction |
+| `text extraction` | document-ocr | 0.95 | Extract text from images |
+| `image to text` | document-ocr | 0.90 | Image text conversion |
+| `read text from image` | document-ocr | 0.95 | Image text reading |
+| `screenshot text` | document-ocr | 0.90 | Extract from screenshot |
+| `scanned document` | document-ocr | 0.85 | Scanned PDF/image OCR |
+| `vietnamese ocr` | document-ocr | 0.95 | Vietnamese document OCR |
+| **BAZI - Fortune Telling** ||||
+| `算八字` | bazi | 0.95 | Chinese Bazi fortune telling |
+| `看八字` | bazi | 0.95 | Bazi analysis |
+| `批八字` | bazi | 0.95 | Bazi reading |
+| `排八字` | bazi | 0.95 | Bazi chart calculation |
+| `四柱` | bazi | 0.95 | Four pillars of destiny |
+| `命盘` | bazi | 0.95 | Destiny chart |
+| `算命` | bazi | 0.95 | Fortune telling |
+| `命理` | bazi | 0.90 | Destiny analysis |
+| `运势` | bazi | 0.85 | Fortune/luck prediction |
+| `大运` | bazi | 0.85 | Decade luck cycles |
+| `流年` | bazi | 0.85 | Yearly fortune |
+| `bazi` | bazi | 0.95 | Bazi (Chinese astrology) |
+| `birth chart` | bazi | 0.85 | Birth chart analysis |
+| `fortune telling` | bazi | 0.85 | Fortune telling |
+| **SKILL INSTALLER - Auto Dependencies** ||||
+| `install deps` | skill-installer | 0.95 | Install skill dependencies |
+| `check deps` | skill-installer | 0.95 | Check dependencies |
+| `setup skill` | skill-installer | 0.90 | Setup skill environment |
+| `install dependencies` | skill-installer | 0.95 | Install dependencies |
 
 ### A.3 Confidence Scoring Algorithm
 
@@ -552,6 +602,22 @@ NEXT ACTION: Load SKILL.md files and begin PRE-REVIEW
 **Kích hoạt khi:** Thiết kế UI với design system có sẵn, tạo prototype, landing page, mobile app, dashboard, deck, hyperframes. Khi user nhắc đến "open-design", "design system", "brand-grade design", "prototype generation"
 **Mục đích:** Tích hợp [nexu-io/open-design](https://github.com/nexu-io/open-design) (71k stars, Apache-2.0) - open-source Claude Design alternative với 100+ skills, 150 design systems, 261 plugins. Cung cấp artifact generation: web prototype, mobile app, dashboard, deck (PPTX), hyperframes (MP4). Hỗ trợ MCP server cho Cursor.
 
+### 11. document-ocr
+**Path:** `.cursor/skills/document-ocr/SKILL.md`
+**Kích hoạt khi:** OCR text extraction, đọc text từ ảnh, screenshots, scanned documents, Vietnamese OCR, image to text conversion, document scanning. Khi user nhắc đến "ocr", "text extraction", "image to text", "read text from image", "screenshot text", "scanned document", "document scanner"
+**Mục đích:** Tích hợp Tesseract OCR vào workflow vibe coding để tự động đọc text từ ảnh, file scanned, và documents. Hỗ trợ nhiều ngôn ngữ (Vietnamese, English, Chinese, etc.). Cải thiện khả năng đọc hiểu khi phân tích screenshots, diagrams, và mockups. Based on [OSS-DocumentScanner](https://github.com/ossappscollective/OSS-DocumentScanner) methodology.
+**Auto-Dependencies:** pytesseract, Pillow, opencv-python, Tesseract OCR system
+
+### 12. skill-installer
+**Path:** `.cursor/skills/skill-installer/SKILL.md`
+**Kích hoạt khi:** Khi bất kỳ skill nào được kích hoạt mà chưa có dependencies. Tự động check và install dependencies trước khi chạy skill.
+**Mục đích:** Auto-Dependency Installation cho tất cả skills. Đảm bảo môi trường sẵn sàng trước khi chạy skill tasks.
+
+### 13. bazi
+**Path:** `.cursor/skills/bazi/SKILL.md`
+**Kích hoạt khi:** 四柱八字命理分析，算八字，看八字，批八字，排八字，命盘，算命，运势分析，大运流年。当用户提到"算八字"、"看八字"、"批八字"、"排八字"、"四柱"、"命盘"、"算命"、"命理"、"运势"、"大运"、"流年"、"bazi"、"birth chart"、"fortune telling"时。
+**Mục đích:** Tích hợp [bazi-skill](https://github.com/jinchenma94/bazi-skill) (2k stars, MIT License) - 四柱八字命理分析工具。通过交互式对话收集出生信息，排出四柱八字，参照九本经典命理典籍（穷通宝典、三命通会、滴天髓、渊海子平、子平真诠等）进行专业分析。
+
 ---
 
 ## Skill Combination Rules
@@ -573,6 +639,7 @@ NEXT ACTION: Load SKILL.md files and begin PRE-REVIEW
 | Security vulnerability review | security-review | (standalone or combined with relevant domain skill) | security-review-pre + security-review-post + [domain skill gates] |
 | API security review | security-review | (standalone) | security-review-pre + security-review-post + API-specific checks |
 | APK/binary/JS reverse-engineering | security-review | reverse-skill routing | security-review-pre + RE skill gate + security-review-post |
+| Bazi fortune analysis | bazi | (standalone) | bazi-pre + bazi-post |
 | Any coding task (vibe code) | karpathy-coding | (overlay - always runs with primary skill) | karpathy-pre + [primary skill gates] + karpathy-post |
 
 ---
@@ -1516,7 +1583,8 @@ SKILL KEYWORD MATRIX:
 │ security, vulnerability   │ security-review           │ 0.95 │
 │ MoMo, SePay, PayOS, etc. │ vietnam-payment-review   │ 0.95 │
 │ less code, yagni, vibe   │ ponytail                  │ 0.95 │
-│ simple, minimal, don't assume │ karpathy-coding          │ 0.95 │
+│ simple, minimal, don't assume │ karpathy-coding       │ 0.95 │
+│ bazi, 四柱, 算命, 命盘   │ bazi                     │ 0.95 │
 
 CONFIDENCE THRESHOLDS:
 ══════════════════════════════════════════════════════════════
@@ -1572,6 +1640,17 @@ SECURITY TASK?
         → PRE: karpathy §K.1-K.4 + §S.1-S.3 + LLM threat model
         → POST: §Security-5 + OWASP LLM Top 10 + ASI Top 10 + karpathy §K.5-K.7
 
+BAZI TASK?
+  ├── Bazi Fortune Analysis
+  │     → bazi (standalone)
+  │     → PRE: collect birth info (name, birthdays, time, gender, location)
+  │     → POST: present chart, analyze with classical texts
+  │
+  └── Bazi + Historical Calibration
+        → bazi (with event verification)
+        → PRE: collect birth info
+        → POST: present chart + predict 3-5 past events for verification
+
 ANY CODING TASK?
   → karpathy-coding runs as OVERLAY with every primary skill
   → PRE: §K.1-K.4 (always)
@@ -1599,6 +1678,8 @@ breakpoint, resume on "continue". No recap, no repetition.
 ## Liên kết
 
 - [[context-router]] — Context routing rules
+- [[memory-first]] — Memory context management
+- [[multi-language-vibe-code]] — Multi-language request processing & vibe code protocol
 - [[frontend-architecture]] — Frontend architecture patterns
 - [[coding-standards]] — Coding standards
 - [[frontend-taste]] — `.cursor/skills/frontend-taste/SKILL.md`
@@ -1609,4 +1690,5 @@ breakpoint, resume on "continue". No recap, no repetition.
 - [[security-review]] — `.cursor/skills/security-review/SKILL.md`
 - [[visual-explainer]] — `.cursor/skills/visual-explainer/SKILL.md` (từ [visual-explainer](https://github.com/nicobailon/visual-explainer))
 - [[karpathy-coding]] — `.cursor/skills/karpathy-coding/SKILL.md` (từ [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) 182k stars)
+- [[bazi]] — `.cursor/skills/bazi/SKILL.md` (từ [bazi-skill](https://github.com/jinchenma94/bazi-skill) 2k stars - Chinese Bazi fortune telling)
 - [reverse-skill](https://github.com/zhaoxuya520/reverse-skill) — Cybersecurity Skills Router (APK RE, Binary Analysis, JS Reverse, Pentest, EDR Bypass, Firmware, LLM Security)
