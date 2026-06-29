@@ -1,13 +1,28 @@
 # Cursor Enterprise Framework - Root Rules
 
+> Based on [agent-skills](https://github.com/addyosmani/agent-skills) (67k stars)
+
 ## Framework Overview
 This project uses Cursor Enterprise Framework - a comprehensive development framework with:
 - 39 specialized rules
 - 17 skills with dual-gate system
 - 36 knowledge bases
+- 4 agent personas
+- 4 reference checklists
 - Automated task analysis
 
 ## Quick Reference
+
+### Development Lifecycle (agent-skills)
+
+```
+DEFINE          PLAN           BUILD          VERIFY         SHIP
+┌──────┐      ┌──────┐      ┌──────┐      ┌──────┐      ┌──────┐
+│ Idea │ ───▶ │ Spec │ ───▶ │ Code │ ───▶ │ Test │ ───▶ │  Go  │
+│Refine│      │  PRD │      │ Impl │      │Debug │      │ Live │
+└──────┘      └──────┘      └──────┘      └──────┘      └──────┘
+  /spec          /plan          /build        /test         /ship
+```
 
 ### Essential Skills (Auto-loaded)
 - **karpathy-coding**: Vibe coding - "just do it", think first
@@ -19,6 +34,7 @@ This project uses Cursor Enterprise Framework - a comprehensive development fram
 - Read `.cursor/rules/skill-registry.mdc` - skill definitions
 - Read `.cursor/rules/skill-integration.mdc` - how skills work
 - Read `.cursor/rules/task-analyzer.mdc` - task analysis
+- Read `.cursor/AGENTS.md` - agent personas
 
 ### Architecture
 - `.cursor/rules/architecture-patterns.mdc` - Design patterns
@@ -30,6 +46,17 @@ All tasks should pass:
 1. Pre-review gates (before implementation)
 2. Post-review gates (after implementation)
 
+## Agent Personas
+
+Specialized reviewers for targeted tasks:
+
+| Persona | Trigger | Expertise |
+|---------|---------|-----------|
+| Code Reviewer | /review | Five-axis code review |
+| Test Engineer | /test | Test strategy, coverage |
+| Security Auditor | /security | OWASP, vulnerabilities |
+| Web Performance Auditor | /webperf | Core Web Vitals |
+
 ## Skills Navigation
 See `.cursor/INDEX.md` for complete skill list and descriptions.
 
@@ -38,3 +65,4 @@ See `.cursor/INDEX.md` for complete skill list and descriptions.
 - Use appropriate skills for the task
 - Run frontend-review for UI changes
 - Use karpathy-coding + ponytail for efficient coding
+- Reference `.cursor/references/` for checklists

@@ -1,8 +1,9 @@
 ---
-description: Single Source of Truth cho tất cả skill definitions, triggers, confidence thresholds, và gate mappings. Được sử dụng bởi skill-integration, task-analyzer, và multi-language-vibe-code. Bao gồm Ponytail Lazy Senior Dev principles.
+description: Single Source of Truth cho tất cả skill definitions, triggers, confidence thresholds, và gate mappings. Được sử dụng bởi skill-integration, task-analyzer, và multi-language-vibe-code. Bao gồm Ponytail Lazy Senior Dev principles. Integrated với agent-skills (addyosmani/agent-skills).
 created: 2026-06-26
-version: 1.1.0
-tags: [skill-registry, skills, auto-discovery, skills, mandatory, overlay, ponytail, lazy-senior, code-quality]
+version: 1.2.0
+updated: 2026-06-29
+tags: [skill-registry, skills, auto-discovery, skills, mandatory, overlay, ponytail, lazy-senior, code-quality, agent-skills]
 ---
 
 # Skill Registry - Single Source of Truth
@@ -454,8 +455,20 @@ Mỗi skill được định nghĩa với các properties:
 
 ### 2.1 Keyword → Skill Mapping
 
+> **Source:** Based on [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) - Production-grade engineering skills
+
 | Keyword / Pattern | Primary Skill | Confidence | Notes |
 |---|---|---|---|
+| **LIFECYCLE COMMANDS (agent-skills)** ||||
+| `spec`, `/spec` | spec-driven-development | 0.95 | Write PRD before code |
+| `plan`, `/plan` | planning-and-task-breakdown | 0.95 | Atomic task breakdown |
+| `build`, `/build` | incremental-implementation | 0.95 | Thin vertical slices |
+| `test`, `/test` | test-driven-development | 0.95 | TDD with proof |
+| `review`, `/review` | code-review-and-quality | 0.95 | Five-axis review |
+| `webperf`, `/webperf` | performance-optimization | 0.95 | Core Web Vitals |
+| `code-simplify` | code-simplification | 0.90 | Chesterton's Fence |
+| `ship`, `/ship` | shipping-and-launch | 0.95 | Pre-launch checklist |
+| `interview` | interview-me | 0.90 | One-question-at-a-time |
 | **VISUAL** ||||
 | `diagram` | visual-explainer | 0.95 | Architecture/system diagrams |
 | `architecture overview` | visual-explainer | 0.95 | System architecture |

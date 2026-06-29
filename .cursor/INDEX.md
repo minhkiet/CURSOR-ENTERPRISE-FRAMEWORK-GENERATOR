@@ -1,6 +1,7 @@
 ﻿# Cursor Enterprise Framework - Index
 
-> Last updated: 2026-06-26
+> Last updated: 2026-06-29  
+> Integrated with [agent-skills](https://github.com/addyosmani/agent-skills) (67k stars)
 
 ## Tổng quan
 
@@ -10,6 +11,8 @@
 | Skills | 17 folders |
 | Knowledge | 36 dirs |
 | Scripts | 12 |
+| References | 4 |
+| Agent Personas | 4 |
 
 ## Files
 
@@ -116,6 +119,36 @@
 | **Frontend** | nextjs, nuxt, vue |
 | **Special** | bazi, docker, numerology, pdf, performance, security, tuvi |
 
+## Agent Personas
+
+Based on [agent-skills](https://github.com/addyosmani/agent-skills) - 4 specialist personas:
+
+| Persona | Role | Expertise |
+|---------|------|-----------|
+| **Code Reviewer** | Senior Staff Engineer | Five-axis code review |
+| **Test Engineer** | QA Specialist | Test strategy, coverage |
+| **Security Auditor** | Security Engineer | OWASP, vulnerabilities |
+| **Web Performance Auditor** | Web Performance Engineer | Core Web Vitals |
+
+> See `.cursor/AGENTS.md` for full persona definitions
+
+---
+
+## References (4 files)
+
+Quick-reference checklists aligned with agent-skills:
+
+| Reference | Purpose |
+|----------|---------|
+| `testing-patterns.md` | Test pyramid, naming, mocking, anti-patterns |
+| `security-checklist.md` | OWASP Top 10, pre-commit checks, headers |
+| `performance-checklist.md` | Core Web Vitals, bundle analysis, anti-patterns |
+| `accessibility-checklist.md` | WCAG 2.1 AA, keyboard nav, screen readers |
+
+> See `.cursor/references/` directory
+
+---
+
 ## Scripts (12 scripts)
 
 | Script | Purpose |
@@ -133,6 +166,15 @@
 | `setup-mcp.ps1` | MCP setup (weknora) |
 
 ## Changelog
+
+### 2026-06-29 v5.0
+- Integrated [agent-skills](https://github.com/addyosmani/agent-skills) (67k stars)
+- Created `.cursor/AGENTS.md` with 4 agent personas
+- Created `.cursor/references/` with 4 checklists
+- Added lifecycle commands to `commands/README.md`
+- Updated `skill-registry.mdc` with agent-skills triggers
+- Added slash commands: /spec, /plan, /build, /test, /review, /ship, /webperf
+- **Updated counts:** References 4, Agent Personas 4
 
 ### 2026-06-26 v2.0
 - Split `multi-language-vibe-code.mdc` (2860 lines) → 3 files:
