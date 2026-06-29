@@ -729,6 +729,216 @@ Consider using multiple databases for different purposes:
 - MySQL: Legacy data, read-heavy analytics
 - SQL Server: Specific enterprise integrations
 
+---
+
+## Drizzle ORM Pattern (ChatbotX)
+
+### Tổng quan
+
+ChatbotX sử dụng **Drizzle ORM** với PostgreSQL và pgvector cho AI-powered features. Drizzle cung cấp type-safe SQL query builder với migration support.
+
+### Tech Stack
+
+- **ORM:** Drizzle ORM với `drizzle-orm`
+- **Database:** PostgreSQL 15+ với pgvector extension
+- **Connection:** `postgres` driver (connection pool)
+- **Migrations:** Drizzle Kit
+
+### Table Definition Pattern
+
+```typescript
+import { pgTable, text, index, uniqueIndex } from "drizzle-orm/pg-core"
+import { sharedColumns, bigintAsString } from "../partials/shared"
+
+export const contactModel = pgTable(
+  "Contact",
+  {
+    ...sharedColumns,
+    phone: text(),
+    email: text(),
+    firstName: text(),
+    lastName: text(),
+    workspaceId: bigintAsString()
+      .notNull()
+      .references(() => workspaceModel.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+  },
+  (table) => [
+    index("Contact_workspaceId_idx").using(
+      "btree",
+      table.workspaceId.asc().nullsLast(),
+    ),
+    uniqueIndex("Contact_phone_workspaceId_key").on(
+      table.phone,
+      table.workspaceId,
+    ),
+  ],
+)
+```
+
+### Conventions
+
+| Element | Convention | Example |
+|---------|------------|---------|
+| Table name | PascalCase | `Contact`, `FlowNode` |
+| Export name | camelCase | `contactModel`, `flowNodeModel` |
+| Index name | `TableName_columnName_idx` | `Contact_workspaceId_idx` |
+| Unique index | `TableName_column1_column2_key` | `Contact_email_workspaceId_key` |
+
+### sharedColumns Pattern
+
+```typescript
+// packages/database/src/partials/shared.ts
+export const sharedColumns = {
+  id: bigintAsString().primaryKey().$defaultFn(() => generateId()),
+  createdAt: timestamp("createdAt", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updatedAt", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+}
+```
+
+### bigintAsString Pattern
+
+```typescript
+// packages/database/src/partials/shared.ts
+export const bigintAsString = () =>
+  bigint({ mode: "number" }).mapInto(z.string().transform(Number))
+```
+
+### Enum Pattern
+
+**Step 1:** Define Zod enum:
+
+```typescript
+// packages/database/src/partials/channel.ts
+import z from "zod"
+
+export const channelTypes = z.enum([
+  "whatsapp",
+  "messenger",
+  "instagram",
+  "telegram",
+  "zalo",
+  "tiktok",
+  "webchat",
+  "email",
+])
+export type ChannelType = z.infer<typeof channelTypes>
+```
+
+**Step 2:** Create pgEnum:
+
+```typescript
+import { pgEnum } from "drizzle-orm/pg-core"
+import { channelTypes } from "../partials/channel"
+
+export const channelTypeEnum = pgEnum(
+  "channelType",
+  channelTypes.options as [string, ...string[]],
+)
+```
+
+**CRITICAL:** Adding enum value causes compile errors in `Record<ChannelType, ...>`. Always grep and fix ALL hits.
+
+### Relations Pattern
+
+```typescript
+// packages/database/src/relations/contact.ts
+import { defineRelationsPart } from "drizzle-orm"
+import * as schema from "../schema"
+
+export const contactRelations = defineRelationsPart(schema, (r) => ({
+  contact: {
+    workspace: r.one.workspaceModel({
+      from: r.contact.workspaceId,
+      to: r.workspaceModel.id,
+    }),
+    tags: r.many.contactTagModel({
+      from: r.contact.id,
+      to: r.contactTagModel.contactId,
+    }),
+  },
+}))
+```
+
+### Schema Registration (3 files)
+
+| # | File | Edit |
+|---|------|------|
+| 1 | `src/schema/index.ts` | `export * from "./contact"` |
+| 2 | `src/types.ts` | `export type Contact = typeof schema.contactModel.$inferSelect` |
+| 3 | `src/relations/index.ts` | Import + spread in `relations` object |
+
+### Migration Workflow
+
+```bash
+# Generate migration
+pnpm --filter @chatbotx.io/database make:migration <descriptive_name>
+
+# Apply migration
+pnpm --filter @chatbotx.io/database db:migrate
+
+# Open Drizzle Studio
+pnpm --filter @chatbotx.io/database db:studio
+```
+
+### Query Patterns
+
+```typescript
+import { db, eq, and } from "@chatbotx.io/database/client"
+import { contactModel } from "@chatbotx.io/database/schema"
+
+// Relational query
+const contacts = await db.query.contactModel.findMany({
+  where: { workspaceId },
+  with: { workspace: true, tags: true },
+  columns: { id: true, phone: true, email: true },
+})
+
+// SQL builder
+const contact = await db
+  .select()
+  .from(contactModel)
+  .where(and(
+    eq(contactModel.id, id),
+    eq(contactModel.workspaceId, workspaceId),
+  ))
+  .limit(1)
+```
+
+### Transaction Pattern
+
+```typescript
+await db.transaction(async (tx) => {
+  const contact = await contactService.create({ workspaceId, phone }, tx)
+
+  await Promise.all([
+    contactTagService.addTags({ contactId: contact.id, tagIds }, tx),
+    eventService.log({ contactId: contact.id, event: "created" }, tx),
+  ])
+})
+```
+
+### pgvector for AI Features
+
+```typescript
+// Table with embedding
+export const contactEmbeddingModel = pgTable("ContactEmbedding", {
+  ...sharedColumns,
+  contactId: bigintAsString()
+    .notNull()
+    .references(() => contactModel.id),
+  embedding: vector("embedding", { dimensions: 1536 }).notNull(),
+})
+```
+
+---
+
 ## Liên kết
 
 - [[redis]] - Redis: Caching và session management
@@ -737,6 +947,7 @@ Consider using multiple databases for different purposes:
 - [[security]] - Security: Database security practices
 - [[backup]] - Backup: Backup strategies
 - [[pgvector]] - pgvector: Vector similarity search (PostgreSQL)
+- [[chatbot-development]] - ChatbotX: Full chatbot platform patterns
 
 ---
 

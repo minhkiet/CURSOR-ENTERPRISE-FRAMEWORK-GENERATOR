@@ -1,0 +1,688 @@
+---
+description: ChatbotX Development Patterns - Omnichannel Chatbot Marketing Platform. Tích hợp feature scaffold, Drizzle ORM, BullMQ workers, và Next.js patterns cho ChatbotX platform (ManyChat alternative).
+created: 2026-06-29
+version: 1.0.0
+tags: [chatbotx, chatbot, omnichannel, manychat, drizzle, bullmq, nextjs, typescript, turborepo, marketing-automation]
+---
+
+# ChatbotX Development Guide
+
+## Tổng quan
+
+**ChatbotX** là open-source omnichannel chatbot marketing platform - ManyChat alternative. Built for AI agents với CLI, MCP, và Public API.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                      CHATBOTX ARCHITECTURE                          │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  ┌───────────────┐  ┌───────────────┐  ┌───────────────┐          │
+│  │   apps/       │  │  packages/    │  │integrations/ │          │
+│  │  builder     │  │  database     │  │  whatsapp    │          │
+│  │  worker      │  │  ai           │  │  messenger   │          │
+│  │  realtime    │  │  auth         │  │  telegram    │          │
+│  │  cli         │  │  business     │  │  zalo        │          │
+│  │  mcp-server  │  │  ...          │  │  ...         │          │
+│  └───────────────┘  └───────────────┘  └───────────────┘          │
+│                                                                     │
+│  Tech Stack: Next.js 16, React 19, TypeScript 5, Turborepo        │
+│              Drizzle ORM, PostgreSQL/pgvector, Redis/BullMQ         │
+│              PartyKit, S3-compatible storage                        │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## PHẦN 1: PROJECT STRUCTURE
+
+### 1.1 Directory Layout
+
+```
+.
+|-- apps/
+|   |-- builder/       # Next.js web app (React 19, Next.js 16)
+|   |-- worker/        # Background workers (BullMQ, Kafka)
+|   |-- realtime/     # Realtime server (PartySocket)
+|   |-- cli/          # Command line client
+|   `-- mcp-server/   # MCP server (stdio/SSE)
+|-- integrations/
+|   |-- whatsapp/, messenger/, instagram/, telegram/
+|   |-- zalo/, tiktok/, webchat/, smtp/
+|   |-- openai/, google-sheets/, mailchimp/, ...
+|-- packages/
+|   |-- database/     # Drizzle ORM + pgvector
+|   |-- ai/          # AI agents (OpenAI, Claude, Gemini)
+|   |-- auth/        # Authentication
+|   |-- business/    # Business logic services
+|   |-- automated-response/
+|   |-- analytics/
+|   |-- event-bus/
+|   |-- kafka/
+|   |-- mail/
+|   |-- imports/
+|   |-- flow-config/
+|   |-- variables/
+|   |-- sdk/
+|   |-- scheduler/
+|   |-- ui/
+|   `-- worker-config/
+|-- docker-compose.yml
+|-- pnpm-workspace.yaml
+`-- turbo.json
+```
+
+### 1.2 Package Naming
+
+| Package | Import Path |
+|---------|------------|
+| Database | `@chatbotx.io/database` |
+| AI | `@chatbotx.io/ai` |
+| Auth | `@chatbotx.io/auth` |
+| Business | `@chatbotx.io/business` |
+| UI | `@chatbotx.io/ui` |
+| Worker Config | `@chatbotx.io/worker-config` |
+| SDK | `@chatbotx.io/sdk` |
+| Logger | `@chatbotx.io/logger` |
+
+---
+
+## PHẦN 2: FEATURE SCAFFOLDING
+
+### 2.1 Feature Directory Structure
+
+Features live in `apps/builder/src/features/<feature-name>/`:
+
+```
+features/<feature-name>/
+  actions/              → Server actions (next-safe-action)
+    create-item-action.ts
+    delete-item-action.ts
+  api/                  → oRPC route handlers
+    index.ts
+    authenticated.ts
+    workspace-token.ts
+  queries/              → Server-side DB queries
+    index.ts
+  schema/               → Zod schemas
+    query.ts            → List/filter params
+    action.ts           → Mutation inputs
+    resource.ts         → Response shapes
+  provider/             → Zustand store + context (if needed)
+    item-store.ts
+    item-store-provider.tsx
+  components/           → UI components (if many)
+  hooks/                → Feature-specific hooks (if needed)
+  item-table.tsx        → Root-level components (if few)
+  create-item-dialog.tsx
+```
+
+### 2.2 Page Pattern (Server Component)
+
+```typescript
+// app/space/[workspaceId]/(has-folder)/<feature>/page.tsx
+import { Suspense } from "react"
+import { getIdFromParams } from "@/lib/params"
+import { listItems } from "@/features/<feature>/queries"
+import { ItemsTable } from "@/features/<feature>/items-table"
+
+export default async function ItemsPage(props: {
+  params: Promise<{ workspaceId: string }>
+  searchParams: Promise<SearchParams>
+}) {
+  const workspaceId = getIdFromParams(await props.params, "workspaceId")
+  const searchParams = await props.searchParams
+  const search = listItemsSearchParamsCache.parse(searchParams)
+
+  const promises = Promise.all([
+    listItems({ ...search, workspaceId }),
+  ])
+
+  return (
+    <Suspense>
+      <ItemsTable promises={promises} workspaceId={workspaceId} />
+    </Suspense>
+  )
+}
+```
+
+**Key patterns:**
+- Pages are **async server components** (no `"use client"`)
+- `params` and `searchParams` are `Promise<...>` (Next.js 15+ style)
+- Use `getIdFromParams()` to extract and validate IDs
+- Pass `Promise.all([...])` as `promises` prop to client components
+- Client components unwrap with `React.use(promises)`
+
+### 2.3 Server Actions
+
+```typescript
+// actions/create-item-action.ts
+"use server"
+
+import { workspaceActionClient } from "@/lib/safe-action"
+import { createItemRequest } from "../schema/action"
+
+export const createItemAction = workspaceActionClient
+  .bindArgsSchemas([z.string()]) // workspaceId
+  .inputSchema(createItemRequest)
+  .action(
+    async ({
+      bindArgsParsedInputs: [workspaceId],
+      parsedInput,
+    }) => {
+      return await createItem({ workspaceId, ...parsedInput })
+    },
+  )
+```
+
+### 2.4 Action Clients
+
+| Client | Purpose |
+|--------|---------|
+| `workspaceActionClient` | Requires workspace membership |
+| `authActionClient` | Requires authenticated session only |
+
+### 2.5 Forms Pattern (React Hook Form + Zod)
+
+```typescript
+"use client"
+
+import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { createItemAction } from "../actions/create-item-action"
+
+export const CreateItemForm = ({ workspaceId }: { workspaceId: string }) => {
+  const { form, handleSubmitWithAction } = useHookFormAction(
+    createItemAction.bind(null, workspaceId), // CRITICAL: bind workspaceId
+    zodResolver(createItemRequest),
+    { formProps: { defaultValues: { name: "" } } },
+  )
+
+  return (
+    <form onSubmit={handleSubmitWithAction}>
+      {/* Form fields */}
+    </form>
+  )
+}
+```
+
+**CRITICAL:** When action uses `bindArgsSchemas`, you MUST call `.bind(null, workspaceId)` before passing to `useHookFormAction`.
+
+### 2.6 State Management (Zustand)
+
+```typescript
+// provider/item-store.ts
+import { createStore } from "zustand/vanilla"
+
+type ItemState = {
+  items: Item[]
+  selectedId: string | null
+}
+
+export const createItemStore = (initial: Partial<ItemState> = {}) =>
+  createStore<ItemStore>((set) => ({
+    items: [],
+    selectedId: null,
+    ...initial,
+    setSelectedId: (id) => set({ selectedId: id }),
+  }))
+```
+
+### 2.7 Form Section Layout
+
+```typescript
+import { Card, CardContent, CardHeader, CardTitle } from "@chatbotx.io/ui"
+
+<Card>
+  <CardHeader>
+    <CardTitle className="text-base">{t("feature.sections.title")}</CardTitle>
+  </CardHeader>
+  <CardContent className="space-y-4">
+    <InputField ... />
+  </CardContent>
+</Card>
+```
+
+---
+
+## PHẦN 3: DATABASE (DRIZZLE ORM)
+
+### 3.1 Table Definition
+
+```typescript
+import { pgTable, text, index, uniqueIndex } from "drizzle-orm/pg-core"
+import { sharedColumns, bigintAsString } from "../partials/shared"
+
+export const myModel = pgTable(
+  "MyModel",
+  {
+    ...sharedColumns,
+    name: text().notNull(),
+    workspaceId: bigintAsString()
+      .notNull()
+      .references(() => workspaceModel.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+  },
+  (table) => [
+    index("MyModel_workspaceId_idx").using(
+      "btree",
+      table.workspaceId.asc().nullsLast(),
+    ),
+    uniqueIndex("MyModel_name_workspaceId_key").on(
+      table.name,
+      table.workspaceId,
+    ),
+  ],
+)
+```
+
+**Conventions:**
+- Table name: `PascalCase` string matching SQL table name
+- Export name: `camelCaseModel` (e.g. `contactModel`)
+- `sharedColumns` provides: `id`, `createdAt`, `updatedAt`
+- `bigintAsString()` stores `bigint` in DB, exposes as `string`
+- FK pattern: `.references(() => otherModel.id, { onDelete, onUpdate })`
+- Index naming: `TableName_columnName_idx` or `TableName_column_key`
+
+### 3.2 Enum Pattern
+
+**Step 1** — define Zod enum in `src/partials/<domain>.ts`:
+
+```typescript
+import z from "zod"
+
+export const myStatusTypes = z.enum(["active", "inactive", "pending"])
+export type MyStatusType = z.infer<typeof myStatusTypes>
+```
+
+**Step 2** — create `pgEnum` and use in table:
+
+```typescript
+import { pgEnum } from "drizzle-orm/pg-core"
+import { myStatusTypes } from "../partials/<domain>"
+
+export const myStatus = pgEnum(
+  "myStatus",
+  myStatusTypes.options as [string, ...string[]],
+)
+```
+
+**CRITICAL cascade:** Adding enum value to `channelTypes`/`integrationTypes` causes compile errors in every `Record<ChannelType, ...>`. Always grep and fix ALL hits.
+
+### 3.3 Relations
+
+```typescript
+// src/relations/<file>.ts
+import { defineRelationsPart } from "drizzle-orm"
+import * as schema from "../schema"
+
+export const myModelRelations = defineRelationsPart(schema, (r) => ({
+  myModel: {
+    workspace: r.one.workspaceModel({
+      from: r.myModel.workspaceId,
+      to: r.workspaceModel.id,
+    }),
+    items: r.many.myItemModel({
+      from: r.myModel.id,
+      to: r.myItemModel.myModelId,
+    }),
+  },
+}))
+```
+
+### 3.4 Schema Registration (3 files)
+
+| # | File | Edit |
+|---|------|------|
+| 1 | `src/schema/index.ts` | `export * from "./ "` |
+| 2 | `src/types.ts` | `export type MyModel = typeof schema.myModel.$inferSelect` |
+| 3 | `src/relations/index.ts` | Import at top + spread in `relations` object |
+
+### 3.5 Migration Workflow
+
+```bash
+# 1. Modify schema
+pnpm --filter @chatbotx.io/database make:migration <descriptive_name>
+
+# 2. Apply migration
+pnpm --filter @chatbotx.io/database db:migrate
+
+# 3. Inspect
+pnpm --filter @chatbotx.io/database db:studio
+```
+
+### 3.6 Query Patterns
+
+```typescript
+// Relational queries (inside service or repository)
+const items = await db.query.myModel.findMany({
+  where: { workspaceId },
+  with: { workspace: true },
+  columns: { id: true, name: true },
+})
+
+// SQL builder
+import { db, eq, and } from "@chatbotx.io/database/client"
+
+await db
+  .update(myModel)
+  .set({ name: "new name" })
+  .where(and(eq(myModel.id, id), eq(myModel.workspaceId, workspaceId)))
+```
+
+### 3.7 Transactions
+
+```typescript
+import { db } from "@chatbotx.io/database/client"
+
+await db.transaction(async (tx) => {
+  const product = await productService.create({ data, tx })
+
+  await Promise.all([
+    productVariantService.createBulk({ productId: product.id, variants, tx }),
+    productAddonService.createBulk({ productId: product.id, addons, tx }),
+  ])
+})
+```
+
+---
+
+## PHẦN 4: WORKERS (BULLMQ)
+
+### 4.1 Architecture
+
+Workers run as separate Node processes in `apps/worker/`. They consume from **BullMQ** queues (Redis) or **Kafka** topics.
+
+### 4.2 Existing Workers
+
+| Worker | Queue/Topic | Entry |
+|--------|------------|-------|
+| integration | `integration` | `src/integration/worker.ts` |
+| chat | `chat` | `src/chat/worker.ts` |
+| ai-agent | `aiAgent` | `src/ai-agent/worker.ts` |
+| default | `default` | `src/default/worker.ts` |
+| trigger | `trigger` | `src/trigger/worker.ts` |
+| webhook | `webhook` | `src/webhook/worker.ts` |
+| schedule | (cron) | `src/schedule/worker.ts` |
+| sequence-scheduler | Kafka | `src/sequence-scheduler/worker*.ts` |
+
+### 4.3 Creating a New Queue
+
+**Step 1** — Add to `packages/worker-config/src/lib/types.ts`:
+
+```typescript
+export const queueName = {
+  // ...existing
+  myQueue: "myQueue",
+} as const
+```
+
+**Step 2** — Create `packages/worker-config/src/queues/<name>/index.ts`:
+
+```typescript
+import { Queue } from "bullmq"
+import { getRedisConnection, defaultJobOptions, fakeQueue } from "../../lib/connection"
+
+export enum MyQueueJobAction {
+  processItem = "processItem",
+  syncData = "syncData",
+}
+
+export type MyQueueJobData = {
+  type: MyQueueJobAction
+  data: Record<string, unknown>
+}
+
+const NEXT_PHASE = process.env.NEXT_PHASE
+export const myQueue =
+  NEXT_PHASE === "phase-production-build"
+    ? fakeQueue
+    : new Queue(queueNames.enum.myQueue, {
+        connection: getRedisConnection(),
+        defaultJobOptions,
+      })
+```
+
+### 4.4 Creating a New Worker
+
+```typescript
+// apps/worker/src/<domain>/worker.ts
+import { Worker, type Job } from "bullmq"
+import { queueNames } from "@chatbotx.io/worker-config"
+import { getRedisConnection, defaultWorkerOptions } from "@chatbotx.io/worker-config"
+import type { MyQueueJobData } from "@chatbotx.io/worker-config"
+import { ensureBootstrapped } from "../lib/bootstrap"
+import { logger } from "@chatbotx.io/logger"
+
+const startMyWorker = async () => {
+  await ensureBootstrapped()
+
+  const worker = new Worker(
+    queueNames.enum.myQueue,
+    async (job: Job<MyQueueJobData>) => {
+      logger.info(job.data, "Worker received job")
+      // Handle job...
+    },
+    {
+      connection: getRedisConnection(),
+      ...defaultWorkerOptions,
+    },
+  )
+
+  worker.on("failed", (job, err) => {
+    logger.error({ err, jobId: job?.id }, "Job failed")
+  })
+}
+
+startMyWorker()
+```
+
+### 4.5 Enqueuing Jobs
+
+```typescript
+import { myQueue, MyQueueJobAction } from "@chatbotx.io/worker-config"
+
+await myQueue.add("processItem", {
+  type: MyQueueJobAction.processItem,
+  data: { itemId: "123", workspaceId: "456" },
+})
+```
+
+### 4.6 Job ID Rules
+
+**CRITICAL: `jobId` must NOT contain `:`** — BullMQ uses `:` as Redis key delimiter.
+
+```typescript
+// ✅ correct
+const jobId = `broadcast-send-contact-${broadcastId}-${contactId}-${type}`
+
+// ❌ runtime crash
+const jobId = `bcast:${broadcastId}:${contactId}:${type}`
+```
+
+| Job Type | `removeOnComplete` Policy |
+|----------|--------------------------|
+| Dedup job (one-shot) | `{ age, count }` — TTL retention |
+| Re-driveable job (cron) | `true` — immediate removal |
+
+### 4.7 Cron Jobs
+
+```typescript
+await myQueue.add(
+  "syncData",
+  { type: MyQueueJobAction.syncData, data: { source: "cron" } },
+  { repeat: { pattern: "0 */6 * * *" } }, // every 6 hours
+)
+```
+
+---
+
+## PHẦN 5: I18N (next-intl)
+
+### 5.1 Translation Structure
+
+Translations live in `apps/builder/messages/en.json`:
+
+| Namespace | Purpose |
+|-----------|---------|
+| `fields.*` | Reusable field labels, placeholders |
+| `actions.*` | Button/action labels |
+| `messages.*` | Toast messages, confirmations |
+| `.*` | Feature-specific text |
+
+### 5.2 Form Fields — Reuse `fields.*`
+
+```typescript
+<InputField
+  label={t("fields.name.label")}
+  name="name"
+  placeholder={t("fields.name.placeholder")}
+  required
+/>
+```
+
+**Never hardcode labels:**
+
+```typescript
+// WRONG
+<InputField label="Username" name="username" />
+
+// CORRECT
+<InputField label={t("fields.username.label")} name="username" />
+```
+
+### 5.3 Actions & Messages
+
+```typescript
+// Buttons
+{t("actions.cancel")}
+{t("actions.create")}
+{t("actions.save")}
+
+// Toast messages
+toast.success(t("messages.createdSuccess", { feature: "Contact" }))
+toast.error(error.serverError || t("messages.unknownError"))
+```
+
+---
+
+## PHẦN 6: CODING RULES
+
+### 6.1 Data Access (NEVER do these)
+
+```
+🚫 DO NOT import `db` directly in apps/ or integrations/
+🚫 DO NOT use dynamic `import()` — breaks tsdown build
+🚫 DO NOT hardcode user-facing strings — use useTranslations()
+🚫 DO NOT use console.log/error/warn in server code — use logger
+```
+
+### 6.2 Correct Patterns
+
+| What | Do This |
+|------|---------|
+| DB access | Service (`@chatbotx.io/business`) or Repository |
+| Logging (server) | `logger.error({ err: error }, "message")` |
+| i18n | `useTranslations()` + `t()` |
+| Action client | `workspaceActionClient` or `authActionClient` |
+| Route auth | Middleware (`@/middlewares/auth`) |
+
+### 6.3 Business Logic
+
+Business logic services **MUST** live in `packages/business/src/<feature>/service.ts`:
+
+```typescript
+// packages/business/src/<feature>/service.ts
+export class MyService extends BaseService {
+  async create(params: CreateParams): Promise<MyEntity> {
+    // Business logic here
+  }
+}
+
+export const myService = new MyService()
+```
+
+### 6.4 Model Routing (Cost Optimization)
+
+| Task | Model Tier |
+|------|------------|
+| File lookup, grep, inventory | Haiku / Sonnet |
+| Implementation, code review, debugging | Sonnet |
+| Architecture, synthesis, incident root-cause | Opus |
+
+---
+
+## PHẦN 7: DEVELOPMENT COMMANDS
+
+```bash
+pnpm dev              # run turbo dev
+pnpm build            # build all packages/apps
+pnpm lint             # run Ultracite lint
+pnpm fix              # run Biome auto-fix
+pnpm check:circular   # check circular dependencies
+pnpm check:unused     # check unused files/dependencies
+
+# Package-specific
+pnpm --filter builder dev
+pnpm --filter worker dev
+pnpm --filter realtime dev
+pnpm --filter @chatbotx.io/database db:studio
+pnpm --filter @chatbotx.io/database db:migrate
+```
+
+---
+
+## PHẦN 8: CHECKLISTS
+
+### 8.1 New Feature Checklist
+
+1. Create `src/features/<feature>/` directory
+2. Define Zod schemas in `schema/`
+3. Create DB queries in `queries/` (call business service)
+4. Add server actions in `actions/`
+5. Create oRPC API in `api/` (if needed)
+6. Register router in `src/routers/index.ts`
+7. Create page(s) under `src/app/space/[workspaceId]/...`
+8. Build UI components
+9. Add i18n translations — reuse `fields.*`, add feature text
+10. Verify no hardcoded strings
+
+### 8.2 Database Checklist
+
+1. Define table schema with `sharedColumns`
+2. Add indexes and unique constraints
+3. Define relations if needed
+4. Update `src/schema/index.ts`
+5. Update `src/types.ts`
+6. Update `src/relations/index.ts` (import + spread)
+7. Run migration: `pnpm --filter @chatbotx.io/database make:migration <name>`
+8. Apply: `pnpm --filter @chatbotx.io/database db:migrate`
+
+### 8.3 Worker Checklist
+
+1. Define queue name in `packages/worker-config/src/lib/types.ts`
+2. Create job types in `packages/worker-config/src/queues/<name>/`
+3. Export from `packages/worker-config/src/index.ts`
+4. Create worker in `apps/worker/src/<domain>/worker.ts`
+5. Register entry in `apps/worker/tsdown.config.ts`
+6. Add dev script in `apps/worker/package.json`
+
+---
+
+## LIÊN KẾT
+
+- [[skill-registry]] — Skill definitions (chatbotx-feature, chatbotx-database, chatbotx-worker)
+- [[backend-frameworks]] — NestJS, Laravel, ASP.NET patterns
+- [[databases]] — PostgreSQL, MySQL, database patterns
+- [[workflow-engines]] — BullMQ, Kafka, n8n patterns
+- [[frontend-frameworks]] — Next.js, React patterns
+
+---
+
+## NGUỒN THAM KHẢO
+
+- [ChatbotX GitHub](https://github.com/ChatbotXIO/ChatbotX) (304 stars)
+- [ChatbotX SKILL.md](https://github.com/ChatbotXIO/ChatbotX/blob/main/SKILL.md)
+- [ChatbotX CLAUDE.md](https://github.com/ChatbotXIO/ChatbotX/blob/main/CLAUDE.md)

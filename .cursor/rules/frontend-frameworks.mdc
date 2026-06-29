@@ -434,6 +434,7 @@ Mandatory dual-gate review cho mọi frontend task:
 
 - [[ui-visual-design]] - UI/Visual Design principles
 - [[typescript]] - TypeScript best practices
+- [[chatbot-development]] - ChatbotX: Next.js 16 + React 19 patterns cho builder app
 - [[testing]] - Testing frontend components
 - [[performance]] - Performance optimization
 - [[deployment]] - Frontend deployment

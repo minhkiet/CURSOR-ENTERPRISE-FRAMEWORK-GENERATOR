@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
 """
-Cursor Enterprise Framework - Local Setup Installer
-====================================================
-Creates a standalone .exe to install .cursor to any project.
-
-Usage:
-    python setup_exe_builder.py        # Build the .exe
-    cursor-setup.exe [ProjectPath]     # Run the installer
+Cursor Enterprise Framework - Standalone Installer
+==================================================
+This script is compiled into a standalone .exe
 """
 
 import os
@@ -14,22 +10,12 @@ import sys
 import shutil
 import subprocess
 from pathlib import Path
+from datetime import datetime
 
-try:
-    import PyInstaller.__main__
-except ImportError:
-    print("[X] PyInstaller not found. Installing...")
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "pyinstaller"])
-    import PyInstaller.__main__
-
-# Configuration
-SCRIPT_DIR = Path(__file__).parent.absolute()
-# .cursor is at project root, not in scripts folder
-# SCRIPT_DIR = .cursor/scripts, so parent.parent = project root
-PROJECT_ROOT = SCRIPT_DIR.parent.parent
-CURSOR_SOURCE = PROJECT_ROOT / ".cursor"
-SETUP_SCRIPT = SCRIPT_DIR / "setup_local_installer.py"
-DIST_FOLDER = PROJECT_ROOT  # exe goes to project root
+# Source .cursor location (relative to exe location)
+EXE_DIR = Path(sys.argv[0]).parent.resolve() if hasattr(sys, 'frozen') else Path(__file__).parent.resolve()
+SOURCE_ROOT = Path(r"D:\PROJECTS\CURSORS\CURSOR ENTERPRISE FRAMEWORK GENERATOR")
+CURSOR_SOURCE = SOURCE_ROOT / ".cursor"
 
 # Colors for terminal output
 class Colors:
@@ -57,58 +43,6 @@ def log(msg, level="info"):
         "warning": "[!] ",
         "error": "[X] ",
         "header": "\n" + "="*50
-    }
-    prefix_char = prefix.get(level, "[...]")
-    print(f"{color}{prefix_char} {msg}{Colors.ENDC}")
-
-def create_installer_script():
-    """Create the standalone installer script that will be compiled to .exe"""
-    
-    installer_code = '''#!/usr/bin/env python3
-"""
-Cursor Enterprise Framework - Standalone Installer
-==================================================
-This script is compiled into a standalone .exe
-"""
-
-import os
-import sys
-import shutil
-import subprocess
-from pathlib import Path
-from datetime import datetime
-
-# Source .cursor location (relative to exe location)
-EXE_DIR = Path(sys.argv[0]).parent.resolve() if hasattr(sys, 'frozen') else Path(__file__).parent.resolve()
-SOURCE_ROOT = Path(r"D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR")
-CURSOR_SOURCE = SOURCE_ROOT / ".cursor"
-
-# Colors for terminal output
-class Colors:
-    HEADER = '\\033[95m'
-    OKBLUE = '\\033[94m'
-    OKCYAN = '\\033[96m'
-    OKGREEN = '\\033[92m'
-    WARNING = '\\033[93m'
-    FAIL = '\\033[91m'
-    ENDC = '\\033[0m'
-    BOLD = '\\033[1m'
-
-def log(msg, level="info"):
-    colors = {
-        "info": Colors.OKCYAN,
-        "success": Colors.OKGREEN,
-        "warning": Colors.WARNING,
-        "error": Colors.FAIL,
-        "header": Colors.HEADER + Colors.BOLD
-    }
-    color = colors.get(level, Colors.OKCYAN)
-    prefix = {
-        "info": "[...]",
-        "success": "[OK] ",
-        "warning": "[!] ",
-        "error": "[X] ",
-        "header": "\\n" + "="*50
     }
     prefix_char = prefix.get(level, "[...]")
     print(f"{color}{prefix_char} {msg}{Colors.ENDC}")
@@ -242,8 +176,8 @@ def main():
         print("  -List       List all projects")
         print()
         log("Examples:", "info")
-        print("  cursor-setup.exe D:\\\\Projects\\\\MyApp")
-        print("  cursor-setup.exe D:\\\\Projects\\\\MyApp -Force")
+        print("  cursor-setup.exe D:\\Projects\\MyApp")
+        print("  cursor-setup.exe D:\\Projects\\MyApp -Force")
         print("  cursor-setup.exe -List")
         print()
         return
@@ -263,103 +197,6 @@ def main():
     else:
         log(message, "error")
         print()
-        sys.exit(1)
-
-if __name__ == "__main__":
-    main()
-'''
-    
-    # Write installer script
-    with open(SETUP_SCRIPT, "w", encoding="utf-8") as f:
-        f.write(installer_code)
-    
-    print(f"[OK] Created installer script: {SETUP_SCRIPT}")
-
-def build_exe():
-    """Build the .exe using PyInstaller"""
-    
-    if not CURSOR_SOURCE.exists():
-        print(f"[X] Source .cursor not found at: {CURSOR_SOURCE}")
-        return False
-    
-    log("Building standalone .exe...", "header")
-    
-    # PyInstaller arguments
-    args = [
-        str(SETUP_SCRIPT),
-        "--name=cursor-setup",
-        "--onefile",
-        "--console",
-        f"--distpath={DIST_FOLDER}",
-        f"--workpath={SCRIPT_DIR}/build",
-        "--clean",
-        "--noconfirm",
-        # Embed source path
-        f"--add-data={CURSOR_SOURCE};.cursor_source",
-    ]
-    
-    try:
-        PyInstaller.__main__.run(args)
-        log("Build completed successfully!", "success")
-        
-        # Find the exe
-        exe_path = DIST_FOLDER / "cursor-setup.exe"
-        if exe_path.exists():
-            log(f"Executable: {exe_path}", "success")
-            return True
-    except Exception as e:
-        log(f"Build failed: {e}", "error")
-        return False
-    
-    return False
-
-def log(msg, level="info"):
-    colors = {
-        "info": Colors.OKCYAN,
-        "success": Colors.OKGREEN,
-        "warning": Colors.WARNING,
-        "error": Colors.FAIL,
-        "header": Colors.HEADER + Colors.BOLD
-    }
-    color = colors.get(level, Colors.OKCYAN)
-    prefix = {
-        "info": "[...]",
-        "success": "[OK] ",
-        "warning": "[!] ",
-        "error": "[X] ",
-        "header": "\n" + "="*50
-    }
-    prefix_char = prefix.get(level, "[...]")
-    print(f"{color}{prefix_char} {msg}{Colors.ENDC}")
-
-def main():
-    print()
-    print("=" * 50)
-    print("  CURSOR SETUP EXE BUILDER")
-    print("=" * 50)
-    print()
-    
-    # Check if PyInstaller is available
-    try:
-        import PyInstaller
-        log("PyInstaller found", "success")
-    except ImportError:
-        log("PyInstaller not found. Installing...", "info")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "pyinstaller"])
-        log("PyInstaller installed", "success")
-    
-    # Create installer script
-    create_installer_script()
-    
-    # Build exe
-    if build_exe():
-        print()
-        log("Done! You can now run:", "success")
-        print(f"  {DIST_FOLDER / 'cursor-setup.exe'}")
-        print()
-    else:
-        print()
-        log("Build failed. Check errors above.", "error")
         sys.exit(1)
 
 if __name__ == "__main__":

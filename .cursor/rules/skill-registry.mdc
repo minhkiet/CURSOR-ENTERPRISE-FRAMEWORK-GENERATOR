@@ -1,9 +1,9 @@
 ---
-description: Single Source of Truth cho tất cả skill definitions, triggers, confidence thresholds, và gate mappings. Được sử dụng bởi skill-integration, task-analyzer, và multi-language-vibe-code. Bao gồm Ponytail Lazy Senior Dev principles. Integrated với agent-skills (addyosmani/agent-skills).
+description: Single Source of Truth cho tất cả skill definitions, triggers, confidence thresholds, và gate mappings. Được sử dụng bởi skill-integration, task-analyzer, và multi-language-vibe-code. Bao gồm Ponytail Lazy Senior Dev principles. Integrated với agent-skills (addyosmani/agent-skills) và ChatbotX development patterns.
 created: 2026-06-26
-version: 1.2.0
+version: 1.3.0
 updated: 2026-06-29
-tags: [skill-registry, skills, auto-discovery, skills, mandatory, overlay, ponytail, lazy-senior, code-quality, agent-skills]
+tags: [skill-registry, skills, auto-discovery, mandatory, overlay, ponytail, lazy-senior, code-quality, agent-skills, chatbotx, chatbot-marketing]
 ---
 
 # Skill Registry - Single Source of Truth
@@ -451,6 +451,74 @@ Mỗi skill được định nghĩa với các properties:
 
 ---
 
+#### chatbotx-feature
+
+| Property | Value |
+|----------|-------|
+| **ID** | `chatbotx-feature` |
+| **Path** | `.cursor/rules/chatbot-development.mdc` |
+| **Role** | `primary` |
+| **Domains** | `chatbotx`, `frontend`, `fullstack` |
+| **Confidence Base** | `0.95` |
+| **Threshold** | `0.90` (auto-select) |
+
+**Triggers:**
+- chatbotx, ChatbotX, omnichannel chatbot
+- ManyChat alternative, Chatfuel, Wati
+- new feature/page, component, server action
+- flow builder, inbox, contact CRM, broadcast
+- sequence, automation, webhook integration
+- WhatsApp, Messenger, Instagram, Telegram, Zalo, TikTok
+
+**Tech Stack:** Next.js 16, React 19, TypeScript 5, Turborepo, pnpm workspaces
+
+**Purpose:** Build chatbot marketing platform features following ChatbotX conventions. Feature scaffold, server actions, oRPC API, Zustand state, i18n.
+
+---
+
+#### chatbotx-database
+
+| Property | Value |
+|----------|-------|
+| **ID** | `chatbotx-database` |
+| **Path** | `.cursor/rules/chatbot-development.mdc` |
+| **Role** | `primary` |
+| **Domains** | `chatbotx`, `database` |
+| **Confidence Base** | `0.95` |
+| **Threshold** | `0.90` (auto-select) |
+
+**Triggers:**
+- drizzle, Drizzle ORM, PostgreSQL
+- database migration, table schema
+- pgvector, vector search
+- new table, enum, relation
+- repository, service pattern
+
+**Purpose:** Drizzle ORM patterns for ChatbotX: table definitions, migrations, relations, transactions, repository pattern.
+
+---
+
+#### chatbotx-worker
+
+| Property | Value |
+|----------|-------|
+| **ID** | `chatbotx-worker` |
+| **Path** | `.cursor/rules/chatbot-development.mdc` |
+| **Role** | `primary` |
+| **Domains** | `chatbotx`, `backend` |
+| **Confidence Base** | `0.95` |
+| **Threshold** | `0.90` (auto-select) |
+
+**Triggers:**
+- worker, BullMQ, queue, job
+- background processing, cron, scheduled task
+- Kafka, event consumer
+- webhook handler, trigger automation
+
+**Purpose:** Background worker patterns for ChatbotX: BullMQ queues, Kafka consumers, scheduled jobs, retry logic.
+
+---
+
 ## PHẦN 2: TRIGGER MATRIX
 
 ### 2.1 Keyword → Skill Mapping
@@ -554,6 +622,21 @@ Mỗi skill được định nghĩa với các properties:
 | **ADDRESS - Vietnam** ||||
 | `địa chỉ` + `Việt Nam` | vietnam-address | 0.95 | Vietnamese address |
 | `tỉnh` + `thành phố` | vietnam-address | 0.90 | Province/city selection |
+| **CHATBOT - ChatbotX** ||||
+| `chatbotx`, `ChatbotX` | chatbotx-feature | 0.95 | ChatbotX platform |
+| `manychat`, `chatfuel`, `wati` | chatbotx-feature | 0.90 | Alternative platforms |
+| `omnichannel`, `inbox`, `flow builder` | chatbotx-feature | 0.90 | ChatbotX features |
+| `contact`, `contact CRM`, `segment` | chatbotx-feature | 0.85 | Contact management |
+| `broadcast`, `sequence`, `automation` | chatbotx-feature | 0.90 | Marketing automation |
+| `whatsapp`, `messenger`, `instagram`, `telegram`, `zalo` | chatbotx-feature | 0.85 | Channel integrations |
+| **DATABASE - Drizzle** ||||
+| `drizzle`, `pgvector`, `migration` | chatbotx-database | 0.95 | Drizzle ORM |
+| `new table`, `schema`, `enum` | chatbotx-database | 0.90 | Database schema |
+| `relation`, `repository`, `service` | chatbotx-database | 0.85 | Data access pattern |
+| **WORKER - BullMQ** ||||
+| `worker`, `bullmq`, `queue` | chatbotx-worker | 0.95 | BullMQ workers |
+| `job`, `cron`, `scheduled` | chatbotx-worker | 0.90 | Background jobs |
+| `kafka`, `consumer`, `event` | chatbotx-worker | 0.90 | Event processing |
 
 ---
 
@@ -637,6 +720,9 @@ def calculate_confidence(skill: str, request: str) -> float:
 | Visual Document | pixelrag | full-output | pixelrag-pre/post + fulloutput-pre/post |
 | Visual RAG | pixelrag | weknora-kb | pixelrag-pre/post + weknora-pre/post |
 | ReAct Agent | weknora-agent | weknora-kb | agent-pre + weknora-pre + posts |
+| **ChatbotX Feature** | chatbotx-feature | full-output, frontend-review | chatbotx-pre/post + fulloutput-pre/post + review-pre/post |
+| **ChatbotX Database** | chatbotx-database | chatbotx-feature | chatbotx-db-pre/post |
+| **ChatbotX Worker** | chatbotx-worker | chatbotx-feature | chatbotx-worker-pre/post |
 | **Any coding task** | (task-specific) | karpathy-coding | karpathy-pre/post + task gates |
 
 ### 4.2 Mandatory Overlay Rule
@@ -701,6 +787,12 @@ karpathy-pre (MANDATORY) → [ponytail-pre if enabled] → IMPLEMENT → [ponyta
 | `ponytail-post` | ponytail Checklist | checklist | ponytail (if enabled) |
 | `payment-pre` | vietnam-payment-review | pre-gate | vietnam-payment |
 | `payment-post` | vietnam-payment-review | post-gate | vietnam-payment |
+| `chatbotx-pre` | chatbot-development | feature-scaffold | chatbotx-feature |
+| `chatbotx-post` | chatbot-development | feature checklist | chatbotx-feature |
+| `chatbotx-db-pre` | chatbot-development | drizzle-database | chatbotx-database |
+| `chatbotx-db-post` | chatbot-development | db checklist | chatbotx-database |
+| `chatbotx-worker-pre` | chatbot-development | worker-development | chatbotx-worker |
+| `chatbotx-worker-post` | chatbot-development | worker checklist | chatbotx-worker |
 
 ### 5.2 Gate Execution Order
 
@@ -779,6 +871,12 @@ START: Request Received
 ├── Is request OCR? (text extraction, image to text)
 │   ├── VISUAL? → pixelrag
 │   └── OTHER? → document-ocr
+│
+├── Is request CHATBOT/CHATBOTX? (omnichannel marketing, chatbot platform)
+│   ├── FEATURE? → chatbotx-feature + full-output + frontend-review
+│   ├── DATABASE? → chatbotx-database + chatbotx-feature
+│   ├── WORKER? → chatbotx-worker + chatbotx-feature
+│   └── OTHER? → chatbotx-feature + karpathy-coding
 │
 └── DEFAULT
     ├── CODING TASK → [domain skill] + karpathy-coding
@@ -992,5 +1090,7 @@ Task → Skill Detection → Pre-Review Gate(s)
 
 | Date | Version | Changes |
 |------|---------|---------|
-| 2026-06-26 | 1.1.0 | Merged Ponytail Lazy Senior Dev section (§7) |
+| 2026-06-29 | 1.3.0 | Added ChatbotX development skills (chatbotx-feature, chatbotx-database, chatbotx-worker) |
+| 2026-06-26 | 1.2.0 | Merged Vietnamese payment and address skills |
+| 2026-06-26 | 1.1.0 | Merged Ponytail Lazy Senior Dev section |
 | 2026-06-26 | 1.0.0 | Initial unified skill registry |

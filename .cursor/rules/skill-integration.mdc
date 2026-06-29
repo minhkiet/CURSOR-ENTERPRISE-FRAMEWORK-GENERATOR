@@ -1752,4 +1752,6 @@ Priority khi 2 primary skills conflict:
 - [[visual-explainer]] — `.cursor/skills/visual-explainer/SKILL.md` (từ [visual-explainer](https://github.com/nicobailon/visual-explainer))
 - [[karpathy-coding]] — `.cursor/skills/karpathy-coding/SKILL.md` (từ [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) 182k stars)
 - [[bazi]] — `.cursor/skills/bazi/SKILL.md` (từ [bazi-skill](https://github.com/jinchenma94/bazi-skill) 2k stars - Chinese Bazi fortune telling)
+- [[chatbot-development]] — `.cursor/rules/chatbot-development.mdc` (ChatbotX patterns: feature scaffold, Drizzle, BullMQ)
+- [ChatbotX GitHub](https://github.com/ChatbotXIO/ChatbotX) — Open-source ManyChat alternative (304 stars)
 - [reverse-skill](https://github.com/zhaoxuya520/reverse-skill) — Cybersecurity Skills Router (APK RE, Binary Analysis, JS Reverse, Pentest, EDR Bypass, Firmware, LLM Security)

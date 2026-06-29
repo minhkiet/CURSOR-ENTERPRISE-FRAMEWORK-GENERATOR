@@ -1881,10 +1881,212 @@ Monitor executions. Handle failures. Optimize performance. Version workflows.
 
 ---
 
+## BullMQ Pattern (ChatbotX)
+
+### Tổng quan
+
+ChatbotX sử dụng **BullMQ** cho background job processing với Redis. BullMQ cung cấp reliable queue system với retry, priority, và scheduled jobs.
+
+### Architecture
+
+```
+apps/worker/
+├── src/
+│   ├── chat/worker.ts        # Chat message processing
+│   ├── trigger/worker.ts    # Automation triggers
+│   ├── webhook/worker.ts    # Webhook handlers
+│   └── sequence/worker.ts   # Sequence scheduler
+│
+packages/worker-config/
+└── src/
+    ├── queues/               # Queue definitions
+    │   ├── chat/index.ts
+    │   ├── trigger/index.ts
+    │   └── webhook/index.ts
+    └── lib/
+        ├── connection.ts    # Redis connection
+        └── types.ts         # Queue name constants
+```
+
+### Queue Definition Pattern
+
+```typescript
+// packages/worker-config/src/queues/chat/index.ts
+import { Queue } from "bullmq"
+import { getRedisConnection, defaultJobOptions, fakeQueue } from "../../lib/connection"
+
+export enum ChatJobAction {
+  sendMessage = "sendMessage",
+  processIncoming = "processIncoming",
+}
+
+export type ChatJobData = {
+  type: ChatJobAction
+  data: {
+    contactId: string
+    workspaceId: string
+    channel: string
+    content?: string
+  }
+}
+
+const NEXT_PHASE = process.env.NEXT_PHASE
+export const chatQueue =
+  NEXT_PHASE === "phase-production-build"
+    ? fakeQueue
+    : new Queue("chat", {
+        connection: getRedisConnection(),
+        defaultJobOptions,
+      })
+```
+
+### Worker Pattern
+
+```typescript
+// apps/worker/src/chat/worker.ts
+import { Worker, type Job } from "bullmq"
+import { queueNames } from "@chatbotx.io/worker-config"
+import { getRedisConnection, defaultWorkerOptions } from "@chatbotx.io/worker-config"
+import type { ChatJobData } from "@chatbotx.io/worker-config"
+import { ChatJobAction } from "@chatbotx.io/worker-config"
+import { ensureBootstrapped } from "../lib/bootstrap"
+import { logger } from "@chatbotx.io/logger"
+
+const startChatWorker = async () => {
+  await ensureBootstrapped()
+
+  const worker = new Worker(
+    queueNames.enum.chat,
+    async (job: Job<ChatJobData>) => {
+      logger.info(job.data, "[chat] Worker received job")
+
+      switch (job.data.type) {
+        case ChatJobAction.sendMessage:
+          return await handleSendMessage(job.data.data)
+        case ChatJobAction.processIncoming:
+          return await handleProcessIncoming(job.data.data)
+      }
+    },
+    {
+      connection: getRedisConnection(),
+      ...defaultWorkerOptions,
+    },
+  )
+
+  worker.on("failed", (job, err) => {
+    logger.error({ err, jobId: job?.id }, "[chat] Job failed")
+  })
+
+  worker.on("completed", (job) => {
+    logger.info({ jobId: job.id }, "[chat] Job completed")
+  })
+}
+
+startChatWorker()
+```
+
+### Enqueue Pattern
+
+```typescript
+import { chatQueue, ChatJobAction } from "@chatbotx.io/worker-config"
+
+// Simple job
+await chatQueue.add("sendMessage", {
+  type: ChatJobAction.sendMessage,
+  data: { contactId, workspaceId, channel, content },
+})
+
+// Bulk enqueue
+await chatQueue.addBulk([
+  { name: "sendMessage", data: { type: ChatJobAction.sendMessage, data: {...} } },
+  { name: "sendMessage", data: { type: ChatJobAction.sendMessage, data: {...} } },
+])
+
+// Scheduled job
+await chatQueue.add("sendMessage", {
+  type: ChatJobAction.sendMessage,
+  data: { contactId, workspaceId, channel },
+}, {
+  repeat: { pattern: "0 */6 * * *" }, // every 6 hours
+})
+```
+
+### Job ID Rules
+
+**CRITICAL: Job ID must NOT contain `:`** — BullMQ uses `:` as Redis key delimiter.
+
+```typescript
+// ✅ correct
+const jobId = `chat-send-${contactId}-${workspaceId}`
+
+// ❌ runtime crash
+const jobId = `chat:send:${contactId}:${workspaceId}`
+```
+
+| Policy | When to Use |
+|--------|-------------|
+| `removeOnComplete: { age, count }` | Dedup jobs (TTL retention) |
+| `removeOnComplete: true` | Re-driveable cron jobs |
+
+### Redis Connection Pattern
+
+```typescript
+// packages/worker-config/src/lib/connection.ts
+import Redis from "ioredis"
+
+export const getRedisConnection = () => {
+  const redisUrl = process.env.REDIS_URL || "redis://localhost:6379"
+  return new Redis(redisUrl, {
+    maxRetriesPerRequest: null,
+    enableReadyCheck: false,
+  })
+}
+
+export const defaultJobOptions = {
+  attempts: 3,
+  backoff: { type: "exponential", delay: 1000 },
+  removeOnComplete: { age: 3600, count: 100 },
+  removeOnFail: { age: 86400 },
+}
+```
+
+### Kafka for High-Throughput
+
+For sequence dispatch (high-volume), ChatbotX uses Kafka:
+
+```typescript
+// Producer
+import { createProducer } from "@chatbotx.io/kafka"
+
+const producer = await createProducer()
+await producer.send({
+  topic: "sequence-dispatch",
+  messages: [{ key: contactId, value: JSON.stringify(payload) }],
+})
+
+// Consumer
+import { createConsumer } from "@chatbotx.io/kafka"
+
+const consumer = await createConsumer({
+  groupId: "sequence-scheduler",
+  topics: ["sequence-dispatch"],
+})
+
+consumer.run({
+  eachMessage: async ({ topic, partition, message }) => {
+    const payload = JSON.parse(message.value.toString())
+    // process...
+  },
+})
+```
+
+---
+
 ## Liên kết
 
 - [[queue]] - Message queues
 - [[event-driven]] - Event-driven patterns
 - [[saga-pattern]] - Saga pattern
 - [[enterprise-patterns]] - Microservices
+- [[chatbot-development]] - ChatbotX: Full chatbot platform patterns
 - [[cqrs]] - CQRS integration
