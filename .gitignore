@@ -9,3 +9,4 @@
 .cursor/scripts/*.toc
 /cursor-setup-gui/bin
 /cursor-setup-gui/obj
+/cursor-setup.exe
