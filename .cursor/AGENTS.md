@@ -1,6 +1,6 @@
 # Cursor Enterprise Framework - Agent Personas & Lifecycle Protocol
 
-> Based on [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) - Production-grade engineering skills for AI coding agents
+> Based on [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) (67k stars) and [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) (186k stars)
 
 ---
 
@@ -340,6 +340,7 @@ Agent Personas work with the existing skill system:
 | `full-output` | Complete implementations | fulloutput-pre/post |
 | `security-review` | Security vulnerabilities | security-pre/post |
 | `vietnam-payment-review` | MoMo, SePay, PayOS | payment-pre/post |
+| `video-generation` | AI video, short video (9:16) | video-pre/post |
 | `karpathy-coding` | All coding tasks (overlay) | karpathy-pre/post |
 | `ponytail` | Efficiency, minimize code | ponytail-pre/post |
 

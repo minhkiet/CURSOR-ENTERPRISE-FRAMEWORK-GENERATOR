@@ -1,8 +1,11 @@
 ---
 description: Karpathy Coding Discipline - Think Before Coding, simplicity, surgical changes, goal-driven execution. Mandatory overlay for all coding tasks. Complements ponytail for YAGNI optimization.
 created: 2026-06-26
-version: 1.1.0
+version: 1.2.0
+updated: 2026-07-01
 tags: [karpathy, coding-discipline, vibe-code, simplicity, minimal, goal-driven, surgical, think-first]
+source: https://github.com/multica-ai/andrej-karpathy-skills (186k stars)
+see_also: .cursor/rules/karpathy-guidelines.mdc (alwaysApply rule)
 ---
 
 # Karpathy Coding Discipline

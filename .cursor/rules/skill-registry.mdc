@@ -1,8 +1,8 @@
 ---
-description: Single Source of Truth cho tất cả skill definitions, triggers, confidence thresholds, và gate mappings. Được sử dụng bởi skill-integration, task-analyzer, và multi-language-vibe-code. Bao gồm Ponytail Lazy Senior Dev principles. Integrated với agent-skills (addyosmani/agent-skills) và ChatbotX development patterns.
+description: Single Source of Truth cho tất cả skill definitions, triggers, confidence thresholds, và gate mappings. Được sử dụng bởi skill-integration, task-analyzer, và multi-language-vibe-code. Bao gồm Ponytail Lazy Senior Dev principles. Integrated với agent-skills (addyosmani/agent-skills) và ChatbotX development patterns. Tích hợp Karpathy Guidelines từ andrej-karpathy-skills.
 created: 2026-06-26
-version: 1.3.0
-updated: 2026-06-29
+version: 1.5.0
+updated: 2026-07-01
 tags: [skill-registry, skills, auto-discovery, mandatory, overlay, ponytail, lazy-senior, code-quality, agent-skills, chatbotx, chatbot-marketing]
 ---
 
@@ -237,6 +237,7 @@ Mỗi skill được định nghĩa với các properties:
 |----------|-------|
 | **ID** | `karpathy-coding` |
 | **Path** | `.cursor/skills/karpathy-coding/SKILL.md` |
+| **Rule** | `.cursor/rules/karpathy-guidelines.mdc` (alwaysApply: true) |
 | **Role** | `mandatory_overlay` |
 | **Domains** | `general` (all coding tasks) |
 | **Confidence Base** | `1.0` |
@@ -254,7 +255,7 @@ Mỗi skill được định nghĩa với các properties:
 
 **Purpose:** Think before coding, simplicity first, surgical changes, goal-driven execution. Luôn chạy song song với các skill khác như overlay discipline.
 
-**Source:** [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) (182k stars)
+**Source:** [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) (186k stars)
 
 ---
 
@@ -519,6 +520,33 @@ Mỗi skill được định nghĩa với các properties:
 
 ---
 
+#### video-generation
+
+| Property | Value |
+|----------|-------|
+| **ID** | `video-generation` |
+| **Path** | `.cursor/skills/video-generation/SKILL.md` |
+| **Role** | `primary` |
+| **Domains** | `video`, `automation` |
+| **Confidence Base** | `0.95` |
+| **Threshold** | `0.90` (auto-select) |
+
+**Triggers:**
+- video generation, auto-generate video, AI video
+- HyperFrames, short video, TikTok, YouTube Shorts
+- OmniVoice, TTS Vietnamese, text-to-speech
+- `/create-template-video`, `video pipeline`
+- 9:16 format, vertical video, mobile video
+
+**Pre-Gates:** V.1-V.3 (Prerequisites, Input Validation, Template Selection)  
+**Post-Gates:** V.4-V.5 (Output Verification, Quality Check)
+
+**Purpose:** Auto-generate short videos (9:16) from URLs or text using HyperFrames rendering, OmniVoice TTS, and FFmpeg. Integrated from AI-auto-generate-video.
+
+**Source:** [huytranvan2010/AI-auto-generate-video](https://github.com/huytranvan2010/AI-auto-generate-video) (118 stars, MIT License)
+
+---
+
 ## PHẦN 2: TRIGGER MATRIX
 
 ### 2.1 Keyword → Skill Mapping
@@ -637,6 +665,12 @@ Mỗi skill được định nghĩa với các properties:
 | `worker`, `bullmq`, `queue` | chatbotx-worker | 0.95 | BullMQ workers |
 | `job`, `cron`, `scheduled` | chatbotx-worker | 0.90 | Background jobs |
 | `kafka`, `consumer`, `event` | chatbotx-worker | 0.90 | Event processing |
+| **VIDEO - Generation** ||||
+| `video generation`, `auto-generate video` | video-generation | 0.95 | AI video pipeline |
+| `hyperframes`, `short video` | video-generation | 0.90 | HyperFrames rendering |
+| `omnivoice`, `tts vietnamese` | video-generation | 0.95 | Vietnamese TTS |
+| `/create-template-video` | video-generation | 0.95 | Claude Code skill |
+| `tiktok`, `youtube shorts`, `9:16` | video-generation | 0.85 | Short video format |
 
 ---
 
@@ -723,6 +757,8 @@ def calculate_confidence(skill: str, request: str) -> float:
 | **ChatbotX Feature** | chatbotx-feature | full-output, frontend-review | chatbotx-pre/post + fulloutput-pre/post + review-pre/post |
 | **ChatbotX Database** | chatbotx-database | chatbotx-feature | chatbotx-db-pre/post |
 | **ChatbotX Worker** | chatbotx-worker | chatbotx-feature | chatbotx-worker-pre/post |
+| **Video Generation** | video-generation | full-output, karpathy-coding | video-pre/post + fulloutput-pre/post + karpathy-pre/post |
+| **Video + Custom Template** | video-generation | open-design, full-output | video-pre/post + design-pre/post |
 | **Any coding task** | (task-specific) | karpathy-coding | karpathy-pre/post + task gates |
 
 ### 4.2 Mandatory Overlay Rule
@@ -793,6 +829,8 @@ karpathy-pre (MANDATORY) → [ponytail-pre if enabled] → IMPLEMENT → [ponyta
 | `chatbotx-db-post` | chatbot-development | db checklist | chatbotx-database |
 | `chatbotx-worker-pre` | chatbot-development | worker-development | chatbotx-worker |
 | `chatbotx-worker-post` | chatbot-development | worker checklist | chatbotx-worker |
+| `video-pre` | video-generation V.1-V.3 | Prerequisites, Input, Template | video-generation |
+| `video-post` | video-generation V.4-V.5 | Output Verification, Quality | video-generation |
 
 ### 5.2 Gate Execution Order
 
@@ -877,6 +915,11 @@ START: Request Received
 │   ├── DATABASE? → chatbotx-database + chatbotx-feature
 │   ├── WORKER? → chatbotx-worker + chatbotx-feature
 │   └── OTHER? → chatbotx-feature + karpathy-coding
+│
+├── Is request VIDEO? (video generation, AI video, short video)
+│   ├── WITH TEMPLATE? → video-generation + open-design
+│   ├── WITH FULL OUTPUT? → video-generation + full-output
+│   └── DEFAULT? → video-generation + karpathy-coding
 │
 └── DEFAULT
     ├── CODING TASK → [domain skill] + karpathy-coding
@@ -1090,6 +1133,8 @@ Task → Skill Detection → Pre-Review Gate(s)
 
 | Date | Version | Changes |
 |------|---------|---------|
+| 2026-07-01 | 1.5.0 | Added video-generation skill from AI-auto-generate-video (HyperFrames, OmniVoice TTS) |
+| 2026-07-01 | 1.4.0 | Integrated karpathy-guidelines rule (alwaysApply) from andrej-karpathy-skills (186k stars) |
 | 2026-06-29 | 1.3.0 | Added ChatbotX development skills (chatbotx-feature, chatbotx-database, chatbotx-worker) |
 | 2026-06-26 | 1.2.0 | Merged Vietnamese payment and address skills |
 | 2026-06-26 | 1.1.0 | Merged Ponytail Lazy Senior Dev section |
