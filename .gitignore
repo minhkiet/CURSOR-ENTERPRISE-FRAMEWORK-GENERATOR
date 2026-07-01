@@ -7,3 +7,5 @@
 .cursor/scripts/*.pkg
 .cursor/scripts/*.exe
 .cursor/scripts/*.toc
+/cursor-setup-gui/bin
+/cursor-setup-gui/obj

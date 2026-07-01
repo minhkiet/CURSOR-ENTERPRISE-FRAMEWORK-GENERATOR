@@ -1,7 +1,0 @@
-D:\PROJECTS\CURSORS\CURSOR ENTERPRISE FRAMEWORK GENERATOR\cursor-setup-gui-published\cursor-setup.pdb
-D:\PROJECTS\CURSORS\CURSOR ENTERPRISE FRAMEWORK GENERATOR\cursor-setup-gui-published\D3DCompiler_47_cor3.dll
-D:\PROJECTS\CURSORS\CURSOR ENTERPRISE FRAMEWORK GENERATOR\cursor-setup-gui-published\PenImc_cor3.dll
-D:\PROJECTS\CURSORS\CURSOR ENTERPRISE FRAMEWORK GENERATOR\cursor-setup-gui-published\PresentationNative_cor3.dll
-D:\PROJECTS\CURSORS\CURSOR ENTERPRISE FRAMEWORK GENERATOR\cursor-setup-gui-published\vcruntime140_cor3.dll
-D:\PROJECTS\CURSORS\CURSOR ENTERPRISE FRAMEWORK GENERATOR\cursor-setup-gui-published\wpfgfx_cor3.dll
-D:\PROJECTS\CURSORS\CURSOR ENTERPRISE FRAMEWORK GENERATOR\cursor-setup-gui-published\cursor-setup.exe
