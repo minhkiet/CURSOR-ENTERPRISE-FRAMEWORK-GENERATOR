@@ -41,11 +41,12 @@ set "GITHUB_MODE=0"
 set "GITHUB_URL="
 set "GITHUB_BRANCH_ARG="
 
-:: Parse GitHub-related arguments
-call :parse_github_args %*
+:: Custom installation directory
+set "CUSTOM_INSTALL_DIR="
+set "SHOW_GUI_PICKER=0"
 
-:: Parse GitHub-related arguments
-:parse_github_args
+:: Parse command-line arguments
+:parse_args
 if "%~1"=="" goto :eof
 if /i "%~1"=="--github" (
     set "GITHUB_MODE=1"
@@ -54,7 +55,7 @@ if /i "%~1"=="--github" (
         shift
     )
     shift
-    goto :parse_github_args
+    goto :parse_args
 )
 if /i "%~1"=="--branch" (
     if not "%~2"=="" (
@@ -62,7 +63,7 @@ if /i "%~1"=="--branch" (
         shift
     )
     shift
-    goto :parse_github_args
+    goto :parse_args
 )
 if /i "%~1"=="--clone" (
     set "GITHUB_MODE=2"
@@ -71,7 +72,7 @@ if /i "%~1"=="--clone" (
         shift
     )
     shift
-    goto :parse_github_args
+    goto :parse_args
 )
 if /i "%~1"=="--zip" (
     set "GITHUB_MODE=3"
@@ -80,13 +81,84 @@ if /i "%~1"=="--zip" (
         shift
     )
     shift
-    goto :parse_github_args
+    goto :parse_args
+)
+if /i "%~1"=="--install-dir" (
+    if not "%~2"=="" (
+        set "CUSTOM_INSTALL_DIR=%~2"
+        shift
+    )
+    shift
+    goto :parse_args
+)
+if /i "%~1"=="--gui-picker" (
+    set "SHOW_GUI_PICKER=1"
+    shift
+    goto :parse_args
 )
 goto :eof
 
 :: ----------------------------------------------------------
+:: Handle GUI folder picker
+:: ----------------------------------------------------------
+if %SHOW_GUI_PICKER%==1 (
+    echo.
+    echo [GUI] Opening folder picker dialog...
+    call :show_gui_folder_picker
+    if errorlevel 1 (
+        exit /b 1
+    )
+    
+    :: Override USER_CURSOR_HOME with custom directory
+    set "USER_CURSOR_HOME=%CUSTOM_INSTALL_DIR%"
+    set "USER_SKILLS=%USER_CURSOR_HOME%\skills"
+    set "USER_RULES=%USER_CURSOR_HOME%\rules"
+    set "USER_MEMORY=%USER_CURSOR_HOME%\memory"
+    set "USER_KNOWLEDGE=%USER_CURSOR_HOME%\knowledge"
+    set "USER_PROMPTS=%USER_CURSOR_HOME%\prompts"
+    set "USER_WORKFLOWS=%USER_CURSOR_HOME%\workflows"
+    set "USER_TEMPLATES=%USER_CURSOR_HOME%\templates"
+)
+
+:: ----------------------------------------------------------
 :: GitHub Installation Functions
 :: ----------------------------------------------------------
+
+:show_gui_folder_picker
+:: Display a GUI folder picker dialog using PowerShell
+set "PICKER_TEMP=%TEMP%\cursor_install_dir.txt"
+if exist "%PICKER_TEMP%" del /f /q "%PICKER_TEMP%" >nul 2>&1
+
+powershell -ExecutionPolicy Bypass -NoProfile -Command "
+Add-Type -AssemblyName System.Windows.Forms
+$d = New-Object System.Windows.Forms.FolderBrowserDialog
+$d.Description = 'Select installation folder for Cursor Enterprise Framework'
+$d.UseDescriptionForTitle = $true
+$d.ShowNewFolderButton = $true
+$d.SelectedPath = [Environment]::GetFolderPath('UserProfile')
+if ($d.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
+    $d.SelectedPath | Out-File -FilePath '%PICKER_TEMP%' -Encoding UTF8
+}
+"
+
+if not exist "%PICKER_TEMP%" (
+    echo [CANCELLED] Installation cancelled or no folder selected.
+    exit /b 1
+)
+
+set /p CUSTOM_INSTALL_DIR=<"%PICKER_TEMP%"
+del /f /q "%PICKER_TEMP%" >nul 2>&1
+
+if "%CUSTOM_INSTALL_DIR%"=="" (
+    echo [CANCELLED] No folder selected.
+    exit /b 1
+)
+
+:: Remove trailing backslash if present
+if "%CUSTOM_INSTALL_DIR:~-1%"=="\" set "CUSTOM_INSTALL_DIR=%CUSTOM_INSTALL_DIR:~0,-1%"
+
+echo [SELECTED] Installation folder: %CUSTOM_INSTALL_DIR%
+exit /b 0
 
 :github_clone
 :: Clone repository from GitHub
@@ -235,7 +307,11 @@ echo   Cursor Enterprise Framework v4.2.0 - Cross-Project Setup
 echo ============================================================
 echo.
 echo   Source:        %SOURCE_DIR%
-echo   User profile:  %USERPROFILE%
+if not "%CUSTOM_INSTALL_DIR%"=="" (
+    echo   Install to:   %CUSTOM_INSTALL_DIR% [CUSTOM]
+) else (
+    echo   User profile:  %USERPROFILE% [DEFAULT]
+)
 echo   Mode:          %FORCE_MODE%
 if %FORCE%==1 (echo   Force mode:    ENABLED - will overwrite existing) else (echo   Force mode:    disabled - use --force to overwrite)
 if %GITHUB_MODE%==1 echo   GitHub mode:   Clone (SSH/HTTPS)
@@ -784,10 +860,14 @@ if %GITHUB_MODE% gtr 0 (
 echo   Tip: Run 'setup.bat --force' to overwrite existing
 echo        components with the latest versions.
 echo.
-echo   GitHub Installation Options:
-echo   - setup.bat --github [repo-url]     Clone from GitHub
-echo   - setup.bat --clone [repo-url]      Clone from GitHub
-echo   - setup.bat --zip [repo-url]        Download as ZIP
-echo   - setup.bat --branch [branch-name]   Specify branch
+echo   Installation Options:
+echo   - setup.bat --gui-picker        Choose folder via GUI dialog
+echo   - setup.bat --install-dir PATH  Specify custom installation folder
+echo   - setup.bat --github [url]     Clone from GitHub
+echo   - setup.bat --clone [url]      Clone from GitHub
+echo   - setup.bat --zip [url]        Download as ZIP
+echo   - setup.bat --branch [name]    Specify branch
+echo   - setup.bat --force            Overwrite existing files
+echo   - setup.bat --no-cursor-check  Skip Cursor running check
 echo.
 exit /b 0

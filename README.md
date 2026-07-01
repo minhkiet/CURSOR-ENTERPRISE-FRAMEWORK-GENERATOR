@@ -193,6 +193,39 @@ The framework implements **10 token optimization strategies**:
 
 ---
 
+## GUI Installation (Recommended)
+
+For easy installation with a graphical folder picker, use `cursor-setup.exe`:
+
+### Method 1: Double-click cursor-setup.exe
+
+```
+1. Download or copy cursor-setup.exe to the framework folder
+2. Double-click cursor-setup.exe
+3. Select installation folder via GUI dialog
+4. Done!
+```
+
+### Method 2: Using cursor-setup.bat
+
+```cmd
+cursor-setup.bat
+```
+
+### Method 3: Using setup.bat with --gui-picker
+
+```cmd
+setup.bat --gui-picker
+```
+
+### Method 4: Custom installation path (command-line)
+
+```cmd
+setup.bat --install-dir "D:\MyCustomPath\.cursor"
+```
+
+---
+
 ## GitHub Installation
 
 ### Quick Install (One Command)
@@ -537,6 +570,39 @@ Framework triển khai **10 chiến lược tối ưu token**:
 | PDF | Tạo và xử lý PDF |
 | Docker / Kubernetes | Container orchestration |
 | Cloudflare / AWS / Azure / GCP | Cloud platforms |
+
+---
+
+## Cài đặt GUI (Khuyến nghị)
+
+Để cài đặt dễ dàng với hộp thoại chọn thư mục đồ họa, sử dụng `cursor-setup.exe`:
+
+### Cách 1: Double-click cursor-setup.exe
+
+```
+1. Tải hoặc copy cursor-setup.exe vào thư mục framework
+2. Double-click cursor-setup.exe
+3. Chọn thư mục cài đặt qua hộp thoại GUI
+4. Xong!
+```
+
+### Cách 2: Sử dụng cursor-setup.bat
+
+```cmd
+cursor-setup.bat
+```
+
+### Cách 3: Dùng setup.bat với --gui-picker
+
+```cmd
+setup.bat --gui-picker
+```
+
+### Cách 4: Chỉ định đường dẫn tùy chỉnh (command-line)
+
+```cmd
+setup.bat --install-dir "D:\MyCustomPath\.cursor"
+```
 
 ---
 
