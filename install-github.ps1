@@ -169,16 +169,21 @@ try {
     
     $setupBat = Join-Path $tempDir "setup.bat"
     if (Test-Path $setupBat) {
-        $args = @("--no-cursor-check")
+        $args = @()
+        if ($SkipCursorCheck) { $args += "--no-cursor-check" }
         if ($Force) { $args += "--force" }
-        
+
+        Push-Location $tempDir
+        $env:CEF_SOURCE_DIR = $tempDir
         & $setupBat @args
-        if ($LASTEXITCODE -ne 0) {
-            throw "Setup failed with exit code $LASTEXITCODE"
+        $setupExit = $LASTEXITCODE
+        Remove-Item Env:CEF_SOURCE_DIR -ErrorAction SilentlyContinue
+        Pop-Location
+        if ($setupExit -ne 0) {
+            throw "Setup failed with exit code $setupExit"
         }
     } else {
-        Write-Warn "setup.bat not found, installing manually..."
-        & "$PSScriptRoot\setup.bat" @args
+        Write-Warn "setup.bat not found in downloaded files"
     }
     
     # ============================================================
@@ -186,10 +191,10 @@ try {
     # ============================================================
     Write-Host ""
     Write-Host "[4/4] Cleaning up..." -ForegroundColor Yellow
-    
+
     Remove-Item -Path $tempDir -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item -Path $zipFile -Force -ErrorAction SilentlyContinue
-    
+
     Write-Success "Cleanup complete"
     
     # ============================================================

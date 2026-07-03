@@ -1,4 +1,6 @@
 @echo off
+setlocal enabledelayedexpansion
+
 :: ============================================================
 :: Quick Install from GitHub - Cursor Enterprise Framework
 :: ============================================================
@@ -7,7 +9,6 @@
 ::   install-github.bat [repo-url]            - Use custom repo
 ::   install-github.bat [repo-url] [branch]   - Custom repo + branch
 :: ============================================================
-setlocal enabledelayedexpansion
 
 set "DEFAULT_REPO=https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR"
 set "DEFAULT_BRANCH=main"
@@ -49,13 +50,19 @@ echo   Git clone not available or failed.
 echo.
 echo [2/3] Attempting ZIP download...
 
-:: Parse repo URL
+:: Parse repo URL to extract user/repo path
 set "REPO_PATH=%REPO_URL%"
 set "REPO_PATH=!REPO_PATH:https://github.com/=!"
 set "REPO_PATH=!REPO_PATH:http://github.com/=!"
-set "REPO_PATH=!REPO_PATH:github.com/=!"
+set "REPO_PATH=!REPO_PATH:git@github.com:=!"
+set "REPO_PATH=!REPO_PATH:.git=!"
+set "REPO_PATH=!REPO_PATH:/=!"
 
-set "ZIP_URL=https://github.com/%REPO_PATH%/archive/refs/heads/%BRANCH%.zip"
+:: Strip leading/trailing slashes
+set "REPO_PATH=!REPO_PATH:~1!"
+if "!REPO_PATH:~-1!"=="/" set "REPO_PATH=!REPO_PATH:~0,-1!"
+
+set "ZIP_URL=https://github.com/!REPO_PATH!/archive/refs/heads/%BRANCH%.zip"
 set "ZIP_FILE=%TEMP%\cef.zip"
 
 echo   URL: !ZIP_URL!
@@ -78,24 +85,23 @@ echo [3/3] Extracting files...
 
 powershell -Command "Expand-Archive -Path '!ZIP_FILE!' -DestinationPath '%INSTALL_DIR%' -Force"
 
-:: Find extracted folder
-for /d %%D in ("%INSTALL_DIR%\*") do set "EXTRACTED=%%D"
-if defined EXTRACTED (
-    :: Move contents to parent
-    for /f "delims=" %%F in ('dir /b "!EXTRACTED!"') do (
-        if /i not "%%F"=="%INSTALL_DIR%" (
-            xcopy /s /y "!EXTRACTED!\%%F" "%INSTALL_DIR%\" 2>nul
-        )
+:: Find and flatten the extracted folder (GitHub creates repo-branch/ subfolder)
+for /d %%D in ("%INSTALL_DIR%\*") do (
+    echo   Found folder: %%~nxD
+    :: Move all contents out of the extracted subfolder
+    for /f "delims=" %%F in ('dir /b "%%D" 2^>nul') do (
+        xcopy /s /y "%%D\%%F" "%INSTALL_DIR%\" 2>nul
     )
-    rmdir /s /q "!EXTRACTED!" 2>nul
+    rmdir /s /q "%%D" 2>nul
 )
 
-:run_setup
 echo   Extraction complete!
 
-:: Run the setup
+:run_setup
+:: Run the setup, passing source dir via environment variable
 echo.
 echo [SETUP] Running setup from downloaded files...
+set "CEF_SOURCE_DIR=%INSTALL_DIR%"
 "%INSTALL_DIR%\setup.bat" --force --no-cursor-check
 
 :: Cleanup

@@ -33,8 +33,11 @@ set "FORCE=0"
 if /i "%1"=="--force" set "FORCE=1"
 if /i "%1"=="-f" set "FORCE=1"
 set "SKIP_CURSOR_CHECK=0"
-if /i "%1"=="--no-cursor-check" set "SKIP_CURSOR_CHECK=1"
-if /i "%2"=="--no-cursor-check" set "SKIP_CURSOR_CHECK=1"
+if /i "%~1"=="--no-cursor-check" set "SKIP_CURSOR_CHECK=1"
+if /i "%~2"=="--no-cursor-check" set "SKIP_CURSOR_CHECK=1"
+
+:: External source override (set by installer scripts)
+if defined CEF_SOURCE_DIR set "SOURCE_DIR=%CEF_SOURCE_DIR%"
 
 :: GitHub mode flags
 set "GITHUB_MODE=0"
@@ -733,7 +736,7 @@ if exist "%TEMPLATES_SOURCE%" (
 ::    Destination: %USERPROFILE%\.cursor\scripts\
 :: ----------------------------------------------------------
 echo.
-echo [9/9] Syncing automation scripts to ~/.cursor/scripts/...
+echo [8/9] Syncing automation scripts to ~/.cursor/scripts/...
 
 set "SCRIPTS_SOURCE=%SOURCE_DIR%\.cursor\scripts"
 if not exist "%SCRIPTS_SOURCE%" (

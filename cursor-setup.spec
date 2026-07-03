@@ -1,11 +1,14 @@
 # -*- mode: python ; coding: utf-8 -*-
+import os
 
+# SPECPATH = project root — .cursor is directly inside it
+_cursor_src = os.path.join(SPECPATH, '.cursor')
 
 a = Analysis(
-    ['D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\.cursor\\scripts\\setup_local_installer.py'],
+    [os.path.join(SPECPATH, '.cursor', 'scripts', 'setup_local_installer.py')],
     pathex=[],
     binaries=[],
-    datas=[('D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\.cursor', '.cursor_source')],
+    datas=[],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

@@ -1,8 +1,11 @@
 # -*- mode: python ; coding: utf-8 -*-
+import os
 
+# SPECPATH = .cursor/scripts/ — project root is two levels up
+_project_root = os.path.normpath(os.path.join(SPECPATH, '..', '..'))
 
 a = Analysis(
-    ['setup_local_installer.py'],
+    [os.path.join(SPECPATH, 'setup_local_installer.py')],
     pathex=[],
     binaries=[],
     datas=[],

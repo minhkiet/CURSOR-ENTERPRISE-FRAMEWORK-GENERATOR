@@ -10,3 +10,6 @@
 /cursor-setup-gui/bin
 /cursor-setup-gui/obj
 /cursor-setup.exe
+/cursor-setup-py.exe
+/cursor-setup-gui-publish
+/cursor-setup-gui.exe

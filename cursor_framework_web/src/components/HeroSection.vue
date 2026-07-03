@@ -17,17 +17,17 @@ function smoothScroll(href: string) {
 }
 
 const stats = [
-  { icon: 'layers', title: 'Rules', count: '40', items: ['skill-registry, skill-integration', 'architecture-patterns, coding-standards', 'security, performance, multi-tenant'], color: 'violet' },
-  { icon: 'file', title: 'Skills', count: '17', items: ['frontend-taste, frontend-review', 'karpathy-coding, ponytail', 'security-review, full-output'], color: 'cyan' },
-  { icon: 'search', title: 'Knowledge', count: '36', items: ['architecture, best-practice, anti-pattern', 'faq, checklist, glossary', 'decision-tree per domain'], color: 'emerald' },
-  { icon: 'code', title: 'Domains', count: '36+', items: ['Nuxt, Vue, Next, React', 'Laravel, NestJS, ASP.NET Core', 'Supabase, PostgreSQL, Redis'], color: 'violet' }
+  { icon: 'layers', title: 'Rules', count: '41', items: ['skill-registry, skill-integration', 'architecture-patterns, coding-standards', 'security, performance, multi-tenant'], color: 'violet' },
+  { icon: 'file', title: 'Skills', count: '18', items: ['frontend-taste, frontend-review', 'karpathy-coding, ponytail', 'security-review, full-output'], color: 'cyan' },
+  { icon: 'search', title: 'Knowledge', count: '37', items: ['architecture, best-practice, anti-pattern', 'faq, checklist, glossary', 'decision-tree per domain'], color: 'emerald' },
+  { icon: 'code', title: 'Domains', count: '37+', items: ['Nuxt, Vue, Next, React', 'Laravel, NestJS, ASP.NET Core', 'Supabase, PostgreSQL, Redis'], color: 'violet' }
 ]
 
 const terminalLines = [
   { type: 'cmd', text: 'Initialize CEF for my CRM project' },
-  { type: 'muted', text: 'Loading rules...', success: '40 rules loaded' },
-  { type: 'muted', text: 'Loading skills...', success: '17 skills loaded' },
-  { type: 'muted', text: 'Loading knowledge...', success: '36 knowledge directories indexed' },
+  { type: 'muted', text: 'Loading rules...', success: '41 rules loaded' },
+  { type: 'muted', text: 'Loading skills...', success: '18 skills loaded' },
+  { type: 'muted', text: 'Loading knowledge...', success: '37 knowledge directories indexed' },
   { type: 'muted', text: 'Building memory...', success: 'Context optimized' },
   { type: 'cmd', text: 'Build Multi-Tenant SaaS with Supabase' },
   { type: 'success', text: '✓ Context routed: supabase, rls, multi-tenant' },
@@ -50,9 +50,9 @@ onMounted(() => {
         <span class="badge-dot"></span>
         <span>v5.0.0</span>
         <span class="badge-sep">·</span>
-        <span>668 files</span>
+        <span>592 files</span>
         <span class="badge-sep">·</span>
-        <span>36 domains</span>
+        <span>37 domains</span>
       </div>
 
       <h1 class="hero-title">

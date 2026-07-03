@@ -12,10 +12,25 @@ import subprocess
 from pathlib import Path
 from datetime import datetime
 
-# Source .cursor location (relative to exe location)
-EXE_DIR = Path(sys.argv[0]).parent.resolve() if hasattr(sys, 'frozen') else Path(__file__).parent.resolve()
-SOURCE_ROOT = Path(r"D:\PROJECTS\CURSORS\CURSOR ENTERPRISE FRAMEWORK GENERATOR")
-CURSOR_SOURCE = SOURCE_ROOT / ".cursor"
+# Source .cursor location - resolved at runtime
+_EXE_DIR = Path(sys.argv[0]).parent.resolve() if hasattr(sys, 'frozen') else Path(__file__).parent.resolve()
+_MEI_PASS = getattr(sys, '_MEIPASS', str(_EXE_DIR))
+
+# Find .cursor source: prefer bundled (_MEIPASS), fall back to exe-adjacent
+_CURSOR_BUNDLED = Path(_MEI_PASS) / '.cursor_source'
+_CURSOR_ADJACENT = _EXE_DIR / '.cursor'
+
+if _CURSOR_BUNDLED.exists():
+    SOURCE_ROOT = _EXE_DIR  # exe dir contains the bundled .cursor_source
+    CURSOR_SOURCE = _CURSOR_BUNDLED
+elif _CURSOR_ADJACENT.exists():
+    SOURCE_ROOT = _EXE_DIR
+    CURSOR_SOURCE = _CURSOR_ADJACENT
+else:
+    # Last resort: try relative path from script location
+    SCRIPT_DIR = Path(__file__).parent.resolve()
+    SOURCE_ROOT = SCRIPT_DIR
+    CURSOR_SOURCE = SOURCE_ROOT / '.cursor'
 
 # Colors for terminal output
 class Colors:

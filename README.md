@@ -23,14 +23,17 @@ The framework is built on **4 core principles**:
 
 | Component | Target | Actual | Status |
 |-----------|:------:|:------:|--------|
-| Rules | 55 | **40** | ✅ Complete |
-| Skills | 44 | **17** | ✅ Complete |
-| Knowledge Dirs | 35+ | **36** | ✅ Complete |
+| Rules | 55 | **41** | ✅ Complete |
+| Skills | 44 | **18** | ✅ Complete |
+| Knowledge Dirs | 35+ | **37** | ✅ Complete |
 | Scripts | 10+ | **12** | ✅ Complete |
-| Commands | 20+ | **29** | ✅ New |
+| Commands | 20+ | **26** | ✅ Complete |
+| Prompts | 20+ | **31** | ✅ New |
+| Workflows | 10+ | **11** | ✅ New |
+| Templates | 5+ | **6** | ✅ New |
 | Python Package | - | **12 modules** | ✅ New |
 | Web Interface | - | **Vue.js** | ✅ New |
-| **Total Files** | **500+** | **668** | ✅ **+33%** |
+| **Total Files** | **500+** | **592** | ✅ **+18%** |
 
 📦 **ZIP Package**: `cursor-enterprise-framework-v5.zip` — TBD
 
@@ -68,8 +71,8 @@ Cloudflare · AWS · Azure · GCP · Docker · Kubernetes · Coolify · Vercel �
 
 ```
 .cursor/
-├── rules/         MDC Rules — Standards & Principles         (40 files)
-├── skills/        MDC Skills — Specialized Expertise         (17 files)
+├── rules/         MDC Rules — Standards & Principles         (41 files)
+├── skills/        MDC Skills — Specialized Expertise         (18 dirs)
 ├── memory/        Memory System
 │   ├── schema/    SQLite schemas
 │   ├── session-summary/
@@ -77,12 +80,12 @@ Cloudflare · AWS · Azure · GCP · Docker · Kubernetes · Coolify · Vercel �
 │   ├── decision-history/
 │   ├── bug-history/
 │   └── *.json     Index files
-├── knowledge/     Knowledge Base (36 directories)
-├── prompts/       Prompt Templates
-├── workflows/     Standard Workflows
-├── templates/     Project Templates
+├── knowledge/     Knowledge Base (37 directories)
+├── prompts/       Prompt Templates (31 files)
+├── workflows/     Standard Workflows (11 files)
+├── templates/     Project Templates (6 files)
 ├── scripts/       Automation Scripts (12)
-├── commands/      Slash Commands (29)
+├── commands/      Slash Commands (26 files)
 ├── hooks/         Lifecycle Hooks
 ├── cache/         Compiled Cache
 └── vector-db/     Vector DB Configuration
