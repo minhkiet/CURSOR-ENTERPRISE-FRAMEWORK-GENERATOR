@@ -50,9 +50,9 @@ onMounted(() => {
         <span class="badge-dot"></span>
         <span>v5.0.0</span>
         <span class="badge-sep">·</span>
-        <span>592 files</span>
+        <span>604 files</span>
         <span class="badge-sep">·</span>
-        <span>37 domains</span>
+        <span>8 agents</span>
       </div>
 
       <h1 class="hero-title">

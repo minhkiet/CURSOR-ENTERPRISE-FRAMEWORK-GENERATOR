@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const isScrolled = ref(false)
 const isMobileMenuOpen = ref(false)
 const isMobileMode = ref(false)
 
 const navLinks = [
+  { label: 'Templates', to: '/templates', isRoute: true },
   { href: '#explorer', label: 'Rules & Skills' },
   { href: '#principles', label: 'Nguyên tắc' },
   { href: '#architecture', label: 'Kiến trúc' },
   { href: '#components', label: 'Components' },
   { href: '#domains', label: 'Domains' },
+  { href: '#agents', label: 'Agents' },
   { href: '#prompts', label: 'Prompts' },
   { href: '#getting-started', label: 'Bắt đầu' }
 ]
@@ -46,13 +50,17 @@ function checkMobileMode() {
   }
 }
 
-function smoothScroll(e: Event, href: string): void {
+function smoothScroll(e: Event, link: { href?: string; to?: string; isRoute?: boolean }): void {
   e.preventDefault()
-  const target = document.querySelector(href)
-  if (target) {
-    const navbarHeight = 60
-    const targetPosition = target.getBoundingClientRect().top + window.scrollY - navbarHeight
-    window.scrollTo({ top: targetPosition, behavior: 'smooth' })
+  if (link.isRoute && link.to) {
+    router.push(link.to)
+  } else if (link.href) {
+    const target = document.querySelector(link.href)
+    if (target) {
+      const navbarHeight = 60
+      const targetPosition = target.getBoundingClientRect().top + window.scrollY - navbarHeight
+      window.scrollTo({ top: targetPosition, behavior: 'smooth' })
+    }
   }
   closeMobileMenu()
 }
@@ -82,7 +90,7 @@ onUnmounted(() => {
 <template>
   <header class="navbar" :class="{ scrolled: isScrolled }">
     <div class="navbar-inner">
-      <a href="#" class="navbar-logo">
+      <router-link to="/" class="navbar-logo">
         <div class="navbar-logo-icon">
           <svg viewBox="0 0 16 16" fill="none">
             <path d="M8 1L1 4.5L8 8L15 4.5L8 1Z" fill="white" fill-opacity="0.9"/>
@@ -93,19 +101,27 @@ onUnmounted(() => {
         <span class="navbar-logo-text">CEF</span>
         <span class="navbar-logo-sep">/</span>
         <span class="navbar-logo-full">Enterprise Framework</span>
-        <span class="navbar-badge">v4.0</span>
-      </a>
+        <span class="navbar-badge">v5.0</span>
+      </router-link>
 
       <nav class="navbar-nav" :class="{ 'mobile-trigger': isMobileMode }">
-        <a
-          v-for="link in navLinks"
-          :key="link.href"
-          :href="link.href"
-          class="nav-link"
-          @click="smoothScroll($event, link.href)"
-        >
-          {{ link.label }}
-        </a>
+        <template v-for="link in navLinks" :key="link.label">
+          <router-link
+            v-if="link.isRoute"
+            :to="link.to!"
+            class="nav-link"
+          >
+            {{ link.label }}
+          </router-link>
+          <a
+            v-else
+            :href="link.href"
+            class="nav-link"
+            @click="smoothScroll($event, link)"
+          >
+            {{ link.label }}
+          </a>
+        </template>
       </nav>
 
       <div class="navbar-actions">
@@ -116,18 +132,18 @@ onUnmounted(() => {
           <span>GitHub</span>
           <span class="star-badge">★</span>
         </a>
-        <a href="#getting-started" class="btn-primary" @click="smoothScroll($event, '#getting-started')">
+        <router-link to="/templates" class="btn-primary">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
             <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
           </svg>
-          Bắt đầu ngay
-        </a>
+          Templates
+        </router-link>
       </div>
 
-      <button 
+      <button
         v-show="isMobileMode"
-        class="navbar-mobile-toggle" 
-        @click="toggleMobileMenu" 
+        class="navbar-mobile-toggle"
+        @click="toggleMobileMenu"
         aria-label="Toggle menu"
       >
         <span></span>
@@ -138,15 +154,24 @@ onUnmounted(() => {
 
     <div v-show="isMobileMode" class="mobile-menu" :class="{ open: isMobileMenuOpen }">
       <nav class="mobile-nav">
-        <a
-          v-for="link in navLinks"
-          :key="link.href"
-          :href="link.href"
-          class="mobile-nav-link"
-          @click="smoothScroll($event, link.href)"
-        >
-          {{ link.label }}
-        </a>
+        <template v-for="link in navLinks" :key="link.label">
+          <router-link
+            v-if="link.isRoute"
+            :to="link.to!"
+            class="mobile-nav-link"
+            @click="closeMobileMenu"
+          >
+            {{ link.label }}
+          </router-link>
+          <a
+            v-else
+            :href="link.href"
+            class="mobile-nav-link"
+            @click="smoothScroll($event, link)"
+          >
+            {{ link.label }}
+          </a>
+        </template>
       </nav>
     </div>
   </header>

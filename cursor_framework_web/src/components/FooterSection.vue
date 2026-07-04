@@ -1,11 +1,13 @@
 <script setup lang="ts">
 const footerLinks = {
   framework: [
+    { label: 'Templates Gallery', to: '/templates', isRoute: true },
     { label: 'Rules & Skills', href: '#explorer' },
     { label: 'Nguyên tắc', href: '#principles' },
     { label: 'Kiến trúc', href: '#architecture' },
     { label: 'Components', href: '#components' },
-    { label: 'Domains', href: '#domains' }
+    { label: 'Domains', href: '#domains' },
+    { label: 'Agent Personas', href: '#agents' }
   ],
   resources: [
     { label: 'Documentation', href: 'https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR#readme', external: true },
@@ -22,18 +24,18 @@ const footerLinks = {
 }
 
 const socialLinks = [
-  { 
-    name: 'GitHub', 
+  {
+    name: 'GitHub',
     href: 'https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR',
     icon: 'github'
   },
-  { 
-    name: 'Discord', 
+  {
+    name: 'Discord',
     href: '#',
     icon: 'discord'
   },
-  { 
-    name: 'Twitter', 
+  {
+    name: 'Twitter',
     href: '#',
     icon: 'twitter'
   }
@@ -69,7 +71,7 @@ function smoothScroll(e: Event, href: string) {
           </div>
           <p>Enterprise-grade framework cho AI coding agents. Tối ưu token, memory, và knowledge reuse.</p>
           <div class="footer-version">
-            <span class="cef-badge cef-badge-purple">v4.0.0</span>
+            <span class="cef-badge cef-badge-purple">v5.0.0</span>
             <span class="cef-badge cef-badge-outline">MIT</span>
           </div>
           <div class="footer-social">
@@ -99,7 +101,8 @@ function smoothScroll(e: Event, href: string) {
           <h4>Framework</h4>
           <ul>
             <li v-for="link in footerLinks.framework" :key="link.label">
-              <a :href="link.href" @click="smoothScroll($event, link.href)">{{ link.label }}</a>
+              <router-link v-if="link.isRoute" :to="link.to!">{{ link.label }}</router-link>
+              <a v-else :href="link.href" @click="smoothScroll($event, link.href!)">{{ link.label }}</a>
             </li>
           </ul>
         </div>

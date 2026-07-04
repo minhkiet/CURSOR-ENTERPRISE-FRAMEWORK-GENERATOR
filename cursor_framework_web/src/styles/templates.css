@@ -1,0 +1,27 @@
+/* ─── TEMPLATES GALLERY & PREVIEW ─── */
+
+.gallery-page {
+  min-height: 100vh;
+}
+
+.not-found {
+  padding: 200px 0;
+  text-align: center;
+}
+
+.not-found h2 {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.not-found p {
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+/* Responsive helpers for gallery/preview pages */
+@media (max-width: 1024px) {
+  .preview-layout {
+    grid-template-columns: 1fr !important;
+  }
+}

@@ -6,7 +6,7 @@ const statsBarRef = ref<HTMLElement | null>(null)
 const isVisible = ref(false)
 
 const stats = [
-  { target: 592, label: 'Files', sublabel: '592 total in framework' },
+  { target: 604, label: 'Files', sublabel: '604 total in framework' },
   { target: 41, label: 'Rules', sublabel: 'MDC rules & principles' },
   { target: 18, label: 'Skills', sublabel: 'Specialized expertise' },
   { target: 37, label: 'Knowledge', sublabel: 'Directories across domains' },

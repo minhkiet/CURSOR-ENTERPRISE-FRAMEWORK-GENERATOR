@@ -74,7 +74,7 @@ onMounted(() => {
                   <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
                 </svg>
                 rules
-                <span class="ft-count">40 files</span>
+                <span class="ft-count">41 files</span>
               </div>
               <div class="ft-sub">
                 <div class="ft-item ft-file">
@@ -98,7 +98,7 @@ onMounted(() => {
                   </svg>
                   context-router.mdc
                 </div>
-                <div class="ft-item ft-file" style="color: var(--text-faint); font-style: italic;">+37 more rules...</div>
+                <div class="ft-item ft-file" style="color: var(--text-faint); font-style: italic;">+38 more rules...</div>
               </div>
             </div>
 
@@ -108,7 +108,7 @@ onMounted(() => {
                   <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
                 </svg>
                 skills
-                <span class="ft-count">17 files</span>
+                <span class="ft-count">18 files</span>
               </div>
               <div class="ft-sub">
                 <div class="ft-item ft-file">
@@ -132,7 +132,7 @@ onMounted(() => {
                   </svg>
                   figma/
                 </div>
-                <div class="ft-item ft-file" style="color: var(--text-faint); font-style: italic;">+14 more skills...</div>
+                <div class="ft-item ft-file" style="color: var(--text-faint); font-style: italic;">+15 more skills...</div>
               </div>
             </div>
 
@@ -142,7 +142,7 @@ onMounted(() => {
                   <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
                 </svg>
                 knowledge
-                <span class="ft-count">36 directories</span>
+                <span class="ft-count">37 directories</span>
               </div>
               <div class="ft-sub">
                 <div class="ft-item ft-folder" style="color: var(--text-secondary);">
@@ -163,7 +163,41 @@ onMounted(() => {
                   </svg>
                   ai-rag/
                 </div>
-                <div class="ft-item ft-file" style="color: var(--text-faint); font-style: italic;">+5 more domains...</div>
+                <div class="ft-item ft-file" style="color: var(--text-faint); font-style: italic;">+6 more domains...</div>
+              </div>
+            </div>
+
+            <div class="ft-branch">
+              <div class="ft-item ft-folder" style="color: #fbbf24;">
+                <svg class="ft-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="stroke: #fbbf24;">
+                  <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
+                </svg>
+                agents
+                <span class="ft-count">8 personas</span>
+              </div>
+              <div class="ft-sub">
+                <div class="ft-item ft-file">
+                  <svg class="ft-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                  </svg>
+                  code-reviewer.md
+                </div>
+                <div class="ft-item ft-file">
+                  <svg class="ft-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                  </svg>
+                  security-auditor.md
+                </div>
+                <div class="ft-item ft-file">
+                  <svg class="ft-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                  </svg>
+                  test-engineer.md
+                </div>
+                <div class="ft-item ft-file" style="color: var(--text-faint); font-style: italic;">+5 more agents...</div>
               </div>
             </div>
 
@@ -208,7 +242,7 @@ onMounted(() => {
               </svg>
             </div>
             <div class="arch-desc-text">
-              <h4>40 MDC Rules</h4>
+              <h4>41 MDC Rules</h4>
               <p>YAML frontmatter với metadata, tags, version. Mỗi rule định nghĩa tiêu chuẩn cho architecture, coding, security, performance.</p>
             </div>
           </div>
@@ -221,7 +255,7 @@ onMounted(() => {
               </svg>
             </div>
             <div class="arch-desc-text">
-              <h4>17 Specialized Skills</h4>
+              <h4>18 Specialized Skills</h4>
               <p>SKILL.md files cho Cursor, Claude Code, Codex, Claude Plugins. Mỗi skill cung cấp step-by-step expertise.</p>
             </div>
           </div>
@@ -234,8 +268,20 @@ onMounted(() => {
               </svg>
             </div>
             <div class="arch-desc-text">
-              <h4>36 Knowledge Domains</h4>
+              <h4>37 Knowledge Domains</h4>
               <p>Mỗi domain đi kèm bộ knowledge chuẩn hóa: architecture, best-practice, anti-pattern, faq, checklist, glossary.</p>
+            </div>
+          </div>
+
+          <div class="arch-desc-item">
+            <div class="arch-desc-icon" style="background: rgba(251, 191, 36, 0.08); border-color: rgba(251, 191, 36, 0.2);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="stroke: #fbbf24;">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+              </svg>
+            </div>
+            <div class="arch-desc-text">
+              <h4>8 Agent Personas</h4>
+              <p>Specialist reviewers cho code, security, test, perf, API, backend, database, frontend. Dispatch qua slash commands: /review, /security, /test, /perf.</p>
             </div>
           </div>
 

@@ -1,15 +1,5 @@
 <script setup lang="ts">
 import NavBar from './components/NavBar.vue'
-import HeroSection from './components/HeroSection.vue'
-import StatsBar from './components/StatsBar.vue'
-import ExplorerSection from './components/ExplorerSection.vue'
-import PrinciplesSection from './components/PrinciplesSection.vue'
-import ArchitectureSection from './components/ArchitectureSection.vue'
-import ComponentsSection from './components/ComponentsSection.vue'
-import DomainsSection from './components/DomainsSection.vue'
-import OptimizationSection from './components/OptimizationSection.vue'
-import PromptsSection from './components/PromptsSection.vue'
-import GettingStartedSection from './components/GettingStartedSection.vue'
 import FooterSection from './components/FooterSection.vue'
 </script>
 
@@ -17,16 +7,11 @@ import FooterSection from './components/FooterSection.vue'
   <div class="app">
     <NavBar />
     <main>
-      <HeroSection />
-      <StatsBar />
-      <ExplorerSection />
-      <PrinciplesSection />
-      <ArchitectureSection />
-      <ComponentsSection />
-      <DomainsSection />
-      <OptimizationSection />
-      <PromptsSection />
-      <GettingStartedSection />
+      <router-view v-slot="{ Component }">
+        <transition name="fade" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
     </main>
     <FooterSection />
   </div>
@@ -41,5 +26,15 @@ import FooterSection from './components/FooterSection.vue'
 
 main {
   flex: 1;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 200ms ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

@@ -1,11 +1,54 @@
 # CEF Landing Vue 3 App
 
-> Enterprise-grade Vue 3 landing page cho **Cursor Enterprise Framework v5.0.0** — synced 2026-06-26.
+> Enterprise-grade Vue 3 landing page cho **Cursor Enterprise Framework v5.0.0** — synced 2026-07-04.
+
+## What's New
+
+### Landing Page Templates Gallery (v5.0)
+Bộ sưu tập **6 landing page templates** HTML/CSS/JS thuần, đẹp mắt, responsive, tối ưu conversion.
+
+**Truy cập:** [/#/templates](http://localhost:5173/#/templates) sau khi chạy dev server.
+
+#### 6 Templates bao gồm:
+
+| # | Template | Industry | Phong cách |
+|---|----------|----------|------------|
+| 1 | **CRM Dashboard** | CRM/SaaS | Violet/cyan, dashboard mockup |
+| 2 | **Sale Pro** | E-commerce | Orange/gold, flash sale, countdown |
+| 3 | **Bazi Tử Vi** | Tử Vi/Phong thủy | Dark + vàng, cổ điển Á Đông |
+| 4 | **Numerology Life** | Thần số học | Cosmic dark, stars canvas |
+| 5 | **Blog Editorial** | Magazine/Blog | Serif typography, dark mode |
+| 6 | **Portfolio Studio** | Designer/Dev | Editorial Fraunces, masonry |
+
+#### Tính năng Gallery:
+- **Preview iframe**: xem demo trực tiếp trong browser (desktop/tablet/mobile)
+- **Sidebar thông tin**: tagline, highlights, features, tech stack, file info
+- **Tải về riêng lẻ**: download file zip từng template
+- **Tải bộ đầy đủ**: download tất cả 6 templates
+- **Xem source**: mở HTML trực tiếp trong tab mới
+- **Responsive preview**: switch giữa desktop/tablet/mobile
+- **Search + Category filter**: lọc theo tên, tag, industry
+
+#### Cấu trúc templates:
+```
+public/templates/
+├── crm/          # index.html, styles.css, script.js
+├── sale/         # index.html, styles.css, script.js
+├── bazi/         # index.html, styles.css, script.js
+├── numerology/   # index.html, styles.css, script.js
+├── blog/         # index.html, styles.css, script.js
+└── portfolio/    # index.html, styles.css, script.js
+```
+
+Mỗi template là standalone HTML/CSS/JS, không phụ thuộc vào framework. Có thể copy trực tiếp vào bất kỳ project nào.
+
+---
 
 ## Tech Stack
 
 - **Vue 3** với Composition API và `<script setup>`
 - **TypeScript** cho type safety
+- **Vue Router 4** cho SPA navigation (3 routes: home, templates, template/:id)
 - **Vite** cho fast development và building
 - **CSS Variables** cho design tokens
 
@@ -13,10 +56,12 @@
 
 - Responsive design với mobile-first approach
 - Dark theme với premium SaaS aesthetic
+- Vue Router với hash-based routing
 - Intersection Observer animations
 - Interactive components showcase
 - Rules & Skills explorer với search và filtering
 - Token optimization visualization
+- **6 Landing page templates gallery với iframe preview**
 - Copy-to-clipboard functionality
 - Smooth scroll navigation
 
@@ -25,27 +70,29 @@
 ```
 cursor_framework_web/
 ├── src/
-│   ├── components/
-│   │   ├── NavBar.vue
-│   │   ├── HeroSection.vue
-│   │   ├── StatsBar.vue
-│   │   ├── ExplorerSection.vue
-│   │   ├── PrinciplesSection.vue
-│   │   ├── ArchitectureSection.vue
-│   │   ├── ComponentsSection.vue
-│   │   ├── DomainsSection.vue
-│   │   ├── OptimizationSection.vue
-│   │   ├── GettingStartedSection.vue
-│   │   └── FooterSection.vue
-│   ├── composables/
-│   │   └── useIntersectionObserver.ts
+│   ├── components/         # 12 section components
+│   ├── composables/        # useIntersectionObserver
+│   ├── views/              # 3 router views (NEW)
+│   │   ├── HomeView.vue
+│   │   ├── TemplatesGallery.vue
+│   │   └── TemplatePreview.vue
+│   ├── data/               # Template metadata (NEW)
+│   │   └── templates.ts
+│   ├── router.ts           # Vue Router config (NEW)
 │   ├── styles/
-│   │   └── main.css
+│   │   ├── main.css
+│   │   └── templates.css   # Gallery styles (NEW)
 │   ├── App.vue
-│   ├── main.ts
-│   └── env.d.ts
+│   └── main.ts
 ├── public/
-│   └── favicon.svg
+│   ├── favicon.svg
+│   └── templates/          # 6 standalone templates (NEW)
+│       ├── crm/
+│       ├── sale/
+│       ├── bazi/
+│       ├── numerology/
+│       ├── blog/
+│       └── portfolio/
 ├── index.html
 ├── package.json
 ├── vite.config.ts
@@ -55,28 +102,29 @@ cursor_framework_web/
 
 ## Quick Start
 
-Double-click these batch files to get started:
-
-```bash
-start.bat    # Install dependencies & setup
-upweb.bat   # Build & deploy to Vercel
-```
-
-Or use commands manually:
-
 ```bash
 # Install dependencies
 npm install
 
 # Start development server
-npm run dev
+npm run dev      # → http://localhost:5173
 
 # Build for production
 npm run build
 
 # Preview production build
-npm run preview
+npm run preview  # → http://localhost:4173
 ```
+
+## Routing
+
+| Route | Page |
+|-------|------|
+| `/#/` | Home (framework showcase) |
+| `/#/templates` | Templates gallery (6 templates grid) |
+| `/#/templates/:id` | Template preview (iframe demo + download) |
+
+Available template IDs: `crm`, `sale`, `bazi`, `numerology`, `blog`, `portfolio`
 
 ## Deployment
 
@@ -84,85 +132,7 @@ The app is configured for Vercel deployment via `vercel.json`:
 - Framework: Vite
 - Build command: `npm run build`
 - Output directory: `dist`
-
-Run `upweb.bat` or manually:
-1. `npm run build`
-2. `vercel --prod`
-
-## Design System
-
-Sử dụng CSS custom properties cho design tokens:
-
-- **Colors**: Violet/Cyan accent palette
-- **Typography**: Inter + JetBrains Mono
-- **Spacing**: Consistent spacing scale
-- **Radius**: Border radius tokens
-- **Shadows**: Elevation system
-
-## Components
-
-### NavBar
-- Fixed position với blur backdrop
-- Responsive mobile menu
-- Smooth scroll navigation
-
-### HeroSection
-- Animated badge pill
-- Gradient title
-- Terminal mockup với typing animation
-- Stats cards với hover effects
-
-### StatsBar
-- Animated counter numbers
-- Staggered reveal animation
-
-### ExplorerSection
-- Category filtering
-- Real-time search
-- Rules/Skills toggle
-- Empty state handling
-
-### PrinciplesSection
-- Card hover animations
-- Staggered reveal
-
-### ArchitectureSection
-- File tree visualization
-- Tech stack grid
-- Fade-in animations
-
-### ComponentsSection
-- Full UI component showcase
-- Buttons, badges, inputs, cards, alerts, progress, tabs
-
-### DomainsSection
-- Domain cards grid
-- Spotlight badge cho special domains
-- Staggered animations
-
-### OptimizationSection
-- Token savings chart
-- Animated bar visualization
-- Feature list
-
-### GettingStartedSection
-- Step cards
-- Copy-to-clipboard functionality
-- Scripts reference table
-
-### FooterSection
-- Multi-column layout
-- External links với proper rel attributes
-
-## Best Practices
-
-- Composition API với `<script setup>`
-- TypeScript strict mode
-- CSS scoped styles trong components
-- Reusable composables
-- Semantic HTML
-- Accessibility considerations
-- Performance optimized animations
+- Static templates in `public/templates/` are served at `/templates/:id/`
 
 ## License
 
