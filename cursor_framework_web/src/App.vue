@@ -8,10 +8,8 @@ import FooterSection from './components/FooterSection.vue'
     <a href="#main" class="skip-link">Skip to content</a>
     <NavBar />
     <main id="main">
-      <router-view v-slot="{ Component }">
-        <transition name="page" mode="out-in">
-          <component :is="Component" />
-        </transition>
+      <router-view v-slot="{ Component, route }">
+        <component :is="Component" :key="route.fullPath" />
       </router-view>
     </main>
     <FooterSection />
@@ -50,29 +48,12 @@ main {
   outline-offset: 2px;
 }
 
-.page-enter-active,
-.page-leave-active {
-  transition: opacity 280ms cubic-bezier(0.22, 1, 0.36, 1), transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.page-enter-from {
-  opacity: 0;
-  transform: translateY(8px);
-}
-
-.page-leave-to {
-  opacity: 0;
-  transform: translateY(-4px);
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .page-enter-active,
-  .page-leave-active {
-    transition: none;
-  }
-  .page-enter-from,
-  .page-leave-to {
-    transform: none;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }
 </style>
