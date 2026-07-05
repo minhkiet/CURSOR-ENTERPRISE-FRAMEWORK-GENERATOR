@@ -8,44 +8,39 @@ const { observe } = useIntersectionObserver()
 interface Principle {
   id: number
   icon: string
-  number: string
   title: string
   description: string
-  tags: string[]
+  meta: string
 }
 
 const principles: Principle[] = [
   {
     id: 1,
-    icon: 'grid',
-    number: '01 / 04',
-    title: 'Memory First',
-    description: 'Luôn tra cứu memory trước khi bắt đầu task. Tránh lặp lại quyết định đã có, tái sử dụng ADRs và bug fixes.',
-    tags: ['decisions.sqlite', 'bug-history']
+    icon: 'database',
+    title: 'Memory first',
+    description: 'Before any task, query local memory for past decisions, ADRs, and bug fixes. Avoid re-deriving what is already known.',
+    meta: 'decisions.sqlite'
   },
   {
     id: 2,
     icon: 'search',
-    number: '02 / 04',
-    title: 'Retrieval First',
-    description: 'Luôn retrieval knowledge trước khi hỏi. Semantic search qua 272 knowledge files thay vì guess.',
-    tags: ['knowledge-base', 'semantic-search']
+    title: 'Retrieval first',
+    description: 'Semantic search across 272 knowledge files beats guessing. Load only what the current task needs.',
+    meta: 'knowledge base'
   },
   {
     id: 3,
     icon: 'zap',
-    number: '03 / 04',
-    title: 'Token Optimization',
-    description: 'Tối ưu token ở mọi bước. Context Router, Auto-Compression, Lazy Loading giảm tiêu thụ đến 40%.',
-    tags: ['context-router', 'lazy-load']
+    title: 'Token optimization',
+    description: 'Context router, auto-compression, and lazy loading cut context use by up to 40 percent on long sessions.',
+    meta: 'context router'
   },
   {
     id: 4,
-    icon: 'users',
-    number: '04 / 04',
-    title: 'Knowledge Reuse',
-    description: 'Tái sử dụng existing decisions và solutions. Không tạo lại những gì đã có — chỉ adapt và extend.',
-    tags: ['adr', 'pattern-reuse']
+    icon: 'share',
+    title: 'Knowledge reuse',
+    description: 'Reuse existing patterns, conventions, and solutions. Adapt and extend, never rebuild from scratch.',
+    meta: 'patterns.db'
   }
 ]
 
@@ -68,45 +63,32 @@ onMounted(() => {
   <section class="principles-section" id="principles" ref="sectionRef">
     <div class="container">
       <div class="section-header">
-        <div class="section-label">Core Philosophy</div>
-        <h2 class="section-title">4 Nguyên tắc cốt lõi</h2>
+        <div class="section-label">Principles</div>
+        <h2 class="section-title">Four rules that shape every decision.</h2>
         <p class="section-desc">
-          Mọi quyết định thiết kế đều phục vụ cho việc tối ưu hóa hiệu suất AI agent.
-          Mỗi nguyên tắc được implement cụ thể trong framework.
+          Not aspirational guidelines. These are mechanical behaviors enforced by the framework,
+          measurable in token count, latency, and retrieval accuracy.
         </p>
       </div>
 
       <div class="principles-grid">
-        <div
+        <article
           v-for="(principle, index) in principles"
           :key="principle.id"
           class="principle-card"
           :class="{ visible: visibleCards.has(index) }"
         >
+          <div class="principle-number">{{ String(principle.id).padStart(2, '0') }}</div>
           <div class="principle-icon">
-            <svg v-if="principle.icon === 'grid'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-              <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-            </svg>
-            <svg v-else-if="principle.icon === 'search'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
-            </svg>
-            <svg v-else-if="principle.icon === 'zap'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-            </svg>
-            <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
-            </svg>
+            <svg v-if="principle.icon === 'database'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+            <svg v-else-if="principle.icon === 'search'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <svg v-else-if="principle.icon === 'zap'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
           </div>
-          <div class="principle-number">{{ principle.number }}</div>
-          <h3>{{ principle.title }}</h3>
-          <p>{{ principle.description }}</p>
-          <div class="principle-tags">
-            <span v-for="tag in principle.tags" :key="tag" class="tag">{{ tag }}</span>
-          </div>
-        </div>
+          <h3 class="principle-title">{{ principle.title }}</h3>
+          <p class="principle-desc">{{ principle.description }}</p>
+          <code class="principle-meta">{{ principle.meta }}</code>
+        </article>
       </div>
     </div>
   </section>
@@ -115,27 +97,43 @@ onMounted(() => {
 <style scoped>
 .principles-section {
   padding: var(--section-py) 0;
-  background: var(--gradient-surface);
 }
 
 .principles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 16px;
-  margin-top: 48px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
 }
 
 .principle-card {
-  position: relative;
   padding: 28px;
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--border-soft);
   background: var(--bg-surface);
-  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out),
-              border-color var(--t-base), box-shadow var(--t-base);
+  transform: translateY(8px);
+  transition: opacity 500ms var(--ease-out-quart), transform 500ms var(--ease-out-quart), border-color var(--t-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.principle-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  transition: left 800ms var(--ease-out-quart);
+  transition-delay: var(--delay, 0ms);
+}
+
+.principle-card.visible::after {
+  left: 100%;
 }
 
 .principle-card.visible {
@@ -143,86 +141,94 @@ onMounted(() => {
   transform: translateY(0);
 }
 
-.principle-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, transparent 60%, rgba(120, 119, 232, 0.04) 100%);
-  pointer-events: none;
-}
-
 .principle-card:hover {
-  border-color: var(--border-accent);
-  box-shadow: var(--shadow-glow);
+  border-color: var(--accent-line);
+  background: var(--bg-elevated);
   transform: translateY(-3px);
 }
 
-.principle-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: var(--radius-md);
-  background: var(--accent-glow);
-  border: 1px solid var(--border-accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-  position: relative;
-  z-index: 1;
-}
-
-.principle-icon svg {
-  width: 20px;
-  height: 20px;
-  stroke: var(--accent-primary);
+.principle-card:hover .principle-icon {
+  background: var(--accent-dim);
+  transform: scale(1.05);
 }
 
 .principle-number {
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.15em;
-  color: var(--text-faint);
   font-family: var(--font-mono);
-  margin-bottom: 10px;
-  position: relative;
-  z-index: 1;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
 }
 
-.principle-card h3 {
+.principle-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  transition: all var(--t-base);
+}
+
+.principle-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.principle-title {
   font-size: 17px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 10px;
-  position: relative;
-  z-index: 1;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
 }
 
-.principle-card p {
+.principle-desc {
   font-size: 13px;
   color: var(--text-secondary);
-  line-height: 1.65;
-  margin-bottom: 18px;
-  position: relative;
-  z-index: 1;
+  line-height: 1.6;
+  flex: 1;
 }
 
-.principle-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  position: relative;
-  z-index: 1;
-}
-
-.tag {
-  font-size: 10.5px;
-  font-weight: 600;
+.principle-meta {
   font-family: var(--font-mono);
-  color: var(--accent-primary);
-  background: var(--accent-glow);
-  border: 1px solid var(--border-accent);
-  padding: 3px 8px;
-  border-radius: var(--radius-full);
+  font-size: 11px;
+  color: var(--text-tertiary);
+  padding: 4px 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-sm);
+  align-self: flex-start;
+}
+
+@media (max-width: 1024px) {
+  .principles-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .principles-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .principle-card,
+  .principle-icon {
+    transition: none !important;
+  }
+  .principle-card::after {
+    display: none;
+  }
+  .principle-card:hover {
+    transform: none;
+  }
+  .principle-card:hover .principle-icon {
+    transform: none;
+  }
 }
 </style>

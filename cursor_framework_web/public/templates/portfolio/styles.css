@@ -260,7 +260,8 @@ em { font-style: italic; }
 .work { padding: 120px 0; border-top: 1px solid var(--rule); }
 
 .section-head { margin-bottom: 80px; }
-.section-num {
+.section-num,
+.section-meta-line {
   font-family: var(--font-serif);
   font-style: italic;
   font-size: 14px;

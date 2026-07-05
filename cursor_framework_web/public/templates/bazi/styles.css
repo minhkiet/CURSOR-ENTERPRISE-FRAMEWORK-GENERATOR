@@ -353,6 +353,17 @@ em { font-style: italic; }
   to { transform: rotate(360deg); }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .bazi-wheel,
+  .bw-center { animation: none !important; }
+  .pillars, .el-card, .step, .pc, .t-card,
+  .booking-info, .booking-form {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
 .bw-ring {
   position: absolute;
   border-radius: 50%;

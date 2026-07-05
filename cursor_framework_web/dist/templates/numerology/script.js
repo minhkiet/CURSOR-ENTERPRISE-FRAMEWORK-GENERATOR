@@ -29,6 +29,19 @@ if (canvas) {
     }
   }
 
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let rafId = null;
+
+  function drawStatic() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(212,175,55,${s.alpha})`;
+      ctx.fill();
+    });
+  }
+
   function draw(time) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -41,12 +54,27 @@ if (canvas) {
       ctx.fill();
     });
 
-    requestAnimationFrame(draw);
+    rafId = requestAnimationFrame(draw);
   }
 
   window.addEventListener('resize', resize);
   resize();
-  draw(0);
+
+  if (reduceMotion) {
+    drawStatic();
+  } else {
+    rafId = requestAnimationFrame(draw);
+  }
+
+  // Allow toggling at runtime via OS setting change
+  window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', e => {
+    if (e.matches) {
+      if (rafId) cancelAnimationFrame(rafId);
+      drawStatic();
+    } else {
+      rafId = requestAnimationFrame(draw);
+    }
+  });
 }
 
 // Reveal on scroll

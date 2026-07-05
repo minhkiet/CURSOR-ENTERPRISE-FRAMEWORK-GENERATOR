@@ -2,6 +2,8 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import HomeView from './views/HomeView.vue'
 import TemplatesGallery from './views/TemplatesGallery.vue'
 import TemplatePreview from './views/TemplatePreview.vue'
+import LearnView from './views/LearnView.vue'
+import PromptsView from './views/PromptsView.vue'
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -20,6 +22,16 @@ const router = createRouter({
       path: '/templates/:id',
       name: 'template-preview',
       component: TemplatePreview
+    },
+    {
+      path: '/learn',
+      name: 'learn',
+      component: LearnView
+    },
+    {
+      path: '/prompts',
+      name: 'prompts',
+      component: PromptsView
     }
   ],
   scrollBehavior(to, _from, savedPosition) {

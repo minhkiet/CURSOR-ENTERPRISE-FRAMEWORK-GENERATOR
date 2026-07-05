@@ -32,31 +32,16 @@ function previewTemplate(id: string) {
 function downloadTemplate() {
   if (!template.value) return
   downloadStatus.value = 'preparing'
-  // Simulate prep then trigger download
   setTimeout(() => {
     downloadStatus.value = 'ready'
     const link = document.createElement('a')
-    link.href = `/templates/${template.value!.id}/${template.value!.id}-landing.zip`
-    link.download = `${template.value!.id}-landing.zip`
+    link.href = `/templates/${template.value!.id}/index.html`
+    link.download = `${template.value!.id}-landing.html`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
     setTimeout(() => (downloadStatus.value = 'idle'), 2000)
   }, 600)
-}
-
-function downloadAll() {
-  downloadStatus.value = 'preparing'
-  setTimeout(() => {
-    downloadStatus.value = 'ready'
-    const link = document.createElement('a')
-    link.href = `/templates/all-templates.zip`
-    link.download = `cef-landing-templates.zip`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    setTimeout(() => (downloadStatus.value = 'idle'), 2000)
-  }, 800)
 }
 
 const iframeRef = ref<HTMLIFrameElement | null>(null)
@@ -70,7 +55,7 @@ function onIframeLoad() {
   try {
     iframeRef.value?.contentWindow?.scrollTo(0, 0)
   } catch (_e) {
-    // ignore cross-origin access errors
+    // ignore cross-origin access
   }
 }
 
@@ -78,7 +63,6 @@ function refreshFrame() {
   if (iframeRef.value) {
     const src = iframeRef.value.src
     iframeRef.value.src = 'about:blank'
-    // Force a reload on the next tick so the new src fully resets scroll
     requestAnimationFrame(() => {
       if (iframeRef.value) {
         iframeRef.value.src = src
@@ -86,19 +70,22 @@ function refreshFrame() {
     })
   }
 }
+
+function getDownloadLabel() {
+  if (downloadStatus.value === 'idle') return 'Download'
+  if (downloadStatus.value === 'preparing') return 'Preparing...'
+  return 'Downloaded'
+}
 </script>
 
 <template>
-  <div v-if="template" class="preview-page" :style="{ '--tpl-accent': template.accent, '--tpl-accent-2': template.accentSecondary }">
-    <!-- Top Bar -->
+  <div v-if="template" class="preview-page">
     <section class="preview-topbar">
       <div class="container">
         <div class="preview-topbar-inner">
           <button class="back-btn" @click="backToGallery">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-            <span>Quay lại gallery</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            <span>Back to gallery</span>
           </button>
 
           <div class="preview-meta">
@@ -108,36 +95,19 @@ function refreshFrame() {
           </div>
 
           <div class="preview-actions">
-            <button class="info-toggle" :class="{ active: showInfo }" @click="showInfo = !showInfo" :aria-label="showInfo ? 'Ẩn thông tin' : 'Hiện thông tin'">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 16v-4M12 8h.01" />
-              </svg>
-            </button>
-            <button class="src-btn" @click="viewSource" title="Xem source">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="16 18 22 12 16 6" />
-                <polyline points="8 6 2 12 8 18" />
-              </svg>
+            <button class="action-btn" @click="viewSource">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
               <span>Source</span>
             </button>
-            <button class="dl-btn" @click="downloadTemplate" :disabled="downloadStatus !== 'idle'">
-              <svg v-if="downloadStatus === 'idle'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
-              </svg>
-              <svg v-else-if="downloadStatus === 'preparing'" class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 12a9 9 0 11-6.219-8.56" />
-              </svg>
-              <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-              <span>
-                {{
-                  downloadStatus === 'idle' ? 'Tải về .zip' :
-                  downloadStatus === 'preparing' ? 'Đang chuẩn bị...' :
-                  'Đã tải!'
-                }}
-              </span>
+            <button class="action-btn" @click="showInfo = !showInfo" :aria-label="showInfo ? 'Hide info' : 'Show info'">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+              <span>{{ showInfo ? 'Hide info' : 'Info' }}</span>
+            </button>
+            <button class="btn btn-primary dl-btn" @click="downloadTemplate" :disabled="downloadStatus !== 'idle'">
+              <svg v-if="downloadStatus === 'idle'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+              <svg v-else-if="downloadStatus === 'preparing'" class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>
+              <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>{{ getDownloadLabel() }}</span>
             </button>
           </div>
         </div>
@@ -145,16 +115,15 @@ function refreshFrame() {
     </section>
 
     <div class="preview-layout">
-      <!-- Side Info -->
       <aside v-if="showInfo" class="preview-sidebar">
         <div class="sidebar-section">
-          <span class="sidebar-label">Tagline</span>
+          <span class="sidebar-label">About</span>
           <p class="sidebar-tagline">{{ template.tagline }}</p>
           <p class="sidebar-desc">{{ template.description }}</p>
         </div>
 
         <div class="sidebar-section">
-          <span class="sidebar-label">Thông số</span>
+          <span class="sidebar-label">Highlights</span>
           <div class="sidebar-stats">
             <div v-for="h in template.highlights" :key="h.label" class="sidebar-stat">
               <div class="sidebar-stat-value">{{ h.value }}</div>
@@ -164,33 +133,31 @@ function refreshFrame() {
         </div>
 
         <div class="sidebar-section">
-          <span class="sidebar-label">Tính năng chính</span>
+          <span class="sidebar-label">Features</span>
           <ul class="sidebar-features">
             <li v-for="f in template.features" :key="f">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
               {{ f }}
             </li>
           </ul>
         </div>
 
         <div class="sidebar-section">
-          <span class="sidebar-label">Tech stack</span>
+          <span class="sidebar-label">Tech Stack</span>
           <div class="sidebar-tech">
             <span v-for="tech in template.techStack" :key="tech" class="tech-pill">{{ tech }}</span>
           </div>
         </div>
 
         <div class="sidebar-section">
-          <span class="sidebar-label">File info</span>
+          <span class="sidebar-label">File Info</span>
           <div class="sidebar-file">
             <div class="file-row">
-              <span>Số trang</span>
+              <span>Pages</span>
               <strong>{{ template.pages }}</strong>
             </div>
             <div class="file-row">
-              <span>Dung lượng</span>
+              <span>Size</span>
               <strong>{{ template.fileSize }}</strong>
             </div>
             <div class="file-row">
@@ -199,54 +166,31 @@ function refreshFrame() {
             </div>
           </div>
         </div>
-
-        <button class="sidebar-dl" @click="downloadTemplate">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
-          </svg>
-          Tải template này
-        </button>
       </aside>
 
-      <!-- Iframe Preview -->
       <div class="preview-stage">
         <div class="device-bar">
           <div class="device-modes">
             <button
-              v-for="mode in ['desktop', 'tablet', 'mobile'] as const"
+              v-for="mode in (['desktop', 'tablet', 'mobile'] as const)"
               :key="mode"
               class="device-btn"
               :class="{ active: viewMode === mode }"
               @click="viewMode = mode"
             >
-              <svg v-if="mode === 'desktop'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="2" y="3" width="20" height="14" rx="2" />
-                <path d="M8 21h8M12 17v4" />
-              </svg>
-              <svg v-else-if="mode === 'tablet'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="4" y="2" width="16" height="20" rx="2" />
-                <path d="M11 18h2" />
-              </svg>
-              <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="5" y="2" width="14" height="20" rx="2" />
-                <path d="M12 18h.01" />
-              </svg>
+              <svg v-if="mode === 'desktop'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+              <svg v-else-if="mode === 'tablet'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M11 18h2"/></svg>
+              <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
               <span>{{ mode === 'desktop' ? 'Desktop' : mode === 'tablet' ? 'Tablet' : 'Mobile' }}</span>
             </button>
           </div>
           <div class="device-url">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="11" width="18" height="11" rx="2" />
-              <path d="M7 11V7a5 5 0 0110 0v4" />
-            </svg>
-            <span>cef.minhkiet.dev/templates/{{ template.id }}</span>
+            <span class="url-dot"></span>
+            <span class="url-text">cef.dev/templates/{{ template.id }}</span>
           </div>
           <div class="device-action">
-            <button class="device-refresh" @click="refreshFrame">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M23 4v6h-6M1 20v-6h6" />
-                <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
-              </svg>
+            <button class="device-refresh" @click="refreshFrame" :aria-label="'Refresh preview'">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
             </button>
           </div>
         </div>
@@ -263,31 +207,26 @@ function refreshFrame() {
       </div>
     </div>
 
-    <!-- Related -->
     <section class="preview-related">
       <div class="container">
         <div class="section-header">
-          <div class="section-label">Khám phá thêm</div>
-          <h2 class="section-title">Templates khác bạn có thể thích</h2>
+          <div class="section-label">More templates</div>
+          <h2 class="section-title">Other landing pages in the library.</h2>
         </div>
         <div class="related-grid">
           <article
             v-for="t in otherTemplates"
             :key="t.id"
             class="related-card"
-            :style="{ '--rc-accent': t.accent }"
             @click="previewTemplate(t.id)"
           >
-            <div class="related-thumb" :style="{ background: t.bgGradient }">
-              <div class="related-thumb-mock">
-                <div class="rt-line" :style="{ background: t.accent, width: '60%' }"></div>
-                <div class="rt-line" :style="{ background: t.accentSecondary, opacity: 0.5, width: '80%' }"></div>
-                <div class="rt-blocks">
-                  <div :style="{ background: t.accent, opacity: 0.4 }"></div>
-                  <div :style="{ background: t.accentSecondary, opacity: 0.4 }"></div>
-                  <div :style="{ background: t.accent, opacity: 0.3 }"></div>
-                </div>
-              </div>
+            <div class="related-thumb">
+              <iframe
+                :src="`/templates/${t.slug}/`"
+                :title="t.name"
+                class="related-thumb-iframe"
+                loading="lazy"
+              ></iframe>
             </div>
             <div class="related-body">
               <span class="related-cat">{{ t.industry }}</span>
@@ -296,45 +235,21 @@ function refreshFrame() {
             </div>
           </article>
         </div>
-
-        <div class="download-all-bar">
-          <div class="dab-content">
-            <div class="dab-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
-                <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-                <line x1="12" y1="22.08" x2="12" y2="12" />
-              </svg>
-            </div>
-            <div>
-              <h3>Tải tất cả 6 templates</h3>
-              <p>Bundle đầy đủ với documentation và assets</p>
-            </div>
-          </div>
-          <button class="dab-btn" @click="downloadAll">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
-            </svg>
-            Tải bộ đầy đủ
-          </button>
-        </div>
       </div>
     </section>
   </div>
 
   <div v-else class="not-found">
     <div class="container">
-      <h2>Không tìm thấy template</h2>
-      <p>Template không tồn tại hoặc đã bị xóa.</p>
-      <button class="cta-btn" @click="backToGallery">Quay lại gallery</button>
+      <h2>Template not found</h2>
+      <p>The template you requested does not exist or was removed.</p>
+      <button class="btn btn-primary" @click="backToGallery">Back to gallery</button>
     </div>
   </div>
 </template>
 
 <style scoped>
 .preview-page {
-  --tpl-accent: #6366f1;
-  --tpl-accent-2: #a78bfa;
   padding-top: 60px;
 }
 
@@ -342,10 +257,8 @@ function refreshFrame() {
   position: sticky;
   top: 60px;
   z-index: 40;
-  background: rgba(7, 7, 26, 0.92);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border-soft);
+  background: var(--bg-canvas);
+  border-bottom: 1px solid var(--border-subtle);
   padding: 14px 0;
 }
 
@@ -359,15 +272,15 @@ function refreshFrame() {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 14px;
+  padding: 7px 12px;
   background: var(--bg-surface);
-  border: 1px solid var(--border-soft);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
   color: var(--text-secondary);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12.5px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all var(--t-base);
+  transition: all var(--t-fast);
   font-family: inherit;
 }
 
@@ -390,10 +303,11 @@ function refreshFrame() {
 }
 
 .preview-meta-cat {
+  font-family: var(--font-mono);
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: var(--tpl-accent);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--accent);
   text-transform: uppercase;
 }
 
@@ -402,8 +316,8 @@ function refreshFrame() {
 }
 
 .preview-meta-title {
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
   color: var(--text-primary);
   letter-spacing: -0.01em;
   overflow: hidden;
@@ -414,48 +328,38 @@ function refreshFrame() {
 .preview-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
-.info-toggle,
-.src-btn,
-.dl-btn {
+.action-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 12px;
+  padding: 7px 10px;
   background: var(--bg-surface);
-  border: 1px solid var(--border-soft);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
   color: var(--text-secondary);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12.5px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all var(--t-base);
+  transition: all var(--t-fast);
   font-family: inherit;
 }
 
-.info-toggle:hover,
-.src-btn:hover {
+.action-btn:hover {
   color: var(--text-primary);
   border-color: var(--border-strong);
 }
 
-.info-toggle.active {
-  color: var(--tpl-accent);
-  border-color: var(--tpl-accent);
-  background: rgba(99, 102, 241, 0.08);
+.action-btn svg {
+  width: 14px;
+  height: 14px;
 }
 
 .dl-btn {
-  background: var(--tpl-accent);
-  color: #fff;
-  border-color: transparent;
-}
-
-.dl-btn:hover:not(:disabled) {
-  background: var(--tpl-accent-2);
-  transform: translateY(-1px);
+  font-size: 12.5px;
+  padding: 7px 14px;
 }
 
 .dl-btn:disabled {
@@ -463,8 +367,6 @@ function refreshFrame() {
   cursor: not-allowed;
 }
 
-.info-toggle svg,
-.src-btn svg,
 .dl-btn svg {
   width: 14px;
   height: 14px;
@@ -485,7 +387,7 @@ function refreshFrame() {
 }
 
 .preview-sidebar {
-  border-right: 1px solid var(--border-soft);
+  border-right: 1px solid var(--border-subtle);
   background: var(--bg-surface);
   padding: 24px;
   overflow-y: auto;
@@ -500,30 +402,32 @@ function refreshFrame() {
   border-bottom: 1px solid var(--border-subtle);
 }
 
-.sidebar-section:last-of-type {
-  border-bottom: none;
+.sidebar-section:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
 }
 
 .sidebar-label {
   display: block;
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   color: var(--text-muted);
   text-transform: uppercase;
   margin-bottom: 10px;
 }
 
 .sidebar-tagline {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--text-primary);
   line-height: 1.4;
   margin: 0 0 8px;
+  letter-spacing: -0.01em;
 }
 
 .sidebar-desc {
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--text-secondary);
   line-height: 1.65;
   margin: 0;
@@ -537,19 +441,18 @@ function refreshFrame() {
 
 .sidebar-stat {
   padding: 12px 8px;
-  background: var(--bg-raised);
+  background: var(--bg-elevated);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   text-align: center;
 }
 
 .sidebar-stat-value {
-  font-size: 16px;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--tpl-accent), var(--tpl-accent-2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
 }
 
 .sidebar-stat-label {
@@ -571,7 +474,7 @@ function refreshFrame() {
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--text-secondary);
   line-height: 1.5;
 }
@@ -579,7 +482,7 @@ function refreshFrame() {
 .sidebar-features svg {
   width: 14px;
   height: 14px;
-  color: var(--tpl-accent);
+  color: var(--accent);
   flex-shrink: 0;
   margin-top: 2px;
 }
@@ -591,13 +494,13 @@ function refreshFrame() {
 }
 
 .tech-pill {
-  padding: 4px 10px;
+  padding: 3px 8px;
   font-size: 11px;
-  font-weight: 600;
-  background: var(--bg-raised);
-  border: 1px solid var(--border-soft);
+  font-weight: 500;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-sm);
   font-family: var(--font-mono);
 }
 
@@ -611,50 +514,19 @@ function refreshFrame() {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--text-secondary);
   padding: 6px 0;
 }
 
 .file-row strong {
   color: var(--text-primary);
-  font-weight: 700;
-}
-
-.sidebar-dl {
-  width: 100%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: var(--tpl-accent);
-  color: #fff;
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all var(--t-base);
-  font-family: inherit;
-  margin-top: 4px;
-}
-
-.sidebar-dl:hover {
-  background: var(--tpl-accent-2);
-  transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-}
-
-.sidebar-dl svg {
-  width: 16px;
-  height: 16px;
+  font-family: var(--font-mono);
+  font-weight: 500;
 }
 
 .preview-stage {
-  background:
-    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.01) 0 2px, transparent 2px 16px),
-    var(--bg-void);
+  background: var(--bg-canvas);
   display: flex;
   flex-direction: column;
 }
@@ -663,33 +535,33 @@ function refreshFrame() {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 20px;
-  background: var(--bg-base);
-  border-bottom: 1px solid var(--border-soft);
+  padding: 10px 20px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .device-modes {
   display: flex;
-  gap: 4px;
-  padding: 3px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-md);
+  gap: 2px;
+  padding: 2px;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
 }
 
 .device-btn {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 6px 10px;
+  padding: 5px 9px;
   background: transparent;
   border: none;
   color: var(--text-muted);
-  font-size: 12px;
-  font-weight: 600;
-  border-radius: var(--radius-sm);
+  font-size: 11.5px;
+  font-weight: 500;
+  border-radius: 4px;
   cursor: pointer;
-  transition: all var(--t-base);
+  transition: all var(--t-fast);
   font-family: inherit;
 }
 
@@ -703,8 +575,8 @@ function refreshFrame() {
 }
 
 .device-btn svg {
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
 }
 
 .device-url {
@@ -712,33 +584,48 @@ function refreshFrame() {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 14px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-md);
+  padding: 6px 12px;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 11.5px;
   color: var(--text-secondary);
+  max-width: 360px;
 }
 
-.device-url svg {
-  width: 12px;
-  height: 12px;
-  color: var(--color-success);
+.url-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  flex-shrink: 0;
+}
+
+.url-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.device-action {
+  display: flex;
+  gap: 6px;
 }
 
 .device-refresh {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-md);
+  width: 30px;
+  height: 30px;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all var(--t-base);
+  transition: all var(--t-fast);
 }
 
 .device-refresh:hover {
@@ -747,8 +634,8 @@ function refreshFrame() {
 }
 
 .device-refresh svg {
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
 }
 
 .device-frame {
@@ -762,42 +649,41 @@ function refreshFrame() {
 
 .tpl-frame {
   width: 100%;
-  height: calc(100vh - 220px);
+  height: calc(100vh - 200px);
   min-height: 600px;
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
   background: #fff;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-  transition: max-width var(--t-base);
+  transition: max-width 300ms var(--ease-out-quart);
 }
 
 .device-tablet .tpl-frame {
   max-width: 768px;
   height: 1024px;
-  max-height: calc(100vh - 220px);
+  max-height: calc(100vh - 200px);
 }
 
 .device-mobile .tpl-frame {
   max-width: 375px;
   height: 812px;
-  max-height: calc(100vh - 220px);
+  max-height: calc(100vh - 200px);
 }
 
 .preview-related {
-  padding: 80px 0;
-  background: var(--bg-base);
+  padding: 60px 0 80px;
+  background: var(--bg-canvas);
 }
 
 .related-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
-  margin-bottom: 48px;
+  gap: 14px;
 }
 
 .related-card {
   background: var(--bg-surface);
-  border: 1px solid var(--border-soft);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   overflow: hidden;
   cursor: pointer;
@@ -805,157 +691,53 @@ function refreshFrame() {
 }
 
 .related-card:hover {
-  border-color: var(--rc-accent);
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  border-color: var(--border-default);
+  transform: translateY(-2px);
 }
 
 .related-thumb {
   aspect-ratio: 16 / 10;
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: var(--bg-canvas);
+  overflow: hidden;
+  position: relative;
 }
 
-.related-thumb-mock {
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 6px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.rt-line {
-  height: 6px;
-  border-radius: 3px;
-}
-
-.rt-blocks {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  margin-top: 6px;
-}
-
-.rt-blocks > div {
-  height: 24px;
-  border-radius: 4px;
+.related-thumb-iframe {
+  width: 200%;
+  height: 200%;
+  transform: scale(0.5);
+  transform-origin: top left;
+  border: 0;
+  pointer-events: none;
+  background: #fff;
 }
 
 .related-body {
-  padding: 20px;
+  padding: 16px 18px;
 }
 
 .related-cat {
+  font-family: var(--font-mono);
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: var(--rc-accent);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--accent);
   text-transform: uppercase;
 }
 
 .related-body h3 {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 600;
   margin: 6px 0 4px;
   color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
 
 .related-body p {
   font-size: 12px;
   color: var(--text-secondary);
   margin: 0;
-  line-height: 1.5;
-}
-
-.download-all-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 24px 32px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-xl);
-  position: relative;
-  overflow: hidden;
-}
-
-.download-all-bar::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--gradient-surface);
-  pointer-events: none;
-}
-
-.dab-content {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  position: relative;
-}
-
-.dab-icon {
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--gradient-primary);
-  border-radius: var(--radius-md);
-  color: #fff;
-  flex-shrink: 0;
-}
-
-.dab-icon svg {
-  width: 24px;
-  height: 24px;
-}
-
-.dab-content h3 {
-  font-size: 16px;
-  font-weight: 700;
-  margin: 0 0 2px;
-  color: var(--text-primary);
-}
-
-.dab-content p {
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin: 0;
-}
-
-.dab-btn {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  background: var(--gradient-primary);
-  color: #fff;
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all var(--t-base);
-  font-family: inherit;
-  box-shadow: 0 8px 24px rgba(120, 119, 232, 0.3);
-}
-
-.dab-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(120, 119, 232, 0.4);
-}
-
-.dab-btn svg {
-  width: 16px;
-  height: 16px;
+  line-height: 1.55;
 }
 
 .not-found {
@@ -964,28 +746,14 @@ function refreshFrame() {
 }
 
 .not-found h2 {
-  font-size: 28px;
+  font-size: 24px;
   margin-bottom: 8px;
+  font-weight: 600;
 }
 
 .not-found p {
   color: var(--text-secondary);
   margin-bottom: 24px;
-}
-
-.cta-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  background: var(--gradient-primary);
-  color: #fff;
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: inherit;
 }
 
 @media (max-width: 1024px) {
@@ -998,7 +766,7 @@ function refreshFrame() {
     top: 0;
     max-height: none;
     border-right: none;
-    border-bottom: 1px solid var(--border-soft);
+    border-bottom: 1px solid var(--border-subtle);
   }
 
   .device-url {
@@ -1008,12 +776,6 @@ function refreshFrame() {
   .tpl-frame {
     height: 700px;
   }
-
-  .download-all-bar {
-    flex-direction: column;
-    align-items: stretch;
-    text-align: center;
-  }
 }
 
 @media (max-width: 640px) {
@@ -1021,7 +783,7 @@ function refreshFrame() {
     font-size: 13px;
   }
 
-  .src-btn span {
+  .action-btn span {
     display: none;
   }
 
