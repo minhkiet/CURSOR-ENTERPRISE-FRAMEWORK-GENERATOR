@@ -114,8 +114,8 @@ function getDownloadLabel() {
       </div>
     </section>
 
-    <div class="preview-layout">
-      <aside v-if="showInfo" class="preview-sidebar">
+    <div class="preview-layout" :class="{ 'info-hidden': !showInfo }">
+      <aside class="preview-sidebar">
         <div class="sidebar-section">
           <span class="sidebar-label">About</span>
           <p class="sidebar-tagline">{{ template.tagline }}</p>
@@ -384,6 +384,15 @@ function getDownloadLabel() {
   display: grid;
   grid-template-columns: 320px 1fr;
   min-height: calc(100vh - 60px);
+  transition: grid-template-columns 250ms var(--ease-out-quart);
+}
+
+.preview-layout.info-hidden {
+  grid-template-columns: 0 1fr;
+}
+
+.preview-stage {
+  min-width: 0;
 }
 
 .preview-sidebar {
@@ -394,6 +403,12 @@ function getDownloadLabel() {
   max-height: calc(100vh - 60px);
   position: sticky;
   top: 60px;
+  transition: opacity 200ms var(--ease-out-quart);
+}
+
+.preview-layout.info-hidden .preview-sidebar {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .sidebar-section {
@@ -656,6 +671,10 @@ function getDownloadLabel() {
   background: #fff;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
   transition: max-width 300ms var(--ease-out-quart);
+}
+
+.device-frame {
+  width: 100%;
 }
 
 .device-tablet .tpl-frame {
