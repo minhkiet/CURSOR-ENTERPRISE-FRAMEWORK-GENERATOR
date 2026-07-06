@@ -49,12 +49,12 @@ Xem `tokens.json`.
 ## 4. Section anatomy (Marketing landing)
 
 1. **Sticky header**. Logo · Product · Solutions · Pricing · Resources · Login · "Start free" CTA
-2. **Hero**. Headline 72px + 18px subtext + CTA "Bắt đầu miễn phí" + "Xem demo 3 phút" + dashboard screenshot
+2. **Hero search**. Headline 72px + 18px subtext + inline search bar + dual CTA + dashboard screenshot
 3. **Logo wall**. 50+ customer logos
-4. **3-pillar feature bento**. Bento asymmetric với screenshot từng feature
-5. **Pipeline demo video**. Video walkthrough 60s
-6. **Customer testimonials**. Bento 3 customer + quote + metric
-7. **Integrations**. Logo grid với Slack, Gmail, Outlook, Zapier, etc.
+4. **Bento market**. 3-pillar feature bento asymmetric với screenshots từng feature
+5. **Feature grid**. Integrations logo grid + logo wall
+6. **Pipeline demo video**. Video walkthrough 60s
+7. **Customer testimonials**. Bento 3 customer + quote + metric
 8. **Pricing**. 3 tiers
 9. **FAQ**. 8 câu hỏi
 10. **Final CTA**. "Đóng deal đầu tiên trong 7 ngày"
@@ -74,6 +74,9 @@ Xem `tokens.json`.
 
 ## 6. Components
 
+- `hero-search.md` — Landing page hero với search bar + dual CTA + dashboard screenshot
+- `bento-market.md` — 3-pillar asymmetric feature bento với screenshots
+- `feature-grid.md` — Integrations grid + logo wall
 - `pipeline-kanban.md`
 - `contact-table.md`
 - `dashboard-widget.md`

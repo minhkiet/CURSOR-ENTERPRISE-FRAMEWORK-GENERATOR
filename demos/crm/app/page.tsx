@@ -1,6 +1,7 @@
 import { StickyHeader } from '@/components/StickyHeader';
 import { Hero, TrustStrip } from '@/components/Hero';
 import { FeatureBento } from '@/components/FeatureBento';
+import { IntegrationsSection } from '@/components/IntegrationsSection';
 import { DashboardShowcase } from '@/components/DashboardShowcase';
 import { PipelineShowcase } from '@/components/PipelineShowcase';
 import { PricingSection } from '@/components/PricingSection';
@@ -14,6 +15,7 @@ export default function Home() {
       <Hero />
       <TrustStrip />
       <FeatureBento />
+      <IntegrationsSection />
       <DashboardShowcase />
       <PipelineShowcase />
       <PricingSection />

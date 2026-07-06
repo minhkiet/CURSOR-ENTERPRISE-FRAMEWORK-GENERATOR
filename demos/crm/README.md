@@ -28,8 +28,9 @@ demos/crm/
 │   └── page.tsx            # Main page composition
 ├── components/
 │   ├── StickyHeader.tsx    # Header với mobile menu
-│   ├── Hero.tsx            # Hero copy + dashboard mock + trust logos
-│   ├── FeatureBento.tsx    # 4-col bento asymmetric (1 large + 5 small)
+│   ├── Hero.tsx            # Hero + inline search bar + dashboard mock + trust strip
+│   ├── FeatureBento.tsx    # 4-col bento asymmetric (2×2 + 1×1 + 2×1 cells)
+│   ├── IntegrationsSection.tsx  # 12 integrations grid + API docs link
 │   ├── DashboardShowcase.tsx  # Bento: hero KPI + secondary + activity + stuck deals
 │   ├── PipelineShowcase.tsx   # 5-stage kanban với deal cards
 │   ├── PricingSection.tsx    # 3 tiers với monthly/annual toggle
@@ -37,7 +38,7 @@ demos/crm/
 │   └── MegaFooter.tsx      # Pre-footer CTA + 6 cols + trust signals
 ├── data/
 │   ├── hero.ts             # Headline + subhead + trust logos
-│   ├── features.ts         # 6 features (1 large + 5 small)
+│   ├── features.ts         # 6 features (2×2 + 1×1 + 2×1 cell sizes)
 │   ├── dashboard.ts        # KPI + sparkline + activity + stuck deals
 │   ├── pipeline.ts         # 5 stages + 5 sample deals
 │   ├── pricing.ts          # 3 tiers (Starter · Pro · Enterprise)
@@ -54,8 +55,9 @@ demos/crm/
 | Section | Source | Notes |
 |---|---|---|
 | StickyHeader | Custom | Sticky blur, mobile menu, dual CTA |
-| Hero + Trust | `crm-guidelines.md` | Hero copy + dashboard mock + 8 logo wall |
-| FeatureBento | `features.ts` | 4-col asymmetric, 1 large + 5 small |
+| Hero | `hero-search.md` | Headline + inline search với 5 gợi ý + dashboard mock + trust strip |
+| FeatureBento | `bento-market.md` | 4-col asymmetric: Pipeline 2×2 + 4×1×1 cells + Reports 2×1 |
+| IntegrationsSection | `feature-grid.md` | 12 integration cards + API docs link + "Request integration" |
 | DashboardShowcase | `dashboard-widget.md` | Bento: hero KPI indigo gradient + sparkline + 4 secondary + activity feed + stuck deals |
 | PipelineShowcase | `pipeline-kanban.md` | 5-stage kanban với deal cards, hot/stalled badges |
 | PricingSection | `pricing-tier.md` | 3 tiers, recommended Pro, monthly/annual tabs |
