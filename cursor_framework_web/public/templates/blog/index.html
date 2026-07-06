@@ -1,357 +1,422 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Blog Editorial — Trải nghiệm đọc tuyệt vời</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --accent: #10b981;
-      --accent2: #34d399;
-      --bg: #022c22;
-      --card: #064e3b;
-      --text: #ecfdf5;
-      --text2: #a7f3d0;
-    }
-
-    html { font-size: 16px; scroll-behavior: smooth; }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      min-height: 100vh;
-    }
-
-    /* ── Nav ── */
-    .nav {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(0,0,0,0.5);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      padding: 0 24px;
-    }
-    .nav-inner {
-      max-width: 1100px; margin: 0 auto;
-      display: flex; align-items: center; justify-content: space-between;
-      height: 56px;
-    }
-    .nav-logo {
-      font-size: 17px; font-weight: 700; letter-spacing: -0.02em;
-      color: var(--text);
-      text-decoration: none;
-    }
-    .nav-logo span { color: var(--accent); }
-    .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
-    .nav-links a {
-      color: var(--text2); font-size: 13.5px; font-weight: 500;
-      text-decoration: none; transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--text); }
-    .nav-cta {
-      background: var(--accent); color: #fff; font-size: 13px; font-weight: 600;
-      padding: 8px 18px; border-radius: 8px; text-decoration: none;
-      transition: opacity 0.2s, transform 0.2s;
-    }
-    .nav-cta:hover { opacity: 0.88; transform: translateY(-1px); }
-
-    /* ── Hero ── */
-    .hero {
-      min-height: 520px;
-      display: flex; align-items: center; justify-content: center;
-      background: var(--bg);
-      position: relative; overflow: hidden;
-    }
-    .hero::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: var(--bgGradient, linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%));
-      opacity: 0.6;
-    }
-    .hero::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse 80% 60% at 50% 40%, #10b98122 0%, transparent 70%);
-    }
-    .hero-inner {
-      position: relative; z-index: 1;
-      text-align: center; padding: 60px 24px;
-      max-width: 700px;
-    }
-    .hero-badge {
-      display: inline-block;
-      background: #10b98122; border: 1px solid #10b98155;
-      color: var(--accent); font-size: 11.5px; font-weight: 600;
-      padding: 5px 14px; border-radius: 999px;
-      letter-spacing: 0.05em; text-transform: uppercase;
-      margin-bottom: 20px;
-    }
-    .hero-headline {
-      font-size: clamp(36px, 6vw, 64px);
-      font-weight: 800; line-height: 1.05; letter-spacing: -0.03em;
-      margin-bottom: 18px; color: var(--text);
-    }
-    .hero-sub {
-      font-size: 17px; color: var(--text2); max-width: 480px;
-      margin: 0 auto 32px; line-height: 1.65;
-    }
-    .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    .btn-primary {
-      background: var(--accent); color: #fff;
-      padding: 12px 28px; border-radius: 10px;
-      font-size: 15px; font-weight: 600; text-decoration: none;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 20px #10b98144;
-    }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px #10b98155; }
-    .btn-secondary {
-      background: rgba(255,255,255,0.08); color: var(--text);
-      border: 1px solid rgba(255,255,255,0.12);
-      padding: 12px 28px; border-radius: 10px;
-      font-size: 15px; font-weight: 500; text-decoration: none;
-      transition: background 0.2s;
-    }
-    .btn-secondary:hover { background: rgba(255,255,255,0.13); }
-
-    /* ── Stats ── */
-    .stats-bar {
-      background: var(--card);
-      border-top: 1px solid rgba(255,255,255,0.05);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      padding: 24px;
-    }
-    .stats-inner {
-      max-width: 700px; margin: 0 auto;
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 16px; text-align: center;
-    }
-    .stat-value {
-      font-size: 28px; font-weight: 800; letter-spacing: -0.03em;
-      color: var(--accent); font-variant-numeric: tabular-nums;
-    }
-    .stat-label { font-size: 12px; color: var(--text2); margin-top: 2px; }
-
-    /* ── Features ── */
-    .section { max-width: 900px; margin: 0 auto; padding: 64px 24px; }
-    .section-label {
-      font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
-    }
-    .section-title {
-      font-size: clamp(26px, 4vw, 38px); font-weight: 800;
-      letter-spacing: -0.03em; margin-bottom: 8px; line-height: 1.15;
-    }
-    .section-sub { color: var(--text2); font-size: 16px; margin-bottom: 40px; }
-
-    .features-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 16px;
-    }
-    .feature-card {
-      background: var(--card); border-radius: 12px; padding: 20px;
-      border: 1px solid rgba(255,255,255,0.05);
-    }
-    .feature-icon {
-      width: 36px; height: 36px; border-radius: 8px;
-      background: #10b98122; display: flex; align-items: center; justify-content: center;
-      margin-bottom: 12px; font-size: 16px;
-    }
-    .feature-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
-    .feature-desc { font-size: 12.5px; color: var(--text2); line-height: 1.55; }
-
-    /* ── Testimonial ── */
-    .testimonial {
-      background: var(--card); border-radius: 16px; padding: 32px;
-      border-left: 3px solid var(--accent);
-      margin-bottom: 0;
-    }
-    .testimonial-text {
-      font-size: 17px; line-height: 1.7; margin-bottom: 16px;
-      font-style: italic; color: var(--text);
-    }
-    .testimonial-author { font-size: 13px; font-weight: 600; }
-    .testimonial-role { color: var(--text2); font-size: 12px; margin-top: 2px; }
-
-    /* ── FAQ ── */
-    .faq-item {
-      border-bottom: 1px solid rgba(255,255,255,0.05); padding: 18px 0;
-    }
-    .faq-q { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
-    .faq-a { font-size: 13px; color: var(--text2); line-height: 1.65; }
-
-    /* ── CTA Banner ── */
-    .cta-banner {
-      background: var(--card);
-      border-radius: 16px; padding: 48px 32px;
-      text-align: center;
-      background-image: radial-gradient(ellipse 60% 50% at 50% 100%, #10b98122 0%, transparent 70%);
-    }
-    .cta-banner h2 {
-      font-size: clamp(22px, 4vw, 34px); font-weight: 800;
-      letter-spacing: -0.03em; margin-bottom: 12px;
-    }
-    .cta-banner p { color: var(--text2); font-size: 15px; margin-bottom: 24px; }
-
-    /* ── Footer ── */
-    .footer {
-      text-align: center; padding: 32px 24px;
-      color: var(--text2); font-size: 12px;
-      border-top: 1px solid rgba(255,255,255,0.04);
-    }
-
-    /* ── Responsive ── */
-    @media (max-width: 600px) {
-      .nav-links { display: none; }
-      .hero-headline { font-size: 36px; }
-      .stats-inner { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-      .stat-value { font-size: 20px; }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Editorial · Câu chuyện công nghệ, thiết kế và văn hóa</title>
+<meta name="description" content="Magazine số về công nghệ, thiết kế và văn hóa Đông Nam Á. Đọc mỗi sáng thứ Bảy. 24,000 độc giả." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+<link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-<!-- NAV -->
-<nav class="nav">
-  <div class="nav-inner">
-    <a href="#" class="nav-logo">Byte Paper<span>.</span></a>
-    <ul class="nav-links">
-      <li><a href="#">Articles</a></li>
-      <li><a href="#">Topics</a></li>
-      <li><a href="#">Authors</a></li>
-      <li><a href="#">Newsletter</a></li>
-    </ul>
-    <a href="#" class="nav-cta">Subscribe</a>
-  </div>
-</nav>
+<div class="reading-progress"></div>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-inner">
-    <span class="hero-badge">Technology & Design</span>
-    <h1 class="hero-headline">Thinking in<br>public</h1>
-    <p class="hero-sub">Deep dives on software architecture, UX design, and the craft of building products people love.</p>
-    <div class="hero-actions">
-      <a href="#" class="btn-primary">Get Started Free</a>
-      <a href="#" class="btn-secondary">View Demo</a>
+<!-- ─── TOP HEADER (newspaper-style) ─── -->
+<header class="masthead">
+  <div class="container masthead-top">
+    <div class="masthead-meta">
+      <span id="date">Saturday, July 4, 2026</span>
+      <span class="sep">·</span>
+      <span>Hà Nội · 28°C · Partly cloudy</span>
+    </div>
+    <div class="masthead-meta">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <i class="ph ph-moon"></i>
+      </button>
+      <span>EN</span>
+      <span class="sep">|</span>
+      <span>VI</span>
+      <button class="sub-btn">
+        Subscribe <i class="ph ph-arrow-up-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Brand -->
+  <div class="brand container">
+    <a href="#" class="brand-link">
+      <span class="brand-serif">The</span>
+      <span class="brand-display">Editorial</span>
+    </a>
+    <div class="brand-tagline">Câu chuyện về công nghệ, thiết kế và văn hóa Đông Nam Á · Volume IV</div>
+  </div>
+
+  <!-- Nav -->
+  <nav class="prim-nav">
+    <div class="container">
+      <ul>
+        <li><a href="#" class="active">Trang chủ</a></li>
+        <li><a href="#">Công nghệ</a></li>
+        <li><a href="#">Thiết kế</a></li>
+        <li><a href="#">Văn hóa</a></li>
+        <li><a href="#">Kinh doanh</a></li>
+        <li><a href="#">Phỏng vấn</a></li>
+        <li><a href="#">Reviews</a></li>
+        <li><a href="#">Long-form</a></li>
+        <li>
+          <button class="search-btn" aria-label="Search">
+            <i class="ph ph-magnifying-glass"></i>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<!-- ─── FEATURED (real images via Picsum) ─── -->
+<section class="featured">
+  <div class="container">
+    <div class="feat-grid">
+
+      <!-- Lead story -->
+      <article class="feat-lead">
+        <div class="fl-image">
+          <img src="https://picsum.photos/seed/ai-conductor-coding-team-hanoi/960/640" alt="" loading="eager"/>
+          <span class="fl-badge">FEATURED</span>
+        </div>
+        <div class="fl-body">
+          <div class="post-meta">
+            <span class="post-cat">Công nghệ</span>
+            <span class="post-sep">·</span>
+            <span>8 phút đọc</span>
+            <span class="post-sep">·</span>
+            <span>2 giờ trước</span>
+          </div>
+          <h1 class="fl-title">
+            Tương lai của AI coding: Khi developer trở thành <em>nhạc trưởng AI</em>
+          </h1>
+          <p class="fl-excerpt">
+            Cursor, Claude Code và hàng trăm AI agents đang thay đổi cách chúng ta viết code.
+            Nhưng điều thú vị nhất không phải code viết nhanh hơn, mà là developer giờ điều phối
+            cả một dàn nhạc AI, từ planning agent, code generator đến test runner, để ra sản phẩm.
+          </p>
+          <div class="fl-author">
+            <img src="https://i.pravatar.cc/96?img=12" alt="" />
+            <div>
+              <div class="author-name">Minh Kiệt</div>
+              <div class="author-role">Editor-in-Chief · Thứ Bảy tuần này</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Side stories -->
+      <div class="feat-side">
+        <article class="side-card">
+          <div class="sc-image">
+            <img src="https://picsum.photos/seed/uiux-trends-audience-2026/640/420" alt=""/>
+          </div>
+          <div class="sc-body">
+            <span class="post-cat">Thiết kế</span>
+            <h3>10 xu hướng UI/UX 2026 mà designer không thể bỏ qua</h3>
+            <div class="post-meta small">
+              <span>5 phút</span><span class="post-sep">·</span><span>Hôm qua</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="side-card">
+          <div class="sc-image">
+            <img src="https://picsum.photos/seed/vietnam-startup-funding-vietnamfund/640/420" alt=""/>
+          </div>
+          <div class="sc-body">
+            <span class="post-cat">Kinh doanh</span>
+            <h3>Startup Việt gọi vốn 5 triệu USD với AI bản địa hóa</h3>
+            <div class="post-meta small">
+              <span>7 phút</span><span class="post-sep">·</span><span>3 ngày trước</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="side-card">
+          <div class="sc-image">
+            <img src="https://picsum.photos/seed/vng-founder-vietnam-tech-pioneer/640/420" alt=""/>
+          </div>
+          <div class="sc-body">
+            <span class="post-cat">Phỏng vấn</span>
+            <h3>Chuyện ít biết về founder VNG: "Tôi đã fail 3 lần trước khi thành công"</h3>
+            <div class="post-meta small">
+              <span>12 phút</span><span class="post-sep">·</span><span>5 ngày trước</span>
+            </div>
+          </div>
+        </article>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- STATS -->
-<div class="stats-bar">
-  <div class="stats-inner">
-    
-    <div>
-      <div class="stat-value">100/100</div>
-      <div class="stat-label">Lighthouse</div>
+<!-- ─── LATEST (real images, asymmetric) ─── -->
+<section class="latest">
+  <div class="container">
+    <div class="section-divider">
+      <h2 class="section-title">Bài viết mới nhất</h2>
+      <a href="#" class="see-all">Xem tất cả <i class="ph ph-arrow-right"></i></a>
     </div>
-    <div>
-      <div class="stat-value">50K+</div>
-      <div class="stat-label">Monthly Readers</div>
-    </div>
-    <div>
-      <div class="stat-value">3 posts/week</div>
-      <div class="stat-label">Publishing Cadence</div>
-    </div>
-  </div>
-</div>
 
-<!-- FEATURES -->
-<section class="section">
-  <div class="section-label">Features</div>
-  <h2 class="section-title">Everything you need.</h2>
-  <p class="section-sub">Built for real workflows. No bloat.</p>
-  <div class="features-grid">
-    
-    <div class="feature-card">
-      <div class="feature-icon">✦</div>
-      <div class="feature-title">Editorial typography (Serif + Sans)</div>
-      <div class="feature-desc">Editorial typography (Serif + Sans)</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">✦</div>
-      <div class="feature-title">Reading time + progress bar</div>
-      <div class="feature-desc">Reading time + progress bar</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">✦</div>
-      <div class="feature-title">Dark mode auto switch</div>
-      <div class="feature-desc">Dark mode auto switch</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">✦</div>
-      <div class="feature-title">Newsletter subscription widget</div>
-      <div class="feature-desc">Newsletter subscription widget</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">✦</div>
-      <div class="feature-title">Related posts algorithm</div>
-      <div class="feature-desc">Related posts algorithm</div>
+    <div class="latest-grid">
+      <article class="post-card pc-big">
+        <div class="pc-image">
+          <img src="https://picsum.photos/seed/rust-systems-programming-language/720/480" alt=""/>
+        </div>
+        <div class="pc-body">
+          <div class="post-meta">
+            <span class="post-cat">Công nghệ</span>
+            <span class="post-sep">·</span>
+            <span>6 phút</span>
+          </div>
+          <h3 class="pc-title">Tại sao Rust trở thành ngôn ngữ của tương lai system programming?</h3>
+          <p class="pc-excerpt">Memory safety không cần garbage collector. Performance ngang C++. Cộng đồng Rust Việt Nam tăng 3 lần chỉ trong 1 năm.</p>
+          <div class="pc-author">
+            <img src="https://i.pravatar.cc/72?img=33" alt=""/>
+            <span>Trần Linh · Backend Engineer tại Tiki</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="post-card">
+        <div class="pc-image">
+          <img src="https://picsum.photos/seed/genz-remote-work-southeast-asia-bali/720/480" alt=""/>
+        </div>
+        <div class="pc-body">
+          <div class="post-meta">
+            <span class="post-cat">Văn hóa</span>
+            <span class="post-sep">·</span>
+            <span>9 phút</span>
+          </div>
+          <h3 class="pc-title">Gen Z và cuộc cách mạng làm việc từ xa tại Đông Nam Á</h3>
+          <p class="pc-excerpt">Bangkok, Bali, Hà Nội trở thành "digital nomad hub". 68% Gen Z chọn remote bất chấp lương thấp hơn 15%.</p>
+          <div class="pc-author">
+            <img src="https://i.pravatar.cc/72?img=45" alt=""/>
+            <span>Phạm Hà</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="post-card">
+        <div class="pc-image">
+          <img src="https://picsum.photos/seed/apple-vision-pro-vietnam-designer-review/720/480" alt=""/>
+        </div>
+        <div class="pc-body">
+          <div class="post-meta">
+            <span class="post-cat">Reviews</span>
+            <span class="post-sep">·</span>
+            <span>11 phút</span>
+          </div>
+          <h3 class="pc-title">Đánh giá sau 6 tháng dùng Vision Pro: Có đáng 3,500 USD?</h3>
+          <p class="pc-excerpt">Trải nghiệm thực tế từ một designer Hà Nội. Ưu điểm bất ngờ, nhược điểm không ngờ.</p>
+          <div class="pc-author">
+            <img src="https://i.pravatar.cc/72?img=11" alt=""/>
+            <span>Nguyễn Việt</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="post-card">
+        <div class="pc-image">
+          <img src="https://picsum.photos/seed/shopee-vietnam-ecommerce-strategy-super-app/720/480" alt=""/>
+        </div>
+        <div class="pc-body">
+          <div class="post-meta">
+            <span class="post-cat">Kinh doanh</span>
+            <span class="post-sep">·</span>
+            <span>7 phút</span>
+          </div>
+          <h3 class="pc-title">Bí mật đằng sau sự tăng trưởng 300% của Shopee Việt Nam</h3>
+          <p class="pc-excerpt">Phân tích chiến lược "super app", live commerce, và cách họ đánh bại Tiki, Lazada.</p>
+          <div class="pc-author">
+            <img src="https://i.pravatar.cc/72?img=8" alt=""/>
+            <span>Đặng Minh</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="post-card">
+        <div class="pc-image">
+          <img src="https://picsum.photos/seed/figma-config-2026-designer-feature/720/480" alt=""/>
+        </div>
+        <div class="pc-body">
+          <div class="post-meta">
+            <span class="post-cat">Thiết kế</span>
+            <span class="post-sep">·</span>
+            <span>4 phút</span>
+          </div>
+          <h3 class="pc-title">Figma Config 2026: Tất cả tính năng mới designer cần biết</h3>
+          <p class="pc-excerpt">AI design, code connect, variables 2.0 và những thay đổi làm thay đổi cách làm việc nhóm.</p>
+          <div class="pc-author">
+            <img src="https://i.pravatar.cc/72?img=56" alt=""/>
+            <span>Hoàng Long</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="post-card">
+        <div class="pc-image">
+          <img src="https://picsum.photos/seed/tiki-cto-microservices-migration-vietnam/720/480" alt=""/>
+        </div>
+        <div class="pc-body">
+          <div class="post-meta">
+            <span class="post-cat">Phỏng vấn</span>
+            <span class="post-sep">·</span>
+            <span>14 phút</span>
+          </div>
+          <h3 class="pc-title">CTO Tiki: "Chúng tôi đã rebuild toàn bộ hệ thống trong 9 tháng"</h3>
+          <p class="pc-excerpt">Từ monolith 7 năm tuổi sang microservices. Bài học xương máu và chiến lược migration.</p>
+          <div class="pc-author">
+            <img src="https://i.pravatar.cc/72?img=29" alt=""/>
+            <span>Khôi Nguyên</span>
+          </div>
+        </div>
+      </article>
     </div>
   </div>
 </section>
 
-<!-- HIGHLIGHTS -->
-<section class="section" style="padding-top:0;">
-  <div class="section-label">By the numbers</div>
-  <div class="features-grid">
-    
-    <div class="feature-card" style="text-align:center;">
-      <div class="stat-value" style="font-size:36px;margin-bottom:4px;">100/100</div>
-      <div class="stat-label">Lighthouse Score</div>
+<!-- ─── TOPICS (no pills on images; real text-only cloud) ─── -->
+<section class="topics">
+  <div class="container">
+    <div class="section-divider">
+      <h2 class="section-title">Chủ đề đang hot</h2>
     </div>
-    <div class="feature-card" style="text-align:center;">
-      <div class="stat-value" style="font-size:36px;margin-bottom:4px;">6m 24s</div>
-      <div class="stat-label">Avg Read Time</div>
+    <div class="topic-cloud">
+      <a href="#" class="topic t-xl">AI Coding</a>
+      <a href="#" class="topic t-lg">Rust</a>
+      <a href="#" class="topic">Startup Việt</a>
+      <a href="#" class="topic t-lg">Remote Work</a>
+      <a href="#" class="topic">Figma</a>
+      <a href="#" class="topic">Web3</a>
+      <a href="#" class="topic t-xl">UX Research</a>
+      <a href="#" class="topic">Career</a>
+      <a href="#" class="topic t-lg">Mental Health</a>
+      <a href="#" class="topic">Climate Tech</a>
+      <a href="#" class="topic">Open Source</a>
+      <a href="#" class="topic">Edge Computing</a>
+      <a href="#" class="topic t-lg">AI Ethics</a>
+      <a href="#" class="topic">Hardware</a>
     </div>
-    <div class="feature-card" style="text-align:center;">
-      <div class="stat-value" style="font-size:36px;margin-bottom:4px;">12%</div>
-      <div class="stat-label">Bounce Rate</div>
+  </div>
+</section>
+
+<!-- ─── EDITOR'S NOTE (long-form, asymmetric) ─── -->
+<section class="editors-note">
+  <div class="container">
+    <div class="note-grid">
+      <div>
+        <div class="post-cat">Editor's Note</div>
+        <h2 class="note-title">Vì sao chúng tôi làm magazine này</h2>
+      </div>
+      <div class="note-body">
+        <p>
+          Chúng tôi bắt đầu The Editorial từ quan sát đơn giản: Đông Nam Á đang có một trong
+          những giai đoạn chuyển đổi công nghệ thú vị nhất lịch sử. Nhưng phần lớn câu chuyện
+          đó chỉ được kể qua lăng kính của Thung lũng Silicon, và bằng tiếng Anh.
+        </p>
+        <p>
+          Chúng tôi viết bằng tiếng Việt, cho người Việt, về những gì đang thực sự xảy ra ở
+          Hà Nội, TP.HCM, Jakarta, Bangkok, Manila. Không phải press release. Không phải
+          hot take. Chỉ là những câu chuyện dài hơi, được nghiên cứu kỹ, viết bởi người
+          trong cuộc.
+        </p>
+        <p>
+          Mỗi sáng thứ Bảy, miễn phí. Không quảng cáo. Không paywall. Chỉ vì chúng tôi tin
+          rằng câu chuyện địa phương xứng đáng được kể cho đúng người.
+        </p>
+        <div class="note-sig">
+          <img src="https://i.pravatar.cc/96?img=12" alt=""/>
+          <div>
+            <div class="note-name">Minh Kiệt</div>
+            <div class="note-role">Editor-in-Chief · The Editorial</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- TESTIMONIAL -->
-<section class="section" style="padding-top:0;">
-  <div class="testimonial">
-    <p class="testimonial-text">"Finally a dev blog that respects my time. Short, precise, zero fluff."</p>
-    <div class="testimonial-author">Dat Le</div>
-    <div class="testimonial-role">Senior Engineer, FPT</div>
+<!-- ─── NEWSLETTER ─── -->
+<section class="newsletter">
+  <div class="container">
+    <div class="nl-box">
+      <div class="nl-eyebrow"><i class="ph-fill ph-envelope-simple-open"></i> Newsletter</div>
+      <h2>Nhận bài viết hay mỗi sáng thứ Bảy.</h2>
+      <p>Cùng 24,718 độc giả nhận newsletter chọn lọc của chúng tôi. Không spam, hủy bất kỳ lúc nào.</p>
+      <form class="nl-form" @submit.prevent>
+        <input type="email" placeholder="email@example.com" />
+        <button type="submit">Đăng ký <i class="ph ph-arrow-right"></i></button>
+      </form>
+      <div class="nl-stats">
+        <div><strong>24,718</strong> độc giả</div>
+        <div><strong>4.9★</strong> rating</div>
+        <div><strong>Mỗi T7</strong> gửi</div>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- FAQ -->
-<section class="section" style="padding-top:0;">
-  <div class="section-label">FAQ</div>
-  <h2 class="section-title">Common questions.</h2>
-  
-  <div class="faq-item">
-    <div class="faq-q">Do you accept guest posts?</div>
-    <div class="faq-a">Yes — we publish 2 guest posts per month. Pitch via the contact form with a 200-word outline.</div>
-  </div>
-  <div class="faq-item">
-    <div class="faq-q">Is there a newsletter?</div>
-    <div class="faq-a">Weekly digest every Monday. 3 curated articles + 1 tool recommendation. 50,000+ subscribers.</div>
-  </div>
-</section>
-
-<!-- CTA -->
-<section class="section" style="padding-top:0;">
-  <div class="cta-banner">
-    <h2>Ready to get started?</h2>
-    <p>Join thousands of users today. 8 pages · 192 KB · HTML5, CSS3, Vanilla JS</p>
-    <a href="#" class="btn-primary">Try Blog Editorial Free</a>
-  </div>
-</section>
-
-<!-- FOOTER -->
+<!-- ─── FOOTER ─── -->
 <footer class="footer">
-  <div>Blog Editorial · EDITORIAL template · Part of Cursor Enterprise Framework</div>
+  <div class="container">
+    <div class="footer-top">
+      <div>
+        <h3 class="footer-brand">
+          <span class="brand-serif">The</span>
+          <span class="brand-display">Editorial</span>
+        </h3>
+        <p class="footer-desc">Câu chuyện về công nghệ, thiết kế và văn hóa Đông Nam Á, từ những người trong cuộc.</p>
+        <div class="footer-socials">
+          <a href="#" aria-label="Twitter"><i class="ph-fill ph-twitter-logo"></i></a>
+          <a href="#" aria-label="Instagram"><i class="ph-fill ph-instagram-logo"></i></a>
+          <a href="#" aria-label="LinkedIn"><i class="ph-fill ph-linkedin-logo"></i></a>
+          <a href="#" aria-label="RSS"><i class="ph-fill ph-rss"></i></a>
+        </div>
+      </div>
+      <div>
+        <h4>Chuyên mục</h4>
+        <ul>
+          <li><a href="#">Công nghệ</a></li>
+          <li><a href="#">Thiết kế</a></li>
+          <li><a href="#">Văn hóa</a></li>
+          <li><a href="#">Phỏng vấn</a></li>
+          <li><a href="#">Long-form</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Theo dõi</h4>
+        <ul>
+          <li><a href="#">Newsletter (24k)</a></li>
+          <li><a href="#">RSS feed</a></li>
+          <li><a href="#">Twitter / X</a></li>
+          <li><a href="#">LinkedIn</a></li>
+          <li><a href="#">Instagram</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Về chúng tôi</h4>
+        <ul>
+          <li><a href="#">Đội ngũ biên tập</a></li>
+          <li><a href="#">Liên hệ</a></li>
+          <li><a href="#">Quảng cáo</a></li>
+          <li><a href="#">Viết cho chúng tôi</a></li>
+          <li><a href="#">Quy tắc biên tập</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bot">
+      <div>© 2026 The Editorial. Được viết bởi con người, biên tập bởi con người.</div>
+      <div class="legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Cookies</a>
+        <a href="#">Colophon</a>
+      </div>
+    </div>
+  </div>
 </footer>
 
+<script src="script.js"></script>
 </body>
 </html>

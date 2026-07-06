@@ -1,358 +1,517 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nhà Tốt — Mua bán & cho thuê BĐS minh bạch</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --accent: #f59e0b;
-      --accent2: #10b981;
-      --bg: #1a0f00;
-      --card: #2d1a00;
-      --text: #fffbeb;
-      --text2: #fde68a;
-    }
-
-    html { font-size: 16px; scroll-behavior: smooth; }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      min-height: 100vh;
-    }
-
-    /* ── Nav ── */
-    .nav {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(0,0,0,0.5);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      padding: 0 24px;
-    }
-    .nav-inner {
-      max-width: 1100px; margin: 0 auto;
-      display: flex; align-items: center; justify-content: space-between;
-      height: 56px;
-    }
-    .nav-logo {
-      font-size: 17px; font-weight: 700; letter-spacing: -0.02em;
-      color: var(--text);
-      text-decoration: none;
-    }
-    .nav-logo span { color: var(--accent); }
-    .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
-    .nav-links a {
-      color: var(--text2); font-size: 13.5px; font-weight: 500;
-      text-decoration: none; transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--text); }
-    .nav-cta {
-      background: var(--accent); color: #fff; font-size: 13px; font-weight: 600;
-      padding: 8px 18px; border-radius: 8px; text-decoration: none;
-      transition: opacity 0.2s, transform 0.2s;
-    }
-    .nav-cta:hover { opacity: 0.88; transform: translateY(-1px); }
-
-    /* ── Hero ── */
-    .hero {
-      min-height: 520px;
-      display: flex; align-items: center; justify-content: center;
-      background: var(--bg);
-      position: relative; overflow: hidden;
-    }
-    .hero::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: var(--bgGradient, linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%));
-      opacity: 0.6;
-    }
-    .hero::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse 80% 60% at 50% 40%, #f59e0b22 0%, transparent 70%);
-    }
-    .hero-inner {
-      position: relative; z-index: 1;
-      text-align: center; padding: 60px 24px;
-      max-width: 700px;
-    }
-    .hero-badge {
-      display: inline-block;
-      background: #f59e0b22; border: 1px solid #f59e0b55;
-      color: var(--accent); font-size: 11.5px; font-weight: 600;
-      padding: 5px 14px; border-radius: 999px;
-      letter-spacing: 0.05em; text-transform: uppercase;
-      margin-bottom: 20px;
-    }
-    .hero-headline {
-      font-size: clamp(36px, 6vw, 64px);
-      font-weight: 800; line-height: 1.05; letter-spacing: -0.03em;
-      margin-bottom: 18px; color: var(--text);
-    }
-    .hero-sub {
-      font-size: 17px; color: var(--text2); max-width: 480px;
-      margin: 0 auto 32px; line-height: 1.65;
-    }
-    .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    .btn-primary {
-      background: var(--accent); color: #fff;
-      padding: 12px 28px; border-radius: 10px;
-      font-size: 15px; font-weight: 600; text-decoration: none;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 20px #f59e0b44;
-    }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px #f59e0b55; }
-    .btn-secondary {
-      background: rgba(255,255,255,0.08); color: var(--text);
-      border: 1px solid rgba(255,255,255,0.12);
-      padding: 12px 28px; border-radius: 10px;
-      font-size: 15px; font-weight: 500; text-decoration: none;
-      transition: background 0.2s;
-    }
-    .btn-secondary:hover { background: rgba(255,255,255,0.13); }
-
-    /* ── Stats ── */
-    .stats-bar {
-      background: var(--card);
-      border-top: 1px solid rgba(255,255,255,0.05);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      padding: 24px;
-    }
-    .stats-inner {
-      max-width: 700px; margin: 0 auto;
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 16px; text-align: center;
-    }
-    .stat-value {
-      font-size: 28px; font-weight: 800; letter-spacing: -0.03em;
-      color: var(--accent); font-variant-numeric: tabular-nums;
-    }
-    .stat-label { font-size: 12px; color: var(--text2); margin-top: 2px; }
-
-    /* ── Features ── */
-    .section { max-width: 900px; margin: 0 auto; padding: 64px 24px; }
-    .section-label {
-      font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
-    }
-    .section-title {
-      font-size: clamp(26px, 4vw, 38px); font-weight: 800;
-      letter-spacing: -0.03em; margin-bottom: 8px; line-height: 1.15;
-    }
-    .section-sub { color: var(--text2); font-size: 16px; margin-bottom: 40px; }
-
-    .features-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 16px;
-    }
-    .feature-card {
-      background: var(--card); border-radius: 12px; padding: 20px;
-      border: 1px solid rgba(255,255,255,0.05);
-    }
-    .feature-icon {
-      width: 36px; height: 36px; border-radius: 8px;
-      background: #f59e0b22; display: flex; align-items: center; justify-content: center;
-      margin-bottom: 12px; font-size: 16px;
-    }
-    .feature-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
-    .feature-desc { font-size: 12.5px; color: var(--text2); line-height: 1.55; }
-
-    /* ── Testimonial ── */
-    .testimonial {
-      background: var(--card); border-radius: 16px; padding: 32px;
-      border-left: 3px solid var(--accent);
-      margin-bottom: 0;
-    }
-    .testimonial-text {
-      font-size: 17px; line-height: 1.7; margin-bottom: 16px;
-      font-style: italic; color: var(--text);
-    }
-    .testimonial-author { font-size: 13px; font-weight: 600; }
-    .testimonial-role { color: var(--text2); font-size: 12px; margin-top: 2px; }
-
-    /* ── FAQ ── */
-    .faq-item {
-      border-bottom: 1px solid rgba(255,255,255,0.05); padding: 18px 0;
-    }
-    .faq-q { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
-    .faq-a { font-size: 13px; color: var(--text2); line-height: 1.65; }
-
-    /* ── CTA Banner ── */
-    .cta-banner {
-      background: var(--card);
-      border-radius: 16px; padding: 48px 32px;
-      text-align: center;
-      background-image: radial-gradient(ellipse 60% 50% at 50% 100%, #f59e0b22 0%, transparent 70%);
-    }
-    .cta-banner h2 {
-      font-size: clamp(22px, 4vw, 34px); font-weight: 800;
-      letter-spacing: -0.03em; margin-bottom: 12px;
-    }
-    .cta-banner p { color: var(--text2); font-size: 15px; margin-bottom: 24px; }
-
-    /* ── Footer ── */
-    .footer {
-      text-align: center; padding: 32px 24px;
-      color: var(--text2); font-size: 12px;
-      border-top: 1px solid rgba(255,255,255,0.04);
-    }
-
-    /* ── Responsive ── */
-    @media (max-width: 600px) {
-      .nav-links { display: none; }
-      .hero-headline { font-size: 36px; }
-      .stats-inner { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-      .stat-value { font-size: 20px; }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NhaTot — Mua bán & cho thuê BDS minh bạch</title>
+<meta name="description" content="NhaTot la nen tang BDS so 1 Viet Nam: 124K tin dang, 63 thanh pho, 100% verified. Ban do gia, virtual tour 360, AI matching theo ngan sach." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" />
+<link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-<!-- NAV -->
+<!-- ─── NAV ─── -->
 <nav class="nav">
-  <div class="nav-inner">
-    <a href="#" class="nav-logo">Nhà  Tốt<span>.</span></a>
-    <ul class="nav-links">
-      <li><a href="#">Mua</a></li>
-      <li><a href="#">Thuê</a></li>
-      <li><a href="#">Dự án</a></li>
-      <li><a href="#">Giá đất</a></li>
-      <li><a href="#">Đăng tin</a></li>
+  <div class="container nav-inner">
+    <a href="#" class="logo">
+      <svg class="logo-mark" viewBox="0 0 32 32" fill="none">
+        <rect x="4" y="4" width="24" height="24" rx="7" fill="currentColor"/>
+        <path d="M10 22 L16 10 L22 22 M13 17 H19" stroke="#fafbff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>nhatot<span class="logo-dot">.</span></span>
+    </a>
+    <ul class="nav-menu">
+      <li><a href="#features">Tinh nang</a></li>
+      <li><a href="#workflow">Quy trinh</a></li>
+      <li><a href="#pricing">Bang gia</a></li>
+      <li><a href="#customers">Danh gia</a></li>
     </ul>
-    <a href="#" class="nav-cta">Tìm nhà</a>
+    <div class="nav-actions">
+      <a href="#" class="nav-ghost">Dang nhap</a>
+      <a href="#pricing" class="nav-cta">
+        Dang tin mien phi
+        <i class="ph ph-arrow-up-right"></i>
+      </a>
+    </div>
   </div>
 </nav>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-inner">
-    <span class="hero-badge">124,000 verified listings</span>
-    <h1 class="hero-headline">Tìm nhà dễ hơn,<br>tin tưởng hơn</h1>
-    <p class="hero-sub">124K tin đăng đã xác minh. Bản đồ giá theo quận. AI gợi ý theo ngân sách của bạn.</p>
-    <div class="hero-actions">
-      <a href="#" class="btn-primary">Get Started Free</a>
-      <a href="#" class="btn-secondary">View Demo</a>
+<!-- ─── HERO ─── -->
+<header class="hero">
+  <div class="container hero-grid">
+    <div class="hero-text">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        124K tin dang · 63 thanh pho · 100% verified
+      </div>
+
+      <h1 class="hero-title">
+        Mua ban & cho thue<br/>
+        BDS minh bach hon <span class="hl">83%</span>.
+      </h1>
+
+      <p class="hero-desc">
+        NhaTot thay the 5 website BDS rời rạc bằng một nền tảng duy nhất:
+        ban đồ giá BĐS, virtual tour 3D 360°, AI matching theo ngân sách,
+        check pháp lý tự động. Không còn tin rác, không còn môi giới ảo.
+      </p>
+
+      <div class="hero-cta">
+        <a href="#pricing" class="btn btn-primary btn-lg">
+          Tim nha ngay
+          <i class="ph ph-arrow-right"></i>
+        </a>
+        <a href="#workflow" class="btn btn-ghost btn-lg">
+          <i class="ph-fill ph-play-circle"></i>
+          Xem quy trinh 2 phut
+        </a>
+      </div>
+
+      <div class="hero-meta">
+        <div class="meta-avatars">
+          <div class="av" style="background:#f59e0b">HN</div>
+          <div class="av" style="background:#10b981">HCM</div>
+          <div class="av" style="background:#3b82f6">DN</div>
+          <div class="av" style="background:#8b5cf6">CT</div>
+          <div class="av av-more">+124K</div>
+        </div>
+        <div class="meta-text">
+          <div class="meta-stars">
+            <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+            <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+            <i class="ph-fill ph-star"></i>
+          </div>
+          <div>4.8 · 8,431 danh gia tren App Store</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Property listing mockup: 3 stacked cards + price heatmap -->
+    <div class="hero-visual">
+      <div class="prop-list">
+        <!-- Property card 1 -->
+        <div class="prop-card">
+          <div class="pc-img">
+            <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=80" alt="Can ho Quan 7" loading="lazy" />
+            <div class="pc-badge pc-badge-hot">
+              <i class="ph-fill ph-fire"></i> Hot
+            </div>
+            <div class="pc-price-tag">3.2 ty</div>
+          </div>
+          <div class="pc-info">
+            <div class="pc-title">Can ho 2PN Quan 7, Riverside</div>
+            <div class="pc-meta">
+              <span><i class="ph ph-map-pin"></i> Quan 7, Ho Chi Minh</span>
+              <span><i class="ph ph-ruler"></i> 78 m&sup2;</span>
+              <span><i class="ph ph-bed"></i> 2PN</span>
+            </div>
+            <div class="pc-footer">
+              <div class="pc-agent">
+                <div class="pa-avatar" style="background:#d97706">TN</div>
+                <span>Thanh Nguyen</span>
+                <i class="ph-fill ph-seal-check" style="color:#10b981"></i>
+              </div>
+              <div class="pc-views"><i class="ph ph-eye"></i> 1.2K</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Property card 2 -->
+        <div class="prop-card">
+          <div class="pc-img">
+            <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&q=80" alt="Nha pho Tay Ho" loading="lazy" />
+            <div class="pc-badge pc-badge-new">
+              <i class="ph-fill ph-sparkle"></i> Moi
+            </div>
+            <div class="pc-price-tag">12.5 ty</div>
+          </div>
+          <div class="pc-info">
+            <div class="pc-title">Nha pho 4 tang Tay Ho, nha dan</div>
+            <div class="pc-meta">
+              <span><i class="ph ph-map-pin"></i> Tay Ho, Ha Noi</span>
+              <span><i class="ph ph-ruler"></i> 180 m&sup2;</span>
+              <span><i class="ph ph-bed"></i> 5PN</span>
+            </div>
+            <div class="pc-footer">
+              <div class="pc-agent">
+                <div class="pa-avatar" style="background:#059669">HL</div>
+                <span>Ha Le</span>
+                <i class="ph-fill ph-seal-check" style="color:#10b981"></i>
+              </div>
+              <div class="pc-views"><i class="ph ph-eye"></i> 847</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Property card 3 -->
+        <div class="prop-card">
+          <div class="pc-img">
+            <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80" alt="Studio Da Nang" loading="lazy" />
+            <div class="pc-price-tag">1.8 ty</div>
+          </div>
+          <div class="pc-info">
+            <div class="pc-title">Studio view bien My Khe, cho thue</div>
+            <div class="pc-meta">
+              <span><i class="ph ph-map-pin"></i> My Khe, Da Nang</span>
+              <span><i class="ph ph-ruler"></i> 42 m&sup2;</span>
+              <span><i class="ph ph-bed"></i> 1PN</span>
+            </div>
+            <div class="pc-footer">
+              <div class="pc-agent">
+                <div class="pa-avatar" style="background:#7c3aed">PM</div>
+                <span>Phuong Mai</span>
+                <i class="ph-fill ph-seal-check" style="color:#10b981"></i>
+              </div>
+              <div class="pc-views"><i class="ph ph-eye"></i> 3.4K</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Price heatmap mini SVG -->
+      <div class="heatmap-card">
+        <div class="hm-title">
+          <i class="ph ph-chart-bar"></i>
+          Gia trung binh theo quan
+        </div>
+        <div class="hm-bars">
+          <div class="hm-bar" style="--h:65%"><span class="hm-label">Q.7</span><span class="hm-val">3.2 ty</span></div>
+          <div class="hm-bar" style="--h:85%"><span class="hm-label">Tay Ho</span><span class="hm-val">12.5 ty</span></div>
+          <div class="hm-bar" style="--h:40%"><span class="hm-label">Q.2</span><span class="hm-val">2.1 ty</span></div>
+          <div class="hm-bar" style="--h:55%"><span class="hm-label">Q.Binh Thanh</span><span class="hm-val">2.8 ty</span></div>
+          <div class="hm-bar" style="--h:30%"><span class="hm-label">Thu Duc</span><span class="hm-val">1.6 ty</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ─── STATS ─── -->
+<section class="stats">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="si-icon"><i class="ph ph-house-line"></i></div>
+        <div class="si-num" data-target="124000">124K</div>
+        <div class="si-label">Tin dang BDS</div>
+      </div>
+      <div class="stat-item">
+        <div class="si-icon"><i class="ph ph-map-pin"></i></div>
+        <div class="si-num" data-target="63">63</div>
+        <div class="si-label">Thanh pho & tinh</div>
+      </div>
+      <div class="stat-item">
+        <div class="si-icon"><i class="ph-fill ph-shield-check"></i></div>
+        <div class="si-num" data-target="100">100<span class="si-pct">%</span></div>
+        <div class="si-label">Tin da verified</div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- STATS -->
-<div class="stats-bar">
-  <div class="stats-inner">
-    
-    <div>
-      <div class="stat-value">124K</div>
-      <div class="stat-label">Verified Listings</div>
+<!-- ─── FEATURES (Bento grid) ─── -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Tinh nang</div>
+      <h2 class="section-title">5 thu ban can, khong hon.</h2>
+      <p class="section-desc">Moi thu tu tim nha den dong hop dong, tat ca trong mot ung dung.</p>
     </div>
-    <div>
-      <div class="stat-value">63</div>
-      <div class="stat-label">Cities</div>
-    </div>
-    <div>
-      <div class="stat-value">100%</div>
-      <div class="stat-label">Verified Properties</div>
-    </div>
-  </div>
-</div>
 
-<!-- FEATURES -->
-<section class="section">
-  <div class="section-label">Features</div>
-  <h2 class="section-title">Everything you need.</h2>
-  <p class="section-sub">Built for real workflows. No bloat.</p>
-  <div class="features-grid">
-    
-    <div class="feature-card">
-      <div class="feature-icon">✦</div>
-      <div class="feature-title">Bản đồ giá BĐS</div>
-      <div class="feature-desc">Bản đồ giá BĐS theo quận/huyện</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">✦</div>
-      <div class="feature-title">Virtual tour 3D & ảnh 360°</div>
-      <div class="feature-desc">Virtual tour 3D & ảnh 360°</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">✦</div>
-      <div class="feature-title">AI matching</div>
-      <div class="feature-desc">AI matching theo ngân sách + nhu cầu</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">✦</div>
-      <div class="feature-title">Đặt lịch xem nhà online</div>
-      <div class="feature-desc">Đặt lịch xem nhà online</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">✦</div>
-      <div class="feature-title">Pháp lý check tự động (sổ đỏ, quy hoạch)</div>
-      <div class="feature-desc">Pháp lý check tự động (sổ đỏ, quy hoạch)</div>
+    <!-- Bento grid: 1 big + 4 small -->
+    <div class="bento">
+      <article class="bento-card bento-big">
+        <div class="bc-tag"><i class="ph ph-map-trifold"></i> Ban do gia</div>
+        <h3>Ban do gia BĐS chuan 95% theo tuyen.</h3>
+        <p>Map gia trung binh theo tuyen duong, quan huyen, phuong xa. So sanh gia 6 thang truoc, du bao xu huong. Chi can keo map, thay ngay gia that.</p>
+        <div class="bc-mock">
+          <div class="map-mini">
+            <svg viewBox="0 0 380 180" fill="none">
+              <rect width="380" height="180" rx="10" fill="#1c1917"/>
+              <!-- Grid lines -->
+              <line x1="0" y1="45" x2="380" y2="45" stroke="#292524" stroke-width="1"/>
+              <line x1="0" y1="90" x2="380" y2="90" stroke="#292524" stroke-width="1"/>
+              <line x1="0" y1="135" x2="380" y2="135" stroke="#292524" stroke-width="1"/>
+              <!-- District blobs -->
+              <circle cx="80" cy="80" r="36" fill="#f59e0b" fill-opacity=".18"/>
+              <circle cx="80" cy="80" r="20" fill="#f59e0b" fill-opacity=".35"/>
+              <circle cx="80" cy="80" r="8" fill="#f59e0b"/>
+              <text x="80" y="130" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="600">Q.7</text>
+
+              <circle cx="190" cy="60" r="44" fill="#f59e0b" fill-opacity=".12"/>
+              <circle cx="190" cy="60" r="26" fill="#f59e0b" fill-opacity=".28"/>
+              <circle cx="190" cy="60" r="10" fill="#f59e0b"/>
+              <text x="190" y="116" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="600">Tay Ho</text>
+
+              <circle cx="300" cy="100" r="32" fill="#f59e0b" fill-opacity=".15"/>
+              <circle cx="300" cy="100" r="18" fill="#f59e0b" fill-opacity=".3"/>
+              <circle cx="300" cy="100" r="7" fill="#f59e0b"/>
+              <text x="300" y="148" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="600">Q.2</text>
+
+              <circle cx="140" cy="130" r="28" fill="#f59e0b" fill-opacity=".14"/>
+              <circle cx="140" cy="130" r="16" fill="#f59e0b" fill-opacity=".26"/>
+              <circle cx="140" cy="130" r="6" fill="#f59e0b"/>
+              <text x="140" y="170" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="600">TB</text>
+
+              <!-- Price tooltip -->
+              <rect x="52" y="20" width="72" height="30" rx="6" fill="#f59e0b"/>
+              <text x="88" y="38" text-anchor="middle" fill="#1c1917" font-size="12" font-weight="700">3.2 ty/m&sup2;</text>
+              <polygon points="88,50 82,54 94,54" fill="#f59e0b"/>
+            </svg>
+          </div>
+        </div>
+      </article>
+
+      <article class="bento-card">
+        <div class="bc-tag"><i class="ph ph-cube"></i> Virtual tour 3D</div>
+        <h3>Xem nha 360° khong can ra khoi ghe.</h3>
+        <p>3D virtual tour tuyen tinh chuan nhu mat kinh. Di chuyen phong, phong to, xem ban ve 3D. Giam 60% cuoc hen that bao.</p>
+      </article>
+
+      <article class="bento-card">
+        <div class="bc-tag"><i class="ph ph-robot"></i> AI Matching</div>
+        <h3>Go y nha phu hop voi ngan sach.</h3>
+        <p>Nhap ngan sach, vi tri, yeu cau. AI du doan 5 bat dong san phu hop nhat trong 3 giay. Khong con phai loc tay 100+ ket qua.</p>
+      </article>
+
+      <article class="bento-card">
+        <div class="bc-tag"><i class="ph ph-calendar-check"></i> Dat lich xem</div>
+        <h3>Hen xem nha chi trong 30 giay.</h3>
+        <p>Chu nha chap nhan lich trong 1 tap. Nhac nho tu dong 24h truoc. Danh gia sau buoi xem — tat ca trong app.</p>
+      </article>
+
+      <article class="bento-card">
+        <div class="bc-tag"><i class="ph ph-file-search"></i> Check phap ly</div>
+        <h3>Kiem tra phap ly tu dong, 247.</h3>
+        <p>So sanh quyen so huu, giay phep xay dung, no thue, tranh chap. Bao cao phap ly trong 5 phut cho bat ky tin nao.</p>
+      </article>
     </div>
   </div>
 </section>
 
-<!-- HIGHLIGHTS -->
-<section class="section" style="padding-top:0;">
-  <div class="section-label">By the numbers</div>
-  <div class="features-grid">
-    
-    <div class="feature-card" style="text-align:center;">
-      <div class="stat-value" style="font-size:36px;margin-bottom:4px;">124K</div>
-      <div class="stat-label">Tin đăng</div>
+<!-- ─── WORKFLOW ─── -->
+<section class="workflow" id="workflow">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Quy trinh</div>
+      <h2 class="section-title">4 buoc tu tim nha den nhan chave.</h2>
     </div>
-    <div class="feature-card" style="text-align:center;">
-      <div class="stat-value" style="font-size:36px;margin-bottom:4px;">63</div>
-      <div class="stat-label">Thành phố</div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="fs-num">01</div>
+        <h4>Tim kiem theo khu vuc</h4>
+        <p>Loc theo quan huyen, ban kinh, gia, dien tich. Map gia truc quan giup loc nhanh hon 10 lan.</p>
+      </div>
+      <div class="flow-step">
+        <div class="fs-num">02</div>
+        <h4>Loc theo ngan sach</h4>
+        <p>AI xu ly 124K tin, go y 5 bat dong san phu hop nhat voi ngan sach va tien ich.</p>
+      </div>
+      <div class="flow-step">
+        <div class="fs-num">03</div>
+        <h4>Virtual tour 3D 360</h4>
+        <p>Xem 360° mat bang, noi that, view tuyen tinh. Loc ket qua chi con hen thuc te voi nhung tin xac dinh.</p>
+      </div>
+      <div class="flow-step">
+        <div class="fs-num">04</div>
+        <h4>Dat lich xem that</h4>
+        <p>Dat lich 30 giay qua app. Chu nha xac nhan tu dong. Nhac nho 24h truoc. Danh gia sau buoi xem.</p>
+      </div>
     </div>
-    <div class="feature-card" style="text-align:center;">
-      <div class="stat-value" style="font-size:36px;margin-bottom:4px;">100%</div>
-      <div class="stat-label">Verified</div>
+  </div>
+</section>
+
+<!-- ─── PRICING ─── -->
+<section class="pricing" id="pricing">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Bang gia</div>
+      <h2 class="section-title">Chi tra khi ban thuc su can.</h2>
+      <p class="section-desc">Dang tin mien phi. Nang cap khi can AI matching hoac virtual tour.</p>
+    </div>
+    <div class="price-grid">
+      <article class="price-card">
+        <div class="pc-name">Chu nha</div>
+        <div class="pc-price"><span>₫</span>0<span>/thang</span></div>
+        <p class="pc-desc">Cho chu nha can ban tin, khong can ho tro.</p>
+        <ul class="pc-features">
+          <li><i class="ph ph-check"></i> 1 tin dang / thang</li>
+          <li><i class="ph ph-check"></i> 20 anh / tin</li>
+          <li><i class="ph ph-check"></i> Hien thi map</li>
+          <li><i class="ph ph-check"></i> Chat voi nguoi mua</li>
+          <li><i class="ph ph-check"></i> App iOS / Android</li>
+        </ul>
+        <a href="#" class="btn btn-outline btn-full">Dang tin mien phi</a>
+      </article>
+
+      <article class="price-card pc-featured">
+        <div class="pc-ribbon"><i class="ph-fill ph-crown-simple"></i> Pho bien nhat</div>
+        <div class="pc-name">Moi gioi</div>
+        <div class="pc-price"><span>₫</span>1.5M<span>/thang</span></div>
+        <p class="pc-desc">Cho moi gioi chuyen nghiep can AI & virtual tour.</p>
+        <ul class="pc-features">
+          <li><i class="ph ph-check"></i> 50 tin dang / thang</li>
+          <li><i class="ph ph-check"></i> Virtual tour 3D 360</li>
+          <li><i class="ph ph-check"></i> AI matching theo ngan sach</li>
+          <li><i class="ph ph-check"></i> Check phap ly tu dong</li>
+          <li><i class="ph ph-check"></i> Dat lich xem tich hop</li>
+          <li><i class="ph ph-check"></i> Bao cao hieu suat</li>
+        </ul>
+        <a href="#" class="btn btn-primary btn-full">Dung thu 14 ngay</a>
+      </article>
+
+      <article class="price-card">
+        <div class="pc-name">Doanh nghiep</div>
+        <div class="pc-price">Custom</div>
+        <p class="pc-desc">Cho cong ty BDS lon can API & dedicated support.</p>
+        <ul class="pc-features">
+          <li><i class="ph ph-check"></i> Tin dang khong gioi han</li>
+          <li><i class="ph ph-check"></i> REST API & webhook</li>
+          <li><i class="ph ph-check"></i> White-label site</li>
+          <li><i class="ph ph-check"></i> Dedicated CSM 24/7</li>
+          <li><i class="ph ph-check"></i> Data export & analytics</li>
+          <li><i class="ph ph-check"></i> SLA 99.9%</li>
+        </ul>
+        <a href="#" class="btn btn-outline btn-full">Lien he sales</a>
+      </article>
     </div>
   </div>
 </section>
 
-<!-- TESTIMONIAL -->
-<section class="section" style="padding-top:0;">
-  <div class="testimonial">
-    <p class="testimonial-text">"Đặt lịch xem 3 căn trong 1 buổi. Nhà Tốt check pháp lý tự động, yên tâm đặt cọc."</p>
-    <div class="testimonial-author">Anh Tùng</div>
-    <div class="testimonial-role">First-time buyer, Da Nang</div>
+<!-- ─── CUSTOMERS ─── -->
+<section class="customers" id="customers">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Khach hang</div>
+      <h2 class="section-title">124,000 nguoi da tim duoc nha qua NhaTot.</h2>
+    </div>
+
+    <div class="t-row">
+      <article class="t-card t-big">
+        <div class="t-quote">"Troi 3 thang tim nha HCM. Qua NhaTot, AI matching cho thay 5 tin phu hop trong 3 giay. Dat duoc can ho Q.7 gia tot hon 12% so voi goc."</div>
+        <div class="t-author">
+          <img src="https://i.pravatar.cc/80?img=14" alt="" loading="lazy" />
+          <div>
+            <div class="t-name">Tran Van Minh</div>
+            <div class="t-role">Chu nha moi · Quan 7, Ho Chi Minh</div>
+          </div>
+        </div>
+        <div class="t-stat">
+          <div class="ts-num">3 ngay</div>
+          <div class="ts-label">Tu tim den nhan chave</div>
+        </div>
+      </article>
+
+      <article class="t-card">
+        <div class="t-quote">"Virtual tour tiet kiem 60% cuoc hen that bao. Khach xem 360 truoc, chi hen thuc te khi thuc su quan tam."</div>
+        <div class="t-author">
+          <img src="https://i.pravatar.cc/80?img=29" alt="" loading="lazy" />
+          <div>
+            <div class="t-name">Le Thi Lan</div>
+            <div class="t-role">Moi gioi chuyen nghiep · Ha Noi</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="t-card">
+        <div class="t-quote">"Check phap ly tu dong cuu roi minh khoi mot vuon dat co tranh chap. Bao cao chi 5 phut, rat chi tiet."</div>
+        <div class="t-author">
+          <img src="https://i.pravatar.cc/80?img=53" alt="" loading="lazy" />
+          <div>
+            <div class="t-name">Nguyen Quoc Huy</div>
+            <div class="t-role">Nguoi mua dau tu · Da Nang</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="t-card">
+        <div class="t-quote">"Ban do gia giup toi mua dat Tay Ho khi gia con thap 20%. Map rat de hieu, ke ca nguoi moi vao thi truong."</div>
+        <div class="t-author">
+          <img src="https://i.pravatar.cc/80?img=19" alt="" loading="lazy" />
+          <div>
+            <div class="t-name">Pham Thi Huyen</div>
+            <div class="t-role">Dau tu BDS · Can Tho</div>
+          </div>
+        </div>
+      </article>
+    </div>
   </div>
 </section>
 
-<!-- FAQ -->
-<section class="section" style="padding-top:0;">
-  <div class="section-label">FAQ</div>
-  <h2 class="section-title">Common questions.</h2>
-  
-  <div class="faq-item">
-    <div class="faq-q">Is the listing information verified?</div>
-    <div class="faq-a">Yes — every listing goes through document verification, physical inspection, and owner confirmation before publishing.</div>
-  </div>
-  <div class="faq-item">
-    <div class="faq-q">Does NhaTot charge buyers?</div>
-    <div class="faq-a">No — service is completely free for buyers. Sellers pay a small fee to post.</div>
-  </div>
-</section>
-
-<!-- CTA -->
-<section class="section" style="padding-top:0;">
-  <div class="cta-banner">
-    <h2>Ready to get started?</h2>
-    <p>Join thousands of users today. 7 pages · 298 KB · HTML5, CSS3, Vanilla JS, Mapbox GL</p>
-    <a href="#" class="btn-primary">Try Nhà Tốt Free</a>
+<!-- ─── FINAL CTA ─── -->
+<section class="final">
+  <div class="container">
+    <div class="final-box">
+      <h2>San sang tim nha <span class="hl">minh bach</span>?</h2>
+      <p>124,000 tin dang, 63 thanh pho, 100% verified. Khong phi tra phí de bat dau.</p>
+      <div class="final-actions">
+        <a href="#" class="btn btn-primary btn-lg">Tim nha ngay <i class="ph ph-arrow-right"></i></a>
+        <a href="#" class="btn btn-outline btn-lg">Dang tin mien phi</a>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- FOOTER -->
+<!-- ─── FOOTER ─── -->
 <footer class="footer">
-  <div>Nhà Tốt · REAL ESTATE template · Part of Cursor Enterprise Framework</div>
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo">
+          <svg class="logo-mark" viewBox="0 0 32 32" fill="none">
+            <rect x="4" y="4" width="24" height="24" rx="7" fill="currentColor"/>
+            <path d="M10 22 L16 10 L22 22 M13 17 H19" stroke="#fafbff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>nhatot<span class="logo-dot">.</span></span>
+        </div>
+        <p>Nen tang BDS so 1 Viet Nam. Headquarter tai Ho Chi Minh, server Vietnam DC & Singapore.</p>
+      </div>
+      <div>
+        <h5>San pham</h5>
+        <ul>
+          <li><a href="#">Tinh nang</a></li>
+          <li><a href="#">Bang gia</a></li>
+          <li><a href="#">Tich hop API</a></li>
+          <li><a href="#">App iOS</a></li>
+          <li><a href="#">App Android</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Tai nguyen</h5>
+        <ul>
+          <li><a href="#">Blog BDS</a></li>
+          <li><a href="#">Huong dan su dung</a></li>
+          <li><a href="#">Bao cao thi truong</a></li>
+          <li><a href="#">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Cong ty</h5>
+        <ul>
+          <li><a href="#">Ve NhaTot</a></li>
+          <li><a href="#">Tuyen dung (18)</a></li>
+          <li><a href="#">Bao chi</a></li>
+          <li><a href="#">Lien he</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2026 NhaTot Vietnam JSC. MST: 0109247153.</div>
+      <div class="footer-legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Security</a>
+        <a href="#">Status</a>
+      </div>
+    </div>
+  </div>
 </footer>
 
+<script src="script.js"></script>
 </body>
 </html>

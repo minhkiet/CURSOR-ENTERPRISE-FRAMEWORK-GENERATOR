@@ -1,357 +1,494 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bazi Tử Vi — Xem vận mệnh theo Tứ Trụ</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --accent: #dc2626;
-      --accent2: #fbbf24;
-      --bg: #1a0505;
-      --card: #2d0a0a;
-      --text: #fef2f2;
-      --text2: #fecaca;
-    }
-
-    html { font-size: 16px; scroll-behavior: smooth; }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      min-height: 100vh;
-    }
-
-    /* ── Nav ── */
-    .nav {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(0,0,0,0.5);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      padding: 0 24px;
-    }
-    .nav-inner {
-      max-width: 1100px; margin: 0 auto;
-      display: flex; align-items: center; justify-content: space-between;
-      height: 56px;
-    }
-    .nav-logo {
-      font-size: 17px; font-weight: 700; letter-spacing: -0.02em;
-      color: var(--text);
-      text-decoration: none;
-    }
-    .nav-logo span { color: var(--accent); }
-    .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
-    .nav-links a {
-      color: var(--text2); font-size: 13.5px; font-weight: 500;
-      text-decoration: none; transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--text); }
-    .nav-cta {
-      background: var(--accent); color: #fff; font-size: 13px; font-weight: 600;
-      padding: 8px 18px; border-radius: 8px; text-decoration: none;
-      transition: opacity 0.2s, transform 0.2s;
-    }
-    .nav-cta:hover { opacity: 0.88; transform: translateY(-1px); }
-
-    /* ── Hero ── */
-    .hero {
-      min-height: 520px;
-      display: flex; align-items: center; justify-content: center;
-      background: var(--bg);
-      position: relative; overflow: hidden;
-    }
-    .hero::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: var(--bgGradient, linear-gradient(135deg, #450a0a 0%, #7c2d12 50%, #991b1b 100%));
-      opacity: 0.6;
-    }
-    .hero::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse 80% 60% at 50% 40%, #dc262622 0%, transparent 70%);
-    }
-    .hero-inner {
-      position: relative; z-index: 1;
-      text-align: center; padding: 60px 24px;
-      max-width: 700px;
-    }
-    .hero-badge {
-      display: inline-block;
-      background: #dc262622; border: 1px solid #dc262655;
-      color: var(--accent); font-size: 11.5px; font-weight: 600;
-      padding: 5px 14px; border-radius: 999px;
-      letter-spacing: 0.05em; text-transform: uppercase;
-      margin-bottom: 20px;
-    }
-    .hero-headline {
-      font-size: clamp(36px, 6vw, 64px);
-      font-weight: 800; line-height: 1.05; letter-spacing: -0.03em;
-      margin-bottom: 18px; color: var(--text);
-    }
-    .hero-sub {
-      font-size: 17px; color: var(--text2); max-width: 480px;
-      margin: 0 auto 32px; line-height: 1.65;
-    }
-    .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    .btn-primary {
-      background: var(--accent); color: #fff;
-      padding: 12px 28px; border-radius: 10px;
-      font-size: 15px; font-weight: 600; text-decoration: none;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 20px #dc262644;
-    }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px #dc262655; }
-    .btn-secondary {
-      background: rgba(255,255,255,0.08); color: var(--text);
-      border: 1px solid rgba(255,255,255,0.12);
-      padding: 12px 28px; border-radius: 10px;
-      font-size: 15px; font-weight: 500; text-decoration: none;
-      transition: background 0.2s;
-    }
-    .btn-secondary:hover { background: rgba(255,255,255,0.13); }
-
-    /* ── Stats ── */
-    .stats-bar {
-      background: var(--card);
-      border-top: 1px solid rgba(255,255,255,0.05);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      padding: 24px;
-    }
-    .stats-inner {
-      max-width: 700px; margin: 0 auto;
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 16px; text-align: center;
-    }
-    .stat-value {
-      font-size: 28px; font-weight: 800; letter-spacing: -0.03em;
-      color: var(--accent); font-variant-numeric: tabular-nums;
-    }
-    .stat-label { font-size: 12px; color: var(--text2); margin-top: 2px; }
-
-    /* ── Features ── */
-    .section { max-width: 900px; margin: 0 auto; padding: 64px 24px; }
-    .section-label {
-      font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
-    }
-    .section-title {
-      font-size: clamp(26px, 4vw, 38px); font-weight: 800;
-      letter-spacing: -0.03em; margin-bottom: 8px; line-height: 1.15;
-    }
-    .section-sub { color: var(--text2); font-size: 16px; margin-bottom: 40px; }
-
-    .features-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 16px;
-    }
-    .feature-card {
-      background: var(--card); border-radius: 12px; padding: 20px;
-      border: 1px solid rgba(255,255,255,0.05);
-    }
-    .feature-icon {
-      width: 36px; height: 36px; border-radius: 8px;
-      background: #dc262622; display: flex; align-items: center; justify-content: center;
-      margin-bottom: 12px; font-size: 16px;
-    }
-    .feature-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
-    .feature-desc { font-size: 12.5px; color: var(--text2); line-height: 1.55; }
-
-    /* ── Testimonial ── */
-    .testimonial {
-      background: var(--card); border-radius: 16px; padding: 32px;
-      border-left: 3px solid var(--accent);
-      margin-bottom: 0;
-    }
-    .testimonial-text {
-      font-size: 17px; line-height: 1.7; margin-bottom: 16px;
-      font-style: italic; color: var(--text);
-    }
-    .testimonial-author { font-size: 13px; font-weight: 600; }
-    .testimonial-role { color: var(--text2); font-size: 12px; margin-top: 2px; }
-
-    /* ── FAQ ── */
-    .faq-item {
-      border-bottom: 1px solid rgba(255,255,255,0.05); padding: 18px 0;
-    }
-    .faq-q { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
-    .faq-a { font-size: 13px; color: var(--text2); line-height: 1.65; }
-
-    /* ── CTA Banner ── */
-    .cta-banner {
-      background: var(--card);
-      border-radius: 16px; padding: 48px 32px;
-      text-align: center;
-      background-image: radial-gradient(ellipse 60% 50% at 50% 100%, #dc262622 0%, transparent 70%);
-    }
-    .cta-banner h2 {
-      font-size: clamp(22px, 4vw, 34px); font-weight: 800;
-      letter-spacing: -0.03em; margin-bottom: 12px;
-    }
-    .cta-banner p { color: var(--text2); font-size: 15px; margin-bottom: 24px; }
-
-    /* ── Footer ── */
-    .footer {
-      text-align: center; padding: 32px 24px;
-      color: var(--text2); font-size: 12px;
-      border-top: 1px solid rgba(255,255,255,0.04);
-    }
-
-    /* ── Responsive ── */
-    @media (max-width: 600px) {
-      .nav-links { display: none; }
-      .hero-headline { font-size: 36px; }
-      .stats-inner { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-      .stat-value { font-size: 20px; }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tứ Trụ Bazi · Luận Giải Vận Mệnh 5000 Năm Triết Học Đông Phương</title>
+<meta name="description" content="Tứ Trụ (八字): hệ thống luận giải vận mệnh cổ xưa Đông Á. 12 năm kinh nghiệm, 15,000+ khách hàng. Tư vấn 1-1 với Thầy." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+<link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-<!-- NAV -->
+<div class="ornament ornament-top" aria-hidden="true"></div>
+<div class="ornament ornament-bot" aria-hidden="true"></div>
+
+<!-- ─── NAV ─── -->
 <nav class="nav">
-  <div class="nav-inner">
-    <a href="#" class="nav-logo">Tử  Vi  Việt<span>.</span></a>
-    <ul class="nav-links">
-      <li><a href="#">Xem Bazi</a></li>
-      <li><a href="#">Phong Thủy</a></li>
-      <li><a href="#">Tử Vi</a></li>
-      <li><a href="#">Đăng nhập</a></li>
+  <div class="container nav-inner">
+    <a href="#" class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 40 40" fill="none">
+          <circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="1.5" fill="none"/>
+          <path d="M20 5 Q12 20 20 35 Q28 20 20 5" fill="currentColor"/>
+          <circle cx="20" cy="20" r="4" fill="#fbf7ee"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <span class="logo-vn">Tứ Trụ</span>
+        <span class="logo-en">Bazi Mastery</span>
+      </div>
+    </a>
+    <ul class="nav-menu">
+      <li><a href="#about">Giới thiệu</a></li>
+      <li><a href="#process">Quy trình</a></li>
+      <li><a href="#pricing">Gói dịch vụ</a></li>
+      <li><a href="#testimonials">Đánh giá</a></li>
     </ul>
-    <a href="#" class="nav-cta">Xem Ngay</a>
+    <a href="#booking" class="nav-cta">
+      Đặt lịch xem <i class="ph ph-arrow-up-right"></i>
+    </a>
   </div>
 </nav>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-inner">
-    <span class="hero-badge">Cao nhân Tử Vi hàng đầu</span>
-    <h1 class="hero-headline">Giải mã vận mệnh<br>qua Tứ Trụ</h1>
-    <p class="hero-sub">Xem tử vi chính xác theo ngày giờ âm lịch. Luận giải về tài lộc, tình duyên, sự nghiệp.</p>
-    <div class="hero-actions">
-      <a href="#" class="btn-primary">Get Started Free</a>
-      <a href="#" class="btn-secondary">View Demo</a>
+<!-- ─── HERO ─── -->
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="container hero-grid">
+    <div class="hero-text">
+      <div class="hero-ornament">✦ ✦ ✦</div>
+      <span class="hero-eyebrow">Đúc kết 5,000 năm · Tinh hoa triết học Đông phương</span>
+      <h1 class="hero-title">
+        Khám phá <em>vận mệnh</em><br/>
+        qua <em>Tứ Trụ</em> của bạn
+      </h1>
+      <p class="hero-desc">
+        Bazi (Tứ Trụ) là hệ thống luận giải vận mệnh cổ xưa nhất Đông Á, dựa trên ngày giờ
+        sinh theo Can Chi. Tìm hiểu Thiên–Địa–Nhân trong bạn, khám phá cơ hội và thử thách
+        của từng giai đoạn cuộc đời.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#booking" class="btn btn-primary btn-lg">
+          <i class="ph-fill ph-yin-yang"></i>
+          <span>Xem Bazi miễn phí</span>
+        </a>
+        <a href="#process" class="btn btn-ghost btn-lg">
+          Tìm hiểu thêm
+        </a>
+      </div>
+
+      <div class="hero-trust">
+        <div class="trust-item">
+          <div class="trust-num">15,000+</div>
+          <div class="trust-label">Khách hàng tin tưởng</div>
+        </div>
+        <div class="trust-sep">✦</div>
+        <div class="trust-item">
+          <div class="trust-num">4.97<i>/5</i></div>
+          <div class="trust-label">Đánh giá 5 sao</div>
+        </div>
+        <div class="trust-sep">✦</div>
+        <div class="trust-item">
+          <div class="trust-num">12<i>năm</i></div>
+          <div class="trust-label">Kinh nghiệm Thầy</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="bazi-wheel">
+        <div class="bw-ring bw-1"></div>
+        <div class="bw-ring bw-2"></div>
+        <div class="bw-ring bw-3"></div>
+
+        <!-- 8 Trigrams around -->
+        <div class="bw-trigram t1">☰</div>
+        <div class="bw-trigram t2">☱</div>
+        <div class="bw-trigram t3">☲</div>
+        <div class="bw-trigram t4">☳</div>
+        <div class="bw-trigram t5">☴</div>
+        <div class="bw-trigram t6">☵</div>
+        <div class="bw-trigram t7">☶</div>
+        <div class="bw-trigram t8">☷</div>
+
+        <div class="bw-center">
+          <div class="bw-zh">天</div>
+          <div class="bw-zh">地</div>
+          <div class="bw-divider"></div>
+          <div class="bw-zh">人</div>
+          <div class="bw-zh">和</div>
+        </div>
+      </div>
+      <div class="wheel-label">Thiên · Địa · Nhân · Hòa</div>
+    </div>
+  </div>
+</header>
+
+<!-- ─── ABOUT ─── -->
+<section class="about" id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-left">
+        <span class="section-label-vn">Giới thiệu</span>
+        <h2 class="section-title">Bazi là gì?</h2>
+        <p>
+          Bazi (八字) hay Tứ Trụ (四柱) là nghệ thuật luận giải vận mệnh dựa trên 4 trụ:
+          <strong>Năm, Tháng, Ngày, Giờ sinh</strong>. Mỗi trụ gồm 1 Thiên Can và 1 Địa Chi,
+          tạo thành 8 chữ tượng trưng cho "bản đồ" vũ trụ tại thời điểm bạn sinh ra.
+        </p>
+        <p>
+          Dựa trên ngũ hành (Kim, Mộc, Thủy, Hỏa, Thổ), chúng tôi giúp bạn hiểu rõ tính cách,
+          sự nghiệp, tình duyên, sức khỏe và vận khí của từng giai đoạn 10 năm (đại vận).
+        </p>
+
+        <div class="pillars">
+          <div class="pillar">
+            <div class="pillar-icon">年</div>
+            <div class="pillar-name">Năm</div>
+            <div class="pillar-desc">Tổ tiên, gia đình, tuổi thơ</div>
+          </div>
+          <div class="pillar">
+            <div class="pillar-icon">月</div>
+            <div class="pillar-name">Tháng</div>
+            <div class="pillar-desc">Cha mẹ, sự nghiệp ban đầu</div>
+          </div>
+          <div class="pillar">
+            <div class="pillar-icon">日</div>
+            <div class="pillar-name">Ngày</div>
+            <div class="pillar-desc">Bản thân, vợ/chồng</div>
+          </div>
+          <div class="pillar">
+            <div class="pillar-icon">時</div>
+            <div class="pillar-name">Giờ</div>
+            <div class="pillar-desc">Con cái, tương lai</div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="about-card">
+        <div class="card-deco">✦</div>
+        <h3>Bạn sẽ nhận được</h3>
+        <ul class="card-list">
+          <li><span class="check">✓</span> Bản đồ Tứ Trụ chi tiết, vẽ tay hoặc vector</li>
+          <li><span class="check">✓</span> Phân tích ngũ hành tương sinh - tương khắc</li>
+          <li><span class="check">✓</span> Luận giải tính cách & tài năng bẩm sinh</li>
+          <li><span class="check">✓</span> Dự báo đại vận 10 năm tới (12 đại vận)</li>
+          <li><span class="check">✓</span> Tư vấn nghề nghiệp & hướng đi phù hợp</li>
+          <li><span class="check">✓</span> Bảng hợp màu, hợp hướng, hợp tuổi</li>
+          <li><span class="check">✓</span> Hỗ trợ trọn đời qua Zalo 24/7</li>
+        </ul>
+      </aside>
     </div>
   </div>
 </section>
 
-<!-- STATS -->
-<div class="stats-bar">
-  <div class="stats-inner">
-    
-    <div>
-      <div class="stat-value">15,000+</div>
-      <div class="stat-label">Lượt xem</div>
+<!-- ─── FIVE ELEMENTS DIAGRAM (real SVG illustration) ─── -->
+<section class="elements">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-label-vn">Ngũ hành</span>
+      <h2 class="section-title">Năm yếu tố tạo nên <em>vũ trụ</em>.</h2>
+      <p class="section-desc">Mỗi người chịu ảnh hưởng bởi sự tương tác phức tạp giữa 5 năng lượng cơ bản.</p>
     </div>
-    <div>
-      <div class="stat-value">4.9/5</div>
-      <div class="stat-label">Đánh giá</div>
-    </div>
-    <div>
-      <div class="stat-value">24h</div>
-      <div class="stat-label">Giao kết quả</div>
-    </div>
-  </div>
-</div>
 
-<!-- FEATURES -->
-<section class="section">
-  <div class="section-label">Features</div>
-  <h2 class="section-title">Everything you need.</h2>
-  <p class="section-sub">Built for real workflows. No bloat.</p>
-  <div class="features-grid">
-    
-    <div class="feature-card">
-      <div class="feature-icon">✦</div>
-      <div class="feature-title">Tứ Trụ interactive demo</div>
-      <div class="feature-desc">Tứ Trụ interactive demo</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">✦</div>
-      <div class="feature-title">Form nhập ngày giờ sinh</div>
-      <div class="feature-desc">Form nhập ngày giờ sinh</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">✦</div>
-      <div class="feature-title">Luận giải can chi chi tiết</div>
-      <div class="feature-desc">Luận giải can chi chi tiết</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">✦</div>
-      <div class="feature-title">Bảng hợp màu, hợp hướng</div>
-      <div class="feature-desc">Bảng hợp màu, hợp hướng</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">✦</div>
-      <div class="feature-title">Tích hợp thanh toán QR</div>
-      <div class="feature-desc">Tích hợp thanh toán QR</div>
+    <div class="elements-grid">
+      <div class="el-card el-wood">
+        <div class="el-symbol">木</div>
+        <div class="el-name">Mộc</div>
+        <div class="el-season">Mùa xuân</div>
+        <p>Tăng trưởng, sáng tạo, khởi đầu. Hướng Đông.</p>
+      </div>
+      <div class="el-card el-fire">
+        <div class="el-symbol">火</div>
+        <div class="el-name">Hỏa</div>
+        <div class="el-season">Mùa hè</div>
+        <p>Nhiệt huyết, năng động, biểu đạt. Hướng Nam.</p>
+      </div>
+      <div class="el-card el-earth">
+        <div class="el-symbol">土</div>
+        <div class="el-name">Thổ</div>
+        <div class="el-season">Cuối mùa</div>
+        <p>Ổn định, tin cậy, trung tâm. Ở giữa.</p>
+      </div>
+      <div class="el-card el-metal">
+        <div class="el-symbol">金</div>
+        <div class="el-name">Kim</div>
+        <div class="el-season">Mùa thu</div>
+        <p>Sắc bén, kỷ luật, quyết đoán. Hướng Tây.</p>
+      </div>
+      <div class="el-card el-water">
+        <div class="el-symbol">水</div>
+        <div class="el-name">Thủy</div>
+        <div class="el-season">Mùa đông</div>
+        <p>Trí tuệ, linh hoạt, sâu sắc. Hướng Bắc.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- HIGHLIGHTS -->
-<section class="section" style="padding-top:0;">
-  <div class="section-label">By the numbers</div>
-  <div class="features-grid">
-    
-    <div class="feature-card" style="text-align:center;">
-      <div class="stat-value" style="font-size:36px;margin-bottom:4px;">15K+</div>
-      <div class="stat-label">Khách hàng tin tưởng</div>
+<!-- ─── PROCESS ─── -->
+<section class="process" id="process">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-label-vn">Quy trình</span>
+      <h2 class="section-title">4 bước đơn giản,<br/>trọn vẹn tri thức.</h2>
     </div>
-    <div class="feature-card" style="text-align:center;">
-      <div class="stat-value" style="font-size:36px;margin-bottom:4px;">4.9/5</div>
-      <div class="stat-label">Đánh giá 5 sao</div>
+    <div class="process-grid">
+      <div class="step">
+        <div class="step-num">壹</div>
+        <h3>Cung cấp thông tin</h3>
+        <p>Nhập ngày giờ sinh chính xác (dương lịch hoặc âm lịch) qua form online.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">貳</div>
+        <h3>Luận giải chuyên sâu</h3>
+        <p>Thầy với 12+ năm kinh nghiệm sẽ trực tiếp luận giải lá số Tử Vi của bạn.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">參</div>
+        <h3>Báo cáo chi tiết</h3>
+        <p>Nhận báo cáo 30–80 trang kèm infographic trực quan, dễ hiểu, lưu giữ trọn đời.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">肆</div>
+        <h3>Tư vấn 1-1</h3>
+        <p>Buổi tư vấn trực tiếp 60–120 phút qua Zoom hoặc tại văn phòng HCM/HN.</p>
+      </div>
     </div>
-    <div class="feature-card" style="text-align:center;">
-      <div class="stat-value" style="font-size:36px;margin-bottom:4px;">24h</div>
-      <div class="stat-label">Thời gian giao</div>
+  </div>
+</section>
+
+<!-- ─── PRICING ─── -->
+<section class="pricing" id="pricing">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-label-vn">Gói dịch vụ</span>
+      <h2 class="section-title">Chọn gói <em>phù hợp</em> với bạn.</h2>
+      <p class="section-desc">Một lần tư vấn, lợi ích trọn đời. Hỗ trợ qua Zalo 24/7.</p>
+    </div>
+    <div class="pricing-grid">
+      <article class="pc">
+        <div class="pc-name">Cơ Bản</div>
+        <p class="pc-desc">Cho người mới tìm hiểu Tứ Trụ</p>
+        <div class="pc-amount">990K</div>
+        <ul class="pc-features">
+          <li><span class="check">✓</span> Bản đồ Tứ Trụ cơ bản</li>
+          <li><span class="check">✓</span> Báo cáo PDF 15 trang</li>
+          <li><span class="check">✓</span> Phân tích tính cách tổng quan</li>
+          <li><span class="check">✓</span> Tư vấn 30 phút online</li>
+          <li class="off"><span class="off">✗</span> Đại vận 10 năm chi tiết</li>
+        </ul>
+        <a href="#booking" class="btn btn-outline-vintage btn-full">Chọn gói Cơ Bản</a>
+      </article>
+
+      <article class="pc pc-featured">
+        <div class="pc-ribbon">
+          <span>✦</span>
+          Phổ biến nhất · 68% chọn
+          <span>✦</span>
+        </div>
+        <div class="pc-name">Chuyên Sâu</div>
+        <p class="pc-desc">Cho người nghiêm túc tìm hiểu vận mệnh</p>
+        <div class="pc-amount">2,490K</div>
+        <ul class="pc-features">
+          <li><span class="check">✓</span> Bản đồ Tứ Trụ đầy đủ</li>
+          <li><span class="check">✓</span> Báo cáo PDF 40 trang cao cấp</li>
+          <li><span class="check">✓</span> Phân tích 12 đại vận (120 năm)</li>
+          <li><span class="check">✓</span> Tư vấn 1-1 60 phút</li>
+          <li><span class="check">✓</span> Hợp màu, hợp hướng, hợp tuổi</li>
+          <li><span class="check">✓</span> Hỗ trợ Zalo 3 tháng</li>
+        </ul>
+        <a href="#booking" class="btn btn-primary btn-full">
+          Chọn gói Chuyên Sâu <i class="ph ph-arrow-right"></i>
+        </a>
+      </article>
+
+      <article class="pc">
+        <div class="pc-name">VIP Premium</div>
+        <p class="pc-desc">Cho doanh nhân, lãnh đạo cần tư vấn sâu</p>
+        <div class="pc-amount">5,990K</div>
+        <ul class="pc-features">
+          <li><span class="check">✓</span> Tất cả tính năng Chuyên Sâu</li>
+          <li><span class="check">✓</span> Báo cáo 80 trang, thiết kế riêng</li>
+          <li><span class="check">✓</span> Tư vấn 1-1 120 phút</li>
+          <li><span class="check">✓</span> Phong thủy nhà ở, văn phòng</li>
+          <li><span class="check">✓</span> Xem hợp tuổi cả gia đình</li>
+          <li><span class="check">✓</span> Hỗ trợ Zalo trọn đời</li>
+        </ul>
+        <a href="#booking" class="btn btn-outline-vintage btn-full">Liên hệ VIP</a>
+      </article>
     </div>
   </div>
 </section>
 
-<!-- TESTIMONIAL -->
-<section class="section" style="padding-top:0;">
-  <div class="testimonial">
-    <p class="testimonial-text">"Luận rất chính xác. Đã đặt thêm gói Tử Vi chi tiết cho cả gia đình."</p>
-    <div class="testimonial-author">Chị Hương</div>
-    <div class="testimonial-role">Khách hàng tại TP.HCM</div>
+<!-- ─── TESTIMONIALS ─── -->
+<section class="testimonials" id="testimonials">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-label-vn">Chia sẻ từ khách hàng</span>
+      <h2 class="section-title">15,000+ khách hàng <em>đã thay đổi</em>.</h2>
+    </div>
+    <div class="testimonials-grid">
+      <article class="t-card">
+        <div class="t-rating">★★★★★</div>
+        <p>"Sau khi xem Bazi, tôi hiểu được lý do mình hay gặp khó khăn trong công việc vào năm 32. Thầy đã tư vấn cách hóa giải, và quả thật năm 33 mọi thứ thay đổi hẳn."</p>
+        <div class="t-author">
+          <img src="https://i.pravatar.cc/96?img=68" alt=""/>
+          <div>
+            <div class="t-name">Nguyễn L.</div>
+            <div class="t-role">CEO tập đoàn, TP.HCM</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="t-card">
+        <div class="t-rating">★★★★★</div>
+        <p>"Tôi từng không tin vào tử vi, nhưng bản phân tích Bazi của Thầy quá chính xác đến từng chi tiết. Thầy rất tâm huyết, không phán xét, chỉ giúp tôi hiểu và chọn hướng đi tốt hơn."</p>
+        <div class="t-author">
+          <img src="https://i.pravatar.cc/96?img=45" alt=""/>
+          <div>
+            <div class="t-name">Trần M.</div>
+            <div class="t-role">Bác sĩ chuyên khoa, Hà Nội</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="t-card">
+        <div class="t-rating">★★★★★</div>
+        <p>"Báo cáo rất chi tiết, thiết kế đẹp mắt. Tôi đã đặt cho cả gia đình 5 người. Đặc biệt phần xem hợp tuổi vợ chồng giúp chúng tôi hiểu nhau hơn rất nhiều."</p>
+        <div class="t-author">
+          <img src="https://i.pravatar.cc/96?img=31" alt=""/>
+          <div>
+            <div class="t-name">Phạm H.</div>
+            <div class="t-role">Kế toán trưởng, Đà Nẵng</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="t-card t-card-quote-only">
+        <div class="t-rating">★★★★★</div>
+        <p>"Đây là món quà ý nghĩa nhất tôi từng tặng bố mẹ. Hai cụ rất xúc động khi đọc báo cáo. Cảm ơn Thầy."</p>
+        <div class="t-author">
+          <img src="https://i.pravatar.cc/96?img=12" alt=""/>
+          <div>
+            <div class="t-name">Hoàng A.</div>
+            <div class="t-role">Kỹ sư phần mềm, Nhật Bản</div>
+          </div>
+        </div>
+      </article>
+    </div>
   </div>
 </section>
 
-<!-- FAQ -->
-<section class="section" style="padding-top:0;">
-  <div class="section-label">FAQ</div>
-  <h2 class="section-title">Common questions.</h2>
-  
-  <div class="faq-item">
-    <div class="faq-q">Cần cung cấp thông tin gì?</div>
-    <div class="faq-a">Ngày, tháng, năm, giờ sinh (âm lịch). Càng chính xác giờ sinh, luận càng đúng.</div>
-  </div>
-  <div class="faq-item">
-    <div class="faq-q">Kết quả giao như thế nào?</div>
-    <div class="faq-a">PDF chi tiết gửi qua Zalo trong 24h. Có thể book lịch tư vấn 1-1 qua video call.</div>
+<!-- ─── BOOKING ─── -->
+<section class="booking" id="booking">
+  <div class="container">
+    <div class="booking-grid">
+      <div class="booking-info">
+        <span class="section-label-vn">Đăng ký ngay</span>
+        <h2 class="section-title">Xem Bazi miễn phí<br/>cùng <em>Thầy</em>.</h2>
+        <p>
+          Để lại thông tin, chúng tôi sẽ gửi <strong>5 phút luận giải miễn phí</strong> trong vòng 24h.
+          Hoàn toàn không thu phí cho lần đầu tiên.
+        </p>
+        <div class="booking-meta">
+          <div class="meta-item">
+            <div class="meta-icon"><i class="ph-fill ph-calendar"></i></div>
+            <div>
+              <div class="meta-label">Thời gian giao</div>
+              <div class="meta-value">Trong vòng 24h</div>
+            </div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-icon"><i class="ph-fill ph-shield-check"></i></div>
+            <div>
+              <div class="meta-label">Bảo mật</div>
+              <div class="meta-value">Tuyệt đối</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <form class="booking-form" @submit.prevent>
+        <h3>Thông tin của bạn</h3>
+
+        <div class="form-row">
+          <label>Họ và tên <span class="req">*</span></label>
+          <input type="text" placeholder="Nguyễn Văn An" required />
+        </div>
+
+        <div class="form-row form-row-2">
+          <div>
+            <label>Ngày sinh (Dương lịch) <span class="req">*</span></label>
+            <input type="date" required />
+          </div>
+          <div>
+            <label>Giờ sinh <span class="req">*</span></label>
+            <select required>
+              <option value="">Chọn giờ</option>
+              <option>Tý (23h-1h)</option>
+              <option>Sửu (1h-3h)</option>
+              <option>Dần (3h-5h)</option>
+              <option>Mão (5h-7h)</option>
+              <option>Thìn (7h-9h)</option>
+              <option>Tỵ (9h-11h)</option>
+              <option>Ngọ (11h-13h)</option>
+              <option>Mùi (13h-15h)</option>
+              <option>Thân (15h-17h)</option>
+              <option>Dậu (17h-19h)</option>
+              <option>Tuất (19h-21h)</option>
+              <option>Hợi (21h-23h)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>Số điện thoại (Zalo) <span class="req">*</span></label>
+          <input type="tel" placeholder="0901 234 567" required />
+        </div>
+
+        <div class="form-row">
+          <label>Email</label>
+          <input type="email" placeholder="email@example.com" />
+        </div>
+
+        <div class="form-row">
+          <label>Câu hỏi của bạn</label>
+          <textarea rows="3" placeholder="Bạn muốn được tư vấn về vấn đề gì?"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg btn-full">
+          <span>✦</span>
+          Gửi yêu cầu xem Bazi
+          <span>✦</span>
+        </button>
+        <p class="form-note">
+          <i class="ph-fill ph-lock"></i> Chúng tôi cam kết bảo mật thông tin cá nhân tuyệt đối.
+        </p>
+      </form>
+    </div>
   </div>
 </section>
 
-<!-- CTA -->
-<section class="section" style="padding-top:0;">
-  <div class="cta-banner">
-    <h2>Ready to get started?</h2>
-    <p>Join thousands of users today. 7 pages · 289 KB · HTML5, CSS3, Vanilla JS, SVG Animations</p>
-    <a href="#" class="btn-primary">Try Bazi Tử Vi Free</a>
-  </div>
-</section>
-
-<!-- FOOTER -->
 <footer class="footer">
-  <div>Bazi Tử Vi · BAZI template · Part of Cursor Enterprise Framework</div>
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <div class="logo-mark">
+          <svg viewBox="0 0 40 40" fill="none">
+            <circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            <path d="M20 5 Q12 20 20 35 Q28 20 20 5" fill="currentColor"/>
+            <circle cx="20" cy="20" r="4" fill="#fbf7ee"/>
+          </svg>
+        </div>
+        <span>Tứ Trụ Bazi Mastery</span>
+      </div>
+      <div class="footer-links">
+        <a href="#about">Giới thiệu</a>
+        <a href="#pricing">Dịch vụ</a>
+        <a href="#">Blog · Tứ Trụ</a>
+        <a href="#booking">Liên hệ</a>
+      </div>
+      <div class="footer-copy">© 2026 Tứ Trụ Bazi Mastery · Văn hóa Đông phương · Made in Hà Nội</div>
+    </div>
+  </div>
 </footer>
 
+<script src="script.js"></script>
 </body>
 </html>

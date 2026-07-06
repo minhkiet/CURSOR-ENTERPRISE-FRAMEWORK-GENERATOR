@@ -1,357 +1,457 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Numerology Life — Khám phá sức mạnh con số</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --accent: #06b6d4;
-      --accent2: #a855f7;
-      --bg: #080820;
-      --card: #12103d;
-      --text: #f0f9ff;
-      --text2: #bae6fd;
-    }
-
-    html { font-size: 16px; scroll-behavior: smooth; }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      min-height: 100vh;
-    }
-
-    /* ── Nav ── */
-    .nav {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(0,0,0,0.5);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      padding: 0 24px;
-    }
-    .nav-inner {
-      max-width: 1100px; margin: 0 auto;
-      display: flex; align-items: center; justify-content: space-between;
-      height: 56px;
-    }
-    .nav-logo {
-      font-size: 17px; font-weight: 700; letter-spacing: -0.02em;
-      color: var(--text);
-      text-decoration: none;
-    }
-    .nav-logo span { color: var(--accent); }
-    .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
-    .nav-links a {
-      color: var(--text2); font-size: 13.5px; font-weight: 500;
-      text-decoration: none; transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--text); }
-    .nav-cta {
-      background: var(--accent); color: #fff; font-size: 13px; font-weight: 600;
-      padding: 8px 18px; border-radius: 8px; text-decoration: none;
-      transition: opacity 0.2s, transform 0.2s;
-    }
-    .nav-cta:hover { opacity: 0.88; transform: translateY(-1px); }
-
-    /* ── Hero ── */
-    .hero {
-      min-height: 520px;
-      display: flex; align-items: center; justify-content: center;
-      background: var(--bg);
-      position: relative; overflow: hidden;
-    }
-    .hero::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: var(--bgGradient, linear-gradient(135deg, #0c0a4d 0%, #1e1b4b 50%, #312e81 100%));
-      opacity: 0.6;
-    }
-    .hero::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse 80% 60% at 50% 40%, #06b6d422 0%, transparent 70%);
-    }
-    .hero-inner {
-      position: relative; z-index: 1;
-      text-align: center; padding: 60px 24px;
-      max-width: 700px;
-    }
-    .hero-badge {
-      display: inline-block;
-      background: #06b6d422; border: 1px solid #06b6d455;
-      color: var(--accent); font-size: 11.5px; font-weight: 600;
-      padding: 5px 14px; border-radius: 999px;
-      letter-spacing: 0.05em; text-transform: uppercase;
-      margin-bottom: 20px;
-    }
-    .hero-headline {
-      font-size: clamp(36px, 6vw, 64px);
-      font-weight: 800; line-height: 1.05; letter-spacing: -0.03em;
-      margin-bottom: 18px; color: var(--text);
-    }
-    .hero-sub {
-      font-size: 17px; color: var(--text2); max-width: 480px;
-      margin: 0 auto 32px; line-height: 1.65;
-    }
-    .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    .btn-primary {
-      background: var(--accent); color: #fff;
-      padding: 12px 28px; border-radius: 10px;
-      font-size: 15px; font-weight: 600; text-decoration: none;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 20px #06b6d444;
-    }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px #06b6d455; }
-    .btn-secondary {
-      background: rgba(255,255,255,0.08); color: var(--text);
-      border: 1px solid rgba(255,255,255,0.12);
-      padding: 12px 28px; border-radius: 10px;
-      font-size: 15px; font-weight: 500; text-decoration: none;
-      transition: background 0.2s;
-    }
-    .btn-secondary:hover { background: rgba(255,255,255,0.13); }
-
-    /* ── Stats ── */
-    .stats-bar {
-      background: var(--card);
-      border-top: 1px solid rgba(255,255,255,0.05);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      padding: 24px;
-    }
-    .stats-inner {
-      max-width: 700px; margin: 0 auto;
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 16px; text-align: center;
-    }
-    .stat-value {
-      font-size: 28px; font-weight: 800; letter-spacing: -0.03em;
-      color: var(--accent); font-variant-numeric: tabular-nums;
-    }
-    .stat-label { font-size: 12px; color: var(--text2); margin-top: 2px; }
-
-    /* ── Features ── */
-    .section { max-width: 900px; margin: 0 auto; padding: 64px 24px; }
-    .section-label {
-      font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
-    }
-    .section-title {
-      font-size: clamp(26px, 4vw, 38px); font-weight: 800;
-      letter-spacing: -0.03em; margin-bottom: 8px; line-height: 1.15;
-    }
-    .section-sub { color: var(--text2); font-size: 16px; margin-bottom: 40px; }
-
-    .features-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 16px;
-    }
-    .feature-card {
-      background: var(--card); border-radius: 12px; padding: 20px;
-      border: 1px solid rgba(255,255,255,0.05);
-    }
-    .feature-icon {
-      width: 36px; height: 36px; border-radius: 8px;
-      background: #06b6d422; display: flex; align-items: center; justify-content: center;
-      margin-bottom: 12px; font-size: 16px;
-    }
-    .feature-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
-    .feature-desc { font-size: 12.5px; color: var(--text2); line-height: 1.55; }
-
-    /* ── Testimonial ── */
-    .testimonial {
-      background: var(--card); border-radius: 16px; padding: 32px;
-      border-left: 3px solid var(--accent);
-      margin-bottom: 0;
-    }
-    .testimonial-text {
-      font-size: 17px; line-height: 1.7; margin-bottom: 16px;
-      font-style: italic; color: var(--text);
-    }
-    .testimonial-author { font-size: 13px; font-weight: 600; }
-    .testimonial-role { color: var(--text2); font-size: 12px; margin-top: 2px; }
-
-    /* ── FAQ ── */
-    .faq-item {
-      border-bottom: 1px solid rgba(255,255,255,0.05); padding: 18px 0;
-    }
-    .faq-q { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
-    .faq-a { font-size: 13px; color: var(--text2); line-height: 1.65; }
-
-    /* ── CTA Banner ── */
-    .cta-banner {
-      background: var(--card);
-      border-radius: 16px; padding: 48px 32px;
-      text-align: center;
-      background-image: radial-gradient(ellipse 60% 50% at 50% 100%, #06b6d422 0%, transparent 70%);
-    }
-    .cta-banner h2 {
-      font-size: clamp(22px, 4vw, 34px); font-weight: 800;
-      letter-spacing: -0.03em; margin-bottom: 12px;
-    }
-    .cta-banner p { color: var(--text2); font-size: 15px; margin-bottom: 24px; }
-
-    /* ── Footer ── */
-    .footer {
-      text-align: center; padding: 32px 24px;
-      color: var(--text2); font-size: 12px;
-      border-top: 1px solid rgba(255,255,255,0.04);
-    }
-
-    /* ── Responsive ── */
-    @media (max-width: 600px) {
-      .nav-links { display: none; }
-      .hero-headline { font-size: 36px; }
-      .stats-inner { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-      .stat-value { font-size: 20px; }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cosmos Numerology · 6 con số tiết lộ vũ trụ bên trong bạn</title>
+<meta name="description" content="Khám phá 6 chỉ số Thần Số Học Pythagoras: Life Path, Expression, Soul Urge, Personality, Maturity, Birthday. Báo cáo PDF 40 trang, hỗ trợ tiếng Việt." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+<link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-<!-- NAV -->
+<canvas id="starfield"></canvas>
+
+<!-- ─── NAV ─── -->
 <nav class="nav">
-  <div class="nav-inner">
-    <a href="#" class="nav-logo">Numera<span>.</span></a>
-    <ul class="nav-links">
-      <li><a href="#">Calculator</a></li>
-      <li><a href="#">How it works</a></li>
-      <li><a href="#">Stories</a></li>
-      <li><a href="#">Login</a></li>
+  <div class="container nav-inner">
+    <a href="#" class="logo">
+      <div class="logo-mark">∞</div>
+      <span class="logo-text">Cosmos<span class="logo-em">.</span>Numerology</span>
+    </a>
+    <ul class="nav-menu">
+      <li><a href="#numbers">6 chỉ số</a></li>
+      <li><a href="#how">Cách hoạt động</a></li>
+      <li><a href="#pricing">Bảng giá</a></li>
+      <li><a href="#stories">Câu chuyện</a></li>
     </ul>
-    <a href="#" class="nav-cta">Discover Now</a>
+    <a href="#calculator" class="nav-cta">Tính miễn phí</a>
   </div>
 </nav>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-inner">
-    <span class="hero-badge">Based on Pythagorean Numerology</span>
-    <h1 class="hero-headline">Your numbers<br>hold the answers</h1>
-    <p class="hero-sub">Calculate your Life Path, Expression, and Soul Urge numbers. Get a personalized cosmic report in 60 seconds.</p>
-    <div class="hero-actions">
-      <a href="#" class="btn-primary">Get Started Free</a>
-      <a href="#" class="btn-secondary">View Demo</a>
+<!-- ─── HERO (cosmos aesthetic) ─── -->
+<header class="hero">
+  <div class="hero-glow"></div>
+  <div class="container hero-grid">
+
+    <div class="hero-text">
+      <div class="hero-eyebrow">
+        <i class="ph-fill ph-star-four"></i> Numerology · Pythagoras · Self-discovery
+      </div>
+      <h1 class="hero-title">
+        Con số tiết lộ<br/>
+        <em>vũ trụ bên trong bạn.</em>
+      </h1>
+      <p class="hero-desc">
+        Khám phá 6 chỉ số quan trọng nhất trong Thần Số Học Pythagoras: Life Path, Expression,
+        Soul Urge, Personality, Maturity và Birthday. Hiểu bản thân, chọn đúng nghề, đúng người,
+        đúng thời điểm.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#calculator" class="btn btn-primary btn-lg">
+          <span>Tính 6 chỉ số của bạn</span>
+          <i class="ph ph-arrow-up-right"></i>
+        </a>
+        <a href="#how" class="btn btn-ghost btn-lg">
+          <i class="ph ph-book-open"></i>
+          <span>Tìm hiểu thêm</span>
+        </a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hs">
+          <div class="hs-num">12,847</div>
+          <div class="hs-label">Người đã khám phá</div>
+        </div>
+        <div class="hs-sep"></div>
+        <div class="hs">
+          <div class="hs-num">4.97 <i class="ph-fill ph-star"></i></div>
+          <div class="hs-label">Đánh giá trung bình</div>
+        </div>
+        <div class="hs-sep"></div>
+        <div class="hs">
+          <div class="hs-num">92<span>%</span></div>
+          <div class="hs-label">Độ chính xác (verified)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cosmos visualization -->
+    <div class="hero-visual">
+      <div class="solar-system">
+        <div class="orbit-ring r1"></div>
+        <div class="orbit-ring r2"></div>
+        <div class="orbit-ring r3"></div>
+
+        <!-- Numbers on orbits -->
+        <div class="orbit-num num-1" style="--a:0deg">3</div>
+        <div class="orbit-num num-2" style="--a:60deg">7</div>
+        <div class="orbit-num num-3" style="--a:120deg">11</div>
+        <div class="orbit-num num-4" style="--a:180deg">5</div>
+        <div class="orbit-num num-5" style="--a:240deg">9</div>
+        <div class="orbit-num num-6" style="--a:300deg">2</div>
+
+        <div class="core">
+          <div class="core-inner">7</div>
+          <div class="core-label">Life Path</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ─── 6 NUMBERS (cosmic cards) ─── -->
+<section class="numbers" id="numbers">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">6 Core Numbers</div>
+      <h2 class="section-title">Bản đồ số học<br/>của <em>bạn</em>.</h2>
+      <p class="section-desc">Mỗi con số tiết lộ một khía cạnh khác nhau trong cuộc sống của bạn, từ mục đích sống đến khát vọng sâu thẳm nhất.</p>
+    </div>
+
+    <div class="numbers-grid">
+      <article class="num-card">
+        <div class="nc-num">01</div>
+        <h3>Life Path</h3>
+        <p class="nc-sub">Số đường đời</p>
+        <p>Mục đích sống, bài học chính, cơ hội và thử thách lớn nhất của bạn trong kiếp này.</p>
+      </article>
+      <article class="num-card">
+        <div class="nc-num">02</div>
+        <h3>Expression</h3>
+        <p class="nc-sub">Số biểu đạt</p>
+        <p>Tài năng tự nhiên và cách bạn thể hiện bản thân với thế giới xung quanh.</p>
+      </article>
+      <article class="num-card">
+        <div class="nc-num">03</div>
+        <h3>Soul Urge</h3>
+        <p class="nc-sub">Số linh hồn</p>
+        <p>Khát vọng sâu thẳm, điều thực sự khiến bạn hạnh phúc khi làm đúng.</p>
+      </article>
+      <article class="num-card">
+        <div class="nc-num">04</div>
+        <h3>Personality</h3>
+        <p class="nc-sub">Số nhân cách</p>
+        <p>Ấn tượng đầu tiên bạn tạo ra: vẻ ngoài xã hội và cách người khác nhìn bạn.</p>
+      </article>
+      <article class="num-card">
+        <div class="nc-num">05</div>
+        <h3>Maturity</h3>
+        <p class="nc-sub">Số trưởng thành</p>
+        <p>Mục tiêu dài hạn sau tuổi 40, con người bạn sẽ dần trở thành.</p>
+      </article>
+      <article class="num-card">
+        <div class="nc-num">06</div>
+        <h3>Birthday</h3>
+        <p class="nc-sub">Số ngày sinh</p>
+        <p>Tài năng bẩm sinh, điều bạn giỏi từ khi sinh ra mà không cần cố gắng.</p>
+      </article>
     </div>
   </div>
 </section>
 
-<!-- STATS -->
-<div class="stats-bar">
-  <div class="stats-inner">
-    
-    <div>
-      <div class="stat-value">99.2%</div>
-      <div class="stat-label">Accuracy Rate</div>
-    </div>
-    <div>
-      <div class="stat-value">3</div>
-      <div class="stat-label">Languages</div>
-    </div>
-    <div>
-      <div class="stat-value">500+</div>
-      <div class="stat-label">Daily Reports</div>
-    </div>
-  </div>
-</div>
+<!-- ─── CALCULATOR ─── -->
+<section class="calculator" id="calculator">
+  <div class="container">
+    <div class="calc-wrap">
+      <div class="calc-info">
+        <div class="section-eyebrow">Free Calculator</div>
+        <h2 class="calc-title">Tính ngay 6 chỉ số của bạn.</h2>
+        <p class="calc-desc">Chỉ cần nhập họ tên đầy đủ (như giấy khai sinh) và ngày sinh. Hệ thống tính toán trong vài giây.</p>
+        <ul class="calc-features">
+          <li><i class="ph-fill ph-lightning"></i> Tính toán tức thì · dưới 5 giây</li>
+          <li><i class="ph-fill ph-target"></i> Độ chính xác verified 92%</li>
+          <li><i class="ph-fill ph-file-pdf"></i> Báo cáo PDF chi tiết tới 40 trang</li>
+          <li><i class="ph-fill ph-lock-key"></i> Bảo mật tuyệt đối · dữ liệu mã hóa AES-256</li>
+        </ul>
+      </div>
 
-<!-- FEATURES -->
-<section class="section">
-  <div class="section-label">Features</div>
-  <h2 class="section-title">Everything you need.</h2>
-  <p class="section-sub">Built for real workflows. No bloat.</p>
-  <div class="features-grid">
-    
-    <div class="feature-card">
-      <div class="feature-icon">✦</div>
-      <div class="feature-title">Calculator 6 chỉ số chính</div>
-      <div class="feature-desc">Calculator 6 chỉ số chính</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">✦</div>
-      <div class="feature-title">Biểu đồ trực quan sinh động</div>
-      <div class="feature-desc">Biểu đồ trực quan sinh động</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">✦</div>
-      <div class="feature-title">Báo cáo PDF tự động</div>
-      <div class="feature-desc">Báo cáo PDF tự động</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">✦</div>
-      <div class="feature-title">Personalized insights AI</div>
-      <div class="feature-desc">Personalized insights AI</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">✦</div>
-      <div class="feature-title">Cosmic animations</div>
-      <div class="feature-desc">Cosmic animations</div>
+      <form class="calc-form" @submit.prevent>
+        <h3>Nhập thông tin của bạn</h3>
+
+        <div class="calc-field">
+          <label for="fullname">Họ và tên đầy đủ <span class="req">*</span><br/><small>(theo giấy khai sinh)</small></label>
+          <input id="fullname" type="text" placeholder="Nguyễn Văn An" required/>
+        </div>
+
+        <div class="calc-field">
+          <label for="dob">Ngày sinh <span class="req">*</span></label>
+          <input id="dob" type="date" required/>
+        </div>
+
+        <button type="submit" class="calc-btn">
+          <span>Khám phá 6 con số</span>
+          <i class="ph ph-arrow-right"></i>
+        </button>
+
+        <p class="calc-fineprint">
+          <i class="ph-fill ph-shield-check"></i> Dữ liệu chỉ dùng để tính toán, không lưu trữ hay chia sẻ với bên thứ ba.
+        </p>
+
+        <div class="calc-result" id="result" hidden>
+          <div class="result-divider">
+            <span>Kết quả của bạn</span>
+          </div>
+          <div class="result-grid">
+            <div class="r-item r-7">
+              <div class="r-num">7</div>
+              <div class="r-label">Life Path</div>
+            </div>
+            <div class="r-item r-3">
+              <div class="r-num">3</div>
+              <div class="r-label">Expression</div>
+            </div>
+            <div class="r-item r-11">
+              <div class="r-num">11/2</div>
+              <div class="r-label">Soul Urge</div>
+            </div>
+            <div class="r-item r-5">
+              <div class="r-num">5</div>
+              <div class="r-label">Personality</div>
+            </div>
+            <div class="r-item r-9">
+              <div class="r-num">9</div>
+              <div class="r-label">Maturity</div>
+            </div>
+            <div class="r-item r-2">
+              <div class="r-num">2</div>
+              <div class="r-label">Birthday</div>
+            </div>
+          </div>
+          <a href="#pricing" class="calc-cta">
+            Xem báo cáo đầy đủ <i class="ph ph-arrow-right"></i>
+          </a>
+        </div>
+      </form>
     </div>
   </div>
 </section>
 
-<!-- HIGHLIGHTS -->
-<section class="section" style="padding-top:0;">
-  <div class="section-label">By the numbers</div>
-  <div class="features-grid">
-    
-    <div class="feature-card" style="text-align:center;">
-      <div class="stat-value" style="font-size:36px;margin-bottom:4px;">99.2%</div>
-      <div class="stat-label">Độ chính xác</div>
+<!-- ─── HOW IT WORKS ─── -->
+<section class="how" id="how">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">Cách hoạt động</div>
+      <h2 class="section-title">Từ <em>tên</em> và <em>ngày sinh</em>,<br/>đến bản đồ số học hoàn chỉnh.</h2>
     </div>
-    <div class="feature-card" style="text-align:center;">
-      <div class="stat-value" style="font-size:36px;margin-bottom:4px;">500+</div>
-      <div class="stat-label">Reports/ngày</div>
+
+    <div class="how-grid">
+      <div class="how-step">
+        <div class="how-num">01</div>
+        <h3>Nhập tên & ngày sinh</h3>
+        <p>Mỗi chữ cái trong tên có giá trị số (bảng Pythagoras). Mỗi ngày sinh mang một ý nghĩa riêng biệt.</p>
+      </div>
+      <div class="how-arrow"><i class="ph ph-arrow-right"></i></div>
+      <div class="how-step">
+        <div class="how-num">02</div>
+        <h3>Tính toán tự động</h3>
+        <p>Thuật toán của chúng tôi tính 6 chỉ số chính trong vài giây với độ chính xác verified 92% qua nghiên cứu mù đôi.</p>
+      </div>
+      <div class="how-arrow"><i class="ph ph-arrow-right"></i></div>
+      <div class="how-step">
+        <div class="how-num">03</div>
+        <h3>Nhận báo cáo PDF</h3>
+        <p>Báo cáo 30–50 trang với infographic đẹp mắt, dễ đọc, dễ hiểu. Bao gồm tất cả insights cá nhân hóa và lời khuyên hành động.</p>
+      </div>
     </div>
-    <div class="feature-card" style="text-align:center;">
-      <div class="stat-value" style="font-size:36px;margin-bottom:4px;">3</div>
-      <div class="stat-label">Languages</div>
+  </div>
+</section>
+
+<!-- ─── PRICING ─── -->
+<section class="pricing" id="pricing">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">Bảng giá</div>
+      <h2 class="section-title">Chọn gói <em>phù hợp</em> với bạn.</h2>
+      <p class="section-desc">Báo cáo cá nhân hoặc cặp đôi. Thanh toán một lần, dùng trọn đời.</p>
+    </div>
+
+    <div class="price-grid">
+      <article class="pc">
+        <div class="pc-name">Free</div>
+        <p class="pc-desc">Dùng thử để xem có hợp không</p>
+        <div class="pc-price">
+          <span class="pc-amount">0₫</span>
+        </div>
+        <ul class="pc-features">
+          <li><i class="ph-bold ph-check"></i> Tính 6 chỉ số cơ bản</li>
+          <li><i class="ph-bold ph-check"></i> Báo cáo 5 trang</li>
+          <li><i class="ph-bold ph-check"></i> Tổng quan & định nghĩa</li>
+          <li class="off"><i class="ph-bold ph-x"></i> Chi tiết & insights sâu</li>
+          <li class="off"><i class="ph-bold ph-x"></i> Compatibility (cặp đôi)</li>
+        </ul>
+        <a href="#calculator" class="btn btn-ghost btn-full">Bắt đầu miễn phí</a>
+      </article>
+
+      <article class="pc pc-featured">
+        <div class="pc-ribbon">
+          <i class="ph-fill ph-crown-simple"></i>
+          Phổ biến nhất · 73% chọn
+        </div>
+        <div class="pc-name">Personal</div>
+        <p class="pc-desc">Cho người muốn hiểu sâu bản thân</p>
+        <div class="pc-price">
+          <span class="pc-amount">499K</span>
+          <span class="pc-period">một lần</span>
+        </div>
+        <ul class="pc-features">
+          <li><i class="ph-bold ph-check"></i> 6 chỉ số chi tiết (40 trang)</li>
+          <li><i class="ph-bold ph-check"></i> Báo cáo PDF cao cấp, thiết kế đẹp</li>
+          <li><i class="ph-bold ph-check"></i> Hợp màu sắc, nghề nghiệp</li>
+          <li><i class="ph-bold ph-check"></i> Hợp tuổi vợ/chồng (nếu có)</li>
+          <li><i class="ph-bold ph-check"></i> Hỗ trợ email 3 tháng</li>
+        </ul>
+        <a href="#" class="btn btn-primary btn-full">
+          Chọn Personal <i class="ph ph-arrow-right"></i>
+        </a>
+      </article>
+
+      <article class="pc">
+        <div class="pc-name">Couple</div>
+        <p class="pc-desc">Cho cặp đôi muốn hiểu nhau sâu hơn</p>
+        <div class="pc-price">
+          <span class="pc-amount">899K</span>
+          <span class="pc-period">một lần</span>
+        </div>
+        <ul class="pc-features">
+          <li><i class="ph-bold ph-check"></i> 2 báo cáo cá nhân (mỗi người)</li>
+          <li><i class="ph-bold ph-check"></i> Báo cáo hợp cặp 30 trang</li>
+          <li><i class="ph-bold ph-check"></i> Compatibility 12 yếu tố</li>
+          <li><i class="ph-bold ph-check"></i> Tư vấn 60 phút qua Zoom</li>
+          <li><i class="ph-bold ph-check"></i> Hỗ trợ Zalo 6 tháng</li>
+        </ul>
+        <a href="#" class="btn btn-outline btn-full">Chọn Couple</a>
+      </article>
     </div>
   </div>
 </section>
 
-<!-- TESTIMONIAL -->
-<section class="section" style="padding-top:0;">
-  <div class="testimonial">
-    <p class="testimonial-text">"The Life Path reading was surprisingly accurate. It helped me understand why I kept gravitating toward certain careers."</p>
-    <div class="testimonial-author">Khanh Pham</div>
-    <div class="testimonial-role">Startup Founder</div>
+<!-- ─── STORIES ─── -->
+<section class="stories" id="stories">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">Câu chuyện thật</div>
+      <h2 class="section-title">12,847 người đã khám phá<br/>điều <em>đặc biệt</em> trong họ.</h2>
+    </div>
+
+    <div class="stories-grid">
+      <article class="story">
+        <div class="story-rating">
+          <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+          <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+          <i class="ph-fill ph-star"></i>
+        </div>
+        <p>"Số 7 Life Path của tôi giải thích tại sao tôi luôn cần không gian tĩnh lặng để sáng tạo. Từ đó tôi thiết kế lại workspace và năng suất tăng gấp đôi."</p>
+        <div class="story-author">
+          <img src="https://i.pravatar.cc/80?img=23" alt=""/>
+          <div>
+            <div class="sa-name">Nguyễn An</div>
+            <div class="sa-meta">Designer · Life Path 7</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="story">
+        <div class="story-rating">
+          <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+          <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+          <i class="ph-fill ph-star"></i>
+        </div>
+        <p>"Compatibility report giúp tôi và chồng hiểu tại sao chúng tôi hay xung đột (số 1 vs số 8). Giờ cãi vã giảm 80%."</p>
+        <div class="story-author">
+          <img src="https://i.pravatar.cc/80?img=49" alt=""/>
+          <div>
+            <div class="sa-name">Lê Hương</div>
+            <div class="sa-meta">Marketing · Couple report</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="story">
+        <div class="story-rating">
+          <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+          <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+          <i class="ph-fill ph-star"></i>
+        </div>
+        <p>"Soul Urge 11/2 của tôi thực sự là spiritual teacher. Báo cáo giúp tôi tự tin theo đuổi con đường coach."</p>
+        <div class="story-author">
+          <img src="https://i.pravatar.cc/80?img=8" alt=""/>
+          <div>
+            <div class="sa-name">Trần Minh</div>
+            <div class="sa-meta">Life coach · Soul Urge 11</div>
+          </div>
+        </div>
+      </article>
+    </div>
   </div>
 </section>
 
-<!-- FAQ -->
-<section class="section" style="padding-top:0;">
-  <div class="section-label">FAQ</div>
-  <h2 class="section-title">Common questions.</h2>
-  
-  <div class="faq-item">
-    <div class="faq-q">How is this different from western numerology apps?</div>
-    <div class="faq-a">We use the Pythagorean method with an enhanced AI layer that cross-references your chart with 12,000+ historical patterns.</div>
-  </div>
-  <div class="faq-item">
-    <div class="faq-q">Is my birth data safe?</div>
-    <div class="faq-a">We never store your personal data. The report is generated and emailed, then discarded.</div>
-  </div>
-</section>
-
-<!-- CTA -->
-<section class="section" style="padding-top:0;">
-  <div class="cta-banner">
-    <h2>Ready to get started?</h2>
-    <p>Join thousands of users today. 6 pages · 267 KB · HTML5, CSS3, Vanilla JS, Canvas API</p>
-    <a href="#" class="btn-primary">Try Numerology Life Free</a>
+<!-- ─── CTA SECTION ─── -->
+<section class="cta-final">
+  <div class="container">
+    <div class="cta-box">
+      <i class="ph-fill ph-star-four cta-deco"></i>
+      <h2>Sẵn sàng khám phá <em>vũ trụ</em> bên trong bạn?</h2>
+      <p>12,847 người đã tìm được câu trả lời. Đến lượt bạn, chỉ mất 30 giây để bắt đầu.</p>
+      <a href="#calculator" class="btn btn-cosmic btn-xl">
+        Bắt đầu tính miễn phí <i class="ph ph-arrow-up-right"></i>
+      </a>
+    </div>
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer class="footer">
-  <div>Numerology Life · NUMEROLOGY template · Part of Cursor Enterprise Framework</div>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="logo-mark">∞</div>
+        <strong style="margin-top:12px;display:block">Cosmos Numerology</strong>
+        <p style="font-size:13px;color:var(--text-mute);margin-top:8px;line-height:1.5">Self-discovery through numerology, for the curious and the seekers.</p>
+      </div>
+      <div>
+        <h5>Báo cáo</h5>
+        <ul>
+          <li><a href="#">Personal Report</a></li>
+          <li><a href="#">Couple Report</a></li>
+          <li><a href="#">Business Report</a></li>
+          <li><a href="#">Year Forecast 2027</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Tài nguyên</h5>
+        <ul>
+          <li><a href="#">Về Pythagoras</a></li>
+          <li><a href="#">Blog · Số học</a></li>
+          <li><a href="#">Sách nên đọc</a></li>
+          <li><a href="#">Glossary</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Công ty</h5>
+        <ul>
+          <li><a href="#">Về chúng tôi</a></li>
+          <li><a href="#">Liên hệ</a></li>
+          <li><a href="#">Affiliate program</a></li>
+          <li><a href="#">API cho developer</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2026 Cosmos Numerology. Made with ✨ in Hà Nội.</div>
+      <div class="footer-legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Cookies</a>
+      </div>
+    </div>
+  </div>
 </footer>
 
+<script src="script.js"></script>
 </body>
 </html>
