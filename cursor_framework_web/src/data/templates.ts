@@ -198,6 +198,186 @@ export const templates: Template[] = [
     fileSize: '234 KB',
     pages: 5,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'GSAP']
+  },
+  {
+    id: 'food-delivery',
+    slug: 'food-delivery',
+    name: 'Lẩu Đêm',
+    category: 'Food & Beverage',
+    tagline: 'Đặt đồ ăn 30 phút, nóng hổi',
+    description:
+      'Landing page app giao đồ ăn tối Việt Nam. Tracking thời gian thực, đa nhà hàng, thanh toán MoMo/ZaloPay. Phù hợp F&B startup, chuỗi quán ăn, dark kitchen.',
+    industry: 'F&B',
+    accent: '#ef4444',
+    accentSecondary: '#fb923c',
+    bgGradient: 'linear-gradient(135deg, #7c2d12 0%, #991b1b 50%, #b91c1c 100%)',
+    icon: 'fork-knife',
+    features: [
+      'GPS tracking shipper realtime',
+      'Menu đa nhà hàng, filter theo món',
+      'Thanh toán MoMo, ZaloPay, tiền mặt',
+      'Đánh giá & review sau giao',
+      'Mã giảm giá & loyalty program'
+    ],
+    highlights: [
+      { label: 'Đơn/ngày', value: '12K+' },
+      { label: 'Đúng giờ', value: '94%' },
+      { label: 'Nhà hàng', value: '2,400+' }
+    ],
+    tags: ['Food', 'Delivery', 'Mobile-first', 'Realtime'],
+    fileSize: '256 KB',
+    pages: 6,
+    techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Mapbox GL']
+  },
+  {
+    id: 'edu-tutor',
+    slug: 'edu-tutor',
+    name: 'Gia Sư Việt',
+    category: 'Education & Tutor',
+    tagline: 'Gia sư 1-1, lộ trình cá nhân hoá',
+    description:
+      'Landing page nền tảng kết nối gia sư Việt Nam. Lộ trình học riêng cho từng học sinh, lớp thử miễn phí, công cụ luyện tập. Phù hợp trung tâm, gia sư tự do, edtech startup.',
+    industry: 'EDUCATION',
+    accent: '#3b82f6',
+    accentSecondary: '#06b6d4',
+    bgGradient: 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 100%)',
+    icon: 'graduation-cap',
+    features: [
+      'Matching AI theo trình độ & mục tiêu',
+      'Lớp thử 30 phút miễn phí',
+      'Bảng điểm & báo cáo phụ huynh',
+      'Luyện tập tương tác, chấm tự động',
+      'Thanh toán theo buổi hoặc gói tháng'
+    ],
+    highlights: [
+      { label: 'Gia sư', value: '4,800+' },
+      { label: 'Học sinh', value: '38K' },
+      { label: 'Đậu ĐH', value: '92%' }
+    ],
+    tags: ['Education', '1-on-1', 'AI-matching', 'Parent-dashboard'],
+    fileSize: '273 KB',
+    pages: 7,
+    techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Chart.js']
+  },
+  {
+    id: 'beauty-spa',
+    slug: 'beauty-spa',
+    name: 'Sen Spa',
+    category: 'Beauty & Wellness',
+    tagline: 'Spa cao cấp, đặt lịch 60 giây',
+    description:
+      'Landing page cho spa & salon làm đẹp cao cấp. Đặt lịch trực tuyến, chọn therapist, gallery trước-sau. Phù hợp spa, beauty clinic, nail salon, hair studio.',
+    industry: 'BEAUTY',
+    accent: '#ec4899',
+    accentSecondary: '#a78bfa',
+    bgGradient: 'linear-gradient(135deg, #4c1d95 0%, #6b21a8 50%, #831843 100%)',
+    icon: 'flower-lotus',
+    features: [
+      'Booking realtime với calendar widget',
+      'Chọn therapist yêu thích',
+      'Gallery before/after (consent-based)',
+      'Gói membership & loyalty',
+      'Nhắc lịch tự động qua Zalo'
+    ],
+    highlights: [
+      { label: 'Chi nhánh', value: '24' },
+      { label: 'Khách quay lại', value: '78%' },
+      { label: 'Đánh giá', value: '4.9★' }
+    ],
+    tags: ['Spa', 'Booking', 'Membership', 'Wellness'],
+    fileSize: '241 KB',
+    pages: 5,
+    techStack: ['HTML5', 'CSS3', 'Vanilla JS']
+  },
+  {
+    id: 'fitness',
+    slug: 'fitness',
+    name: 'GymZone',
+    category: 'Fitness & Yoga',
+    tagline: 'Tập luyện thông minh, kết quả thật',
+    description:
+      'Landing page cho phòng gym, yoga studio, boxing club. Đặt lớp realtime, theo dõi tiến độ, coach 1-1 video call. Phù hợp chuỗi fitness, boutique studio, personal trainer.',
+    industry: 'FITNESS',
+    accent: '#22c55e',
+    accentSecondary: '#eab308',
+    bgGradient: 'linear-gradient(135deg, #14532d 0%, #166534 50%, #15803d 100%)',
+    icon: 'dumbbell',
+    features: [
+      'Class booking với waitlist tự động',
+      'Workout plan cá nhân hoá theo goal',
+      'Progress tracking: weight, reps, PR',
+      'Video call 1-1 với coach',
+      'Cộng đồng & thử thách hàng tuần'
+    ],
+    highlights: [
+      { label: 'Hội viên', value: '18K+' },
+      { label: 'Lớp/tuần', value: '420' },
+      { label: 'Coach', value: '120' }
+    ],
+    tags: ['Gym', 'Yoga', 'Booking', 'Tracking'],
+    fileSize: '228 KB',
+    pages: 6,
+    techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'GSAP']
+  },
+  {
+    id: 'realestate',
+    slug: 'realestate',
+    name: 'Nhà Tốt',
+    category: 'Real Estate',
+    tagline: 'Mua bán & cho thuê BĐS minh bạch',
+    description:
+      'Landing page nền tảng BĐS Việt Nam. Listing chi tiết, bản đồ giá, lịch xem nhà online, AI gợi ý theo ngân sách. Phù hợp sàn BĐS, môi giới, chủ nhà.',
+    industry: 'REAL ESTATE',
+    accent: '#f59e0b',
+    accentSecondary: '#10b981',
+    bgGradient: 'linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%)',
+    icon: 'house',
+    features: [
+      'Bản đồ giá BĐS theo quận/huyện',
+      'Virtual tour 3D & ảnh 360°',
+      'AI matching theo ngân sách + nhu cầu',
+      'Đặt lịch xem nhà online',
+      'Pháp lý check tự động (sổ đỏ, quy hoạch)'
+    ],
+    highlights: [
+      { label: 'Tin đăng', value: '124K' },
+      { label: 'Thành phố', value: '63' },
+      { label: 'Verified', value: '100%' }
+    ],
+    tags: ['Real Estate', 'Map', 'AI-match', 'Virtual Tour'],
+    fileSize: '298 KB',
+    pages: 7,
+    techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Mapbox GL']
+  },
+  {
+    id: 'travel',
+    slug: 'travel',
+    name: 'Viet Travel',
+    category: 'Travel & Tour',
+    tagline: 'Tour Đông Nam Á, đặt nhanh 2 phút',
+    description:
+      'Landing page công ty du lịch & tour Đông Nam Á. Itinerary chi tiết, review thật từ khách, thanh toán linh hoạt. Phù hợp công ty tour, OTA nhỏ, homestay network.',
+    industry: 'TRAVEL',
+    accent: '#06b6d4',
+    accentSecondary: '#f59e0b',
+    bgGradient: 'linear-gradient(135deg, #0c4a6e 0%, #075985 50%, #0369a1 100%)',
+    icon: 'airplane-tilt',
+    features: [
+      'Itinerary từng ngày với map chi tiết',
+      'Review thật từ khách đã đi (có ảnh)',
+      'Thanh toán trả góp 0% qua thẻ tín dụng',
+      'So sánh giá 50+ hãng bay khác nhau',
+      'Hỗ trợ 24/7 qua Zalo & hotline'
+    ],
+    highlights: [
+      { label: 'Tour/năm', value: '8,400+' },
+      { label: 'Điểm đến', value: '120' },
+      { label: 'Quay lại', value: '64%' }
+    ],
+    tags: ['Travel', 'Tour', 'Booking', 'Southeast Asia'],
+    fileSize: '262 KB',
+    pages: 6,
+    techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Mapbox GL']
   }
 ]
 

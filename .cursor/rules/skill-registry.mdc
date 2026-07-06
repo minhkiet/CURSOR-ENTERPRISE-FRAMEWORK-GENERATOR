@@ -83,6 +83,10 @@ Mỗi skill được định nghĩa với các properties:
 **Pre-Gates:** §0.A-0.F (6 sections)  
 **Post-Gates:** §6.A-6.H (8 sections)
 
+**Augmented by:** §9 (design-lead two-pass philosophy, anti-slop catalog) · §10 (Emil Kowalski animation polish) · §11 (style/palette reference + Vercel audit pointer) · §12 (sources & conflict resolution).
+
+**Synthesizes (merged, not installed separately):** `pbakaus/impeccable` ⭐1 · `Leonxlnx/taste-skill` ⭐2 · `anthropics/frontend-design` ⭐3 · `vercel-labs/web-design-guidelines` ⭐4 · `nextlevelbuilder/ui-ux-pro-max` ⭐5 · `emilkowalski/emil-design-eng` ⭐6. See SKILL.md §12 for merge order and conflict resolution.
+
 **Purpose:** Anti-slop frontend cho landing pages và portfolios. Không phải dashboard, không phải data table.
 
 ---

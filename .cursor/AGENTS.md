@@ -336,7 +336,7 @@ Agent Personas work with the existing skill system:
 |-------|-------------|-------|
 | `frontend-taste` | Landing pages, portfolios | taste-pre/post |
 | `frontend-redesign` | Improve existing UI | redesign-pre/post |
-| `frontend-review` | Quality checks, audits | review-pre/post |
+| `frontend-review` | Quality checks, audits (includes Vercel ⭐4 compliance check in Part E) | review-pre/post |
 | `full-output` | Complete implementations | fulloutput-pre/post |
 | `security-review` | Security vulnerabilities | security-pre/post |
 | `vietnam-payment-review` | MoMo, SePay, PayOS | payment-pre/post |
@@ -431,5 +431,5 @@ Delivery
 - [[skill-registry]] - Single source of truth for skills
 - [[skill-integration]] - Skill auto-discovery protocol
 - [[ponytail]] - Lazy Senior Dev principles
-- [[frontend-taste]] - Frontend design skill
+- [[frontend-taste]] - Frontend design skill (synthesizes pbakaus/impeccable ⭐1, Leonxlnx/taste-skill ⭐2, anthropics/frontend-design ⭐3, vercel-labs/web-design-guidelines ⭐4, nextlevelbuilder/ui-ux-pro-max ⭐5, emilkowalski/emil-design-eng ⭐6 — see SKILL.md §12 for merge order)
 - [[security-review]] - Security review skill

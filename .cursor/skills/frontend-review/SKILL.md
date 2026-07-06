@@ -220,10 +220,72 @@ When the user asks for a review, a code review, quality check, or "is this ready
 
 ---
 
+## PART E: VERCEL WEB INTERFACE GUIDELINES — COMPLIANCE CHECK
+
+> Synthesized from `vercel-labs/web-design-guidelines` (⭐4). Run this *after* Parts B and D pass.
+
+### E.1 When to Run
+
+- Before declaring a frontend task done, after B.7 full-output verification
+- When the user asks for "review my UI", "check accessibility", "audit design", "review UX"
+- In CI: wire via `npx skills add vercel-labs/agent-skills --skill web-design-guidelines`
+
+### E.2 The 10 Categories (priority order)
+
+| # | Category | Key checks (must have) | Common anti-patterns |
+|---|---|---|---|
+| 1 | Accessibility | Contrast 4.5:1, alt text, keyboard nav, aria-labels | Removing focus rings, icon-only buttons without labels |
+| 2 | Touch & Interaction | Min 44×44px targets, 8px+ spacing, loading feedback | Hover-only interactions, instant state changes (0ms) |
+| 3 | Performance | WebP/AVIF, lazy loading, reserve space (CLS < 0.1) | Layout thrashing, undeclared image dimensions |
+| 4 | Style Selection | Match product type, consistency, SVG icons | Mixing flat & skeuomorphic, emoji as icons |
+| 5 | Layout & Responsive | Mobile-first breakpoints, viewport meta, no horizontal scroll | Fixed px containers, disabled zoom |
+| 6 | Typography & Color | Base 16px, line-height 1.5, semantic color tokens | Text < 12px body, gray-on-gray, raw hex in components |
+| 7 | Animation | 150-300ms, motion conveys meaning, transform/opacity only | Decorative-only animation, animating width/height |
+| 8 | Forms & Feedback | Visible labels, error near field, helper text, progressive disclosure | Placeholder-only label, errors only at top |
+| 9 | Navigation Patterns | Predictable back, bottom nav ≤5 items, deep linking | Overloaded nav, broken back behavior, no deep links |
+| 10 | Charts & Data | Legends, tooltips, accessible colors | Relying on color alone to convey meaning |
+
+### E.3 Cross-Reference With This Skill's Existing Axes
+
+| Vercel category | Maps to existing review section |
+|---|---|
+| 1 Accessibility | B.3 Accessibility Review |
+| 2 Touch & Interaction | B.5 State & Interaction Review |
+| 3 Performance | B.4 Performance Review |
+| 4 Style Selection | B.2 Design & Taste Review (style consistency) |
+| 5 Layout & Responsive | B.2 Layout diversity + B.4 Viewport stability |
+| 6 Typography & Color | B.2 Design & Taste Review (typography + color consistency) |
+| 7 Animation | B.4 + frontend-taste §4 + §10 (Emil layer) |
+| 8 Forms & Feedback | B.3 Form labels + B.5 Form/empty/error states |
+| 9 Navigation Patterns | B.5 (active nav link styled differently) + C.2 (no broken links) |
+| 10 Charts & Data | Out of scope for landing pages (see frontend-taste §7) |
+
+If Parts B and D pass, E.2 will pass. Run E.2 only when you need the *full* Vercel ruleset (e.g. for a public-sector or compliance-bound project).
+
+### E.4 Output Format
+
+When invoking `@web-design-guidelines` directly, it outputs terse `file:line` findings. When running inline (no install), output the same format manually after fetching:
+
+```
+[VERCEL-AUDIT] <file>:<line> — <category>: <rule> — <fix>
+```
+
+### E.5 Install (optional, only when CI integration is needed)
+
+```bash
+npx skills add vercel-labs/agent-skills --skill web-design-guidelines
+```
+
+This installs the skill payload into `.cursor/skills/` or `.claude/skills/` and wires the audit into PR checks. The full Vercel ruleset is fetched dynamically from `https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md` at runtime — never embedded.
+
+
+---
+
 ## Liens
 
 - [[../rules/skill-integration]] - Skill Integration Rules
 - [[../rules/coding-standards]] - Coding Standards
-- [[../skills/frontend-taste]] - Frontend Taste Skill
+- [[../skills/frontend-taste]] - Frontend Taste Skill (now includes ⭐1-⭐6 design sources — see §12)
 - [[../skills/frontend-redesign]] - Frontend Redesign Skill
 - [[../skills/full-output]] - Full Output Skill
+- https://github.com/vercel-labs/agent-skills/blob/main/skills/web-design-guidelines/SKILL.md - Vercel Web Interface Guidelines (⭐4)

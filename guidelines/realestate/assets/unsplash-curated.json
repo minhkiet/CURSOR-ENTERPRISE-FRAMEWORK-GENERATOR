@@ -1,0 +1,60 @@
+{
+  "comment": "Curated Unsplash photo IDs for Anchor Pro real estate platform. All photos are professional real estate / interior / architectural photography. Free to use under Unsplash License.",
+  "exterior": {
+    "luxury_villa_modern": "1564013799919-ab600027ffc6",
+    "villa_pool_palm": "1613490493576-7fde63acd811",
+    "modern_house_dusk": "1568605114967-8130f3a36994",
+    "penthouse_view": "1502672260266-1c1ef2d93688",
+    "apartment_building": "1545324418-cc1a3fa10c00",
+    "townhouse_street": "1564013799919-ab600027ffc6",
+    "shophouse_corner": "1572120360610-d971b9d7767c",
+    "modern_apartment_exterior": "1486325212027-8081e485255e"
+  },
+  "interior": {
+    "living_room_luxury": "1600585154340-be6161a56a0c",
+    "kitchen_modern": "1556909114-f6e7ad7d3136",
+    "bedroom_master": "1505693416388-ac5ce068fe85",
+    "bathroom_marble": "1620626011761-996317b8d101",
+    "dining_room": "1600210492486-724fe5c67fb0",
+    "office_room": "1497366216548-37526070297c",
+    "balcony_view": "1502005229762-cf1b2da7c5d6",
+    "stairs_modern": "1600566753190-17f0baa2a6c3"
+  },
+  "neighborhood": {
+    "saigon_skyline": "1583417319070-4a69db38a482",
+    "hanoi_old_quarter": "1528127269322-539801943592",
+    "danang_beach": "1559592413-7cec4d0cae2b",
+    "dalat_pine": "1573279107032-d3e88dc7d12a",
+    "phuquoc_resort": "1582719508461-905c673771fd",
+    "hoian_lantern": "1528127269322-539801943592",
+    "vn_street_aerial": "1573108237986-c1eaff6c2a3a",
+    "modern_district": "1480714378408-67cf0d13bc1b"
+  },
+  "agent_portrait": {
+    "agent_male_1": "1507003211169-0a1dd7228f2d",
+    "agent_female_1": "1494790108377-be9c29b29330",
+    "agent_male_2": "1472099645785-5658abf4ff4e",
+    "agent_female_2": "1438761681033-6461ffad8d80",
+    "agent_male_3": "1500648767791-00dcc994a43e",
+    "agent_female_3": "1573496359142-b8d87734a5a2"
+  },
+  "project_rendering": {
+    "master_plan_aerial": "1545324418-cc1a3fa10c00",
+    "rooftop_pool_render": "1571055107559-3e67626fa8be",
+    "lobby_luxury": "1545324418-cc1a3fa10c00",
+    "amenities_gym": "1534438327276-14e5300c3a48"
+  },
+  "hero_video_cover": {
+    "comment": "Curated Coverr.co video IDs for hero backgrounds. Replace {slug} in https://cdn.coverr.co/videos/coverr-{slug}/1080p.mp4",
+    "saigon_skyline_drone": "aerial-view-of-modern-buildings-in-hong-kong-3695/1080p.mp4",
+    "modern_lobby_panning": "people-walking-in-a-luxury-hotel-lobby-1581/1080p.mp4",
+    "luxury_pool_aerial": "luxury-villa-with-pool-2656/1080p.mp4",
+    "modern_kitchen_pan": "modern-kitchen-2584/1080p.mp4"
+  },
+  "testimonial_video": {
+    "comment": "30-60s vertical videos. For production replace with real testimonial footage from Anchor Pro customers.",
+    "customer_1": "https://cdn.coverr.co/videos/coverr-business-woman-on-video-call-2748/1080p.mp4",
+    "customer_2": "https://cdn.coverr.co/videos/coverr-business-man-smiling-at-camera-2756/1080p.mp4",
+    "customer_3": "https://cdn.coverr.co/videos/coverr-real-estate-agent-showing-house-3267/1080p.mp4"
+  }
+}

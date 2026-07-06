@@ -1,6 +1,6 @@
 ﻿---
 name: frontend-taste
-description: Anti-slop frontend skill for landing pages, portfolios, and redesigns. Reads the brief, infers the design direction, sets three dials (VARIANCE/MOTION/DENSITY), and ships interfaces that do not look templated. Includes mandatory pre-review and post-review checkpoints before and after code generation.
+description: Anti-slop frontend skill for landing pages, portfolios, and redesigns. Reads the brief, infers the design direction, sets three dials (VARIANCE/MOTION/DENSITY), and ships interfaces that do not look templated. Includes mandatory pre-review and post-review checkpoints before and after code generation. Synthesizes pbakaus/impeccable, Leonxlnx/taste-skill, anthropics/frontend-design, vercel-labs/web-design-guidelines, nextlevelbuilder/ui-ux-pro-max, and emilkowalski/emil-design-eng into a single coherent playbook. See §12 for attribution and conflict-resolution rules.
 ---
 
 # Taste Frontend Skill (Anti-Slop Edition)
@@ -514,9 +514,336 @@ npm install motion gsap
 
 ---
 
+## 9. DESIGN-LEAD PHILOSOPHY (Two-Pass Build)
+
+> Synthesized from `anthropics/frontend-design` (⭐3) and `pbakaus/impeccable` (⭐1).
+> This is the *frame of mind* behind every section above. Apply it whenever §0.B produces a non-trivial design read.
+
+### 9.A Two-Pass Build (mandatory for landing pages and redesigns)
+
+```
+PASS 1 — BRAINSTORM (do not write code yet)
+  ↓  Pick 4-6 named hex values for the palette
+  ↓  Pick display + body + (optional utility) typefaces — DELIBERATE PAIRING, not default
+  ↓  One-sentence layout concept
+  ↓  ONE signature element the page will be remembered by
+  ↓  Self-critique: is any of this the generic default for this category?
+     (If yes, revise before moving on.)
+
+PASS 2 — BUILD
+  ↓  Implement exactly the revised plan
+  ↓  Derive every color/type decision from the tokens — no off-token drift
+  ↓  Run §6 post-review audit before declaring done
+```
+
+The two-pass discipline is the single highest-leverage rule in this skill. Most "AI-slop" output happens because the agent jumps from brief → code in one pass and never revisits the plan.
+
+### 9.B The Signature Element
+
+Every distinctive page has **one** memorable element that embodies the brief. Examples:
+- A kinetic headline that scrubs based on scroll progress
+- A real-time data visualization that responds to the cursor
+- A bespoke cursor / magnetic interaction reserved for the primary CTA
+- A typographic mark used as the brand's identity
+
+The signature gets **one place** of boldness. Everything around it stays quiet and disciplined. Channel Chanel's rule: *before leaving the house, look in the mirror and remove one accessory.*
+
+### 9.C Anti-Cream Default (color)
+
+If the brief calls for "warm / editorial / heritage / magazine" and you reach for `#f5f1ea`, `#faf7f1`, or any OKLCH L 0.84-0.97 + low-chroma warm band — **stop**. That warm-neutral band is the saturated 2026 AI default. Token names like `--paper`, `--cream`, `--sand`, `--bone` are tells in themselves.
+
+Instead, pick one of:
+- **(a) Saturated body** — terracotta, oxblood, deep ochre, near-black as the page color
+- **(b) True off-white** at chroma 0 (or chroma toward the brand's own hue, not toward warmth)
+- **(c) Darker mid-tone tinted neutral** that is clearly the brand's own
+
+The brand's "warmth" lives in accent + typography + imagery, not in body background.
+
+### 9.D Anti-Identical-Card-Grids (layout)
+
+Five-card row with icon-heading-text repeated five times is banned. Vary the grid: 1+2 split, 2+1 asymmetric, hero+4 with mixed cell sizes, masonry. If you have N items, you need N cells with a real composition — not 5 identical siblings.
+
+### 9.E Display Letter-Spacing Floor
+
+`letter-spacing` on display H1 must stay ≥ -0.04em. Anything tighter (`-0.05em` to `-0.085em`) and the letters touch. The right tight range is -0.02 to -0.03em. Use `text-wrap: balance` on h1-h3 and `text-wrap: pretty` on long prose.
+
+### 9.F Heading Overflow Test
+
+Long headline words + large `clamp()` scales + narrow grids cause overflow on tablet/mobile. Test the heading copy at every breakpoint; if it overflows, reduce the clamp max or rewrite the copy. The viewport is part of the design.
+
+### 9.G Heading Ceiling
+
+Display H1 max `clamp()` ≤ 6rem (~96px). Above that the page is shouting, not designing.
+
+### 9.H Side-Stripe Borders (banned)
+
+`border-left` or `border-right` > 1px as a colored accent on cards, list items, callouts, or alerts. Never intentional. Rewrite with full borders, background tints, leading numbers/icons, or nothing.
+
+### 9.I Gradient Text (banned)
+
+`background-clip: text` + gradient background. Decorative, never meaningful. Emphasis via weight or size, single solid color.
+
+### 9.J Hero-Metric Template (banned)
+
+Big number + small label + supporting stats + gradient accent. The SaaS cliché. Reject on sight.
+
+### 9.K Reveal-Safety (motion)
+
+Reveal animations must enhance an *already-visible default*. Do not gate content visibility on a class-triggered transition — transitions pause on hidden tabs and headless renderers, so the section ships blank. The default state must be readable; the reveal is an enhancement.
+
+### 9.L The AI Slop Test
+
+If someone could look at the interface and say "AI made that" without doubt, it has failed.
+
+- **First-order check:** if a viewer could guess the theme + palette from the *category alone* (e.g. "AI workflow tool", "fintech app"), it is the first training-data reflex. Rework the scene sentence and color strategy until the answer is not obvious from the domain.
+- **Second-order check:** if the viewer could guess the aesthetic family from category-plus-anti-references (e.g. "fintech that's not navy-and-gold → terminal-native dark mode"), it is the trap one tier deeper. Rework until both answers are not obvious.
+
+---
+
+## 10. ANIMATION DECISION FRAMEWORK (Emil Kowalski Polish Layer)
+
+> Synthesized from `emilkowalski/emil-design-eng` (⭐6). Augments §4 with the *decision rules* the polish layer requires.
+> See also: https://animations.dev/
+
+### 10.A Decision Order (always ask these in order before writing any animation code)
+
+1. **Should this animate at all?** How often will the user see this animation?
+   - 100+/day (keyboard shortcuts, command palette) → **No animation. Ever.**
+   - Tens/day (hover effects, list navigation) → Remove or drastically reduce
+   - Occasional (modals, drawers, toasts) → Standard animation
+   - Rare (onboarding, celebrations) → Can add delight
+
+2. **What is the purpose?** Valid answers: spatial consistency, state indication, explanation, feedback, preventing jarring change. Invalid: "it looked cool".
+
+3. **What easing?**
+   - Entering the screen → `ease-out` (starts fast, feels responsive)
+   - Moving on screen → `ease-in-out`
+   - Hover / color change → `ease`
+   - Constant motion (marquee, progress) → `linear`
+   - **Default → `ease-out`. Never `ease-in` for UI — it makes the interface feel sluggish at the exact moment the user is watching.**
+
+4. **How fast?**
+   - Button press feedback: 100-160ms
+   - Tooltips, small popovers: 125-200ms
+   - Dropdowns, selects: 150-250ms
+   - Modals, drawers: 200-500ms
+   - Marketing/explanatory: can be longer
+   - **Rule: UI animations stay under 300ms.** A 180ms dropdown feels more responsive than a 400ms one.
+
+### 10.B Custom Easing Curves (mandatory for craft feel)
+
+```css
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);     /* strong UI interactions */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1); /* on-screen movement */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);  /* iOS-like drawer (Ionic) */
+}
+```
+
+Do not create curves from scratch. Use https://easing.dev/ or https://easings.co/.
+
+### 10.C Spring Animations (when to reach for them)
+
+Springs feel natural because they simulate physics. Reach for them for:
+- Drag interactions with momentum
+- Elements that should feel "alive" (Apple's Dynamic Island, magnetic hovers)
+- Gestures that can be interrupted mid-animation
+- Decorative mouse-tracking interactions
+
+```js
+// Apple-style — easier to reason about
+{ type: "spring", duration: 0.5, bounce: 0.2 }
+
+// Traditional physics — more control
+{ type: "spring", mass: 1, stiffness: 100, damping: 10 }
+```
+
+**Keep bounce subtle (0.1-0.3).** Bounce is for drag-to-dismiss and playful interactions, not for primary UI feedback.
+
+**Interruptibility advantage:** springs maintain velocity when interrupted. CSS animations restart from zero. For any interaction that can be retriggered rapidly (toggling states, queueing toasts), springs produce smoother results.
+
+### 10.D Component Polish Rules
+
+| Element | Rule | Why |
+|---|---|---|
+| Buttons | `transform: scale(0.97)` on `:active` | Buttons must feel responsive to press |
+| Entry animations | Never from `scale(0)` — start at `scale(0.9)` + opacity | Nothing in real world appears from nothing |
+| Popovers | `transform-origin: var(--radix-popover-content-transform-origin)` | Popovers scale from trigger; modals stay centered (exception) |
+| Tooltips | Skip animation on subsequent hovers (data-instant) | Feels faster without defeating initial delay purpose |
+| Crossfades that feel off | Add `filter: blur(2px)` during transition | Blur bridges the visual gap between old and new state |
+| Entry | Prefer CSS `@starting-style` over `useEffect`-mounted pattern | Modern, no JS mount race |
+| Interruptible UI | Prefer CSS transitions over `@keyframes` | Transitions can be interrupted and retargeted mid-flight |
+| Hardware-accel | Animate ONLY `transform` and `opacity` | Never `width`/`height`/`top`/`left` |
+
+### 10.E Imperceptible Details That Compound
+
+- **Spring mouse tracking:** Tying visual change directly to mouse position feels artificial. Use `useSpring` to interpolate value changes with momentum.
+- **Translate by percentage:** `translateY(100%)` moves an element by its own height regardless of actual size. Use for drawer/toast positioning.
+- **`scale()` scales children too:** unlike `width`/`height`, `scale()` scales font, icons, content proportionally — a feature, not a bug.
+- **`transform-origin` matters:** default `center` is wrong for almost every popover. Set to where the trigger lives.
+- **Blur mask for imperfect transitions:** when crossfade feels off despite trying different easings, add `filter: blur(2px)` during the transition. Keep blur under 20px (Safari cost).
+- **`clip-path: inset()`** for reveals, hold-to-delete patterns, comparison sliders, perfect color transitions on tabs. Hardware-accelerated, no extra DOM.
+
+### 10.F Gesture and Drag (when needed)
+
+- **Momentum-based dismissal:** don't require dragging past a threshold. If velocity > ~0.11 (`Math.abs(dragDistance) / elapsedTime`), dismiss regardless of distance.
+- **Boundary damping** instead of hard stops — feels physical.
+- **Interruptibility:** any drag/swipe/pinch animation must be retargetable mid-flight.
+
+### 10.G Review Format (mandatory for any animation review)
+
+When reviewing motion code, output a single markdown table — never a "Before:/After:" list:
+
+```
+| Before | After | Why |
+| --- | --- | --- |
+| `transition: all 300ms` | `transition: transform 200ms ease-out` | Specify exact properties; never `all` |
+| `ease-in` on dropdown | `ease-out` with custom curve | `ease-in` feels sluggish; `ease-out` gives instant feedback |
+```
+
+---
+
+## 11. STYLE & PALETTE REFERENCE (Database Pointer)
+
+> Synthesized from `nextlevelbuilder/ui-ux-pro-max` (⭐5). This section is a **pointer**, not an embedded database. The skill file stays lean; the data lives in the source repo and can be queried at design time.
+
+### 11.A Why a pointer and not the database
+
+`ui-ux-pro-max` ships with ~30MB of CSV data: 50+ styles, 161 palettes, 57 font pairings, 161 product types, 99 UX guidelines, 25 chart types across 10 stacks. Embedding that into `SKILL.md` would:
+- Blow past Cursor's skill-loading budget per request
+- Go stale instantly when the source repo updates
+- Duplicate data that already lives in `.cursor/rules/ui-visual-design.mdc`
+
+### 11.B Reference resolution order
+
+When you need a style, palette, font pairing, or UX rule:
+
+1. **§2.A Design System Map** — if the brief matches an official system (Fluent, Carbon, Material, Polaris, Primer, GOV.UK, USWDS, Radix, shadcn/ui), use that. Stop here.
+2. **§0.E Existing project tokens** — check `package.json`, `tailwind.config.*`, `:root` CSS vars. If a committed palette exists, identity-preservation wins.
+3. **`.cursor/rules/ui-visual-design.mdc`** — for general visual design principles in this workspace.
+4. **`ui-ux-pro-max` CLI (optional, install on demand):**
+   ```bash
+   # One-time install for the project
+   npm install -g ui-ux-pro-max-cli
+   uipro init --ai cursor
+   ```
+   Then query:
+   ```bash
+   # Style + palette + font pairing for a brief
+   uipro search "<keywords>" --design-system
+
+   # Stack-specific guidance
+   uipro search "<topic>" --stack react
+   ```
+   Use `--domain` to scope: `style`, `color`, `typography`, `ux`, `chart`, `product`, `stack`.
+5. **Vercel Web Interface Guidelines** (see §11.C) — for a11y/perf/UX compliance rules.
+
+### 11.C Vercel Web Interface Guidelines (⭐4)
+
+The `vercel-labs/web-design-guidelines` skill is **a runtime-fetched audit tool**, not a static rule file. SKILL.md only contains a pointer to `https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md`. To run an audit:
+
+```
+# From any Cursor chat
+@web-design-guidelines <file-or-pattern>
+```
+
+Or inline-fetch when needed:
+
+```
+WebFetch https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md
+```
+
+**100+ rules covering:** Accessibility (aria, semantic, keyboard), Focus States, Forms (autocomplete, validation), Animation (prefers-reduced-motion, compositor transforms), Typography (curly quotes, tabular-nums), Images (dimensions, lazy, alt), Performance (virtualization, layout thrashing, preconnect), Navigation & State (URL reflects state, deep-linking), Dark Mode & Theming (color-scheme, theme-color), Touch & Interaction (touch-action, tap-highlight), Locale & i18n (Intl.DateTimeFormat, Intl.NumberFormat).
+
+**When to run the audit:** after §6 post-review passes, before declaring done. Output format is terse `file:line` — wire into PR checks via `npx skills add vercel-labs/agent-skills --skill web-design-guidelines` if you want CI enforcement.
+
+### 11.D Rule priority table (from ui-ux-pro-max — reference, not rules)
+
+| Priority | Category | Impact |
+|---|---|---|
+| 1 | Accessibility | CRITICAL — contrast 4.5:1, alt text, keyboard nav, aria |
+| 2 | Touch & Interaction | CRITICAL — 44×44px targets, 8px+ spacing, loading feedback |
+| 3 | Performance | HIGH — WebP/AVIF, lazy load, reserve space (CLS < 0.1) |
+| 4 | Style Selection | HIGH — match product type, consistency, no emoji-as-icons |
+| 5 | Layout & Responsive | HIGH — mobile-first, viewport meta, no horizontal scroll |
+| 6 | Typography & Color | MEDIUM — 16px base, 1.5 line-height, semantic tokens |
+| 7 | Animation | MEDIUM — 150-300ms, motion conveys meaning |
+| 8 | Forms & Feedback | MEDIUM — visible labels, error near field, helper text |
+| 9 | Navigation Patterns | HIGH — predictable back, deep linking, max 5 bottom-nav |
+| 10 | Charts & Data | LOW — legends, tooltips, accessible colors |
+
+Note: this priority order is **embedded as reference only**. The active rules live in §0-§9 of this skill and in `.cursor/rules/ui-visual-design.mdc`. The database is the *why*, this file is the *what to do*.
+
+---
+
+## 12. SOURCES, ATTRIBUTION & CONFLICT RESOLUTION
+
+### 12.A Source skills (merged into this file)
+
+| # | Skill | Source | Stars | Merged into |
+|---|-------|--------|-------|-------------|
+| ⭐1 | impeccable | github.com/pbakaus/impeccable | 39k | §9 (philosophy + anti-slop catalog) + §2 (anti-cream) |
+| ⭐2 | taste-skill | github.com/Leonxlnx/taste-skill | — | §0-§4 (original source of dials, GSAP skeletons, em-dash ban) |
+| ⭐3 | frontend-design | github.com/anthropics/skills | 147k | §9 (two-pass build, signature element, critique) |
+| ⭐4 | web-design-guidelines | github.com/vercel-labs/agent-skills | 25k | §11.C (runtime audit pointer; not embedded — stays fresh) |
+| ⭐5 | ui-ux-pro-max | github.com/nextlevelbuilder/ui-ux-pro-max-skill | 95k | §11 (database pointer, priority table) |
+| ⭐6 | emil-design-eng | github.com/emilkowalski/skill | 2k | §10 (animation decision framework + polish layer) |
+
+### 12.B Merge order
+
+The ⭐ priority (1=highest) defines **conflict resolution** when sources disagree:
+
+- ⭐1 wins on **anti-slop catalog and color strategy** (cream ban, ghost-card ban, signature element framing)
+- ⭐2 wins on **structural defaults** (the three dials, GSAP canonical skeletons, em-dash ban — *this is the spine of the skill*)
+- ⭐3 wins on **philosophy and intent framing** (two-pass build, design-lead voice)
+- ⭐4 wins on **a11y/perf/UX compliance rules** (any conflict with ⭐1-3 on accessibility → ⭐4 wins, no exceptions)
+- ⭐5 wins on **style/palette/font pairing lookup** (when the brief needs a database-driven recommendation, not a taste-driven one)
+- ⭐6 wins on **micro-interaction polish** (motion decisions, easing curves, button-press feedback)
+
+In practice the sources agree on most things. When they disagree, the resolution above is the rule.
+
+### 12.C Active skills in this workspace
+
+| Skill | File | Role | Pre-gate | Post-gate |
+|---|---|---|---|---|
+| `frontend-taste` (this file) | `.cursor/skills/frontend-taste/SKILL.md` | Build landing pages, portfolios, redesigns | §0 pre-flight | §6 audit + §10 polish review |
+| `frontend-review` | `.cursor/skills/frontend-review/SKILL.md` | Quality gate for any frontend task | Part A scope | Part B 7-axis review |
+| `frontend-redesign` | `.cursor/skills/frontend-redesign/SKILL.md` | Upgrade existing sites without breaking functionality | §0 pre-audit | §4 post-redesign audit |
+| `karpathy-coding` | `.cursor/skills/karpathy-coding/SKILL.md` | Overlay: pre/post reasoning gate for any code task | karpathy-pre | karpathy-post |
+| `full-output` | `.cursor/skills/full-output/SKILL.md` | Multi-file implementations | fulloutput-pre | fulloutput-post |
+| `ponytail` | `.cursor/skills/ponytail/SKILL.md` | Lazy Senior Dev — minimum viable code | ponytail-pre | ponytail-post |
+
+### 12.D Why no new skill files were created
+
+The six source skills overlap heavily with each other and with the three pre-existing skills in this workspace. Creating six parallel skills would:
+
+- Cause direct conflicts on every rule (each skill ships its own opinion on motion duration, color, typography)
+- Multiply the per-request context load (Cursor loads each skill's body into context on relevant requests)
+- Force the agent to pick between conflicting rules at runtime
+- Stale instantly (⭐4 fetches rules dynamically for a reason)
+
+The single-source-of-truth pattern — this file — means one rule per concern, one place to update, zero conflict. The ⭐1→⭐6 merge order encodes the priority without creating files.
+
+### 12.E External pointers (install only when needed)
+
+These are **not installed** by default. Install via `npx skills add` only when the use case demands live data:
+
+- `npx skills add https://github.com/pbakaus/impeccable --skill impeccable` — only if you want the full commands menu (`craft`, `shape`, `audit`, `polish`, ...) and the bundled detector hooks
+- `npx skills add https://github.com/Leonxlnx/taste-skill --skill design-taste-frontend-v1` — only if you want the v1 baseline for diff comparison
+- `npx skills add vercel-labs/agent-skills --skill web-design-guidelines` — only if you want CI/PR-check integration for the Vercel rules
+- `uipro init --ai cursor` (from `ui-ux-pro-max-cli`) — only if you need on-demand palette/style/font queries during a build
+
+In all four cases, the merge into this file is **complete enough that you do not need them for normal use**. Install only when you specifically want live-data access.
+
+---
+
 ## Liens
 
 - [[../rules/skill-integration]] - Skill Integration Rules
 - [[../rules/frontend-architecture]] - Frontend Architecture
 - [[../skills/frontend-review]] - Frontend Review Skill
+- [[../skills/frontend-redesign]] - Frontend Redesign Skill
 - [[../skills/full-output]] - Full Output Skill
+- [[../rules/ui-visual-design]] - Workspace Visual Design Principles
+
+**Synthesized from:** [pbakaus/impeccable](https://github.com/pbakaus/impeccable) ⭐1 · [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) ⭐2 · [anthropics/frontend-design](https://github.com/anthropics/skills) ⭐3 · [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) ⭐4 · [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) ⭐5 · [emilkowalski/skill](https://github.com/emilkowalski/skill) ⭐6. See §12 for merge order and conflict resolution.
