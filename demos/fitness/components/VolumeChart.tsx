@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import * as Phosphor from '@phosphor-icons/react';
+import { TrendingUp } from 'lucide-react';
 import { VOLUME_DATA_30D } from '@/data/pr';
 
 export function VolumeChart() {
@@ -46,14 +46,13 @@ export function VolumeChart() {
           </div>
         </div>
 
-        {/* Summary */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
           <article className="bg-gradient-to-br from-ink-950 to-ink-900 border border-ink-800 rounded-2xl p-5">
             <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tổng khối lượng</p>
             <p className="mt-2 text-[40px] lg:text-[52px] font-display text-ink-50 tabular-nums leading-none">{total.toLocaleString('vi-VN')}</p>
             <p className="mt-1 text-[10px] text-slate-500 uppercase tracking-wider font-bold">kg</p>
             <div className="mt-3 inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded-full text-[11.5px] font-extrabold tabular-nums">
-              <Phosphor.TrendUp size={11} weight="bold" />
+              <TrendingUp size={11} strokeWidth={2.5} />
               +{delta.toFixed(1)}% so với kỳ trước
             </div>
           </article>
@@ -76,7 +75,6 @@ export function VolumeChart() {
           </article>
         </div>
 
-        {/* Bar chart */}
         <div className="bg-ink-950 border border-ink-800 rounded-2xl p-5 lg:p-7" role="img" aria-label={`Biểu đồ khối lượng ${period}, tổng ${total.toLocaleString('vi-VN')} kilogam`}>
           <div className="flex items-end justify-between gap-1 h-64 lg:h-80">
             {VOLUME_DATA_30D.map((d, i) => {
@@ -109,7 +107,6 @@ export function VolumeChart() {
           </div>
         </div>
 
-        {/* By muscle */}
         <div className="mt-6 grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
           {[
             { key: 'chest', label: 'Ngực', color: 'bg-rose-500' },

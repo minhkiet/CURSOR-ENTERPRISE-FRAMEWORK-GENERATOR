@@ -1,10 +1,10 @@
-import * as Phosphor from '@phosphor-icons/react';
+import { ArrowRight, Star, Play, Sprout, Dumbbell, Flame, Users, BookOpen, TrendingUp, BarChart3 } from 'lucide-react';
 import { SAMPLE_PROGRAMS, TESTIMONIALS } from '@/data/programs';
 
 const DIFFICULTY_MAP = {
-  beginner: { label: 'Mới bắt đầu', color: 'bg-emerald-500/20 text-emerald-400', icon: 'Seedling' },
-  intermediate: { label: 'Trung cấp', color: 'bg-amber-500/20 text-amber-400', icon: 'Barbell' },
-  advanced: { label: 'Nâng cao', color: 'bg-rose-500/20 text-rose-400', icon: 'Flame' }
+  beginner: { label: 'Mới bắt đầu', color: 'bg-emerald-500/20 text-emerald-400', icon: Sprout },
+  intermediate: { label: 'Trung cấp', color: 'bg-amber-500/20 text-amber-400', icon: Dumbbell },
+  advanced: { label: 'Nâng cao', color: 'bg-rose-500/20 text-rose-400', icon: Flame }
 } as const;
 
 const EQUIPMENT_LABEL: Record<string, string> = {
@@ -18,11 +18,19 @@ const EQUIPMENT_LABEL: Record<string, string> = {
   parallettes: 'Parallettes'
 };
 
+const TESTIMONIAL_ICON_MAP: Record<string, any> = {
+  TrendUp: TrendingUp,
+  ChartBar: BarChart3,
+  Barbell: Dumbbell,
+  Trophy: Flame,
+  UsersThree: Users,
+  Books: BookOpen
+};
+
 export function ProgramLibrary() {
   return (
     <section id="programs" className="bg-ink-950 py-16 lg:py-24 text-ink-50" aria-labelledby="programs-heading">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
           <div>
             <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-electric-400 mb-2 block">
@@ -38,16 +46,14 @@ export function ProgramLibrary() {
           </div>
           <a href="#" className="inline-flex items-center gap-1.5 px-5 py-3 bg-ink-800 hover:bg-ink-700 text-ink-50 text-[13px] font-extrabold rounded-lg transition-colors">
             Xem 47 chương trình
-            <Phosphor.ArrowRight size={14} weight="bold" />
+            <ArrowRight size={14} strokeWidth={2.5} />
           </a>
         </div>
 
-        {/* Programs grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5 mb-16">
           {SAMPLE_PROGRAMS.map(p => <ProgramCard key={p.id} program={p} />)}
         </div>
 
-        {/* Testimonials */}
         <div className="border-t border-ink-800 pt-12">
           <h3 className="text-2xl lg:text-3xl font-display text-ink-50 mb-8">
             Gymer Việt nói gì?
@@ -63,7 +69,7 @@ export function ProgramLibrary() {
 
 function ProgramCard({ program }: { program: typeof SAMPLE_PROGRAMS[number] }) {
   const diff = DIFFICULTY_MAP[program.difficulty];
-  const DiffIcon = Phosphor[diff.icon] as any;
+  const DiffIcon = diff.icon;
 
   return (
     <article className="group bg-ink-900 border border-ink-800 rounded-2xl overflow-hidden hover:border-electric-500/50 transition-colors flex flex-col">
@@ -77,12 +83,12 @@ function ProgramCard({ program }: { program: typeof SAMPLE_PROGRAMS[number] }) {
         <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/30 to-transparent" />
 
         <span className={`absolute top-3 left-3 inline-flex items-center gap-1 px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full backdrop-blur ${diff.color}`} aria-label={`Độ khó: ${diff.label}`}>
-          <DiffIcon size={10} weight="bold" />
+          <DiffIcon size={10} strokeWidth={2.5} />
           {diff.label}
         </span>
 
         <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-1 bg-black/60 backdrop-blur text-ink-50 text-[10px] font-bold rounded-full tabular-nums">
-          <Phosphor.Star size={10} weight="fill" className="text-amber-400" />
+          <Star size={10} strokeWidth={0} fill="currentColor" className="text-amber-400" />
           {program.rating}
         </span>
 
@@ -138,9 +144,9 @@ function ProgramCard({ program }: { program: typeof SAMPLE_PROGRAMS[number] }) {
           }`}
         >
           {program.enrolledByUser ? (
-            <><Phosphor.Play size={12} weight="fill" /> TIẾP TỤC</>
+            <><Play size={12} strokeWidth={0} fill="currentColor" /> TIẾP TỤC</>
           ) : (
-            <>BẮT ĐẦU <Phosphor.ArrowRight size={12} weight="bold" /></>
+            <>BẮT ĐẦU <ArrowRight size={12} strokeWidth={3} /></>
           )}
         </button>
       </div>
@@ -157,11 +163,11 @@ function TestimonialCard({ t }: { t: typeof TESTIMONIALS[number] }) {
 
       <div className="mt-4 grid grid-cols-2 gap-2">
         {t.metrics.map((m, i) => {
-          const Icon = Phosphor[m.icon] as any;
+          const Icon = TESTIMONIAL_ICON_MAP[m.icon] ?? TrendingUp;
           return (
             <div key={i} className="bg-ink-950 rounded-lg p-2.5">
               <div className="flex items-center gap-1 text-[10px] text-slate-500 uppercase tracking-wider font-bold">
-                <Icon size={10} weight="bold" className="text-electric-400" />
+                <Icon size={10} strokeWidth={2.5} className="text-electric-400" />
                 {m.label}
               </div>
               <p className="text-[16px] font-display text-ink-50 tabular-nums">{m.value}</p>

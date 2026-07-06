@@ -1,12 +1,12 @@
 'use client';
 import { useState } from 'react';
-import * as Phosphor from '@phosphor-icons/react';
+import { Heart, CheckCircle2, Circle, PlayCircle, Trophy, SkipForward, Volume2 } from 'lucide-react';
 import { SAMPLE_SETS, EXERCISE_INFO } from '@/data/workout';
 
 export function WorkoutShowcase() {
-  const [sets, setSets] = useState(SAMPLE_SETS);
-  const [isResting, setIsResting] = useState(true);
-  const [restRemaining, setRestRemaining] = useState(87);
+  const [sets] = useState(SAMPLE_SETS);
+  const [isResting] = useState(true);
+  const [restRemaining] = useState(87);
   const activeIdx = 2;
 
   const totalVolume = sets.filter(s => s.completed).reduce((sum, s) => sum + s.weight * s.reps, 0);
@@ -14,7 +14,6 @@ export function WorkoutShowcase() {
   return (
     <section id="workout" className="bg-ink-900 py-16 lg:py-24 text-ink-50 border-y border-ink-800" aria-labelledby="workout-heading">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="flex items-end justify-between mb-10 flex-wrap gap-3">
           <div>
             <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-electric-400 mb-2 block">
@@ -52,7 +51,7 @@ export function WorkoutShowcase() {
               </div>
 
               <div className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 px-2.5 py-1 bg-black/70 backdrop-blur rounded-full text-[11px] font-bold text-ink-50">
-                <Phosphor.Heart size={11} weight="fill" className="text-rose-500" />
+                <Heart size={11} strokeWidth={2.5} fill="currentColor" className="text-rose-500" />
                 <span className="tabular-nums">142</span> BPM
               </div>
 
@@ -65,7 +64,7 @@ export function WorkoutShowcase() {
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-2" aria-label="Form cues">
               {EXERCISE_INFO.cues.map((cue, i) => (
                 <li key={i} className="flex items-start gap-2 p-3 bg-ink-800/50 border border-ink-800 rounded-lg text-[12.5px] text-slate-300">
-                  <Phosphor.CheckCircle size={14} weight="fill" className="text-electric-400 flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 size={14} strokeWidth={2.5} className="text-electric-400 flex-shrink-0 mt-0.5" />
                   <span>{cue}</span>
                 </li>
               ))}
@@ -74,10 +73,8 @@ export function WorkoutShowcase() {
 
           {/* Right: Rest timer + Set list */}
           <div className="lg:col-span-5 space-y-4">
-            {/* Rest timer */}
             {isResting && <RestTimerDisplay remaining={restRemaining} total={90} />}
 
-            {/* Set list */}
             <section aria-labelledby="sets-heading" className="bg-ink-950 border border-ink-800 rounded-2xl overflow-hidden">
               <header className="flex items-center justify-between p-4 border-b border-ink-800">
                 <h3 id="sets-heading" className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
@@ -90,13 +87,13 @@ export function WorkoutShowcase() {
               <ol className="divide-y divide-ink-800">
                 {sets.map((s, i) => {
                   const isActive = i === activeIdx && !s.completed;
-                  let StatusIcon = Phosphor.Circle;
+                  let StatusIcon: any = Circle;
                   let statusColor = 'text-slate-600';
                   if (s.completed) {
-                    StatusIcon = Phosphor.CheckCircle;
+                    StatusIcon = CheckCircle2;
                     statusColor = 'text-electric-400';
                   } else if (isActive) {
-                    StatusIcon = Phosphor.PlayCircle;
+                    StatusIcon = PlayCircle;
                     statusColor = 'text-electric-400';
                   }
 
@@ -108,13 +105,13 @@ export function WorkoutShowcase() {
                       }`}
                       aria-current={isActive ? 'true' : undefined}
                     >
-                      <StatusIcon size={20} weight={s.completed ? 'fill' : 'regular'} className={statusColor} />
+                      <StatusIcon size={20} className={statusColor} />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
                           <span className="text-[13px] font-extrabold text-ink-50 tabular-nums">Hiệp {s.index}</span>
                           {s.isPR && (
                             <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-amber-500/20 text-amber-400 text-[9.5px] font-bold uppercase tracking-wider rounded">
-                              <Phosphor.Trophy size={9} weight="fill" />
+                              <Trophy size={9} strokeWidth={2.5} fill="currentColor" />
                               PR
                             </span>
                           )}
@@ -172,7 +169,7 @@ function RestTimerDisplay({ remaining, total }: { remaining: number; total: numb
           −15s
         </button>
         <button className="h-14 bg-rose-500 hover:bg-rose-400 text-white text-[13px] font-extrabold rounded-xl flex items-center justify-center gap-1.5">
-          <Phosphor.SkipForward size={13} weight="bold" />
+          <SkipForward size={13} strokeWidth={2.5} />
           BỎ QUA
         </button>
         <button className="h-14 bg-ink-800 hover:bg-ink-700 text-slate-300 text-[13px] font-extrabold rounded-xl">
@@ -181,7 +178,7 @@ function RestTimerDisplay({ remaining, total }: { remaining: number; total: numb
       </div>
 
       <p className="mt-3 text-center text-[10.5px] text-slate-500 inline-flex items-center gap-1 justify-center w-full">
-        <Phosphor.SpeakerSimpleHigh size={11} weight="bold" />
+        <Volume2 size={11} strokeWidth={2.5} />
         Audio cue khi còn 3 giây
       </p>
     </section>

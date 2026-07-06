@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Viet Travel — Tour Đông Nam Á, đặt nhanh 2 phút</title>
+<meta name="description" content="Viet Travel tổ chức tour trong nước và Đông Nam Á với itinerary chi tiết từng ngày, review thật có ảnh, và đặt cọc chỉ từ 2.9M. Hơn 8,400 tour đã đi." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="#" class="logo">
+      <svg class="logo-mark" viewBox="0 0 32 32" fill="none">
+        <rect x="4" y="4" width="24" height="24" rx="7" fill="currentColor"/>
+        <path d="M11 11 L21 16 L11 21 Z" fill="#fafbff"/>
+      </svg>
+      <span>viet<span class="logo-dot">.</span>travel</span>
+    </a>
+    <ul class="nav-menu">
+      <li><a href="#highlights">Điểm đến</a></li>
+      <li><a href="#features">Tính năng</a></li>
+      <li><a href="#workflow">Quy trình</a></li>
+      <li><a href="#pricing">Bảng giá</a></li>
+      <li><a href="#customers">Review</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="#" class="nav-ghost">Đăng nhập</a>
+      <a href="#pricing" class="nav-cta">
+        Đặt tour ngay
+        <i class="ph ph-arrow-up-right"></i>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<header class="hero">
+  <div class="container hero-grid">
+    <div class="hero-text">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        Hơn 8,400 tour đã đi · Khởi hành mỗi ngày
+      </div>
+
+      <h1 class="hero-title">
+        Tour Đông Nam Á,<br/>
+        đặt nhanh <span class="hl">2 phút</span>.
+      </h1>
+
+      <p class="hero-desc">
+        Viet Travel tổ chức tour trong nước và Đông Nam Á với itinerary chi tiết từng ngày,
+        review thật có ảnh từ khách đã đi, hỗ trợ trả góp 0% qua thẻ. Chủ động chọn ngày,
+        so sánh 50+ hãng bay, đặt cọc ngay hôm nay.
+      </p>
+
+      <div class="hero-cta">
+        <a href="#pricing" class="btn btn-primary btn-lg">
+          Đặt tour ngay
+          <i class="ph ph-airplane-tilt"></i>
+        </a>
+        <a href="#workflow" class="btn btn-ghost btn-lg">
+          <i class="ph-fill ph-play-circle"></i>
+          Xem 1 phút giới thiệu
+        </a>
+      </div>
+
+      <div class="hero-meta">
+        <div class="meta-avatars">
+          <div class="av" style="background:#06b6d4">PQ</div>
+          <div class="av" style="background:#f59e0b">DL</div>
+          <div class="av" style="background:#10b981">BL</div>
+          <div class="av" style="background:#8b5cf6">BK</div>
+          <div class="av av-more">+8k</div>
+        </div>
+        <div class="meta-text">
+          <div class="meta-stars">
+            <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+            <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+            <i class="ph-fill ph-star"></i>
+          </div>
+          <div>4.8 · 3,412 đánh giá trên Google</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tour itinerary mockup -->
+    <div class="hero-visual">
+      <div class="dash">
+        <div class="dash-top">
+          <div class="dash-tabs">
+            <span class="dash-tab active"><i class="ph ph-calendar-blank"></i> Itinerary</span>
+            <span class="dash-tab"><i class="ph ph-map-pin"></i> Bản đồ</span>
+            <span class="dash-tab"><i class="ph ph-image"></i> Ảnh thật</span>
+          </div>
+          <div class="dash-dots"><i></i><i></i><i></i></div>
+        </div>
+
+        <div class="dash-stats">
+          <div class="dash-stat">
+            <div class="ds-label">Khởi hành</div>
+            <div class="ds-value" id="countdown-date">--/--</div>
+            <div class="ds-delta up"><i class="ph ph-clock"></i> Còn <span id="countdown-days">--</span> ngày</div>
+          </div>
+          <div class="dash-stat">
+            <div class="ds-label">Giá từ</div>
+            <div class="ds-value">8.9M₫</div>
+            <div class="ds-delta up"><i class="ph ph-trend-up"></i> Khứ hồi</div>
+          </div>
+          <div class="dash-stat">
+            <div class="ds-label">Slot còn</div>
+            <div class="ds-value">12</div>
+            <div class="ds-delta warn"><i class="ph ph-warning"></i> Đang có</div>
+          </div>
+        </div>
+
+        <!-- 4-day itinerary cards -->
+        <div class="dash-list">
+          <div class="itinerary-header">
+            <i class="ph ph-airplane-tilt"></i> Tour Bali 5N4Đ — Khám phá đảo thiên đường
+          </div>
+          <div class="day-card">
+            <div class="day-num">Ngày 1</div>
+            <div class="day-info">
+              <div class="day-loc"><i class="ph ph-map-pin"></i> Phú Quốc — Quốc khánh</div>
+              <div class="day-acts">Đến sân bay, transit 2h, nghỉ đêm tại Kuta</div>
+              <div class="day-weather"><i class="ph ph-sun"></i> 31°C · Nắng</div>
+            </div>
+          </div>
+          <div class="day-card">
+            <div class="day-num">Ngày 2</div>
+            <div class="day-info">
+              <div class="day-loc"><i class="ph ph-map-pin"></i> Đà Lạt — Cao nguyên</div>
+              <div class="day-acts">Thung lũng Tình Yêu, Đồi Chồng, thác Datanla</div>
+              <div class="day-weather"><i class="ph ph-cloud"></i> 22°C · Mát</div>
+            </div>
+          </div>
+          <div class="day-card">
+            <div class="day-num">Ngày 3</div>
+            <div class="day-info">
+              <div class="day-loc"><i class="ph ph-map-pin"></i> Bali — Indonesia</div>
+              <div class="day-acts">Tanah Lot, Ubud Monkey Forest, rice terrace</div>
+              <div class="day-weather"><i class="ph ph-sun"></i> 29°C · Nắng</div>
+            </div>
+          </div>
+          <div class="day-card">
+            <div class="day-num">Ngày 4</div>
+            <div class="day-info">
+              <div class="day-loc"><i class="ph ph-map-pin"></i> Bangkok — Thái Lan</div>
+              <div class="day-acts">Grand Palace, Khao San Road, floating market</div>
+              <div class="day-weather"><i class="ph ph-cloud-rain"></i> 33°C · Nóng</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="float float-a">
+        <div class="fa-icon"><i class="ph-fill ph-check-circle"></i></div>
+        <div>
+          <div class="fa-title">Đặt cọc thành công</div>
+          <div class="fa-meta">Thanh toán 2.900.000₫ · 12 phút trước</div>
+        </div>
+      </div>
+
+      <div class="float float-b">
+        <div class="fa-icon" style="background:#fef3c7;color:#f59e0b"><i class="ph-fill ph-users-three"></i></div>
+        <div>
+          <div class="fa-title">Nhóm vừa đủ chỗ</div>
+          <div class="fa-meta">12/12 khách · Full slot</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ─── HIGHLIGHT STATS ─── -->
+<section class="logos">
+  <div class="container">
+    <p class="logos-label">Hơn 8,400 tour đã khởi hành · Đồng hành cùng 120 điểm đến</p>
+    <div class="logos-grid">
+      <div class="logo-cell stat">
+        <div class="stat-num" data-target="8400">0</div>
+        <div class="stat-label">tour/năm</div>
+      </div>
+      <div class="logo-cell stat">
+        <div class="stat-num" data-target="120">0</div>
+        <div class="stat-label">điểm đến</div>
+      </div>
+      <div class="logo-cell stat">
+        <div class="stat-num" data-target="64" data-suffix="%">0</div>
+        <div class="stat-label">khách quay lại</div>
+      </div>
+      <div class="logo-cell stat">
+        <div class="stat-num" data-target="50" data-prefix="50+">0</div>
+        <div class="stat-label">hãng bay</div>
+      </div>
+      <div class="logo-cell stat">
+        <div class="stat-num" data-target="24">0</div>
+        <div class="stat-label">giờ hỗ trợ</div>
+      </div>
+      <div class="logo-cell stat">
+        <div class="stat-num" data-target="0" data-prefix="0%">0</div>
+        <div class="stat-label">lãi suất trả góp</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FEATURES (asymmetric layout, no 3 equal cards) ─── -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Tính năng</div>
+      <h2 class="section-title">5 lý do khách chọn Viet Travel.</h2>
+      <p class="section-desc">Không phải tour hộ thoe. Mỗi chuyến đi được thiết kế chi tiết, có review thật, và hỗ trợ tận tình.</p>
+    </div>
+
+    <!-- Bento grid: 1 big + 4 small -->
+    <div class="bento">
+      <article class="bento-card bento-big">
+        <div class="bc-tag"><i class="ph ph-calendar-check"></i> Itinerary</div>
+        <h3>Lịch trình chi tiết từng ngày, không mập mờ.</h3>
+        <p>Ngày đi, ngày về, giờ bay, khách sạn, bữa ăn, hoạt động — tất cả đều rõ ràng trước khi đặt. Không phí ẩn, không bất ngờ.</p>
+        <div class="bc-mock">
+          <div class="mini-itinerary">
+            <div class="mi-row"><span class="mi-day">T7</span><span class="mi-date">12/07</span><span class="mi-city">Phú Quốc</span><span class="mi-act">Bãi biển, chợ đêm</span></div>
+            <div class="mi-row"><span class="mi-day">CN</span><span class="mi-date">13/07</span><span class="mi-city">Phú Quốc</span><span class="mi-act">Grand World, Hồ Tiên</span></div>
+            <div class="mi-row"><span class="mi-day">T2</span><span class="mi-date">14/07</span><span class="mi-city">HCM</span><span class="mi-act">Về nhà</span></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="bento-card">
+        <div class="bc-tag"><i class="ph ph-camera"></i> Review thật</div>
+        <h3>Ảnh thật từ khách đã đi.</h3>
+        <p>Mỗi tour có hàng trăm ảnh và video thật từ khách. Không dùng ảnh stock. Biết trước mình sẽ thấy gì.</p>
+      </article>
+
+      <article class="bento-card">
+        <div class="bc-tag"><i class="ph ph-credit-card"></i> Trả góp</div>
+        <h3>Trả góp 0% qua thẻ Visa/Mastercard.</h3>
+        <p>Tour 8.9M chia 6 tháng, mỗi tháng chỉ 1.48M. Không phí lãi, không cần chứng minh thu nhập.</p>
+      </article>
+
+      <article class="bento-card">
+        <div class="bc-tag"><i class="ph ph-airplane"></i> Hãng bay</div>
+        <h3>So sánh 50+ hãng bay, chọn chuyến tốt nhất.</h3>
+        <p>Vietnam Airlines, VietJet, Bamboo, Thai Air, Cebu Pacific. So sánh giá, giờ bay, hành lý để chọn phù hợp.</p>
+      </article>
+
+      <article class="bento-card">
+        <div class="bc-tag"><i class="ph ph-chat-circle-dots"></i> Hỗ trợ 24/7</div>
+        <h3>Zalo, điện thoại, WhatsApp — luôn có người trả lời.</h3>
+        <p>Tour đêm, đi lạc, cần hỗ trợ khẩn — gọi Zalo 24/7. Hướng dẫn viên đồng hành từ sân bay đến khi về nhà.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ─── WORKFLOW (number ribbon, not 3 cards) ─── -->
+<section class="workflow" id="workflow">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Quy trình</div>
+      <h2 class="section-title">4 bước từ ý tưởng đến khi khởi hành.</h2>
+    </div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="fs-num">01</div>
+        <h4>Chọn điểm đến</h4>
+        <p>Lọc theo ngân sách, ngày đi, số ngày, loại tour. Xem itinerary chi tiết và review thật từ khách đã đi.</p>
+      </div>
+      <div class="flow-step">
+        <div class="fs-num">02</div>
+        <h4>Xem lịch trình</h4>
+        <p>Đọc itinerary từng ngày: giờ bay, khách sạn, bữa ăn, hoạt động. So sánh với 50+ hãng bay khác nhau.</p>
+      </div>
+      <div class="flow-step">
+        <div class="fs-num">03</div>
+        <h4>Đặt cọc</h4>
+        <p>Đặt cọc 30% qua VNPay, MoMo, hoặc thẻ. Trả góp 0% 6 tháng qua thẻ Visa. Xác nhận qua Zalo trong 5 phút.</p>
+      </div>
+      <div class="flow-step">
+        <div class="fs-num">04</div>
+        <h4>Khởi hành</h4>
+        <p>Hướng dẫn viên đón tại sân bay. Từ đây, mọi thứ đã được sắp xếp. Chỉ việc tận hưởng.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PRICING ─── -->
+<section class="pricing" id="pricing">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Bảng giá</div>
+      <h2 class="section-title">Giá đã bao gồm, không phí ẩn.</h2>
+      <p class="section-desc">Khách sạn 3-5 sao, vé máy bay khứ hồi, bữa ăn, vào cửa, hướng dẫn viên. So sánh với tự đi, tiết kiệm 20-40%.</p>
+    </div>
+    <div class="price-grid">
+      <article class="price-card">
+        <div class="pc-name">Tour trong nước</div>
+        <div class="pc-price"><span>từ </span>2.9M<span>₫/khách</span></div>
+        <p class="pc-desc">Đà Lạt · Phú Quốc · Nha Trang · Hội An · Sapa</p>
+        <ul class="pc-features">
+          <li><i class="ph ph-check"></i> 3N2Đ — 5N4Đ</li>
+          <li><i class="ph ph-check"></i> Khách sạn 3-4 sao</li>
+          <li><i class="ph ph-check"></i> Xe du lịch đời mới</li>
+          <li><i class="ph ph-check"></i> Ăn sáng + 2 bữa chính</li>
+          <li><i class="ph ph-check"></i> Vé vào cửa các điểm tham quan</li>
+          <li><i class="ph ph-check"></i> Hướng dẫn viên địa phương</li>
+        </ul>
+        <a href="#" class="btn btn-outline btn-full">Xem tour Đà Lạt</a>
+      </article>
+
+      <article class="price-card pc-featured">
+        <div class="pc-ribbon"><i class="ph-fill ph-crown-simple"></i> Phổ biến nhất</div>
+        <div class="pc-name">Tour Đông Nam Á</div>
+        <div class="pc-price"><span>từ </span>8.9M<span>₫/khách</span></div>
+        <p class="pc-desc">Bali · Bangkok · Singapore · Siem Reap · Manila</p>
+        <ul class="pc-features">
+          <li><i class="ph ph-check"></i> 4N3Đ — 6N5Đ</li>
+          <li><i class="ph ph-check"></i> Khách sạn 4-5 sao</li>
+          <li><i class="ph ph-check"></i> VietJet/VNA khứ hồi</li>
+          <li><i class="ph ph-check"></i> Bao gồm visa</li>
+          <li><i class="ph ph-check"></i> Ăn 3 bữa/ngày</li>
+          <li><i class="ph ph-check"></i> Hướng dẫn viên suốt tuyến</li>
+        </ul>
+        <a href="#" class="btn btn-primary btn-full">Đặt tour Bali</a>
+      </article>
+
+      <article class="price-card">
+        <div class="pc-name">Tour Châu Âu / Úc</div>
+        <div class="pc-price"><span>từ </span>38M<span>₫/khách</span></div>
+        <p class="pc-desc">Paris · London · Rome · Sydney · Tokyo</p>
+        <ul class="pc-features">
+          <li><i class="ph ph-check"></i> 9N8Đ — 14N13Đ</li>
+          <li><i class="ph ph-check"></i> Khách sạn 4-5 sao trung tâm</li>
+          <li><i class="ph ph-check"></i> Hãng bay quốc tế</li>
+          <li><i class="ph ph-check"></i> Full-service: visa + bảo hiểm</li>
+          <li><i class="ph ph-check"></i> Guide chuyên nghiệp suốt tuyến</li>
+          <li><i class="ph ph-check"></i> WiFi trên xe, nước suốt tuyến</li>
+        </ul>
+        <a href="#" class="btn btn-outline btn-full">Liên hệ tư vấn</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CUSTOMERS (testimonial + real photo) ─── -->
+<section class="customers" id="customers">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Review</div>
+      <h2 class="section-title">Khách đã đi, review thật có ảnh.</h2>
+    </div>
+
+    <div class="t-row">
+      <article class="t-card t-big">
+        <div class="t-quote">"Đi Bali với chồng 4 ngày 3 đêm. Itinerary rõ ràng từng giờ, khách sạn đúng như hình, hướng dẫn viên tên Linh cực dễ thương. Đã đặt tour Nhật tháng 9 rồi."</div>
+        <div class="t-author">
+          <img src="https://i.pravatar.cc/80?img=16" alt="" loading="lazy" />
+          <div>
+            <div class="t-name">Nguyễn Thị Hương Giang</div>
+            <div class="t-role">Cặp đôi · Tour Bali 4N3Đ</div>
+          </div>
+        </div>
+        <div class="t-stat">
+          <div class="ts-num">4.9</div>
+          <div class="ts-label">Điểm đánh giá trên Google</div>
+        </div>
+      </article>
+
+      <article class="t-card">
+        <div class="t-quote">"Gia đình 4 người đi Nha Trang 3N2Đ. Con nhỏ 5 tuổi được HDV chăm sóc rất kỹ. Ăn uống phong phú, khách sạn view biển. Đã giới thiệu cho 2 gia đình bạn."</div>
+        <div class="t-author">
+          <img src="https://i.pravatar.cc/80?img=31" alt="" loading="lazy" />
+          <div>
+            <div class="t-name">Trần Văn Minh</div>
+            <div class="t-role">Gia đình 4 người · Tour Nha Trang</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="t-card">
+        <div class="t-quote">"Nhóm 6 người bạn đi Thái Lan 5N4Đ. Viet Travel sắp xếp itinerary tự do xen kẽ group, không quá gò bó. Giá tốt hơn tự book 15%."</div>
+        <div class="t-author">
+          <img src="https://i.pravatar.cc/80?img=44" alt="" loading="lazy" />
+          <div>
+            <div class="t-name">Lê Hoàng Nam</div>
+            <div class="t-role">Nhóm bạn · Tour Bangkok 5N4Đ</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="t-card">
+        <div class="t-quote">"Đi Singapore solo lần đầu. HDV đón ở sân bay Changi, giúp check-in hotel nhanh. 4 ngày đi Sentosa, Marina Bay, Gardens by the Bay — đáng đồng tiền."</div>
+        <div class="t-author">
+          <img src="https://i.pravatar.cc/80?img=22" alt="" loading="lazy" />
+          <div>
+            <div class="t-name">Phạm Thị Mai Anh</div>
+            <div class="t-role">Solo traveler · Tour Singapore 4N3Đ</div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FINAL CTA ─── -->
+<section class="final">
+  <div class="container">
+    <div class="final-box">
+      <h2>Sẵn sàng khởi hành <span class="hl">chuyến tiếp theo</span>?</h2>
+      <p>8,400 tour đã đi. Itinerary rõ ràng, không phí ẩn, hỗ trợ 24/7. Đặt cọc ngay hôm nay.</p>
+      <div class="final-actions">
+        <a href="#pricing" class="btn btn-primary btn-lg">Đặt tour ngay <i class="ph ph-airplane-tilt"></i></a>
+        <a href="#" class="btn btn-outline btn-lg">Chat Zalo tư vấn</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo">
+          <svg class="logo-mark" viewBox="0 0 32 32" fill="none">
+            <rect x="4" y="4" width="24" height="24" rx="7" fill="currentColor"/>
+            <path d="M11 11 L21 16 L11 21 Z" fill="#fafbff"/>
+          </svg>
+          <span>viet<span class="logo-dot">.</span>travel</span>
+        </div>
+        <p>Tour Đông Nam Á, đặt nhanh 2 phút. Hơn 8,400 tour đã khởi hành. Headquarter tại TP.HCM, văn phòng Hà Nội và Đà Nẵng.</p>
+      </div>
+      <div>
+        <h5>Tour</h5>
+        <ul>
+          <li><a href="#">Trong nước</a></li>
+          <li><a href="#">Đông Nam Á</a></li>
+          <li><a href="#">Châu Á</a></li>
+          <li><a href="#">Châu Âu / Úc</a></li>
+          <li><a href="#">Tour theo yêu cầu</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Tài nguyên</h5>
+        <ul>
+          <li><a href="#">Blog du lịch</a></li>
+          <li><a href="#">Review điểm đến</a></li>
+          <li><a href="#">Hướng dẫn xin visa</a></li>
+          <li><a href="#">Mẹo tiết kiệm</a></li>
+          <li><a href="#">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Công ty</h5>
+        <ul>
+          <li><a href="#">Về Viet Travel</a></li>
+          <li><a href="#">Tuyển dụng (8)</a></li>
+          <li><a href="#">Hợp tác đại lý</a></li>
+          <li><a href="#">Liên hệ</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2026 Viet Travel Vietnam JSC. MST: 0108246835.</div>
+      <div class="footer-legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Security</a>
+        <a href="#">Status</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

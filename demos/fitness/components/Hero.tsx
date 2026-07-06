@@ -1,4 +1,4 @@
-import * as Phosphor from '@phosphor-icons/react';
+import { Apple, Download, Sparkles, CheckCircle2, Trophy, Heart, Check } from 'lucide-react';
 import { HERO_HEADLINE, HERO_SUBHEAD, TRUST_LOGOS, STATS } from '@/data/hero';
 
 export function Hero() {
@@ -13,7 +13,7 @@ export function Hero() {
           {/* Copy */}
           <div className="lg:col-span-6">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-electric-500/10 border border-electric-500/30 text-electric-400 text-[11px] font-bold uppercase tracking-wider rounded-full mb-5">
-              <Phosphor.Sparkle size={11} weight="fill" />
+              <Sparkles size={11} strokeWidth={2.5} />
               App #1 cho gymer Việt · 2026
             </span>
 
@@ -31,31 +31,31 @@ export function Hero() {
             </p>
 
             <div className="mt-7 flex flex-wrap items-center gap-3">
-              <a href="/download" className="inline-flex items-center gap-2 px-6 py-3.5 bg-electric-500 hover:bg-electric-400 text-ink-950 text-[14px] font-extrabold rounded-lg shadow-lg shadow-electric-500/30">
-                <Phosphor.AppleLogo size={16} weight="bold" />
+              <a href="/download" className="inline-flex items-center gap-2 px-6 py-3.5 bg-electric-500 hover:bg-electric-400 text-ink-950 text-[14px] font-extrabold rounded-lg shadow-lg shadow-electric-500/30 transition-colors">
+                <Apple size={16} strokeWidth={2.5} />
                 Tải cho iPhone
                 <span className="text-[11px] font-bold opacity-70">v6.2 · 89MB</span>
               </a>
-              <a href="/download/android" className="inline-flex items-center gap-2 px-6 py-3.5 bg-ink-800 hover:bg-ink-700 text-ink-50 text-[14px] font-bold border border-ink-700 rounded-lg">
-                <Phosphor.Download size={14} weight="bold" />
+              <a href="/download/android" className="inline-flex items-center gap-2 px-6 py-3.5 bg-ink-800 hover:bg-ink-700 text-ink-50 text-[14px] font-bold border border-ink-700 rounded-lg transition-colors">
+                <Download size={14} strokeWidth={2.5} />
                 Android
               </a>
-              <a href="/demo" className="px-6 py-3.5 text-[14px] font-bold text-slate-300 hover:text-electric-400">
+              <a href="/demo" className="px-6 py-3.5 text-[14px] font-bold text-slate-300 hover:text-electric-400 transition-colors">
                 Xem demo →
               </a>
             </div>
 
             <ul className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12.5px] text-slate-400">
               <li className="inline-flex items-center gap-1.5">
-                <Phosphor.CheckCircle size={13} weight="fill" className="text-electric-400" />
+                <CheckCircle2 size={13} strokeWidth={2.5} className="text-electric-400" />
                 Free 14-day Pro
               </li>
               <li className="inline-flex items-center gap-1.5">
-                <Phosphor.CheckCircle size={13} weight="fill" className="text-electric-400" />
+                <CheckCircle2 size={13} strokeWidth={2.5} className="text-electric-400" />
                 Sync Apple Watch + Strava
               </li>
               <li className="inline-flex items-center gap-1.5">
-                <Phosphor.CheckCircle size={13} weight="fill" className="text-electric-400" />
+                <CheckCircle2 size={13} strokeWidth={2.5} className="text-electric-400" />
                 Privacy-first
               </li>
             </ul>
@@ -109,7 +109,7 @@ function WatchMock() {
             <div className="grid grid-cols-3 gap-2">
               <button className="h-12 bg-ink-800 rounded-lg text-ink-50 text-[18px] font-extrabold">−</button>
               <button className="h-12 bg-electric-500 rounded-lg text-ink-950 text-[12px] font-extrabold flex items-center justify-center">
-                <Phosphor.Check size={20} weight="bold" />
+                <Check size={20} strokeWidth={3} />
               </button>
               <button className="h-12 bg-ink-800 rounded-lg text-ink-50 text-[18px] font-extrabold">+</button>
             </div>
@@ -122,7 +122,7 @@ function WatchMock() {
 
         {/* Floating badge */}
         <div className="absolute -left-8 top-1/4 bg-electric-500 text-ink-950 px-4 py-2.5 rounded-2xl shadow-xl shadow-electric-500/30 flex items-center gap-2 animate-pulse">
-          <Phosphor.Trophy size={16} weight="fill" />
+          <Trophy size={16} strokeWidth={2.5} />
           <span className="text-[12px] font-extrabold uppercase tracking-wider">PR mới!</span>
         </div>
 
@@ -130,7 +130,7 @@ function WatchMock() {
         <div className="absolute -right-6 bottom-1/4 bg-ink-800 border border-ink-700 px-3 py-2.5 rounded-xl shadow-xl">
           <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Heart rate</p>
           <p className="text-[18px] font-display text-rose-500 tabular-nums flex items-center gap-1">
-            <Phosphor.Heart size={14} weight="fill" />
+            <Heart size={14} strokeWidth={2.5} fill="currentColor" />
             142
           </p>
         </div>

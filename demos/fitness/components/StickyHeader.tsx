@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import * as Phosphor from '@phosphor-icons/react';
+import { Dumbbell, Menu, X, Download } from 'lucide-react';
 
 export function StickyHeader() {
   const [open, setOpen] = useState(false);
@@ -11,29 +11,29 @@ export function StickyHeader() {
         <div className="flex items-center justify-between h-16">
           <a href="#" className="flex items-center gap-2">
             <div className="w-9 h-9 bg-gradient-to-br from-electric-500 to-electric-700 rounded-lg flex items-center justify-center">
-              <Phosphor.Barbell size={20} weight="fill" className="text-ink-950" />
+              <Dumbbell size={20} className="text-ink-950" strokeWidth={2.5} />
             </div>
             <span className="text-[17px] font-display text-ink-50">IRONPATH</span>
           </a>
 
           <nav className="hidden lg:flex items-center gap-7 text-[13px] font-semibold text-slate-300">
-            <a href="#features" className="hover:text-electric-400">Tính năng</a>
-            <a href="#workout" className="hover:text-electric-400">Workout</a>
-            <a href="#programs" className="hover:text-electric-400">Chương trình</a>
-            <a href="#stats" className="hover:text-electric-400">PR & Volume</a>
-            <a href="#" className="hover:text-electric-400">Cộng đồng</a>
+            <a href="#features" className="hover:text-electric-400 transition-colors">Tính năng</a>
+            <a href="#workout" className="hover:text-electric-400 transition-colors">Workout</a>
+            <a href="#programs" className="hover:text-electric-400 transition-colors">Chương trình</a>
+            <a href="#stats" className="hover:text-electric-400 transition-colors">PR & Volume</a>
+            <a href="#" className="hover:text-electric-400 transition-colors">Cộng đồng</a>
           </nav>
 
           <div className="hidden lg:flex items-center gap-2">
-            <a href="/login" className="px-3 py-2 text-[13px] font-semibold text-slate-300 hover:text-electric-400">Đăng nhập</a>
-            <a href="/signup" className="inline-flex items-center gap-1.5 px-4 py-2 bg-electric-500 hover:bg-electric-400 text-ink-950 text-[13px] font-extrabold rounded-lg">
-              <Phosphor.Download size={13} weight="bold" />
+            <a href="/login" className="px-3 py-2 text-[13px] font-semibold text-slate-300 hover:text-electric-400 transition-colors">Đăng nhập</a>
+            <a href="/signup" className="inline-flex items-center gap-1.5 px-4 py-2 bg-electric-500 hover:bg-electric-400 text-ink-950 text-[13px] font-extrabold rounded-lg transition-colors">
+              <Download size={13} strokeWidth={3} />
               Tải app
             </a>
           </div>
 
           <button onClick={() => setOpen(!open)} className="lg:hidden w-10 h-10 inline-flex items-center justify-center text-slate-300" aria-label="Menu">
-            <Phosphor.List size={20} weight="bold" />
+            {open ? <X size={20} strokeWidth={2.5} /> : <Menu size={20} strokeWidth={2.5} />}
           </button>
         </div>
       </div>

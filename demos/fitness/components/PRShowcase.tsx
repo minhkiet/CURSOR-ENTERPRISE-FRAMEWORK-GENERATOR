@@ -1,15 +1,14 @@
-import * as Phosphor from '@phosphor-icons/react';
+import { Trophy, TrendingUp, CalendarCheck, Flame, ArrowUp, Play } from 'lucide-react';
 import { SAMPLE_PRS } from '@/data/pr';
 
 export function PRShowcase() {
   return (
     <section id="stats" className="bg-ink-950 py-16 lg:py-24 text-ink-50" aria-labelledby="pr-heading">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="flex items-end justify-between mb-10 flex-wrap gap-3">
           <div>
             <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-electric-400 mb-2">
-              <Phosphor.Trophy size={12} weight="fill" />
+              <Trophy size={12} strokeWidth={2.5} fill="currentColor" />
               Personal records
             </span>
             <h2 id="pr-heading" className="text-3xl lg:text-5xl font-display tracking-tight">
@@ -19,24 +18,30 @@ export function PRShowcase() {
           </div>
           <a href="#" className="inline-flex items-center gap-1.5 px-4 py-2 border border-ink-700 hover:border-electric-500 text-slate-300 hover:text-electric-400 text-[13px] font-bold rounded-lg transition-colors">
             Xem tất cả 247 PRs
-            <Phosphor.ArrowRight size={14} weight="bold" />
+            <ArrowRightInline />
           </a>
         </div>
 
-        {/* PR Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
           {SAMPLE_PRS.map(pr => <PRCard key={pr.id} pr={pr} />)}
         </div>
 
-        {/* Stats summary */}
         <div className="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-5">
-          <PillMetric icon="Trophy" label="PRs 2026" value="247" suffix="records" />
-          <PillMetric icon="TrendUp" label="Tổng cải thiện" value="50" suffix="kg" />
-          <PillMetric icon="CalendarCheck" label="Tuần luyện" value="28" suffix="tuần" />
-          <PillMetric icon="Flame" label="Streak" value="47" suffix="ngày liên tiếp" />
+          <PillMetric icon="trophy" label="PRs 2026" value="247" suffix="records" />
+          <PillMetric icon="trend" label="Tổng cải thiện" value="50" suffix="kg" />
+          <PillMetric icon="calendar" label="Tuần luyện" value="28" suffix="tuần" />
+          <PillMetric icon="flame" label="Streak" value="47" suffix="ngày liên tiếp" />
         </div>
       </div>
     </section>
+  );
+}
+
+function ArrowRightInline() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M5 12h14M12 5l7 7-7 7" />
+    </svg>
   );
 }
 
@@ -48,12 +53,12 @@ function PRCard({ pr }: { pr: typeof SAMPLE_PRS[number] }) {
         <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/40 to-transparent" />
 
         <div className="absolute top-3 left-3 inline-flex items-center gap-1 px-2 py-1 bg-electric-500 text-ink-950 text-[10px] font-extrabold uppercase tracking-wider rounded-full shadow-lg shadow-electric-500/40" aria-label="Cá nhân tốt nhất">
-          <Phosphor.Trophy size={10} weight="fill" />
+          <Trophy size={10} strokeWidth={2.5} fill="currentColor" />
           PR
         </div>
 
         <div className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-1 bg-emerald-500/90 text-white text-[10px] font-extrabold rounded-full" aria-label={`Cải thiện ${pr.improvement} ${pr.improvementUnit} so với PR trước`}>
-          <Phosphor.ArrowUp size={10} weight="bold" />
+          <ArrowUp size={10} strokeWidth={3} />
           {pr.improvement} {pr.improvementUnit}
         </div>
 
@@ -82,7 +87,7 @@ function PRCard({ pr }: { pr: typeof SAMPLE_PRS[number] }) {
         )}
 
         <button className="mt-3 w-full py-2 bg-ink-800 hover:bg-ink-700 text-slate-300 text-[12px] font-bold rounded-lg flex items-center justify-center gap-1.5 transition-colors">
-          <Phosphor.Play size={11} weight="fill" />
+          <Play size={11} strokeWidth={2.5} fill="currentColor" />
           Xem video
         </button>
       </div>
@@ -90,12 +95,19 @@ function PRCard({ pr }: { pr: typeof SAMPLE_PRS[number] }) {
   );
 }
 
+const ICON_MAP: Record<string, any> = {
+  trophy: Trophy,
+  trend: TrendingUp,
+  calendar: CalendarCheck,
+  flame: Flame
+};
+
 function PillMetric({ icon, label, value, suffix }: { icon: string; label: string; value: string; suffix: string }) {
-  const Icon = Phosphor[icon] as any;
+  const Icon = ICON_MAP[icon] ?? Trophy;
   return (
     <div className="flex items-center gap-2.5 p-3.5 bg-ink-900 border border-ink-800 rounded-xl">
       <div className="w-10 h-10 rounded-lg bg-electric-500/10 flex items-center justify-center flex-shrink-0">
-        <Icon size={18} weight="fill" className="text-electric-400" />
+        <Icon size={18} strokeWidth={2.5} fill="currentColor" className="text-electric-400" />
       </div>
       <div>
         <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{label}</p>

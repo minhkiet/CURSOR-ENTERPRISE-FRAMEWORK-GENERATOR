@@ -1,5 +1,14 @@
-import * as Phosphor from '@phosphor-icons/react';
+import { BarChart3, Dumbbell, Trophy, Timer, MoveUpRight, LineChart, Apple } from 'lucide-react';
 import { FEATURES } from '@/data/features';
+
+const ICON_MAP: Record<string, any> = {
+  Barbell: Dumbbell,
+  Trophy,
+  Timer,
+  ChartBar: BarChart3,
+  AppleLogo: Apple,
+  StravaLogo: LineChart
+};
 
 const SIZE_MAP = {
   large: 'lg:col-span-2 lg:row-span-2',
@@ -25,7 +34,7 @@ export function FeatureBento() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5 lg:auto-rows-[180px]">
           {FEATURES.map(f => {
-            const Icon = Phosphor[f.icon] as any;
+            const Icon = ICON_MAP[f.icon] ?? Dumbbell;
             return (
               <article
                 key={f.id}
@@ -36,7 +45,7 @@ export function FeatureBento() {
                     ? 'bg-electric-500 text-ink-950 shadow-lg shadow-electric-500/30'
                     : 'bg-electric-500/10 text-electric-400 group-hover:bg-electric-500 group-hover:text-ink-950 transition-colors'
                 }`}>
-                  <Icon size={f.variant === 'large' ? 24 : 20} weight="bold" />
+                  <Icon size={f.variant === 'large' ? 24 : 20} strokeWidth={2.25} />
                 </div>
 
                 <h3 className={`font-display text-ink-50 ${f.variant === 'large' ? 'text-[24px]' : 'text-[16px]'} leading-tight`}>
@@ -49,7 +58,7 @@ export function FeatureBento() {
 
                 <div className="mt-auto pt-3 flex items-center gap-2">
                   <span className="inline-flex items-center gap-1 text-[11.5px] font-extrabold text-electric-400 tabular-nums">
-                    <Phosphor.ArrowUpRight size={12} weight="bold" />
+                    <MoveUpRight size={12} strokeWidth={3} />
                     {f.metric}
                   </span>
                 </div>
