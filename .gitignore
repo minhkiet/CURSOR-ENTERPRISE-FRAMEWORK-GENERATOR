@@ -1,4 +1,20 @@
-# Cursor build artifacts
+# ============================================================
+# Cursor Enterprise Framework - .gitignore
+# Generated for workspace: D:\PROJECTS\CURSORS\CURSOR ENTERPRISE FRAMEWORK GENERATOR
+# ============================================================
+
+# --- Git internals ---
+.git/
+.git/cursor/
+.git/filter-repo/
+
+# --- Cursor IDE artifacts ---
+.cursor/
+!.cursor/AGENTS.md
+!.cursor/cursor.json
+!.cursor/INDEX.md
+!.cursor/PROJECT.md
+!.cursor/UTF8
 .cursor/scripts/build/
 .cursor/scripts/dist/
 .cursor/scripts/**/*.pyc
@@ -7,9 +23,103 @@
 .cursor/scripts/*.pkg
 .cursor/scripts/*.exe
 .cursor/scripts/*.toc
-/cursor-setup-gui/bin
-/cursor-setup-gui/obj
-/cursor-setup.exe
-/cursor-setup-py.exe
-/cursor-setup-gui-publish
-/cursor-setup-gui.exe
+.cursor/agents/
+.cursor/cache/
+.cursor/commands/
+.cursor/hooks/
+.cursor/knowledge/
+.cursor/memory/
+.cursor/prompts/
+.cursor/references/
+.cursor/rules/
+.cursor/skills/
+.cursor/templates/
+.cursor/workflows/
+.cursor/scripts/embedding-builder/
+.cursor/scripts/knowledge-compiler/
+.cursor/scripts/memory-builder/
+.cursor/scripts/project-index-builder/
+.cursor/scripts/weknora/
+
+# --- Python build / package artifacts ---
+cursor_framework/__pycache__/
+cursor_framework/*.egg-info/
+cursor_framework/review/
+cursor_framework/tests/
+cursor_framework/utils/__pycache__/
+cursor_framework_web/dist/
+cursor_framework_web/node_modules/
+cursor_framework_web/scripts/
+cursor_framework_web/public/templates/
+cursor_framework_web/*.tsbuildinfo
+
+# --- .NET build artifacts ---
+cursor-setup-gui/bin/
+cursor-setup-gui/obj/
+cursor-setup-gui-publish/
+
+# --- Node.js / Next.js demo build artifacts ---
+demos/*/node_modules/
+demos/*/.next/
+demos/*/.turbo/
+demos/*/out/
+demos/*/dist/
+
+# --- Installer / release artifacts ---
+cursor-setup.exe
+cursor-setup-py.exe
+cursor-setup-gui.exe
+cursor-setup-gui-publish/
+cursor-setup.spec
+cursor-setup.zip
+cursor-setup-gui-publish/
+
+# --- Build scripts (generated / CI output) ---
+build_setup.bat
+build_setup.ps1
+publish-release.ps1
+
+# --- Screenshots (dev artifacts) ---
+screenshots/page-*.png
+screenshots/learn-*.png
+screenshots/modal-*.png
+screenshots/nav-*.png
+screenshots/prompts*.png
+
+# --- Dist / release output ---
+dist/
+cursor-setup-gui-publish/
+
+# --- Test artifacts ---
+test-cases/*.pdf
+test-cases/batcuclinhso.pdf
+
+# --- Cursor IDE settings (local-only) ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- OS artifacts ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+~$*
+
+# --- Editor artifacts ---
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+*.sublime-*
+
+# --- Log files ---
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
