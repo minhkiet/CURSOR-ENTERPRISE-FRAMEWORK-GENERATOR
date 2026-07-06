@@ -8,38 +8,6 @@
 .git/cursor/
 .git/filter-repo/
 
-# --- Cursor IDE artifacts ---
-.cursor/
-!.cursor/AGENTS.md
-!.cursor/cursor.json
-!.cursor/INDEX.md
-!.cursor/PROJECT.md
-!.cursor/UTF8
-.cursor/scripts/build/
-.cursor/scripts/dist/
-.cursor/scripts/**/*.pyc
-.cursor/scripts/**/*.pyz
-.cursor/scripts/*.zip
-.cursor/scripts/*.pkg
-.cursor/scripts/*.exe
-.cursor/scripts/*.toc
-.cursor/agents/
-.cursor/cache/
-.cursor/commands/
-.cursor/hooks/
-.cursor/knowledge/
-.cursor/memory/
-.cursor/prompts/
-.cursor/references/
-.cursor/rules/
-.cursor/skills/
-.cursor/templates/
-.cursor/workflows/
-.cursor/scripts/embedding-builder/
-.cursor/scripts/knowledge-compiler/
-.cursor/scripts/memory-builder/
-.cursor/scripts/project-index-builder/
-.cursor/scripts/weknora/
 
 # --- Python build / package artifacts ---
 cursor_framework/__pycache__/
@@ -123,4 +91,3 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
-/demos/fitness/node_modules

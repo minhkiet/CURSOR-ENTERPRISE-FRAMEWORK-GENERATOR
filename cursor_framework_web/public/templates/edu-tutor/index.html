@@ -1,526 +1,357 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>GiaSuViet — Gia sư 1-1, lộ trình cá nhân hoá</title>
-<meta name="description" content="Nền tảng gia sư hàng đầu Việt Nam. 4.800+ gia sư, AI matching theo trình độ, lớp thử 30 phút miễn phí. Giúp học sinh cải thiện điểm số và đậu Đại học mong muốn." />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
-<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
-<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" />
-<link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gia Sư Việt — Gia sư 1-1, lộ trình cá nhân hoá</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --accent: #3b82f6;
+      --accent2: #06b6d4;
+      --bg: #0a1628;
+      --card: #1e3a6e;
+      --text: #eff6ff;
+      --text2: #bfdbfe;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── Nav ── */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 0 24px;
+    }
+    .nav-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 56px;
+    }
+    .nav-logo {
+      font-size: 17px; font-weight: 700; letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
+    .nav-links a {
+      color: var(--text2); font-size: 13.5px; font-weight: 500;
+      text-decoration: none; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--accent); color: #fff; font-size: 13px; font-weight: 600;
+      padding: 8px 18px; border-radius: 8px; text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    /* ── Hero ── */
+    .hero {
+      min-height: 520px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg);
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: var(--bgGradient, linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 100%));
+      opacity: 0.6;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 40%, #3b82f622 0%, transparent 70%);
+    }
+    .hero-inner {
+      position: relative; z-index: 1;
+      text-align: center; padding: 60px 24px;
+      max-width: 700px;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: #3b82f622; border: 1px solid #3b82f655;
+      color: var(--accent); font-size: 11.5px; font-weight: 600;
+      padding: 5px 14px; border-radius: 999px;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .hero-headline {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 800; line-height: 1.05; letter-spacing: -0.03em;
+      margin-bottom: 18px; color: var(--text);
+    }
+    .hero-sub {
+      font-size: 17px; color: var(--text2); max-width: 480px;
+      margin: 0 auto 32px; line-height: 1.65;
+    }
+    .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--accent); color: #fff;
+      padding: 12px 28px; border-radius: 10px;
+      font-size: 15px; font-weight: 600; text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px #3b82f644;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px #3b82f655; }
+    .btn-secondary {
+      background: rgba(255,255,255,0.08); color: var(--text);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 12px 28px; border-radius: 10px;
+      font-size: 15px; font-weight: 500; text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.13); }
+
+    /* ── Stats ── */
+    .stats-bar {
+      background: var(--card);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding: 24px;
+    }
+    .stats-inner {
+      max-width: 700px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 16px; text-align: center;
+    }
+    .stat-value {
+      font-size: 28px; font-weight: 800; letter-spacing: -0.03em;
+      color: var(--accent); font-variant-numeric: tabular-nums;
+    }
+    .stat-label { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+    /* ── Features ── */
+    .section { max-width: 900px; margin: 0 auto; padding: 64px 24px; }
+    .section-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(26px, 4vw, 38px); font-weight: 800;
+      letter-spacing: -0.03em; margin-bottom: 8px; line-height: 1.15;
+    }
+    .section-sub { color: var(--text2); font-size: 16px; margin-bottom: 40px; }
+
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .feature-card {
+      background: var(--card); border-radius: 12px; padding: 20px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .feature-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: #3b82f622; display: flex; align-items: center; justify-content: center;
+      margin-bottom: 12px; font-size: 16px;
+    }
+    .feature-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .feature-desc { font-size: 12.5px; color: var(--text2); line-height: 1.55; }
+
+    /* ── Testimonial ── */
+    .testimonial {
+      background: var(--card); border-radius: 16px; padding: 32px;
+      border-left: 3px solid var(--accent);
+      margin-bottom: 0;
+    }
+    .testimonial-text {
+      font-size: 17px; line-height: 1.7; margin-bottom: 16px;
+      font-style: italic; color: var(--text);
+    }
+    .testimonial-author { font-size: 13px; font-weight: 600; }
+    .testimonial-role { color: var(--text2); font-size: 12px; margin-top: 2px; }
+
+    /* ── FAQ ── */
+    .faq-item {
+      border-bottom: 1px solid rgba(255,255,255,0.05); padding: 18px 0;
+    }
+    .faq-q { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .faq-a { font-size: 13px; color: var(--text2); line-height: 1.65; }
+
+    /* ── CTA Banner ── */
+    .cta-banner {
+      background: var(--card);
+      border-radius: 16px; padding: 48px 32px;
+      text-align: center;
+      background-image: radial-gradient(ellipse 60% 50% at 50% 100%, #3b82f622 0%, transparent 70%);
+    }
+    .cta-banner h2 {
+      font-size: clamp(22px, 4vw, 34px); font-weight: 800;
+      letter-spacing: -0.03em; margin-bottom: 12px;
+    }
+    .cta-banner p { color: var(--text2); font-size: 15px; margin-bottom: 24px; }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center; padding: 32px 24px;
+      color: var(--text2); font-size: 12px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .hero-headline { font-size: 36px; }
+      .stats-inner { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .stat-value { font-size: 20px; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- ─── NAV ─── -->
+<!-- NAV -->
 <nav class="nav">
-  <div class="container nav-inner">
-    <a href="#" class="logo">
-      <svg class="logo-mark" viewBox="0 0 32 32" fill="none">
-        <rect x="4" y="4" width="24" height="24" rx="7" fill="currentColor"/>
-        <path d="M11 11 L16 8 L21 11 L21 20 L16 23 L11 20 Z" stroke="#fafbff" stroke-width="1.8" fill="none" stroke-linejoin="round"/>
-        <path d="M16 8 V23 M11 11 L21 11" stroke="#fafbff" stroke-width="1.8" stroke-linecap="round"/>
-      </svg>
-      <span>gsviet<span class="logo-dot">.</span></span>
-    </a>
-    <ul class="nav-menu">
-      <li><a href="#features">Tính năng</a></li>
-      <li><a href="#workflow">Cách hoạt động</a></li>
-      <li><a href="#pricing">Bảng giá</a></li>
-      <li><a href="#customers">Đánh giá</a></li>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">Gia  Sư  Việt<span>.</span></a>
+    <ul class="nav-links">
+      <li><a href="#">Tìm gia sư</a></li>
+      <li><a href="#">Cách hoạt động</a></li>
+      <li><a href="#">Giá</a></li>
+      <li><a href="#">Đăng ký</a></li>
     </ul>
-    <div class="nav-actions">
-      <a href="#" class="nav-ghost">Đăng nhập</a>
-      <a href="#pricing" class="nav-cta">
-        Lớp thử miễn phí
-        <i class="ph ph-arrow-up-right"></i>
-      </a>
-    </div>
+    <a href="#" class="nav-cta">Dùng thử</a>
   </div>
 </nav>
 
-<!-- ─── HERO ─── -->
-<header class="hero">
-  <div class="container hero-grid">
-    <div class="hero-text">
-      <div class="eyebrow">
-        <span class="eyebrow-dot"></span>
-        4.800+ gia sư đang dạy · 38K học sinh theo học
-      </div>
-
-      <h1 class="hero-title">
-        Gia sư 1-1,<br/>
-        lộ trình <span class="hl">cá nhân hoá</span>.
-      </h1>
-
-      <p class="hero-desc">
-        GiaSuViet ghép gia sư phù hợp bằng AI theo trình độ, mục tiêu và lịch học.
-        Lớp thử 30 phút miễn phí — không cam kết. Phụ huynh theo dõi kết quả real-time qua app.
-      </p>
-
-      <div class="hero-cta">
-        <a href="#pricing" class="btn btn-primary btn-lg">
-          Đăng ký lớp thử miễn phí
-          <i class="ph ph-arrow-right"></i>
-        </a>
-        <a href="#workflow" class="btn btn-ghost btn-lg">
-          <i class="ph-fill ph-graduation-cap"></i>
-          Xem cách hoạt động
-        </a>
-      </div>
-
-      <div class="hero-stats">
-        <div class="h-stat">
-          <div class="hs-num">4.800<span class="hs-suf">+</span></div>
-          <div class="hs-label">Gia sư chất lượng</div>
-        </div>
-        <div class="h-divider"></div>
-        <div class="h-stat">
-          <div class="hs-num">38<span class="hs-suf">K</span></div>
-          <div class="hs-label">Học sinh đồng hành</div>
-        </div>
-        <div class="h-divider"></div>
-        <div class="h-stat">
-          <div class="hs-num">92<span class="hs-suf">%</span></div>
-          <div class="hs-label">Đậu Đại học mục tiêu</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Dashboard mockup: Student Progress -->
-    <div class="hero-visual">
-      <div class="dash">
-        <div class="dash-top">
-          <div class="dash-tabs">
-            <span class="dash-tab active"><i class="ph ph-chart-pie-slice"></i> Tiến độ</span>
-            <span class="dash-tab"><i class="ph ph-books"></i> Bài tập</span>
-            <span class="dash-tab"><i class="ph ph-chat-circle-dots"></i> Phụ huynh</span>
-          </div>
-          <div class="dash-dots"><i></i><i></i><i></i></div>
-        </div>
-
-        <div class="dash-stats">
-          <div class="dash-stat">
-            <div class="ds-label">Điểm trung bình</div>
-            <div class="ds-value">8.4</div>
-            <div class="ds-delta up"><i class="ph ph-trend-up"></i> +1.2</div>
-          </div>
-          <div class="dash-stat">
-            <div class="ds-label">Buổi đã học</div>
-            <div class="ds-value">14</div>
-            <div class="ds-delta up"><i class="ph ph-check-circle"></i> Tháng này</div>
-          </div>
-          <div class="dash-stat">
-            <div class="ds-label">Xếp hạng lớp</div>
-            <div class="ds-value">3/42</div>
-            <div class="ds-delta up"><i class="ph ph-trend-up"></i> +5 bậc</div>
-          </div>
-        </div>
-
-        <!-- Progress ring area -->
-        <div class="dash-progress">
-          <div class="dp-ring">
-            <svg viewBox="0 0 80 80">
-              <circle cx="40" cy="40" r="32" fill="none" stroke="#e4e4e7" stroke-width="8"/>
-              <circle cx="40" cy="40" r="32" fill="none" stroke="#3b82f6" stroke-width="8"
-                stroke-dasharray="201.06" stroke-dashoffset="26.14"
-                stroke-linecap="round" transform="rotate(-90 40 40)"/>
-            </svg>
-            <div class="dp-ring-inner">
-              <div class="dp-pct">87%</div>
-              <div class="dp-sub">Toán</div>
-            </div>
-          </div>
-          <div class="dp-subjects">
-            <div class="sbj-card">
-              <div class="sbj-info">
-                <i class="ph-fill ph-calculator sbj-icon" style="color:#3b82f6"></i>
-                <span class="sbj-name">Toán</span>
-                <span class="sbj-badge green">8.7</span>
-              </div>
-              <div class="sbj-bar"><div class="sbj-fill" style="width:87%;background:#3b82f6"></div></div>
-            </div>
-            <div class="sbj-card">
-              <div class="sbj-info">
-                <i class="ph-fill ph-atom sbj-icon" style="color:#06b6d4"></i>
-                <span class="sbj-name">Lý</span>
-                <span class="sbj-badge cyan">8.2</span>
-              </div>
-              <div class="sbj-bar"><div class="sbj-fill" style="width:82%;background:#06b6d4"></div></div>
-            </div>
-            <div class="sbj-card">
-              <div class="sbj-info">
-                <i class="ph-fill ph-book-open-text sbj-icon" style="color:#8b5cf6"></i>
-                <span class="sbj-name">Anh</span>
-                <span class="sbj-badge purple">7.9</span>
-              </div>
-              <div class="sbj-bar"><div class="sbj-fill" style="width:79%;background:#8b5cf6"></div></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Parent chat mockup -->
-        <div class="dash-chat">
-          <div class="dc-hdr">
-            <i class="ph ph-chats"></i>
-            Nhắn tin phụ huynh
-          </div>
-          <div class="dc-msg dc-msg-gs">
-            <div class="dcm-avatar">GS</div>
-            <div>
-              <div class="dcm-text">Em vừa chấm bài kiểm tra tháng của bé. Điểm Toán tăng từ 7.5 lên 8.7.</div>
-              <div class="dcm-time">10:32 · Gia sư Minh</div>
-            </div>
-          </div>
-          <div class="dc-msg dc-msg-ph">
-            <div class="dcm-avatar" style="background:#10b981">PH</div>
-            <div>
-              <div class="dcm-text">Dạ con cảm ơn ad. Tháng tới cần tập trung thêm phần Hình học không ạ?</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="float float-a">
-        <div class="fa-icon"><i class="ph-fill ph-robot"></i></div>
-        <div>
-          <div class="fa-title">AI matching hoàn tất</div>
-          <div class="fa-meta">Gia sư phù hợp nhất: 92% match</div>
-        </div>
-      </div>
-
-      <div class="float float-b">
-        <div class="fa-icon" style="background:#dcfce7;color:#10b981"><i class="ph-fill ph-check-circle"></i></div>
-        <div>
-          <div class="fa-title">Báo cáo tuần gửi phụ huynh</div>
-          <div class="fa-meta">Gửi tự động · 18:00 hàng tuần</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</header>
-
-<!-- ─── LOGO WALL ─── -->
-<section class="logos">
-  <div class="container">
-    <p class="logos-label">Được tin tưởng bởi phụ huynh tại Hà Nội, TP.HCM, Đà Nẵng và 40+ tỉnh thành</p>
-    <div class="logos-grid">
-      <div class="logo-cell">
-        <svg viewBox="0 0 120 32" fill="currentColor"><path d="M8 8h6v16H8zm10 0h6l4 10 4-10h6v16h-4V14l-4 10h-4l-4-10v10h-4z"/></svg>
-        <span>Vinschool</span>
-      </div>
-      <div class="logo-cell">
-        <svg viewBox="0 0 120 32" fill="currentColor"><circle cx="14" cy="16" r="8" stroke="currentColor" fill="none" stroke-width="3"/><text x="32" y="22" font-family="Geist" font-size="14" font-weight="700">NewtonEdu</text></svg>
-      </div>
-      <div class="logo-cell">
-        <svg viewBox="0 0 120 32" fill="currentColor"><rect x="6" y="8" width="14" height="16" rx="2"/><rect x="22" y="8" width="14" height="16" rx="2" fill-opacity=".55"/></svg>
-        <span>AMEd</span>
-      </div>
-      <div class="logo-cell">
-        <svg viewBox="0 0 120 32" fill="currentColor"><path d="M8 24 L16 8 L24 24 Z M14 18 H18" stroke="currentColor" fill="none" stroke-width="2.5"/></svg>
-        <span>PisSchool</span>
-      </div>
-      <div class="logo-cell">
-        <svg viewBox="0 0 130 32" fill="currentColor"><path d="M8 16 Q14 6 20 16 Q26 26 32 16" stroke="currentColor" stroke-width="2.5" fill="none"/><text x="40" y="22" font-family="Geist" font-size="14" font-weight="700">TutorHub</text></svg>
-      </div>
-      <div class="logo-cell">
-        <svg viewBox="0 0 120 32" fill="currentColor"><rect x="6" y="6" width="20" height="20" rx="4"/><rect x="9" y="9" width="14" height="14" rx="2" fill="#fafbff"/></svg>
-        <span>EduKids</span>
-      </div>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <span class="hero-badge">Hơn 4,800 gia sư đã kiểm chứng</span>
+    <h1 class="hero-headline">Con giỏi hơn<br>mỗi ngày</h1>
+    <p class="hero-sub">Gia sư 1-1 phù hợp từng trình độ. Lớp thử miễn phí 30 phút. Báo cáo phụ huynh hàng tuần.</p>
+    <div class="hero-actions">
+      <a href="#" class="btn-primary">Get Started Free</a>
+      <a href="#" class="btn-secondary">View Demo</a>
     </div>
   </div>
 </section>
 
-<!-- ─── FEATURES (Bento grid) ─── -->
-<section class="features" id="features">
-  <div class="container">
-    <div class="section-head">
-      <div class="eyebrow">Tính năng</div>
-      <h2 class="section-title">Mọi thứ phụ huynh cần, không phức tạp.</h2>
-      <p class="section-desc">Từ ghép gia sư đến theo dõi kết quả — GiaSuViet lo từ đầu đến cuối.</p>
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    
+    <div>
+      <div class="stat-value">4,800+</div>
+      <div class="stat-label">Gia Sư</div>
     </div>
+    <div>
+      <div class="stat-value">38,000</div>
+      <div class="stat-label">Học Sinh</div>
+    </div>
+    <div>
+      <div class="stat-value">92%</div>
+      <div class="stat-label">Đậu ĐH</div>
+    </div>
+  </div>
+</div>
 
-    <div class="bento">
-      <article class="bento-card bento-big">
-        <div class="bc-tag"><i class="ph ph-robot"></i> AI Matching</div>
-        <h3>Ghép gia sư đúng người, đúng việc.</h3>
-        <p>AI phân tích 23 tín hiệu: trình độ học sinh, mục tiêu điểm số, lịch rảnh, phong cách dạy, khu vực. Matching score hiển thị ngay để phụ huynh yên tâm.</p>
-        <div class="bc-mock">
-          <div class="match-list">
-            <div class="ml-row">
-              <div class="ml-avatar" style="background:linear-gradient(135deg,#3b82f6,#06b6d4)">HT</div>
-              <div class="ml-info">
-                <div class="ml-name">Th.S Hoàng Thị Mai</div>
-                <div class="ml-sub">Toán · THPT · 7 năm kinh nghiệm</div>
-              </div>
-              <div class="ml-score">94%</div>
-            </div>
-            <div class="ml-row">
-              <div class="ml-avatar" style="background:linear-gradient(135deg,#8b5cf6,#ec4899)">NV</div>
-              <div class="ml-info">
-                <div class="ml-name">Th.S Nguyễn Văn Hùng</div>
-                <div class="ml-sub">Lý · THPT · 5 năm kinh nghiệm</div>
-              </div>
-              <div class="ml-score">89%</div>
-            </div>
-            <div class="ml-row">
-              <div class="ml-avatar" style="background:linear-gradient(135deg,#10b981,#06b6d4)">TV</div>
-              <div class="ml-info">
-                <div class="ml-name">Cô Trần Thị Vân</div>
-                <div class="ml-sub">Anh · THPT · IELTS 8.5</div>
-              </div>
-              <div class="ml-score">91%</div>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <article class="bento-card">
-        <div class="bc-tag"><i class="ph ph-chalkboard-teacher"></i> Lớp thử</div>
-        <h3>30 phút miễn phí, không cam kết.</h3>
-        <p>Học sinh dự lớp thử với gia sư được ghép. Phụ huynh ngồi cạnh hoặc xem qua camera. Nếu không phù hợp, ghép lại ngay.</p>
-      </article>
-
-      <article class="bento-card">
-        <div class="bc-tag"><i class="ph ph-file-text"></i> Báo cáo</div>
-        <h3>Báo cáo tuần cho phụ huynh, tự động.</h3>
-        <p>Cuối mỗi tuần, app gửi báo cáo: nội dung đã dạy, bài tập được giao, tiến độ so với mục tiêu.</p>
-      </article>
-
-      <article class="bento-card">
-        <div class="bc-tag"><i class="ph ph-pencil-circle"></i> Bài tập</div>
-        <h3>Bài tập tương tác, chấm tự động.</h3>
-        <p>Ngân hàng 50.000+ câu hỏi theo chương trình BGD. HS làm bài, AI chấm và phân tích lỗi sai chi tiết.</p>
-      </article>
-
-      <article class="bento-card">
-        <div class="bc-tag"><i class="ph ph-wallet"></i> Thanh toán</div>
-        <h3>Thanh toán theo buổi hoặc gói tháng.</h3>
-        <p>Không hợp đồng dài hạn. Nạp tiền qua VNPay, MoMo, chuyển khoản. Hoàn tiền nếu gia sư không đạt yêu cầu.</p>
-      </article>
+<!-- FEATURES -->
+<section class="section">
+  <div class="section-label">Features</div>
+  <h2 class="section-title">Everything you need.</h2>
+  <p class="section-sub">Built for real workflows. No bloat.</p>
+  <div class="features-grid">
+    
+    <div class="feature-card">
+      <div class="feature-icon">✦</div>
+      <div class="feature-title">Matching AI</div>
+      <div class="feature-desc">Matching AI theo trình độ & mục tiêu</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✦</div>
+      <div class="feature-title">Lớp thử 30 phút miễn phí</div>
+      <div class="feature-desc">Lớp thử 30 phút miễn phí</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✦</div>
+      <div class="feature-title">Bảng điểm & báo cáo phụ huynh</div>
+      <div class="feature-desc">Bảng điểm & báo cáo phụ huynh</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✦</div>
+      <div class="feature-title">Luyện tập tương tác, chấm tự động</div>
+      <div class="feature-desc">Luyện tập tương tác, chấm tự động</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✦</div>
+      <div class="feature-title">Thanh toán</div>
+      <div class="feature-desc">Thanh toán theo buổi hoặc gói tháng</div>
     </div>
   </div>
 </section>
 
-<!-- ─── WORKFLOW (4-step ribbon) ─── -->
-<section class="workflow" id="workflow">
-  <div class="container">
-    <div class="section-head">
-      <div class="eyebrow">Cách hoạt động</div>
-      <h2 class="section-title">4 bước từ đăng ký đến lớp học đầu tiên.</h2>
+<!-- HIGHLIGHTS -->
+<section class="section" style="padding-top:0;">
+  <div class="section-label">By the numbers</div>
+  <div class="features-grid">
+    
+    <div class="feature-card" style="text-align:center;">
+      <div class="stat-value" style="font-size:36px;margin-bottom:4px;">4,800+</div>
+      <div class="stat-label">Gia sư</div>
     </div>
-    <div class="flow">
-      <div class="flow-step">
-        <div class="fs-num">01</div>
-        <h4>Đăng ký học sinh</h4>
-        <p>Nhập môn học, trình độ hiện tại, mục tiêu điểm số, lịch rảnh và khu vực. Mất 2 phút.</p>
-      </div>
-      <div class="flow-step">
-        <div class="fs-num">02</div>
-        <h4>AI matching gia sư</h4>
-        <p>Trong 10 phút, hệ thống gợi ý 3–5 gia sư phù hợp nhất với matching score rõ ràng.</p>
-      </div>
-      <div class="flow-step">
-        <div class="fs-num">03</div>
-        <h4>Lớp thử 30 phút</h4>
-        <p>Đặt lịch lớp thử miễn phí. Gia sư và học sinh làm quen, đánh giá mức độ phù hợp.</p>
-      </div>
-      <div class="flow-step">
-        <div class="fs-num">04</div>
-        <h4>Học chính thức</h4>
-        <p>Chốt gia sư, chọn gói học phí, bắt đầu lịch học. Báo cáo tuần tự động gửi phụ huynh.</p>
-      </div>
+    <div class="feature-card" style="text-align:center;">
+      <div class="stat-value" style="font-size:36px;margin-bottom:4px;">38K</div>
+      <div class="stat-label">Học sinh</div>
+    </div>
+    <div class="feature-card" style="text-align:center;">
+      <div class="stat-value" style="font-size:36px;margin-bottom:4px;">92%</div>
+      <div class="stat-label">Đậu ĐH</div>
     </div>
   </div>
 </section>
 
-<!-- ─── PRICING ─── -->
-<section class="pricing" id="pricing">
-  <div class="container">
-    <div class="section-head">
-      <div class="eyebrow">Bảng giá</div>
-      <h2 class="section-title">Giá minh bạch, không phí ẩn.</h2>
-      <p class="section-desc">Thanh toán theo buổi hoặc gói tháng. Lớp thử luôn miễn phí.</p>
-    </div>
-    <div class="price-grid">
-      <article class="price-card">
-        <div class="pc-name">Lớp thử</div>
-        <div class="pc-price"><span>Miễn phí</span></div>
-        <p class="pc-desc">Dành cho học sinh mới làm quen nền tảng.</p>
-        <ul class="pc-features">
-          <li><i class="ph ph-check"></i> 1 buổi 30 phút</li>
-          <li><i class="ph ph-check"></i> Gia sư được AI ghép</li>
-          <li><i class="ph ph-check"></i> Phụ huynh tham gia được</li>
-          <li><i class="ph ph-check"></i> Không cần đăng ký thẻ</li>
-        </ul>
-        <a href="#" class="btn btn-outline btn-full">Đăng ký lớp thử</a>
-      </article>
-
-      <article class="price-card pc-featured">
-        <div class="pc-ribbon"><i class="ph-fill ph-star"></i> Phổ biến nhất</div>
-        <div class="pc-name">Gói tháng</div>
-        <div class="pc-price"><span>₫</span>1.2M<span>/tháng</span></div>
-        <p class="pc-desc">Cho học sinh cần cải thiện đều đặn.</p>
-        <ul class="pc-features">
-          <li><i class="ph ph-check"></i> 8 buổi (2 buổi/tuần)</li>
-          <li><i class="ph ph-check"></i> Gia sư cố định cả tháng</li>
-          <li><i class="ph ph-check"></i> Báo cáo tuần tự động</li>
-          <li><i class="ph ph-check"></i> Bài tập tương tác</li>
-          <li><i class="ph ph-check"></i> Đổi gia sư nếu không phù hợp</li>
-        </ul>
-        <a href="#" class="btn btn-primary btn-full">Mua gói tháng</a>
-      </article>
-
-      <article class="price-card">
-        <div class="pc-name">Gói kỳ</div>
-        <div class="pc-price"><span>₫</span>5.8M<span>/kỳ 4 tháng</span></div>
-        <p class="pc-desc">Cam kết đầu ra, phù hợp lớp 12 ôn thi ĐH.</p>
-        <ul class="pc-features">
-          <li><i class="ph ph-check"></i> 32 buổi trong 4 tháng</li>
-          <li><i class="ph ph-check"></i> Lộ trình ôn thi chi tiết</li>
-          <li><i class="ph ph-check"></i> Báo cáo phụ huynh 2 lần/tháng</li>
-          <li><i class="ph ph-check"></i> Cam kết đầu ra bằng văn bản</li>
-          <li><i class="ph ph-check"></i> Hoàn 30% nếu không đạt mục tiêu</li>
-        </ul>
-        <a href="#" class="btn btn-outline btn-full">Mua gói kỳ</a>
-      </article>
-    </div>
+<!-- TESTIMONIAL -->
+<section class="section" style="padding-top:0;">
+  <div class="testimonial">
+    <p class="testimonial-text">"Con từ 5.5 lên 8.5 sau 3 tháng. Gia sư dạy rất có hệ thống."</p>
+    <div class="testimonial-author">Chị Mai</div>
+    <div class="testimonial-role">Phụ huynh, Q.7 TP.HCM</div>
   </div>
 </section>
 
-<!-- ─── CUSTOMERS (testimonials) ─── -->
-<section class="customers" id="customers">
-  <div class="container">
-    <div class="section-head">
-      <div class="eyebrow">Đánh giá</div>
-      <h2 class="section-title">38.000 phụ huynh đã tin tưởng GiaSuViet.</h2>
-    </div>
-
-    <div class="t-row">
-      <article class="t-card t-big">
-        <div class="t-quote">"Con tôi từ 5.5 Toán lên 8.2 sau 3 tháng học với cô Minh. Điểm thi thử ĐH lần gần nhất đạt 8.8 — cao hơn cả mục tiêu ban đầu. Báo cáo tuần của app rất chi tiết, tôi không cần hỏi han nhiều."</div>
-        <div class="t-author">
-          <img src="https://i.pravatar.cc/80?img=11" alt="" loading="lazy" />
-          <div>
-            <div class="t-name">Chị Nguyễn Thị Hương</div>
-            <div class="t-role">Phụ huynh · Lớp 12, Quận 2, TP.HCM</div>
-          </div>
-        </div>
-        <div class="t-stat">
-          <div class="ts-num">+2.7</div>
-          <div class="ts-label">Điểm Toán tăng sau 3 tháng</div>
-        </div>
-      </article>
-
-      <article class="t-card">
-        <div class="t-quote">"Mình đậu ĐH Ngoại Thương với điểm thi 27.5. GiaSuViet giúp mình lấp đầy khoảng trống kiến thức mà lớp học ở trường không cover được. Gia sư dạy rất có hệ thống."</div>
-        <div class="t-author">
-          <img src="https://i.pravatar.cc/80?img=26" alt="" loading="lazy" />
-          <div>
-            <div class="t-name">Trần Minh Đức</div>
-            <div class="t-role">Học sinh đậu ĐH · KHTN 2025</div>
-          </div>
-        </div>
-      </article>
-
-      <article class="t-card">
-        <div class="t-quote">"Trước đây mình dạy trung tâm, chuyển sang GiaSuViet thu nhập tăng 40% vì không mất chi phí trung gian. Học sinh ổn định, app quản lý lịch rất tiện."</div>
-        <div class="t-author">
-          <img src="https://i.pravatar.cc/80?img=50" alt="" loading="lazy" />
-          <div>
-            <div class="t-name">Th.S Lê Thị Lan</div>
-            <div class="t-role">Giáo viên chuyển sang gia sư · Hà Nội</div>
-          </div>
-        </div>
-      </article>
-
-      <article class="t-card">
-        <div class="t-quote">"Có 2 con học cùng lúc, GiaSuViet ghép được 2 gia sư cùng ngày giờ. Tiết kiệm thời gian đưa đón. Điểm cả 2 con đều cải thiện rõ rệt."</div>
-        <div class="t-author">
-          <img src="https://i.pravatar.cc/80?img=7" alt="" loading="lazy" />
-          <div>
-            <div class="t-name">Anh Phạm Đình Khoa</div>
-            <div class="t-role">Phụ huynh · 2 con, quận Ba Đình, Hà Nội</div>
-          </div>
-        </div>
-      </article>
-    </div>
+<!-- FAQ -->
+<section class="section" style="padding-top:0;">
+  <div class="section-label">FAQ</div>
+  <h2 class="section-title">Common questions.</h2>
+  
+  <div class="faq-item">
+    <div class="faq-q">Gia sư có kiểm tra pháp lý?</div>
+    <div class="faq-a">Tất cả gia sư xác minh CMND, bằng cấp, và lý lịch. Chỉ nhận 1/3 hồ sơ đăng ký.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Học phí thế nào?</div>
+    <div class="faq-a">Thanh toán theo buổi (từ 120K/buổi) hoặc gói tháng tiết kiệm 20%. Không phí setup.</div>
   </div>
 </section>
 
-<!-- ─── FINAL CTA ─── -->
-<section class="final">
-  <div class="container">
-    <div class="final-box">
-      <h2>Sẵn sàng cải thiện điểm số <span class="hl">ngay hôm nay</span>?</h2>
-      <p>Lớp thử 30 phút miễn phí. Không cam kết. Được ghép gia sư trong 24 giờ.</p>
-      <div class="final-actions">
-        <a href="#" class="btn btn-primary btn-lg">Đăng ký lớp thử <i class="ph ph-arrow-right"></i></a>
-        <a href="#" class="btn btn-outline btn-lg">Tìm gia sư ngay</a>
-      </div>
-    </div>
+<!-- CTA -->
+<section class="section" style="padding-top:0;">
+  <div class="cta-banner">
+    <h2>Ready to get started?</h2>
+    <p>Join thousands of users today. 7 pages · 273 KB · HTML5, CSS3, Vanilla JS, Chart.js</p>
+    <a href="#" class="btn-primary">Try Gia Sư Việt Free</a>
   </div>
 </section>
 
-<!-- ─── FOOTER ─── -->
+<!-- FOOTER -->
 <footer class="footer">
-  <div class="container">
-    <div class="footer-top">
-      <div class="footer-brand">
-        <div class="logo">
-          <svg class="logo-mark" viewBox="0 0 32 32" fill="none">
-            <rect x="4" y="4" width="24" height="24" rx="7" fill="currentColor"/>
-            <path d="M11 11 L16 8 L21 11 L21 20 L16 23 L11 20 Z" stroke="#fafbff" stroke-width="1.8" fill="none" stroke-linejoin="round"/>
-            <path d="M16 8 V23 M11 11 L21 11" stroke="#fafbff" stroke-width="1.8" stroke-linecap="round"/>
-          </svg>
-          <span>gsviet<span class="logo-dot">.</span></span>
-        </div>
-        <p>Nền tảng gia sư hàng đầu Việt Nam. 4.800+ gia sư chất lượng, 38K học sinh theo học. Headquarter tại TP.HCM.</p>
-      </div>
-      <div>
-        <h5>Dịch vụ</h5>
-        <ul>
-          <li><a href="#">Tìm gia sư</a></li>
-          <li><a href="#">Gói học phí</a></li>
-          <li><a href="#">AI Matching</a></li>
-          <li><a href="#">Báo cáo phụ huynh</a></li>
-          <li><a href="#">Bài tập tương tác</a></li>
-        </ul>
-      </div>
-      <div>
-        <h5>Hỗ trợ</h5>
-        <ul>
-          <li><a href="#">Trung tâm trợ giúp</a></li>
-          <li><a href="#">Hướng dẫn sử dụng</a></li>
-          <li><a href="#">FAQ</a></li>
-          <li><a href="#">Liên hệ CSKH</a></li>
-        </ul>
-      </div>
-      <div>
-        <h5>Công ty</h5>
-        <ul>
-          <li><a href="#">Về GiaSuViet</a></li>
-          <li><a href="#">Tuyển dụng gia sư</a></li>
-          <li><a href="#">Báo chí</a></li>
-          <li><a href="#">Liên hệ</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <div>© 2026 GiaSuViet JSC. MST: 0123456789.</div>
-      <div class="footer-legal">
-        <a href="#">Privacy</a>
-        <a href="#">Terms</a>
-        <a href="#">Security</a>
-        <a href="#">Status</a>
-      </div>
-    </div>
-  </div>
+  <div>Gia Sư Việt · EDUCATION template · Part of Cursor Enterprise Framework</div>
 </footer>
 
-<script src="script.js"></script>
 </body>
 </html>

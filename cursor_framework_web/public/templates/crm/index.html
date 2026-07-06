@@ -1,507 +1,352 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Helix CRM — Pipeline trực quan cho đội sales Việt</title>
-<meta name="description" content="Helix CRM giúp đội sales Việt Nam đóng nhiều deal hơn với pipeline trực quan, AI lead scoring và automation thông minh. Dùng thử miễn phí 14 ngày." />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
-<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
-<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" />
-<link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CRM Dashboard — Quản lý khách hàng thông minh</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --accent: #6366f1;
+      --accent2: #a78bfa;
+      --bg: #0f0e30;
+      --card: #1a1a4e;
+      --text: #f1f5f9;
+      --text2: #cbd5e1;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── Nav ── */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 0 24px;
+    }
+    .nav-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 56px;
+    }
+    .nav-logo {
+      font-size: 17px; font-weight: 700; letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
+    .nav-links a {
+      color: var(--text2); font-size: 13.5px; font-weight: 500;
+      text-decoration: none; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--accent); color: #fff; font-size: 13px; font-weight: 600;
+      padding: 8px 18px; border-radius: 8px; text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    /* ── Hero ── */
+    .hero {
+      min-height: 520px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg);
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: var(--bgGradient, linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%));
+      opacity: 0.6;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 40%, #6366f122 0%, transparent 70%);
+    }
+    .hero-inner {
+      position: relative; z-index: 1;
+      text-align: center; padding: 60px 24px;
+      max-width: 700px;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: #6366f122; border: 1px solid #6366f155;
+      color: var(--accent); font-size: 11.5px; font-weight: 600;
+      padding: 5px 14px; border-radius: 999px;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .hero-headline {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 800; line-height: 1.05; letter-spacing: -0.03em;
+      margin-bottom: 18px; color: var(--text);
+    }
+    .hero-sub {
+      font-size: 17px; color: var(--text2); max-width: 480px;
+      margin: 0 auto 32px; line-height: 1.65;
+    }
+    .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--accent); color: #fff;
+      padding: 12px 28px; border-radius: 10px;
+      font-size: 15px; font-weight: 600; text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px #6366f144;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px #6366f155; }
+    .btn-secondary {
+      background: rgba(255,255,255,0.08); color: var(--text);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 12px 28px; border-radius: 10px;
+      font-size: 15px; font-weight: 500; text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.13); }
+
+    /* ── Stats ── */
+    .stats-bar {
+      background: var(--card);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding: 24px;
+    }
+    .stats-inner {
+      max-width: 700px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 16px; text-align: center;
+    }
+    .stat-value {
+      font-size: 28px; font-weight: 800; letter-spacing: -0.03em;
+      color: var(--accent); font-variant-numeric: tabular-nums;
+    }
+    .stat-label { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+    /* ── Features ── */
+    .section { max-width: 900px; margin: 0 auto; padding: 64px 24px; }
+    .section-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(26px, 4vw, 38px); font-weight: 800;
+      letter-spacing: -0.03em; margin-bottom: 8px; line-height: 1.15;
+    }
+    .section-sub { color: var(--text2); font-size: 16px; margin-bottom: 40px; }
+
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .feature-card {
+      background: var(--card); border-radius: 12px; padding: 20px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .feature-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: #6366f122; display: flex; align-items: center; justify-content: center;
+      margin-bottom: 12px; font-size: 16px;
+    }
+    .feature-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .feature-desc { font-size: 12.5px; color: var(--text2); line-height: 1.55; }
+
+    /* ── Testimonial ── */
+    .testimonial {
+      background: var(--card); border-radius: 16px; padding: 32px;
+      border-left: 3px solid var(--accent);
+      margin-bottom: 0;
+    }
+    .testimonial-text {
+      font-size: 17px; line-height: 1.7; margin-bottom: 16px;
+      font-style: italic; color: var(--text);
+    }
+    .testimonial-author { font-size: 13px; font-weight: 600; }
+    .testimonial-role { color: var(--text2); font-size: 12px; margin-top: 2px; }
+
+    /* ── FAQ ── */
+    .faq-item {
+      border-bottom: 1px solid rgba(255,255,255,0.05); padding: 18px 0;
+    }
+    .faq-q { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .faq-a { font-size: 13px; color: var(--text2); line-height: 1.65; }
+
+    /* ── CTA Banner ── */
+    .cta-banner {
+      background: var(--card);
+      border-radius: 16px; padding: 48px 32px;
+      text-align: center;
+      background-image: radial-gradient(ellipse 60% 50% at 50% 100%, #6366f122 0%, transparent 70%);
+    }
+    .cta-banner h2 {
+      font-size: clamp(22px, 4vw, 34px); font-weight: 800;
+      letter-spacing: -0.03em; margin-bottom: 12px;
+    }
+    .cta-banner p { color: var(--text2); font-size: 15px; margin-bottom: 24px; }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center; padding: 32px 24px;
+      color: var(--text2); font-size: 12px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .hero-headline { font-size: 36px; }
+      .stats-inner { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .stat-value { font-size: 20px; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- ─── NAV ─── -->
+<!-- NAV -->
 <nav class="nav">
-  <div class="container nav-inner">
-    <a href="#" class="logo">
-      <svg class="logo-mark" viewBox="0 0 32 32" fill="none">
-        <rect x="4" y="4" width="24" height="24" rx="7" fill="currentColor"/>
-        <path d="M11 21 V11 M11 16 H21 M21 11 V21" stroke="#fafbff" stroke-width="2.2" stroke-linecap="round"/>
-      </svg>
-      <span>helix<span class="logo-dot">.</span></span>
-    </a>
-    <ul class="nav-menu">
-      <li><a href="#features">Tính năng</a></li>
-      <li><a href="#workflow">Workflow</a></li>
-      <li><a href="#pricing">Bảng giá</a></li>
-      <li><a href="#customers">Khách hàng</a></li>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">Flow C R M<span>.</span></a>
+    <ul class="nav-links">
+      <li><a href="#">Features</a></li>
+      <li><a href="#">Pricing</a></li>
+      <li><a href="#">Blog</a></li>
+      <li><a href="#">Login</a></li>
     </ul>
-    <div class="nav-actions">
-      <a href="#" class="nav-ghost">Đăng nhập</a>
-      <a href="#pricing" class="nav-cta">
-        Dùng thử
-        <i class="ph ph-arrow-up-right"></i>
-      </a>
-    </div>
+    <a href="#" class="nav-cta">Start Free</a>
   </div>
 </nav>
 
-<!-- ─── HERO ─── -->
-<header class="hero">
-  <div class="container hero-grid">
-    <div class="hero-text">
-      <div class="eyebrow">
-        <span class="eyebrow-dot"></span>
-        v4.2 · 8,247 reps đang dùng Helix
-      </div>
-
-      <h1 class="hero-title">
-        Pipeline trực quan.<br/>
-        Deal đóng nhanh hơn <span class="hl">47%</span>.
-      </h1>
-
-      <p class="hero-desc">
-        Helix CRM thay thế bảng tính và 5 tools rời rạc bằng một pipeline duy nhất:
-        kéo-thả deals, AI chấm điểm lead, tự động follow-up. Thiết kế cho sales team Việt Nam,
-        tích hợp Zalo và VNPay sẵn.
-      </p>
-
-      <div class="hero-cta">
-        <a href="#pricing" class="btn btn-primary btn-lg">
-          Bắt đầu 14 ngày miễn phí
-          <i class="ph ph-arrow-right"></i>
-        </a>
-        <a href="#workflow" class="btn btn-ghost btn-lg">
-          <i class="ph-fill ph-play-circle"></i>
-          Xem 2 phút demo
-        </a>
-      </div>
-
-      <div class="hero-meta">
-        <div class="meta-avatars">
-          <div class="av" style="background:#0ea5e9">HN</div>
-          <div class="av" style="background:#f97316">TM</div>
-          <div class="av" style="background:#8b5cf6">LK</div>
-          <div class="av" style="background:#10b981">PD</div>
-          <div class="av av-more">+8k</div>
-        </div>
-        <div class="meta-text">
-          <div class="meta-stars">
-            <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
-            <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
-            <i class="ph-fill ph-star"></i>
-          </div>
-          <div>4.9 · 2,847 đánh giá trên Capterra</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Dashboard mockup: real layout, not gradient -->
-    <div class="hero-visual">
-      <div class="dash">
-        <div class="dash-top">
-          <div class="dash-tabs">
-            <span class="dash-tab active"><i class="ph ph-funnel"></i> Pipeline</span>
-            <span class="dash-tab"><i class="ph ph-users"></i> Contacts</span>
-            <span class="dash-tab"><i class="ph ph-chart-line-up"></i> Reports</span>
-          </div>
-          <div class="dash-dots"><i></i><i></i><i></i></div>
-        </div>
-
-        <div class="dash-stats">
-          <div class="dash-stat">
-            <div class="ds-label">Revenue MTD</div>
-            <div class="ds-value">₫284.6M</div>
-            <div class="ds-delta up"><i class="ph ph-trend-up"></i> 24.3%</div>
-          </div>
-          <div class="dash-stat">
-            <div class="ds-label">Open deals</div>
-            <div class="ds-value">142</div>
-            <div class="ds-delta up"><i class="ph ph-trend-up"></i> 12%</div>
-          </div>
-          <div class="dash-stat">
-            <div class="ds-label">Win rate</div>
-            <div class="ds-value">68.2%</div>
-            <div class="ds-delta up"><i class="ph ph-trend-up"></i> 8.1%</div>
-          </div>
-        </div>
-
-        <div class="dash-chart">
-          <svg viewBox="0 0 400 110" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#3D5AFE" stop-opacity=".18"/>
-                <stop offset="100%" stop-color="#3D5AFE" stop-opacity="0"/>
-              </linearGradient>
-            </defs>
-            <!-- Grid -->
-            <line x1="0" y1="27" x2="400" y2="27" stroke="#e5e7eb" stroke-dasharray="2 4"/>
-            <line x1="0" y1="55" x2="400" y2="55" stroke="#e5e7eb" stroke-dasharray="2 4"/>
-            <line x1="0" y1="82" x2="400" y2="82" stroke="#e5e7eb" stroke-dasharray="2 4"/>
-            <!-- Area -->
-            <path d="M0,78 C40,68 60,72 100,58 C140,44 160,52 200,38 C240,24 280,32 320,18 C360,8 380,14 400,22 L400,110 L0,110 Z" fill="url(#area)"/>
-            <path d="M0,78 C40,68 60,72 100,58 C140,44 160,52 200,38 C240,24 280,32 320,18 C360,8 380,14 400,22" stroke="#3D5AFE" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-            <!-- Data points -->
-            <circle cx="100" cy="58" r="3" fill="#3D5AFE"/>
-            <circle cx="200" cy="38" r="3" fill="#3D5AFE"/>
-            <circle cx="320" cy="18" r="3" fill="#3D5AFE"/>
-            <!-- Highlight -->
-            <circle cx="320" cy="18" r="7" fill="#3D5AFE" fill-opacity=".15"/>
-          </svg>
-        </div>
-
-        <div class="dash-list">
-          <div class="dash-row">
-            <div class="dr-avatar" style="background:linear-gradient(135deg,#f97316,#fb923c)">VT</div>
-            <div class="dr-info">
-              <div class="dr-name">VinaTech Solutions</div>
-              <div class="dr-meta">Enterprise · Quận 1, HCM</div>
-            </div>
-            <div class="dr-amount">₫1.28B</div>
-            <div class="dr-stage won">Won</div>
-          </div>
-          <div class="dash-row">
-            <div class="dr-avatar" style="background:linear-gradient(135deg,#ec4899,#f472b6)">MK</div>
-            <div class="dr-info">
-              <div class="dr-name">MinhKiet Agency</div>
-              <div class="dr-meta">Pro · Đà Nẵng</div>
-            </div>
-            <div class="dr-amount">₫312M</div>
-            <div class="dr-stage neg">Negotiation</div>
-          </div>
-          <div class="dash-row">
-            <div class="dr-avatar" style="background:linear-gradient(135deg,#10b981,#34d399)">SH</div>
-            <div class="dr-info">
-              <div class="dr-name">Saigon Holdings</div>
-              <div class="dr-meta">Starter · Hà Nội</div>
-            </div>
-            <div class="dr-amount">₫84M</div>
-            <div class="dr-stage prop">Proposal</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="float float-a">
-        <div class="fa-icon"><i class="ph-fill ph-envelope-simple-open"></i></div>
-        <div>
-          <div class="fa-title">Auto follow-up gửi</div>
-          <div class="fa-meta">3 email queued · 11 phút trước</div>
-        </div>
-      </div>
-
-      <div class="float float-b">
-        <div class="fa-icon" style="background:#dcfce7;color:#10b981"><i class="ph-fill ph-target"></i></div>
-        <div>
-          <div class="fa-title">Lead mới vừa chấm điểm</div>
-          <div class="fa-meta">Score: <strong>92/100</strong> · Ngoc Tran</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</header>
-
-<!-- ─── LOGO WALL ─── -->
-<section class="logos">
-  <div class="container">
-    <p class="logos-label">Được tin dùng bởi 8,247 đội sales tại Việt Nam và Đông Nam Á</p>
-    <div class="logos-grid">
-      <div class="logo-cell">
-        <svg viewBox="0 0 120 32" fill="currentColor"><path d="M8 8h6v16H8zm10 0h6l4 10 4-10h6v16h-4V14l-4 10h-4l-4-10v10h-4z"/></svg>
-        <span>VinaTech</span>
-      </div>
-      <div class="logo-cell">
-        <svg viewBox="0 0 120 32" fill="currentColor"><circle cx="14" cy="16" r="8" stroke="currentColor" fill="none" stroke-width="3"/><text x="32" y="22" font-family="Geist" font-size="14" font-weight="700">SaigonHD</text></svg>
-      </div>
-      <div class="logo-cell">
-        <svg viewBox="0 0 120 32" fill="currentColor"><rect x="6" y="8" width="14" height="16" rx="2"/><rect x="22" y="8" width="14" height="16" rx="2" fill-opacity=".55"/></svg>
-        <span>MekongCo</span>
-      </div>
-      <div class="logo-cell">
-        <svg viewBox="0 0 120 32" fill="currentColor"><path d="M8 24 L16 8 L24 24 Z M14 18 H18" stroke="currentColor" fill="none" stroke-width="2.5"/></svg>
-        <span>HanoiDev</span>
-      </div>
-      <div class="logo-cell">
-        <svg viewBox="0 0 130 32" fill="currentColor"><path d="M8 16 Q14 6 20 16 Q26 26 32 16" stroke="currentColor" stroke-width="2.5" fill="none"/><text x="40" y="22" font-family="Geist" font-size="14" font-weight="700">DaNang</text></svg>
-      </div>
-      <div class="logo-cell">
-        <svg viewBox="0 0 120 32" fill="currentColor"><rect x="6" y="6" width="20" height="20" rx="4"/><rect x="9" y="9" width="14" height="14" rx="2" fill="#fafbff"/></svg>
-        <span>Bitexco</span>
-      </div>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <span class="hero-badge">New v3.0 — AI-powered segmentation</span>
+    <h1 class="hero-headline">Close more deals<br>with less effort</h1>
+    <p class="hero-sub">Pipeline visualization, contact scoring, and automated follow-ups. Built for modern sales teams.</p>
+    <div class="hero-actions">
+      <a href="#" class="btn-primary">Get Started Free</a>
+      <a href="#" class="btn-secondary">View Demo</a>
     </div>
   </div>
 </section>
 
-<!-- ─── FEATURES (asymmetric layout, no 3 equal cards) ─── -->
-<section class="features" id="features">
-  <div class="container">
-    <div class="section-head">
-      <div class="eyebrow">Tính năng</div>
-      <h2 class="section-title">Mọi thứ sales rep cần, không hơn.</h2>
-      <p class="section-desc">Không có 47 feature bạn không bao giờ dùng. Chỉ có 7 thứ bạn dùng mỗi ngày.</p>
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    
+    <div>
+      <div class="stat-value">4,200+</div>
+      <div class="stat-label">Active Teams</div>
     </div>
+    <div>
+      <div class="stat-value">$2.1B</div>
+      <div class="stat-label">Revenue Tracked</div>
+    </div>
+    <div>
+      <div class="stat-value">99.9%</div>
+      <div class="stat-label">Uptime SLA</div>
+    </div>
+  </div>
+</div>
 
-    <!-- Bento grid: 1 big + 4 small -->
-    <div class="bento">
-      <article class="bento-card bento-big">
-        <div class="bc-tag"><i class="ph ph-funnel"></i> Pipeline</div>
-        <h3>Kéo thả deal qua stages, forecast tự động.</h3>
-        <p>7 stages mặc định (Lead → Won). Kéo deal qua các cột, Helix tự tính weighted forecast và cảnh báo khi deal bị stuck &gt; 14 ngày.</p>
-        <div class="bc-mock">
-          <div class="kanban">
-            <div class="kan-col"><div class="kan-h">Lead <span>23</span></div><div class="kan-card k-red"></div><div class="kan-card k-blue"></div><div class="kan-card k-green"></div></div>
-            <div class="kan-col"><div class="kan-h">Qualified <span>18</span></div><div class="kan-card k-blue"></div><div class="kan-card k-amber"></div></div>
-            <div class="kan-col"><div class="kan-h">Proposal <span>11</span></div><div class="kan-card k-amber"></div><div class="kan-card k-red"></div></div>
-            <div class="kan-col"><div class="kan-h">Won <span>7</span></div><div class="kan-card k-green"></div></div>
-          </div>
-        </div>
-      </article>
-
-      <article class="bento-card">
-        <div class="bc-tag"><i class="ph ph-sparkle"></i> AI Scoring</div>
-        <h3>Lead score chính xác 92%.</h3>
-        <p>Model đọc 47 tín hiệu hành vi: email opens, page views, firmographic, ngành nghề. Rep chỉ cần gọi theo thứ tự ưu tiên.</p>
-      </article>
-
-      <article class="bento-card">
-        <div class="bc-tag"><i class="ph ph-envelope-simple"></i> Automation</div>
-        <h3>Follow-up sequence 5 bước.</h3>
-        <p>Template tiếng Việt có sẵn. A/B test subject lines. Tự động dừng khi lead reply.</p>
-      </article>
-
-      <article class="bento-card">
-        <div class="bc-tag"><i class="ph ph-phone"></i> Click-to-call</div>
-        <h3>VoIP tích hợp, ghi âm tự động.</h3>
-        <p>Quay số từ CRM, transcription tiếng Việt, AI tóm tắt cuộc gọi sau 1 phút.</p>
-      </article>
-
-      <article class="bento-card">
-        <div class="bc-tag"><i class="ph ph-chart-bar"></i> Reports</div>
-        <h3>Dashboard real-time, không lag.</h3>
-        <p>47 metrics có sẵn. Tự build custom reports bằng drag-drop, share qua link.</p>
-      </article>
-
-      <article class="bento-card">
-        <div class="bc-tag"><i class="ph ph-plug"></i> 200+ Tích hợp</div>
-        <h3>Slack, Gmail, Zalo OA, VNPay.</h3>
-        <p>Kết nối trong 30 giây. Webhook & REST API cho dev tích hợp sâu hơn.</p>
-      </article>
+<!-- FEATURES -->
+<section class="section">
+  <div class="section-label">Features</div>
+  <h2 class="section-title">Everything you need.</h2>
+  <p class="section-sub">Built for real workflows. No bloat.</p>
+  <div class="features-grid">
+    
+    <div class="feature-card">
+      <div class="feature-icon">✦</div>
+      <div class="feature-title">Pipeline visualization</div>
+      <div class="feature-desc">Pipeline visualization với drag-drop</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✦</div>
+      <div class="feature-title">Contact segmentation thông minh</div>
+      <div class="feature-desc">Contact segmentation thông minh</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✦</div>
+      <div class="feature-title">Email automation & templates</div>
+      <div class="feature-desc">Email automation & templates</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✦</div>
+      <div class="feature-title">Real-time analytics dashboard</div>
+      <div class="feature-desc">Real-time analytics dashboard</div>
     </div>
   </div>
 </section>
 
-<!-- ─── WORKFLOW (number ribbon, not 3 cards) ─── -->
-<section class="workflow" id="workflow">
-  <div class="container">
-    <div class="section-head">
-      <div class="eyebrow">Cách hoạt động</div>
-      <h2 class="section-title">4 bước từ lead mới đến deal đóng.</h2>
+<!-- HIGHLIGHTS -->
+<section class="section" style="padding-top:0;">
+  <div class="section-label">By the numbers</div>
+  <div class="features-grid">
+    
+    <div class="feature-card" style="text-align:center;">
+      <div class="stat-value" style="font-size:36px;margin-bottom:4px;">+47%</div>
+      <div class="stat-label">Conversion Rate</div>
     </div>
-    <div class="flow">
-      <div class="flow-step">
-        <div class="fs-num">01</div>
-        <h4>Kết nối nguồn lead</h4>
-        <p>Facebook Ads, Zalo OA, Web form, import CSV. Helix lo dedupe và enrich từ 23 nguồn dữ liệu.</p>
-      </div>
-      <div class="flow-step">
-        <div class="fs-num">02</div>
-        <h4>AI chấm điểm & phân lead</h4>
-        <p>Score 0–100, route đến rep phù hợp theo vùng miền, ngành hàng, hoặc deal size.</p>
-      </div>
-      <div class="flow-step">
-        <div class="fs-num">03</div>
-        <h4>Engage đa kênh</h4>
-        <p>Email sequence, call task, Zalo template. Tất cả log lại timeline deal tự động.</p>
-      </div>
-      <div class="flow-step">
-        <div class="fs-num">04</div>
-        <h4>Đóng deal & đồng bộ kế toán</h4>
-        <p>Ký hợp đồng điện tử VNPT-CA. Invoice tự tạo, đồng bộ MISA, FAST.</p>
-      </div>
+    <div class="feature-card" style="text-align:center;">
+      <div class="stat-value" style="font-size:36px;margin-bottom:4px;">92%</div>
+      <div class="stat-label">Customer Retention</div>
+    </div>
+    <div class="feature-card" style="text-align:center;">
+      <div class="stat-value" style="font-size:36px;margin-bottom:4px;">$8.4K</div>
+      <div class="stat-label">Avg Deal Size</div>
     </div>
   </div>
 </section>
 
-<!-- ─── PRICING ─── -->
-<section class="pricing" id="pricing">
-  <div class="container">
-    <div class="section-head">
-      <div class="eyebrow">Bảng giá</div>
-      <h2 class="section-title">Giá theo số rep, không theo features.</h2>
-      <p class="section-desc">14 ngày dùng thử đầy đủ tính năng Pro. Không cần thẻ tín dụng.</p>
-    </div>
-    <div class="price-grid">
-      <article class="price-card">
-        <div class="pc-name">Starter</div>
-        <div class="pc-price"><span>₫</span>690K<span>/rep/tháng</span></div>
-        <p class="pc-desc">Cho cá nhân & team nhỏ 1–3 người.</p>
-        <ul class="pc-features">
-          <li><i class="ph ph-check"></i> Tối đa 3 rep</li>
-          <li><i class="ph ph-check"></i> 1,000 contacts</li>
-          <li><i class="ph ph-check"></i> Pipeline cơ bản</li>
-          <li><i class="ph ph-check"></i> Email tích hợp Gmail/Outlook</li>
-          <li><i class="ph ph-check"></i> App iOS/Android</li>
-        </ul>
-        <a href="#" class="btn btn-outline btn-full">Bắt đầu</a>
-      </article>
-
-      <article class="price-card pc-featured">
-        <div class="pc-ribbon"><i class="ph-fill ph-crown-simple"></i> Phổ biến nhất</div>
-        <div class="pc-name">Pro</div>
-        <div class="pc-price"><span>₫</span>1.79M<span>/rep/tháng</span></div>
-        <p class="pc-desc">Team 4–25 người đang tăng trưởng.</p>
-        <ul class="pc-features">
-          <li><i class="ph ph-check"></i> Rep không giới hạn</li>
-          <li><i class="ph ph-check"></i> 25,000 contacts</li>
-          <li><i class="ph ph-check"></i> Automation + AI scoring</li>
-          <li><i class="ph ph-check"></i> Click-to-call + ghi âm</li>
-          <li><i class="ph ph-check"></i> Custom reports & forecast</li>
-          <li><i class="ph ph-check"></i> Zalo OA + VNPay tích hợp</li>
-        </ul>
-        <a href="#" class="btn btn-primary btn-full">Dùng thử 14 ngày</a>
-      </article>
-
-      <article class="price-card">
-        <div class="pc-name">Enterprise</div>
-        <div class="pc-price">Custom</div>
-        <p class="pc-desc">25+ rep, yêu cầu SLA & on-premise.</p>
-        <ul class="pc-features">
-          <li><i class="ph ph-check"></i> Tất cả tính năng Pro</li>
-          <li><i class="ph ph-check"></i> SSO & SAML</li>
-          <li><i class="ph ph-check"></i> Dedicated CSM 24/7</li>
-          <li><i class="ph ph-check"></i> Custom API & webhook</li>
-          <li><i class="ph ph-check"></i> On-premise Việt Nam</li>
-          <li><i class="ph ph-check"></i> SLA 99.99% + DR</li>
-        </ul>
-        <a href="#" class="btn btn-outline btn-full">Liên hệ sales</a>
-      </article>
-    </div>
+<!-- TESTIMONIAL -->
+<section class="section" style="padding-top:0;">
+  <div class="testimonial">
+    <p class="testimonial-text">"FlowCRM cut our sales cycle from 45 to 18 days. The pipeline view alone is worth it."</p>
+    <div class="testimonial-author">Minh Tran</div>
+    <div class="testimonial-role">Head of Sales, TechVina</div>
   </div>
 </section>
 
-<!-- ─── CUSTOMERS (testimonial + real photo) ─── -->
-<section class="customers" id="customers">
-  <div class="container">
-    <div class="section-head">
-      <div class="eyebrow">Khách hàng</div>
-      <h2 class="section-title">8,247 đội sales, từ startup 3 người đến tập đoàn 3,000 nhân viên.</h2>
-    </div>
-
-    <div class="t-row">
-      <article class="t-card t-big">
-        <div class="t-quote">"Helix thay thế 4 tools chúng tôi đang dùng. Sales rep giờ chỉ cần mở 1 tab để xem đầy đủ context khách hàng. Win rate tăng từ 41% lên 68% trong 90 ngày."</div>
-        <div class="t-author">
-          <img src="https://i.pravatar.cc/80?img=47" alt="" loading="lazy" />
-          <div>
-            <div class="t-name">Nguyễn Văn An</div>
-            <div class="t-role">Sales Director · VinaTech Solutions</div>
-          </div>
-        </div>
-        <div class="t-stat">
-          <div class="ts-num">68%</div>
-          <div class="ts-label">Win rate sau 90 ngày</div>
-        </div>
-      </article>
-
-      <article class="t-card">
-        <div class="t-quote">"AI scoring tiết kiệm 2 giờ mỗi ngày cho mỗi rep. Tổng team 12 người tiết kiệm 24 giờ, tương đương 3 FTE."</div>
-        <div class="t-author">
-          <img src="https://i.pravatar.cc/80?img=49" alt="" loading="lazy" />
-          <div>
-            <div class="t-name">Trần Thị Mai</div>
-            <div class="t-role">VP Sales · Saigon Holdings</div>
-          </div>
-        </div>
-      </article>
-
-      <article class="t-card">
-        <div class="t-quote">"Đã thử 5 CRM. Helix là duy nhất có support tiếng Việt 24/7 và tích hợp sẵn MISA kế toán."</div>
-        <div class="t-author">
-          <img src="https://i.pravatar.cc/80?img=12" alt="" loading="lazy" />
-          <div>
-            <div class="t-name">Lê Hoàng</div>
-            <div class="t-role">Founder · Mekong Agency</div>
-          </div>
-        </div>
-      </article>
-
-      <article class="t-card">
-        <div class="t-quote">"Forecast chính xác đến 95% giúp founder như tôi ra quyết định tuyển dụng đúng lúc."</div>
-        <div class="t-author">
-          <img src="https://i.pravatar.cc/80?img=33" alt="" loading="lazy" />
-          <div>
-            <div class="t-name">Phạm Hà</div>
-            <div class="t-role">CEO · Bloom Floral</div>
-          </div>
-        </div>
-      </article>
-    </div>
+<!-- FAQ -->
+<section class="section" style="padding-top:0;">
+  <div class="section-label">FAQ</div>
+  <h2 class="section-title">Common questions.</h2>
+  
+  <div class="faq-item">
+    <div class="faq-q">Does it integrate with Salesforce?</div>
+    <div class="faq-a">Yes — native two-way sync with Salesforce, HubSpot, Pipedrive, and 40+ more CRMs.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Is there a free trial?</div>
+    <div class="faq-a">14-day free trial, no credit card required. Team plan starts at $29/seat/month.</div>
   </div>
 </section>
 
-<!-- ─── FINAL CTA ─── -->
-<section class="final">
-  <div class="container">
-    <div class="final-box">
-      <h2>Sẵn sàng tăng doanh thu <span class="hl">47%</span>?</h2>
-      <p>14 ngày dùng thử miễn phí. Không cần thẻ tín dụng. Hỗ trợ tiếng Việt 24/7.</p>
-      <div class="final-actions">
-        <a href="#" class="btn btn-primary btn-lg">Bắt đầu ngay <i class="ph ph-arrow-right"></i></a>
-        <a href="#" class="btn btn-outline btn-lg">Đặt lịch demo</a>
-      </div>
-    </div>
+<!-- CTA -->
+<section class="section" style="padding-top:0;">
+  <div class="cta-banner">
+    <h2>Ready to get started?</h2>
+    <p>Join thousands of users today. 6 pages · 248 KB · HTML5, CSS3, Vanilla JS, Chart.js</p>
+    <a href="#" class="btn-primary">Try CRM Dashboard Free</a>
   </div>
 </section>
 
-<!-- ─── FOOTER ─── -->
+<!-- FOOTER -->
 <footer class="footer">
-  <div class="container">
-    <div class="footer-top">
-      <div class="footer-brand">
-        <div class="logo">
-          <svg class="logo-mark" viewBox="0 0 32 32" fill="none">
-            <rect x="4" y="4" width="24" height="24" rx="7" fill="currentColor"/>
-            <path d="M11 21 V11 M11 16 H21 M21 11 V21" stroke="#fafbff" stroke-width="2.2" stroke-linecap="round"/>
-          </svg>
-          <span>helix<span class="logo-dot">.</span></span>
-        </div>
-        <p>Pipeline trực quan cho đội sales Việt Nam. Headquarter tại Hà Nội, server Singapore + Vietnam DC.</p>
-      </div>
-      <div>
-        <h5>Sản phẩm</h5>
-        <ul>
-          <li><a href="#">Tính năng</a></li>
-          <li><a href="#">Bảng giá</a></li>
-          <li><a href="#">Tích hợp</a></li>
-          <li><a href="#">REST API</a></li>
-          <li><a href="#">Changelog</a></li>
-        </ul>
-      </div>
-      <div>
-        <h5>Tài nguyên</h5>
-        <ul>
-          <li><a href="#">Blog sales</a></li>
-          <li><a href="#">CRM playbook VN</a></li>
-          <li><a href="#">Case study</a></li>
-          <li><a href="#">Webinar</a></li>
-        </ul>
-      </div>
-      <div>
-        <h5>Công ty</h5>
-        <ul>
-          <li><a href="#">Về Helix</a></li>
-          <li><a href="#">Tuyển dụng (12)</a></li>
-          <li><a href="#">Báo chí</a></li>
-          <li><a href="#">Liên hệ</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <div>© 2026 Helix CRM Vietnam JSC. MST: 0108246835.</div>
-      <div class="footer-legal">
-        <a href="#">Privacy</a>
-        <a href="#">Terms</a>
-        <a href="#">Security</a>
-        <a href="#">Status</a>
-      </div>
-    </div>
-  </div>
+  <div>CRM Dashboard · CRM template · Part of Cursor Enterprise Framework</div>
 </footer>
 
-<script src="script.js"></script>
 </body>
 </html>

@@ -1,478 +1,357 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>GymZone — Tap luyen thong minh, ket qua that</title>
-<meta name="description" content="GymZone giup ban tap luyen hieu qua voi lich tap ca nhan hoa, coach PT 1-1, va cong dong the duc vinh vuong. 420 lop/tuan, 120 coach, 18K+ hoi vien." />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
-<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
-<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" />
-<link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GymZone — Tập luyện thông minh, kết quả thật</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --accent: #22c55e;
+      --accent2: #eab308;
+      --bg: #0a1f0a;
+      --card: #1a3d1a;
+      --text: #f0fdf4;
+      --text2: #bbf7d0;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── Nav ── */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 0 24px;
+    }
+    .nav-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 56px;
+    }
+    .nav-logo {
+      font-size: 17px; font-weight: 700; letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
+    .nav-links a {
+      color: var(--text2); font-size: 13.5px; font-weight: 500;
+      text-decoration: none; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--accent); color: #fff; font-size: 13px; font-weight: 600;
+      padding: 8px 18px; border-radius: 8px; text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    /* ── Hero ── */
+    .hero {
+      min-height: 520px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg);
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: var(--bgGradient, linear-gradient(135deg, #14532d 0%, #166534 50%, #15803d 100%));
+      opacity: 0.6;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 40%, #22c55e22 0%, transparent 70%);
+    }
+    .hero-inner {
+      position: relative; z-index: 1;
+      text-align: center; padding: 60px 24px;
+      max-width: 700px;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: #22c55e22; border: 1px solid #22c55e55;
+      color: var(--accent); font-size: 11.5px; font-weight: 600;
+      padding: 5px 14px; border-radius: 999px;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .hero-headline {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 800; line-height: 1.05; letter-spacing: -0.03em;
+      margin-bottom: 18px; color: var(--text);
+    }
+    .hero-sub {
+      font-size: 17px; color: var(--text2); max-width: 480px;
+      margin: 0 auto 32px; line-height: 1.65;
+    }
+    .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--accent); color: #fff;
+      padding: 12px 28px; border-radius: 10px;
+      font-size: 15px; font-weight: 600; text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px #22c55e44;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px #22c55e55; }
+    .btn-secondary {
+      background: rgba(255,255,255,0.08); color: var(--text);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 12px 28px; border-radius: 10px;
+      font-size: 15px; font-weight: 500; text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.13); }
+
+    /* ── Stats ── */
+    .stats-bar {
+      background: var(--card);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding: 24px;
+    }
+    .stats-inner {
+      max-width: 700px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 16px; text-align: center;
+    }
+    .stat-value {
+      font-size: 28px; font-weight: 800; letter-spacing: -0.03em;
+      color: var(--accent); font-variant-numeric: tabular-nums;
+    }
+    .stat-label { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+    /* ── Features ── */
+    .section { max-width: 900px; margin: 0 auto; padding: 64px 24px; }
+    .section-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(26px, 4vw, 38px); font-weight: 800;
+      letter-spacing: -0.03em; margin-bottom: 8px; line-height: 1.15;
+    }
+    .section-sub { color: var(--text2); font-size: 16px; margin-bottom: 40px; }
+
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .feature-card {
+      background: var(--card); border-radius: 12px; padding: 20px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .feature-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: #22c55e22; display: flex; align-items: center; justify-content: center;
+      margin-bottom: 12px; font-size: 16px;
+    }
+    .feature-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .feature-desc { font-size: 12.5px; color: var(--text2); line-height: 1.55; }
+
+    /* ── Testimonial ── */
+    .testimonial {
+      background: var(--card); border-radius: 16px; padding: 32px;
+      border-left: 3px solid var(--accent);
+      margin-bottom: 0;
+    }
+    .testimonial-text {
+      font-size: 17px; line-height: 1.7; margin-bottom: 16px;
+      font-style: italic; color: var(--text);
+    }
+    .testimonial-author { font-size: 13px; font-weight: 600; }
+    .testimonial-role { color: var(--text2); font-size: 12px; margin-top: 2px; }
+
+    /* ── FAQ ── */
+    .faq-item {
+      border-bottom: 1px solid rgba(255,255,255,0.05); padding: 18px 0;
+    }
+    .faq-q { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .faq-a { font-size: 13px; color: var(--text2); line-height: 1.65; }
+
+    /* ── CTA Banner ── */
+    .cta-banner {
+      background: var(--card);
+      border-radius: 16px; padding: 48px 32px;
+      text-align: center;
+      background-image: radial-gradient(ellipse 60% 50% at 50% 100%, #22c55e22 0%, transparent 70%);
+    }
+    .cta-banner h2 {
+      font-size: clamp(22px, 4vw, 34px); font-weight: 800;
+      letter-spacing: -0.03em; margin-bottom: 12px;
+    }
+    .cta-banner p { color: var(--text2); font-size: 15px; margin-bottom: 24px; }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center; padding: 32px 24px;
+      color: var(--text2); font-size: 12px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .hero-headline { font-size: 36px; }
+      .stats-inner { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .stat-value { font-size: 20px; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- ─── NAV ─── -->
+<!-- NAV -->
 <nav class="nav">
-  <div class="container nav-inner">
-    <a href="#" class="logo">
-      <svg class="logo-mark" viewBox="0 0 32 32" fill="none">
-        <rect x="4" y="4" width="24" height="24" rx="7" fill="currentColor"/>
-        <path d="M10 22 V10 M10 16 H16 L22 10 V22 M22 16 H16" stroke="#fafbff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <span>gz<span class="logo-dot">.</span></span>
-    </a>
-    <ul class="nav-menu">
-      <li><a href="#features">Tinh nang</a></li>
-      <li><a href="#workflow">Quy trinh</a></li>
-      <li><a href="#pricing">Bang gia</a></li>
-      <li><a href="#customers">Hoi vien</a></li>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">Gym Zone<span>.</span></a>
+    <ul class="nav-links">
+      <li><a href="#">Classes</a></li>
+      <li><a href="#">Coaches</a></li>
+      <li><a href="#">Pricing</a></li>
+      <li><a href="#">Community</a></li>
     </ul>
-    <div class="nav-actions">
-      <a href="#" class="nav-ghost">Dang nhap</a>
-      <a href="#pricing" class="nav-cta">
-        Tap thu mien phi
-        <i class="ph ph-arrow-up-right"></i>
-      </a>
-    </div>
+    <a href="#" class="nav-cta">Join Now</a>
   </div>
 </nav>
 
-<!-- ─── HERO ─── -->
-<header class="hero">
-  <div class="container hero-grid">
-    <div class="hero-text">
-      <div class="eyebrow">
-        <span class="eyebrow-dot"></span>
-        420 lop/tuan · 120 coach · 18K+ hoi vien
-      </div>
-
-      <h1 class="hero-title">
-        Tap luyen thong minh,<br/>
-        ket qua that <span class="hl">that day</span>.
-      </h1>
-
-      <p class="hero-desc">
-        GymZone thay the chi tap theo youtube bằng lộ trình cá nhân hoá:
-        AI phan tich the trang, coach PT 1-1 goc video, lop nhom HIIT/Yoga/Boxing.
-        Thiet ke cho nguoi Viet Nam, ket noi Apple Health & Google Fit.
-      </p>
-
-      <div class="hero-cta">
-        <a href="#pricing" class="btn btn-primary btn-lg">
-          Bat dau tap thu
-          <i class="ph ph-arrow-right"></i>
-        </a>
-        <a href="#workflow" class="btn btn-ghost btn-lg">
-          <i class="ph-fill ph-play-circle"></i>
-          Xem 1 phut gioi thieu
-        </a>
-      </div>
-
-      <div class="hero-stats">
-        <div class="hstat">
-          <div class="hstat-num">18K+</div>
-          <div class="hstat-label">Hoi vien</div>
-        </div>
-        <div class="hstat-sep"></div>
-        <div class="hstat">
-          <div class="hstat-num">420</div>
-          <div class="hstat-label">Lop/tuan</div>
-        </div>
-        <div class="hstat-sep"></div>
-        <div class="hstat">
-          <div class="hstat-num">120</div>
-          <div class="hstat-label">Coach</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Workout dashboard mockup -->
-    <div class="hero-visual">
-      <div class="dash">
-        <div class="dash-top">
-          <div class="dash-tabs">
-            <span class="dash-tab active"><i class="ph ph-calendar-blank"></i> Lop tuan</span>
-            <span class="dash-tab"><i class="ph ph-chart-line"></i> Tien do</span>
-            <span class="dash-tab"><i class="ph ph-trophy"></i> PR</span>
-          </div>
-          <div class="dash-dots"><i></i><i></i><i></i></div>
-        </div>
-
-        <!-- 7-day schedule -->
-        <div class="wk-cal">
-          <div class="wk-header">
-            <span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span>CN</span>
-          </div>
-          <div class="wk-row">
-            <div class="wk-slot filled yga"><span>Yoga 6AM</span></div>
-            <div class="wk-slot"></div>
-            <div class="wk-slot filled hit"><span>HIIT 7AM</span></div>
-            <div class="wk-slot"></div>
-            <div class="wk-slot filled yga"><span>Yoga 6AM</span></div>
-            <div class="wk-slot filled bxc"><span>Boxing 8AM</span></div>
-            <div class="wk-slot filled hit"><span>HIIT 9AM</span></div>
-          </div>
-        </div>
-
-        <!-- Progress chart -->
-        <div class="prog-chart">
-          <div class="pc-title">Tien do tuan nay</div>
-          <svg viewBox="0 0 340 90" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="pg" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#22c55e" stop-opacity=".2"/>
-                <stop offset="100%" stop-color="#22c55e" stop-opacity="0"/>
-              </linearGradient>
-              <linearGradient id="py" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#eab308" stop-opacity=".15"/>
-                <stop offset="100%" stop-color="#eab308" stop-opacity="0"/>
-              </linearGradient>
-            </defs>
-            <line x1="0" y1="22" x2="340" y2="22" stroke="#e4e4e7" stroke-dasharray="2 4"/>
-            <line x1="0" y1="45" x2="340" y2="45" stroke="#e4e4e7" stroke-dasharray="2 4"/>
-            <line x1="0" y1="68" x2="340" y2="68" stroke="#e4e4e7" stroke-dasharray="2 4"/>
-            <path d="M0,60 C40,55 60,50 100,42 C140,34 160,38 200,30 C240,22 260,28 300,18 C320,13 330,15 340,18 L340,90 L0,90 Z" fill="url(#pg)"/>
-            <path d="M0,60 C40,55 60,50 100,42 C140,34 160,38 200,30 C240,22 260,28 300,18 C320,13 330,15 340,18" stroke="#22c55e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-            <path d="M0,72 C40,68 60,70 100,64 C140,58 160,62 200,56 C240,50 260,54 300,46 C320,42 330,44 340,46 L340,90 L0,90 Z" fill="url(#py)"/>
-            <path d="M0,72 C40,68 60,70 100,64 C140,58 160,62 200,56 C240,50 260,54 300,46 C320,42 330,44 340,46" stroke="#eab308" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="5 3"/>
-            <circle cx="200" cy="30" r="3" fill="#22c55e"/>
-            <circle cx="300" cy="18" r="3" fill="#22c55e"/>
-          </svg>
-          <div class="pc-legend">
-            <span class="pcl-item"><i class="ph-fill ph-circle" style="color:#22c55e"></i> Calories</span>
-            <span class="pcl-item"><i class="ph-fill ph-circle" style="color:#eab308"></i> Doi tich luc</span>
-          </div>
-        </div>
-
-        <!-- PR tracker -->
-        <div class="pr-list">
-          <div class="pr-row">
-            <div class="pr-icon" style="background:#dcfce7;color:#16a34a"><i class="ph-fill ph-barbell"></i></div>
-            <div class="pr-info">
-              <div class="pr-name">Deadlift</div>
-              <div class="pr-meta">Tang 15kg trong 8 tuan</div>
-            </div>
-            <div class="pr-val">100kg</div>
-          </div>
-          <div class="pr-row">
-            <div class="pr-icon" style="background:#fef9c3;color:#ca8a04"><i class="ph-fill ph-timer"></i></div>
-            <div class="pr-info">
-              <div class="pr-name">5K Run</div>
-              <div class="pr-meta">Giam 4 phut 30 giy</div>
-            </div>
-            <div class="pr-val">22:15</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="float float-a">
-        <div class="fa-icon" style="background:#dcfce7;color:#16a34a"><i class="ph-fill ph-check-circle"></i></div>
-        <div>
-          <div class="fa-title">Hoan thanh buoi tap</div>
-          <div class="fa-meta">HIIT 7AM · Hom qua 06:45</div>
-        </div>
-      </div>
-
-      <div class="float float-b">
-        <div class="fa-icon"><i class="ph-fill ph-fire"></i></div>
-        <div>
-          <div class="fa-title">Da dot 420kcal</div>
-          <div class="fa-meta">Muc tieu: 500kcal · Con 80kcal</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</header>
-
-<!-- ─── FEATURES (bento grid) ─── -->
-<section class="features" id="features">
-  <div class="container">
-    <div class="section-head">
-      <div class="eyebrow">Tinh nang</div>
-      <h2 class="section-title">Tu buoi tap dau tien den phut thu 10.000.</h2>
-      <p class="section-desc">Khong co 100 bai tap vo nghia. Chi 5 thu ban dung moi ngay de dat muc tieu.</p>
-    </div>
-
-    <div class="bento">
-      <article class="bento-card bento-big">
-        <div class="bc-tag"><i class="ph ph-calendar-check"></i> Dat lich</div>
-        <h3>Book lop realtime, ghe ngoi tu dong.</h3>
-        <p>Xem 420 lop/tuan, book ghe tu dong khi con cho, nhan nhac 2 tieng truoc buoi tap. Huong dan bai tap chi tiet co san trong app.</p>
-        <div class="bc-mock">
-          <div class="bk-grid">
-            <div class="bk-card">
-              <div class="bk-time">06:00</div>
-              <div class="bk-class">Yoga</div>
-              <div class="bk-spot gr">Con 4 cho</div>
-            </div>
-            <div class="bk-card">
-              <div class="bk-time">07:00</div>
-              <div class="bk-class">HIIT</div>
-              <div class="bk-spot rd">Day</div>
-            </div>
-            <div class="bk-card">
-              <div class="bk-time">08:00</div>
-              <div class="bk-class">Boxing</div>
-              <div class="bk-spot gr">Con 12 cho</div>
-            </div>
-            <div class="bk-card">
-              <div class="bk-time">18:00</div>
-              <div class="bk-class">Pilates</div>
-              <div class="bk-spot gr">Con 6 cho</div>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <article class="bento-card">
-        <div class="bc-tag"><i class="ph ph-user-gear"></i> Plan</div>
-        <h3>Lop tap ca nhan hoa chi 3 phut.</h3>
-        <p>AI phan tich muc tieu, the trang, lich su tap. Sinh lich tap 12 tuan phu hop voi cuoc song ban.</p>
-      </article>
-
-      <article class="bento-card">
-        <div class="bc-tag"><i class="ph ph-chart-line-up"></i> Tracking</div>
-        <h3>Theo doi tien do, khong chi can nang.</h3>
-        <p>Ky suat, luong calories, VO2 max, do ben. Doi khi thay doi nhiet do co the, nhung con so khong di xuong.</p>
-      </article>
-
-      <article class="bento-card">
-        <div class="bc-tag"><i class="ph ph-video-camera"></i> PT 1-on-1</div>
-        <h3>Coaching qua video call, gap mat.</h3>
-        <p>120 coach certified san sang goi video 1-1. Tra loi trong 15 phut, khong choi nha.</p>
-      </article>
-
-      <article class="bento-card">
-        <div class="bc-tag"><i class="ph ph-users-three"></i> Cang dong</div>
-        <h3>Thu thach 30 ngay, co gang cung nhau.</h3>
-        <p>Tham gia thu thach voi 10.000 hoi vien. Len bang xep hang, nhan qua hang tuan.</p>
-      </article>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <span class="hero-badge">120 certified coaches, 18,000 members</span>
+    <h1 class="hero-headline">Your transformation<br>starts here</h1>
+    <p class="hero-sub">Personalized workout plans, certified coaches, and a community that keeps you accountable.</p>
+    <div class="hero-actions">
+      <a href="#" class="btn-primary">Get Started Free</a>
+      <a href="#" class="btn-secondary">View Demo</a>
     </div>
   </div>
 </section>
 
-<!-- ─── WORKFLOW ─── -->
-<section class="workflow" id="workflow">
-  <div class="container">
-    <div class="section-head">
-      <div class="eyebrow">Quy trinh</div>
-      <h2 class="section-title">4 buoc tu nguoi moi den the duc cu.</h2>
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    
+    <div>
+      <div class="stat-value">18K+</div>
+      <div class="stat-label">Members</div>
     </div>
-    <div class="flow">
-      <div class="flow-step">
-        <div class="fs-num">01</div>
-        <h4>Danh gia the luc</h4>
-        <p>InBody scan, test cardio, khao sat muc tieu. 15 phut de hieu chinh xac vi tri bat dau.</p>
-      </div>
-      <div class="flow-step">
-        <div class="fs-num">02</div>
-        <h4>Chon muc tieu</h4>
-        <p>Giam can, tang co, chay marathon, hay chi muon khoe hon? Moi muc tieu co lich tap rieng.</p>
-      </div>
-      <div class="flow-step">
-        <div class="fs-num">03</div>
-        <h4>Lộ trinh AI</h4>
-        <p>Algorithm tao ke hoach tap 12 tuan. Dieu chinh tu dong khi ban hoan thanh hoac bo cua buoi tap.</p>
-      </div>
-      <div class="flow-step">
-        <div class="fs-num">04</div>
-        <h4>Do luong tien do</h4>
-        <p>InBody moi quy, PR tracker, dashboard ca nhan. Thay ro suc khoe thay doi sau 30 ngay.</p>
-      </div>
+    <div>
+      <div class="stat-value">420</div>
+      <div class="stat-label">Classes/Week</div>
+    </div>
+    <div>
+      <div class="stat-value">120</div>
+      <div class="stat-label">Coaches</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="section">
+  <div class="section-label">Features</div>
+  <h2 class="section-title">Everything you need.</h2>
+  <p class="section-sub">Built for real workflows. No bloat.</p>
+  <div class="features-grid">
+    
+    <div class="feature-card">
+      <div class="feature-icon">✦</div>
+      <div class="feature-title">Class booking</div>
+      <div class="feature-desc">Class booking với waitlist tự động</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✦</div>
+      <div class="feature-title">Workout plan cá nhân hoá</div>
+      <div class="feature-desc">Workout plan cá nhân hoá theo goal</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✦</div>
+      <div class="feature-title">Progress tracking: weight, reps, PR</div>
+      <div class="feature-desc">Progress tracking: weight, reps, PR</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✦</div>
+      <div class="feature-title">Video call 1-1</div>
+      <div class="feature-desc">Video call 1-1 với coach</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✦</div>
+      <div class="feature-title">Cộng đồng & thử thách hàng tuần</div>
+      <div class="feature-desc">Cộng đồng & thử thách hàng tuần</div>
     </div>
   </div>
 </section>
 
-<!-- ─── PRICING ─── -->
-<section class="pricing" id="pricing">
-  <div class="container">
-    <div class="section-head">
-      <div class="eyebrow">Bang gia</div>
-      <h2 class="section-title">Gia theo tap tap, khong theo khoang cach.</h2>
-      <p class="section-desc">Tap thu 1 buoi mien phi. Khong can the tin dung.</p>
+<!-- HIGHLIGHTS -->
+<section class="section" style="padding-top:0;">
+  <div class="section-label">By the numbers</div>
+  <div class="features-grid">
+    
+    <div class="feature-card" style="text-align:center;">
+      <div class="stat-value" style="font-size:36px;margin-bottom:4px;">18K+</div>
+      <div class="stat-label">Hội viên</div>
     </div>
-    <div class="price-grid">
-      <article class="price-card">
-        <div class="pc-name">Pay-as-you-go</div>
-        <div class="pc-price"><span>200K</span><span>/buoi</span></div>
-        <p class="pc-desc">Cho nguoi muon thu truoc khi cam kết.</p>
-        <ul class="pc-features">
-          <li><i class="ph ph-check"></i> Dat lich 420 lop/tuan</li>
-          <li><i class="ph ph-check"></i> Vao gym tu do</li>
-          <li><i class="ph ph-check"></i> App GymZone</li>
-          <li><i class="ph ph-check"></i> Huong dan tai may</li>
-          <li><i class="ph ph-check"></i> Khong han che thoi gian</li>
-        </ul>
-        <a href="#" class="btn btn-outline btn-full">Dat lich ngay</a>
-      </article>
-
-      <article class="price-card pc-featured">
-        <div class="pc-ribbon"><i class="ph-fill ph-crown-simple"></i> Pho bien nhat</div>
-        <div class="pc-name">Member 3 thang</div>
-        <div class="pc-price"><span>2.400.000₫</span><span>/3 thang</span></div>
-        <p class="pc-desc">Cam ket 30 buoi, tiet kiem 25% so voi mua le.</p>
-        <ul class="pc-features">
-          <li><i class="ph ph-check"></i> 30 buoi tap</li>
-          <li><i class="ph ph-check"></i> Tang 2 buoi PT 1-on-1</li>
-          <li><i class="ph ph-check"></i> Lich tap AI ca nhan</li>
-          <li><i class="ph ph-check"></i> Tham gia thu thach cong dong</li>
-          <li><i class="ph ph-check"></i> Do InBody 1 lan</li>
-          <li><i class="ph ph-check"></i> Thay doi lich tap bat ky</li>
-        </ul>
-        <a href="#" class="btn btn-primary btn-full">Dang ky ngay</a>
-      </article>
-
-      <article class="price-card">
-        <div class="pc-name">Member 12 thang</div>
-        <div class="pc-price"><span>8.900.000₫</span><span>/nam</span></div>
-        <p class="pc-desc">Khong gioi han buoi tap, tiet kiem 40%.</p>
-        <ul class="pc-features">
-          <li><i class="ph ph-check"></i> Khong gioi han buoi tap</li>
-          <li><i class="ph ph-check"></i> 12 buoi PT 1-on-1</li>
-          <li><i class="ph ph-check"></i> Do InBody moi quy</li>
-          <li><i class="ph ph-check"></i> Lich tap AI nang cao</li>
-          <li><i class="ph ph-check"></i> Ưu tien dat lich VIP</li>
-          <li><i class="ph ph-check"></i> Tham gia tat ca thu thach</li>
-        </ul>
-        <a href="#" class="btn btn-outline btn-full">Lien he sales</a>
-      </article>
+    <div class="feature-card" style="text-align:center;">
+      <div class="stat-value" style="font-size:36px;margin-bottom:4px;">420</div>
+      <div class="stat-label">Lớp/tuần</div>
+    </div>
+    <div class="feature-card" style="text-align:center;">
+      <div class="stat-value" style="font-size:36px;margin-bottom:4px;">120</div>
+      <div class="stat-label">Coach</div>
     </div>
   </div>
 </section>
 
-<!-- ─── CUSTOMERS ─── -->
-<section class="customers" id="customers">
-  <div class="container">
-    <div class="section-head">
-      <div class="eyebrow">Hoi vien</div>
-      <h2 class="section-title">18K+ nguoi Viet Nam da thay doi.</h2>
-    </div>
-
-    <div class="t-row">
-      <article class="t-card t-big">
-        <div class="t-quote">"GymZone giup toi giam 12kg trong 6 thang. PT Ngoc Anh chi ra cach an dung, khong cat kalo. Gio toi dang chay duoc 21km ma khong bi met."</div>
-        <div class="t-author">
-          <img src="https://i.pravatar.cc/80?img=8" alt="" loading="lazy" />
-          <div>
-            <div class="t-name">Tran Van Duc</div>
-            <div class="t-role">Giam 12kg · 6 thang</div>
-          </div>
-        </div>
-        <div class="t-stat">
-          <div class="ts-num">-12kg</div>
-          <div class="ts-label">Sau 6 thang tap deu dan</div>
-        </div>
-      </article>
-
-      <article class="t-card">
-        <div class="t-quote">"Toi tang duoc 8kg co trong 4 thang nho lich tap AI. Khong can di tapluc bao gio, van co khuon.</div>
-        <div class="t-author">
-          <img src="https://i.pravatar.cc/80?img=13" alt="" loading="lazy" />
-          <div>
-            <div class="t-name">Le Thi Mai</div>
-            <div class="t-role">Tang 8kg co · 4 thang</div>
-          </div>
-        </div>
-      </article>
-
-      <article class="t-card">
-        <div class="t-quote">"Chay marathon dau tien 42km trong 3:45. PT Hoang cho toi lich chay 20 tuan, huong dan dinh duong chi tiet.</div>
-        <div class="t-author">
-          <img src="https://i.pravatar.cc/80?img=60" alt="" loading="lazy" />
-          <div>
-            <div class="t-name">Nguyen Phuong</div>
-            <div class="t-role">Vuot marathon dau tien</div>
-          </div>
-        </div>
-      </article>
-
-      <article class="t-card">
-        <div class="t-quote">"Di lam van phong nhung van co 6 mui. Nho lop Yoga 6AM, gio suc khoe tot hon, ngu ngon hon nhieu.</div>
-        <div class="t-author">
-          <img src="https://i.pravatar.cc/80?img=21" alt="" loading="lazy" />
-          <div>
-            <div class="t-name">Pham Tuan Anh</div>
-            <div class="t-role">Office worker · tap 6 thang</div>
-          </div>
-        </div>
-      </article>
-    </div>
+<!-- TESTIMONIAL -->
+<section class="section" style="padding-top:0;">
+  <div class="testimonial">
+    <p class="testimonial-text">"GymZone coach giúp mình xây dựng kế hoạch tập phù hợp. Kết quả sau 6 tháng: -18kg, 6-pack đầu tiên."</p>
+    <div class="testimonial-author">Minh Duc</div>
+    <div class="testimonial-role">Lost 18kg in 6 months</div>
   </div>
 </section>
 
-<!-- ─── FINAL CTA ─── -->
-<section class="final">
-  <div class="container">
-    <div class="final-box">
-      <h2>San sang <span class="hl">thay doi</span>?</h2>
-      <p>Tap thu 1 buoi mien phi. Khong can the tin dung. Coach tieng Viet 6AM-10PM.</p>
-      <div class="final-actions">
-        <a href="#" class="btn btn-primary btn-lg">Bat dau ngay <i class="ph ph-arrow-right"></i></a>
-        <a href="#" class="btn btn-outline btn-lg">Dat lich tham quan</a>
-      </div>
-    </div>
+<!-- FAQ -->
+<section class="section" style="padding-top:0;">
+  <div class="section-label">FAQ</div>
+  <h2 class="section-title">Common questions.</h2>
+  
+  <div class="faq-item">
+    <div class="faq-q">Do I need to commit to a contract?</div>
+    <div class="faq-a">No — month-to-month membership available. No joining fee. Cancel anytime.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Is there a trial class?</div>
+    <div class="faq-a">Free first class for all new members. Book via the app or website.</div>
   </div>
 </section>
 
-<!-- ─── FOOTER ─── -->
+<!-- CTA -->
+<section class="section" style="padding-top:0;">
+  <div class="cta-banner">
+    <h2>Ready to get started?</h2>
+    <p>Join thousands of users today. 6 pages · 228 KB · HTML5, CSS3, Vanilla JS, GSAP</p>
+    <a href="#" class="btn-primary">Try GymZone Free</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
 <footer class="footer">
-  <div class="container">
-    <div class="footer-top">
-      <div class="footer-brand">
-        <div class="logo">
-          <svg class="logo-mark" viewBox="0 0 32 32" fill="none">
-            <rect x="4" y="4" width="24" height="24" rx="7" fill="currentColor"/>
-            <path d="M10 22 V10 M10 16 H16 L22 10 V22 M22 16 H16" stroke="#fafbff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span>gz<span class="logo-dot">.</span></span>
-        </div>
-        <p>Tap luyen thong minh cho nguoi Viet Nam. 6 chi nhanh tai Ha Noi, Ho Chi Minh, Da Nang.</p>
-      </div>
-      <div>
-        <h5>San pham</h5>
-        <ul>
-          <li><a href="#">Tinh nang</a></li>
-          <li><a href="#">Bang gia</a></li>
-          <li><a href="#">Lop tap</a></li>
-          <li><a href="#">Coach</a></li>
-          <li><a href="#">Changelog</a></li>
-        </ul>
-      </div>
-      <div>
-        <h5>Chi nhanh</h5>
-        <ul>
-          <li><a href="#">Ha Noi</a></li>
-          <li><a href="#">Ho Chi Minh</a></li>
-          <li><a href="#">Da Nang</a></li>
-          <li><a href="#">Can Tho</a></li>
-        </ul>
-      </div>
-      <div>
-        <h5>Cong ty</h5>
-        <ul>
-          <li><a href="#">Ve GymZone</a></li>
-          <li><a href="#">Tuyen dung (18)</a></li>
-          <li><a href="#">Bao chi</a></li>
-          <li><a href="#">Lien he</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <div>© 2026 GymZone Vietnam JSC. MST: 0109246835.</div>
-      <div class="footer-legal">
-        <a href="#">Privacy</a>
-        <a href="#">Terms</a>
-        <a href="#">Security</a>
-        <a href="#">Status</a>
-      </div>
-    </div>
-  </div>
+  <div>GymZone · FITNESS template · Part of Cursor Enterprise Framework</div>
 </footer>
 
-<script src="script.js"></script>
 </body>
 </html>
