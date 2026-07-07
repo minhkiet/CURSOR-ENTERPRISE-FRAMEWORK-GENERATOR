@@ -14,6 +14,7 @@
     "clean": "rmdir /s /q dist node_modules 2>nul || true"
   },
   "dependencies": {
+    "jszip": "^3.10.1",
     "motion": "^12.42.2",
     "vue": "^3.4.29",
     "vue-router": "^4.3.3"

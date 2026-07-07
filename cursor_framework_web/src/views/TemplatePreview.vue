@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getTemplateById, templates } from '../data/templates'
+import DownloadModal from '../components/DownloadModal.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -10,7 +11,7 @@ const template = computed(() => getTemplateById(route.params.id as string))
 
 const viewMode = ref<'desktop' | 'tablet' | 'mobile'>('desktop')
 const showInfo = ref(true)
-const downloadStatus = ref<'idle' | 'preparing' | 'ready'>('idle')
+const showDownloadModal = ref(false)
 
 const iframeSrc = computed(() => {
   if (!template.value) return ''
@@ -29,19 +30,12 @@ function previewTemplate(id: string) {
   router.push(`/templates/${id}`)
 }
 
-function downloadTemplate() {
-  if (!template.value) return
-  downloadStatus.value = 'preparing'
-  setTimeout(() => {
-    downloadStatus.value = 'ready'
-    const link = document.createElement('a')
-    link.href = `/templates/${template.value!.id}/index.html`
-    link.download = `${template.value!.id}-landing.html`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    setTimeout(() => (downloadStatus.value = 'idle'), 2000)
-  }, 600)
+function openDownloadModal() {
+  showDownloadModal.value = true
+}
+
+function closeDownloadModal() {
+  showDownloadModal.value = false
 }
 
 const iframeRef = ref<HTMLIFrameElement | null>(null)
@@ -70,12 +64,6 @@ function refreshFrame() {
     })
   }
 }
-
-function getDownloadLabel() {
-  if (downloadStatus.value === 'idle') return 'Download'
-  if (downloadStatus.value === 'preparing') return 'Preparing...'
-  return 'Downloaded'
-}
 </script>
 
 <template>
@@ -103,11 +91,9 @@ function getDownloadLabel() {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
               <span>{{ showInfo ? 'Hide info' : 'Info' }}</span>
             </button>
-            <button class="btn btn-primary dl-btn" @click="downloadTemplate" :disabled="downloadStatus !== 'idle'">
-              <svg v-if="downloadStatus === 'idle'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-              <svg v-else-if="downloadStatus === 'preparing'" class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>
-              <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>{{ getDownloadLabel() }}</span>
+            <button class="btn btn-primary dl-btn" @click="openDownloadModal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+              <span>Tải về</span>
             </button>
           </div>
         </div>
@@ -246,6 +232,16 @@ function getDownloadLabel() {
       <button class="btn btn-primary" @click="backToGallery">Back to gallery</button>
     </div>
   </div>
+
+  <DownloadModal
+    v-if="showDownloadModal && template"
+    :template-id="template.id"
+    :template-name="template.name"
+    :template-industry="template.industry"
+    :template-tagline="template.tagline"
+    :template-description="template.description"
+    @close="closeDownloadModal"
+  />
 </template>
 
 <style scoped>

@@ -1,28 +1,4 @@
-/* VIET TRAVEL — script.js */
-
-// Countdown: next departure
-function updateCountdown() {
-  const daysEl = document.getElementById('countdown-days');
-  const dateEl = document.getElementById('countdown-date');
-  if (!daysEl || !dateEl) return;
-
-  const now = new Date();
-  const nextSaturday = new Date(now);
-  nextSaturday.setDate(now.getDate() + (6 - now.getDay() + 7) % 7 + 1);
-  nextSaturday.setHours(0, 0, 0, 0);
-
-  const diffMs = nextSaturday - now;
-  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-
-  const day = String(nextSaturday.getDate()).padStart(2, '0');
-  const month = String(nextSaturday.getMonth() + 1).padStart(2, '0');
-
-  daysEl.textContent = diffDays;
-  dateEl.textContent = `${day}/${month}`;
-}
-
-updateCountdown();
-setInterval(updateCountdown, 60000);
+/* VIETTRAVEL — script.js */
 
 // Smooth count-up animation for stats
 function countUp(el, target, duration = 1200, prefix = '', suffix = '') {
@@ -68,11 +44,11 @@ const statsObserver = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.5 });
 
-document.querySelectorAll('.stat-num').forEach(el => {
+document.querySelectorAll('.si-num').forEach(el => {
   if (!el.dataset.animated) statsObserver.observe(el);
 });
 
-// Stagger reveal for bento cards & flow steps
+// Stagger reveal for cards
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach((entry, idx) => {
     if (entry.isIntersecting) {
@@ -80,12 +56,12 @@ const revealObserver = new IntersectionObserver((entries) => {
       entry.target.classList.add('is-revealed');
     }
   });
-}, { threshold: 0.15 });
+}, { threshold: 0.1 });
 
-document.querySelectorAll('.bento-card, .flow-step, .price-card, .t-card, .dash-stat').forEach(el => {
+document.querySelectorAll('.bento-card, .flow-step, .price-card, .review-card, .guide-card, .dest-card').forEach(el => {
   el.style.opacity = '0';
-  el.style.transform = 'translateY(12px)';
-  el.style.transition = 'opacity .55s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1), border-color .25s';
+  el.style.transform = 'translateY(16px)';
+  el.style.transition = 'opacity .55s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1), border-color .25s, box-shadow .25s';
   revealObserver.observe(el);
 });
 

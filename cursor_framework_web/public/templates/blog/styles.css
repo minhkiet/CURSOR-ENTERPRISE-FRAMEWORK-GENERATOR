@@ -695,6 +695,53 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
   .footer-bot { flex-direction: column; align-items: flex-start; }
 }
 
+/* ─── FLOATING CONTACT BUTTONS ─── */
+.floating-contact {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 200;
+}
+
+.floating-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s;
+  animation: float-bounce 3s ease-in-out infinite;
+  position: relative;
+}
+.floating-btn_hotline { animation-delay: 0.2s; }
+.floating-btn_zalo { animation-delay: 0s; }
+
+.floating-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+.floating-btn svg { width: 100%; height: 100%; }
+.floating-btn_pulse {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  animation: pulse-ring 2s ease-out infinite;
+}
+.floating-btn_hotline .floating-btn_pulse { background: rgba(0, 136, 74, 0.3); }
+.floating-btn_zalo .floating-btn_pulse { background: rgba(0, 104, 255, 0.3); }
+
+@keyframes float-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
 @media (max-width: 640px) {
   .container { padding: 0 20px; }
   .masthead-top { font-size: 11px; padding: 10px 20px; }
