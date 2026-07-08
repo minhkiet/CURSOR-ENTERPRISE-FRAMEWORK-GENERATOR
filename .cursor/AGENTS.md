@@ -38,7 +38,7 @@ Cursor Enterprise Framework tích hợp **Agent Personas** từ agent-skills - c
 
 | Command | Description | Key Principle |
 |---------|-------------|---------------|
-| `/plan` | Plan how to build it | **Small, atomic tasks** |
+| `/plan` | Plan how to build it (atomic 2-5min tasks, exact file paths, verification steps) | **Small, atomic tasks** |
 
 ### Build Phase
 
@@ -52,7 +52,7 @@ Cursor Enterprise Framework tích hợp **Agent Personas** từ agent-skills - c
 | Command | Description | Key Principle |
 |---------|-------------|---------------|
 | `/test` | Prove it works | **Tests are proof** |
-| `/debug` | Debugging and error recovery | Five-step triage |
+| `/debug` | Debugging and error recovery (4-phase: reproduce, isolate, hypothesize, fix root cause) | Five-step triage |
 
 ### Review Phase
 
@@ -378,6 +378,8 @@ Skill Auto-Discovery
 Agent Persona Selection (if review requested)
     ↓
 Pre-Review Gates
+    ↓
+Apply karpathy gates K.1-K.7 (verification before completion)
     ↓
 Implementation
     ↓

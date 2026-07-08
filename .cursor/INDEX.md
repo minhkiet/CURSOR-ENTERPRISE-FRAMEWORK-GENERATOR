@@ -105,6 +105,8 @@
 | `skill-installer` | skills/skill-installer/SKILL.md |
 
 > **Note:** `reverse-skill/` folder chứa 57 CTF competition skills (không đếm vào 17 skills chính)
+>
+> **Note:** 4 concept-ref mappings from [obra/superpowers](https://github.com/obra/superpowers) (248k stars) integrated inline — `brainstorming`, `writing-plans`, `test-driven-development`, `systematic-debugging`. See `.cursor/rules/skill-registry.mdc` §1.2 (Meta Skills) + §8 (References).
 
 ## Knowledge (36 directories)
 
@@ -166,6 +168,13 @@ Quick-reference checklists aligned with agent-skills:
 | `setup-mcp.ps1` | MCP setup (weknora) |
 
 ## Changelog
+
+### 2026-07-07 v6.0
+- Integrated [obra/superpowers](https://github.com/obra/superpowers) methodology (248k stars) — synced 13 concepts into 6 existing files
+- Added 4 concept-ref skills in `skill-registry.mdc` §1.2 Meta Skills (brainstorming, writing-plans, TDD, systematic-debugging)
+- New sections: `intent-detection.mdc §G.6 Brainstorming`, `task-analyzer.mdc §4.4 Writing-Plans + §X.1 Systematic Debugging`, `karpathy-coding §X Verification + §Y Code Review`, `version-control.mdc Worktree Workflow`
+- `AGENTS.md` slash commands enriched (`/plan`, `/debug`) + Execution Flow updated with K.1-K.7 verification
+- **Updated counts:** Skills 17 (Meta Skills = 4 concept-refs) — no file count change
 
 ### 2026-06-29 v5.0
 - Integrated [agent-skills](https://github.com/addyosmani/agent-skills) (67k stars)

@@ -640,6 +640,23 @@ security_post:
 }
 ```
 
+### 4.4 Writing-Plans Discipline (from Superpowers)
+
+> **Source:** [obra/superpowers](https://github.com/obra/superpowers) `writing-plans` skill (248k stars) — "Breaks work into bite-sized tasks (2-5 minutes each). Every task has exact file paths, complete code, verification steps."
+
+When `/plan` is invoked, the generated task manifest MUST follow this discipline:
+
+| Rule | Description |
+|---|---|
+| Atomic tasks | Each task 2-5 minutes of focused work |
+| Exact file paths | No ambiguity (`src/auth/login.ts`, not "the auth code") |
+| Complete code in plan | Each task carries the full code snippet to add — not "implement X" |
+| Verification per task | Each task has a `verify:` clause (run tests, hit URL, etc.) |
+| Tests first | New behavior gets a failing test before implementation |
+| Acceptance criteria | Each task states an objective "Done when …" condition |
+
+This aligns with framework's existing `karpathy-coding §K.4 Goal Definition` (success criteria + verification points).
+
 ---
 
 ## PHẦN 5: DEPENDENCY AUTO-INSTALL
@@ -931,6 +948,60 @@ IS REQUEST ABOUT...
 - [ ] full-output: No skeletons, No TODOs, Complete code
 - [ ] frontend-review: Correctness, Design, A11y, Performance verified
 - [ ] security-review: Auth, Validation, Data protection, Crypto verified
+
+---
+
+## PHẦN X.1: SYSTEMATIC DEBUGGING (from Superpowers)
+
+> **Source:** [obra/superpowers](https://github.com/obra/superpowers) `systematic-debugging` skill (248k stars) — "4-phase root cause process. Includes root-cause-tracing, defense-in-depth, condition-based-waiting techniques."
+
+The `/debug` command (see AGENTS.md) follows this 4-phase process. It is invoked when:
+- Tests are failing for unclear reasons
+- Bug reported without obvious cause
+- Production error with stack trace
+
+### Phase 1: Reproduce
+
+- [ ] Get a consistent reproduction (deterministic, repeatable)
+- [ ] Identify exact inputs that trigger the bug
+- [ ] Capture error message, stack trace, environment state
+- [ ] **Stop here if not reproducible** — don't guess from symptoms alone
+
+### Phase 2: Isolate
+
+- [ ] Narrow down to smallest failing case (minimal reproduction)
+- [ ] Binary search the code path (which layer/module causes the failure?)
+- [ ] Remove variables: same input, different environment? Same input, different code path?
+- [ ] Log intermediate values at boundaries
+- [ ] **Output:** 1-3 line statement of "this fails in module X when condition Y"
+
+### Phase 3: Hypothesize + Test
+
+- [ ] List 2-3 candidate root causes ranked by likelihood
+- [ ] For each hypothesis, write the cheapest test that proves/disproves it
+  - Add a log line, run one test, inspect, revert
+  - Use a debugger breakpoint, not print spam
+- [ ] **Disprove > confirm** — if you can't write a test that fails for the right reason, your hypothesis is incomplete
+
+### Phase 4: Fix + Verify Root Cause
+
+- [ ] Fix the root cause, not the symptom
+  - Symptom: "test fails" → wrong fix: skip the test
+  - Symptom: "API returns 500" → wrong fix: catch the exception
+  - **Root cause:** why does the exception happen in the first place?
+- [ ] Verify the failing test now passes
+- [ ] Verify NO OTHER tests regressed
+- [ ] Add a regression test that would have caught this bug
+- [ ] Defense-in-depth: at what OTHER points could this same bug exist?
+
+### Anti-Patterns to Reject
+
+| Anti-pattern | Why bad |
+|---|---|
+| Random code changes hoping the bug goes away | Wastes time, hides the real issue |
+| Adding `try/catch` to suppress errors | Hides the bug, makes next debugging harder |
+| "Works on my machine" closure | Bug is real, environment is the symptom, not the cause |
+| Suppressing the failing test | Defeats the entire test suite |
 
 ---
 

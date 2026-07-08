@@ -767,3 +767,68 @@ git push origin :refs/tags/v1.0.0  # Remote
 - [Conventional Commits](https://www.conventionalcommits.org/)
 - [Git Flow](https://nvie.com/posts/a-successful-git-branching-model/)
 - [Trunk Based Development](https://trunkbaseddevelopment.com/)
+
+---
+
+## Worktree Workflow (from Superpowers)
+
+> **Source:** [obra/superpowers](https://github.com/obra/superpowers) `using-git-worktrees` + `finishing-a-development-branch` skills (248k stars) — "Creates isolated workspace on new branch, runs project setup, verifies clean test baseline."
+
+### When to Use a Worktree
+
+Use a worktree when:
+- Working on a feature that takes more than one session
+- Comparing two branches side-by-side without stashing
+- Running long-lived dev servers (different ports per worktree)
+- Reviewing a PR locally without disrupting the main checkout
+
+### Create a Worktree
+
+```bash
+# From main checkout, add a worktree for the new feature branch
+git worktree add ../proj-feature-auth feature/PROJ-123-user-auth
+
+# That gives you a sibling directory at ../proj-feature-auth
+# already on branch feature/PROJ-123-user-auth
+cd ../proj-feature-auth
+npm install   # or whatever setup the project has
+npm test      # verify clean baseline BEFORE writing code
+```
+
+A worktree shares the same `.git` database with the main checkout. There's no remote push until you decide to ship.
+
+### Daily Use
+
+```bash
+# Inside the worktree, work normally
+git add . && git commit -m "feat(auth): add login form"
+
+# Inspect a different branch from the main checkout, NOT from this worktree
+cd ../proj-main
+git fetch origin
+git checkout origin/feature/PROJ-456-other-stuff   # bonus worktree, auto-managed
+
+# Back to your work
+cd ../proj-feature-auth
+```
+
+### Finishing a Development Branch
+
+When tasks are complete and all tests pass, present options to the user:
+
+| Option | When to pick |
+|---|---|
+| **Merge** (no-ff) | Branch is small, single-purpose, ready to integrate |
+| **Open PR** | Need code review or CI checks before merge |
+| **Keep** (don't integrate yet) | Branch is WIP, dependencies not ready, want to return |
+| **Discard** | Branch was a dead end, throw away the worktree + branch |
+
+Cleanup script for the discard path:
+
+```bash
+# Inside main checkout, remove the worktree and the branch
+git worktree remove ../proj-feature-auth
+git branch -D feature/PROJ-123-user-auth
+```
+
+For Merge / PR / Keep, run project test suite one last time, then follow the existing §Release Workflow in this file.

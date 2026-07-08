@@ -378,6 +378,216 @@ export const templates: Template[] = [
     fileSize: '262 KB',
     pages: 6,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Mapbox GL']
+  },
+  {
+    id: 'farm',
+    slug: 'farm',
+    name: 'GreenFarm',
+    category: 'Nong Trai & Nong San',
+    tagline: 'Nong san hieu organic, giao tan cong',
+    description:
+      'Landing page cho trang trai organic, shop nong san sach. San pham tuoi song, giao hang trong ngay, farm-to-table. Phu hop trai organic, cuu nong trai, san pham dac san vung mien.',
+    industry: 'FARM',
+    accent: '#16a34a',
+    accentSecondary: '#eab308',
+    bgGradient: 'linear-gradient(135deg, #14532d 0%, #166534 50%, #22c55e 100%)',
+    icon: 'plant',
+    features: [
+      'Danh muc san pham theo mua vu',
+      'Dat hang & giao hang trong ngay',
+      'Trai nghiem thu hoach',
+      'Gia ca minh bac hon chplay',
+      'Trai cay tuoi song'
+    ],
+    highlights: [
+      { label: 'San pham', value: '200+' },
+      { label: 'Khach hang', value: '15K' },
+      { label: 'Giao hang', value: '2h' }
+    ],
+    tags: ['Nong trai', 'Organic', 'Farm-to-table', 'Giao hang'],
+    fileSize: '245 KB',
+    pages: 6,
+    techStack: ['HTML5', 'CSS3', 'Vanilla JS']
+  },
+  {
+    id: 'orchard',
+    slug: 'orchard',
+    name: 'TropicFruit',
+    category: 'Vuon Trai Cay',
+    tagline: 'Trai cay dac san Mien Dong',
+    description:
+      'Landing page cho vuon trai cay Mien Dong. Trai cay theo mua vu, tour thu hoach, goi qua tang. Phu hop vuon trai, tien luong, nong dan gia dinh.',
+    industry: 'ORCHARD',
+    accent: '#ea580c',
+    accentSecondary: '#fbbf24',
+    bgGradient: 'linear-gradient(135deg, #7c2d12 0%, #9a3412 50%, #ea580c 100%)',
+    icon: 'tree',
+    features: [
+      'Lich trai cay theo mua vu',
+      'Tour thu hoach & nha hang trai cay',
+      'Goi qua tang & hanh trinh',
+      'Ban si trai cay dac san',
+      'Trai nghiem thu hoach that'
+    ],
+    highlights: [
+      { label: 'Loai trai cay', value: '45+' },
+      { label: 'Dien tich', value: '50 ha' },
+      { label: 'Nam thanh lap', value: '1985' }
+    ],
+    tags: ['Vuon trai cay', 'Mien Dong', 'Du lich', 'Trai nghiem'],
+    fileSize: '238 KB',
+    pages: 5,
+    techStack: ['HTML5', 'CSS3', 'Vanilla JS']
+  },
+  {
+    id: 'agritech',
+    slug: 'agritech',
+    name: 'AgriTech Pro',
+    category: 'Thiet Bi Nong San',
+    tagline: 'Cong nghe nong nghiep hien dai',
+    description:
+      'Landing page cho cong ty thiet bi nong nghiep. May gap hoa, UAV drone, he thong tuoi tu dong. Phu hop nha phan phoi, trai nong, doanh nghiep nong nghiep.',
+    industry: 'AGRITECH',
+    accent: '#0891b2',
+    accentSecondary: '#06b6d4',
+    bgGradient: 'linear-gradient(135deg, #164e63 0%, #0e7490 50%, #0891b2 100%)',
+    icon: 'tractor',
+    features: [
+      'May gap hoa hieu suat cao',
+      'Drone phun thuoc tu dong',
+      'He thong tuoi thong minh IoT',
+      'Giao hang & bao hanh toan quoc',
+      'Ky thuat hieu chinh'
+    ],
+    highlights: [
+      { label: 'Thiet bi', value: '150+' },
+      { label: 'Khach hang', value: '3,200+' },
+      { label: 'Bao hanh', value: '2 nam' }
+    ],
+    tags: ['Thiet bi nong nghiep', 'Drone', 'IoT', 'Co khi'],
+    fileSize: '256 KB',
+    pages: 6,
+    techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'IoT']
+  },
+  {
+    id: 'aitech',
+    slug: 'aitech',
+    name: 'NeuralAI',
+    category: 'Cong Nghe AI',
+    tagline: 'Giai phap AI cho doanh nghiep',
+    description:
+      'Landing page cho startup AI. Chatbot, phan tich du lieu, nhan dien hinh anh, NLP. Phu hop SaaS AI, tu van AI, startup cong nghe.',
+    industry: 'AI TECH',
+    accent: '#7c3aed',
+    accentSecondary: '#a78bfa',
+    bgGradient: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%)',
+    icon: 'brain',
+    features: [
+      'Chatbot AI tuyet ky',
+      'Phan tich du lieu thong minh',
+      'Nhan dien hinh anh chinh xac',
+      'Xu ly ngon ngu tu nhien',
+      'Giai phap theo ngach'
+    ],
+    highlights: [
+      { label: 'Model', value: 'GPT-4' },
+      { label: 'Do chinh xac', value: '97.8%' },
+      { label: 'API calls', value: '1M+/thang' }
+    ],
+    tags: ['AI', 'Chatbot', 'Machine Learning', 'SaaS'],
+    fileSize: '278 KB',
+    pages: 7,
+    techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'AI APIs']
+  },
+  {
+    id: 'computech',
+    slug: 'computech',
+    name: 'TechHub',
+    category: 'Cong Nghe May Tinh',
+    tagline: 'Laptop, PC gaming, linh kien chinh hang',
+    description:
+      'Landing page cho cua hang may tinh. Laptop gaming, PC build, linh kien, phu kien. Phu hop cua hang laptop, gaming gear, linh kien may tinh.',
+    industry: 'COMPUTER',
+    accent: '#dc2626',
+    accentSecondary: '#f59e0b',
+    bgGradient: 'linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #991b1b 100%)',
+    icon: 'laptop',
+    features: [
+      'Laptop gaming & van phong',
+      'PC build theo yeu cau',
+      'Linh kien chinh hang',
+      'Trai nghiem thuc te',
+      'Bao hanh & tra gop'
+    ],
+    highlights: [
+      { label: 'San pham', value: '2,000+' },
+      { label: 'Thuong hieu', value: '50+' },
+      { label: 'Tra gop', value: '0%' }
+    ],
+    tags: ['Laptop', 'Gaming PC', 'Linh kien', 'Cong nghe'],
+    fileSize: '264 KB',
+    pages: 6,
+    techStack: ['HTML5', 'CSS3', 'Vanilla JS']
+  },
+  {
+    id: 'preschool',
+    slug: 'preschool',
+    name: 'Little Stars',
+    category: 'Giao Duc Mam Non',
+    tagline: 'Nuoi day tre trong tinh yeu',
+    description:
+      'Landing page cho truong mam non. Chuong trinh hoc theo doi tuong, co so vat chat hien dai, giao vien nhiet tinh. Phu hop truong mam non, nha tre, mam non chuyen biet.',
+    industry: 'EDUCATION',
+    accent: '#f97316',
+    accentSecondary: '#84cc16',
+    bgGradient: 'linear-gradient(135deg, #7c2d12 0%, #9a3412 50%, #f97316 100%)',
+    icon: 'baby',
+    features: [
+      'Chuong trinh hoc theo nhom tuoi',
+      'Co so vat chat hien dai',
+      'Giao vien chuyen nghiep',
+      'Bao cao hap nhan hang ngay',
+      'An toan & giam sat 24/7'
+    ],
+    highlights: [
+      { label: 'Tre em', value: '300+' },
+      { label: 'Giao vien', value: '25' },
+      { label: 'Nam kinh nghiem', value: '15' }
+    ],
+    tags: ['Mam non', 'Giao duc tre', 'Nuoi day', 'Phat trien'],
+    fileSize: '229 KB',
+    pages: 5,
+    techStack: ['HTML5', 'CSS3', 'Vanilla JS']
+  },
+  {
+    id: 'church',
+    slug: 'church',
+    name: 'Holy Light Parish',
+    category: 'Giao Xu Cong Giao',
+    tagline: 'Noi anh sang Chua soi vao long',
+    description:
+      'Landing page cho giao xu Cong giao. Lich than le, thong tin bi tich, hoat dong giao xu. Phu hop giao xu, giao phan, cong dong tin nguoi.',
+    industry: 'CHURCH',
+    accent: '#b91c1c',
+    accentSecondary: '#fcd34d',
+    bgGradient: 'linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #b91c1c 100%)',
+    icon: 'cross',
+    features: [
+      'Lich than le chi tiet',
+      'Thong tin bi tich',
+      'Hoat dong giao xu',
+      'Doi ngu linh muc',
+      'Lien he & ban do'
+    ],
+    highlights: [
+      { label: 'Giao dan', value: '3,000+' },
+      { label: 'Nam thanh lap', value: '1995' },
+      { label: 'Linh muc', value: '2' }
+    ],
+    tags: ['Cong giao', 'Giao xu', 'Than le', 'Giao dan'],
+    fileSize: '198 KB',
+    pages: 4,
+    techStack: ['HTML5', 'CSS3', 'Vanilla JS']
   }
 ]
 

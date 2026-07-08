@@ -1,11 +1,12 @@
 ---
 description: Karpathy Coding Discipline - Think Before Coding, simplicity, surgical changes, goal-driven execution. Mandatory overlay for all coding tasks. Complements ponytail for YAGNI optimization.
 created: 2026-06-26
-version: 1.2.0
-updated: 2026-07-01
-tags: [karpathy, coding-discipline, vibe-code, simplicity, minimal, goal-driven, surgical, think-first]
+version: 1.3.0
+updated: 2026-07-07
+tags: [karpathy, coding-discipline, vibe-code, simplicity, minimal, goal-driven, surgical, think-first, superpowers-aligned, verification, code-review]
 source: https://github.com/multica-ai/andrej-karpathy-skills (186k stars)
 see_also: .cursor/rules/karpathy-guidelines.mdc (alwaysApply rule)
+also_see: .cursor/skills/karpathy-coding — concept-refs to [obra/superpowers](https://github.com/obra/superpowers) `verification-before-completion` and `code-review` skills (248k stars)
 ---
 
 # Karpathy Coding Discipline
@@ -201,3 +202,56 @@ Khi thấy các signals này → karpathy-coding cần được strengthen:
 - Clarifying questions come BEFORE implementation
 - Simplicity maintained across all outputs
 - Surgical changes only
+
+---
+
+## §X — Verification Before Completion (from Superpowers)
+
+> **Source:** [obra/superpowers](https://github.com/obra/superpowers) `verification-before-completion` skill (248k stars) — "Ensure it's actually fixed."
+
+K.7 (Goal Achievement) is necessary but not sufficient. Before declaring a task complete, run an extra independent verification pass:
+
+- [ ] **Read the actual code** — re-open the files you just touched and confirm the diff matches what you said you wrote. Don't trust your memory of "I added X".
+- [ ] **Verify each success criterion from K.4** — go line-by-line through your original K.4 goal list. Each "Done when …" condition must be observably true.
+- [ ] **Run the verification step, don't assume it would pass** — if your plan said `npm test`, actually ran it. If your plan said "open localhost:3000", actually opened it.
+- [ ] **No banned patterns** — full-output §2 patterns must not appear: `// ...`, `// TODO`, "rest follows the same pattern", etc. Grep your own diff.
+- [ ] **Cross-check with the original request** — re-read the user's first message. Every line of their ask is answered by something you delivered.
+
+**Anti-pattern:** "I think it works" — this is the failure mode `verification-before-completion` exists to prevent.
+
+---
+
+## §Y — Requesting & Receiving Code Review (from Superpowers)
+
+> **Source:** [obra/superpowers](https://github.com/obra/superpowers) `requesting-code-review` + `receiving-code-review` skills (248k stars).
+
+### §Y.1 Requesting Code Review (pre-review checklist)
+
+Before asking for review, the agent runs these items first:
+
+- [ ] All K.1-K.7 gates pass
+- [ ] All `verification-before-completion` items (§X above) pass
+- [ ] Scope is declared: "This PR/change does X, doesn't do Y"
+- [ ] Tests run locally and pass
+- [ ] Diff is surgical — no drive-by cleanups, no unrelated formatting
+- [ ] Reviewer can read top-to-bottom in 5 minutes
+
+### §Y.2 Receiving Code Review (response protocol)
+
+When a reviewer (human or AI) gives feedback:
+
+| Step | Action |
+|---|---|
+| 1. **Read fully** | Don't react to the first comment; read every comment before responding |
+| 2. **Verify claims** | For each piece of feedback, check if it's actually correct against the code. Reviewers are fallible. |
+| 3. **Ask for clarification** | If a comment is unclear ("this could be cleaner"), ask what specifically before changing |
+| 4. **Push back if wrong** | If the reviewer is mistaken, say so with evidence (file path, line number, why their claim doesn't hold). Don't capitulate to authority. |
+| 5. **Implement or document** | If correct, fix. If not applicable, mark as "won't fix — because …" with justification |
+| 6. **Verify again** | Re-run §X verification after applying feedback — did the fix introduce a new issue? |
+
+**Anti-patterns to reject:**
+- Performative agreement ("good point, will fix" without actually verifying)
+- Capitulating to incorrect feedback to avoid conflict
+- Applying feedback without understanding why it was suggested
+- Implementing suggestions that expand scope beyond the request
+

@@ -685,6 +685,45 @@ clarification_templates:
       - Page: `landing page for AI startup`
 ```
 
+### G.6 Brainstorming Protocol (from Superpowers)
+
+> **Source:** [obra/superpowers](https://github.com/obra/superpowers) `brainstorming` skill (248k stars) — "Refines rough ideas through questions, explores alternatives, presents design in sections for validation."
+
+The brainstorming protocol activates BEFORE writing code, when intent is unclear or the design has multiple valid paths. It complements the clarification flow above (G.1-G.5) and the frontend-taste §0.C Ambiguous Brief Protocol.
+
+#### Core Principles
+
+1. **Ask before assuming** — surface trade-offs explicitly; surface assumptions explicitly; if the user says "build X", ask "what problem does X solve?" before designing X.
+2. **One question at a time** — don't bombard user with a 10-question form; peel one question, wait for answer, then next. Avoid premature decisions.
+3. **Explore alternatives** — for every "I want to do X", list 2-3 valid options with concrete trade-offs. Don't pick silently.
+4. **Present design in chunks** — once aligned, write a design doc in sections (problem, scope, options, decision, risks), get explicit approval per section before coding.
+5. **Persist via design doc** — write approved design to a doc file (e.g., `docs/specs/<feature>.md`) so the plan in `task-analyzer.mdc §3` has a stable reference.
+
+#### When to Trigger
+
+| Signal | Trigger condition |
+|---|---|
+| Vague brief | No concrete deliverable specified (already covered by G.1-G.3) |
+| Multiple options | 2+ valid approaches (performance vs simplicity, library A vs B) |
+| New feature scope | Ambiguous feature boundaries — what's in/out? |
+| Open-ended "improve" | Could mean redesign, refactor, fix, or add |
+
+#### Connection to Framework
+
+```
+Brainstorming (G.6)
+    ↓ (design doc with user approval)
+Intent Analysis (C) ─→ Skill Detection (skill-registry)
+    ↓
+Planning (task-analyzer §3 — atomic tasks 2-5min)
+    ↓
+Pre-Review Gate → Implementation → Post-Review Gate
+```
+
+> See: [[frontend-taste]] §0.B Design Read Declaration for landing page specific application.
+
+---
+
 ## LIÊN KẾT
 
 - [[skill-registry]] — Single source of truth cho skills

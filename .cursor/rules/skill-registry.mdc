@@ -1,8 +1,9 @@
 ---
 description: Single Source of Truth cho tất cả skill definitions, triggers, confidence thresholds, và gate mappings. Được sử dụng bởi skill-integration, task-analyzer, và multi-language-vibe-code. Bao gồm Ponytail Lazy Senior Dev principles. Integrated với agent-skills (addyosmani/agent-skills) và ChatbotX development patterns. Tích hợp Karpathy Guidelines từ andrej-karpathy-skills.
 created: 2026-06-26
-version: 1.5.0
-updated: 2026-07-01
+version: 1.6.0
+updated: 2026-07-07
+tags: [skill-registry, skills, auto-discovery, mandatory, overlay, ponytail, lazy-senior, code-quality, agent-skills, chatbotx, chatbot-marketing, superpowers, methodology]---
 tags: [skill-registry, skills, auto-discovery, mandatory, overlay, ponytail, lazy-senior, code-quality, agent-skills, chatbotx, chatbot-marketing]
 ---
 
@@ -548,6 +549,80 @@ Mỗi skill được định nghĩa với các properties:
 **Purpose:** Auto-generate short videos (9:16) from URLs or text using HyperFrames rendering, OmniVoice TTS, and FFmpeg. Integrated from AI-auto-generate-video.
 
 **Source:** [huytranvan2010/AI-auto-generate-video](https://github.com/huytranvan2010/AI-auto-generate-video) (118 stars, MIT License)
+
+---
+
+#### Meta Skills (Superpowers-aligned)
+
+> **Concept references** — These are NOT standalone skills. They are pointers to where Superpowers methodology concepts have been merged into existing files. Single source of truth: PHẦN 8 References.
+>
+> **Source:** [obra/superpowers](https://github.com/obra/superpowers) (248k stars, MIT License)
+
+#### brainstorming
+
+| Property | Value |
+|----------|-------|
+| **ID** | `brainstorming` (concept-ref) |
+| **Target** | `.cursor/rules/intent-detection.mdc §G.6` |
+| **Role** | `concept_ref` |
+| **Domains** | `general` |
+| **Confidence Base** | `0.85` |
+| **Threshold** | `0.85` (auto-load on ambiguous request) |
+
+**Triggers:** New feature request, design vague, multiple valid approaches, "what should I build", needs-before-code.
+
+**Purpose:** Socratic design refinement — ask before assuming, one question at a time, explore alternatives, persist design docs.
+
+---
+
+#### writing-plans
+
+| Property | Value |
+|----------|-------|
+| **ID** | `writing-plans` (concept-ref) |
+| **Target** | `.cursor/rules/task-analyzer.mdc §3` |
+| **Role** | `concept_ref` |
+| **Domains** | `general` |
+| **Confidence Base** | `0.85` |
+| **Threshold** | `0.85` (auto-load on `/plan`) |
+
+**Triggers:** `/plan`, task decomposition, planning phase, atomic tasks, implementation roadmap.
+
+**Purpose:** Break work into bite-sized tasks (2-5 min each). Every task has exact file paths, complete code, verification steps.
+
+---
+
+#### test-driven-development (TDD)
+
+| Property | Value |
+|----------|-------|
+| **ID** | `test-driven-development` (concept-ref) |
+| **Target** | `.cursor/rules/testing.mdc §TDD` |
+| **Role** | `concept_ref` |
+| **Domains** | `general` |
+| **Confidence Base** | `0.90` |
+| **Threshold** | `0.90` (auto-load when testing mentioned) |
+
+**Triggers:** RED-GREEN-REFACTOR, write tests first, TDD cycle, proof before code.
+
+**Purpose:** TDD enforcement — write failing test, watch it fail, write minimal code, watch it pass, commit.
+
+---
+
+#### systematic-debugging
+
+| Property | Value |
+|----------|-------|
+| **ID** | `systematic-debugging` (concept-ref) |
+| **Target** | `.cursor/rules/task-analyzer.mdc §X.1` |
+| **Role** | `concept_ref` |
+| **Domains** | `general` |
+| **Confidence Base** | `0.90` |
+| **Threshold** | `0.90` (auto-load on `/debug`) |
+
+**Triggers:** `/debug`, bug investigation, root cause, 4-phase debugging, error triage.
+
+**Purpose:** 4-phase root cause process — reproduce, isolate, hypothesize + test, fix + verify root cause (not symptoms).
 
 ---
 
@@ -1133,10 +1208,67 @@ Task → Skill Detection → Pre-Review Gate(s)
 
 ---
 
+## PHẦN 8: SUPERPOWERS METHODOLOGY REFERENCES
+
+> **Source:** [obra/superpowers](https://github.com/obra/superpowers) (248k stars, MIT License) — "An agentic skills framework & software development methodology that works."
+>
+> **Sync policy:** Concept references are merged into existing files — never create new `SKILL.md` files. Each Superpowers concept maps to exactly one existing rule or skill.
+
+### 8.1 Concept → Existing File Mapping
+
+| Superpowers concept | Synced into file | Section |
+|---|---|---|
+| `using-superpowers` (bootstrap) | `.cursor/AGENTS.md` | §Agent Personas |
+| `brainstorming` | `.cursor/rules/intent-detection.mdc` | §G.6 Brainstorming Protocol |
+| `using-git-worktrees` | `.cursor/rules/version-control.mdc` | §X Worktree Workflow |
+| `writing-plans` | `.cursor/rules/task-analyzer.mdc` | §3 Task Decomposition |
+| `subagent-driven-development` | `.cursor/AGENTS.md` | §Code Reviewer Persona + §Execution Flow |
+| `executing-plans` | `.cursor/AGENTS.md` | §`/build` command |
+| `test-driven-development` | `.cursor/rules/testing.mdc` | §TDD Cycle (RED-GREEN-REFACTOR) |
+| `systematic-debugging` | `.cursor/rules/task-analyzer.mdc` | §X.1 |
+| `verification-before-completion` | `.cursor/skills/karpathy-coding/SKILL.md` | §K.5-K.7 + §X Verification |
+| `requesting-code-review` | `.cursor/skills/karpathy-coding/SKILL.md` | §Y Code Review Protocol |
+| `receiving-code-review` | `.cursor/skills/karpathy-coding/SKILL.md` | §Y Code Review Protocol |
+| `finishing-a-development-branch` | `.cursor/rules/version-control.mdc` | §X Worktree + existing release workflow |
+| `writing-skills` | `.cursor/skills/skill-installer/SKILL.md` | (already covered) |
+
+### 8.2 Lifecycle Alignment (DEFINE → SHIP)
+
+Cursor slash commands map 1-1 to the Superpowers workflow:
+
+| Phase | Cursor command | Superpowers equivalent |
+|---|---|---|
+| DEFINE | `/spec` | `brainstorming` + `writing-plans` |
+| PLAN | `/plan` | `writing-plans` (atomic 2-5min tasks) |
+| BUILD | `/build` | `subagent-driven-development` / `executing-plans` |
+| VERIFY | `/test` | `test-driven-development` + `verification-before-completion` |
+| REVIEW | `/review` | `requesting-code-review` (Code Reviewer persona) |
+| DEBUG | `/debug` | `systematic-debugging` (4-phase) |
+| SHIP | `/ship` | `finishing-a-development-branch` (merge/PR/discard) |
+
+### 8.3 Common Workflow (already in /spec README)
+
+The Superpowers workflow begins BEFORE coding — agent asks clarifying questions, presents design in chunks, only writes plan and code after explicit user approval. This aligns with framework's `intent-detection.mdc §G Clarification Flow` + `frontend-taste §0.C Ambiguous Brief Protocol`.
+
+### 8.4 Skill Mesh
+
+4 concept-ref skills registered in PHẦN 1.2 (Meta Skills): `brainstorming`, `writing-plans`, `test-driven-development`, `systematic-debugging`. They appear in skill detection triggers but resolve to the target file's section, not a standalone skill.
+
+### 8.5 Version Sync
+
+| Date | Superpowers | Cursor Framework mapping |
+|---|---|---|
+| 2026-07-07 | main (no version tag) | Integrated into framework v1.6.0 |
+
+No future tracking required — concept-ref mappings are stable. If Superpowers changes upstream concepts, only the target section needs review.
+
+---
+
 ## CHANGELOG
 
 | Date | Version | Changes |
 |------|---------|---------|
+| 2026-07-07 | 1.6.0 | Integrated Superpowers methodology (248k stars) — 4 concept-ref skills (§1.2 Meta Skills) + §8 References mapping. NO new files created. |
 | 2026-07-01 | 1.5.0 | Added video-generation skill from AI-auto-generate-video (HyperFrames, OmniVoice TTS) |
 | 2026-07-01 | 1.4.0 | Integrated karpathy-guidelines rule (alwaysApply) from andrej-karpathy-skills (186k stars) |
 | 2026-06-29 | 1.3.0 | Added ChatbotX development skills (chatbotx-feature, chatbotx-database, chatbotx-worker) |
