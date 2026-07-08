@@ -8,7 +8,7 @@
 | Category | Count |
 |----------|-------|
 | Rules | 39 files |
-| Skills | 17 folders |
+| Skills | 50 folders |
 | Knowledge | 36 dirs |
 | Scripts | 12 |
 | References | 4 |
@@ -82,7 +82,7 @@
 - `vibe-code-protocol.mdc` - Vibe Code Execution & Validation
 - `multi-language-processing.mdc` - Translation Layer
 
-## Skills (17 skills)
+## Skills (50 skills)
 
 | Skill | Path |
 |-------|------|
@@ -103,8 +103,40 @@
 | `weknora-agent` | skills/weknora-agent/SKILL.md |
 | `pixelrag` | skills/pixelrag/SKILL.md |
 | `skill-installer` | skills/skill-installer/SKILL.md |
+| `mcp-builder` | skills/mcp-builder/SKILL.md |
+| `vercel-react-best-practices` | skills/vercel-react-best-practices/SKILL.md |
+| `adbc` | skills/adbc/SKILL.md |
+| `aoti-debug` | skills/aoti-debug/SKILL.md |
+| `artifacts-builder` | skills/artifacts-builder/SKILL.md |
+| `aws-cognito-admin` | skills/aws-cognito-admin/SKILL.md |
+| `canvas-design` | skills/canvas-design/SKILL.md |
+| `create-pull-request` | skills/create-pull-request/SKILL.md |
+| `csv-wrangling` | skills/csv-wrangling/SKILL.md |
+| `data-distributed-storage` | skills/data-distributed-storage/SKILL.md |
+| `deploy-to-vercel` | skills/deploy-to-vercel/SKILL.md |
+| `fastapi-martinholovsky` | skills/fastapi-martinholovsky/SKILL.md |
+| `graphql` | skills/graphql/SKILL.md |
+| `image-enhancer` | skills/image-enhancer/SKILL.md |
+| `jq-json-processing` | skills/jq-json-processing/SKILL.md |
+| `microsoft-code-reference` | skills/microsoft-code-reference/SKILL.md |
+| `microsoft-docs` | skills/microsoft-docs/SKILL.md |
+| `mysql` | skills/mysql/SKILL.md |
+| `mysql-patterns` | skills/mysql-patterns/SKILL.md |
+| `prefect` | skills/prefect/SKILL.md |
+| `pytorch-patterns` | skills/pytorch-patterns/SKILL.md |
+| `redis-observability` | skills/redis-observability/SKILL.md |
+| `senior-data-engineer` | skills/senior-data-engineer/SKILL.md |
+| `skill-share` | skills/skill-share/SKILL.md |
+| `sql-server-table-reconciliation` | skills/sql-server-table-reconciliation/SKILL.md |
+| `tensorflow-data-pipelines` | skills/tensorflow-data-pipelines/SKILL.md |
+| `tensorflow-model-deployment` | skills/tensorflow-model-deployment/SKILL.md |
+| `theme-factory` | skills/theme-factory/SKILL.md |
+| `vercel-composition-patterns` | skills/vercel-composition-patterns/SKILL.md |
+| `web-design-guidelines` | skills/web-design-guidelines/SKILL.md |
+| `webapp-testing` | skills/webapp-testing/SKILL.md |
+| `youtube-downloader` | skills/youtube-downloader/SKILL.md |
 
-> **Note:** `reverse-skill/` folder chứa 57 CTF competition skills (không đếm vào 17 skills chính)
+> **Note:** `reverse-skill/` folder chứa 57 CTF competition skills (không đếm vào 50 skills chính)
 >
 > **Note:** 4 concept-ref mappings from [obra/superpowers](https://github.com/obra/superpowers) (248k stars) integrated inline — `brainstorming`, `writing-plans`, `test-driven-development`, `systematic-debugging`. See `.cursor/rules/skill-registry.mdc` §1.2 (Meta Skills) + §8 (References).
 
@@ -141,7 +173,7 @@ Based on [agent-skills](https://github.com/addyosmani/agent-skills) - 4 speciali
 Quick-reference checklists aligned with agent-skills:
 
 | Reference | Purpose |
-|----------|---------|
+|-----------|---------|
 | `testing-patterns.md` | Test pyramid, naming, mocking, anti-patterns |
 | `security-checklist.md` | OWASP Top 10, pre-commit checks, headers |
 | `performance-checklist.md` | Core Web Vitals, bundle analysis, anti-patterns |

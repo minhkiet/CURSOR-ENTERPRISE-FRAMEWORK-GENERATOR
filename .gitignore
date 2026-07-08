@@ -9,12 +9,12 @@
 .git/filter-repo/
 
 # --- Cursor IDE artifacts ---
-.cursor/
 !.cursor/AGENTS.md
 !.cursor/cursor.json
 !.cursor/INDEX.md
 !.cursor/PROJECT.md
 !.cursor/UTF8
+!.cursor/skills/
 .cursor/scripts/build/
 .cursor/scripts/dist/
 .cursor/scripts/**/*.pyc
@@ -32,7 +32,6 @@
 .cursor/prompts/
 .cursor/references/
 .cursor/rules/
-.cursor/skills/
 .cursor/templates/
 .cursor/workflows/
 .cursor/scripts/embedding-builder/

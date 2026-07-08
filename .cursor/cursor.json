@@ -11,7 +11,7 @@
   "skills": {
     "registry": ".cursor/rules/skill-registry.mdc",
     "dependencies": ".cursor/scripts/skill-dependencies.json",
-    "totalSkills": 17,
+    "totalSkills": 50,
     "alwaysEnabled": ["karpathy-coding", "full-output"]
   },
   "knowledge": {

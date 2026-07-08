@@ -165,6 +165,7 @@ namespace CursorSetup
         private CheckBox buildEmbeddingsCheckBox;
         private CheckBox packageFrameworkCheckBox;
         private Label buildNoteLabel;
+        private ToolTip buildToolTip;
 
         // Bottom (always visible)
         private ProgressBar progressBar;
@@ -486,11 +487,13 @@ namespace CursorSetup
                         string desc = (zipPath != null) ? ExtractDescription(zipPath, cat, item) : "";
                         categoryDescriptions[cat][item] = desc;
 
-                        var lvi = new ListViewItem(item);
+                        int index = lv.Items.Count + 1;
+                        var lvi = new ListViewItem(index.ToString());
                         lvi.Checked = true; // checked by default
                         // ponytail: alternating row tint for readability
                         if (lv.Items.Count % 2 == 1)
                             lvi.BackColor = Color.FromArgb(248, 250, 253);
+                        lvi.SubItems.Add(item);
                         string showDesc = string.IsNullOrEmpty(desc) ? Lang.T("no_description") : Lang.Translate(desc);
                         lvi.SubItems.Add(showDesc);
                         lvi.ToolTipText = showDesc;
@@ -507,20 +510,36 @@ namespace CursorSetup
             this.Size = new Size(860, 800);
             this.MinimumSize = new Size(860, 800);
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.FormBorderStyle = FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
+            this.FormBorderStyle = FormBorderStyle.Sizable;
+            this.MaximizeBox = true;
+            this.WindowState = FormWindowState.Maximized;
             this.BackColor = Color.FromArgb(245, 246, 250);
 
-            // --- Header ---
-            headerPanel = new Panel { Dock = DockStyle.Top, Height = 100, BackColor = Color.FromArgb(30, 60, 114) };
+            // --- Main layout with proportional resize ---
+            TableLayoutPanel rootTable = new TableLayoutPanel
+            {
+                ColumnCount = 1,
+                RowCount = 4,
+                Dock = DockStyle.Fill,
+                BackColor = Color.FromArgb(245, 246, 250),
+                Padding = new Padding(0)
+            };
+            rootTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 72));
+            rootTable.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            rootTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 200));
+            rootTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 80));
 
+            // --- Header ---
+            headerPanel = new Panel { Height = 72, BackColor = Color.FromArgb(30, 60, 114) };
+            headerPanel.Width = this.ClientSize.Width;
             titleLabel = new Label
             {
                 Text = Lang.T("app.title_short"),
                 Font = new Font("Segoe UI", 20, FontStyle.Bold),
                 ForeColor = Color.White,
-                Location = new Point(30, 18),
-                AutoSize = true
+                Location = new Point(30, 12),
+                AutoSize = true,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
             };
 
             subtitleLabel = new Label
@@ -528,23 +547,31 @@ namespace CursorSetup
                 Text = Lang.T("app.subtitle"),
                 Font = new Font("Segoe UI", 10),
                 ForeColor = Color.FromArgb(180, 200, 230),
-                Location = new Point(30, 52),
-                AutoSize = true
+                Location = new Point(30, 38),
+                AutoSize = true,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
             };
 
-            // Language picker (top-right, aligned with title row)
+            summaryLabel = new Label
+            {
+                Text = Lang.T("loading_components"),
+                Font = new Font("Segoe UI", 9, FontStyle.Italic),
+                ForeColor = Color.FromArgb(180, 200, 230),
+                Location = new Point(30, 60),
+                AutoSize = true,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
+            };
+
             Label langHeaderLabel = new Label
             {
                 Text = Lang.T("combobox.lang") + ":",
                 Font = new Font("Segoe UI", 9),
                 ForeColor = Color.White,
-                Location = new Point(640, 32),
                 AutoSize = true
             };
             languageComboBox = new ComboBox
             {
-                Location = new Point(700, 28),
-                Size = new Size(105, 26),
+                Size = new Size(110, 26),
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
                 BackColor = Color.White,
@@ -553,19 +580,28 @@ namespace CursorSetup
             };
             languageComboBox.Items.Add(new LangItem("vi", "Tiếng Việt"));
             languageComboBox.Items.Add(new LangItem("en", "English"));
-            languageComboBox.SelectedIndex = 0; // Vietnamese by default
+            languageComboBox.SelectedIndex = 0;
             languageComboBox.SelectedIndexChanged += LanguageComboBox_SelectedIndexChanged;
 
-            summaryLabel = new Label
+            TableLayoutPanel langPanel = new TableLayoutPanel
             {
-                Text = Lang.T("loading_components"),
-                Font = new Font("Segoe UI", 9, FontStyle.Italic),
-                ForeColor = Color.FromArgb(180, 200, 230),
-                Location = new Point(450, 70),
-                AutoSize = true
+                ColumnCount = 2,
+                RowCount = 1,
+                Dock = DockStyle.Right,
+                AutoSize = true,
+                Padding = new Padding(0),
+                Margin = new Padding(0),
+                BackColor = Color.Transparent
             };
+            langPanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+            langPanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+            langPanel.Controls.Add(langHeaderLabel, 0, 0);
+            langPanel.Controls.Add(languageComboBox, 1, 0);
+            languageComboBox.Margin = new Padding(8, 0, 0, 0);
+            langPanel.Location = new Point(0, 24);
 
-            headerPanel.Controls.AddRange(new Control[] { titleLabel, subtitleLabel, langHeaderLabel, languageComboBox, summaryLabel });
+            headerPanel.Controls.AddRange(new Control[] { titleLabel, subtitleLabel, summaryLabel, langPanel });
+            rootTable.Controls.Add(headerPanel, 0, 0);
 
             // --- TabControl body ---
             mainTabs = new TabControl
@@ -591,51 +627,60 @@ namespace CursorSetup
             allTabPages.Add(tpComponents);
             allTabPages.Add(tpAdvanced);
 
-            // --- Bottom status panel ---
-            Panel statusPanel = new Panel { Dock = DockStyle.Bottom, Height = 230, BackColor = Color.White, Padding = new Padding(20, 12, 20, 12) };
+            rootTable.Controls.Add(mainTabs, 0, 1);
 
+            // --- Bottom status panel ---
+            Panel statusPanel = new Panel { Height = 200, BackColor = Color.White, Padding = new Padding(20, 12, 20, 12) };
+            statusPanel.Width = this.ClientSize.Width;
             statusLabel = new Label
             {
                 Text = Lang.T("ready_to_install"),
-                Location = new Point(0, 5),
-                AutoSize = true,
+                Location = new Point(20, 12),
+                Size = new Size(780, 24),
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                ForeColor = Color.FromArgb(30, 60, 114)
+                ForeColor = Color.FromArgb(30, 60, 114),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
             };
 
             progressBar = new ProgressBar
             {
-                Location = new Point(0, 28),
-                Size = new Size(820, 22),
+                Location = new Point(20, 36),
+                Size = new Size(780, 20),
                 Style = ProgressBarStyle.Continuous,
                 BackColor = Color.FromArgb(220, 220, 230),
-                ForeColor = Color.FromArgb(30, 100, 180)
+                ForeColor = Color.FromArgb(30, 100, 180),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
             };
 
             logTextBox = new TextBox
             {
-                Location = new Point(0, 58),
-                Size = new Size(820, 130),
+                Location = new Point(20, 60),
+                Size = new Size(780, 130),
                 Multiline = true,
                 ReadOnly = true,
                 BackColor = Color.FromArgb(45, 45, 50),
                 ForeColor = Color.FromArgb(200, 200, 200),
                 Font = new Font("Consolas", 9),
-                ScrollBars = ScrollBars.Vertical
+                ScrollBars = ScrollBars.Vertical,
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right
             };
 
+            statusPanel.Controls.AddRange(new Control[] { statusLabel, progressBar, logTextBox });
+            rootTable.Controls.Add(statusPanel, 0, 2);
+
             // --- Button panel ---
-            Panel buttonPanel = new Panel { Dock = DockStyle.Bottom, Height = 64, BackColor = Color.FromArgb(235, 236, 240) };
+            Panel buttonPanel = new Panel { Height = 68, BackColor = Color.FromArgb(235, 235, 240), Padding = new Padding(20, 12, 20, 12) };
 
             cancelButton = new Button
             {
                 Text = Lang.T("btn.cancel"),
-                Location = new Point(570, 14),
-                Size = new Size(110, 36),
+                Location = new Point(600, 12),
+                Size = new Size(120, 44),
                 FlatStyle = FlatStyle.Flat,
                 BackColor = Color.FromArgb(210, 210, 215),
                 ForeColor = Color.FromArgb(50, 50, 60),
-                Font = new Font("Segoe UI", 10)
+                Font = new Font("Segoe UI", 10),
+                Anchor = AnchorStyles.Bottom | AnchorStyles.Right
             };
             cancelButton.FlatAppearance.BorderSize = 0;
             cancelButton.Cursor = Cursors.Hand;
@@ -644,23 +689,35 @@ namespace CursorSetup
             installButton = new Button
             {
                 Text = Lang.T("btn.install"),
-                Location = new Point(690, 14),
-                Size = new Size(140, 36),
+                Location = new Point(730, 12),
+                Size = new Size(140, 44),
                 FlatStyle = FlatStyle.Flat,
                 BackColor = Color.FromArgb(30, 120, 60),
                 ForeColor = Color.White,
-                Font = new Font("Segoe UI", 10, FontStyle.Bold)
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                Anchor = AnchorStyles.Bottom | AnchorStyles.Right
             };
             installButton.FlatAppearance.BorderSize = 0;
             installButton.Click += InstallButton_Click;
 
             buttonPanel.Controls.AddRange(new Control[] { cancelButton, installButton });
+            rootTable.Controls.Add(buttonPanel, 0, 3);
 
-            statusPanel.Controls.AddRange(new Control[] { statusLabel, progressBar, logTextBox });
+            // Tooltips for post-install build options
+            buildToolTip = new ToolTip
+            {
+                ShowAlways = true,
+                InitialDelay = 400,
+                ReshowDelay = 200,
+                AutoPopDelay = 10000
+            };
+            buildToolTip.SetToolTip(buildMemoryCheckBox, Lang.T("install.build_memory_tt"));
+            buildToolTip.SetToolTip(compileKnowledgeCheckBox, Lang.T("install.compile_knowledge_tt"));
+            buildToolTip.SetToolTip(buildIndexCheckBox, Lang.T("install.build_index_tt"));
+            buildToolTip.SetToolTip(buildEmbeddingsCheckBox, Lang.T("install.build_embeddings_tt"));
+            buildToolTip.SetToolTip(packageFrameworkCheckBox, Lang.T("install.package_framework_tt"));
 
-            // Z-order: header (top) -> tabs (fill) -> status (bottom) -> buttons (bottom-most)
-            this.Controls.AddRange(new Control[] { mainTabs, statusPanel, buttonPanel, headerPanel });
-
+            this.Controls.Add(rootTable);
             Lang.OnChanged += ApplyLocalization;
         }
 
@@ -692,7 +749,8 @@ namespace CursorSetup
                 Font = new Font("Segoe UI", 10),
                 ReadOnly = true,
                 BackColor = Color.White,
-                BorderStyle = BorderStyle.FixedSingle
+                BorderStyle = BorderStyle.FixedSingle,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
             };
 
             browseButton = new Button
@@ -703,7 +761,8 @@ namespace CursorSetup
                 FlatStyle = FlatStyle.Flat,
                 BackColor = Color.FromArgb(100, 130, 180),
                 ForeColor = Color.White,
-                Font = new Font("Segoe UI", 9)
+                Font = new Font("Segoe UI", 9),
+                Anchor = AnchorStyles.Top | AnchorStyles.Right
             };
             browseButton.FlatAppearance.BorderSize = 0;
             browseButton.Click += BrowseButton_Click;
@@ -716,7 +775,8 @@ namespace CursorSetup
                 FlatStyle = FlatStyle.Flat,
                 BackColor = Color.FromArgb(70, 130, 80),
                 ForeColor = Color.White,
-                Font = new Font("Segoe UI", 8)
+                Font = new Font("Segoe UI", 8),
+                Anchor = AnchorStyles.Top | AnchorStyles.Right
             };
             newFolderButton.FlatAppearance.BorderSize = 0;
             newFolderButton.Click += NewFolderButton_Click;
@@ -726,7 +786,8 @@ namespace CursorSetup
                 Text = Lang.T("install.force"),
                 Location = new Point(10, 110),
                 AutoSize = true,
-                Font = new Font("Segoe UI", 9)
+                Font = new Font("Segoe UI", 9),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
             };
 
             cursorCheckBox = new CheckBox
@@ -734,7 +795,8 @@ namespace CursorSetup
                 Text = Lang.T("install.skip_cursor"),
                 Location = new Point(10, 138),
                 AutoSize = true,
-                Font = new Font("Segoe UI", 9)
+                Font = new Font("Segoe UI", 9),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
             };
 
             installTipLabel = new Label
@@ -744,7 +806,8 @@ namespace CursorSetup
                 ForeColor = Color.Gray,
                 Location = new Point(10, 175),
                 AutoSize = true,
-                MaximumSize = new Size(740, 0)
+                MaximumSize = new Size(740, 0),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
             };
 
             // Post-install build options (optional, default unchecked)
@@ -754,7 +817,8 @@ namespace CursorSetup
                 Location = new Point(10, 215),
                 Size = new Size(820, 200),
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
-                ForeColor = Color.FromArgb(30, 60, 114)
+                ForeColor = Color.FromArgb(30, 60, 114),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
             };
 
             buildOptionsDescLabel = new Label
@@ -763,7 +827,8 @@ namespace CursorSetup
                 Location = new Point(15, 24),
                 Size = new Size(790, 18),
                 Font = new Font("Segoe UI", 8, FontStyle.Italic),
-                ForeColor = Color.Gray
+                ForeColor = Color.Gray,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
             };
 
             buildMemoryCheckBox = new CheckBox
@@ -772,7 +837,8 @@ namespace CursorSetup
                 Location = new Point(25, 50),
                 AutoSize = true,
                 Font = new Font("Segoe UI", 9),
-                Checked = false
+                Checked = false,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
             };
             compileKnowledgeCheckBox = new CheckBox
             {
@@ -780,7 +846,8 @@ namespace CursorSetup
                 Location = new Point(25, 75),
                 AutoSize = true,
                 Font = new Font("Segoe UI", 9),
-                Checked = false
+                Checked = false,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
             };
             buildIndexCheckBox = new CheckBox
             {
@@ -788,7 +855,8 @@ namespace CursorSetup
                 Location = new Point(25, 100),
                 AutoSize = true,
                 Font = new Font("Segoe UI", 9),
-                Checked = false
+                Checked = false,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
             };
             buildEmbeddingsCheckBox = new CheckBox
             {
@@ -796,7 +864,8 @@ namespace CursorSetup
                 Location = new Point(25, 125),
                 AutoSize = true,
                 Font = new Font("Segoe UI", 9),
-                Checked = false
+                Checked = false,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
             };
             packageFrameworkCheckBox = new CheckBox
             {
@@ -804,7 +873,8 @@ namespace CursorSetup
                 Location = new Point(25, 150),
                 AutoSize = true,
                 Font = new Font("Segoe UI", 9),
-                Checked = false
+                Checked = false,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
             };
 
             buildNoteLabel = new Label
@@ -813,7 +883,8 @@ namespace CursorSetup
                 Location = new Point(45, 175),
                 Size = new Size(770, 18),
                 Font = new Font("Segoe UI", 8, FontStyle.Italic),
-                ForeColor = Color.FromArgb(150, 100, 0)
+                ForeColor = Color.FromArgb(150, 100, 0),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
             };
 
             buildOptionsGroup.Controls.AddRange(new Control[]
@@ -836,15 +907,24 @@ namespace CursorSetup
             TabPage tab = new TabPage { Text = Lang.T("tab." + (descKey == "components_desc" ? "components" : "advanced")),
                                          Padding = new Padding(10) };
 
+            Panel categoryScrollPanel = new Panel
+            {
+                Dock = DockStyle.Fill,
+                AutoScroll = true,
+                Padding = new Padding(0)
+            };
+            tab.Controls.Add(categoryScrollPanel);
+
             Label descLabel = new Label
             {
                 Text = Lang.T(descKey),
                 Font = new Font("Segoe UI", 9),
                 ForeColor = Color.Gray,
                 Location = new Point(10, 8),
-                AutoSize = true
+                AutoSize = true,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
             };
-            tab.Controls.Add(descLabel);
+            categoryScrollPanel.Controls.Add(descLabel);
             tabDescLabels[tab] = descLabel;
 
             var entries = new List<(CheckBox, Label, ListView, string)>();
@@ -861,7 +941,8 @@ namespace CursorSetup
                     AutoSize = true,
                     Font = new Font("Segoe UI", 9, FontStyle.Bold),
                     Checked = true,
-                    Enabled = !isCore
+                    Enabled = !isCore,
+                    Anchor = AnchorStyles.Top | AnchorStyles.Left
                 };
                 selectAll.CheckedChanged += (s, e) =>
                 {
@@ -875,7 +956,7 @@ namespace CursorSetup
                     }
                 };
                 categorySelectAll[cat] = selectAll;
-                tab.Controls.Add(selectAll);
+                categoryScrollPanel.Controls.Add(selectAll);
 
                 Label countLabel = new Label
                 {
@@ -883,10 +964,11 @@ namespace CursorSetup
                     Location = new Point(740, y + 2),
                     AutoSize = true,
                     Font = new Font("Segoe UI", 9),
-                    ForeColor = Color.Gray
+                    ForeColor = Color.Gray,
+                    Anchor = AnchorStyles.Top | AnchorStyles.Right
                 };
                 categoryCountLabels[cat] = countLabel;
-                tab.Controls.Add(countLabel);
+                categoryScrollPanel.Controls.Add(countLabel);
 
                 ListView listView = new ListView
                 {
@@ -901,16 +983,34 @@ namespace CursorSetup
                     Font = new Font("Segoe UI", 9),
                     BorderStyle = BorderStyle.FixedSingle,
                     HeaderStyle = ColumnHeaderStyle.Nonclickable,
-                    BackColor = Color.White
+                    BackColor = Color.White,
+                    Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
                 };
-                listView.Columns.Add(Lang.T("column.component"), 220);
-                listView.Columns.Add(Lang.T("column.description"), 560);
+                listView.Columns.Add(Lang.T("column.index"), 50);
+                listView.Columns.Add(Lang.T("column.component"), 180);
+                listView.Columns.Add(Lang.T("column.description"), 530);
+                listView.ColumnWidthChanging += (s, e) =>
+                {
+                    if (e.ColumnIndex == listView.Columns.Count - 1)
+                    {
+                        int fixedWidth = listView.Columns[0].Width + listView.Columns[1].Width + SystemInformation.VerticalScrollBarWidth;
+                        int newDescWidth = Math.Max(180, listView.ClientSize.Width - fixedWidth);
+                        e.NewWidth = newDescWidth;
+                    }
+                };
+                listView.Resize += (s, e) =>
+                {
+                    int fixedWidth = listView.Columns[0].Width + listView.Columns[1].Width + SystemInformation.VerticalScrollBarWidth;
+                    int descWidth = Math.Max(180, listView.ClientSize.Width - fixedWidth);
+                    if (listView.Columns[listView.Columns.Count - 1].Width != descWidth)
+                        listView.Columns[listView.Columns.Count - 1].Width = descWidth;
+                };
                 listView.ItemChecked += (s, e) =>
                 {
                     BeginInvoke(new Action(() => UpdateCategoryCount(cat)));
                 };
                 categoryListBoxes[cat] = listView;
-                tab.Controls.Add(listView);
+                categoryScrollPanel.Controls.Add(listView);
 
                 entries.Add((selectAll, countLabel, listView, cat));
                 y += 22 + 180 + 8;
@@ -950,6 +1050,14 @@ namespace CursorSetup
             buildEmbeddingsCheckBox.Text = Lang.T("install.build_embeddings");
             packageFrameworkCheckBox.Text = Lang.T("install.package_framework");
             buildNoteLabel.Text = Lang.T("install.build_exe_note");
+            if (buildToolTip != null)
+            {
+                buildToolTip.SetToolTip(buildMemoryCheckBox, Lang.T("install.build_memory_tt"));
+                buildToolTip.SetToolTip(compileKnowledgeCheckBox, Lang.T("install.compile_knowledge_tt"));
+                buildToolTip.SetToolTip(buildIndexCheckBox, Lang.T("install.build_index_tt"));
+                buildToolTip.SetToolTip(buildEmbeddingsCheckBox, Lang.T("install.build_embeddings_tt"));
+                buildToolTip.SetToolTip(packageFrameworkCheckBox, Lang.T("install.package_framework_tt"));
+            }
             cancelButton.Text = Lang.T("btn.cancel");
             installButton.Text = Lang.T("btn.install");
 
@@ -976,10 +1084,11 @@ namespace CursorSetup
                     bool isCore = CoreCategories.Contains(cat);
                     sa.Text = isCore ? Lang.T("always_installed", cat) : Lang.T("select_all", cat);
                     // Column headers
-                    if (listView.Columns.Count >= 2)
+                    if (listView.Columns.Count >= 3)
                     {
-                        listView.Columns[0].Text = Lang.T("column.component");
-                        listView.Columns[1].Text = Lang.T("column.description");
+                        listView.Columns[0].Text = Lang.T("column.index");
+                        listView.Columns[1].Text = Lang.T("column.component");
+                        listView.Columns[2].Text = Lang.T("column.description");
                     }
                     UpdateCategoryCount(cat);
                 }
