@@ -20,22 +20,75 @@ jobs:
           python-version: "3.13"
           cache: pip
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
 
-      - name: Run tests with coverage
+      - name: Run pytest
         run: pytest --tb=short -v
 
       - name: Coverage summary
         if: always()
         run: |
           coverage report --skip-covered
-          echo "Coverage report generated under htmlcov/ (not uploaded as artifact to keep workflow light)"
+          echo "Coverage report generated under htmlcov/"
 
-      - name: Verify C# GUI builds
+      - name: Upload coverage HTML
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: htmlcov
+          retention-days: 14
+
+      # ponytail: pin to .NET 8 — csproj targets net8.0-windows. .NET 9/10
+      # SDKs sometimes change codegen for WinForms in subtle ways. Match the
+      # version explicitly so CI matches local dev (8.0.416).
+      - name: Setup .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Build C# GUI
         working-directory: cursor-setup-gui
         run: |
           dotnet --version
           dotnet build -c Release --nologo
+
+      # ponytail: smoke-test the new --silent --install-zip CLI to catch
+      # regression in the args parser or extraction path. Uses python
+      # zipfile (more reliable than PS ZipFile.CreateFromDirectory which
+      # has Windows handle-leak races). The CLI extracts to <cwd-parent>/
+      # .cursor by design — that's where projects live relative to the
+      # build output.
+      - name: Smoke test CLI silent install
+        working-directory: cursor-setup-gui
+        shell: pwsh
+        run: |
+          $work = New-Item -ItemType Directory -Path "../_smoke" -Force
+          $workDir = $work.FullName
+          New-Item -ItemType Directory -Path "$workDir/rules" -Force | Out-Null
+          Set-Content "$workDir/rules/test.mdc" -Value "# smoke-test"
+          python -c "import zipfile; zipfile.ZipFile(r'$workDir/test.zip','w').write(r'$workDir/rules/test.mdc','rules/test.mdc')"
+          $exe = "bin/Release/net8.0-windows/win-x64/cursor-setup.exe"
+          $proc = Start-Process -FilePath $exe `
+            -ArgumentList "--silent","--install-zip","test.zip" `
+            -WorkingDirectory $workDir -PassThru -Wait
+          if ($proc.ExitCode -ne 0) { throw "CLI install exited with $($proc.ExitCode)" }
+          $projectRoot = Split-Path -Parent $workDir
+          if (-not (Test-Path "$projectRoot/.cursor/rules/test.mdc")) {
+            throw "extraction failed: expected $projectRoot/.cursor/rules/test.mdc"
+          }
+          # ponytail: clean up the test artifact so it doesn't pollute the
+          # repo's real .cursor/rules/ directory on every CI run.
+          Remove-Item "$projectRoot/.cursor/rules/test.mdc" -Force
+          Write-Host "OK: CLI silent install verified"

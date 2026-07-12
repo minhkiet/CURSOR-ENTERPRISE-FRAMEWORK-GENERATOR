@@ -1518,11 +1518,84 @@ namespace CursorSetup
         }
 
         [STAThread]
-        public static void Main()
+        public static void Main(string[] args)
         {
+            // ponytail: --install-zip <path> [--silent] unblocks automated
+            // install testing (CI, scripted setup). Silent mode skips UI:
+            // extract only, exit 0 success / 1 failure.
+            if (args.Length > 0 && args[0] == "--silent")
+            {
+                string zip = null;
+                for (int i = 1; i < args.Length - 1; i++)
+                {
+                    if (args[i] == "--install-zip") { zip = args[i + 1]; break; }
+                }
+                if (zip == null)
+                {
+                    File.WriteAllText("cursor-setup-cli.log",
+                        "--silent requires --install-zip <path>\n");
+                    Environment.Exit(2);
+                }
+                int rc = RunSilentInstallAsync(zip).GetAwaiter().GetResult();
+                Environment.Exit(rc);
+            }
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new SetupForm());
+        }
+
+        /// <summary>
+        /// Silent-mode installer: extract zip to standard install path,
+        /// skip post-install scripts (no UI to gather settings).
+        /// Returns process exit code (0 success, 1 failure).
+        /// </summary>
+        private static async Task<int> RunSilentInstallAsync(string zipPath)
+        {
+            // ponytail: WinExe suppresses stdio. Redirect to log file so CI
+            // can capture results. Path: <zip>.install.log next to input.
+            string logPath = zipPath + ".install.log";
+            using var log = new StreamWriter(logPath, append: false) { AutoFlush = true };
+            try
+            {
+                if (!File.Exists(zipPath))
+                {
+                    log.WriteLine($"FAIL: zip not found: {zipPath}");
+                    return 1;
+                }
+                string projectRoot = Directory.GetParent(
+                    Directory.GetCurrentDirectory()).FullName;
+                string installPath = Path.Combine(projectRoot, ".cursor");
+                Directory.CreateDirectory(installPath);
+
+                using (var archive = System.IO.Compression.ZipFile.OpenRead(zipPath))
+                {
+                    int total = archive.Entries.Count;
+                    int current = 0;
+                    int copied = 0;
+                    foreach (var entry in archive.Entries)
+                    {
+                        current++;
+                        string filePath = Path.Combine(installPath, entry.FullName);
+                        if (string.IsNullOrEmpty(entry.Name)) continue; // directory
+                        Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+                        entry.ExtractToFile(filePath, overwrite: true);
+                        copied++;
+                        if (current % 50 == 0 || current == total)
+                        {
+                            log.WriteLine($"[{current}/{total}] {entry.FullName}");
+                        }
+                    }
+                    log.WriteLine($"extracted {copied}/{total} files");
+                }
+                log.WriteLine($"OK: extracted to {installPath}");
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                log.WriteLine($"FAIL: {ex.GetType().Name}: {ex.Message}");
+                return 1;
+            }
         }
     }
 }
