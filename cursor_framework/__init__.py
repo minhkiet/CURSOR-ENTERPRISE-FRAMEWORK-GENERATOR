@@ -24,10 +24,17 @@ Version: 1.2.0
 __version__ = "1.2.0"
 __author__ = "Cursor Enterprise Framework"
 
-from .context_router import ContextRouter, IntentClassifier, SkillRoute
+from .context_router import (
+    ContextRouter,
+    IntentClassifier,
+    IntentType,
+    Domain,
+    Skill,
+    SkillRoute,
+)
 from .memory_manager import MemoryManager, MemoryEntry, MemoryTier
 from .memory_store import MemoryStore
-from .token_optimizer import TokenOptimizer, TokenBudget
+from .token_optimizer import TokenOptimizer, TokenBudget, CompressionStrategy, CompressionResult
 from .skill_discovery import SkillDiscovery, SkillRegistry
 from .indexer import Indexer, IndexResult, AssetEntry
 from .context_builder import ContextBuilder, ContextResult
@@ -38,6 +45,9 @@ from .dashboard import Dashboard
 __all__ = [
     "ContextRouter",
     "IntentClassifier",
+    "IntentType",
+    "Domain",
+    "Skill",
     "SkillRoute",
     "MemoryManager",
     "MemoryEntry",
@@ -45,6 +55,8 @@ __all__ = [
     "MemoryStore",
     "TokenOptimizer",
     "TokenBudget",
+    "CompressionStrategy",
+    "CompressionResult",
     "SkillDiscovery",
     "SkillRegistry",
     "Indexer",

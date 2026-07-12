@@ -232,10 +232,12 @@ def count_code_lines(code: str) -> dict[str, int]:
     Returns:
         Dictionary with line counts
     """
-    lines = code.split("\n")
+    # ponytail: splitlines() is line-counting-friendly — it ignores the
+    # trailing empty entry that split("\n") produces after a final "\n".
+    # "code" excludes both blanks and comments (matches test expectation).
+    lines = code.splitlines()
     total = len(lines)
     blank = sum(1 for line in lines if not line.strip())
-    code_lines = total - blank
     comment = 0
     in_multiline = False
 
@@ -255,7 +257,7 @@ def count_code_lines(code: str) -> dict[str, int]:
     return {
         "total": total,
         "blank": blank,
-        "code": code_lines,
+        "code": total - blank - comment,
         "comment": comment,
     }
 
