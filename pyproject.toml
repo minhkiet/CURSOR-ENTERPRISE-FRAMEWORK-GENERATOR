@@ -48,6 +48,7 @@ where = ["."]
 include = ["cursor_framework*"]
 
 [tool.pytest.ini_options]
-testpaths = ["cursor_framework/tests"]
+testpaths = ["cursor_framework/tests", "tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
+addopts = "--cov=cursor_framework --cov-report=term-missing --cov-report=html:htmlcov"

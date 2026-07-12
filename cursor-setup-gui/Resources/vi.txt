@@ -13,6 +13,13 @@ ready_to_install=Sẵn sàng cài đặt
 tab.install=Cài đặt
 tab.components=Thành phần
 tab.advanced=Nâng cao
+tab.hooks=Hooks
+hooks.desc=Tích hợp tuỳ chọn với thư viện Python cursor_framework. Hook chạy như tiến trình nền, không chặn cài đặt. Bỏ tick để tắt hook.
+hooks.prescan_label=Pre-scan: kiểm tra ZIP trước khi giải nén
+hooks.prescan_script_label=Đối số Python (truyền vào `python`):
+hooks.postinstall_label=Post-install: tạo INDEX.json cho Dashboard / Workflow
+hooks.postinstall_script_label=Đối số Python (truyền vào `python`):
+hooks.hint=Bỏ tick checkbox để tắt hook. Sửa script để thay đổi lệnh mặc định. Cả hai hook đều an toàn — nếu thiếu Python hoặc lỗi script, cài đặt vẫn tiếp tục bình thường.
 components_desc=Chọn thành phần muốn cài. Mặc định: chọn tất cả.
 advanced_desc=Tài nguyên tuỳ chọn. Mặc định: chọn tất cả.
 
@@ -66,6 +73,7 @@ log.complete_header=Cài đặt hoàn tất!
 log.installed_to=Đã cài vào: {0}
 log.restart_cursor=Hãy khởi động lại Cursor IDE để tải thành phần mới.
 log.post_install=Chạy bước build sau cài đặt...
+log.hook_post_install=Tạo INDEX.json...
 log.post_step===> {0}
 log.post_done=    ✓ Hoàn tất ({0:0.0}s)
 log.post_failed=    ✗ Thất bại (exit {0})

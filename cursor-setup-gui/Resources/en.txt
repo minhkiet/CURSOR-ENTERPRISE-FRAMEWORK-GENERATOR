@@ -13,6 +13,13 @@ ready_to_install=Ready to install
 tab.install=Install
 tab.components=Components
 tab.advanced=Advanced
+tab.hooks=Hooks
+hooks.desc=Optional integration with the cursor_framework Python library. Hooks run as background subprocess and never block installation. Disable any hook to skip it.
+hooks.prescan_label=Pre-scan: validate ZIP before extraction
+hooks.prescan_script_label=Python arguments (passed to `python`):
+hooks.postinstall_label=Post-install: write INDEX.json for Dashboard / Workflow
+hooks.postinstall_script_label=Python arguments (passed to `python`):
+hooks.hint=Disable a hook by unchecking its checkbox. Edit the script to override the default command. Both hooks are fail-safe — if Python is missing or the script errors, the installer continues normally.
 components_desc=Choose which components to install. Defaults: all selected.
 advanced_desc=Optional resources. Defaults: all selected.
 
@@ -66,6 +73,7 @@ log.complete_header=Installation completed successfully!
 log.installed_to=Installed to: {0}
 log.restart_cursor=Please restart Cursor IDE to load the new components.
 log.post_install=Running post-install build steps...
+log.hook_post_install=Generating INDEX.json...
 log.post_step===> {0}
 log.post_done=    OK ({0:0.0}s)
 log.post_failed=    FAILED (exit {0})

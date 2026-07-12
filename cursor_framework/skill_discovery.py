@@ -383,6 +383,7 @@ class SkillDiscovery:
         self.gate_executor = GateExecutor()
         self.base_path = base_path or os.getcwd()
         self._discovery_history: list[DetectedSkill] = []
+        self._skill_file_cache: dict[str, tuple[float, str]] = {}
 
     def detect_skills(self, request: str) -> list[DetectedSkill]:
         """
@@ -502,7 +503,7 @@ class SkillDiscovery:
 
     def load_skill_file(self, skill_name: str) -> Optional[str]:
         """
-        Load skill file content.
+        Load skill file content with mtime-based cache.
 
         Args:
             skill_name: Name of the skill
@@ -515,10 +516,31 @@ class SkillDiscovery:
             return None
 
         skill_path = Path(self.base_path) / skill.path
-        if skill_path.exists():
-            return skill_path.read_text(encoding="utf-8")
+        if not skill_path.exists():
+            return None
 
-        return None
+        try:
+            mtime = skill_path.stat().st_mtime
+        except OSError:
+            return None
+
+        cached = self._skill_file_cache.get(str(skill_path))
+        if cached and cached[0] == mtime:
+            return cached[1]
+
+        try:
+            content = skill_path.read_text(encoding="utf-8")
+        except OSError:
+            return None
+
+        self._skill_file_cache[str(skill_path)] = (mtime, content)
+        return content
+
+    def clear_skill_cache(self) -> int:
+        """Drop all cached skill file contents. Returns number of entries cleared."""
+        count = len(self._skill_file_cache)
+        self._skill_file_cache.clear()
+        return count
 
     def execute_gates(
         self, skills: list[DetectedSkill], context: dict, gate_type: GateType

@@ -1,0 +1,41 @@
+name: tests
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  test:
+    runs-on: windows-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run tests with coverage
+        run: pytest --tb=short -v
+
+      - name: Coverage summary
+        if: always()
+        run: |
+          coverage report --skip-covered
+          echo "Coverage report generated under htmlcov/ (not uploaded as artifact to keep workflow light)"
+
+      - name: Verify C# GUI builds
+        working-directory: cursor-setup-gui
+        run: |
+          dotnet --version
+          dotnet build -c Release --nologo

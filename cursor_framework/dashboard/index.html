@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cursor Framework Dashboard</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 14px/1.5 system-ui, -apple-system, Segoe UI, sans-serif;
+         max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+  h1 { font-size: 1.5rem; margin-bottom: .25rem; }
+  .sub { color: #888; margin-bottom: 1.5rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+          gap: .75rem; margin-bottom: 2rem; }
+  .card { border: 1px solid #8884; border-radius: 6px; padding: .75rem 1rem; }
+  .card .v { font-size: 1.6rem; font-weight: 600; }
+  .card .l { font-size: .8rem; color: #888; text-transform: uppercase;
+             letter-spacing: .04em; }
+  table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+  th, td { text-align: left; padding: .35rem .5rem; border-bottom: 1px solid #8882; }
+  th { font-size: .8rem; color: #888; text-transform: uppercase; }
+  code { background: #8882; padding: 0 .25rem; border-radius: 3px; font-size: 90%; }
+  .meta { font-size: .8rem; color: #888; }
+  .badge { display: inline-block; padding: .1rem .4rem; border-radius: 3px;
+           background: #8883; font-size: .75rem; }
+  .live::before { content: "●"; color: #0c0; margin-right: .3rem; }
+  .stale::before { content: "●"; color: #c00; margin-right: .3rem; }
+</style>
+</head>
+<body>
+<h1>Cursor Framework Dashboard</h1>
+<div class="sub" id="meta">loading…</div>
+
+<h2>Assets</h2>
+<div class="grid" id="assets"></div>
+
+<h2>Memory</h2>
+<div class="grid" id="memory"></div>
+
+<h2>Categories</h2>
+<table>
+<thead><tr><th>Category</th><th>Count</th></tr></thead>
+<tbody id="cats"></tbody>
+</table>
+
+<h2>Workflow runtime</h2>
+<div class="grid" id="workflow"></div>
+
+<script>
+const fmt = (n) => Number(n || 0).toLocaleString();
+
+// ponytail: if URL has ?token=..., forward it on every fetch so the
+// dashboard works behind Dashboard(..., auth_token="...").
+const TOKEN = new URLSearchParams(location.search).get("token") || "";
+const authHeaders = TOKEN ? { "X-Auth-Token": TOKEN } : {};
+
+async function load(url) {
+  const sep = url.includes("?") ? "&" : "?";
+  const full = url + (TOKEN ? sep + "token=" + encodeURIComponent(TOKEN) : "");
+  const r = await fetch(full, { cache: "no-store", headers: authHeaders });
+  if (!r.ok) return null;
+  return r.json();
+}
+
+function card(label, value, extra = "") {
+  return `<div class="card"><div class="l">${label}</div>
+    <div class="v">${value}</div>${extra}</div>`;
+}
+
+async function refresh() {
+  const idx = await load("/api/index");
+  const stats = await load("/api/stats");
+
+  const meta = document.getElementById("meta");
+  if (stats && stats.index_fresh) {
+    meta.innerHTML = `<span class="live">index live</span>
+      · root <code>${idx.root}</code>
+      · scanned ${idx.scanned_at}
+      · auto-refresh every 3s`;
+  } else {
+    meta.innerHTML = `<span class="stale">no index</span>
+      — run <code>python -m cursor_framework.indexer .cursor</code> first`;
+  }
+
+  const assets = document.getElementById("assets");
+  const mem = document.getElementById("memory");
+  const cats = document.getElementById("cats");
+  const wf = document.getElementById("workflow");
+
+  if (idx) {
+    const t = idx.totals;
+    assets.innerHTML =
+      card("Grand total", fmt(t.grand_total)) +
+      card("Skills", fmt(t.skills)) +
+      card("Rules", fmt(t.rules)) +
+      card("Knowledge", fmt(t.knowledge)) +
+      card("Commands", fmt(t.commands)) +
+      card("Hooks", fmt(t.hooks));
+
+    cats.innerHTML = Object.entries(t)
+      .filter(([k]) => k !== "grand_total")
+      .sort((a, b) => b[1] - a[1])
+      .map(([k, v]) => `<tr><td>${k}</td><td>${fmt(v)}</td></tr>`)
+      .join("");
+  } else {
+    assets.innerHTML = card("Grand total", "—");
+    cats.innerHTML = "";
+  }
+
+  if (stats) {
+    const m = stats.memory || {};
+    mem.innerHTML =
+      card("Entries", fmt(m.entries)) +
+      card("Hits", fmt(m.hits)) +
+      card("Misses", fmt(m.misses)) +
+      card("Tokens saved", fmt(m.tokens_saved));
+
+    const w = stats.workflow || {};
+    const wcards = Object.entries(w)
+      .map(([k, v]) => card(k, fmt(v)))
+      .join("");
+    wf.innerHTML = wcards || card("(no workflow)", "—");
+  }
+}
+
+refresh();
+setInterval(refresh, 3000);
+</script>
+</body>
+</html>
