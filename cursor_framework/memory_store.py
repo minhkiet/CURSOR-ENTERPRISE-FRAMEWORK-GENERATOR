@@ -122,6 +122,11 @@ class MemoryStore:
 
         return len(payload["entries"])
 
+    # ponytail: 50MB cap. Anything larger almost certainly means a runaway
+    # cache that needs manual intervention, not silent load + OOM. Real
+    # workflows stay well under 5MB (10k entries ≈ 5MB JSON).
+    MAX_LOAD_BYTES = 50 * 1024 * 1024
+
     def load_into(self, manager: "MemoryManager") -> int:
         """
         Read entries from disk into `manager`.
@@ -130,6 +135,15 @@ class MemoryStore:
         leave `manager` unchanged (no exception thrown).
         """
         if not self.path.exists():
+            return 0
+
+        # ponytail: refuse oversized files to prevent OOM. Same defensive
+        # posture as missing/corrupt files — silent return 0.
+        try:
+            size = self.path.stat().st_size
+        except OSError:
+            return 0
+        if size > self.MAX_LOAD_BYTES:
             return 0
 
         try:

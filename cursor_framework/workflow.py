@@ -23,6 +23,7 @@ This is the only class an agent should need to import for normal work.
 from __future__ import annotations
 
 import hashlib
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -41,6 +42,7 @@ class WorkflowResult:
     memory_hits: int
     memory_misses: int
     asset_count: int
+    latency_ms: float = 0.0
 
 
 class Workflow:
@@ -119,17 +121,26 @@ class Workflow:
             Workflow gracefully rebuilds — `from_cache=False` but
             `memory_hits` still increments (the key lookup hit).
         """
+        # ponytail: time the full ask() call so callers can surface
+        # cache-hit vs cache-miss latency in dashboards / benchmarks.
+        started = time.perf_counter()
+
         idx = self._ensure_index()
         key = self._request_key(request)
 
         cached = self.memory.retrieve(key)
         if cached is not None and isinstance(cached, ContextResult):
+            # ponytail: persist memory on cache hit too — process crash
+            # between hits should not lose stats or HOT-tier entries.
+            # Cheap (~few KB JSON) so we don't gate it behind a flag.
+            self.store.save(self.memory)
             return WorkflowResult(
                 context=cached,
                 from_cache=True,
                 memory_hits=self.memory._hits,
                 memory_misses=self.memory._misses,
                 asset_count=idx.result.totals.get("grand_total", 0),
+                latency_ms=(time.perf_counter() - started) * 1000,
             )
         # ponytail: cached value may be a plain dict after JSON round-trip
         # (dataclass loses its type through json). Fall back to rebuild.
@@ -151,6 +162,7 @@ class Workflow:
             memory_hits=self.memory._hits,
             memory_misses=self.memory._misses,
             asset_count=idx.result.totals.get("grand_total", 0),
+            latency_ms=(time.perf_counter() - started) * 1000,
         )
 
     def stats(self) -> dict[str, int]:
