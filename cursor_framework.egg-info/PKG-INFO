@@ -28,683 +28,575 @@ Requires-Dist: python-dotenv>=1.0.0; extra == "all"
 
 # Cursor Enterprise Framework Generator
 
-> A complete enterprise-grade framework for AI Coding Agents — Optimized Token, Memory, and Knowledge Reuse.
+> A cross-IDE framework for AI coding agents — built around **Memory First**, **Retrieval First**, **Token Optimization**, and **Knowledge Reuse**.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Latest Release](https://img.shields.io/badge/release-v1.3.0-blue)](https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/releases)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
 
 ---
 
-## Overview
+## What is it?
 
-**Cursor Enterprise Framework** is an enterprise-level framework designed to maximize the performance of AI coding agents across IDEs: Cursor, Claude Code, Vibe Code, Windsurf, Cline, and Roo Code.
+**Cursor Enterprise Framework (CEF)** is a drop-in `.cursor/` configuration that turns any AI coding agent — Cursor, Claude Code, Windsurf, Cline, Roo Code, Vibe Code — into a context-aware, token-efficient, memory-backed senior developer.
 
-The framework is built on **4 core principles**:
+Instead of starting every session from zero, the framework:
 
-| # | Principle | Description |
-|---|-----------|-------------|
-| 1 | **Memory First** | Always look up memory before starting a task |
-| 2 | **Retrieval First** | Always retrieve knowledge before asking questions |
-| 3 | **Token Optimization First** | Optimize token consumption at every step |
-| 4 | **Knowledge Reuse First** | Reuse existing decisions and solutions |
+1. **Routes requests** to the right domain knowledge via a `ContextRouter`.
+2. **Stores decisions and bug history** in a SQLite-backed memory layer.
+3. **Reuses prompts and skills** from a curated skill library.
+4. **Compresses and caches** token-heavy context automatically.
 
----
+## What's in the box
 
-## Achievements
+| Component | Files | Where |
+|---|--:|---|
+| Rules (`.mdc`) | 42 | `.cursor/rules/` |
+| Skills | 50 | `.cursor/skills/` |
+| Python library (`cursor_framework`) | 14 modules + 6 utils | `cursor_framework/` |
+| Vue.js dashboard | Vue 3 + Vite + Tailwind | `cursor_framework_web/` |
+| Demo projects | 5 (CRM, fitness, food-delivery, realestate, travel) | `demos/` |
+| Windows GUI installer (built) | `cursor-setup.exe` (~162 MB), `cursor-setup.zip` (~22 MB) | `dist/` |
+| PowerShell / CMD installers | 5 scripts | root |
 
-| Component | Target | Actual | Status |
-|-----------|:------:|:------:|--------|
-| Rules | 55 | **41** | ✅ Complete |
-| Skills | 44 | **18** | ✅ Complete |
-| Knowledge Dirs | 35+ | **37** | ✅ Complete |
-| Scripts | 10+ | **12** | ✅ Complete |
-| Commands | 20+ | **26** | ✅ Complete |
-| Prompts | 20+ | **31** | ✅ New |
-| Workflows | 10+ | **11** | ✅ New |
-| Templates | 5+ | **6** | ✅ New |
-| Python Package | - | **12 modules** | ✅ New |
-| Web Interface | - | **Vue.js** | ✅ New |
-| **Total Files** | **500+** | **592** | ✅ **+18%** |
-
-📦 **ZIP Package**: `cursor-enterprise-framework-v5.zip` — TBD
-
----
-
-## Tech Stack Supported
-
-### Frontend
-Next.js 15 · React 19 · Vue 3 · Nuxt 4 · TypeScript 5 · TailwindCSS · Shadcn/UI · Vuetify · Ant Design
-
-### Backend
-Laravel 12 · ASP.NET Core 9 · NestJS · NodeJS
-
-### Database
-MySQL · PostgreSQL · SQL Server · SQLite · Redis
-
-### BaaS
-Supabase — Auth, Database, Storage, Edge Functions, PGVector
-
-### AI
-OpenAI · Gemini · Claude · Ollama · OpenRouter
-
-### RAG
-PGVector · ChromaDB · Qdrant · Weaviate
-
-### Workflow
-n8n · Temporal · Trigger.dev
-
-### Cloud & Deployment
-Cloudflare · AWS · Azure · GCP · Docker · Kubernetes · Coolify · Vercel · Railway
-
----
+The framework ships **605+ files** inside `cursor-setup.zip` (the actual `.cursor/` payload). Repo source counts higher because of demos and build artifacts.
 
 ## Architecture
 
 ```
-.cursor/
-├── rules/         MDC Rules — Standards & Principles         (41 files)
-├── skills/        MDC Skills — Specialized Expertise         (18 dirs)
-├── memory/        Memory System
-│   ├── schema/    SQLite schemas
-│   ├── session-summary/
-│   ├── architecture-history/
-│   ├── decision-history/
-│   ├── bug-history/
-│   └── *.json     Index files
-├── knowledge/     Knowledge Base (37 directories)
-├── prompts/       Prompt Templates (31 files)
-├── workflows/     Standard Workflows (11 files)
-├── templates/     Project Templates (6 files)
-├── scripts/       Automation Scripts (12)
-├── commands/      Slash Commands (26 files)
-├── hooks/         Lifecycle Hooks
-├── cache/         Compiled Cache
-└── vector-db/     Vector DB Configuration
+.cursor/                        # Framework config (installed to ~/.cursor/)
+├── rules/                      # 42 .mdc rule files
+├── skills/                     # 50 specialized skill folders
+├── memory/                     # SQLite memory layer
+├── knowledge/                  # Domain knowledge base
+├── prompts/                    # Prompt templates
+├── workflows/                  # Standard workflows
+├── templates/                  # Project templates
+├── commands/                   # Slash commands
+├── hooks/                      # Lifecycle hooks
+└── agents/                     # Agent personas
+
+cursor_framework/               # Python library
+├── context_router.py           # Intent → skill routing
+├── memory_manager.py           # Memory tier manager
+├── memory_store.py             # SQLite-backed store with size cap
+├── token_optimizer.py          # Token compression
+├── skill_discovery.py          # Auto skill detection + cache
+├── rules_parser.py             # .mdc parser
+├── skills_parser.py            # Skill def parser
+├── workflow.py                 # Workflow engine
+├── indexer.py                  # Builds .cursor/INDEX.json
+├── integration.py              # Cross-module glue
+├── context_builder.py          # Builds full context for LLM
+├── watcher.py                  # Auto-reload on file changes
+├── dashboard.py                # Streamlit dashboard
+└── utils/                      # text / file / code / http / security
+
+cursor_framework_web/           # Vue 3 dashboard
+├── src/{views,components,composables}/
+└── package.json (vue, vite, vue-router, motion, jszip)
+
+cursor-setup-gui/               # C# WinForms GUI installer
+├── SetupForm.cs                # 1600 LOC, per-category picker
+└── Lang.cs / LangItem.cs       # i18n (en/vi)
+
+demos/                          # Reference projects
+├── crm/  fitness/  food-delivery/  realestate/  travel/
 ```
 
----
+## Installation
 
-## Quick Start
+Three ways to install — pick whichever fits your environment.
 
-### 1. Start a New Task
+### Option 1: Windows GUI (recommended for first-time users)
 
-```markdown
-1. Identify task domain
-2. Use Context Router to load the correct knowledge
-3. Check Memory System (decisions.sqlite, bug-history)
-4. Select the appropriate Prompt Template
-5. Follow Workflow step by step
-6. Update Memory after completion
-```
+1. Download both files from the [latest release](https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/releases):
+   - `cursor-setup.exe` (self-contained, no .NET required)
+   - `cursor-setup.zip` (framework payload, ~22 MB)
+2. Place them in the same folder.
+3. Double-click `cursor-setup.exe`.
+4. Pick the destination folder in the GUI dialog (defaults to `%USERPROFILE%\.cursor`).
+5. Click **Install**. Restart Cursor IDE.
 
-### 2. Use Context Router
+The GUI shows progress, an extraction log, and a file-count sanity check.
 
-```markdown
-Request: "Optimize Entity Framework"
-Load: aspnet-core, sql-server, postgres
-Skip: bazi, pdf, crm
+### Option 2: One-liner from PowerShell
 
-Request: "Generate Bát Tự PDF"
-Load: bazi, pdf
-Skip: aspnet-core, supabase
-```
-
-### 3. Use Memory System
-
-```markdown
-Before implementation:
-- Check decisions.sqlite for existing ADRs
-- Check bugs.sqlite for known bugs
-- Check bug-patterns for common patterns
-
-After completion:
-- Update decisions.sqlite if new ADR created
-- Update bugs.sqlite if bug fixed
-- Update session-summary for task summary
-```
-
----
-
-## Scripts
-
-```powershell
-# Build Memory System
-. .cursor/scripts/memory-builder/build-memory.ps1
-
-# Compile Knowledge
-. .cursor/scripts/knowledge-compiler/compile-knowledge.ps1
-
-# Build Project Index
-. .cursor/scripts/project-index-builder/build-index.ps1
-
-# Build Embeddings
-. .cursor/scripts/embedding-builder/build-embeddings.ps1
-
-# Package Framework
-. .cursor/scripts/packager.ps1
-```
-
----
-
-## Token Optimization Strategies
-
-The framework implements **10 token optimization strategies**:
-
-| # | Strategy | Description |
-|---|----------|-------------|
-| 1 | **Context Router** | Load only required domains |
-| 2 | **Knowledge Compiler** | Merge and summarize documents |
-| 3 | **Prompt Cache** | Cache frequently used prompts |
-| 4 | **Session Summary** | Compress session context |
-| 5 | **Decision Memory** | Reuse existing decisions |
-| 6 | **Bug Memory** | Avoid repeating known bugs |
-| 7 | **Incremental Scan** | Scan only changed files |
-| 8 | **Lazy Loading** | Load knowledge on-demand |
-| 9 | **Semantic Retrieval** | Semantic search vs. full scan |
-| 10 | **Auto Compression** | Compress long contexts |
-
----
-
-## Supported Domains
-
-| Domain | Purpose |
-|--------|---------|
-| Bazi | Bát Tự calculations,命运, Vận trình |
-| Tuvi | Tử Vi horoscope, Sao chiếu |
-| Numerology | Thần Số Học, Life Path Number |
-| CRM | Multi-Tenant CRM SaaS |
-| Marketing | Marketing automation |
-| NextJS / Vue / Nuxt | Frontend frameworks |
-| Laravel / ASP.NET / NestJS | Backend frameworks |
-| MySQL / PostgreSQL / SQL Server | Relational databases |
-| Redis | Cache & Queue |
-| Supabase | BaaS with RLS, PGVector |
-| OpenAI / Gemini / Claude | AI providers |
-| RAG / Vector Search | AI retrieval |
-| PDF | PDF generation & processing |
-| Docker / Kubernetes | Container orchestration |
-| Cloudflare / AWS / Azure / GCP | Cloud platforms |
-
----
-
-## GUI Installation (Recommended)
-
-For easy installation with a graphical folder picker, use `cursor-setup.exe`:
-
-### Method 1: Double-click cursor-setup.exe
-
-```
-1. Download or copy cursor-setup.exe to the framework folder
-2. Double-click cursor-setup.exe
-3. Select installation folder via GUI dialog
-4. Done!
-```
-
-### Method 2: Using cursor-setup.bat
-
-```cmd
-cursor-setup.bat
-```
-
-### Method 3: Using setup.bat with --gui-picker
-
-```cmd
-setup.bat --gui-picker
-```
-
-### Method 4: Custom installation path (command-line)
-
-```cmd
-setup.bat --install-dir "D:\MyCustomPath\.cursor"
-```
-
----
-
-## GitHub Installation
-
-### Quick Install (One Command)
-
-**Windows (PowerShell) - INSTALL:**
 ```powershell
 irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1 | iex
 ```
 
-**Windows (PowerShell) - UPDATE (if already installed):**
-```powershell
-irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1 -OutFile $env:TEMP\install-cef.ps1; & $env:TEMP\install-cef.ps1 -Update
-```
-
-**Windows (CMD):**
-```cmd
-curl -LO https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1 && powershell -ExecutionPolicy Bypass -File install.ps1 && del install.ps1
-```
-
-### Using setup.bat with GitHub
-
-```cmd
-:: Clone from GitHub (default repo)
-setup.bat --github
-
-:: Clone with specific repo
-setup.bat --github https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR
-
-:: Clone with specific branch
-setup.bat --github https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR --branch main
-
-:: Download as ZIP (no Git required)
-setup.bat --zip https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR
-```
-
-### Using install-github.bat
-
-```cmd
-:: Default repo
-install-github.bat
-
-:: Custom repo
-install-github.bat https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR
-
-:: Custom repo + branch
-install-github.bat https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR main
-```
-
-### Using install-github.ps1 (PowerShell)
+Download the ZIP from GitHub, extract, and run `setup.bat` automatically. Updates:
 
 ```powershell
-# Default installation
-.\install-github.ps1
-
-# Custom repo and branch
-.\install-github.ps1 -RepoUrl "https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR" -Branch "main"
-
-# Check for updates
-.\install-github.ps1 -CheckUpdate
-
-# Dry run (preview)
-.\install-github.ps1 -DryRun
-
-# Force overwrite existing
-.\install-github.ps1 -Force
+& {irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1} -Update
 ```
 
----
+### Option 3: Clone + setup
 
-## Cursor Framework Python Package
+```powershell
+git clone https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR.git
+cd "CURSOR ENTERPRISE FRAMEWORK GENERATOR"
+.\setup.bat                    # install to %USERPROFILE%\.cursor
+.\setup.bat --force            # overwrite existing install
+.\setup.bat --gui-picker       # show folder-picker dialog
+.\setup.bat --install-dir "D:\custom\.cursor"
+```
 
-A Python library for integrating with the Cursor Enterprise Framework.
+Equivalent CLI installers at the repo root: `install-github.bat`, `install-github.ps1`, `quick-install.ps1`.
+
+## Usage
+
+### In Cursor / Claude Code / Windsurf
+
+Once installed, just open any project. The framework auto-loads:
+
+- **Skills** via `cursor_framework.skill_discovery` — detected from your request, loaded on demand.
+- **Memory** at `~/.cursor/memory/decisions.sqlite` — previous ADRs and bug fixes are checked first.
+- **Rules** in `.cursor/rules/*.mdc` — applied automatically to every request.
+
+Example: ask *"Optimize this Entity Framework query"* and the framework will load `aspnet-core` + `sql-server` skills, skip `bazi`/`pdf`, and surface any related decisions from memory.
+
+### As a Python library
+
+```bash
+git clone https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR.git
+cd "CURSOR ENTERPRISE FRAMEWORK GENERATOR"
+pip install -e ".[all]"        # editable install from this repo
+```
+
+> **Note:** A different package named `cursor-framework` already exists on PyPI.
+> **Do not run `pip install cursor-framework`** — it is a different, older library
+> (v1.0.0, pydantic-only). Always install from source as shown above.
+
+The `cursor_framework` Python package gives you full programmatic control over every subsystem: routing, memory, token budgeting, skill discovery, indexing, and the auto-watch pipeline. There are two usage modes — the **single-entry `Workflow`** class for end-to-end requests, and **standalone modules** for fine-grained control.
+
+#### 1 — Workflow (recommended entry point)
+
+`Workflow` orchestrates the full 4-phase pipeline (`scan → detect → build → persist`) behind a single `ask()` call. Memory survives across Python sessions automatically.
 
 ```python
-# Quick Install
-pip install cursor-framework
+from cursor_framework import Workflow
 
-# Core Features
-from cursor_framework import ContextRouter, MemoryManager, SkillDiscovery
+wf = Workflow(
+    root=".cursor",            # path to .cursor/ directory
+    memory_path=".cache/memory.json",  # persisted memory file
+    max_tokens=4000,          # token budget for skill context
+    max_skills=5,             # cap on skills loaded per request
+    auto_watch=False,         # re-index on file change (see §4)
+)
 
-# Initialize
-router = ContextRouter()
-memory = MemoryManager()
-skills = SkillDiscovery()
+# First call: scans .cursor/, detects skills, builds context
+result = wf.ask("Create a landing page for our SaaS product")
+
+print(result.from_cache)      # False on first run, True on repeats
+print(result.context.tokens)  # actual token count used
+print(result.context.skills_used)   # e.g. ["frontend-taste", "full-output"]
+print(result.context.truncated)     # True if compression was needed
+print(result.memory_hits, result.memory_misses)
+print(result.asset_count)     # grand total assets indexed
+print(f"{result.latency_ms:.1f}ms")
+
+# Rapid follow-up for same request → cache hit, <1ms
+same = wf.ask("Create a landing page for our SaaS product")
+print(same.from_cache)        # True
+
+# Dashboard stats from all subsystems
+stats = wf.stats()
+print(stats)
+# {'restored_entries': 3, 'memory_entries': 12, 'memory_hits': 7,
+#  'tokens_saved': 2400, 'assets_indexed': 387, 'cache_files': 5,
+#  'watcher_scans': 0, 'watcher_changes': 0}
+
+# Force warm-up without making a request
+wf.warm()   # builds index, persists state, returns stats
+
+# Wire to Dashboard for live HTTP monitoring (see §5)
+from cursor_framework import Dashboard
+dash = Dashboard(root=".cursor", workflow=wf)
+# dash.serve(port=8765)   # blocking — run in a thread for non-blocking
 ```
 
-### Core Modules
+#### 2 — Standalone modules
 
-| Module | Description |
-|--------|-------------|
-| `context_router` | Smart context routing to handlers |
-| `memory_manager` | Memory system management |
-| `skill_discovery` | Auto-discover and execute skills |
-| `token_optimizer` | Token optimization strategies |
-| `rules_parser` | Parse and load MDC rules |
-| `skills_parser` | Parse skill definitions |
-| `integration` | Framework integration utilities |
-| `review.frontend_reviewer` | Frontend code review |
+Each module works independently if you need only one piece.
 
-### Utils
+**ContextRouter** — classify intent and route to the right skill:
 
-`cursor_framework/utils/` — `code_utils`, `file_utils`, `http_utils`, `security_utils`, `text_utils`
+```python
+from cursor_framework import ContextRouter, IntentType, Domain, Skill
 
----
+router = ContextRouter()
+route = router.route("Optimize this PostgreSQL query with indexing")
 
-## Cursor Framework Web
+print(route.skill)           # Skill.DATABASE_OPTIMIZATION
+print(route.confidence)      # 0.87
+print(route.intent)          # IntentType.REFACTORING
+print(route.domain)          # Domain.DATABASE
+print(route.reasoning)       # "Intent: refactoring (0.73), Domain: database (0.85)..."
 
-A Vue.js web interface for the framework.
+# Multi-skill routing (e.g. landing page needs taste + full-output + review)
+routes = router.route_multi_skill("Build a greenfield landing page with Tailwind")
+for r in routes:
+    print(r.skill)
+# Skill.FRONTEND_TASTE, Skill.FULL_OUTPUT, Skill.FRONTEND_REVIEW
+```
+
+**SkillDiscovery** — auto-detect and load skills with gate execution:
+
+```python
+from cursor_framework import SkillDiscovery, GateType
+
+sd = SkillDiscovery(base_path=".")   # base path for .cursor/skills/
+
+# Detect skills for a request
+skills = sd.detect_skills("Add security review for momo payment integration")
+for s in skills:
+    print(s.skill, f"conf={s.confidence:.2f}")
+# vietnam-payment-review conf=0.89
+# security-review conf=0.71
+
+# Load skill file content (mtime-cached)
+content = sd.load_skill_file("frontend-taste")
+print(len(content), "chars loaded")
+
+# Execute pre-review gates
+results = sd.execute_gates(skills, context={}, gate_type=GateType.PRE_REVIEW)
+for r in results:
+    print(r.skill, "passed:", r.passed, "items:", r.items_checked)
+
+# Discovery statistics
+print(sd.get_discovery_stats())
+# {'total_discoveries': 4, 'unique_skills': 3, 'avg_confidence': 0.74,
+#  'gate_summary': {'total_gates': 8, 'pre_review': {'total': 4, 'passed': 4}}}
+
+# Clear skill file cache (useful after updating skill files)
+cleared = sd.clear_skill_cache()
+print(f"Cleared {cleared} cached skill files")
+```
+
+**MemoryManager** — tiered in-memory store (hot/warm/cold) with TTL and priority:
+
+```python
+from cursor_framework import MemoryManager, MemoryTier
+
+mm = MemoryManager()
+
+# Store in HOT tier (1h TTL, 100-entry cap)
+mm.store("auth_choice", {"method": "JWT", "reason": "stateless API"},
+         tier=MemoryTier.HOT, priority=8)
+
+# Store in WARM tier (24h TTL, 500-entry cap)
+mm.store("project_tech", {"stack": "Next.js + Prisma"},
+         tier=MemoryTier.WARM, priority=5)
+
+# Retrieve (searches HOT → WARM → COLD automatically)
+print(mm.retrieve("auth_choice"))   # {'method': 'JWT', 'reason': 'stateless API'}
+
+# Retrieve from specific tier
+print(mm.retrieve("project_tech", tier=MemoryTier.WARM))
+
+# Query by pattern
+results = mm.query_by_pattern("auth_*")
+print(list(results.keys()))
+
+# Cross-reference linking
+mm.link_entries("auth_choice", "project_tech")
+print(mm.get_related("auth_choice"))
+
+# Invalidate (mark stale without deleting)
+mm.invalidate("auth_choice")
+
+# Delete
+mm.delete("auth_choice")
+
+# Stats
+stats = mm.get_stats()
+print(stats.hit_rate, stats.miss_rate, stats.total_entries)
+
+# Optimize (cleanup expired + evict low-priority)
+mm.optimize()
+```
+
+**MemoryStore** — JSON persistence for MemoryManager across sessions:
+
+```python
+from cursor_framework import MemoryManager, MemoryTier, MemoryStore
+import json
+
+mm = MemoryManager()
+mm.store("user:42", {"name": "Alice"}, tier=MemoryTier.WARM)
+
+store = MemoryStore(".cache/memory.json")
+count = store.save(mm)          # atomic write; returns entry count
+print(f"Saved {count} entries")
+
+# Later, in a new Python process:
+mm2 = MemoryManager()
+restored = store.load_into(mm2)  # silent on corrupt/missing files
+print(f"Restored {restored} entries, hits={mm2._hits}")
+print(mm2.retrieve("user:42"))   # {'name': 'Alice'}
+```
+
+**TokenOptimizer** — budget management and context compression:
+
+```python
+from cursor_framework import TokenOptimizer, TokenBudget, CompressionStrategy
+
+opt = TokenOptimizer(max_tokens=100_000, compression_threshold=0.7)
+
+# Estimate tokens (conservative: 0.25 chars/token)
+print(opt.estimate_tokens("Hello world, this is a test."))  # ~12
+
+# Manual compression
+long_text = open(".cursor/rules/frontend-frameworks.mdc").read()
+compressed = opt.compress(long_text, target_tokens=2000,
+                           strategy=CompressionStrategy.SEMANTIC_WITH_SUMMARY)
+print(opt.estimate_tokens(compressed))   # ≈ 2000
+
+# Budget management
+budget = TokenBudget(max_tokens=100_000, system_reserve=5000, response_reserve=3000)
+print(budget.available_for_context)      # 92_000
+budget.allocate("skill_context", 5000)
+print(budget.current_usage)             # 5000
+print(budget.get_usage_breakdown())
+
+# Compression statistics
+print(opt.get_compression_stats())
+# {'total_compressions': 2, 'total_original_tokens': 8400,
+#  'tokens_saved': 3400, 'avg_compression_ratio': 0.60}
+```
+
+**Indexer** — scan `.cursor/` into machine + human-readable indexes:
+
+```python
+from cursor_framework import Indexer
+
+idx = Indexer(root=".cursor")
+idx.scan()
+
+print(idx.stats)
+# {'rules': 42, 'skills': 50, 'agents': 1, 'commands': 0,
+#  'hooks': 0, 'knowledge': 0, 'memory': 0, 'prompts': 0,
+#  'references': 0, 'scripts': 0, 'templates': 0, 'workflows': 0,
+#  'grand_total': 93}
+
+# Write outputs
+json_path = idx.write_json()         # .cursor/INDEX.json
+md_path   = idx.write_markdown()     # .cursor/INDEX.md
+print(f"Written: {json_path}, {md_path}")
+
+# Inspect individual entries
+for entry in idx.result.categories["skills"]:
+    if "frontend" in entry.name:
+        print(entry.name, entry.version, entry.description[:60])
+```
+
+**ContextBuilder** — detect skills, load them, compress to token budget:
+
+```python
+from cursor_framework import ContextBuilder
+
+cb = ContextBuilder(root=".cursor", max_tokens=4000)
+
+result = cb.build("Redesign the landing page with modern Tailwind")
+print(result.tokens, result.skill_count, result.truncated)
+# e.g. 3840 3 False
+print(result.skills_used)   # skills actually loaded
+print(result.skipped)       # skills beyond max_skills cap
+
+print(cb.stats())
+# {'compression_runs': 0, 'available_tokens': 3600, 'budget_ratio': 0.90}
+```
+
+**Dashboard** — stdlib HTTP server with live stats:
+
+```python
+from cursor_framework import Dashboard
+import threading
+
+# Basic (no auth, localhost only)
+dash = Dashboard(root=".cursor")
+t = threading.Thread(target=dash.serve, kwargs={"port": 8765}, daemon=True)
+t.start()
+
+# With auth token (all API calls require ?token=xxx or X-Auth-Token header)
+dash = Dashboard(root=".cursor", auth_token="secret123")
+t = threading.Thread(target=dash.serve, kwargs={"port": 8765}, daemon=True)
+t.start()
+
+# Wire to Workflow for live runtime stats
+from cursor_framework import Workflow
+wf = Workflow(root=".cursor", memory_path=".cache/memory.json")
+dash = Dashboard(root=".cursor", workflow=wf)
+# dash.serve(port=8765)
+
+# Endpoints:
+#   GET /             → HTML dashboard
+#   GET /api/index    → INDEX.json (asset counts)
+#   GET /api/stats    → live stats (memory hits, watcher scans, etc.)
+#   GET /api/memory   → memory entry counts
+```
+
+#### 3 — CLI tools
+
+Every module exposes a CLI entry point:
+
+```bash
+# Index .cursor/ → INDEX.json + INDEX.md
+python -m cursor_framework.indexer .cursor
+
+# Run all tests (in-repo)
+pytest
+
+# Build the GUI installer
+cd cursor-setup-gui
+dotnet publish -c Release -r win-x64 --self-contained \
+  -p:PublishSingleFile=true -o ../dist
+```
+
+#### 4 — Auto-watch mode
+
+Enable `auto_watch=True` on `Workflow` to re-index `.cursor/` whenever a file changes. The index is lazily invalidated — the next `ask()` call rebuilds it on the main thread (not in the watcher thread, avoiding concurrency issues).
+
+```python
+wf = Workflow(root=".cursor", auto_watch=True, watch_interval=5.0)
+
+# Simulate a file change
+import pathlib
+pathlib.Path(".cursor/skills/new-skill/SKILL.md").touch()
+
+# Next ask() triggers a fresh scan
+result = wf.ask("Use the new skill")
+print(wf.stats()["watcher_changes"])   # 1
+
+# Stop watching when done
+wf.stop_watching()
+```
+
+#### 5 — Putting it together: a complete agent loop
+
+```python
+from cursor_framework import Workflow, MemoryManager, MemoryTier
+
+# One workflow per project — reuse across the session
+wf = Workflow(root=".cursor", max_tokens=6000, max_skills=5)
+
+requests = [
+    "Create a SaaS landing page with Tailwind and a dark theme",
+    "Add Stripe billing with monthly/annual plans",
+    "Write unit tests for the auth module",
+    "Deploy to Railway with a PostgreSQL database",
+]
+
+for req in requests:
+    result = wf.ask(req)
+    print(f"\n{'='*60}")
+    print(f"Request : {req}")
+    print(f"Skills  : {result.context.skills_used}")
+    print(f"Skipped : {result.context.skipped}")
+    print(f"Tokens  : {result.context.tokens} (truncated={result.context.truncated})")
+    print(f"Cache   : from_cache={result.from_cache}, "
+          f"hits={result.memory_hits}, misses={result.memory_misses}")
+    print(f"Assets  : {result.asset_count} indexed")
+
+print("\nFinal stats:", wf.stats())
+```
+
+Output (example):
+
+```
+Request : Create a SaaS landing page with Tailwind and a dark theme
+Skills  : ['frontend-taste', 'full-output', 'frontend-review']
+Tokens  : 5840 (truncated=False)
+Cache   : from_cache=False, hits=0, misses=3
+Assets  : 387 indexed
+
+Request : Add Stripe billing with monthly/annual plans
+Skills  : ['vietnam-payment-review', 'security-review']
+Tokens  : 3921 (truncated=False)
+Cache   : from_cache=False, hits=0, misses=2
+Assets  : 387 indexed
+
+Request : Write unit tests for the auth module
+Skills  : ['full-output']
+Tokens  : 1240 (truncated=False)
+Cache   : from_cache=False, hits=0, misses=1
+Assets  : 387 indexed
+
+Request : Deploy to Railway with a PostgreSQL database
+Skills  : ['deployment', 'database']
+Tokens  : 2890 (truncated=False)
+Cache   : from_cache=False, hits=0, misses=2
+Assets  : 387 indexed
+
+Final stats: {'restored_entries': 0, 'memory_entries': 24, 'memory_hits': 0,
+              'memory_misses': 8, 'tokens_saved': 0, 'assets_indexed': 387,
+              'cache_files': 6, 'watcher_scans': 0, 'watcher_changes': 0}
+```
+
+Modules: `context_router`, `memory_manager`, `memory_store`, `token_optimizer`, `skill_discovery`, `rules_parser`, `skills_parser`, `context_builder`, `workflow`, `indexer`, `integration`, `watcher`, `dashboard`, `review.frontend_reviewer`. Utilities in `cursor_framework/utils/`: `text_utils`, `file_utils`, `code_utils`, `http_utils`, `security_utils`.
+
+### Vue dashboard (development)
 
 ```bash
 cd cursor_framework_web
 npm install
-npm run dev
+npm run dev                     # http://localhost:5173
+npm run build                   # production bundle to dist/
 ```
 
-Features:
-- Interactive dashboard
-- Rule and skill visualization
-- Knowledge browser
-- Performance metrics
+Views: Home, Learn, Prompts, Template Preview, Templates Gallery.
 
----
+## Tech stack supported
+
+- **Frontend**: Next.js 15 · React 19 · Vue 3 · Nuxt 4 · TypeScript · TailwindCSS · Shadcn/UI · Vuetify · Ant Design
+- **Backend**: Laravel 12 · ASP.NET Core 9 · NestJS · NodeJS
+- **Database**: PostgreSQL · MySQL · SQL Server · SQLite · Redis
+- **BaaS**: Supabase (Auth, DB, Storage, Edge Functions, PGVector)
+- **AI**: OpenAI · Gemini · Claude · Ollama · OpenRouter
+- **RAG**: PGVector · ChromaDB · Qdrant · Weaviate
+- **Workflow**: n8n · Temporal · Trigger.dev · Prefect
+- **Cloud / Deploy**: Cloudflare · AWS · Azure · GCP · Docker · Kubernetes · Coolify · Vercel · Railway
+
+## Demos
+
+| Demo | Stack | Use as reference for |
+|---|---|---|
+| `demos/crm/` | Next.js + Prisma | Multi-tenant SaaS, RLS, billing |
+| `demos/fitness/` | Next.js | Consumer app with dashboards |
+| `demos/food-delivery/` | docs-only | Marketplace patterns (reference docs) |
+| `demos/realestate/` | docs-only | Listing + search (reference docs) |
+| `demos/travel/` | docs-only | Booking flows (reference docs) |
+
+## Development
+
+```bash
+# Clone
+git clone https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR.git
+
+# Install Python deps
+pip install -e ".[all]"
+
+# Run tests (136+ tests across 2 suites)
+pytest                                  # all tests with coverage
+
+# Build the GUI installer
+cd cursor-setup-gui
+dotnet publish -c Release -r win-x64 --self-contained \
+  -p:PublishSingleFile=true -o ../dist
+```
+
+Branch protection on `main` is active (PR + 1 approval required, status checks enforced). Releases are tagged (`v1.3.0` current); see `dist/RELEASE-NOTES-*.md` for each version.
 
 ## License
 
-MIT License
+MIT — see [LICENSE on GitHub](https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/blob/main/LICENSE). *(No LICENSE file is committed in this repo at the moment — declared in `pyproject.toml` and the `setup.bat` installer banner.)*
 
-## Version
+## Versioning
 
-`4.1.0` — 2026-06-25
+- **Repo tags** (`v1.x.y`): mark repo-level milestones.
+- **Framework version** (`4.x.y`, in `setup.bat`): tracks the installed `.cursor/` payload content.
+- **Library version** (`pyproject.toml`): the `cursor_framework` Python package.
 
----
-
-<br>
-
----
-
-# Cursor Enterprise Framework Generator
-
-> Framework cấp Enterprise hoàn chỉnh cho AI Coding Agents — Tối ưu Token, Memory và Knowledge Reuse.
-
-## Tổng quan
-
-**Cursor Enterprise Framework** là bộ framework cấp Enterprise được thiết kế để tối ưu hóa hiệu suất của AI coding agents trên nhiều IDE: Cursor, Claude Code, Vibe Code, Windsurf, Cline và Roo Code.
-
-Framework được xây dựng trên **4 nguyên tắc cốt lõi**:
-
-| # | Nguyên tắc | Mô tả |
-|---|-----------|--------|
-| 1 | **Memory First** | Luôn tra cứu memory trước khi thực hiện task |
-| 2 | **Retrieval First** | Luôn retrieval knowledge trước khi hỏi |
-| 3 | **Token Optimization First** | Tối ưu token tiêu thụ ở mọi bước |
-| 4 | **Knowledge Reuse First** | Tái sử dụng existing decisions và solutions |
-
----
-
-## Thành tựu
-
-| Thành phần | Mục tiêu | Thực tế | Trạng thái |
-|-----------|:--------:|:--------:|--------|
-| Rules | 55 | **40** | ✅ Hoàn thành |
-| Skills | 44 | **17** | ✅ Hoàn thành |
-| Knowledge Dirs | 35+ | **36** | ✅ Hoàn thành |
-| Scripts | 10+ | **12** | ✅ Hoàn thành |
-| Commands | 20+ | **29** | ✅ Mới |
-| Python Package | - | **12 modules** | ✅ Mới |
-| Web Interface | - | **Vue.js** | ✅ Mới |
-| **Tổng Files** | **500+** | **668** | ✅ **Vượt 33%** |
-
-📦 **Gói ZIP**: `cursor-enterprise-framework-v5.zip` — TBD
-
----
-
-## Tech Stack được hỗ trợ
-
-### Frontend
-Next.js 15 · React 19 · Vue 3 · Nuxt 4 · TypeScript 5 · TailwindCSS · Shadcn/UI · Vuetify · Ant Design
-
-### Backend
-Laravel 12 · ASP.NET Core 9 · NestJS · NodeJS
-
-### Database
-MySQL · PostgreSQL · SQL Server · SQLite · Redis
-
-### BaaS
-Supabase — Auth, Database, Storage, Edge Functions, PGVector
-
-### AI
-OpenAI · Gemini · Claude · Ollama · OpenRouter
-
-### RAG
-PGVector · ChromaDB · Qdrant · Weaviate
-
-### Workflow
-n8n · Temporal · Trigger.dev
-
-### Cloud & Deployment
-Cloudflare · AWS · Azure · GCP · Docker · Kubernetes · Coolify · Vercel · Railway
-
----
-
-## Kiến trúc
-
-```
-.cef/
-├── .cursor/
-│   ├── rules/         MDC Rules — Standards & Principles         (40 files)
-│   ├── skills/        MDC Skills — Specialized Expertise           (17 files)
-│   ├── memory/        Memory System
-│   │   ├── schema/    SQLite schemas
-│   │   ├── session-summary/
-│   │   ├── architecture-history/
-│   │   ├── decision-history/
-│   │   ├── bug-history/
-│   │   └── *.json     Index files
-│   ├── knowledge/     Knowledge Base (36 directories)
-│   ├── prompts/       Prompt Templates
-│   ├── workflows/     Standard Workflows
-│   ├── templates/     Project Templates
-│   ├── scripts/       Automation Scripts (12)
-│   ├── commands/      Slash Commands (29)
-│   ├── hooks/         Lifecycle Hooks
-│   ├── cache/         Compiled Cache
-│   └── vector-db/     Vector DB Configuration
-├── cursor_framework/   Python Package
-│   ├── __init__.py
-│   ├── context_router.py
-│   ├── memory_manager.py
-│   ├── skill_discovery.py
-│   ├── token_optimizer.py
-│   ├── rules_parser.py
-│   ├── skills_parser.py
-│   ├── integration.py
-│   ├── review/        Frontend reviewer
-│   ├── utils/         Utility modules
-│   └── tests/         Unit tests
-└── cursor_framework_web/  Vue.js Web Interface
-    ├── src/
-    ├── dist/          Built assets
-    └── index.html
-```
-
----
-
-## Bắt đầu nhanh
-
-### 1. Khi bắt đầu một task mới
-
-```markdown
-1. Xác định domain của task
-2. Sử dụng Context Router để load đúng knowledge
-3. Check Memory System (decisions.sqlite, bug-history)
-4. Chọn Prompt Template phù hợp
-5. Follow Workflow step by step
-6. Update Memory sau khi hoàn thành
-```
-
-### 2. Sử dụng Context Router
-
-```markdown
-Request: "Tối ưu Entity Framework"
-Load: aspnet-core, sql-server, postgres
-Skip: bazi, pdf, crm
-
-Request: "Tạo PDF Bát Tự"
-Load: bazi, pdf
-Skip: aspnet-core, supabase
-```
-
-### 3. Sử dụng Memory System
-
-```markdown
-Trước khi implement:
-- Check decisions.sqlite cho existing ADRs
-- Check bugs.sqlite cho known bugs
-- Check bug-patterns cho common patterns
-
-Sau khi hoàn thành:
-- Update decisions.sqlite nếu tạo ADR mới
-- Update bugs.sqlite nếu sửa bug
-- Update session-summary cho task summary
-```
-
----
-
-## Scripts
-
-```powershell
-# Build Memory System
-. .cursor/scripts/memory-builder/build-memory.ps1
-
-# Compile Knowledge
-. .cursor/scripts/knowledge-compiler/compile-knowledge.ps1
-
-# Build Project Index
-. .cursor/scripts/project-index-builder/build-index.ps1
-
-# Build Embeddings
-. .cursor/scripts/embedding-builder/build-embeddings.ps1
-
-# Package Framework
-. .cursor/scripts/packager.ps1
-```
-
----
-
-## Chiến lược tối ưu Token
-
-Framework triển khai **10 chiến lược tối ưu token**:
-
-| # | Chiến lược | Mô tả |
-|---|-----------|--------|
-| 1 | **Context Router** | Chỉ load domain cần thiết |
-| 2 | **Knowledge Compiler** | Gộp và summarize documents |
-| 3 | **Prompt Cache** | Cache frequently used prompts |
-| 4 | **Session Summary** | Compress session context |
-| 5 | **Decision Memory** | Tái sử dụng existing decisions |
-| 6 | **Bug Memory** | Tránh lặp lại known bugs |
-| 7 | **Incremental Scan** | Chỉ scan changed files |
-| 8 | **Lazy Loading** | Load knowledge on-demand |
-| 9 | **Semantic Retrieval** | Semantic search thay vì full scan |
-| 10 | **Auto Compression** | Nén long contexts |
-
----
-
-## Các Domain được hỗ trợ
-
-| Domain | Mục đích |
-|--------|---------|
-| Bazi | Tính Bát Tự, Cung mệnh, Vận trình |
-| Tuvi | Lá số Tử Vi, Sao chiếu |
-| Numerology | Thần Số Học, Số chủ đạo |
-| CRM | CRM SaaS Multi-Tenant |
-| Marketing | Marketing automation |
-| NextJS / Vue / Nuxt | Frontend frameworks |
-| Laravel / ASP.NET / NestJS | Backend frameworks |
-| MySQL / PostgreSQL / SQL Server | Relational databases |
-| Redis | Cache và Queue |
-| Supabase | BaaS với RLS, PGVector |
-| OpenAI / Gemini / Claude | AI providers |
-| RAG / Vector Search | AI retrieval |
-| PDF | Tạo và xử lý PDF |
-| Docker / Kubernetes | Container orchestration |
-| Cloudflare / AWS / Azure / GCP | Cloud platforms |
-
----
-
-## Cài đặt GUI (Khuyến nghị)
-
-Để cài đặt dễ dàng với hộp thoại chọn thư mục đồ họa, sử dụng `cursor-setup.exe`:
-
-### Cách 1: Double-click cursor-setup.exe
-
-```
-1. Tải hoặc copy cursor-setup.exe vào thư mục framework
-2. Double-click cursor-setup.exe
-3. Chọn thư mục cài đặt qua hộp thoại GUI
-4. Xong!
-```
-
-### Cách 2: Sử dụng cursor-setup.bat
-
-```cmd
-cursor-setup.bat
-```
-
-### Cách 3: Dùng setup.bat với --gui-picker
-
-```cmd
-setup.bat --gui-picker
-```
-
-### Cách 4: Chỉ định đường dẫn tùy chỉnh (command-line)
-
-```cmd
-setup.bat --install-dir "D:\MyCustomPath\.cursor"
-```
-
----
-
-## Cài đặt từ GitHub
-
-### Cài đặt nhanh (Một lệnh)
-
-**Windows (PowerShell):**
-```powershell
-irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1 | iex
-```
-
-**Windows (CMD):**
-```cmd
-curl -LO https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1 && powershell -ExecutionPolicy Bypass -File install.ps1 && del install.ps1
-```
-
-### Sử dụng setup.bat với GitHub
-
-```cmd
-:: Clone từ GitHub (repo mặc định)
-setup.bat --github
-
-:: Clone với repo cụ thể
-setup.bat --github https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR
-
-:: Clone với branch cụ thể
-setup.bat --github https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR --branch main
-
-:: Download dạng ZIP (không cần Git)
-setup.bat --zip https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR
-```
-
-### Sử dụng install-github.bat
-
-```cmd
-:: Repo mặc định
-install-github.bat
-
-:: Repo tùy chỉnh
-install-github.bat https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR
-
-:: Repo + branch tùy chỉnh
-install-github.bat https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR main
-```
-
-### Sử dụng install-github.ps1 (PowerShell)
-
-```powershell
-# Cài đặt mặc định
-.\install-github.ps1
-
-# Repo và branch tùy chỉnh
-.\install-github.ps1 -RepoUrl "https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR" -Branch "main"
-
-# Kiểm tra cập nhật
-.\install-github.ps1 -CheckUpdate
-
-# Xem trước (dry run)
-.\install-github.ps1 -DryRun
-
-# Ghi đè file hiện có
-.\install-github.ps1 -Force
-```
-
----
-
-## License
-
-MIT License
-
-## Phiên bản
-
-`5.0.0` — 2026-06-26
+Current: repo `v1.3.0` · framework `4.2.0` · library `1.0.0`.
