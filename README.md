@@ -133,33 +133,375 @@ Example: ask *"Optimize this Entity Framework query"* and the framework will loa
 
 ```bash
 git clone https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR.git
-cd cursor-framework
+cd "CURSOR ENTERPRISE FRAMEWORK GENERATOR"
 pip install -e ".[all]"        # editable install from this repo
 # PyPI publishing not yet available — install from source for now
 ```
 
+The `cursor_framework` Python package gives you full programmatic control over every subsystem: routing, memory, token budgeting, skill discovery, indexing, and the auto-watch pipeline. There are two usage modes — the **single-entry `Workflow`** class for end-to-end requests, and **standalone modules** for fine-grained control.
+
+#### 1 — Workflow (recommended entry point)
+
+`Workflow` orchestrates the full 4-phase pipeline (`scan → detect → build → persist`) behind a single `ask()` call. Memory survives across Python sessions automatically.
+
 ```python
-from cursor_framework import (
-    ContextRouter,
-    MemoryManager,
-    MemoryTier,
-    SkillDiscovery,
+from cursor_framework import Workflow
+
+wf = Workflow(
+    root=".cursor",            # path to .cursor/ directory
+    memory_path=".cache/memory.json",  # persisted memory file
+    max_tokens=4000,          # token budget for skill context
+    max_skills=5,             # cap on skills loaded per request
+    auto_watch=False,         # re-index on file change (see §4)
 )
 
-# Route a request to the right skill
+# First call: scans .cursor/, detects skills, builds context
+result = wf.ask("Create a landing page for our SaaS product")
+
+print(result.from_cache)      # False on first run, True on repeats
+print(result.context.tokens)  # actual token count used
+print(result.context.skills_used)   # e.g. ["frontend-taste", "full-output"]
+print(result.context.truncated)     # True if compression was needed
+print(result.memory_hits, result.memory_misses)
+print(result.asset_count)     # grand total assets indexed
+print(f"{result.latency_ms:.1f}ms")
+
+# Rapid follow-up for same request → cache hit, <1ms
+same = wf.ask("Create a landing page for our SaaS product")
+print(same.from_cache)        # True
+
+# Dashboard stats from all subsystems
+stats = wf.stats()
+print(stats)
+# {'restored_entries': 3, 'memory_entries': 12, 'memory_hits': 7,
+#  'tokens_saved': 2400, 'assets_indexed': 387, 'cache_files': 5,
+#  'watcher_scans': 0, 'watcher_changes': 0}
+
+# Force warm-up without making a request
+wf.warm()   # builds index, persists state, returns stats
+
+# Wire to Dashboard for live HTTP monitoring (see §5)
+from cursor_framework import Dashboard
+dash = Dashboard(root=".cursor", workflow=wf)
+# dash.serve(port=8765)   # blocking — run in a thread for non-blocking
+```
+
+#### 2 — Standalone modules
+
+Each module works independently if you need only one piece.
+
+**ContextRouter** — classify intent and route to the right skill:
+
+```python
+from cursor_framework import ContextRouter, IntentType, Domain, Skill
+
 router = ContextRouter()
-route = router.route("Create a SaaS landing page with Tailwind")
-print(route.skill, route.confidence)
+route = router.route("Optimize this PostgreSQL query with indexing")
 
-# Store and retrieve decisions
-memory = MemoryManager()
-memory.store("auth_choice", {"method": "JWT", "reason": "stateless API"})
-print(memory.retrieve("auth_choice"))
+print(route.skill)           # Skill.DATABASE_OPTIMIZATION
+print(route.confidence)      # 0.87
+print(route.intent)          # IntentType.REFACTORING
+print(route.domain)          # Domain.DATABASE
+print(route.reasoning)       # "Intent: refactoring (0.73), Domain: database (0.85)..."
 
-# Discover applicable skills for a prompt
-skills = SkillDiscovery().detect_skills("Add unit tests for payment module")
+# Multi-skill routing (e.g. landing page needs taste + full-output + review)
+routes = router.route_multi_skill("Build a greenfield landing page with Tailwind")
+for r in routes:
+    print(r.skill)
+# Skill.FRONTEND_TASTE, Skill.FULL_OUTPUT, Skill.FRONTEND_REVIEW
+```
+
+**SkillDiscovery** — auto-detect and load skills with gate execution:
+
+```python
+from cursor_framework import SkillDiscovery, GateType
+
+sd = SkillDiscovery(base_path=".")   # base path for .cursor/skills/
+
+# Detect skills for a request
+skills = sd.detect_skills("Add security review for momo payment integration")
 for s in skills:
-    print(s.skill, s.confidence)
+    print(s.skill, f"conf={s.confidence:.2f}")
+# vietnam-payment-review conf=0.89
+# security-review conf=0.71
+
+# Load skill file content (mtime-cached)
+content = sd.load_skill_file("frontend-taste")
+print(len(content), "chars loaded")
+
+# Execute pre-review gates
+results = sd.execute_gates(skills, context={}, gate_type=GateType.PRE_REVIEW)
+for r in results:
+    print(r.skill, "passed:", r.passed, "items:", r.items_checked)
+
+# Discovery statistics
+print(sd.get_discovery_stats())
+# {'total_discoveries': 4, 'unique_skills': 3, 'avg_confidence': 0.74,
+#  'gate_summary': {'total_gates': 8, 'pre_review': {'total': 4, 'passed': 4}}}
+
+# Clear skill file cache (useful after updating skill files)
+cleared = sd.clear_skill_cache()
+print(f"Cleared {cleared} cached skill files")
+```
+
+**MemoryManager** — tiered in-memory store (hot/warm/cold) with TTL and priority:
+
+```python
+from cursor_framework import MemoryManager, MemoryTier
+
+mm = MemoryManager()
+
+# Store in HOT tier (1h TTL, 100-entry cap)
+mm.store("auth_choice", {"method": "JWT", "reason": "stateless API"},
+         tier=MemoryTier.HOT, priority=8)
+
+# Store in WARM tier (24h TTL, 500-entry cap)
+mm.store("project_tech", {"stack": "Next.js + Prisma"},
+         tier=MemoryTier.WARM, priority=5)
+
+# Retrieve (searches HOT → WARM → COLD automatically)
+print(mm.retrieve("auth_choice"))   # {'method': 'JWT', 'reason': 'stateless API'}
+
+# Retrieve from specific tier
+print(mm.retrieve("project_tech", tier=MemoryTier.WARM))
+
+# Query by pattern
+results = mm.query_by_pattern("auth_*")
+print(list(results.keys()))
+
+# Cross-reference linking
+mm.link_entries("auth_choice", "project_tech")
+print(mm.get_related("auth_choice"))
+
+# Invalidate (mark stale without deleting)
+mm.invalidate("auth_choice")
+
+# Delete
+mm.delete("auth_choice")
+
+# Stats
+stats = mm.get_stats()
+print(stats.hit_rate, stats.miss_rate, stats.total_entries)
+
+# Optimize (cleanup expired + evict low-priority)
+mm.optimize()
+```
+
+**MemoryStore** — JSON persistence for MemoryManager across sessions:
+
+```python
+from cursor_framework import MemoryManager, MemoryTier, MemoryStore
+import json
+
+mm = MemoryManager()
+mm.store("user:42", {"name": "Alice"}, tier=MemoryTier.WARM)
+
+store = MemoryStore(".cache/memory.json")
+count = store.save(mm)          # atomic write; returns entry count
+print(f"Saved {count} entries")
+
+# Later, in a new Python process:
+mm2 = MemoryManager()
+restored = store.load_into(mm2)  # silent on corrupt/missing files
+print(f"Restored {restored} entries, hits={mm2._hits}")
+print(mm2.retrieve("user:42"))   # {'name': 'Alice'}
+```
+
+**TokenOptimizer** — budget management and context compression:
+
+```python
+from cursor_framework import TokenOptimizer, TokenBudget, CompressionStrategy
+
+opt = TokenOptimizer(max_tokens=100_000, compression_threshold=0.7)
+
+# Estimate tokens (conservative: 0.25 chars/token)
+print(opt.estimate_tokens("Hello world, this is a test."))  # ~12
+
+# Manual compression
+long_text = open(".cursor/rules/frontend-frameworks.mdc").read()
+compressed = opt.compress(long_text, target_tokens=2000,
+                           strategy=CompressionStrategy.SEMANTIC_WITH_SUMMARY)
+print(opt.estimate_tokens(compressed))   # ≈ 2000
+
+# Budget management
+budget = TokenBudget(max_tokens=100_000, system_reserve=5000, response_reserve=3000)
+print(budget.available_for_context)      # 92_000
+budget.allocate("skill_context", 5000)
+print(budget.current_usage)             # 5000
+print(budget.get_usage_breakdown())
+
+# Compression statistics
+print(opt.get_compression_stats())
+# {'total_compressions': 2, 'total_original_tokens': 8400,
+#  'tokens_saved': 3400, 'avg_compression_ratio': 0.60}
+```
+
+**Indexer** — scan `.cursor/` into machine + human-readable indexes:
+
+```python
+from cursor_framework import Indexer
+
+idx = Indexer(root=".cursor")
+idx.scan()
+
+print(idx.stats)
+# {'rules': 42, 'skills': 50, 'agents': 1, 'commands': 0,
+#  'hooks': 0, 'knowledge': 0, 'memory': 0, 'prompts': 0,
+#  'references': 0, 'scripts': 0, 'templates': 0, 'workflows': 0,
+#  'grand_total': 93}
+
+# Write outputs
+json_path = idx.write_json()         # .cursor/INDEX.json
+md_path   = idx.write_markdown()     # .cursor/INDEX.md
+print(f"Written: {json_path}, {md_path}")
+
+# Inspect individual entries
+for entry in idx.result.categories["skills"]:
+    if "frontend" in entry.name:
+        print(entry.name, entry.version, entry.description[:60])
+```
+
+**ContextBuilder** — detect skills, load them, compress to token budget:
+
+```python
+from cursor_framework import ContextBuilder
+
+cb = ContextBuilder(root=".cursor", max_tokens=4000)
+
+result = cb.build("Redesign the landing page with modern Tailwind")
+print(result.tokens, result.skill_count, result.truncated)
+# e.g. 3840 3 False
+print(result.skills_used)   # skills actually loaded
+print(result.skipped)       # skills beyond max_skills cap
+
+print(cb.stats())
+# {'compression_runs': 0, 'available_tokens': 3600, 'budget_ratio': 0.90}
+```
+
+**Dashboard** — stdlib HTTP server with live stats:
+
+```python
+from cursor_framework import Dashboard
+import threading
+
+# Basic (no auth, localhost only)
+dash = Dashboard(root=".cursor")
+t = threading.Thread(target=dash.serve, kwargs={"port": 8765}, daemon=True)
+t.start()
+
+# With auth token (all API calls require ?token=xxx or X-Auth-Token header)
+dash = Dashboard(root=".cursor", auth_token="secret123")
+t = threading.Thread(target=dash.serve, kwargs={"port": 8765}, daemon=True)
+t.start()
+
+# Wire to Workflow for live runtime stats
+from cursor_framework import Workflow
+wf = Workflow(root=".cursor", memory_path=".cache/memory.json")
+dash = Dashboard(root=".cursor", workflow=wf)
+# dash.serve(port=8765)
+
+# Endpoints:
+#   GET /             → HTML dashboard
+#   GET /api/index    → INDEX.json (asset counts)
+#   GET /api/stats    → live stats (memory hits, watcher scans, etc.)
+#   GET /api/memory   → memory entry counts
+```
+
+#### 3 — CLI tools
+
+Every module exposes a CLI entry point:
+
+```bash
+# Index .cursor/ → INDEX.json + INDEX.md
+python -m cursor_framework.indexer .cursor
+
+# Run all tests (in-repo)
+pytest
+
+# Build the GUI installer
+cd cursor-setup-gui
+dotnet publish -c Release -r win-x64 --self-contained \
+  -p:PublishSingleFile=true -o ../dist
+```
+
+#### 4 — Auto-watch mode
+
+Enable `auto_watch=True` on `Workflow` to re-index `.cursor/` whenever a file changes. The index is lazily invalidated — the next `ask()` call rebuilds it on the main thread (not in the watcher thread, avoiding concurrency issues).
+
+```python
+wf = Workflow(root=".cursor", auto_watch=True, watch_interval=5.0)
+
+# Simulate a file change
+import pathlib
+pathlib.Path(".cursor/skills/new-skill/SKILL.md").touch()
+
+# Next ask() triggers a fresh scan
+result = wf.ask("Use the new skill")
+print(wf.stats()["watcher_changes"])   # 1
+
+# Stop watching when done
+wf.stop_watching()
+```
+
+#### 5 — Putting it together: a complete agent loop
+
+```python
+from cursor_framework import Workflow, MemoryManager, MemoryTier
+
+# One workflow per project — reuse across the session
+wf = Workflow(root=".cursor", max_tokens=6000, max_skills=5)
+
+requests = [
+    "Create a SaaS landing page with Tailwind and a dark theme",
+    "Add Stripe billing with monthly/annual plans",
+    "Write unit tests for the auth module",
+    "Deploy to Railway with a PostgreSQL database",
+]
+
+for req in requests:
+    result = wf.ask(req)
+    print(f"\n{'='*60}")
+    print(f"Request : {req}")
+    print(f"Skills  : {result.context.skills_used}")
+    print(f"Skipped : {result.context.skipped}")
+    print(f"Tokens  : {result.context.tokens} (truncated={result.context.truncated})")
+    print(f"Cache   : from_cache={result.from_cache}, "
+          f"hits={result.memory_hits}, misses={result.memory_misses}")
+    print(f"Assets  : {result.asset_count} indexed")
+
+print("\nFinal stats:", wf.stats())
+```
+
+Output (example):
+
+```
+Request : Create a SaaS landing page with Tailwind and a dark theme
+Skills  : ['frontend-taste', 'full-output', 'frontend-review']
+Tokens  : 5840 (truncated=False)
+Cache   : from_cache=False, hits=0, misses=3
+Assets  : 387 indexed
+
+Request : Add Stripe billing with monthly/annual plans
+Skills  : ['vietnam-payment-review', 'security-review']
+Tokens  : 3921 (truncated=False)
+Cache   : from_cache=False, hits=0, misses=2
+Assets  : 387 indexed
+
+Request : Write unit tests for the auth module
+Skills  : ['full-output']
+Tokens  : 1240 (truncated=False)
+Cache   : from_cache=False, hits=0, misses=1
+Assets  : 387 indexed
+
+Request : Deploy to Railway with a PostgreSQL database
+Skills  : ['deployment', 'database']
+Tokens  : 2890 (truncated=False)
+Cache   : from_cache=False, hits=0, misses=2
+Assets  : 387 indexed
+
+Final stats: {'restored_entries': 0, 'memory_entries': 24, 'memory_hits': 0,
+              'memory_misses': 8, 'tokens_saved': 0, 'assets_indexed': 387,
+              'cache_files': 6, 'watcher_scans': 0, 'watcher_changes': 0}
 ```
 
 Modules: `context_router`, `memory_manager`, `memory_store`, `token_optimizer`, `skill_discovery`, `rules_parser`, `skills_parser`, `context_builder`, `workflow`, `indexer`, `integration`, `watcher`, `dashboard`, `review.frontend_reviewer`. Utilities in `cursor_framework/utils/`: `text_utils`, `file_utils`, `code_utils`, `http_utils`, `security_utils`.
