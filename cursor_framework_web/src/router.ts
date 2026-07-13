@@ -4,6 +4,7 @@ import TemplatesGallery from './views/TemplatesGallery.vue'
 import TemplatePreview from './views/TemplatePreview.vue'
 import LearnView from './views/LearnView.vue'
 import PromptsView from './views/PromptsView.vue'
+import InstallGuideView from './views/InstallGuideView.vue'
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -32,6 +33,11 @@ const router = createRouter({
       path: '/prompts',
       name: 'prompts',
       component: PromptsView
+    },
+    {
+      path: '/install',
+      name: 'install',
+      component: InstallGuideView
     }
   ],
   scrollBehavior(to, _from, savedPosition) {

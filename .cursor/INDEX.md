@@ -1,6 +1,6 @@
 # Cursor Enterprise Framework - Auto Index
 
-> Auto-generated: 2026-07-12T09:41:04
+> Auto-generated: 2026-07-13T14:17:36
 > Root: `D:\PROJECTS\CURSORS\CURSOR ENTERPRISE FRAMEWORK GENERATOR\.cursor`
 
 ## Totals
@@ -11,15 +11,15 @@
 | commands | 28 |
 | hooks | 15 |
 | knowledge | 329 |
-| memory | 9 |
+| memory | 14 |
 | prompts | 31 |
 | references | 4 |
-| rules | 42 |
-| scripts | 18 |
+| rules | 43 |
+| scripts | 34 |
 | skills | 50 |
 | templates | 6 |
 | workflows | 11 |
-| **grand_total** | **551** |
+| **grand_total** | **573** |
 
 ## Agents (8)
 
@@ -421,7 +421,7 @@
 | `glossary.md` | `knowledge\weknora\glossary.md` |  |
 | `mcp-integration.md` | `knowledge\weknora\mcp-integration.md` |  |
 
-## Memory (9)
+## Memory (14)
 
 | Name | Path | Description |
 |------|------|-------------|
@@ -432,8 +432,13 @@
 | `memory-index.json` | `memory\memory-index.json` |  |
 | `project-index.md` | `memory\project-index.md` |  |
 | `prompt-index.md` | `memory\prompt-index.md` |  |
+| `bugs.schema.sql` | `memory\schema\bugs.schema.sql` |  |
+| `decisions.schema.sql` | `memory\schema\decisions.schema.sql` |  |
+| `knowledge.schema.sql` | `memory\schema\knowledge.schema.sql` |  |
+| `prompt-cache.schema.sql` | `memory\schema\prompt-cache.schema.sql` |  |
 | `technology-stack.json` | `memory\technology-stack.json` |  |
 | `token-optimization.md` | `memory\token-optimization.md` |  |
+| `UTF8` | `memory\UTF8` |  |
 
 ## Prompts (31)
 
@@ -480,7 +485,7 @@
 | `security-checklist.md` | `references\security-checklist.md` |  |
 | `testing-patterns.md` | `references\testing-patterns.md` |  |
 
-## Rules (42)
+## Rules (43)
 
 | Name | Path | Description |
 |------|------|-------------|
@@ -497,6 +502,7 @@
 | `coding-standards.mdc` | `rules\coding-standards.mdc` | Tiêu chuẩn viết code thống nhất cho Cursor Enterprise Framework |
 | `container-orchestration.mdc` | `rules\container-orchestration.mdc` | Container Orchestration - hợp nhất từ Docker và Kubernetes trong Cursor Enterprise Framework |
 | `context-router.mdc` | `rules\context-router.mdc` | Nguyên tắc Context Router - định tuyến context thông minh đến handlers phù hợp |
+| `core.mdc` | `rules\core.mdc` |  |
 | `cost-optimization.mdc` | `rules\cost-optimization.mdc` | Cost & Token Optimization - hợp nhất từ cost-optimization.mdc và token-optimization.mdc |
 | `crm-saas.mdc` | `rules\crm-saas.mdc` | Nguyên tắc và best practices cho CRM SaaS Implementation trong Cursor Enterprise Framework |
 | `databases.mdc` | `rules\databases.mdc` | Databases - hợp nhất từ Database Overview, PostgreSQL, MySQL, SQL Server, bao gồm Row Level Security |
@@ -527,11 +533,27 @@
 | `vibe-code-protocol.mdc` | `rules\vibe-code-protocol.mdc` | Vibe Code Execution Protocol, Pre/Post Execution Validation, Auth & Payment Handling - workflow execution với pre-review |
 | `workflow-engines.mdc` | `rules\workflow-engines.mdc` | Workflow Engines - hợp nhất từ n8n, Trigger.dev, Temporal |
 
-## Scripts (18)
+## Scripts (34)
 
 | Name | Path | Description |
 |------|------|-------------|
+| `Analysis-00.toc` | `scripts\build\cursor-setup\Analysis-00.toc` |  |
+| `base_library.zip` | `scripts\build\cursor-setup\base_library.zip` |  |
+| `cursor-setup.pkg` | `scripts\build\cursor-setup\cursor-setup.pkg` |  |
+| `EXE-00.toc` | `scripts\build\cursor-setup\EXE-00.toc` |  |
+| `pyimod01_archive.pyc` | `scripts\build\cursor-setup\localpycs\pyimod01_archive.pyc` |  |
+| `pyimod02_importers.pyc` | `scripts\build\cursor-setup\localpycs\pyimod02_importers.pyc` |  |
+| `pyimod03_ctypes.pyc` | `scripts\build\cursor-setup\localpycs\pyimod03_ctypes.pyc` |  |
+| `pyimod04_pywin32.pyc` | `scripts\build\cursor-setup\localpycs\pyimod04_pywin32.pyc` |  |
+| `struct.pyc` | `scripts\build\cursor-setup\localpycs\struct.pyc` |  |
+| `PKG-00.toc` | `scripts\build\cursor-setup\PKG-00.toc` |  |
+| `PYZ-00.pyz` | `scripts\build\cursor-setup\PYZ-00.pyz` |  |
+| `PYZ-00.toc` | `scripts\build\cursor-setup\PYZ-00.toc` |  |
+| `warn-cursor-setup.txt` | `scripts\build\cursor-setup\warn-cursor-setup.txt` |  |
+| `xref-cursor-setup.html` | `scripts\build\cursor-setup\xref-cursor-setup.html` |  |
 | `command-registry.ps1` | `scripts\command-registry.ps1` |  |
+| `cursor-setup.spec` | `scripts\cursor-setup.spec` |  |
+| `cursor-setup.exe` | `scripts\dist\cursor-setup.exe` |  |
 | `build-embeddings.ps1` | `scripts\embedding-builder\build-embeddings.ps1` |  |
 | `compile-knowledge.ps1` | `scripts\knowledge-compiler\compile-knowledge.ps1` |  |
 | `build-memory.ps1` | `scripts\memory-builder\build-memory.ps1` |  |

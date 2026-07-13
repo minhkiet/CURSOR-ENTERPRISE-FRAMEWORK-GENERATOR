@@ -1,20 +1,20 @@
 {
   "root": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\.cursor",
-  "scanned_at": "2026-07-12T09:41:04",
+  "scanned_at": "2026-07-13T14:17:36",
   "totals": {
     "agents": 8,
     "commands": 28,
     "hooks": 15,
     "knowledge": 329,
-    "memory": 9,
+    "memory": 14,
     "prompts": 31,
     "references": 4,
-    "rules": 42,
-    "scripts": 18,
+    "rules": 43,
+    "scripts": 34,
     "skills": 50,
     "templates": 6,
     "workflows": 11,
-    "grand_total": 551
+    "grand_total": 573
   },
   "categories": {
     "agents": [
@@ -4903,6 +4903,46 @@
         "size_bytes": 2807
       },
       {
+        "name": "bugs.schema.sql",
+        "path": "memory\\schema\\bugs.schema.sql",
+        "category": "memory",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 7555
+      },
+      {
+        "name": "decisions.schema.sql",
+        "path": "memory\\schema\\decisions.schema.sql",
+        "category": "memory",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 8472
+      },
+      {
+        "name": "knowledge.schema.sql",
+        "path": "memory\\schema\\knowledge.schema.sql",
+        "category": "memory",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 7332
+      },
+      {
+        "name": "prompt-cache.schema.sql",
+        "path": "memory\\schema\\prompt-cache.schema.sql",
+        "category": "memory",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 3197
+      },
+      {
         "name": "technology-stack.json",
         "path": "memory\\technology-stack.json",
         "category": "memory",
@@ -4921,6 +4961,16 @@
         "version": "",
         "tags": [],
         "size_bytes": 4994
+      },
+      {
+        "name": "UTF8",
+        "path": "memory\\UTF8",
+        "category": "memory",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 9
       }
     ],
     "prompts": [
@@ -5529,6 +5579,16 @@
         "size_bytes": 16706
       },
       {
+        "name": "core.mdc",
+        "path": "rules\\core.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 13
+      },
+      {
         "name": "cost-optimization.mdc",
         "path": "rules\\cost-optimization.mdc",
         "category": "rules",
@@ -6067,6 +6127,146 @@
     ],
     "scripts": [
       {
+        "name": "Analysis-00.toc",
+        "path": "scripts\\build\\cursor-setup\\Analysis-00.toc",
+        "category": "scripts",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 45013
+      },
+      {
+        "name": "base_library.zip",
+        "path": "scripts\\build\\cursor-setup\\base_library.zip",
+        "category": "scripts",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 1401781
+      },
+      {
+        "name": "cursor-setup.pkg",
+        "path": "scripts\\build\\cursor-setup\\cursor-setup.pkg",
+        "category": "scripts",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 7701398
+      },
+      {
+        "name": "EXE-00.toc",
+        "path": "scripts\\build\\cursor-setup\\EXE-00.toc",
+        "category": "scripts",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 12160
+      },
+      {
+        "name": "pyimod01_archive.pyc",
+        "path": "scripts\\build\\cursor-setup\\localpycs\\pyimod01_archive.pyc",
+        "category": "scripts",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 4930
+      },
+      {
+        "name": "pyimod02_importers.pyc",
+        "path": "scripts\\build\\cursor-setup\\localpycs\\pyimod02_importers.pyc",
+        "category": "scripts",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 31802
+      },
+      {
+        "name": "pyimod03_ctypes.pyc",
+        "path": "scripts\\build\\cursor-setup\\localpycs\\pyimod03_ctypes.pyc",
+        "category": "scripts",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 6450
+      },
+      {
+        "name": "pyimod04_pywin32.pyc",
+        "path": "scripts\\build\\cursor-setup\\localpycs\\pyimod04_pywin32.pyc",
+        "category": "scripts",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 1679
+      },
+      {
+        "name": "struct.pyc",
+        "path": "scripts\\build\\cursor-setup\\localpycs\\struct.pyc",
+        "category": "scripts",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 305
+      },
+      {
+        "name": "PKG-00.toc",
+        "path": "scripts\\build\\cursor-setup\\PKG-00.toc",
+        "category": "scripts",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 10350
+      },
+      {
+        "name": "PYZ-00.pyz",
+        "path": "scripts\\build\\cursor-setup\\PYZ-00.pyz",
+        "category": "scripts",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 1366233
+      },
+      {
+        "name": "PYZ-00.toc",
+        "path": "scripts\\build\\cursor-setup\\PYZ-00.toc",
+        "category": "scripts",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 14472
+      },
+      {
+        "name": "warn-cursor-setup.txt",
+        "path": "scripts\\build\\cursor-setup\\warn-cursor-setup.txt",
+        "category": "scripts",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 1876
+      },
+      {
+        "name": "xref-cursor-setup.html",
+        "path": "scripts\\build\\cursor-setup\\xref-cursor-setup.html",
+        "category": "scripts",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 261970
+      },
+      {
         "name": "command-registry.ps1",
         "path": "scripts\\command-registry.ps1",
         "category": "scripts",
@@ -6075,6 +6275,26 @@
         "version": "",
         "tags": [],
         "size_bytes": 29661
+      },
+      {
+        "name": "cursor-setup.spec",
+        "path": "scripts\\cursor-setup.spec",
+        "category": "scripts",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 889
+      },
+      {
+        "name": "cursor-setup.exe",
+        "path": "scripts\\dist\\cursor-setup.exe",
+        "category": "scripts",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 8046998
       },
       {
         "name": "build-embeddings.ps1",

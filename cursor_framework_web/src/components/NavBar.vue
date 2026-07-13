@@ -14,7 +14,7 @@ const navLinks = [
   { href: '#explorer', label: 'Explorer', kind: 'anchor' },
   { href: '#architecture', label: 'Architecture', kind: 'anchor' },
   { to: '/prompts', label: 'Prompts', kind: 'route' },
-  { href: '#getting-started', label: 'Install', kind: 'anchor' }
+  { to: '/install', label: 'Install', kind: 'route' }
 ] as const
 
 function handleScroll() {
