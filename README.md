@@ -135,8 +135,11 @@ Example: ask *"Optimize this Entity Framework query"* and the framework will loa
 git clone https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR.git
 cd "CURSOR ENTERPRISE FRAMEWORK GENERATOR"
 pip install -e ".[all]"        # editable install from this repo
-# PyPI publishing not yet available — install from source for now
 ```
+
+> **Note:** A different package named `cursor-framework` already exists on PyPI.
+> **Do not run `pip install cursor-framework`** — it is a different, older library
+> (v1.0.0, pydantic-only). Always install from source as shown above.
 
 The `cursor_framework` Python package gives you full programmatic control over every subsystem: routing, memory, token budgeting, skill discovery, indexing, and the auto-watch pipeline. There are two usage modes — the **single-entry `Workflow`** class for end-to-end requests, and **standalone modules** for fine-grained control.
 
