@@ -1,9 +1,9 @@
 ---
 description: Single Source of Truth cho tất cả skill definitions, triggers, confidence thresholds, và gate mappings. Được sử dụng bởi skill-integration, task-analyzer, và multi-language-vibe-code. Bao gồm Ponytail Lazy Senior Dev principles. Integrated với agent-skills (addyosmani/agent-skills) và ChatbotX development patterns. Tích hợp Karpathy Guidelines từ andrej-karpathy-skills.
 created: 2026-06-26
-version: 1.6.0
-updated: 2026-07-07
-tags: [skill-registry, skills, auto-discovery, mandatory, overlay, ponytail, lazy-senior, code-quality, agent-skills, chatbotx, chatbot-marketing, superpowers, methodology]---
+version: 1.7.0
+updated: 2026-07-15
+tags: [skill-registry, skills, auto-discovery, mandatory, overlay, ponytail, lazy-senior, code-quality, agent-skills, chatbotx, chatbot-marketing, superpowers, methodology, marketingskills, marketing]---
 tags: [skill-registry, skills, auto-discovery, mandatory, overlay, ponytail, lazy-senior, code-quality, agent-skills, chatbotx, chatbot-marketing]
 ---
 
@@ -750,6 +750,59 @@ Mỗi skill được định nghĩa với các properties:
 | `omnivoice`, `tts vietnamese` | video-generation | 0.95 | Vietnamese TTS |
 | `/create-template-video` | video-generation | 0.95 | Claude Code skill |
 | `tiktok`, `youtube shorts`, `9:16` | video-generation | 0.85 | Short video format |
+| **MARKETING - Conversion** ||||
+| `cro`, `conversion rate`, `conversion optimization` | knowledge/marketing/best-practice.md §2 | 0.90 | CRO heuristics |
+| `signup form`, `signup flow`, `sign-up` | knowledge/marketing/best-practice.md §2.2 | 0.88 | Signup CRO |
+| `onboarding`, `activation`, `aha moment` | knowledge/marketing/best-practice.md §5.1 | 0.88 | Onboarding CRO |
+| `popup`, `pop-up`, `modal`, `exit-intent` | knowledge/marketing/best-practice.md §2.4 | 0.85 | Popup CRO |
+| `paywall`, `upgrade flow`, `trial expiration` | knowledge/marketing/architecture.md §4.1.2 | 0.85 | Paywall flow |
+| **MARKETING - Content** ||||
+| `copywriting`, `landing copy`, `email copy` | knowledge/marketing/best-practice.md §2 | 0.85 | Copywriting |
+| `copy editing`, `subject line`, `headline` | knowledge/marketing/best-practice.md §2.3 | 0.85 | Copy-editing |
+| `cold email`, `outreach`, `B2B email sequence` | knowledge/marketing/best-practice.md §2.5 | 0.88 | Cold outreach |
+| `email sequence`, `newsletter`, `drip campaign` | knowledge/marketing/best-practice.md §2.1 | 0.88 | Email sequence |
+| `social content`, `social post`, `instagram`, `linkedin post` | knowledge/marketing/best-practice.md §2.6 | 0.85 | Social content |
+| `image gen`, `ai image`, `dall-e`, `midjourney` | knowledge/marketing/best-practice.md §2.7 | 0.85 | AI image gen |
+| `video script`, `video marketing`, `tiktok script` | knowledge/marketing/best-practice.md §2.8 | 0.85 | Video frameworks |
+| `sms marketing`, `sms campaign`, `tcpa`, `gdpr sms` | knowledge/marketing/best-practice.md §2.9 | 0.85 | SMS compliance |
+| **MARKETING - SEO** ||||
+| `seo`, `seo audit`, `technical seo` | knowledge/marketing/architecture.md §4.3.1 | 0.90 | SEO |
+| `ai seo`, `llmo`, `geo`, `aeo`, `llms.txt` | knowledge/marketing/architecture.md §4.3.4 | 0.88 | AI search |
+| `programmatic seo`, `seo template`, `seo at scale` | knowledge/marketing/architecture.md §4.3.2 | 0.88 | Programmatic SEO |
+| `site architecture`, `information architecture`, `url structure` | knowledge/marketing/architecture.md §1.2 | 0.85 | IA |
+| `competitor page`, `comparison page`, `vs page`, `alternatives page` | knowledge/marketing/best-practice.md §3.3 | 0.85 | Comparison pages |
+| `schema markup`, `json-ld`, `rich snippets`, `structured data` | knowledge/marketing/best-practice.md §3.4 | 0.88 | Schema markup |
+| `aso`, `app store optimization`, `play store` | knowledge/marketing/best-practice.md §3.5 | 0.88 | ASO |
+| **MARKETING - Paid** ||||
+| `paid ads`, `google ads`, `meta ads`, `facebook ads`, `linkedin ads` | knowledge/marketing/best-practice.md §4.1 | 0.90 | Paid advertising |
+| `ad creative`, `ad copy`, `creative testing` | knowledge/marketing/best-practice.md §4.2 | 0.85 | Ad creative |
+| **MARKETING - Measurement** ||||
+| `analytics`, `tracking plan`, `event tracking`, `ga4`, `mixpanel` | knowledge/marketing/architecture.md §4.5.1 | 0.88 | Analytics |
+| `ab test`, `a/b test`, `split test`, `experiment` | knowledge/marketing/best-practice.md §8.1 | 0.88 | A/B testing |
+| **MARKETING - Retention** ||||
+| `churn`, `churn prevention`, `cancel flow`, `retention`, `dunning` | knowledge/marketing/best-practice.md §7.1 | 0.90 | Churn + retention |
+| **MARKETING - Growth** ||||
+| `co-marketing`, `joint webinar`, `partnership marketing` | knowledge/marketing/best-practice.md §9.1 | 0.85 | Co-marketing |
+| `free tool`, `calculator`, `grader`, `lead magnet tool` | knowledge/marketing/architecture.md §4.7.1 | 0.85 | Free tools |
+| `referral`, `referral program`, `affiliate`, `word of mouth` | knowledge/marketing/best-practice.md §9.3 | 0.85 | Referrals |
+| **MARKETING - Strategy** ||||
+| `marketing ideas`, `marketing tactics`, `growth tactics` | knowledge/marketing/best-practice.md §10.1 | 0.85 | Marketing ideas |
+| `marketing psychology`, `mental models`, `loss aversion`, `social proof` | knowledge/marketing/best-practice.md §10.2 | 0.85 | Psychology |
+| `marketing plan`, `quarterly plan`, `go-to-market`, `gtm` | knowledge/marketing/architecture.md §4.8.4 | 0.88 | Marketing plan |
+| `launch`, `product launch`, `launch strategy` | knowledge/marketing/best-practice.md §10.3 | 0.88 | Launch |
+| `pricing`, `pricing strategy`, `pricing page`, `tier pricing` | knowledge/marketing/best-practice.md §10.4 | 0.88 | Pricing |
+| `offer`, `offer construction`, `value equation`, `guarantee` | knowledge/marketing/best-practice.md §10.5 | 0.85 | Offer construction |
+| **MARKETING - Sales/RevOps** ||||
+| `revops`, `lead scoring`, `lead lifecycle`, `mql`, `sql` | knowledge/marketing/architecture.md §4.9.1 | 0.88 | RevOps |
+| `sales enablement`, `sales deck`, `pitch deck`, `one-pager` | knowledge/marketing/best-practice.md §11.1 | 0.85 | Sales enablement |
+| `prospecting`, `outbound`, `cold call`, `sales sequence` | knowledge/marketing/best-practice.md §11.2 | 0.88 | Prospecting |
+| `pr`, `public relations`, `press release`, `media pitch`, `haro` | knowledge/marketing/best-practice.md §11.3 | 0.85 | PR |
+| `directory submission`, `directory listing`, `saas directories` | knowledge/marketing/best-practice.md §11.4 | 0.85 | Directories |
+| `customer research`, `user interview`, `jtbd`, `jobs to be done` | knowledge/marketing/best-practice.md §11.5 | 0.88 | Customer research |
+| `competitor`, `competitor profiling`, `battlecard`, `positioning` | knowledge/marketing/best-practice.md §11.6 | 0.85 | Competitor research |
+| `marketing council`, `marketing brainstorm`, `multi-persona` | knowledge/marketing/best-practice.md §11.7 | 0.85 | Council |
+| `marketing loops`, `recurring agent`, `marketing workflow` | knowledge/marketing/architecture.md §4.9.8 | 0.85 | Loops |
+| `product marketing`, `product context`, `icp` | knowledge/marketing/glossary.md §13 | 0.90 | Product context |
 
 ---
 
@@ -1269,6 +1322,177 @@ No future tracking required — concept-ref mappings are stable. If Superpowers 
 | Date | Version | Changes |
 |------|---------|---------|
 | 2026-07-07 | 1.6.0 | Integrated Superpowers methodology (248k stars) — 4 concept-ref skills (§1.2 Meta Skills) + §8 References mapping. NO new files created. |
+| 2026-07-15 | 1.7.0 | Integrated marketingskills (39k stars) — 47 skill concept-refs across 9 categories, mapped to existing `.cursor/knowledge/marketing/*.md` sections per §9. NO new SKILL.md files created. |
+
+---
+
+## PHẦN 9: MARKETINGSKILLS CONCEPT REFERENCES
+
+> **Source:** [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) (39k stars, MIT License) — Marketing skills framework by Corey Haines.
+>
+> **Sync policy:** Following the same pattern as PHẦN 8 (Superpowers), all 47 marketing skills are merged as **concept-refs** into the existing 7 knowledge files under `.cursor/knowledge/marketing/`. **NO new `SKILL.md` files are created.** Each marketingskills skill maps to a specific section of an existing knowledge file.
+>
+> **Why concept-refs?** Avoids file proliferation (the user's primary constraint — "tránh tạo nhiều file nhất có thể"). Reuses the high-quality existing marketing knowledge base. Routing happens via `decision-tree.md §11` + `context_router.py`.
+
+### 9.1 Concept → Existing File Mapping
+
+#### 9.1.1 Conversion Optimization (5 skills)
+
+| marketingskills skill | Synced into file | Section |
+|---|---|---|
+| `cro` (page-cro + form-cro v2.0 merge) | `.cursor/knowledge/marketing/best-practice.md` | §2 CRO heuristics |
+| `signup` (was: signup-flow-cro) | `.cursor/knowledge/marketing/best-practice.md` | §2.2 Form fields |
+| `onboarding` (was: onboarding-cro) | `.cursor/knowledge/marketing/best-practice.md` | §5.1 Journey design |
+| `popups` (was: popup-cro) | `.cursor/knowledge/marketing/best-practice.md` | §2.4 Modal templates |
+| `paywalls` (was: paywall-upgrade-cro) | `.cursor/knowledge/marketing/architecture.md` | §4.1.2 Funnel state machine |
+
+#### 9.1.2 Content & Copy (8 skills)
+
+| marketingskills skill | Synced into file | Section |
+|---|---|---|
+| `copywriting` | `.cursor/knowledge/marketing/best-practice.md` | §2 Email + landing copy |
+| `copy-editing` | `.cursor/knowledge/marketing/best-practice.md` | §2.3 Subject-line optimizer |
+| `cold-email` | `.cursor/knowledge/marketing/best-practice.md` | §2.5 B2B outreach sequences |
+| `emails` (was: email-sequence) | `.cursor/knowledge/marketing/best-practice.md` | §2.1 Templates |
+| `social` (was: social-content) | `.cursor/knowledge/marketing/best-practice.md` | §2.6 Multi-platform adaptation |
+| `image` | `.cursor/knowledge/marketing/best-practice.md` | §2.7 AI image gen + alt-text |
+| `video` | `.cursor/knowledge/marketing/best-practice.md` | §2.8 Programmatic video frameworks |
+| `sms` | `.cursor/knowledge/marketing/best-practice.md` | §2.9 SMS compliance + flows |
+
+#### 9.1.3 SEO & Discovery (7 skills)
+
+| marketingskills skill | Synced into file | Section |
+|---|---|---|
+| `seo-audit` | `.cursor/knowledge/marketing/architecture.md` | §4.3.1 Crawler architecture |
+| `ai-seo` (AEO / GEO / LLMO) | `.cursor/knowledge/marketing/architecture.md` | §4.3.4 AI-citation schema + llms.txt |
+| `programmatic-seo` | `.cursor/knowledge/marketing/architecture.md` | §4.3.2 Template-driven pages |
+| `site-architecture` | `.cursor/knowledge/marketing/architecture.md` | §1.2 URL hierarchy |
+| `competitors` (was: competitor-alternatives) | `.cursor/knowledge/marketing/best-practice.md` | §3.3 Comparison page template |
+| `schema` (was: schema-markup) | `.cursor/knowledge/marketing/best-practice.md` | §3.4 Product/Organization/FAQPage |
+| `aso` (was: aso-audit) | `.cursor/knowledge/marketing/best-practice.md` | §3.5 App Store / Play listing |
+
+#### 9.1.4 Paid & Distribution (2 skills)
+
+| marketingskills skill | Synced into file | Section |
+|---|---|---|
+| `ads` (was: paid-ads) | `.cursor/knowledge/marketing/best-practice.md` | §4.1 Google/Meta/LinkedIn campaign structure |
+| `ad-creative` | `.cursor/knowledge/marketing/best-practice.md` | §4.2 Bulk headline/description iteration |
+
+#### 9.1.5 Measurement & Testing (2 skills)
+
+| marketingskills skill | Synced into file | Section |
+|---|---|---|
+| `analytics` (was: analytics-tracking) | `.cursor/knowledge/marketing/architecture.md` | §4.5.1 Event taxonomy |
+| `ab-testing` (was: ab-test-setup) | `.cursor/knowledge/marketing/best-practice.md` | §8.1 Experiment design |
+
+#### 9.1.6 Retention (1 skill)
+
+| marketingskills skill | Synced into file | Section |
+|---|---|---|
+| `churn-prevention` | `.cursor/knowledge/marketing/best-practice.md` | §7.1 Cancel flows + dunning + save offers |
+
+#### 9.1.7 Growth Engineering (3 skills)
+
+| marketingskills skill | Synced into file | Section |
+|---|---|---|
+| `co-marketing` | `.cursor/knowledge/marketing/best-practice.md` | §9.1 Partner ID + joint campaigns |
+| `free-tools` (was: free-tool-strategy) | `.cursor/knowledge/marketing/architecture.md` | §4.7.1 Tool-as-lead-gen |
+| `referrals` (was: referral-program) | `.cursor/knowledge/marketing/best-practice.md` | §9.3 Double-sided incentives |
+
+#### 9.1.8 Strategy & Monetization (6 skills)
+
+| marketingskills skill | Synced into file | Section |
+|---|---|---|
+| `marketing-ideas` | `.cursor/knowledge/marketing/best-practice.md` | §10.1 140 SaaS marketing ideas |
+| `marketing-psychology` | `.cursor/knowledge/marketing/best-practice.md` | §10.2 Mental models (loss aversion, social proof) |
+| `marketing-plan` | `.cursor/knowledge/marketing/architecture.md` | §4.8.4 Quarterly plan template |
+| `launch` (was: launch-strategy) | `.cursor/knowledge/marketing/best-practice.md` | §10.3 Pre/launch/post phases |
+| `pricing` (was: pricing-strategy) | `.cursor/knowledge/marketing/best-practice.md` | §10.4 Value-based pricing |
+| `offers` | `.cursor/knowledge/marketing/best-practice.md` | §10.5 Offer construction |
+
+#### 9.1.9 Sales & RevOps (9 skills)
+
+| marketingskills skill | Synced into file | Section |
+|---|---|---|
+| `revops` | `.cursor/knowledge/marketing/architecture.md` | §4.9.1 Lead lifecycle + scoring |
+| `sales-enablement` | `.cursor/knowledge/marketing/best-practice.md` | §11.1 Pitch decks + one-pagers |
+| `prospecting` | `.cursor/knowledge/marketing/best-practice.md` | §11.2 ICP + multi-channel touch |
+| `public-relations` | `.cursor/knowledge/marketing/best-practice.md` | §11.3 Earned media + HARO |
+| `directory-submissions` | `.cursor/knowledge/marketing/best-practice.md` | §11.4 SaaS/AI directories |
+| `customer-research` | `.cursor/knowledge/marketing/best-practice.md` | §11.5 Interview synthesis + JTBD |
+| `competitor-profiling` | `.cursor/knowledge/marketing/best-practice.md` | §11.6 Positioning teardowns |
+| `marketing-council` | `.cursor/knowledge/marketing/best-practice.md` | §11.7 Multi-persona brainstorm |
+| `marketing-loops` | `.cursor/knowledge/marketing/architecture.md` | §4.9.8 Recurring agent workflows |
+
+#### 9.1.10 Product Marketing (1 skill, NEW v2.0)
+
+| marketingskills skill | Synced into file | Section |
+|---|---|---|
+| `product-marketing` (was: product-marketing-context) | `.cursor/knowledge/marketing/glossary.md` | §13 Product-Marketing Context template |
+
+### 9.2 Routing Pipeline
+
+Routing flow when user request matches marketing keywords:
+
+```
+1. context_router.py (cursor_framework) classifies intent = "marketing"
+2. skill-registry.mdc §2.1 (this file) matches skill slug OR category keyword
+3. decision-tree.md §11 (knowledge/marketing) routes to specific section
+4. Agent loads knowledge/marketing/<file>.md §<section>
+5. Execution per best-practice.md + checklist.md §9 pre-flight gates
+6. Anti-pattern.md §9 post-flight gates
+7. faq.md §9 Q&A for user
+```
+
+### 9.3 Source Sync Metadata
+
+| Field | Value |
+|---|---|
+| **Upstream** | https://github.com/coreyhaines31/marketingskills |
+| **Upstream stars** | 39,000+ (as of 2026-07-15) |
+| **Upstream license** | MIT |
+| **Sync date** | 2026-07-15 |
+| **Skills count** | 47 (9 categories) |
+| **Files created** | 0 (pure concept-ref pattern) |
+| **Files modified** | 7 (all under `.cursor/knowledge/marketing/*.md`) |
+| **Sync policy** | Append-only — new content goes to §9 sections, never overwrites existing §1-§8 |
+
+### 9.4 Why Concept-Refs (Not New Skill Files)
+
+Following the Superpowers pattern (§8) which mirrors marketingskills upstream's own recommendation:
+
+> "Each skill should be **lightweight** (a few hundred tokens) and **invoke as supporting context** rather than a heavyweight skill that takes over the conversation."
+> — marketingskills README philosophy
+
+This framework amplifies the philosophy by skipping the per-skill file entirely and mapping directly to existing structured knowledge. Benefits:
+
+1. **Zero file proliferation** — 47 skills → 0 new files
+2. **Reuses existing knowledge** — high-quality existing marketing knowledge base is fully leveraged
+3. **Routing is deterministic** — keyword + decision tree, not LLM speculation
+4. **Cross-references work** — concept-refs into multiple existing files means a single user request can pull multiple relevant sections
+5. **Migrates cleanly** — when marketingskills renames v1.x→v2.0, only the routing table updates (see `glossary.md §12` v2.0 rename map)
+
+### 9.5 Lifecycle Alignment (Marketing = SHIP loop)
+
+Cursor slash commands apply equally to marketing tasks:
+
+| Phase | Cursor command | Marketing equivalent |
+|---|---|---|
+| DEFINE | `/spec` | `brainstorming` (use existing) + product-marketing context |
+| PLAN | `/plan` | `marketing-plan` + `decision-tree.md §11` routing |
+| BUILD | `/build` | `cro` / `cold-email` / `programmatic-seo` execution |
+| VERIFY | `/test` | `ab-testing` setup + `analytics` tracking |
+| REVIEW | `/review` | `competitor-profiling` + `checklist.md §9` pre-flight |
+| DEBUG | `/debug` | `anti-pattern.md §9` post-flight |
+| SHIP | `/ship` | `launch` execution + `architecture.md §4.8.3` |
+
+### 9.6 Version Sync
+
+| Date | marketingskills | Cursor Framework mapping |
+|---|---|---|
+| 2026-07-15 | main (no version tag, post-rename v2.0) | Integrated into framework v1.7.0 |
+
+No future tracking required — concept-ref mappings are stable. If marketingskills changes upstream, only `glossary.md §12` rename map and routing table in `decision-tree.md §11` need review.
 | 2026-07-01 | 1.5.0 | Added video-generation skill from AI-auto-generate-video (HyperFrames, OmniVoice TTS) |
 | 2026-07-01 | 1.4.0 | Integrated karpathy-guidelines rule (alwaysApply) from andrej-karpathy-skills (186k stars) |
 | 2026-06-29 | 1.3.0 | Added ChatbotX development skills (chatbotx-feature, chatbotx-database, chatbotx-worker) |

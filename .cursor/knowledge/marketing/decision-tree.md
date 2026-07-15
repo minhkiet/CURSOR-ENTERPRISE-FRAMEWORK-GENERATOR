@@ -965,3 +965,371 @@ BẮT ĐẦU: Đánh giá List Quality
         ├─► Document reason: "re-engagement failed"
         └─► Never re-add to list
 ```
+
+---
+
+## 11. marketingskills Routing Tree (sync 2026-07-15)
+
+> Mục đích: routing request → category → knowledge section → implementation. Mỗi decision dưới đây map 1 trigger phrase đến 1 knowledge file đã có sẵn (không tạo file mới — Superpowers concept-ref pattern, xem `skill-registry.mdc §8.1`).
+
+### 11.1 Routing cho Conversion Optimization
+
+```
+"Cải thiện conversion trang"
+   │
+   ├─► Page type?
+   │   ├─► Landing page → best-practice.md §2.1 + checklist.md §9.1.1
+   │   ├─► Pricing page  → best-practice.md §5.2 + architecture.md §4.1.2
+   │   ├─► Signup form   → best-practice.md §2.2 + anti-pattern.md §9.1.2
+   │   └─► Onboarding    → best-practice.md §5.1 + architecture.md §4.1.2
+   │
+   ├─► Optimization target?
+   │   ├─► Form fields    → best-practice.md §2.2 §2.3
+   │   ├─► CTA copy       → best-practice.md §2.4
+   │   ├─► Social proof   → best-practice.md §2.5
+   │   └─► Page speed     → performance rules (vercel-react-best-practices)
+   │
+   └─► A/B test setup → best-practice.md §8.1 + checklist.md §9.5.2
+
+"Optimize onboarding activation"
+   │
+   ├─► Activation event defined? 
+   │   ├─► Yes  → best-practice.md §5.1 + architecture.md §4.1.2
+   │   └─► No   → faq.md §4.2 "Định nghĩa activation event"
+   │
+   └─► Issues?
+       ├─► Drop-off at step 3+ → checklist.md §9.1.1
+       ├─► Low day-1 retention → anti-pattern.md §9.1.5
+       └─► No clear aha moment → faq.md §4.2 "Tìm aha moment"
+
+"Setup exit popup"
+   │
+   ├─► Type?
+   │   ├─► Exit-intent  → best-practice.md §2.4 + checklist.md §9.1.2
+   │   └─► Time-delayed → best-practice.md §2.4
+   │
+   └─► Targeting?
+       ├─► All visitors  → ❌ anti-pattern.md §9.1.4
+       └─► High-intent only → best-practice.md §2.4 ✓
+
+"Paywall upgrade flow"
+   │
+   ├─► Trigger?
+   │   ├─► Feature limit hit → architecture.md §4.7 + best-practice.md §5.2
+   │   └─► Trial expiration → best-practice.md §5.2
+   │
+   └─► Offer?
+       ├─► Discount  → best-practice.md §10.5 (offer stack)
+       └─► Plan switch → best-practice.md §10.4 (pricing)
+```
+
+### 11.2 Routing cho Content & Copy
+
+```
+"Viết email subject line"
+   │
+   ├─► Email type?
+   │   ├─► Newsletter  → best-practice.md §2.1 (subject A/B)
+   │   ├─► Cold email  → best-practice.md §2.5
+   │   └─► Transactional → best-practice.md §2.10
+   │
+   └─► Anti-pattern check → anti-pattern.md §9.2.1 (RE:Viagra)
+
+"Soạn cold email sequence"
+   │
+   ├─► Number of touches?
+   │   ├─► 3-5 emails over 2 weeks → best-practice.md §2.5
+   │   └─► 7+ emails / multi-channel → best-practice.md §2.5 + architecture.md §4.2.2
+   │
+   └─► Personalization depth?
+       ├─► Basic (name, company) → best-practice.md §2.5
+       └─► Trigger event → anti-pattern.md §9.2.4
+
+"Generate social post from blog"
+   │
+   ├─► Platforms?
+   │   ├─► LinkedIn / Twitter → best-practice.md §2.6 + checklist.md §9.2.4
+   │   ├─► Instagram / TikTok → best-practice.md §2.6 (image + video)
+   │   └─► Multi-platform    → architecture.md §4.2.3
+   │
+   └─► Assets?
+       ├─► Image (AI) → best-practice.md §2.7 + anti-pattern.md §9.2.6
+       ├─► Video (programmatic) → best-practice.md §2.8
+       └─► Carousel → best-practice.md §2.6
+
+"SMS marketing"
+   │
+   ├─► Compliance? → anti-pattern.md §9.2.5 + checklist.md §9.2.3
+   ├─► Frequency? → best-practice.md §2.9
+   └─► Opt-in flow? → best-practice.md §2.9 + architecture.md §4.2.2
+```
+
+### 11.3 Routing cho SEO & Discovery
+
+```
+"SEO audit"
+   │
+   ├─► Site size?
+   │   ├─► <1k pages   → best-practice.md §3.1 + architecture.md §4.3.1
+   │   └─► >1k pages   → architecture.md §4.3.1 (crawler scale)
+   │
+   └─► Issues found?
+       ├─► Indexing   → faq.md §3.1 "Tại sao page không index"
+       ├─► Schema     → architecture.md §4.3.3 + checklist.md §9.3.4
+       ├─► Cannibalization → faq.md §3.3
+       └─► Speed      → performance rules
+
+"Optimize cho AI search"
+   │
+   ├─► Engine target?
+   │   ├─► ChatGPT / Claude / Gemini → architecture.md §4.3.4 + best-practice.md §3.1
+   ├─► Perplexity → best-practice.md §3.1
+   └─► Google AI Overviews → architecture.md §4.3.3 (schema) + best-practice.md §3.1
+   │
+   └─► Has llms.txt? → best-practice.md §3.1 ✓ ; else → checklist.md §9.3.2 ✗
+
+"Build 1000 programmatic pages"
+   │
+   ├─► Data source? → best-practice.md §3.2 + architecture.md §4.3.2
+   ├─► Template strategy? → architecture.md §4.3.2
+   ├─► Quality gate? → anti-pattern.md §9.3.2 + checklist.md §9.3.3
+   └─► Volume? 
+       ├─► <1k → manageable
+       └─► >10k → architecture.md §4.3.2 + warning: anti-pattern.md §9.3.2
+
+"Compare page: [competitor] vs [us]"
+   │
+   ├─► Data gathering → best-practice.md §3.3 + architecture.md §4.9.6
+   └─► Template → best-practice.md §3.3
+
+"Schema markup issue"
+   │
+   ├─► Type?
+   │   ├─► Product / Offer → architecture.md §4.3.3 + best-practice.md §3.4
+   │   ├─► Article / FAQ   → best-practice.md §3.4
+   │   └─► LocalBusiness   → best-practice.md §3.4
+   │
+   └─► Validation → checklist.md §9.3.4 + Rich Results Test
+
+"App Store Optimization"
+   │
+   ├─► iOS / Android → best-practice.md §3.5 + checklist.md §9.3.5
+   └─► Localization → best-practice.md §3.5
+```
+
+### 11.4 Routing cho Paid & Distribution
+
+```
+"Launch Google/Meta ads"
+   │
+   ├─► Conversion tracking? → checklist.md §9.4.1 ✗ blocker
+   ├─► Audience size? → checklist.md §9.4.1 (need > 1000)
+   ├─► Creative variants? → best-practice.md §4.2 + checklist.md §9.4.1
+   └─► Campaign structure? → best-practice.md §4.1 + anti-pattern.md §9.4.1
+
+"Creative fatigue (CTR drop)"
+   │
+   ├─► Last refresh? → anti-pattern.md §9.4.2 (> 14 days = refresh)
+   └─► Build new variants → best-practice.md §4.2 + architecture.md §4.4.2
+```
+
+### 11.5 Routing cho Measurement & Testing
+
+```
+"Setup tracking"
+   │
+   ├─► Tool?
+   │   ├─► GA4 → best-practice.md §6.1 + architecture.md §4.5.1
+   │   ├─► Mixpanel / Amplitude → best-practice.md §6.1
+   │   └─► Custom (Kafka + warehouse) → architecture.md §4.5.1
+   │
+   └─► Event taxonomy → architecture.md §4.5.1 + checklist.md §9.5.1
+
+"Run A/B test"
+   │
+   ├─► Hypothesis stage → anti-pattern.md §9.5.1 (max 3/page)
+   ├─► Sample size → checklist.md §9.5.2 + decision tree
+   │   ├─► Baseline 5%, MDE +10% → ~3,800/total (typical)
+   │   └─► Use calculator: optimizely.com/sample-size
+   ├─► Duration → checklist.md §9.5.2 + decision tree
+   │   ├─► Min 1 week (capture weekday cycle)
+   │   └─► Min 2 weeks (capture seasonality)
+   └─► Stop criteria → checklist.md §9.5.2 (sample + p)
+
+"Attribution"
+   │
+   ├─► Model?
+   │   ├─► Last-touch (simple) → architecture.md §4.5.3 (default)
+   │   ├─► Data-driven (ML) → architecture.md §4.5.3 (Shapley)
+   │   └─► Need more detail → best-practice.md §6.2
+   └─► Cross-device? → architecture.md §4.5.1 (identity stitching)
+```
+
+### 11.6 Routing cho Retention
+
+```
+"High churn detected"
+   │
+   ├─► Diagnosis
+   │   ├─► Voluntary (cancel intent) → architecture.md §4.6.2 + best-practice.md §7.1
+   │   ├─► Involuntary (failed payment) → architecture.md §4.6.3 + best-practice.md §7.1
+   │   └─► Passive (low usage) → best-practice.md §7.1 + segment re-engagement
+   │
+   └─► Save offer
+       ├─► Discount → best-practice.md §10.5
+       ├─► Pause   → architecture.md §4.6.2 + checklist.md §9.6.1
+       └─► Plan downgrade → best-practice.md §10.4
+
+"Dunning system"
+   │
+   ├─► Cadence → architecture.md §4.6.3 + checklist.md §9.6.1
+   ├─► Recovery target → architecture.md §4.6.3 (40-60% in 14d)
+   └─► Anti-pattern → anti-pattern.md §9.6.1
+```
+
+### 11.7 Routing cho Growth Engineering
+
+```
+"Build free tool"
+   │
+   ├─► Tool type?
+   │   ├─► Calculator / Grader → architecture.md §4.7.1 + best-practice.md §9.2
+   │   ├─► Template / Generator → best-practice.md §9.2
+   │   └─► Embed widget → architecture.md §4.7.1
+   │
+   └─► Lead gate?
+       ├─► Yes → architecture.md §4.7.1 (ethical gate)
+       └─► No  → best-practice.md §9.2 (faster viral loop)
+
+"Setup referral program"
+   │
+   ├─► Reward type → best-practice.md §9.3 + checklist.md §9.7.2
+   ├─► Fraud guardrails → architecture.md §4.7.2 + anti-pattern.md §9.7.2
+   └─► Tier / payout → architecture.md §4.7.2 + checklist.md §9.7.2
+
+"Co-marketing"
+   │
+   ├─► ICP overlap > 30%? → anti-pattern.md §9.7.3 ✗ 
+   ├─► Joint asset plan → checklist.md §9.7.3 + architecture.md §4.7.3
+   └─► Tracking → architecture.md §4.7.3 (UTM partner slug)
+```
+
+### 11.8 Routing cho Strategy & Monetization
+
+```
+"Đặt giá sản phẩm"
+   │
+   ├─► Tiered or flat?
+   │   ├─► Tiered  → best-practice.md §10.4 + checklist.md §9.8.1
+   │   └─► Flat + usage → best-practice.md §10.4
+   │
+   └─► Optimize
+       ├─► A/B test prices → best-practice.md §10.4 + decision tree §11.5
+       └─► Annual discount → best-practice.md §10.4
+
+"Launch strategy"
+   │
+   ├─► New product? → architecture.md §4.8.3 + checklist.md §9.8.3
+   ├─► New feature? → architecture.md §4.8.3 (smaller scope)
+   └─► Waitlist? → anti-pattern.md §9.8.2 (launch without waitlist = fail)
+
+"Quarterly marketing plan"
+   │
+   ├─► Template → architecture.md §4.8.4 + best-practice.md §10.1
+   ├─► Tactic ideas → best-practice.md §10.1 (140 ideas catalog)
+   └─► Channel mix → architecture.md §4.8.4 + best-practice.md §10.1
+```
+
+### 11.9 Routing cho Sales & RevOps
+
+```
+"Setup lead scoring"
+   │
+   ├─► Inputs?
+   │   ├─► Form data only → ❌ anti-pattern.md §9.9.1
+   │   └─► Behavior + form → architecture.md §4.9.1 + best-practice.md §11.7
+   │
+   └─► Routing
+       ├─► By expertise → checklist.md §9.9.1
+       └─► By territory → architecture.md §4.9.1
+
+"Outreach campaign"
+   │
+   ├─► Sequence
+   │   ├─► 5-7 touches → architecture.md §4.9.3 + checklist.md §9.9.3
+   │   └─► Multi-channel → best-practice.md §11.2
+   │
+   └─► Quality
+       ├─► Bounce handling → checklist.md §9.9.3
+       └─► Reply handling → architecture.md §4.9.3
+
+"Customer research"
+   │
+   ├─► Recruitment → checklist.md §9.9.5 + best-practice.md §11.5
+   ├─► Interview guide → best-practice.md §11.5
+   ├─► Synthesis → architecture.md §4.9.5 + JTBD framework
+   └─► Anti-pattern → anti-pattern.md §9.9.7 (sampling bias)
+
+"PR pitch"
+   │
+   ├─► Media list → checklist.md §9.9.4 + best-practice.md §11.3
+   ├─► Pitch angle → best-practice.md §11.3 + anti-pattern.md §9.9.6
+   └─► Coverage tracking → architecture.md §4.9.4
+
+"Marketing council brainstorm"
+   │
+   ├─► Persona count → best-practice.md §11.7 (5-7)
+   ├─► Context passed → glossary.md §13 (product-marketing context) mandatory
+   └─► Output format → best-practice.md §11.7 (prioritized ideas)
+
+"Setup marketing loop (recurring agent)"
+   │
+   ├─► Type
+   │   ├─► Content   → architecture.md §4.9.8 + checklist.md §9.9.7
+   │   ├─► SEO       → architecture.md §4.9.8
+   │   ├─► Outreach  → architecture.md §4.9.8 + anti-pattern.md §9.9.9
+   │   └─► Retention → architecture.md §4.9.8
+   │
+   └─► Must have
+       ├─► Persistence → architecture.md §4.9.8
+       ├─► Halt conditions → checklist.md §9.9.7 + architecture.md §4.9.8
+       └─► Observability → architecture.md §4.9.8
+
+"Directory submission"
+   │
+   ├─► Tier selection → best-practice.md §11.4 + checklist.md §9.9.7
+   ├─► Submission plan → checklist.md §9.9.7 (1-2/week)
+   └─► Quality check → checklist.md §9.9.7 + anti-pattern.md §9.9.10
+```
+
+### 11.10 Master Decision Tree (Catch-all)
+
+```
+User request về marketing
+   │
+   ├─► Has specific category keyword? (cro/seo/ads/launch/pricing/...)
+   │   ├─► Yes → jump to relevant §11.1-§11.9
+   │   └─► No  → continue
+   │
+   ├─► Has specific skill slug? (signup-flow-cro, ab-test-setup, ...)
+   │   ├─► Yes → glossary.md §12 (v1.x rename map)
+   │   │
+   │   └─► v2.0 slug → glossary.md §11 routing table
+   │
+   ├─► Has product context loaded? (see glossary.md §13)
+   │   ├─► Yes → execute skill per §11.X
+   │   └─► No  → read .agents/product-marketing.md first
+   │           (if missing: ask 3 minimal questions, scaffold)
+   │
+   └─► Apply pre-flight blocker check (checklist.md §9.10)
+       ├─► Pass → execute
+       └─► Fail → surface blockers to user
+```
+
+---
+
+## 12. Routing Performance Notes
+
+- Mỗi routing step < 100ms (lookup section, no file creation)
+- Decision tree compiled once into Python module `cursor_framework/context_router.py` §marketing
+- Edge cases logged in `decisions/marketing/<date>.md` for monthly tuning

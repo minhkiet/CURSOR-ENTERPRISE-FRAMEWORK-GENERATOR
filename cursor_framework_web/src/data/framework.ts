@@ -941,6 +941,724 @@ export const AGENTS: FrameworkItem[] = [
       'Flags: bundles > 500KB gz, render-blocking 3rd party, layout thrash'
     ],
     alignsWith: ['.cursor/rules/performance.mdc']
+  },
+  {
+    id: 'debugger',
+    type: 'agent',
+    name: 'debugger',
+    title: 'Debugger',
+    subtitle: '4-phase root-cause investigator',
+    description:
+      'Systematic bug investigation: reproduce → isolate → fix → verify. Forms ≤ 3 hypotheses per round, tests the cheapest first, escalates when unproven. Never shotgun-debug; never ship a fix without a regression test.',
+    category: 'Engineering',
+    tags: ['debug', 'root-cause', 'repro', 'verification'],
+    role: 'secondary',
+    trigger: '/debug · /fix · /bug',
+    path: '.cursor/agents/debugger.md',
+    bullets: [
+      '4-phase protocol: reproduce · isolate · fix · verify',
+      'Reads code, not stack traces — top-to-bottom, not just failing line',
+      'Hypotheses ranked by likelihood; cheapest probe first',
+      'Refuses to ship a fix without regression test + 5-step verification'
+    ],
+    alignsWith: ['.cursor/rules/coding-standards.mdc', '.cursor/rules/karpathy-guidelines.mdc']
+  },
+  {
+    id: 'ui-designer',
+    type: 'agent',
+    name: 'ui-designer',
+    title: 'UI Designer',
+    subtitle: 'Design tokens · components · states',
+    description:
+      'Translates product goals into production-ready visual specs. Designs systems, not one-off screens. Outputs tokens (color/typography/spacing), component anatomy + states + a11y, ready-to-paste Tailwind / CSS. Never ships a spec without empty/loading/error states.',
+    category: 'Design',
+    tags: ['design-tokens', 'components', 'a11y', 'motion'],
+    role: 'secondary',
+    trigger: '/design · /ui · /redesign',
+    path: '.cursor/agents/ui-designer.md',
+    bullets: [
+      'Tokens first (color / typography / spacing / radius / shadow / motion)',
+      'Composition > configuration; one primary action per viewport',
+      'States per component: empty · loading · error · success · hover · focus · disabled',
+      'WCAG 2.1 AA baseline; never ship without a11y check'
+    ],
+    alignsWith: ['.cursor/rules/ui-visual-design.mdc', '.cursor/skills/web-design-guidelines/SKILL.md']
+  },
+  {
+    id: 'web-cloner',
+    type: 'agent',
+    name: 'web-cloner',
+    title: 'Web Cloner',
+    subtitle: 'Playwright-driven visual + behavioral clone',
+    description:
+      'Clones UI / visual appearance, assets, and interactive behavior into a self-contained project. Fidelity levels L1 (static) → L4 (framework-faithful). Respects robots.txt, copyright, and rate limits. Outputs to .cursor/clones/{domain}/.',
+    category: 'Engineering',
+    tags: ['playwright', 'clone', 'mirror', 'pixel-perfect'],
+    role: 'secondary',
+    trigger: '/clone · /copy · /mirror',
+    path: '.cursor/agents/web-cloner.md',
+    bullets: [
+      '5-phase: discovery · extract · rebuild · verify · document',
+      'Fidelity levels L1–L4 — default L2 (visual + essential JS)',
+      'Visual diff ≤ 2% via toHaveScreenshot(maxDiffPixelRatio: 0.02)',
+      'Self-contained: assets local, no external CDN, no tracking scripts'
+    ],
+    alignsWith: ['.cursor/commands/clone/command.md', '.cursor/skills/playwright/SKILL.md']
+  },
+  {
+    id: 'web-scraper',
+    type: 'agent',
+    name: 'web-scraper',
+    title: 'Web Scraper',
+    subtitle: 'Structured content extraction (SDK/API/UI/test/qc)',
+    description:
+      'Extracts structured content from websites via Playwright. Targets SDK requirements, API specs, UI specs, test docs, QC criteria, articles, tables, lists. Always respects robots.txt, throttles to ≤ 1 req/sec, and cites source URLs in every output file.',
+    category: 'Engineering',
+    tags: ['playwright', 'scrape', 'extract', 'docs'],
+    role: 'secondary',
+    trigger: '/scrape · /extract · /docs',
+    path: '.cursor/agents/web-scraper.md',
+    bullets: [
+      'Content categories: sdk · api · ui · test · qc · article · table · list · code',
+      'Static HTML → fetch/curl; SPA → Playwright with networkidle wait',
+      'Cleanup preserves structure; never strips code, attribution, alt-text',
+      'Output schema predictable: same category → same folder under .cursor/knowledge/{domain}/'
+    ],
+    alignsWith: ['.cursor/commands/scrape/command.md', '.cursor/skills/playwright/SKILL.md']
+  },
+  {
+    id: 'refactor-specialist',
+    type: 'agent',
+    name: 'refactor-specialist',
+    title: 'Refactor Specialist',
+    subtitle: 'Behavior-preserving transformation',
+    description:
+      'Refactors without breaking anything. Behavior preservation is non-negotiable: same tests pass before and after every change. Catalogs 15 code smells with refactor recipes. One smell per commit; never mixed with feature work.',
+    category: 'Engineering',
+    tags: ['refactor', 'smells', 'tests-first', 'boy-scout'],
+    role: 'secondary',
+    trigger: '/refactor · /cleanup',
+    path: '.cursor/agents/refactor-specialist.md',
+    bullets: [
+      '15 smells → 15 refactor recipes (extract-fn, parameter-object, polymorphism…)',
+      'Risk tiers R0–R3; public APIs + schema = R3 (avoid)',
+      'One commit per smell · never mixed with feature work',
+      'Refuses to refactor without an existing test safety net'
+    ],
+    alignsWith: ['.cursor/skills/ponytail/SKILL.md', '.cursor/agents/code-reviewer.md']
+  },
+  {
+    id: 'deployment-engineer',
+    type: 'agent',
+    name: 'deployment-engineer',
+    title: 'Deployment Engineer',
+    subtitle: 'Safe rollout · rollback · observability',
+    description:
+      'Ships safely: small changes, fast rollback, observable at every step, blast radius capped. Pre-flight checklist, canary → ramp → verify phases. Coordinates with migration-specialist for schema changes. Never deploys Friday after 3pm.',
+    category: 'Operations',
+    tags: ['deploy', 'rollback', 'canary', 'observability'],
+    role: 'secondary',
+    trigger: '/deploy · /release · /ship',
+    path: '.cursor/agents/deployment-engineer.md',
+    bullets: [
+      'Pre-flight checklist: 10 gates, all must pass before deploy',
+      'Strategies: all-at-once / rolling / blue-green / canary / feature-flag',
+      'Rollback rehearsed ≤ 1 min for every change',
+      'Coordinates with migration-specialist for schema changes'
+    ],
+    alignsWith: ['.cursor/rules/deployment.mdc', '.cursor/rules/observability.mdc']
+  },
+  {
+    id: 'migration-specialist',
+    type: 'agent',
+    name: 'migration-specialist',
+    title: 'Migration Specialist',
+    subtitle: 'Expand · migrate · contract',
+    description:
+      'Schema changes, data migrations, framework upgrades. Always reversible, always idempotent, always throttled. Uses the expand → migrate → contract pattern (3 deploys, not 1). Coordinates with deployment-engineer for release windows.',
+    category: 'Engineering',
+    tags: ['migration', 'schema', 'backfill', 'expand-contract'],
+    role: 'secondary',
+    trigger: '/migrate · /schema · /backfill',
+    path: '.cursor/agents/migration-specialist.md',
+    bullets: [
+      'Iron rule: expand → migrate → contract (3 deploys, not 1)',
+      'Backfill: batched · idempotent · observable · throttled',
+      'CREATE INDEX CONCURRENTLY, never lock writes on prod tables',
+      'Reversibility plan required for every migration'
+    ],
+    alignsWith: ['.cursor/rules/databases.mdc', '.cursor/agents/deployment-engineer.md']
+  },
+  {
+    id: 'doc-writer',
+    type: 'agent',
+    name: 'doc-writer',
+    title: 'Doc Writer',
+    subtitle: 'API docs · READMEs · ADRs · runbooks',
+    description:
+      'Technical writer for documentation that survives. Applies Diátaxis (tutorial / how-to / reference / explanation), templates per doc type, and verifies every command and example. Treats docs as code: versioned, reviewed, runnable.',
+    category: 'Quality',
+    tags: ['docs', 'adr', 'runbook', 'readme'],
+    role: 'secondary',
+    trigger: '/doc · /readme · /adr · /runbook',
+    path: '.cursor/agents/doc-writer.md',
+    bullets: [
+      'Diátaxis: tutorial · how-to · reference · explanation (one per page)',
+      'Templates: README · ADR · Runbook · API Reference (ready to fill)',
+      'Every command runnable; every example verified; no "coming soon"',
+      'Update docs in same PR as code change when relevant'
+    ],
+    alignsWith: ['.cursor/commands/doc/command.md', '.cursor/commands/adr/command.md']
+  },
+  {
+    id: 'devops-engineer',
+    type: 'agent',
+    name: 'devops-engineer',
+    title: 'DevOps Engineer',
+    subtitle: 'CI/CD · IaC · containers · observability',
+    description:
+      'Builds the systems that build, ship, and run software. Pipelines-as-code, declarative infra, reproducible environments, four golden signals. Optimizes for MTTR, change-failure rate, and dev experience — not just speed. Tags everything for cost tracking.',
+    category: 'Operations',
+    tags: ['ci-cd', 'iac', 'kubernetes', 'observability'],
+    role: 'secondary',
+    trigger: '/build · /infra · /pipeline',
+    path: '.cursor/agents/devops-engineer.md',
+    bullets: [
+      'Four golden signals: latency · traffic · errors · saturation',
+      'IaC: modules versioned · state in remote backend with locking · drift detection',
+      'Container security: non-root · distroless · resource limits · probes',
+      'Reproducible from scratch ≤ 1 hour; tagged resources; SLOs mandatory'
+    ],
+    alignsWith: ['.cursor/rules/container-orchestration.mdc', '.cursor/rules/cloud-infra.mdc']
+  },
+  {
+    id: 'marketing-strategist',
+    type: 'agent',
+    name: 'marketing-strategist',
+    title: 'Marketing Strategist',
+    subtitle: 'Positioning · funnels · content · measurement',
+    description:
+      'Product marketing & growth strategist. Designs positioning, funnels, content, SEO, paid distribution, lifecycle, retention. Operates over 9 marketing categories (47 concept-refs from coreyhaines31/marketingskills). Numbers before opinions; cheapest test first.',
+    category: 'Growth',
+    tags: ['positioning', 'funnel', 'seo', 'lifecycle', 'measurement'],
+    role: 'secondary',
+    trigger: '/marketing · /growth · /positioning · /funnel',
+    path: '.cursor/agents/marketing-strategist.md',
+    bullets: [
+      '9 categories routed via .cursor/knowledge/marketing/decision-tree.md §11',
+      'Funnel audits: 5-step template with hypothesis × impact ranking',
+      'CAC ceiling set before paid launch · LTV × payback target',
+      'One metric · one experiment · one decision. Test before ship.'
+    ],
+    alignsWith: ['.cursor/knowledge/marketing/', '.cursor/rules/skill-registry.mdc §9']
+  }
+];
+
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// ────────────────────────────────────────────────────────────────────────────
+// MARKETING CONCEPT-REFS — `.cursor/knowledge/marketing/*.md` (sync 2026-07-15)
+//
+// Source: https://github.com/coreyhaines31/marketingskills (39k stars, MIT)
+//
+// Follows the Superpowers concept-ref pattern (see .cursor/rules/skill-registry.mdc §8).
+// Each item below is a marketing skill/category merged into an existing knowledge file.
+// NO new SKILL.md files were created — entries here exist purely so the web catalog
+// can display them under the "Marketing" category.
+// ────────────────────────────────────────────────────────────────────────────
+
+export type MarketingCategory =
+  | 'conversion'
+  | 'content'
+  | 'seo'
+  | 'paid'
+  | 'measurement'
+  | 'retention'
+  | 'growth'
+  | 'strategy'
+  | 'sales'
+
+export interface MarketingSkillRef {
+  id: string
+  slug: string // v2.0 skill slug (renamed from v1.x)
+  legacySlug?: string // v1.x slug (for migration reference)
+  name: string
+  title: string
+  category: MarketingCategory
+  description: string
+  knowledgeFile: string // path under .cursor/knowledge/marketing/
+  section: string // e.g. "best-practice.md §2.2"
+  triggers: string[]
+  antiPatternFile?: string
+  faqFile?: string
+}
+
+export const MARKETING_CONCEPT_REFS: MarketingSkillRef[] = [
+  // ─── Conversion Optimization ──────────────────────────────────────────────
+  {
+    id: 'mkt-cro',
+    slug: 'cro',
+    legacySlug: 'page-cro + form-cro (v2.0 merge)',
+    name: 'cro',
+    title: 'Conversion Rate Optimization',
+    category: 'conversion',
+    description:
+      'Optimize landing pages, forms, and signup flows for higher conversion. Covers above-the-fold value prop, CTA placement, social proof, page speed, and form-field reduction.',
+    knowledgeFile: 'best-practice.md',
+    section: '§2 CRO heuristics',
+    triggers: ['cro', 'conversion rate', 'landing page', 'cta'],
+    antiPatternFile: 'anti-pattern.md §9.1',
+    faqFile: 'faq.md §9.1'
+  },
+  {
+    id: 'mkt-signup',
+    slug: 'signup',
+    legacySlug: 'signup-flow-cro',
+    name: 'signup',
+    title: 'Signup Flow CRO',
+    category: 'conversion',
+    description:
+      'Reduce signup friction: minimum viable fields, social login options, progress indicators, and post-signup activation.',
+    knowledgeFile: 'best-practice.md',
+    section: '§2.2 Form fields',
+    triggers: ['signup', 'sign-up', 'register', 'create account'],
+    antiPatternFile: 'anti-pattern.md §9.1.2',
+    faqFile: 'faq.md §9.1'
+  },
+  {
+    id: 'mkt-onboarding',
+    slug: 'onboarding',
+    legacySlug: 'onboarding-cro',
+    name: 'onboarding',
+    title: 'Onboarding CRO',
+    category: 'conversion',
+    description:
+      'Drive new users to activation event and aha moment. 3-5 step checklist, empty states that teach, milestone celebrations.',
+    knowledgeFile: 'best-practice.md',
+    section: '§5.1 Journey design',
+    triggers: ['onboarding', 'activation', 'aha moment', 'first-run'],
+    antiPatternFile: 'anti-pattern.md §9.1.5',
+    faqFile: 'faq.md §9.1'
+  },
+  {
+    id: 'mkt-popups',
+    slug: 'popups',
+    legacySlug: 'popup-cro',
+    name: 'popups',
+    title: 'Popup CRO',
+    category: 'conversion',
+    description:
+      'Non-spammy popups: exit-intent, scroll-depth, time-delayed. Frequency capping, dismissal memory, and intent-based targeting.',
+    knowledgeFile: 'best-practice.md',
+    section: '§2.4 Modal templates',
+    triggers: ['popup', 'pop-up', 'modal', 'exit-intent'],
+    antiPatternFile: 'anti-pattern.md §9.1.4',
+    faqFile: 'faq.md §9.1'
+  },
+  {
+    id: 'mkt-paywalls',
+    slug: 'paywalls',
+    legacySlug: 'paywall-upgrade-cro',
+    name: 'paywalls',
+    title: 'Paywall & Upgrade Flow',
+    category: 'conversion',
+    description:
+      'Trial expiration, feature limit, and usage-based upgrade prompts. Softwall vs hardwall, plan comparison, discount vs feature gating.',
+    knowledgeFile: 'architecture.md',
+    section: '§4.1.2 Funnel state machine',
+    triggers: ['paywall', 'upgrade flow', 'trial expiration'],
+    antiPatternFile: 'anti-pattern.md §9.1',
+    faqFile: 'faq.md §9.1'
+  },
+
+  // ─── Content & Copy ────────────────────────────────────────────────────────
+  {
+    id: 'mkt-copywriting',
+    slug: 'copywriting',
+    name: 'copywriting',
+    title: 'Copywriting',
+    category: 'content',
+    description:
+      'Persuasive copy for landing pages, emails, ads, and sales pages. Above-the-fold formulas (problem→promise→proof→CTA), benefit-led bullets, risk reversal.',
+    knowledgeFile: 'best-practice.md',
+    section: '§2 Email + landing copy',
+    triggers: ['copywriting', 'landing copy', 'sales copy'],
+    antiPatternFile: 'anti-pattern.md §9.2',
+    faqFile: 'faq.md §9.2'
+  },
+  {
+    id: 'mkt-cold-email',
+    slug: 'cold-email',
+    name: 'cold-email',
+    title: 'Cold Email',
+    category: 'content',
+    description:
+      'B2B cold outreach sequences. Trigger events, multi-channel cadence (email + LinkedIn + phone), personalization tokens, reply handling.',
+    knowledgeFile: 'best-practice.md',
+    section: '§2.5 B2B outreach sequences',
+    triggers: ['cold email', 'outreach', 'b2b email', 'sales sequence'],
+    antiPatternFile: 'anti-pattern.md §9.2.4',
+    faqFile: 'faq.md §9.2'
+  },
+  {
+    id: 'mkt-emails',
+    slug: 'emails',
+    legacySlug: 'email-sequence',
+    name: 'emails',
+    title: 'Email Sequence',
+    category: 'content',
+    description:
+      'Lifecycle email: welcome, nurture, re-engagement, transactional. Subject-line A/B, send-time optimization, deliverability (SPF/DKIM/DMARC).',
+    knowledgeFile: 'best-practice.md',
+    section: '§2.1 Templates',
+    triggers: ['email sequence', 'newsletter', 'drip campaign', 'lifecycle email'],
+    antiPatternFile: 'anti-pattern.md §9.2',
+    faqFile: 'faq.md §9.2'
+  },
+  {
+    id: 'mkt-sms',
+    slug: 'sms',
+    name: 'sms',
+    title: 'SMS Marketing',
+    category: 'content',
+    description:
+      'SMS marketing with TCPA / GDPR compliance. Double opt-in, time-window respect, opt-out handling, sender ID registration.',
+    knowledgeFile: 'best-practice.md',
+    section: '§2.9 SMS compliance + flows',
+    triggers: ['sms marketing', 'sms campaign', 'tcpa'],
+    antiPatternFile: 'anti-pattern.md §9.2.5',
+    faqFile: 'faq.md §9.2'
+  },
+
+  // ─── SEO & Discovery ───────────────────────────────────────────────────────
+  {
+    id: 'mkt-seo-audit',
+    slug: 'seo-audit',
+    name: 'seo-audit',
+    title: 'SEO Audit',
+    category: 'seo',
+    description:
+      'Technical SEO audit: crawlability, indexability, internal linking, schema, page speed, and content quality scoring.',
+    knowledgeFile: 'architecture.md',
+    section: '§4.3.1 Crawler architecture',
+    triggers: ['seo', 'seo audit', 'technical seo'],
+    antiPatternFile: 'anti-pattern.md §9.3',
+    faqFile: 'faq.md §9.3'
+  },
+  {
+    id: 'mkt-ai-seo',
+    slug: 'ai-seo',
+    name: 'ai-seo',
+    title: 'AI Search Optimization (AEO/GEO/LLMO)',
+    category: 'seo',
+    description:
+      'Optimize for ChatGPT, Claude, Perplexity, Google AI Overviews. llms.txt, structured data, E-E-A-T signals, citations.',
+    knowledgeFile: 'architecture.md',
+    section: '§4.3.4 AI-citation schema + llms.txt',
+    triggers: ['ai seo', 'llmo', 'geo', 'aeo', 'llms.txt', 'chatgpt search'],
+    antiPatternFile: 'anti-pattern.md §9.3.3',
+    faqFile: 'faq.md §9.3'
+  },
+  {
+    id: 'mkt-programmatic-seo',
+    slug: 'programmatic-seo',
+    name: 'programmatic-seo',
+    title: 'Programmatic SEO',
+    category: 'seo',
+    description:
+      'Template-driven SEO pages at scale (100-10,000+). Data hydration, unique value per page, internal linking matrix, quality gate.',
+    knowledgeFile: 'architecture.md',
+    section: '§4.3.2 Template-driven pages',
+    triggers: ['programmatic seo', 'seo template', 'seo at scale'],
+    antiPatternFile: 'anti-pattern.md §9.3.2',
+    faqFile: 'faq.md §9.3'
+  },
+  {
+    id: 'mkt-schema',
+    slug: 'schema',
+    legacySlug: 'schema-markup',
+    name: 'schema',
+    title: 'Schema Markup',
+    category: 'seo',
+    description:
+      'JSON-LD structured data: Organization, WebSite, Article, Product, FAQPage, BreadcrumbList, LocalBusiness. Rich Results validation.',
+    knowledgeFile: 'best-practice.md',
+    section: '§3.4 Product/Organization/FAQPage',
+    triggers: ['schema markup', 'json-ld', 'rich snippets', 'structured data'],
+    antiPatternFile: 'anti-pattern.md §9.3.4',
+    faqFile: 'faq.md §9.3'
+  },
+  {
+    id: 'mkt-aso',
+    slug: 'aso',
+    legacySlug: 'aso-audit',
+    name: 'aso',
+    title: 'App Store Optimization',
+    category: 'seo',
+    description:
+      'App Store + Play Store listing optimization. Title, subtitle, keyword field, screenshots, preview video, ratings prompt timing.',
+    knowledgeFile: 'best-practice.md',
+    section: '§3.5 App Store / Play listing',
+    triggers: ['aso', 'app store optimization', 'play store'],
+    antiPatternFile: 'anti-pattern.md §9.3.6',
+    faqFile: 'faq.md §9.3'
+  },
+
+  // ─── Paid & Distribution ───────────────────────────────────────────────────
+  {
+    id: 'mkt-ads',
+    slug: 'ads',
+    legacySlug: 'paid-ads',
+    name: 'ads',
+    title: 'Paid Ads',
+    category: 'paid',
+    description:
+      'Google/Meta/LinkedIn/TikTok campaign structure. Audience targeting, exclusion lists, bid strategies, frequency capping, creative refresh cadence.',
+    knowledgeFile: 'best-practice.md',
+    section: '§4.1 Google/Meta/LinkedIn campaign structure',
+    triggers: ['paid ads', 'google ads', 'meta ads', 'facebook ads', 'linkedin ads'],
+    antiPatternFile: 'anti-pattern.md §9.4',
+    faqFile: 'faq.md §9.4'
+  },
+  {
+    id: 'mkt-ad-creative',
+    slug: 'ad-creative',
+    name: 'ad-creative',
+    title: 'Ad Creative',
+    category: 'paid',
+    description:
+      'Bulk creative iteration: 3×3 angle matrix → 27 ad variants → auto-test → scale winner → refresh every 7-14 days.',
+    knowledgeFile: 'best-practice.md',
+    section: '§4.2 Bulk headline/description iteration',
+    triggers: ['ad creative', 'ad copy', 'creative testing'],
+    antiPatternFile: 'anti-pattern.md §9.4.2',
+    faqFile: 'faq.md §9.4'
+  },
+
+  // ─── Measurement & Testing ─────────────────────────────────────────────────
+  {
+    id: 'mkt-analytics',
+    slug: 'analytics',
+    legacySlug: 'analytics-tracking',
+    name: 'analytics',
+    title: 'Analytics & Tracking',
+    category: 'measurement',
+    description:
+      'Tracking plan, event taxonomy, SDK deployment, server-side tracking, Conversion API, Enhanced Conversions. Funnel + cohort dashboards.',
+    knowledgeFile: 'architecture.md',
+    section: '§4.5.1 Event taxonomy',
+    triggers: ['analytics', 'tracking plan', 'ga4', 'mixpanel', 'amplitude'],
+    antiPatternFile: 'anti-pattern.md §9.5',
+    faqFile: 'faq.md §9.5'
+  },
+  {
+    id: 'mkt-ab-testing',
+    slug: 'ab-testing',
+    legacySlug: 'ab-test-setup',
+    name: 'ab-testing',
+    title: 'A/B Testing',
+    category: 'measurement',
+    description:
+      'Hypothesis-driven experimentation. Power analysis, sample size, sequential testing, multi-armed bandits, attribution-aware analysis.',
+    knowledgeFile: 'best-practice.md',
+    section: '§8.1 Experiment design',
+    triggers: ['ab test', 'a/b test', 'split test', 'experiment'],
+    antiPatternFile: 'anti-pattern.md §9.5.1',
+    faqFile: 'faq.md §9.5'
+  },
+
+  // ─── Retention ─────────────────────────────────────────────────────────────
+  {
+    id: 'mkt-churn-prevention',
+    slug: 'churn-prevention',
+    name: 'churn-prevention',
+    title: 'Churn Prevention',
+    category: 'retention',
+    description:
+      'Predictive churn modeling, tiered save offers, dunning sequences (Day 0/3/7/14/21), pause subscriptions, win-back flows.',
+    knowledgeFile: 'best-practice.md',
+    section: '§7.1 Cancel flows + dunning + save offers',
+    triggers: ['churn', 'churn prevention', 'cancel flow', 'retention', 'dunning'],
+    antiPatternFile: 'anti-pattern.md §9.6',
+    faqFile: 'faq.md §9.6'
+  },
+
+  // ─── Growth Engineering ────────────────────────────────────────────────────
+  {
+    id: 'mkt-co-marketing',
+    slug: 'co-marketing',
+    name: 'co-marketing',
+    title: 'Co-Marketing',
+    category: 'growth',
+    description:
+      'Joint content, cross-promo, shared webinars. ICP overlap test, partner tier, UTM tracking, pipeline attribution.',
+    knowledgeFile: 'best-practice.md',
+    section: '§9.1 Partner ID + joint campaigns',
+    triggers: ['co-marketing', 'joint webinar', 'partnership marketing'],
+    antiPatternFile: 'anti-pattern.md §9.7.3',
+    faqFile: 'faq.md §9.7'
+  },
+  {
+    id: 'mkt-free-tools',
+    slug: 'free-tools',
+    legacySlug: 'free-tool-strategy',
+    name: 'free-tools',
+    title: 'Free Tools',
+    category: 'growth',
+    description:
+      'Calculator / Grader / Generator as lead-gen. Solves real problem, shareable output, optional email gate, embed widget for viral loop.',
+    knowledgeFile: 'architecture.md',
+    section: '§4.7.1 Tool-as-lead-gen',
+    triggers: ['free tool', 'calculator', 'grader', 'lead magnet tool'],
+    antiPatternFile: 'anti-pattern.md §9.7.1',
+    faqFile: 'faq.md §9.7'
+  },
+  {
+    id: 'mkt-referrals',
+    slug: 'referrals',
+    legacySlug: 'referral-program',
+    name: 'referrals',
+    title: 'Referral Program',
+    category: 'growth',
+    description:
+      'Double-sided incentives, fraud guardrails (device + payment + IP matching), tier system, payout (account credit preferred).',
+    knowledgeFile: 'best-practice.md',
+    section: '§9.3 Double-sided incentives',
+    triggers: ['referral', 'referral program', 'affiliate', 'word of mouth'],
+    antiPatternFile: 'anti-pattern.md §9.7.2',
+    faqFile: 'faq.md §9.7'
+  },
+
+  // ─── Strategy & Monetization ───────────────────────────────────────────────
+  {
+    id: 'mkt-marketing-ideas',
+    slug: 'marketing-ideas',
+    name: 'marketing-ideas',
+    title: '140 SaaS Marketing Ideas',
+    category: 'strategy',
+    description:
+      'Curated catalog of marketing tactics: SEO, paid, content, partnerships, community, programmatic, free tools, PR.',
+    knowledgeFile: 'best-practice.md',
+    section: '§10.1 140 SaaS marketing ideas',
+    triggers: ['marketing ideas', 'marketing tactics', 'growth tactics'],
+    antiPatternFile: 'anti-pattern.md §9.8',
+    faqFile: 'faq.md §9.8'
+  },
+  {
+    id: 'mkt-launch',
+    slug: 'launch',
+    legacySlug: 'launch-strategy',
+    name: 'launch',
+    title: 'Launch Strategy',
+    category: 'strategy',
+    description:
+      'Pre-launch (waitlist, PR list, content backlog), launch week (Product Hunt, multi-channel blast), post-launch (retention focus).',
+    knowledgeFile: 'best-practice.md',
+    section: '§10.3 Pre/launch/post phases',
+    triggers: ['launch', 'product launch', 'launch strategy'],
+    antiPatternFile: 'anti-pattern.md §9.8.2',
+    faqFile: 'faq.md §9.8'
+  },
+  {
+    id: 'mkt-pricing',
+    slug: 'pricing',
+    legacySlug: 'pricing-strategy',
+    name: 'pricing',
+    title: 'Pricing Strategy',
+    category: 'strategy',
+    description:
+      'Value-based pricing, 3-tier structure, annual discount positioning, free trial vs freemium, international pricing (PPP).',
+    knowledgeFile: 'best-practice.md',
+    section: '§10.4 Value-based pricing',
+    triggers: ['pricing', 'pricing strategy', 'pricing page', 'tier pricing'],
+    antiPatternFile: 'anti-pattern.md §9.8.1',
+    faqFile: 'faq.md §9.8'
+  },
+
+  // ─── Sales & RevOps ────────────────────────────────────────────────────────
+  {
+    id: 'mkt-revops',
+    slug: 'revops',
+    name: 'revops',
+    title: 'RevOps',
+    category: 'sales',
+    description:
+      'Lead lifecycle (Subscriber → MQL → SQL → Opp → Customer), scoring model, routing rules, SLAs, funnel reporting.',
+    knowledgeFile: 'architecture.md',
+    section: '§4.9.1 Lead lifecycle + scoring',
+    triggers: ['revops', 'lead scoring', 'lead lifecycle', 'mql', 'sql'],
+    antiPatternFile: 'anti-pattern.md §9.9.1',
+    faqFile: 'faq.md §9.9'
+  },
+  {
+    id: 'mkt-prospecting',
+    slug: 'prospecting',
+    name: 'prospecting',
+    title: 'Prospecting',
+    category: 'sales',
+    description:
+      'ICP definition, list-building, enrichment, multi-channel sequences. Personalization with trigger events, reply handling.',
+    knowledgeFile: 'best-practice.md',
+    section: '§11.2 ICP + multi-channel touch',
+    triggers: ['prospecting', 'outbound', 'cold call', 'sales sequence'],
+    antiPatternFile: 'anti-pattern.md §9.9.5',
+    faqFile: 'faq.md §9.9'
+  },
+  {
+    id: 'mkt-pr',
+    slug: 'public-relations',
+    name: 'public-relations',
+    title: 'Public Relations',
+    category: 'sales',
+    description:
+      'Earned media, journalist outreach, HARO/Connectively, tier-1 media list, press kit, coverage tracking.',
+    knowledgeFile: 'best-practice.md',
+    section: '§11.3 Earned media + HARO',
+    triggers: ['pr', 'public relations', 'press release', 'media pitch', 'haro'],
+    antiPatternFile: 'anti-pattern.md §9.9.6',
+    faqFile: 'faq.md §9.9'
+  },
+  {
+    id: 'mkt-customer-research',
+    slug: 'customer-research',
+    name: 'customer-research',
+    title: 'Customer Research',
+    category: 'sales',
+    description:
+      'User interview guide, sampling mix (activated + churned + never-active), JTBD synthesis, quarterly insight report.',
+    knowledgeFile: 'best-practice.md',
+    section: '§11.5 Interview synthesis + JTBD',
+    triggers: ['customer research', 'user interview', 'jtbd', 'jobs to be done'],
+    antiPatternFile: 'anti-pattern.md §9.9.7',
+    faqFile: 'faq.md §9.9'
+  },
+  {
+    id: 'mkt-marketing-loops',
+    slug: 'marketing-loops',
+    name: 'marketing-loops',
+    title: 'Marketing Loops',
+    category: 'sales',
+    description:
+      'Recurring agent workflows: content, SEO, outreach, retention loops. Stateful agents with persistence, halt conditions, observability.',
+    knowledgeFile: 'architecture.md',
+    section: '§4.9.8 Recurring agent workflows',
+    triggers: ['marketing loops', 'recurring agent', 'marketing workflow'],
+    antiPatternFile: 'anti-pattern.md §9.9.9',
+    faqFile: 'faq.md §9.9'
+  },
+  {
+    id: 'mkt-product-marketing',
+    slug: 'product-marketing',
+    legacySlug: 'product-marketing-context',
+    name: 'product-marketing',
+    title: 'Product Marketing Context',
+    category: 'sales',
+    description:
+      'Single source of truth for product/audience/positioning. MANDATORY first read for all marketing skills. Stored at .agents/product-marketing.md.',
+    knowledgeFile: 'glossary.md',
+    section: '§13 Product-Marketing Context template',
+    triggers: ['product marketing', 'product context', 'icp'],
+    antiPatternFile: 'anti-pattern.md §9.9.8',
+    faqFile: 'faq.md §9.9'
   }
 ]
 
@@ -950,11 +1668,14 @@ export const AGENTS: FrameworkItem[] = [
 
 export const CATALOG: FrameworkItem[] = [...RULES, ...SKILLS, ...AGENTS]
 
-export function countByType(): { rules: number; skills: number; agents: number } {
+export const MARKETING_CATALOG: MarketingSkillRef[] = MARKETING_CONCEPT_REFS
+
+export function countByType(): { rules: number; skills: number; agents: number; marketing: number } {
   return {
     rules: RULES.length,
     skills: SKILLS.length,
-    agents: AGENTS.length
+    agents: AGENTS.length,
+    marketing: MARKETING_CONCEPT_REFS.length
   }
 }
 

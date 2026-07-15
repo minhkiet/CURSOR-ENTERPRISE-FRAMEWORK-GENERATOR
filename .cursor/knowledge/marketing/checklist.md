@@ -552,3 +552,358 @@
 - [ ] Competitive positioning
 - [ ] Innovation initiatives
 - [ ] Growth planning
+
+---
+
+# 9. marketingskills Pre-Launch Checklist (sync 2026-07-15)
+
+> Áp dụng theo [marketingskills](https://github.com/coreyhaines31/marketingskills) cho 9 category. Mỗi section là danh sách tick phải pass trước khi ship campaign/feature/launch.
+
+## 9.1 Conversion Optimization Checklist
+
+### 9.1.1 CRO / Signup / Onboarding
+- [ ] Above-the-fold value prop clear (5-second test)
+- [ ] Hero CTA visible without scroll
+- [ ] Form fields minimal (< 5 typical, < 8 max)
+- [ ] Social proof near primary CTA (logos, count, testimonial)
+- [ ] Mobile responsive (tested at 320, 375, 414, 768)
+- [ ] Page load < 2.5s LCP (Lighthouse > 90)
+- [ ] A/B test framework integrated (variant assignment)
+- [ ] Empty state copy on success
+- [ ] Welcome email sent within 5 min of signup
+- [ ] Activation event defined and tracked
+- [ ] Onboarding checklist visible (3-5 steps max)
+- [ ] "Skip" option for users wanting self-serve
+
+### 9.1.2 Popups / Paywalls
+- [ ] Frequency cap: 1 per session, 1 per 7 days dismissal
+- [ ] Negative space + dismissible X (no dark pattern)
+- [ ] Mobile-friendly (small bottom-banner preferred over modal)
+- [ ] A/B test copy + design
+- [ ] Trigger event matches intent (exit intent, scroll depth, time)
+- [ ] Conversion tracked separately from organic
+
+## 9.2 Content & Copy Checklist
+
+### 9.2.1 Email
+- [ ] Subject line A/B variant prepared
+- [ ] Preview text (preheader) intentional
+- [ ] Single primary CTA
+- [ ] Plain-text version (not just HTML)
+- [ ] Unsubscribe link in footer
+- [ ] Sender name + reply-to address real
+- [ ] SPF/DKIM/DMARC passing
+- [ ] Test send to multiple clients (Gmail, Outlook, Apple Mail)
+- [ ] Mobile preview (60%+ opens mobile)
+- [ ] Send time optimized per segment
+- [ ] Bounce handling for hard vs soft
+- [ ] List-Unsubscribe header (RFC 8058)
+
+### 9.2.2 Copy / Landing
+- [ ] Above-fold: problem → promise → proof → CTA
+- [ ] One idea per section; subheadings every 200-300 words
+- [ ] Bullet lists for scannable content
+- [ ] CTA above fold AND at end
+- [ ] Social proof specific (numbers, names, photos)
+- [ ] Risk reversal (guarantee, trial, refund) near CTA
+- [ ] No jargon unless audience uses it
+- [ ] Reading level: 6th-8th grade (Hemingway app)
+- [ ] Spell check + grammar (Grammarly)
+
+### 9.2.3 SMS
+- [ ] Double opt-in (TCPA/GDPR compliance)
+- [ ] Clear opt-out language ("Reply STOP")
+- [ ] Time-window respected (recipient local 9am-9pm)
+- [ ] Sender ID registered
+- [ ] < 160 chars (no concat)
+- [ ] Link shortener with tracking
+- [ ] Reply handling (STOP, HELP, transfer to human)
+
+### 9.2.4 Social
+- [ ] Platform-specific format (image ratio, length, hashtag)
+- [ ] Native upload (not link to blog where possible)
+- [ ] Caption hook in first line
+- [ ] Hashtags 3-5 (Instagram), 1-2 (LinkedIn), 0-1 (Twitter/X)
+- [ ] First comment with extra link
+- [ ] Cross-post scheduled across timezones
+- [ ] Tracking links per platform
+
+## 9.3 SEO & Discovery Checklist
+
+### 9.3.1 On-page SEO
+- [ ] Title tag: < 60 chars, keyword near start
+- [ ] Meta description: < 155 chars, CTA
+- [ ] H1: exactly 1, contains primary keyword
+- [ ] H2/H3: keyword variations
+- [ ] URL slug: short, keyword-rich, hyphens
+- [ ] Internal links: 3-5 to related content
+- [ ] External links: 1-2 to authoritative sources
+- [ ] Image alt text: descriptive, includes keyword if natural
+- [ ] Schema markup: Article + BreadcrumbList minimum
+- [ ] Open Graph + Twitter Card tags
+- [ ] Canonical URL set (no duplicates)
+- [ ] Mobile-friendly (passes Google test)
+
+### 9.3.2 AI Search (AEO/GEO/LLMO)
+- [ ] llms.txt at /llms.txt (markdown, < 200 lines)
+- [ ] robots.txt allows GPTBot, ClaudeBot, anthropic-ai
+- [ ] Structured data includes entity definitions
+- [ ] Author byline + About page (E-E-A-T)
+- [ ] Citations: original data, research, quotes
+- [ ] FAQ section with FAQPage schema where appropriate
+
+### 9.3.3 Programmatic SEO
+- [ ] Unique value per page (data, examples, original content)
+- [ ] No doorway intent (genuine search query per page)
+- [ ] Canonical group for similar pages
+- [ ] Internal linking matrix ensures no orphan pages
+- [ ] Sitemap segmented by template type
+- [ ] IndexNow ping on publish
+- [ ] Quality gate before publish (uniqueness score > 70%)
+
+### 9.3.4 Schema
+- [ ] Organization schema on homepage
+- [ ] WebSite + SearchAction (if applicable)
+- [ ] BreadcrumbList on all non-home pages
+- [ ] Product/Offer on product pages
+- [ ] Article on blog posts
+- [ ] FAQPage on FAQ content
+- [ ] LocalBusiness on multi-location
+- [ ] Validate with Rich Results Test
+- [ ] No spammy markup (FAQPage without questions, etc.)
+
+### 9.3.5 ASO
+- [ ] Title: brand + 1-2 key terms (< 30 chars iOS, < 50 Google)
+- [ ] Subtitle: 2-3 more terms (< 30 chars iOS)
+- [ ] Keyword field: 100 chars (iOS), full description (Google)
+- [ ] Description: scannable, feature/benefit bullets
+- [ ] Screenshots: 5-8 per platform, localized
+- [ ] App icon: A/B tested
+- [ ] Preview video: < 30s, captioned
+- [ ] Ratings/reviews prompt at activation event (not first session)
+- [ ] Localization: top 5 markets
+
+## 9.4 Paid & Distribution Checklist
+
+### 9.4.1 Ads / Ad Creative
+- [ ] Conversion tracking pixel firing (test event)
+- [ ] Audience defined (size > 1000 for optimization)
+- [ ] Exclusion list: existing customers, recent converters
+- [ ] 3-5 ad variants per campaign (copy + creative)
+- [ ] Frequency cap set (3-5/week per user)
+- [ ] Daily budget caps in place
+- [ ] Bid strategy: lowest cost (start) → target CPA (scale)
+- [ ] UTM parameters on destination URLs
+- [ ] Landing page matches ad message (scent match)
+- [ ] Mobile preview tested
+- [ ] Creative refresh plan (every 7-14 days)
+
+## 9.5 Measurement & Testing Checklist
+
+### 9.5.1 Analytics
+- [ ] Tracking plan documented (event → property)
+- [ ] Tag Manager / SDK deployed and verified
+- [ ] Conversion events: macro (signup, purchase) tracked
+- [ ] Page view tracking (SPA route changes)
+- [ ] UTM parameters captured
+- [ ] User identification (login → identity stitching)
+- [ ] Data quality: test events removed
+- [ ] Funnel reports built (4-6 steps)
+- [ ] Cohort retention reports
+- [ ] Dashboards: exec, marketing, product
+- [ ] Alerting: anomalies (drop > 20% in 24h)
+
+### 9.5.2 A/B Testing
+- [ ] Hypothesis documented (expected effect, MDE)
+- [ ] Sample size calculated (power 80%, alpha 0.05)
+- [ ] Duration set (avoid peeking)
+- [ ] Variant assignment deterministic (same user → same variant)
+- [ ] Exposure tracking (variant rendered, not just assigned)
+- [ ] Conversion event matches hypothesis
+- [ ] Guardrail metrics (revenue, page speed, errors)
+- [ ] Max 3 concurrent tests per surface
+- [ ] Stop condition defined upfront
+- [ ] Result writeup template (decision, scope, follow-up)
+
+## 9.6 Retention Checklist
+
+### 9.6.1 Churn Prevention
+- [ ] Churn model trained (churn_probability per user)
+- [ ] At-risk segment defined (top 10% probability)
+- [ ] Save offer tiered by churn reason
+- [ ] Dunning sequence: Day 0, 3, 7, 14, 21
+- [ ] Pause option: 30/60/90 day with re-engagement
+- [ ] Cancellation feedback collected
+- [ ] Win-back flow for churned (Day 30, 90, 180)
+- [ ] NPS or CSAT measured monthly
+- [ ] Cohort retention dashboard
+- [ ] Save offer ROI tracked (recovered revenue)
+
+## 9.7 Growth Engineering Checklist
+
+### 9.7.1 Free Tools
+- [ ] Solves real problem (not just lead gen)
+- [ ] Self-contained (no product required to use)
+- [ ] Shareable output (link or PDF)
+- [ ] Email gate optional (use sparingly)
+- [ ] Mobile responsive
+- [ ] Fast load (< 2s)
+- [ ] SEO-optimized landing page
+- [ ] Embed widget for third-party viral loop
+- [ ] Analytics tracking
+- [ ] Conversion to product path defined
+
+### 9.7.2 Referrals
+- [ ] Double-sided incentive (referrer + referee)
+- [ ] Reward condition: paid conversion (not just signup)
+- [ ] Fraud matching: IP, device, payment
+- [ ] Cap per user (avoid gaming)
+- [ ] Tier system for power referrers
+- [ ] Unique referral code per user
+- [ ] Payout: account credit (preferred) or cashout
+- [ ] Tax compliance (1099 reporting in US for cash)
+- [ ] Program landing page + in-product banner
+- [ ] Tracking: referred users + conversion rate
+
+### 9.7.3 Co-Marketing
+- [ ] Partner ICP overlap > 30% (test before commitment)
+- [ ] Joint content plan (1+ assets, dates, owners)
+- [ ] Cross-promo plan (newsletter, social, blog)
+- [ ] UTM tracking with partner slug
+- [ ] Shared landing page (or per-partner LP)
+- [ ] Lead/attendee sharing defined (50/50 typical)
+- [ ] Post-event follow-up
+- [ ] Quarterly review of pipeline generated
+
+## 9.8 Strategy & Monetization Checklist
+
+### 9.8.1 Pricing
+- [ ] 3 plans (good/better/best) — not 5+
+- [ ] Middle plan highlighted "Recommended"
+- [ ] Annual plan presented as "2 months free" or % off
+- [ ] Price points tested (3-4 anchors in different segments)
+- [ ] Free trial or freemium model defined
+- [ ] Free → paid transition well-marked
+- [ ] Enterprise tier for custom (don't expose price)
+- [ ] Price increase plan (grandfather vs. new pricing)
+- [ ] International pricing (PPP if applicable)
+- [ ] Annual billing discount visible and meaningful
+
+### 9.8.2 Offer
+- [ ] Value equation (V = D×L / T×E) balanced
+- [ ] Bonus stack: 3-5 items with $ value
+- [ ] Guarantee: 30/60/lifetime, no-questions
+- [ ] Urgency: real deadline (not fake)
+- [ ] Scarcity: cohort-limited (if applicable)
+- [ ] Risk reversal near CTA
+- [ ] Social proof (specific, not generic)
+- [ ] Single primary CTA per page
+- [ ] Mobile-optimized (long copy becomes short on mobile)
+
+### 9.8.3 Launch
+- [ ] Pre-launch (T-6w): waitlist, content backlog, PR list
+- [ ] Pre-launch (T-2w): influencer seeding, email warm-up
+- [ ] Launch (T+0): multi-channel blast, capacity ready
+- [ ] Launch (T+1w): Product Hunt, Hacker News, Reddit
+- [ ] Post-launch (T+1w): feedback collection, iteration
+- [ ] Post-launch (T+6w): retention focus, retarget visitors
+- [ ] Customer support: capacity for 5x normal volume
+- [ ] Onboarding: post-signup surge handling
+- [ ] Crisis plan: rollback, comms template
+- [ ] Success metrics: DAU/MAU, activation, conversion
+
+## 9.9 Sales & RevOps Checklist
+
+### 9.9.1 RevOps / Lead Lifecycle
+- [ ] Lead scoring model: explicit + implicit
+- [ ] Stage definitions: Subscriber → MQL → SQL → Opp → Customer
+- [ ] Routing rules: by segment + product fit
+- [ ] SLA: MQL → SQL < 5 days; SQL → Opp < 14 days
+- [ ] CRM fields: standardized, required for stage
+- [ ] Duplicate detection: email + phone + company
+- [ ] Lead source captured (UTM)
+- [ ] Funnel reporting: weekly velocity
+- [ ] Win/loss analysis: 30-day cycle
+- [ ] Quota + forecast: monthly review
+
+### 9.9.2 Sales Enablement
+- [ ] Stage-aware collateral (awareness → decide → onboard)
+- [ ] Pitch deck: 10-15 slides, story-driven
+- [ ] One-pagers: per segment, per use case
+- [ ] Case studies: 3-5 strong, ROI quantified
+- [ ] Demo script: structured, discovery-led
+- [ ] Objection doc: top 20 with responses
+- [ ] Security FAQ: SOC2, GDPR, data handling
+- [ ] Pricing proposal template
+- [ ] Mutual action plan (MAP) template
+- [ ] Battlecards: per top-3 competitor
+
+### 9.9.3 Prospecting
+- [ ] ICP defined (firmographic + behavioral)
+- [ ] List source: Apollo, Sales Nav, ZoomInfo (clean)
+- [ ] Enrichment: email verified, phone for follow-up
+- [ ] Sequence: 5-7 touches multi-channel (email + LI + phone)
+- [ ] Personalization: 1+ trigger event per touch
+- [ ] Send windows: Tue-Thu, recipient local time
+- [ ] Auto-pause on reply
+- [ ] Reply tagging: positive, objection, unsubscribe
+- [ ] Bounce handling: 3% threshold = stop list
+- [ ] Reporting: opens, replies, meetings booked
+
+### 9.9.4 PR
+- [ ] Media list: tiered (A: top 20, B: trade 50, C: long tail)
+- [ ] Pitch angle: newsworthy (not just announcement)
+- [ ] Embargo respected (if used)
+- [ ] Press kit: logo, screenshots, boilerplate, fact sheet
+- [ ] Spokesperson designated + media trained
+- [ ] HARO/Connectively: daily monitoring + response
+- [ ] Coverage tracking: open rates, sentiment, share
+- [ ] Reporter relationships: long-term, not transactional
+
+### 9.9.5 Customer Research
+- [ ] Interview guide: 8-10 open-ended questions
+- [ ] Recruited sample: mix of activated, churned, never-active
+- [ ] Incentive: $50-150 or product credit
+- [ ] Recording + transcript (auto-transcribe)
+- [ ] Synthesis: JTBD statements
+- [ ] Tag by persona, stage, pain, gain
+- [ ] Cross-reference to product roadmap
+- [ ] Quarterly synthesis report
+- [ ] Verbatim clips for marketing collateral
+
+### 9.9.6 Competitor Profiling
+- [ ] Top 5 competitors identified
+- [ ] Monitoring: pricing, features, blog, changelog, jobs
+- [ ] Weekly diff alert
+- [ ] Quarterly: full profile + battlecard
+- [ ] Annual: category landscape
+- [ ] Positioning map: 2x2 (price vs. feature, ease vs. power)
+- [ ] Win/loss reasons tracked per competitor
+
+### 9.9.7 Marketing Council / Loops / Directories
+- [ ] Council: 5-7 personas with system prompts
+- [ ] Council input: product-marketing context passed
+- [ ] Loops: stateful agents with persistence
+- [ ] Loops: halt conditions + observability
+- [ ] Directory registry: 50-100 tagged by tier
+- [ ] Submission cadence: 1-2/week
+- [ ] Directory quality check: title, description, logo, link
+- [ ] Calendar: re-submission on profile update
+
+---
+
+## 9.10 Marketing Pre-Flight Summary (one-page view)
+
+| Category | Pre-launch blockers |
+|---|---|
+| Conversion | Tracking events, funnel reports, A/B framework |
+| Content | Templates, send-list, deliverability, legal review |
+| SEO | Schema validation, sitemap, indexability, internal links |
+| Paid | Pixel firing, audience size, frequency caps, landing-page match |
+| Measurement | Tracking plan, dashboards, alerting |
+| Retention | Churn model, save flow, dunning cadence |
+| Growth | ICP overlap, fraud matching, share/embed |
+| Strategy | Pricing page, offer stack, pre-launch waitlist |
+| Sales | Lead scoring, routing SLA, enablement deck |
+
+**Rule:** Không ship campaign/launch/feature nếu pre-flight ở category tương ứng còn blocker.

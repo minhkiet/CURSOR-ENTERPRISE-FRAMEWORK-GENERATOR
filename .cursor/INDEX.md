@@ -1,13 +1,17 @@
 # Cursor Enterprise Framework - Auto Index
 
-> Auto-generated: 2026-07-13T14:17:36
+> Auto-generated: 2026-07-15T20:57:00 (manually updated after agents sync)
 > Root: `D:\PROJECTS\CURSORS\CURSOR ENTERPRISE FRAMEWORK GENERATOR\.cursor`
+>
+> **Marketing domain (sync 2026-07-15)**: 47 skills from [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) (39k stars) merged as concept-refs into existing 7 knowledge files under `.cursor/knowledge/marketing/`. NO new SKILL.md files created. Routing via `decision-tree.md §11`. Full mapping: `.cursor/rules/skill-registry.mdc §9`.
+>
+> **Agents sync (2026-07-15)**: 10 new goal-oriented agents added: `debugger`, `ui-designer`, `web-cloner`, `web-scraper`, `refactor-specialist`, `deployment-engineer`, `migration-specialist`, `doc-writer`, `devops-engineer`, `marketing-strategist`. Each registered in `cursor_framework/skill_discovery.py` + routed via `context_router.py` + displayed in `cursor_framework_web/src/data/framework.ts`.
 
 ## Totals
 
 | Category | Count |
 |----------|-------|
-| agents | 8 |
+| agents | 18 |
 | commands | 28 |
 | hooks | 15 |
 | knowledge | 329 |
@@ -19,9 +23,9 @@
 | skills | 50 |
 | templates | 6 |
 | workflows | 11 |
-| **grand_total** | **573** |
+| **grand_total** | **583** |
 
-## Agents (8)
+## Agents (18)
 
 | Name | Path | Description |
 |------|------|-------------|
@@ -29,10 +33,20 @@
 | `backend-reviewer.md` | `agents\backend-reviewer.md` | Backend specialist for NestJS, Laravel, ASP.NET Core. Reviews API design, business logic, error handling, transactions,  |
 | `code-reviewer.md` | `agents\code-reviewer.md` | Senior Staff Engineer reviewing code changes with rigorous five-axis standards. Use proactively after any non-trivial co |
 | `database-reviewer.md` | `agents\database-reviewer.md` | Database specialist for schema design, query optimization, indexing, migrations, and data integrity. Use for any DB sche |
+| `debugger.md` | `agents\debugger.md` | 4-phase root-cause investigator: reproduce → isolate → fix → verify. Forms ≤ 3 hypotheses per round, tests cheapest first. |
+| `deployment-engineer.md` | `agents\deployment-engineer.md` | Production deployment: 10-gate pre-flight, canary → ramp → verify, rollback rehearsed ≤ 1 min. Coordinates with migration-specialist. |
+| `devops-engineer.md` | `agents\devops-engineer.md` | CI/CD, IaC, containers, observability. Four golden signals. Reproducible from scratch ≤ 1 hour. Tagged resources for cost tracking. |
+| `doc-writer.md` | `agents\doc-writer.md` | Technical writer: README, ADR, runbook, API reference. Diátaxis framework. Every example runnable, every link checked. |
 | `frontend-architect.md` | `agents\frontend-architect.md` | Frontend Architect for Next.js, Nuxt, Vue 3 component design, state management, SSR/SSG, and accessibility. Use for any  |
+| `marketing-strategist.md` | `agents\marketing-strategist.md` | Product marketing & growth strategist. 9 categories · 47 concept-refs from coreyhaines31/marketingskills. Numbers before opinions. |
+| `migration-specialist.md` | `agents\migration-specialist.md` | Schema, data, framework migrations. Expand → migrate → contract (3 deploys). Always reversible, idempotent, throttled. |
+| `refactor-specialist.md` | `agents\refactor-specialist.md` | Behavior-preserving refactoring. 15 smells → 15 recipes. One commit per smell; never mixed with features. |
 | `security-auditor.md` | `agents\security-auditor.md` | Security Engineer for OWASP Top 10, threat modeling, secrets, auth, and supply-chain. Use for any security review, payme |
 | `test-engineer.md` | `agents\test-engineer.md` | QA Specialist enforcing test strategy, coverage, and the Prove-It pattern. Use when designing tests, reviewing coverage, |
+| `ui-designer.md` | `agents\ui-designer.md` | UI/UX designer for design tokens, components, layouts, and production-ready specs. Outputs token-driven Tailwind/CSS ready to paste. |
+| `web-cloner.md` | `agents\web-cloner.md` | Playwright-driven website cloner. Fidelity levels L1–L4. Respects robots.txt + copyright. Outputs to .cursor/clones/{domain}/. |
 | `web-performance-auditor.md` | `agents\web-performance-auditor.md` | Web Performance Engineer for Core Web Vitals, bundle analysis, and rendering performance. Use for any frontend perf audi |
+| `web-scraper.md` | `agents\web-scraper.md` | Structured content extraction via Playwright. 9 categories. ≤ 1 req/sec · cites source URLs in every output file. |
 
 ## Commands (28)
 

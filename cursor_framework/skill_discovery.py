@@ -172,6 +172,293 @@ class SkillRegistry:
                 ],
                 dependencies=["security-review"],
             ),
+            # Marketing umbrella — single entry representing 47 marketingskills
+            # concept-refs (sync 2026-07-15 with coreyhaines31/marketingskills,
+            # 39k stars). Per skill-registry.mdc §9, NO SKILL.md file is
+            # created; routing happens via `.cursor/knowledge/marketing/decision-tree.md §11`.
+            SkillMetadata(
+                name="marketing",
+                version="1.7.0",
+                description=(
+                    "47 marketing concept-refs across 9 categories "
+                    "(Conversion, Content, SEO, Paid, Measurement, Retention, "
+                    "Growth, Strategy, Sales/RevOps) — synced from "
+                    "coreyhaines31/marketingskills into existing "
+                    ".cursor/knowledge/marketing/*.md sections. No new "
+                    "SKILL.md files (concept-ref pattern, see skill-registry.mdc §9)."
+                ),
+                tags=[
+                    "marketing", "growth", "cro", "conversion", "signup",
+                    "onboarding", "copywriting", "cold-email", "email-sequence",
+                    "seo", "programmatic-seo", "ai-seo", "schema", "aso",
+                    "paid-ads", "ad-creative", "analytics", "ab-testing",
+                    "churn-prevention", "co-marketing", "free-tools", "referrals",
+                    "launch", "pricing", "offers", "revops", "prospecting",
+                    "pr", "customer-research", "marketing-council",
+                    "marketing-loops", "product-marketing"
+                ],
+                # Path points to the umbrella knowledge folder, not a single SKILL.md.
+                # Per-skill routing is done at runtime via decision-tree.md §11.
+                path=".cursor/knowledge/marketing/",
+                pre_review_sections=[
+                    # Generic pre-gates — concept-ref pattern means each request
+                    # routes via decision-tree §11 first.
+                    "marketing-pre-product-context",  # verify .agents/product-marketing.md exists
+                    "marketing-pre-preflight",  # checklist.md §9.X pre-launch blockers
+                ],
+                post_review_sections=[
+                    "marketing-post-antipattern",  # anti-pattern.md §9.X
+                    "marketing-post-faq",  # faq.md §9.X
+                ],
+                trigger_keywords=[
+                    "marketing", "growth", "cro", "conversion", "signup",
+                    "onboarding", "popup", "paywall", "copywriting",
+                    "cold email", "newsletter", "sms", "social content",
+                    "seo", "programmatic seo", "ai seo", "schema", "aso",
+                    "paid ads", "google ads", "meta ads", "ad creative",
+                    "analytics", "ab test", "a/b test", "split test",
+                    "churn", "retention", "dunning",
+                    "co-marketing", "free tool", "referral",
+                    "launch", "pricing", "offer",
+                    "revops", "lead scoring", "mql", "sql",
+                    "prospecting", "outbound", "pr", "press release",
+                    "haro", "directory submission", "customer research",
+                    "jtbd", "marketing council", "marketing loops",
+                    "product marketing", "icp", "positioning"
+                ],
+                # Marketing requires mandatory pre-read of product context.
+                dependencies=["product-marketing-context"],
+            ),
+            # ── Agents (sync 2026-07-15) — 10 specialized agents registered as
+            # skills so context_router.py can route user requests to them via
+            # the same keyword + intent pipeline. The path points to each
+            # agent's .md profile at .cursor/agents/{name}.md.
+            SkillMetadata(
+                name="debugger",
+                version="1.0.0",
+                description=(
+                    "4-phase root-cause investigator: reproduce → isolate → "
+                    "fix → verify. Forms ≤ 3 hypotheses per round, tests "
+                    "cheapest first. Never ships a fix without regression test."
+                ),
+                tags=["debug", "bug-fix", "root-cause", "diagnostic"],
+                path=".cursor/agents/debugger.md",
+                pre_review_sections=[
+                    "debugger-pre-repro",  # minimal reproducible case required
+                ],
+                post_review_sections=[
+                    "debugger-post-verify",  # 5-step verification, regression test
+                ],
+                trigger_keywords=[
+                    "debug", "bug", "fix bug", "fix error", "repro",
+                    "root cause", "intermittent", "stack trace", "exception",
+                    "fix lỗi", "sửa lỗi", "lỗi", "bug report"
+                ],
+            ),
+            SkillMetadata(
+                name="ui-designer",
+                version="1.0.0",
+                description=(
+                    "UI/UX designer for design tokens, components, layouts, "
+                    "and production-ready specs. Outputs token-driven Tailwind/"
+                    "CSS ready to paste. Always ships empty/loading/error states."
+                ),
+                tags=["design", "ui", "ux", "tokens", "components"],
+                path=".cursor/agents/ui-designer.md",
+                pre_review_sections=[
+                    "ui-designer-pre-goal",  # user goal + aesthetic direction
+                ],
+                post_review_sections=[
+                    "ui-designer-post-states",  # all states + a11y baseline
+                ],
+                trigger_keywords=[
+                    "design ui", "ui design", "ux", "design system",
+                    "design tokens", "component spec", "redesign",
+                    "thiết kế ui", "thiết kế giao diện", "giao diện",
+                    "wireframe", "mockup", "landing page design"
+                ],
+            ),
+            SkillMetadata(
+                name="web-cloner",
+                version="1.0.0",
+                description=(
+                    "Playwright-driven website cloner. Fidelity levels L1–L4. "
+                    "Respects robots.txt, copyright, and rate limits. Outputs "
+                    "to .cursor/clones/{domain}/ as self-contained project."
+                ),
+                tags=["clone", "playwright", "mirror", "copy"],
+                path=".cursor/agents/web-cloner.md",
+                pre_review_sections=[
+                    "web-cloner-pre-compliance",  # robots.txt + ToS check
+                ],
+                post_review_sections=[
+                    "web-cloner-post-verification",  # visual diff ≤ 2% + a11y
+                ],
+                trigger_keywords=[
+                    "clone", "copy website", "mirror", "replicate site",
+                    "clone web", "copy site", "sao chép web",
+                    "/clone", "/copy", "/mirror"
+                ],
+            ),
+            SkillMetadata(
+                name="web-scraper",
+                version="1.0.0",
+                description=(
+                    "Structured content extraction via Playwright. Categories: "
+                    "sdk, api, ui, test, qc, article, table, list, code. "
+                    "≤ 1 req/sec · cites source URLs in every output file."
+                ),
+                tags=["scrape", "extract", "playwright", "docs"],
+                path=".cursor/agents/web-scraper.md",
+                pre_review_sections=[
+                    "web-scraper-pre-robots",  # robots.txt + ToS check
+                ],
+                post_review_sections=[
+                    "web-scraper-post-verify",  # 95% source match + coverage
+                ],
+                trigger_keywords=[
+                    "scrape", "extract", "crawl", "fetch docs",
+                    "scrape web", "lấy nội dung", "trích xuất",
+                    "/scrape", "/extract", "/docs",
+                    "pull documentation", "scrape article"
+                ],
+            ),
+            SkillMetadata(
+                name="refactor-specialist",
+                version="1.0.0",
+                description=(
+                    "Behavior-preserving code refactoring. 15 smells → 15 "
+                    "recipes. One commit per smell; never mixed with features. "
+                    "Refuses to refactor without an existing test safety net."
+                ),
+                tags=["refactor", "smells", "cleanup", "boy-scout"],
+                path=".cursor/agents/refactor-specialist.md",
+                pre_review_sections=[
+                    "refactor-pre-test-baseline",  # tests must pass before
+                ],
+                post_review_sections=[
+                    "refactor-post-behavior",  # behavior unchanged + metrics
+                ],
+                trigger_keywords=[
+                    "refactor", "cleanup", "code smell", "tech debt",
+                    "boy scout", "extract function", "rename",
+                    "refactor code", "dọn dẹp code", "/refactor"
+                ],
+            ),
+            SkillMetadata(
+                name="deployment-engineer",
+                version="1.0.0",
+                description=(
+                    "Production deployment: 10-gate pre-flight, canary → "
+                    "ramp → verify phases, rollback rehearsed ≤ 1 min. "
+                    "Coordinates with migration-specialist for schema changes."
+                ),
+                tags=["deploy", "release", "rollback", "observability"],
+                path=".cursor/agents/deployment-engineer.md",
+                pre_review_sections=[
+                    "deploy-pre-checklist",  # 10-gate pre-flight
+                ],
+                post_review_sections=[
+                    "deploy-post-verify",  # SLO + business KPI check
+                ],
+                trigger_keywords=[
+                    "deploy", "release", "ship", "rollout", "production",
+                    "canary", "blue green", "deploy to prod",
+                    "triển khai", "release phiên bản",
+                    "/deploy", "/release", "/ship"
+                ],
+            ),
+            SkillMetadata(
+                name="migration-specialist",
+                version="1.0.0",
+                description=(
+                    "Schema, data, and framework migrations. Expand → migrate → "
+                    "contract (3 deploys, not 1). Always reversible, idempotent, "
+                    "throttled. Coordinates with deployment-engineer."
+                ),
+                tags=["migration", "schema", "backfill", "alter-table"],
+                path=".cursor/agents/migration-specialist.md",
+                pre_review_sections=[
+                    "migration-pre-audit",  # schema + callers + SLO audit
+                ],
+                post_review_sections=[
+                    "migration-post-verify",  # row counts + checksums + lag
+                ],
+                trigger_keywords=[
+                    "migrate", "migration", "schema change", "backfill",
+                    "add column", "drop column", "rename column",
+                    "data migration", "framework upgrade",
+                    "/migrate", "di trú", "migration script"
+                ],
+            ),
+            SkillMetadata(
+                name="doc-writer",
+                version="1.0.0",
+                description=(
+                    "Technical writer: README, ADR, runbook, API reference. "
+                    "Diátaxis framework (tutorial · how-to · reference · "
+                    "explanation). Every example runnable, every link checked."
+                ),
+                tags=["docs", "readme", "adr", "runbook"],
+                path=".cursor/agents/doc-writer.md",
+                pre_review_sections=[
+                    "doc-pre-audience",  # reader profile + goal
+                ],
+                post_review_sections=[
+                    "doc-post-verification",  # all examples verified runnable
+                ],
+                trigger_keywords=[
+                    "write docs", "readme", "documentation", "adr",
+                    "runbook", "tutorial", "api reference",
+                    "viết tài liệu",
+                    "/doc", "/readme", "/adr", "/runbook"
+                ],
+            ),
+            SkillMetadata(
+                name="devops-engineer",
+                version="1.0.0",
+                description=(
+                    "CI/CD, IaC, containers, observability. Four golden signals "
+                    "(latency, traffic, errors, saturation). Reproducible from "
+                    "scratch ≤ 1 hour. Tagged resources for cost tracking."
+                ),
+                tags=["ci-cd", "iac", "kubernetes", "observability"],
+                path=".cursor/agents/devops-engineer.md",
+                pre_review_sections=[
+                    "devops-pre-slo",  # SLO must be defined before infra work
+                ],
+                post_review_sections=[
+                    "devops-post-verify",  # pipeline + alerts wired
+                ],
+                trigger_keywords=[
+                    "ci", "cd", "pipeline", "infrastructure", "iac",
+                    "terraform", "kubernetes", "docker",
+                    "ci/cd", "build pipeline", "/build", "container"
+                ],
+            ),
+            SkillMetadata(
+                name="marketing-strategist",
+                version="1.0.0",
+                description=(
+                    "Product marketing & growth strategist. 9 categories: "
+                    "Conversion, Content, SEO, Paid, Measurement, Retention, "
+                    "Growth Eng, Strategy, Sales/RevOps. Numbers before opinions."
+                ),
+                tags=["marketing", "growth", "positioning", "funnel"],
+                path=".cursor/agents/marketing-strategist.md",
+                pre_review_sections=[
+                    "marketing-strategist-pre-metric",  # define measurable goal
+                ],
+                post_review_sections=[
+                    "marketing-strategist-post-tracking",  # tracking plan wired
+                ],
+                trigger_keywords=[
+                    "marketing", "growth", "positioning", "funnel",
+                    "cro", "seo strategy", "paid ads", "retention",
+                    "churn", "pricing", "launch",
+                    "chiến lược marketing", "/marketing", "/growth"
+                ],
+            ),
         ]
 
         for skill in default_skills:

@@ -1780,3 +1780,478 @@ class ConsentEnforcement {
   }
 }
 ```
+
+---
+
+# 4. marketingskills Architecture Patterns (sync 2026-07-15)
+
+> System design cho 9 category từ [marketingskills](https://github.com/coreyhaines31/marketingskills). Mỗi section dưới đây map vào 1 cluster of skills, anchor vào knowledge base hiện có.
+
+## 4.1 Conversion Optimization (cro, signup, onboarding, popups, paywalls)
+
+### 4.1.1 Event Taxonomy
+```
+funnel.page_viewed          { page_id, source, variant }
+funnel.cta_clicked          { cta_id, position, copy }
+funnel.form_started         { form_id, field_count }
+funnel.form_field_completed { form_id, field_name, time_to_complete }
+funnel.form_submitted       { form_id, total_time, errors }
+funnel.signup_completed     { user_id, method, source }
+funnel.activation_achieved  { user_id, activation_event, time_to_aha }
+funnel.upgrade_offer_shown  { user_id, plan, trigger }
+funwall.upgrade_completed   { user_id, from_plan, to_plan, mrr_delta }
+```
+
+### 4.1.2 Funnel State Machine
+```
+States:  Visitor → Lead → MQL → SQL → Customer → Activated → Expanded
+         ↓        ↓       ↓      ↓       ↓            ↓
+       DROP    DROP    DROP   DROP   CHURN       EXPAND
+```
+- Each state has entry trigger + exit criteria
+- Drop-off rate per transition: < 30% healthy, > 50% = investigate
+- Time-in-state: alarm if > 2x baseline
+
+### 4.1.3 Real-time Personalization Layer
+```
+Request → Identify user (cookie/JWT) → Lookup segment (Redis)
+        → Fetch variant assignment (A/B service)
+        → Render with personalization tokens
+        → Track exposure event
+        → Cache response (30-60s, edge or Redis)
+```
+Latency budget: < 100ms added to page load.
+
+---
+
+## 4.2 Content & Copy (copywriting, copy-editing, cold-email, emails, sms, social, image, video)
+
+### 4.2.1 Content Pipeline
+```
+draft → review (peer) → legal (if regulated) → approve → schedule
+         ↓                ↓                       ↓
+       iterate          iterate               schedule to CMS
+                                                       ↓
+                                                   publish
+                                                       ↓
+                                                   measure (24h, 7d, 30d)
+                                                       ↓
+                                                   iterate or archive
+```
+
+### 4.2.2 Email Event Stream
+```
+emails:
+  - email.scheduled    { campaign_id, contact_id, send_at }
+  - email.sent         { message_id, smtp_response }
+  - email.delivered    { message_id, smtp_response }
+  - email.opened       { message_id, ua, ip, timestamp }
+  - email.clicked      { message_id, link, ua, ip, timestamp }
+  - email.bounced      { message_id, reason, type (hard/soft) }
+  - email.complained   { message_id, reason }
+  - email.unsubscribed { contact_id, source }
+```
+Deduplicate opens/clicked with 5-min window per recipient (image-cache proxy).
+
+### 4.2.3 Social Scheduling & Content Adaptation
+```
+Source asset (blog post)
+  → AI rewriter (per platform guidelines)
+  → Asset factory (image, video, carousel)
+  → Scheduler (Buffer/Hootsuite/queue)
+  → Track: impressions, engagement, clicks
+  → Repurpose top performers
+```
+
+---
+
+## 4.3 SEO & Discovery (seo-audit, ai-seo, programmatic-seo, site-architecture, competitors, schema, aso)
+
+### 4.3.1 Site Crawler Architecture
+```
+Crawler queue (priority: index, errors, recent)
+  → Fetch (respect robots.txt, rate limit)
+  → Parse HTML (extract: title, meta, h1-h6, content, links, schema)
+  → Store (pages, links, issues)
+  → Index (ElasticSearch for full-text, graph for link graph)
+  → Report (issues by type, priority, page authority)
+```
+Crawl budget: < 10 URLs/sec, < 5 min per site < 10k pages.
+
+### 4.3.2 Programmatic SEO Generation Pipeline
+```
+1. Keyword research (Ahrefs/GSC export) → CSV
+2. Template definition (1 per page type)
+3. Data hydration (CSVs → render context)
+4. Static generation (Next.js, Hugo, custom)
+5. Quality gate (uniqueness check, internal links, schema)
+6. Deploy to /[category]-for-[use-case]
+7. Submit sitemap to GSC, ping IndexNow
+```
+Scale target: 100-10,000 pages from 1 template.
+
+### 4.3.3 Schema.org Implementation
+```
+Type registry:
+  - Organization (1 per site, global)
+  - WebSite + SearchAction (homepage)
+  - Article (blog posts, news)
+  - Product + Offer (e-commerce)
+  - FAQPage (FAQ-rich snippets)
+  - SoftwareApplication (B2B SaaS)
+  - BreadcrumbList (all non-homepage)
+  - LocalBusiness (multi-location)
+```
+Validation: schema.org validator + Rich Results Test (GSC).
+
+### 4.3.4 AI Search Optimization Layer
+```
+llms.txt (root, plain markdown)
+├── Site summary (one paragraph)
+├── Key pages (10-20 most important)
+├── Product/service offerings
+├── Contact + about
+└── last-updated timestamp
+
+robots.txt: allow GPTBot, ClaudeBot, PerplexityBot, anthropic-ai, Applebot-Extended
+```
+
+---
+
+## 4.4 Paid & Distribution (ads, ad-creative)
+
+### 4.4.1 Campaign Sync Architecture
+```
+CRM/Product
+  ↓ segments (high-LTV, churned, lookalikes)
+Ad platform
+  ↓ audience sync (Facebook CAPI, Google Enhanced Conversions)
+Audience in platform
+  ↓ campaign structure
+Reporting
+  ↓ spend, CTR, CPA, ROAS back to CRM (daily)
+Attribution
+  ↓ merge ad platform data + first-party data
+Optimization
+  ↓ automated bidding rules (target CPA, target ROAS)
+```
+Latency: 24h reporting loop, 1h audience sync.
+
+### 4.4.2 Creative Iteration Pipeline
+```
+Angle matrix (3 × 3) → 9 hooks
+  → AI generation (3 variants per hook = 27 ads)
+  → Upload to ad platform
+  → Auto-test (kill bottom 3 after $50 spend)
+  → Scale winner
+  → Refresh (fatigue every 7-14 days)
+```
+
+---
+
+## 4.5 Measurement & Testing (analytics, ab-testing)
+
+### 4.5.1 Event Pipeline
+```
+SDK (web/mobile/server)
+  → Collector endpoint (validate schema)
+  → Stream processor (Kafka/Kinesis)
+  → Cold storage (S3/Parquet, 7-year retention)
+  → Hot warehouse (BigQuery/Snowflake, 90-day hot)
+  → Aggregations (sessions, conversions, attribution)
+  → Dashboards (Looker/Metabase/Superset)
+  → Alerts (PagerDuty/Slack on anomaly)
+```
+
+### 4.5.2 A/B Test Service
+```
+Experiment record: { id, hypothesis, variants[], allocation, success_metric }
+  → Assignment: hash(visitor_id + experiment_id) % 100
+  → Exposure: log when variant rendered
+  → Conversion: matched to success event
+  → Statistics: Bayesian or frequentist (sequential testing)
+  → Stop: sample size reached OR p < 0.05 + min runtime
+```
+Guardrails: max 3 concurrent tests per page, < 5% revenue impact cap.
+
+### 4.5.3 Attribution Engine
+```
+Touchpoints (chronological, deduped):
+  session_start → page_view → cta_click → form_start → conversion
+Attribution model:
+  - Last-touch (default, simple)
+  - First-touch (top-of-funnel analysis)
+  - Linear (equal weight)
+  - Time-decay (exponential, half-life 7d)
+  - Data-driven (Shapley value, ML-based)
+```
+Output: per-channel revenue contribution, ROAS by source.
+
+---
+
+## 4.6 Retention (churn-prevention)
+
+### 4.6.1 Churn Prediction Pipeline
+```
+Features (per user, daily):
+  - login_frequency (7d, 30d)
+  - feature_usage_breadth
+  - support_tickets (count, sentiment)
+  - nps_score (latest)
+  - payment_failures
+  - team_activity (B2B)
+
+Model: gradient boosting, XGBoost or LightGBM
+Output: churn_probability (0-1) per user
+Threshold: top 10% = at-risk → trigger save flow
+```
+
+### 4.6.2 Save Offer Service
+```
+Detect cancellation intent
+  → Reason: too_expensive | not_using | missing_feature | other
+  → Dynamic offer:
+      too_expensive: downgrade option OR 30% off for 3 months
+      not_using:    pause for 30/60/90 days OR 1:1 onboarding call
+      missing:      roadmap preview + workaround doc
+      other:        feedback to product team + retention call
+  → Confirm
+  → If still cancel: feedback survey, reversible for 24h
+```
+
+### 4.6.3 Dunning Service (failed payment)
+```
+Day 0:  retry payment (most issuers allow this)
+Day 3:  if failed → email (soft) with card update CTA
+Day 7:  retry + email (urgent) + in-app banner
+Day 14: retry + final email
+Day 21: pause account (read-only)
+Day 60: hard delete (with Day 55 warning)
+```
+Recovery target: 40-60% of failed payments within 14 days.
+
+---
+
+## 4.7 Growth Engineering (co-marketing, free-tools, referrals)
+
+### 4.7.1 Free Tool Architecture
+```
+Calculator / Grader / Generator
+  ├── Input: user-provided data
+  ├── Logic: scoring/calc/transform
+  ├── Output: result page (shareable URL)
+  ├── Email gate: optional, to unlock PDF/save
+  └── Embed widget: viral loop on third-party sites
+```
+Hosting: static SPA, edge-rendered for SEO. Lead capture via email gate.
+
+### 4.7.2 Referral Engine
+```
+Referral code: per user, base62 8-char unique
+  → Reward condition: referee converts to paying customer
+  → Double-sided incentive: referrer + referee both get X
+  → Anti-fraud: same IP, card, device fingerprint = block
+  → Tier system: 1-5 / 6-15 / 16+ refs → increasing reward
+  → Payout: account credit OR cashout (Stripe/Bank)
+```
+
+### 4.7.3 Co-Marketing Hub
+```
+Partner record: { name, ICP overlap, audience size, contact }
+  → Joint content: webinar, case study, podcast
+  → Cross-promo: newsletter mentions, social amplification
+  → UTM tracking: ?utm_partner={slug} for attribution
+  → Shared landing pages: /partners/[slug]
+  → Quarterly review: pipeline generated, CAC shared
+```
+
+---
+
+## 4.8 Strategy & Monetization (marketing-ideas, marketing-psychology, marketing-plan, launch, pricing, offers)
+
+### 4.8.1 Pricing Service
+```
+Plan definition: { tier_id, name, price_monthly, price_annual, features[] }
+Pricing rule:    annual = monthly * 12 * 0.83 (17% discount default)
+Tier upgrade:    auto-detect usage → show upgrade prompt
+Tier downgrade:  require reason + confirmation
+Proration:       daily basis, refund credit OR charge difference
+```
+A/B test framework: variant prices 50/50, measure conversion + LTV.
+
+### 4.8.2 Offer Composition Service
+```
+Value equation: V = (Dream × Likelihood) / (Time × Effort)
+  → Each component has adjustment controls
+  → Bonus stack: 3-5 items, each with $ value
+  → Guarantee: 30/60/lifetime
+  → Urgency: genuine deadline + count
+  → Scarcity: cohort-limited
+  → Render: pricing page, sales page, email, ad
+```
+
+### 4.8.3 Launch Service (Pre/Launch/Post)
+```
+Pre-launch (T-6w → T-0):
+  - Waitlist: lead capture, viral loop
+  - Asset backlog: 10-15 content pieces
+  - Influencer seeding
+  - PR list (50+)
+
+Launch (T+0 → T+1w):
+  - Multi-channel blast (email, social, PR)
+  - Product Hunt (Tue-Thu 12:01am PT)
+  - Onboarding surge handling (capacity)
+
+Post-launch (T+1w → T+6w):
+  - Iterate on feedback
+  - Retention focus (LTV > acquisition)
+  - Retarget launch visitors
+  - Content follow-ups
+```
+
+### 4.8.4 Marketing Plan Repository
+```
+Quarterly plan: OKR + channel mix + budget
+  → Weekly: standup (blockers, learnings)
+  → Monthly: retro + reallocation
+  → Quarterly: full retro + next-quarter planning
+Format: structured markdown in `marketing/plan/[quarter].md`
+```
+
+---
+
+## 4.9 Sales & RevOps (revops, sales-enablement, prospecting, pr, customer-research, competitor-profiling, marketing-council, marketing-loops, directory-submissions)
+
+### 4.9.1 Lead Lifecycle Service
+```
+Stages: Subscriber → Lead → MQL → SQL → Opportunity → Customer
+  → Score (explicit + implicit, see glossary §10)
+  → Route (round-robin, territory, named account)
+  → SLA: MQL→SQL within 5 days, SQL→Opp within 14 days
+  → Stage reporting (funnel + velocity)
+  → Win/loss analysis
+```
+
+### 4.9.2 Sales Enablement Repository
+```
+Stage-aware collateral (see best-practice.md §9.10.2):
+  ├── awareness/   (blogs, social, podcast)
+  ├── consider/    (case studies, comparison, ROI calc)
+  ├── decide/      (demo script, proposal template, security FAQ)
+  └── onboard/     (implementation guide, success checklist)
+Versioning: tied to product release (e.g., v3.2 collaterals)
+CMS: Notion, Confluence, or static site with auth
+```
+
+### 4.9.3 Prospecting Service
+```
+List building:
+  - Source: LinkedIn Sales Nav, Apollo, ZoomInfo, manual
+  - Enrichment: Clearbit, Hunter.io (email/phone)
+  - Verification: ZeroBounce, NeverBounce (bounce rate < 3%)
+
+Sequencer:
+  - Multi-channel (email + LinkedIn + phone)
+  - Personalization tokens (company, role, recent trigger)
+  - Send windows: Tue-Thu, 9-11am recipient local time
+  - Auto-pause on reply
+  - Reply handling: positive → notify AE; objection → tagged template
+```
+
+### 4.9.4 PR Distribution Service
+```
+Tier mapping (see best-practice.md §9.10.4)
+  - Daily: HARO response queue (auto-parse, suggest drafts)
+  - Weekly: pitch 5-10 new journalists with newsworthy angle
+  - Monthly: 1 major announcement cycle (funding, launch, milestone)
+
+Tracking: open rates (read receipts), reply rate, coverage count, sentiment
+```
+
+### 4.9.5 Customer Research Repository
+```
+Interviews: audio + transcript (auto-transcribe)
+Synthesis: JTBD statements (see best-practice.md §9.10.5)
+  → Tag by persona, stage, pain, gain
+  → Cross-reference product roadmap
+  → Quarterly synthesis report
+Storage: Dovetail, Notion, or git repo with markdown
+```
+
+### 4.9.6 Competitor Profiling Service
+```
+Monitor: pricing page, feature page, blog, changelog, social, jobs
+  → Weekly diff (crawled + compared)
+  → Alert on major changes (positioning, pricing, new feature)
+  → Quarterly: full profile update + battlecard refresh
+  → Annual: category landscape analysis
+```
+
+### 4.9.7 Marketing Council Engine (multi-persona)
+```
+Personas registry: 5-7 personas with system prompts
+Brief input: 1 marketing question
+  → Run all personas in parallel (5-7 LLM calls)
+  → Synthesize top 3 actionable angles
+  → Output: prioritized idea list + rationale
+Frequency: biweekly strategic, weekly tactical
+```
+
+### 4.9.8 Marketing Loops (recurring agent workflows)
+```
+Loop types (see best-practice.md §9.10.8):
+  - Content loop: weekly, 1 publish
+  - SEO loop: monthly, top 20 audit
+  - Outreach loop: daily, prospecting
+  - Retention loop: real-time, intervention
+
+Implementation: stateful agent (background queue)
+  - Triggers: cron, event, threshold
+  - Persistence: external DB for resumability
+  - Logging: every step + outcome
+  - Halt conditions: explicit guardrails
+  - Observability: dashboard with loop health metrics
+```
+
+### 4.9.9 Directory Submission Tracker
+```
+Directory registry: 50-100 directories tagged by tier
+  - Submission cadence: 1-2/week to avoid spam signals
+  - Status: submitted | live | rejected | needs-update
+  - Quality check: title, description, logo, screenshots, link
+  - Calendar: track submission dates for re-submission on update
+  - Cross-link: each directory link back to canonical profile
+```
+
+---
+
+## 4.10 Cross-Cutting: Product-Marketing Context
+
+> Mọi marketing skill/module PHẢI đọc `.agents/product-marketing.md` (fallback `.claude/product-marketing.md`) trước khi thực thi. Nội dung tối thiểu xem `glossary.md §13`.
+
+Service contract:
+```typescript
+interface ProductMarketingContext {
+  product: { name, category, oneLiner, differentiator };
+  audience: { primaryICP, secondaryICP, antiICP };
+  positioning: { category, mainAlternative };
+  pricing: { entryTier, mainTier, topTier, freePolicy };
+  channels: { primary, secondary, owned };
+  voice: { adjectives, bannedWords, constraints };
+}
+```
+Loading: tại workflow start, fail fast nếu file missing → hỏi user 3 câu tối thiểu.
+
+---
+
+## 4.11 Liên kết section khác
+
+| Section | File | Section number |
+|---|---|---|
+| Best practice implementation | `best-practice.md` | §9.1-§9.10 |
+| Anti-patterns | `anti-pattern.md` | §9.1-§9.10 |
+| Pre-deploy checklist | `checklist.md` | §9.1-§9.9 |
+| Decision flow (skill routing) | `decision-tree.md` | §9 |
+| FAQ by category | `faq.md` | §9.1-§9.9 |
+| Skill glossary | `glossary.md` | §9-§13 |

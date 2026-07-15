@@ -1774,3 +1774,252 @@ class SecureDataService {
   }
 }
 ```
+
+---
+
+## 9. marketingskills Anti-Patterns (sync 2026-07-15)
+
+> Top failure modes cho 9 category từ [marketingskills](https://github.com/coreyhaines31/marketingskills). Mỗi section nêu symptom, root cause, fix.
+
+### 9.1 Conversion Optimization Anti-Patterns
+
+**9.1.1 Optimizing form fields instead of motivation**
+- **Symptom**: A/B testing input length, button color, microcopy → +0.5% conversion
+- **Root cause**: Visitor motivation is the limiting factor, not UX friction
+- **Fix**: Rework the offer/value prop FIRST; then optimize friction
+
+**9.1.2 Pre-filling form fields to "help" users**
+- **Symptom**: Smart-defaults reduces field count; conversion drops
+- **Root cause**: Pre-fills often wrong; users don't notice; submission produces bad data
+- **Fix**: Use only canonical defaults (country = user's locale); never pre-fill personal data
+
+**9.1.3 Welcome email drip fired before user is "ready"**
+- **Symptom**: Welcome Day-1 open rate < 10%, unsubscribes spike
+- **Root cause**: User just signed up; overwhelmed by immediate asks
+- **Fix**: Send welcome → wait for activation event → then drip value
+
+**9.1.4 Exit-intent popup on every page**
+- **Symptom**: Popup CTR high, capture rate low, brand feels spammy
+- **Root cause**: Popups interrupt intent; on every page is over-rotation
+- **Fix**: Show on high-intent pages only (pricing, blog end); cap at 1/visit; dismissible
+
+**9.1.5 Skipping onboarding → "figure it out yourself" product**
+- **Symptom**: Trial-to-paid conversion < 5%; day-1 activation < 30%
+- **Root cause**: No guided path; users never reach aha moment
+- **Fix**: 3-step activation checklist with progress bar; empty states that teach
+
+### 9.2 Content & Copy Anti-Patterns
+
+**9.2.1 Subject line: RE:Viagra at scale**
+- **Symptom**: High open rate from curiosity, no clicks, spam complaints
+- **Root cause**: Misleading subject drives opens, not engagement
+- **Fix**: A/B subject lines by genuine angle, not tricks; aim for > 10% click rate
+
+**9.2.2 Send-everyone-the-same-email blast**
+- **Symptom**: Mass unsubscribes after every newsletter
+- **Root cause**: One-size-fits-all content doesn't respect segment interests
+- **Fix**: Segment by behavior, role, stage; personalize hero + CTA
+
+**9.2.3 Long-form copy without structure**
+- **Symptom**: Skim depth 30%, bounce rate high
+- **Root cause**: Wall of text with no scannable hierarchy
+- **Fix**: Bullet-3-then-elaborate, subheadings every 200 words, bold key phrases
+
+**9.2.4 Cold-email copy-paste with first name only**
+- **Symptom**: Reply rate < 1%, hard bounces increasing
+- **Root cause**: One variable token doesn't make email relevant
+- **Fix**: Reference trigger event (new funding, hiring, blog post) in 1 sentence
+
+**9.2.5 Sending SMS without opt-in**
+- **Symptom**: TCPA/text-law complaints, fines ($500-$1500/message in US)
+- **Root cause**: Marketing uses business phone numbers without consent
+- **Fix**: Double opt-in for SMS; clear opt-out language; honor STOP within 1 minute
+
+**9.2.6 Image generation: random surreal visuals**
+- **Symptom**: Brand incoherence, low engagement on social
+- **Root cause**: AI image gen without brand style guide
+- **Fix**: Style reference (3-5 brand adjectives), negative prompts, human review
+
+### 9.3 SEO & Discovery Anti-Patterns
+
+**9.3.1 "Just write more content" with no keyword strategy**
+- **Symptom**: 200+ blog posts, organic traffic flat
+- **Root cause**: Volume without search-intent targeting = zero ranking gains
+- **Fix**: Keyword research first, cluster by topic, internal-link to pillar page
+
+**9.3.2 Programmatic SEO = spam**
+- **Symptom**: 10k pages indexed, manual action from Google, traffic drops to 0
+- **Root cause**: Thin content, no unique value per page, doorway intent
+- **Fix**: Add unique data per page (real examples, original research); human-quality bar
+
+**9.3.3 llms.txt copied from competitor**
+- **Symptom**: AI search engines cite competitor content
+- **Root cause**: Generic / non-specific to your product
+- **Fix**: Write to YOUR product/audience; include unique data points
+
+**9.3.4 Schema dump: marking up everything wrong**
+- **Symptom**: Manual action for spammy structured data
+- **Root cause**: FAQPage with non-questions; Product without offers; irrelevant markup
+- **Fix**: Match schema.org spec exactly; validate with Rich Results Test
+
+**9.3.5 Site architecture: 4-level deep URLs**
+- **Symptom**: Crawl budget wasted; low ranking on long-tail
+- **Root cause**: Categorical depth > 3; every click costs crawl budget
+- **Fix**: Flatten to /[category]/[page]; max 3 URL levels; breadcrumbs as nav
+
+**9.3.6 ASO: keyword stuffing title**
+- **Symptom**: App store rejects; rank drops after update
+- **Root cause**: Title + keyword field same words = spam
+- **Fix**: Title (brand + 1-2 key terms); subtitle for 2-3 more; keyword field for remaining
+
+### 9.4 Paid & Distribution Anti-Patterns
+
+**9.4.1 Launching ads with no conversion event tracked**
+- **Symptom**: Spend $5k, "conversions" show but no qualified leads
+- **Root cause**: Optimizing for micro-conversions (page view) instead of macro
+- **Fix**: Track qualified lead, signup, sale — whichever maps to LTV
+
+**9.4.2 Ad creative fatigue: same ad for 30+ days**
+- **Symptom**: CTR drops 50% over month; CPM increases
+- **Root cause**: Audience sees same creative, ignores
+- **Fix**: Rotate creative every 7-14 days; build 3-5 ad variants upfront
+
+**9.4.3 "Set and forget" retargeting**
+- **Symptom**: Retargeting list of 50k people, conversion 0.1%
+- **Root cause**: Audience stale; products/prices changed; no creative refresh
+- **Fix**: Refresh audience every 30 days; cap audience size; exclude converters
+
+**9.4.4 Scaling winners before profitability validated**
+- **Symptom**: CPA doubles as spend scales; LTV/CAC < 1
+- **Root cause**: Optimizing platform-side (ROAS 3) but blended ROAS < 1
+- **Fix**: Verify LTV/CAC > 3 before scale; reserve 20% budget for new tests
+
+### 9.5 Measurement & Testing Anti-Patterns
+
+**9.5.1 "Test everything"**
+- **Symptom**: 50+ running tests, none reach significance, results noise
+- **Root cause**: Underpowered tests, multiple comparisons
+- **Fix**: Max 3 concurrent tests per page; require MDE + sample size calc
+
+**9.5.2 Stopping tests at first significance**
+- **Symptom**: Ship a "winning" variant that reverts over time
+- **Root cause**: Peeking; p < 0.05 is not the same as confirmed effect
+- **Fix**: Pre-register duration; use sequential testing or full sample size
+
+**9.5.3 Tracking vanity metrics**
+- **Symptom**: Page views up 30%, revenue flat
+- **Root cause**: Optimizing for traffic, not pipeline or revenue
+- **Fix**: North-star metric: weekly active + revenue per active
+
+**9.5.4 Mixing attribution across events**
+- **Symptom**: Channel A "credited" 3x for one conversion
+- **Root cause**: Multiple events trigger conversion; double-count
+- **Fix**: One canonical conversion event; deduplicate by user+session
+
+### 9.6 Retention Anti-Patterns
+
+**9.6.1 Dunning from day 0 of failed payment**
+- **Symptom**: Cancellation rate spikes; complaints about aggressive
+- **Root cause**: Most failures are temporary (insufficient funds, expired card)
+- **Fix**: Wait 3 days after first failure; retry with smart backoff
+
+**9.6.2 Save offer = free 1 year**
+- **Symptom**: Users learn to ask for 100% off; gross margin collapses
+- **Root cause**: Single-skill save flow with no segmentation
+- **Fix**: Tiered save (10% / 25% / 50% / downgrade) by churn reason
+
+**9.6.3 Pause subscription without usage tracking**
+- **Symptom**: User pauses, never returns; resurrected count 0
+- **Root cause**: Pause = hidden cancel; no re-engagement
+- **Fix**: Pause = 30/60/90 day cap; re-engage at 50% of pause window
+
+### 9.7 Growth Engineering Anti-Patterns
+
+**9.7.1 Free tool = thinly-veiled landing page**
+- **Symptom**: Tool ranks #1, but converts 0% to product
+- **Root cause**: Tool doesn't deliver value, just collects email
+- **Fix**: Solve real problem; reveal product as natural next step (not forced)
+
+**9.7.2 Referral program without fraud guardrails**
+- **Symptom**: 30% of referrals are fraud (same IP, device, family)
+- **Root cause**: No matching engine; reward per email
+- **Fix**: Match by device fingerprint + payment method + IP; review top referrers
+
+**9.7.3 Co-marketing with non-overlapping ICP**
+- **Symptom**: Joint webinar, 100 attendees, 0 leads
+- **Root cause**: Audience mismatch; one side dominates
+- **Fix**: ICP overlap test; co-marketing with 3-5x audience overlap wins
+
+### 9.8 Strategy & Monetization Anti-Patterns
+
+**9.8.1 Pricing page with 5 plans**
+- **Symptom**: Decision paralysis; most pick middle or no-plan
+- **Root cause**: Choice overload; no clear "default"
+- **Fix**: 3 plans (good/better/best); highlight middle as recommended
+
+**9.8.2 Launch with no waitlist**
+- **Symptom**: Day 1 traffic spike, then fade; momentum lost
+- **Root cause**: No pre-built audience; product hunt alone insufficient
+- **Fix**: 4-6 week pre-launch; waitlist; email warm-up; ambassador seeding
+
+**9.8.3 Offer with no clear guarantee**
+- **Symptom**: Conversion 1%, refund rate 5%
+- **Root cause**: Risk on buyer; high-intent users drop off
+- **Fix**: Risk-reversal (30-day money back, no-questions); visible CTA
+
+**9.8.4 Yearly plan: "save 17%" off monthly x 12**
+- **Symptom**: Annual take rate < 10%
+- **Root cause**: Math doesn't trigger; user values cash flow
+- **Fix**: Position annual as "2 months free" or "X% off, paid upfront"
+
+### 9.9 Sales & RevOps Anti-Patterns
+
+**9.9.1 Lead scoring: only form-fill weight**
+- **Symptom**: MQL volume huge, SQL conversion 1%
+- **Root cause**: Form fills ≠ intent; self-reported intent ≠ behavior
+- **Fix**: Combine behavior (visit pricing, request demo) with form data
+
+**9.9.2 Routing by territory, not expertise**
+- **Symptom**: Mid-market leads routed to SMB reps; close rate low
+- **Root cause**: Territory > fit; reps unfamiliar with segment
+- **Fix**: Route by segment + product fit; territory only as tie-breaker
+
+**9.9.3 Sales enablement: deck for every stage, none used**
+- **Symptom**: Reps create own decks; brand incoherence; off-message
+- **Root cause**: Decks not stage-aware; don't map to discovery
+- **Fix**: Stage-aware collateral; track usage; retire unused
+
+**9.9.4 Pitching features, not outcomes**
+- **Symptom**: Demo shows all 47 features, no qualified pipeline
+- **Root cause**: Feature tour ≠ value articulation
+- **Fix**: Frame features as outcomes (e.g., "Reduce churn 20% via __")
+
+**9.9.5 Cold outreach: blast to whole role**
+- **Symptom**: 1k emails/week, 3 replies, 0 deals
+- **Root cause**: Targeting by job title only; no trigger events
+- **Fix**: Layer intent signals (hiring, funding, blog) on top of role
+
+**9.9.6 PR pitching: untargeted blast**
+- **Symptom**: 0 coverage, journalist unsubscribes
+- **Root cause**: Pitching wrong beat; press release vs. story
+- **Fix**: Research journalist's recent articles; pitch angle that fits
+
+**9.9.7 Customer research: only "power users"**
+- **Symptom**: Insights biased toward existing fans
+- **Root cause**: Sampling bias; missing pain points of churned users
+- **Fix**: Mix of activated, churned, never-activated; tier sample by segment
+
+**9.9.8 Marketing council without context**
+- **Symptom**: Brainstorm outputs generic ("be more authentic")
+- **Root cause**: Personas lack product/audience context
+- **Fix**: Pass product-marketing context (see glossary §13) to each persona
+
+**9.9.9 Marketing loops: hard-coded assumptions**
+- **Symptom**: Outreach loop sends stale templates forever
+- **Root cause**: Loop has no feedback mechanism or refresh
+- **Fix**: Loop reads current data; refreshes weekly; abort on quality drop
+
+**9.9.10 Directory spam: 100 submissions in 1 day**
+- **Symptom**: Some directories flag; profile rejected
+- **Root cause**: Mass submission triggers spam detection
+- **Fix**: 1-2 submissions/week; quality bar (full profile, screenshot, link)

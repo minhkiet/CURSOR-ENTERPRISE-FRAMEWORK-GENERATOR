@@ -129,3 +129,195 @@ Retention vs Acquisition: increasing retention 5% can increase profits 25-95%. R
 ## Kết luận
 
 Từ điển thuật ngữ này cung cấp nền tảng kiến thức vững chắc về các khái niệm Marketing. Việc hiểu rõ từng thuật ngữ giúp xây dựng hệ thống Marketing hiệu quả và phù hợp với nhu cầu kinh doanh.
+
+---
+
+## 9. Marketing Skills Glossary — Bổ sung 2026-07-15 (sync với `coreyhaines31/marketingskills` ⭐39k)
+
+> Ánh xạ 47 skill từ [marketingskills](https://github.com/coreyhaines31/marketingskills) về 9 category chính. Mỗi skill được bind vào section tương ứng trong các file `knowledge/marketing/*.md` đã có sẵn — **KHÔNG tạo file mới**, theo Superpowers concept-ref pattern (xem `skill-registry.mdc §8.1`).
+
+### 9.1 Conversion Optimization
+- `cro` (page-cro + form-cro merged in v2.0) → `best-practice.md §2` CRO heuristics, `architecture.md §4` funnel events
+- `signup` → `best-practice.md §2.2` form fields, `anti-pattern.md §1.4` form-friction
+- `onboarding` → `best-practice.md §5.1` journey design, `architecture.md §6` activation events
+- `popups` → `best-practice.md §2.4` modal templates, `anti-pattern.md §2.2` popup-spam
+- `paywalls` → `architecture.md §7` upgrade flow, `best-practice.md §5.2` paywall A/B
+
+### 9.2 Content & Copy
+- `copywriting` → `best-practice.md §2` email + landing copy, `architecture.md §3` content tokens
+- `copy-editing` → `best-practice.md §2.3` subject-line optimizer
+- `cold-email` → `best-practice.md §2.5` B2B outreach sequences
+- `emails` (email-sequence v1) → `best-practice.md §2.1` templates, `architecture.md §5` event-driven sends
+- `social` (social-content v1) → `best-practice.md §2.6` multi-platform adaptation
+- `image` → `best-practice.md §2.7` AI image gen + alt-text
+- `video` → `best-practice.md §2.8` programmatic video frameworks
+- `sms` → `best-practice.md §2.9` SMS compliance + flows
+
+### 9.3 SEO & Discovery
+- `seo-audit` → `architecture.md §8` crawl/sitemap audit, `checklist.md §3` pre-launch SEO
+- `ai-seo` (AEO / GEO / LLMO) → `architecture.md §8.3` AI-citation schema, `best-practice.md §3.1` llms.txt
+- `programmatic-seo` → `architecture.md §8.4` template-driven pages, `best-practice.md §3.2` data hydration
+- `site-architecture` → `architecture.md §1.2` URL hierarchy, `decision-tree.md §4` IA selection
+- `competitors` (competitor-alternatives v1) → `best-practice.md §3.3` comparison page template
+- `schema` (schema-markup v1) → `architecture.md §8.5` JSON-LD, `best-practice.md §3.4` Product/Organization/FAQPage
+- `aso` (aso-audit v1) → `best-practice.md §3.5` App Store / Play listing
+
+### 9.4 Paid & Distribution
+- `ads` (paid-ads v1) → `best-practice.md §4.1` Google/Meta/LinkedIn campaign structure
+- `ad-creative` → `best-practice.md §4.2` bulk headline/description iteration
+- `social` (cross-ref Content & Copy) — share with §9.2
+
+### 9.5 Measurement & Testing
+- `analytics` (analytics-tracking v1) → `architecture.md §9` event taxonomy, `best-practice.md §6.1` measurement framework
+- `ab-testing` (ab-test-setup v1) → `best-practice.md §8.1` experiment design, `decision-tree.md §6` statistical test selection
+
+### 9.6 Retention
+- `churn-prevention` → `best-practice.md §7.1` cancel flows, dunning, save offers, payment-recovery
+
+### 9.7 Growth Engineering
+- `co-marketing` → `best-practice.md §9.1` partner identification, joint campaign playbooks
+- `free-tools` (free-tool-strategy v1) → `architecture.md §10` tool-as-lead-gen, `best-practice.md §9.2` calculator/embed builds
+- `referrals` (referral-program v1) → `best-practice.md §9.3` double-sided incentives, fraud guardrails
+
+### 9.8 Strategy & Monetization
+- `marketing-ideas` (140 SaaS marketing ideas) → `best-practice.md §10.1` tactic catalog
+- `marketing-psychology` → `best-practice.md §10.2` mental models (loss aversion, social proof, anchoring)
+- `marketing-plan` → `architecture.md §11` quarterly plan template
+- `launch` (launch-strategy v1) → `best-practice.md §10.3` pre-launch / launch / post-launch phases
+- `pricing` (pricing-strategy v1) → `best-practice.md §10.4` value-based pricing, packaging tiers
+- `offers` → `best-practice.md §10.5` offer construction (value equation, bonuses, guarantees, urgency)
+
+### 9.9 Sales & RevOps
+- `revops` → `architecture.md §12` lead lifecycle, scoring, routing, MQL→SQL handoff
+- `sales-enablement` → `best-practice.md §11.1` pitch decks, one-pagers, objection docs, demo scripts
+- `prospecting` → `best-practice.md §11.2` ICP definition, list-building, multi-channel touch
+- `public-relations` → `best-practice.md §11.3` earned media, journalist outreach, HARO response
+- `directory-submissions` → `best-practice.md §11.4` SaaS/AI/MCP directories
+- `customer-research` → `best-practice.md §11.5` interview synthesis, JTBD
+- `competitor-profiling` → `best-practice.md §11.6` positioning teardowns
+- `marketing-council` → `best-practice.md §11.7` multi-persona brainstorm (CMO/CRO/SEO/Copy)
+- `marketing-loops` → `architecture.md §13` recurring, self-running agent workflows
+
+---
+
+## 10. Abbreviation Quick-Reference (bổ sung 2026-07-15)
+
+| Viết tắt | Nghĩa | Section |
+|---|---|---|
+| `CRO` | Conversion Rate Optimization | §1.1, §9.1 |
+| `AEO` | Answer Engine Optimization | Optimize cho answer boxes |
+| `GEO` | Generative Engine Optimization | Optimize cho AI search |
+| `LLMO` | LLM Optimization | Tương tự GEO |
+| `ASO` | App Store Optimization | App store listing |
+| `ICP` | Ideal Customer Profile | §9.9 prospecting |
+| `JTBD` | Jobs To Be Done | §9.9 customer-research |
+| `MQL/SQL` | Marketing/Sales Qualified Lead | §9.9 revops |
+| `CTA` | Call To Action | §1–§4 |
+| `KPI` | Key Performance Indicator | §6 |
+| `MRR/ARR` | Monthly/Annual Recurring Revenue | §10.4 pricing |
+| `LTV/CAC` | Lifetime Value / Customer Acquisition Cost | §10.4 |
+| `NPS` | Net Promoter Score | §7 retention |
+| `CSAT` | Customer Satisfaction | §7 retention |
+| `DMU` | Decision Making Unit | B2B sales |
+| `A/B` | Split test (control vs variant) | §8.1 |
+
+---
+
+## 11. Framework Mapping — marketingskills → Cursor Enterprise Framework
+
+> Mục đích: cho phép Agent truy ngược từ trigger keyword → file knowledge nào cần load, không cần tạo `SKILL.md` mới.
+
+```
+Trigger keyword              → Knowledge file
+─────────────────────────────────────────────────────────────
+cro, signup, onboarding      → knowledge/marketing/best-practice.md §2
+popups, paywalls             → knowledge/marketing/best-practice.md §2.4
+copywriting, copy-edit       → knowledge/marketing/best-practice.md §2
+cold-email, email            → knowledge/marketing/best-practice.md §2.1
+sms, social                  → knowledge/marketing/best-practice.md §2.6
+seo, ai-seo, schema          → knowledge/marketing/architecture.md §8
+programmatic-seo             → knowledge/marketing/architecture.md §8.4
+site-arch, competitors       → knowledge/marketing/architecture.md §1.2
+aso                          → knowledge/marketing/best-practice.md §3.5
+ads, ad-creative             → knowledge/marketing/best-practice.md §4
+analytics, ab-testing        → knowledge/marketing/architecture.md §9
+churn, cancel                → knowledge/marketing/best-practice.md §7.1
+referrals, co-marketing      → knowledge/marketing/best-practice.md §9
+free-tool                    → knowledge/marketing/architecture.md §10
+launch, pricing, offers      → knowledge/marketing/best-practice.md §10
+revops, sales-enable         → knowledge/marketing/architecture.md §12
+prospecting, pr              → knowledge/marketing/best-practice.md §11
+marketing-plan, ideas        → knowledge/marketing/architecture.md §11
+```
+
+**Routing rule:** khi gặp bất kỳ keyword trên, `cursor_framework/context_router.py` + `skill-registry.mdc §2.1` PHẢI load `knowledge/marketing/<file>.md` thay vì tạo SKILL.md mới (theo Superpowers concept-ref pattern — `skill-registry.mdc §8.1`).
+
+---
+
+## 12. v2.0 Skill Rename Map (cho upgrade từ marketingskills v1.x)
+
+| Old (v1.x) | New (v2.0) | File đã có section |
+|---|---|---|
+| `ab-test-setup` | `ab-testing` | `best-practice.md §8.1` |
+| `analytics-tracking` | `analytics` | `architecture.md §9` |
+| `aso-audit` | `aso` | `best-practice.md §3.5` |
+| `competitor-alternatives` | `competitors` | `best-practice.md §3.3` |
+| `email-sequence` | `emails` | `best-practice.md §2.1` |
+| `form-cro` | merged into `cro` | `best-practice.md §2` |
+| `free-tool-strategy` | `free-tools` | `architecture.md §10` |
+| `launch-strategy` | `launch` | `best-practice.md §10.3` |
+| `onboarding-cro` | `onboarding` | `best-practice.md §5.1` |
+| `page-cro` | `cro` | `best-practice.md §2` |
+| `paid-ads` | `ads` | `best-practice.md §4.1` |
+| `paywall-upgrade-cro` | `paywalls` | `architecture.md §7` |
+| `popup-cro` | `popups` | `best-practice.md §2.4` |
+| `pricing-strategy` | `pricing` | `best-practice.md §10.4` |
+| `product-marketing-context` | `product-marketing` | (entry in glossary §13 below) |
+| `referral-program` | `referrals` | `best-practice.md §9.3` |
+| `schema-markup` | `schema` | `best-practice.md §3.4` |
+| `signup-flow-cro` | `signup` | `best-practice.md §2.2` |
+| `social-content` | `social` | `best-practice.md §2.6` |
+
+---
+
+## 13. Product-Marketing Context (single source of truth)
+
+> Mọi skill marketing đọc file này trước khi làm việc (xem sơ đồ phụ thuộc trong README upstream). Trong CEF, context này lưu tại `.agents/product-marketing.md` (fallback `.claude/product-marketing.md`) — cùng spec với upstream.
+
+```markdown
+# Product Marketing Context — Template
+
+## Product
+- Name:
+- Category:
+- One-liner:
+- Differentiator:
+
+## Audience
+- Primary ICP:
+- Secondary ICP:
+- Anti-ICP (who we are NOT for):
+
+## Positioning
+- Category we want to own:
+- Main alternative (and why we win):
+- Main alternative (and why we lose):
+
+## Pricing
+- Entry tier:
+- Main tier:
+- Top tier:
+- Free / trial policy:
+
+## Channels
+- Primary acquisition:
+- Secondary acquisition:
+- Owned (email, blog, community, podcast):
+
+## Voice & Constraints
+- Brand voice (3 adjectives):
+- Words we never use:
+- Compliance constraints (regulated industry? GDPR scope?):
+```
+
+**Rule:** Agent PHẢI đọc file này trước khi chạy bất kỳ marketing skill nào. Nếu file chưa tồn tại, hỏi user 3 câu tối thiểu (product one-liner, primary ICP, main alternative) rồi scaffold file.

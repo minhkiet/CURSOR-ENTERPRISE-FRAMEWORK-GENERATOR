@@ -23,8 +23,9 @@ Instead of starting every session from zero, the framework:
 
 | Component | Files | Where |
 |---|--:|---|
-| Rules (`.mdc`) | 42 | `.cursor/rules/` |
+| Rules (`.mdc`) | 43 | `.cursor/rules/` |
 | Skills | 50 | `.cursor/skills/` |
+| Knowledge domains | 8 (incl. **Marketing** with 47 concept-refs) | `.cursor/knowledge/` |
 | Python library (`cursor_framework`) | 14 modules + 6 utils | `cursor_framework/` |
 | Vue.js dashboard | Vue 3 + Vite + Tailwind | `cursor_framework_web/` |
 | Demo projects | 5 (CRM, fitness, food-delivery, realestate, travel) | `demos/` |
@@ -33,14 +34,27 @@ Instead of starting every session from zero, the framework:
 
 The framework ships **605+ files** inside `cursor-setup.zip` (the actual `.cursor/` payload). Repo source counts higher because of demos and build artifacts.
 
+### Knowledge Domains
+
+| Domain | Subfolder | Files | Source |
+|---|---|---|---|
+| Frontend | `.cursor/knowledge/frontend/` | 5 | Internal best practices + Vercel reference |
+| Backend | `.cursor/knowledge/backend/` | 4 | Internal + framework references |
+| Database | `.cursor/knowledge/database/` | 3 | Internal + reference docs |
+| Cloud / DevOps | `.cursor/knowledge/cloud/` | 3 | Internal + reference docs |
+| Security | `.cursor/knowledge/security/` | 3 | OWASP + internal |
+| AI / ML | `.cursor/knowledge/ai/` | 2 | Internal + WeKnora docs |
+| Chatbot | `.cursor/knowledge/chatbot/` | 2 | ChatbotX reference |
+| **Marketing** | `.cursor/knowledge/marketing/` | **7 + 47 concept-refs** | **[coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) ⭐39k (sync 2026-07-15)** |
+
 ## Architecture
 
 ```
 .cursor/                        # Framework config (installed to ~/.cursor/)
-├── rules/                      # 42 .mdc rule files
+├── rules/                      # 43 .mdc rule files (incl. skill-registry §9 marketingskills)
 ├── skills/                     # 50 specialized skill folders
 ├── memory/                     # SQLite memory layer
-├── knowledge/                  # Domain knowledge base
+├── knowledge/                  # Domain knowledge base (8 domains, incl. marketing)
 ├── prompts/                    # Prompt templates
 ├── workflows/                  # Standard workflows
 ├── templates/                  # Project templates
