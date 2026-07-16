@@ -1,0 +1,2 @@
+[console_scripts]
+cursor-framework = cursor_framework.__main__:main

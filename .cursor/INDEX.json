@@ -1,8 +1,8 @@
 {
   "root": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\.cursor",
-  "scanned_at": "2026-07-13T14:17:36",
+  "scanned_at": "2026-07-16T02:02:30",
   "totals": {
-    "agents": 8,
+    "agents": 18,
     "commands": 28,
     "hooks": 15,
     "knowledge": 329,
@@ -14,7 +14,7 @@
     "skills": 50,
     "templates": 6,
     "workflows": 11,
-    "grand_total": 573
+    "grand_total": 583
   },
   "categories": {
     "agents": [
@@ -59,6 +59,46 @@
         "size_bytes": 4607
       },
       {
+        "name": "debugger.md",
+        "path": "agents\\debugger.md",
+        "category": "agents",
+        "kind": "file",
+        "description": "Systematic bug investigator using 4-phase root-cause protocol. Use when a bug repro is unclear, error is intermittent, or quick fixes have failed. Reads code, forms hypotheses, tests the narrowest fix",
+        "version": "",
+        "tags": [],
+        "size_bytes": 6096
+      },
+      {
+        "name": "deployment-engineer.md",
+        "path": "agents\\deployment-engineer.md",
+        "category": "agents",
+        "kind": "file",
+        "description": "Production deployment engineer for Vercel, Cloudflare, AWS, Kubernetes, and serverless platforms. Designs safe rollout, rollback, observability, and post-deploy verification. Use for /deploy, release ",
+        "version": "",
+        "tags": [],
+        "size_bytes": 10197
+      },
+      {
+        "name": "devops-engineer.md",
+        "path": "agents\\devops-engineer.md",
+        "category": "agents",
+        "kind": "file",
+        "description": "CI/CD, infrastructure, and platform engineer. Builds pipelines, IaC (Terraform/Pulumi/Bicep), container orchestration (Docker/K8s), and developer platforms. Use for /build, pipeline failures, infra pr",
+        "version": "",
+        "tags": [],
+        "size_bytes": 11574
+      },
+      {
+        "name": "doc-writer.md",
+        "path": "agents\\doc-writer.md",
+        "category": "agents",
+        "kind": "file",
+        "description": "Technical writer for API docs, READMEs, ADRs, runbooks, and tutorials. Produces accurate, scannable, maintainable docs. Use for /doc, missing documentation, onboarding gaps, or when code has drifted f",
+        "version": "",
+        "tags": [],
+        "size_bytes": 9083
+      },
+      {
         "name": "frontend-architect.md",
         "path": "agents\\frontend-architect.md",
         "category": "agents",
@@ -69,6 +109,36 @@
         "size_bytes": 5257
       },
       {
+        "name": "marketing-strategist.md",
+        "path": "agents\\marketing-strategist.md",
+        "category": "agents",
+        "kind": "file",
+        "description": "Product marketing and growth strategist. Designs positioning, funnels, content strategy, SEO, paid distribution, lifecycle, and retention experiments. Use for marketing planning, audits, or when engin",
+        "version": "",
+        "tags": [],
+        "size_bytes": 14333
+      },
+      {
+        "name": "migration-specialist.md",
+        "path": "agents\\migration-specialist.md",
+        "category": "agents",
+        "kind": "file",
+        "description": "Database and code migration specialist. Plans safe, reversible migrations for schema changes, data migrations, framework upgrades, and large refactors. Apply the expand-migrate-contract pattern. Use w",
+        "version": "",
+        "tags": [],
+        "size_bytes": 11311
+      },
+      {
+        "name": "refactor-specialist.md",
+        "path": "agents\\refactor-specialist.md",
+        "category": "agents",
+        "kind": "file",
+        "description": "Code refactoring specialist. Improves structure, naming, and design without changing behavior. Behavior-preserving transformations only — every refactor must pass the existing test suite before and af",
+        "version": "",
+        "tags": [],
+        "size_bytes": 9404
+      },
+      {
         "name": "security-auditor.md",
         "path": "agents\\security-auditor.md",
         "category": "agents",
@@ -76,7 +146,7 @@
         "description": "Security Engineer for OWASP Top 10, threat modeling, secrets, auth, and supply-chain. Use for any security review, payment flow, auth implementation, or pre-deploy audit.",
         "version": "",
         "tags": [],
-        "size_bytes": 9808
+        "size_bytes": 19007
       },
       {
         "name": "test-engineer.md",
@@ -89,6 +159,26 @@
         "size_bytes": 9284
       },
       {
+        "name": "ui-designer.md",
+        "path": "agents\\ui-designer.md",
+        "category": "agents",
+        "kind": "file",
+        "description": "UI/UX designer for visual design systems, layouts, color/typography, and component specs. Use for new page designs, redesigns, design tokens, or visual specs. Outputs production-ready component specs ",
+        "version": "",
+        "tags": [],
+        "size_bytes": 7215
+      },
+      {
+        "name": "web-cloner.md",
+        "path": "agents\\web-cloner.md",
+        "category": "agents",
+        "kind": "file",
+        "description": "Website cloning specialist using Playwright. Clones UI/visual appearance, assets, and interactive behavior for landing pages and small sites. Outputs to .cursor/clones/{domain}/. Use for /clone, /copy",
+        "version": "",
+        "tags": [],
+        "size_bytes": 7557
+      },
+      {
         "name": "web-performance-auditor.md",
         "path": "agents\\web-performance-auditor.md",
         "category": "agents",
@@ -97,6 +187,16 @@
         "version": "",
         "tags": [],
         "size_bytes": 12277
+      },
+      {
+        "name": "web-scraper.md",
+        "path": "agents\\web-scraper.md",
+        "category": "agents",
+        "kind": "file",
+        "description": "Extracts structured content from websites using Playwright. Targets SDK/API/UI/test/qc documentation, articles, tables, and lists. Outputs structured markdown or JSON to .cursor/knowledge/{domain}/ or",
+        "version": "",
+        "tags": [],
+        "size_bytes": 8487
       }
     ],
     "commands": [
@@ -2048,7 +2148,7 @@
         "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 51219
+        "size_bytes": 81657
       },
       {
         "name": "architecture.md",
@@ -2058,7 +2158,7 @@
         "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 53287
+        "size_bytes": 91676
       },
       {
         "name": "best-practice.md",
@@ -2068,7 +2168,7 @@
         "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 49334
+        "size_bytes": 82995
       },
       {
         "name": "checklist.md",
@@ -2078,7 +2178,7 @@
         "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 17839
+        "size_bytes": 47871
       },
       {
         "name": "decision-tree.md",
@@ -2088,7 +2188,7 @@
         "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 32416
+        "size_bytes": 61411
       },
       {
         "name": "faq.md",
@@ -2098,7 +2198,7 @@
         "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 44483
+        "size_bytes": 75356
       },
       {
         "name": "glossary.md",
@@ -2108,7 +2208,7 @@
         "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 12321
+        "size_bytes": 48876
       },
       {
         "name": "architecture.md",
@@ -5978,7 +6078,7 @@
         "category": "rules",
         "kind": "file",
         "description": "Single Source of Truth cho tất cả skill definitions, triggers, confidence thresholds, và gate mappings. Được sử dụng bởi skill-integration, task-analyzer, và multi-language-vibe-code. Bao gồm Ponytail",
-        "version": "1.6.0",
+        "version": "1.7.0",
         "tags": [
           "skill-registry",
           "skills",
@@ -5992,7 +6092,7 @@
           "chatbotx",
           "chatbot-marketing"
         ],
-        "size_bytes": 51898
+        "size_bytes": 83222
       },
       {
         "name": "supabase.mdc",

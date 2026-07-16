@@ -1,54 +1,26 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "cursor-framework"
-version = "1.0.0"
-description = "Cursor Enterprise Framework - Python Library"
+version = "1.2.0"
+description = "Cursor Enterprise Framework - Python Library + CLI"
 readme = "README.md"
 requires-python = ">=3.10"
-license = {text = "MIT"}
-authors = [
-    {name = "Cursor Enterprise Framework"}
-]
-keywords = ["cursor", "framework", "llm", "enterprise", "context", "memory", "skills"]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-]
+license = { text = "MIT" }
+authors = [{ name = "Cursor Enterprise Framework" }]
 dependencies = [
     "pydantic>=2.0.0",
 ]
 
 [project.optional-dependencies]
-dev = [
-    "pytest>=7.0.0",
-    "pytest-cov>=4.0.0",
-]
-http = [
-    "requests>=2.31.0",
-]
-all = [
-    "pytest>=7.0.0",
-    "pytest-cov>=4.0.0",
-    "requests>=2.31.0",
-    "python-dotenv>=1.0.0",
-]
+http = ["requests>=2.31.0"]
+env = ["python-dotenv>=1.0.0"]
+dev = ["requests>=2.31.0", "python-dotenv>=1.0.0", "build>=1.0"]
 
-[project.urls]
-Homepage = "https://github.com/cursor-enterprise/framework"
+[project.scripts]
+cursor-framework = "cursor_framework.__main__:main"
 
 [tool.setuptools.packages.find]
-where = ["."]
 include = ["cursor_framework*"]
-
-[tool.pytest.ini_options]
-testpaths = ["cursor_framework/tests", "tests"]
-python_files = ["test_*.py"]
-python_functions = ["test_*"]
-addopts = "--cov=cursor_framework --cov-report=term-missing --cov-report=html:htmlcov"

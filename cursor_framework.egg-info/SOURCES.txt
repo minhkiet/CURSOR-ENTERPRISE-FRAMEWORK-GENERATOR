@@ -1,6 +1,7 @@
 README.md
 pyproject.toml
 cursor_framework/__init__.py
+cursor_framework/__main__.py
 cursor_framework/context_builder.py
 cursor_framework/context_router.py
 cursor_framework/dashboard.py
@@ -17,6 +18,7 @@ cursor_framework/workflow.py
 cursor_framework.egg-info/PKG-INFO
 cursor_framework.egg-info/SOURCES.txt
 cursor_framework.egg-info/dependency_links.txt
+cursor_framework.egg-info/entry_points.txt
 cursor_framework.egg-info/requires.txt
 cursor_framework.egg-info/top_level.txt
 cursor_framework/review/__init__.py

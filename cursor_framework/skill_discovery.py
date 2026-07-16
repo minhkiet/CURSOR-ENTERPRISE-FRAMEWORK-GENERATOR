@@ -146,17 +146,60 @@ class SkillRegistry:
             ),
             SkillMetadata(
                 name="security-review",
-                version="1.0.0",
-                description="Comprehensive security review",
-                tags=["security", "vulnerability", "audit"],
+                version="1.1.0",  # sync 2026-07-15: marketing security extensions
+                description=(
+                    "Comprehensive security review (OWASP Top 10 + 30 Marketing Security "
+                    "Additions MSA-01..30 covering GDPR/CCPA, cookie banner parity, "
+                    "email auth, ad platform privacy, dark patterns, AI marketing risks)"
+                ),
+                tags=["security", "vulnerability", "audit", "owasp", "gdpr", "consent", "privacy", "marketing-security"],
                 path=".cursor/skills/security-review/SKILL.md",
                 pre_review_sections=["S.1", "S.2", "S.3"],
                 post_review_sections=["Security-1", "Security-2", "Security-3", "Security-4", "Security-5", "Security-6", "Security-7", "Security-8", "Security-9"],
                 trigger_keywords=[
                     "security", "vulnerability", "penetration", "owasp", "xss",
                     "sql injection", "ssrf", "csrf", "authentication", "authorization",
-                    "apk decompile", "binary analysis", "prompt injection", "exploit"
+                    "apk decompile", "binary analysis", "prompt injection", "exploit",
+                    # 🆕 Marketing security triggers (sync 2026-07-15)
+                    "gdpr", "ccpa", "lgpd", "pipl", "pdpd",
+                    "consent", "cookie banner", "cookie consent", "dsar",
+                    "right to deletion", "data subject request", "dpo",
+                    "dark pattern", "roach motel", "confirmshaming",
+                    "email authentication", "spf", "dkim", "dmarc",
+                    "unsubscribe", "rfc 8058", "one-click unsubscribe",
+                    "webhook signature", "hmac",
+                    "meta capi", "tiktok events api", "google consent mode",
+                    "limited data use", "ld flag",
+                    "customer match", "hashed pii",
+                    "auto-renewal", "click-to-cancel", "cancellation",
+                    "iptc", "att", "app tracking transparency",
+                    "ai marketing", "hallucination", "fabricated stats",
+                    "data breach", "security incident", "leak",
+                    "coppa", "hipaa", "bipa",
+                    "right to be forgotten", "data export",
+                    "double opt-in", "single opt-in",
+                    "consent management", "consent mode",
+                    "/security", "/privacy", "/gdpr", "/consent",
                 ],
+            ),
+            SkillMetadata(
+                name="security-auditor-agent",
+                version="1.0.0",
+                description=(
+                    "Security Auditor agent — full OWASP Top 10 + 30 MSA marketing "
+                    "security additions. Cite CWE/CVE; BLOCK on dark patterns, "
+                    "pre-checked consent, PII to public LLM, missing SPF/DKIM/DMARC."
+                ),
+                tags=["agent", "security", "auditor", "owasp", "marketing-security"],
+                path=".cursor/agents/security-auditor.md",
+                pre_review_sections=["scope-audit"],
+                post_review_sections=["risk-prioritized", "owasp-coverage"],
+                trigger_keywords=[
+                    "/audit", "security audit", "pre-deploy review",
+                    "owasp audit", "cookie banner audit", "consent audit",
+                    "dark pattern audit", "marketing security review",
+                ],
+                dependencies=["security-review"],
             ),
             SkillMetadata(
                 name="vietnam-payment-review",

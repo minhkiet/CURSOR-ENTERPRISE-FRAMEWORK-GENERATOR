@@ -1,10 +1,9 @@
 ---
-description: Single Source of Truth cho tất cả skill definitions, triggers, confidence thresholds, và gate mappings. Được sử dụng bởi skill-integration, task-analyzer, và multi-language-vibe-code. Bao gồm Ponytail Lazy Senior Dev principles. Integrated với agent-skills (addyosmani/agent-skills) và ChatbotX development patterns. Tích hợp Karpathy Guidelines từ andrej-karpathy-skills.
+description: Single Source of Truth cho tất cả skill definitions, triggers, confidence thresholds, và gate mappings. Được sử dụng bởi skill-integration, task-analyzer, và multi-language-vibe-code. Bao gồm Ponytail Lazy Senior Dev principles. Integrated với agent-skills (addyosmani/agent-skills) và ChatbotX development patterns. Tích hợp Karpathy Guidelines từ andrej-karpathy-skills và Hallmark anti-slop design skill từ Nutlope/hallmark (9.3k stars).
 created: 2026-06-26
-version: 1.7.0
-updated: 2026-07-15
-tags: [skill-registry, skills, auto-discovery, mandatory, overlay, ponytail, lazy-senior, code-quality, agent-skills, chatbotx, chatbot-marketing, superpowers, methodology, marketingskills, marketing]---
-tags: [skill-registry, skills, auto-discovery, mandatory, overlay, ponytail, lazy-senior, code-quality, agent-skills, chatbotx, chatbot-marketing]
+version: 1.8.0
+updated: 2026-07-16
+tags: [skill-registry, skills, auto-discovery, mandatory, overlay, ponytail, lazy-senior, code-quality, agent-skills, chatbotx, chatbot-marketing, superpowers, methodology, marketingskills, marketing, hallmark, anti-slop, design]
 ---
 
 # Skill Registry - Single Source of Truth
@@ -653,11 +652,16 @@ Mỗi skill được định nghĩa với các properties:
 | `slide deck` | visual-explainer | 0.95 | Presentation slides |
 | `project recap` | visual-explainer | 0.90 | Mental model snapshot |
 | **FRONTEND - Landing** ||||
-| `landing page` | frontend-taste | 0.95 | Landing/hero pages |
-| `portfolio` | frontend-taste | 0.95 | Personal/company portfolios |
-| `homepage` | frontend-taste | 0.90 | Website homepage |
-| `marketing site` | frontend-taste | 0.90 | Marketing/splash pages |
-| `SaaS landing` | frontend-taste | 0.95 | SaaS product landing |
+| `landing page` | frontend-taste + Hallmark | 0.95 | Landing/hero pages + 20 themes |
+| `portfolio` | frontend-taste + Hallmark | 0.95 | Personal/company portfolios |
+| `homepage` | frontend-taste + Hallmark | 0.90 | Website homepage |
+| `marketing site` | frontend-taste + Hallmark | 0.90 | Marketing/splash pages |
+| `SaaS landing` | frontend-taste + Hallmark | 0.95 | SaaS product landing |
+| `hallmark audit` | frontend-review + Hallmark | 0.95 | Slop-test audit |
+| `hallmark redesign` | frontend-redesign + Hallmark | 0.95 | Full redesign with themes |
+| `hallmark study` | ui-visual-design.mdc | 0.95 | Extract design DNA |
+| `anti-slop` | frontend-taste + Hallmark | 0.95 | AI slop prevention |
+| `20 themes` / `catalog themes` | frontend-taste + Hallmark | 0.85 | Theme selection |
 | **FRONTEND - Redesign** ||||
 | `redesign` | frontend-redesign | 0.95 | Full redesign task |
 | `upgrade` | frontend-redesign | 0.85 | UI/UX upgrade |
@@ -1118,9 +1122,134 @@ REVIEW GATES TO RUN
 
 ---
 
-## PHẦN 7: PONYTAIL - LAZY SENIOR DEV
+## 10. HALLMARK ANTI-SLOP DESIGN SKILL (sync 2026-07-16)
 
-### 7.1 Giới thiệu
+> **Source:** [Nutlope/hallmark](https://github.com/Nutlope/hallmark) (9.3k stars, MIT License) — Anti-AI-slop design skill for Claude Code, Cursor, and Codex.
+>
+> **Sync policy:** Following the Superpowers/marketingskills pattern — Hallmark is merged as a **concept-ref** into existing frontend skills and rules. NO new `SKILL.md` files created. Hallmark's 4 verbs and 20 themes augment `frontend-taste` §9 (anti-slop catalog) and `ui-visual-design.mdc`.
+
+### 10.1 Tổng quan
+
+Hallmark picks a **macrostructure** for the brief, dresses it in one of **twenty themes**, runs **fifty-seven slop-test gates** plus a **pre-emit self-critique**, and refuses the on-distribution defaults every LLM was trained into.
+
+**Key principle:** Two pages by Hallmark for two different briefs feel like different sites, not colour-swaps of the same template.
+
+### 10.2 Four Verbs (Design Actions)
+
+| Verb | What it does | Skill mapping |
+|------|--------------|---------------|
+| *(default)* | Build new UI. Picks a macrostructure, applies the rule-set, runs the slop test before handing back. | `frontend-taste` |
+| `hallmark audit` | Score existing code against the anti-patterns. Punch list, no edits. | `frontend-review` |
+| `hallmark redesign` | Throw out the structure, keep copy + IA + brand, rebuild with a different fingerprint. | `frontend-redesign` |
+| `hallmark study` | Extract the **DNA** from a design you admire: macrostructure, type-pairing, colour anchor. | `ui-visual-design.mdc` |
+
+### 10.3 Twenty Themes (Catalog)
+
+Hallmark themes provide distinct visual fingerprints. Select based on brand brief:
+
+| Theme | Aesthetic | Color Anchor | Use Case |
+|-------|-----------|-------------|----------|
+| **Hum** | Warm minimal | Soft peach + sage | Sourdough app, wellness |
+| **Cobalt** | Industrial clean | Deep blue + cream | API tools, dev infra |
+| **Carnival** | Vibrant bold | Rich red + gold | Record labels, creative |
+| **Lumen** | Bright tech | White + electric blue | AI tools, dashboards |
+| **Garden** | Natural earthy | Moss + cream | Honey farms, organic |
+| **Riso** | Print-inspired | Bright spots on off-white | Print fairs, art |
+| **Custom** | Made-to-measure | Bespoke palette | No catalog fit |
+
+**Catalog themes:** modern-minimal, atmospheric, arctic-frost, golden-hour, ocean-depths, desert-rose, sunset-boulevard, dark-luxury, neo-brutalist, editorial-serif, swiss-grid, vaporwave, brutalist-print, paper-texture, neon-accent, monochrome-pro, pastel-soft, earth-tone, midnight-blue, cherry-pop
+
+### 10.4 57 Slop-Test Gates (Anti-Slop Protocol)
+
+Hallmark runs 57 automated gates before emitting. Key gates mapped to framework:
+
+| Gate Category | Count | Framework mapping |
+|--------------|-------|------------------|
+| Color defaults | 12 | `ui-visual-design.mdc §AI_SLOP_PATTERNS` |
+| Typography defaults | 10 | `frontend-taste §9.C Anti-Cream Default` |
+| Layout patterns | 15 | `frontend-taste §3.3 Layout rules` |
+| Component patterns | 10 | `ui-visual-design.mdc §Anti-Patterns` |
+| Animation defaults | 10 | `frontend-taste §4 Forbidden Animation Patterns` |
+
+### 10.5 Custom Theme Protocol
+
+When brief carries creative intent that no catalog theme fits, Hallmark switches to **Custom**:
+
+1. Design page from scratch
+2. Make-to-measure palette
+3. Custom type pairing
+4. Bespoke layout
+5. Same 57 slop-test gates
+6. No template underneath
+
+**Trigger:** Brief contains unusual brand signals, specific competitor references, or creative direction not matching catalog themes.
+
+### 10.6 Hallmark DNA Extraction (Study Mode)
+
+For `hallmark study`:
+
+```
+1. Extract MACROSTRUCTURE
+   └── Layout family, section hierarchy, visual rhythm
+   
+2. Extract TYPE-PAIRING
+   └── Display font + body font combination
+   
+3. Extract COLOUR ANCHOR
+   └── Primary + accent + neutral base
+   
+4. Refuse pixel-clones
+   └── Design DNA, not visual copy
+   
+5. Optional: Emit portable `design.md`
+   └── For handoff to other AI tools
+```
+
+### 10.7 Source Sync Metadata
+
+| Field | Value |
+|-------|-------|
+| **Upstream** | https://github.com/Nutlope/hallmark |
+| **Upstream stars** | 9,363 (as of 2026-07-16) |
+| **Upstream license** | MIT |
+| **Sync date** | 2026-07-16 |
+| **Files created** | 0 (pure concept-ref pattern) |
+| **Files modified** | 3 (`skill-registry.mdc`, `frontend-taste/SKILL.md`, `ui-visual-design.mdc`) |
+| **Themes count** | 20 catalog + 1 custom |
+| **Slop-test gates** | 57 |
+
+### 10.8 Routing Pipeline
+
+```
+User Request
+    │
+    ├── "build landing" / "new page" → frontend-taste + Hallmark (default verb)
+    │                               └── §10.3 themes available
+    │
+    ├── "hallmark audit" → frontend-review enhanced
+    │                    └── §10.4 slop-test gates
+    │
+    ├── "hallmark redesign" → frontend-redesign enhanced
+    │                      └── §10.3 themes + §10.4 gates
+    │
+    ├── "hallmark study" / "extract design DNA" → ui-visual-design.mdc
+    │                                         └── §10.6 DNA extraction
+    │
+    └── Any frontend task → §9 AI Slop Test
+                          └── 57 gates implicitly active
+```
+
+### 10.9 Changelog
+
+| Date | Version | Changes |
+|------|---------|---------|
+| 2026-07-16 | 1.8.0 | Integrated Hallmark anti-slop design skill (9.3k stars) — 4 verbs, 20 themes, 57 slop-test gates, custom theme protocol, DNA extraction. NO new files created. |
+
+---
+
+## PHẦN 11: PONYTAIL - LAZY SENIOR DEV
+
+### 11.1 Giới thiệu
 
 **"He says nothing. He writes one line. It works."**
 
@@ -1499,3 +1628,238 @@ No future tracking required — concept-ref mappings are stable. If marketingski
 | 2026-06-26 | 1.2.0 | Merged Vietnamese payment and address skills |
 | 2026-06-26 | 1.1.0 | Merged Ponytail Lazy Senior Dev section |
 | 2026-06-26 | 1.0.0 | Initial unified skill registry |
+
+---
+
+## 10. MARKETING SECURITY CONCEPT-REFS (sync 2026-07-15)
+
+> Bổ sung từ [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) v2.6.0 — extension về security/privacy cho marketing. Mọi skill và marketing surface có security exposure đều được map vào security review gates.
+
+### 10.1 Tổng quan Security Overlay
+
+Marketing skills vốn tập trung vào **growth & conversion**. Security/Privacy là **cross-cutting concern** phải được tích hợp vào mỗi skill execution để:
+
+1. Tránh regulatory fines (GDPR max 4% global revenue, CCPA $2.5K/violation)
+2. Bảo vệ customer trust và brand reputation
+3. Đảm bảo long-term viability của data-driven marketing
+4. Tuân thủ industry standards (SOC 2, ISO 27001, ISO 31700)
+
+### 10.2 Security Touchpoints — Concept-Ref Map
+
+Mỗi marketing skill touch nhiều security boundaries. Map sau định nghĩa security review cần thiết cho mỗi skill:
+
+| Skill | Security touchpoint | Reference |
+|---|---|---|
+| **analytics** | Consent-aware SDK init, IP anonymization, retention windows, PII redaction | `best-practice.md §10.2`, `architecture.md §5.3` |
+| **cro** | Form consent, no pre-checked opt-in, privacy link, dark pattern avoidance | `best-practice.md §10.6`, `anti-pattern.md §10.5-10.6` |
+| **signup** | Double opt-in (EU), data minimization, cancellation parity | `best-practice.md §10.4`, `checklist.md §11.6` |
+| **onboarding** | PII handling, retention windows, opt-out mechanisms | `best-practice.md §10.4`, `architecture.md §5.5` |
+| **popups** | Consent-aware firing, no dark patterns, dismissible | `anti-pattern.md §10.6` |
+| **paywalls** | All-in pricing, no hidden fees, fair upgrade flow | `anti-pattern.md §10.6.3` |
+| **copywriting** | Substantiated claims, no deceptive copy, AI disclosure | `anti-pattern.md §10.4.2`, `best-practice.md §10.5` |
+| **copy-editing** | Claims verification, regulatory compliance review | `best-practice.md §10.5` |
+| **cold-email** | One-click unsubscribe, authentication (SPF/DKIM/DMARC), physical address, CAN-SPAM/GDPR | `best-practice.md §10.4`, `anti-pattern.md §10.3` |
+| **emails** | Double opt-in, list hygiene, authentication, suppression list, preference center | `best-practice.md §10.4`, `checklist.md §11.3` |
+| **social** | Sponsored content disclosure, no engagement bait, no PII harvesting | `anti-pattern.md §10.4.1` |
+| **image** | No tracking pixels in shared images, AI disclosure | `best-practice.md §10.13` |
+| **video** | AI-generated disclosure, no deepfakes, EU AI Act compliance | `best-practice.md §10.13` |
+| **sms** | TCPA compliance, opt-in keywords, STOP honoring | `checklist.md §11.3` (analog) |
+| **seo-audit** | log file PII redaction, no PII in URLs, robots.txt respect | `best-practice.md §10.12` |
+| **ai-seo** | Robots.txt opt-out for AI training, citation accuracy | `anti-pattern.md §10.12` |
+| **programmatic-seo** | No scraped PII, public data only, fair use | `best-practice.md §10.12` |
+| **site-architecture** | Privacy-by-design nav, cookie banner placement, policy visibility | `architecture.md §5` |
+| **competitors** | Public data only, no NDA violations, fair comparison | `best-practice.md §10.12` |
+| **schema** | No PII in structured data, reviewer name consent | `best-practice.md §10.9` |
+| **ads** | Server-side CAPI, hashed PII, LDU flag, substantiated claims, ad disclosure | `best-practice.md §10.5`, `architecture.md §5.8` |
+| **ad-creative** | Substantiated claims, AI disclosure, no deceptive creative | `anti-pattern.md §10.4` |
+| **ab-testing** | No personal data in experiment IDs, statistical validity, IRB for medical/financial | `architecture.md §5` |
+| **churn-prevention** | Cancellation parity, no dark patterns, fair save offers, data deletion | `best-practice.md §10.13`, `anti-pattern.md §10.10` |
+| **co-marketing** | DPA with partners, no shared raw PII, data clean rooms | `architecture.md §5.4` |
+| **free-tools** | Data minimization, retention policy, no PII selling | `best-practice.md §10.6` |
+| **referrals** | Double opt-in for referred users, no spam, attribution transparency | `best-practice.md §10.4` |
+| **community-marketing** | User content rights, moderation policies, GDPR for community data | `best-practice.md §10` |
+| **lead-magnets** | Consent for follow-up, easy unsubscribe, data minimization | `best-practice.md §10.4`, `checklist.md §11.6` |
+| **marketing-council** | No PII in prompts, vendor data handling, ephemeral analysis | `best-practice.md §10.13` |
+| **marketing-ideas** | Public sources only, no NDA leaks | `best-practice.md §10` |
+| **marketing-loops** | Halt conditions, audit logs, no automated spam | `architecture.md §4.9.8` |
+| **marketing-plan** | Legal review, privacy law awareness, regional compliance | `best-practice.md §10.3` |
+| **marketing-psychology** | No dark patterns, no exploitation of vulnerable populations | `anti-pattern.md §10.6`, `best-practice.md §10` |
+| **offers** | Fair pricing, no drip pricing, transparency | `anti-pattern.md §10.6.3` |
+| **pricing** | All-in pricing, no hidden fees, auto-renewal disclosure | `anti-pattern.md §10.4.5` |
+| **product-marketing** | Compliance awareness, regulatory positioning | `best-practice.md §10` |
+| **prospecting** | Public data only, GDPR lawful basis, no scraped data | `best-practice.md §10` |
+| **public-relations** | Crisis comms readiness, fact verification, embargo respect | `best-practice.md §10.7`, `checklist.md §11.14` |
+| **revops** | Lead data minimization, consent provenance, role-based access | `best-practice.md §10.11`, `checklist.md §11.7` |
+| **sales-enablement** | No real customer PII in demos, CRM discipline | `anti-pattern.md §10.9`, `checklist.md §11.10` |
+| **aso** | Privacy labels, ATT prompt, COPPA for children | `best-practice.md §10.10`, `checklist.md §11.11` |
+| **launch** | Compliance review, crisis comms, security incident response | `checklist.md §11.14` |
+| **directory-submissions** | Public profile data only, no leaked credentials | `best-practice.md §11` |
+| **competitor-profiling** | Public data only, no NDA leaks, fair analysis | `best-practice.md §10.12` |
+| **customer-research** | Recording consent, IRB, anonymized outputs, special category data handling | `best-practice.md §10.6`, `checklist.md §11.8` |
+
+### 10.3 Security Skill Mappings — Cross-Skill Concept-Refs
+
+Các security/privacy concept-refs theo marketing skill cluster:
+
+**Conversion cluster (cro, signup, onboarding, popups, paywalls):**
+- Privacy consent UI: `best-practice.md §10.1` (consent), `architecture.md §5.2` (consent architecture)
+- Form data minimization: `best-practice.md §10.6`, `checklist.md §11.6`
+- Cancellation parity: `anti-pattern.md §10.6.1`, `checklist.md §11.12`
+- Dark patterns avoidance: `anti-pattern.md §10.6`
+- Pricing transparency: `anti-pattern.md §10.6.3`
+
+**Content cluster (copywriting, copy-editing, emails, cold-email, sms, social, video, image):**
+- Email authentication: `best-practice.md §10.4`, `architecture.md §5.9`, `checklist.md §11.3`
+- Substantiated claims: `anti-pattern.md §10.4.2`
+- CAN-SPAM/CASL/GDPR compliance: `best-practice.md §10.4`
+- AI content disclosure: `best-practice.md §10.13`, `anti-pattern.md §10.11.3`
+- No fabricated urgency: `anti-pattern.md §10.6.4`
+
+**SEO cluster (seo-audit, ai-seo, programmatic-seo, site-architecture, schema):**
+- Log redaction: `best-practice.md §10.12`, `architecture.md §5` (operational)
+- No PII in URLs: `best-practice.md §10.12.5`
+- Robots.txt AI training opt-out: `best-practice.md §10.13`
+- No scraped behind auth: `anti-pattern.md §10.4`
+- Aggregate comparison only: `best-practice.md §10.12`
+
+**Paid cluster (ads, ad-creative):**
+- Server-side CAPI: `architecture.md §5.8`, `best-practice.md §10.5`
+- Hashed PII upload: `anti-pattern.md §10.4.4`, `best-practice.md §10.5`
+- Consent signals (Google Consent Mode v2, Meta LDU): `architecture.md §5.3`
+- Substantiated claims: `anti-pattern.md §10.4.2`
+- Ad disclosure: `anti-pattern.md §10.4.1`
+
+**Measurement cluster (analytics, ab-testing):**
+- Consent-aware SDK: `architecture.md §5.3`, `best-practice.md §10.2`
+- IP anonymization: `anti-pattern.md §10.2.4`
+- Retention windows: `architecture.md §5.5`
+- No PII as user_id: `anti-pattern.md §10.2.2`
+- PII redaction in events: `anti-pattern.md §10.2.3`
+
+**Retention cluster (churn-prevention):**
+- Cancellation parity: `anti-pattern.md §10.6.1`, `checklist.md §11.12`
+- No pre-checked retention offers: `anti-pattern.md §10.10.2`
+- Data deletion after cancel: `best-practice.md §10.13.3`
+- Respectful dunning: `anti-pattern.md §10.10.3`
+
+**Sales cluster (revops, sales-enablement):**
+- No real customer PII in demos: `anti-pattern.md §10.9.1`
+- Synthetic demo data: `best-practice.md §10.11.2`
+- Lead data minimization: `best-practice.md §10.11.1`, `checklist.md §11.7`
+- CRM RBAC + audit log: `best-practice.md §10.14`
+
+**Strategy cluster (marketing-plan, launch):**
+- Crisis comms readiness: `best-practice.md §10.7`, `checklist.md §11.14`
+- Compliance review: `best-practice.md §10.3`
+- Privacy policy current: `checklist.md §11.4`
+
+**Research cluster (customer-research):**
+- Recording consent: `best-practice.md §10.6.1`, `checklist.md §11.8`
+- IRB for high-risk: `best-practice.md §10.6.3`
+- Anonymized outputs: `best-practice.md §10.6.5`
+- Research vendor security review: `checklist.md §11.8`
+
+### 10.4 Trigger Keywords — Security-Aware Routing
+
+Khi user request chứa các keywords sau, security review BẮT BUỘC trigger:
+
+| Keyword cluster | Trigger examples | Severity |
+|---|---|---|
+| GDPR / CCPA / LGPD / PIPL / PDPD | "GDPR compliance", "CCPA opt-out", "privacy policy" | CRITICAL |
+| Cookie / Consent | "cookie banner", "consent management", "cookie consent" | CRITICAL |
+| Email authentication | "SPF", "DKIM", "DMARC", "email authentication" | HIGH |
+| Email marketing | "email campaign", "newsletter", "drip campaign" | HIGH |
+| Webhook | "webhook", "signature verification" | HIGH |
+| Analytics / Tracking | "GA4", "tracking pixel", "analytics setup" | HIGH |
+| Paid ads | "Facebook ads", "Google ads", "Meta pixel", "CAPI" | HIGH |
+| Dark patterns | "dark pattern", "roach motel", "confirmshaming" | CRITICAL |
+| Auto-renewal | "subscription", "auto-renewal", "free trial cancellation" | HIGH |
+| Cancellation | "cancel subscription", "churn flow", "click-to-cancel" | HIGH |
+| Data subject request | "DSAR", "right to deletion", "data export" | CRITICAL |
+| DPO / Privacy | "DPO", "data protection officer", "privacy impact" | CRITICAL |
+| Children | "COPPA", "children's app", "GDPR-K" | CRITICAL |
+| Health / Financial | "HIPAA", "financial data", "special category" | CRITICAL |
+| Recording | "interview recording", "session recording", "consent recording" | HIGH |
+| AI / LLM | "AI marketing", "GPT-4", "Anthropic", "AI content" | MEDIUM |
+| International | "data residency", "cross-border", "EU transfer" | HIGH |
+| Vendor | "third-party vendor", "SOC 2", "vendor review" | HIGH |
+| Breach / Incident | "data breach", "security incident", "leak" | CRITICAL |
+
+### 10.5 Routing Layer Integration
+
+Marketing security triggers sẽ tự động augment routing decisions trong `context_router.py`:
+
+```python
+# Pseudo-code logic (in context_router.py)
+def route_request(user_query: str):
+    base_skill = classify_marketing_skill(user_query)  # existing
+    security_severity = detect_security_severity(user_query)
+    
+    if security_severity == 'CRITICAL':
+        # Block or require security-auditor review
+        return [security_auditor, base_skill]
+    elif security_severity == 'HIGH':
+        # Recommend security review before proceeding
+        return [security_auditor, base_skill, full_output]
+    elif security_severity == 'MEDIUM':
+        # Append security best-practice to context
+        return [base_skill, security_best_practice_ref]
+    else:
+        return [base_skill]
+```
+
+### 10.6 Quarterly Security Review
+
+Mỗi quarter, marketing skills undergo security review:
+
+| Review item | Frequency | Owner |
+|---|---|---|
+| Consent flow audit | Quarterly | DPO + Marketing Ops |
+| Vendor DPA renewal | Annual | Legal + Procurement |
+| Penetration test of marketing pages | Annual | Security team |
+| Privacy policy review | Annual | Legal |
+| Sub-processor list update | Quarterly | DPO |
+| Audit log review | Monthly | Security team |
+| Crisis comms drill | Quarterly | Marketing Lead + Security |
+| Cookie banner UI test | Quarterly | UX + Privacy |
+| Email authentication review | Quarterly | Engineering |
+| Ad platform policy changes | Monthly | Marketing Ops |
+
+### 10.7 Compliance Calendar
+
+Marketing-related compliance deadlines:
+
+| Deadline | Requirement | Region |
+|---|---|---|
+| 2024-02 | Gmail/Yahoo: SPF/DKIM/DMARC, one-click unsubscribe | Global email senders |
+| 2024-03 | Google Consent Mode v2 required for EU | EU users |
+| 2024-final | FTC Click-to-Cancel Rule effective | US subscriptions |
+| 2024-decisions | Multiple privacy enforcement actions ongoing | EU (CNIL, Garante, etc.) |
+| 2025+ | EU AI Act phased enforcement (general purpose AI: Aug 2025) | EU |
+| Ongoing | CPRA enforcement | California |
+| Ongoing | LGPD enforcement | Brazil |
+| Ongoing | PDPD enforcement | Vietnam |
+
+---
+
+## 10.8 Cross-Reference Summary
+
+**Marketing knowledge files (all §X.Y additions 2026-07-15):**
+- `.cursor/knowledge/marketing/best-practice.md §10` — Marketing Security & Privacy Best Practices (16 sub-sections)
+- `.cursor/knowledge/marketing/anti-pattern.md §10` — Marketing Security & Privacy Anti-Patterns (12 sub-sections)
+- `.cursor/knowledge/marketing/checklist.md §11` — Pre-launch Security Checklist (15 sub-sections)
+- `.cursor/knowledge/marketing/architecture.md §5` — Privacy-by-Design & Consent Architecture (16 sub-sections)
+- `.cursor/knowledge/marketing/decision-tree.md §12` — Security-Aware Marketing Routing (8 sub-sections)
+- `.cursor/knowledge/marketing/faq.md §10` — Marketing Security & Privacy FAQ (14 sub-sections)
+- `.cursor/knowledge/marketing/glossary.md §14` — Marketing Security & Privacy Glossary (12 categories)
+
+**Synced rule files:**
+- `.cursor/rules/security.mdc` (existing technical security, cross-referenced)
+- `.cursor/rules/auth.mdc` (existing auth, cross-referenced)
+
+**Synced agent files:**
+- `.cursor/agents/security-auditor.md` (existing, will be enhanced with marketing-specific patterns)
+- `.cursor/agents/marketing-strategist.md` (existing, will be enhanced with security gates)
+
+**Source:**
+- [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) v2.6.0 — referenced for compliance patterns, especially: `analytics`, `ads`, `cold-email`, `emails`, `customer-research`, `schema`, `prospecting`, `churn-prevention`, `sales-enablement`, `signup`, `cro`, `popups`, `paywalls`.

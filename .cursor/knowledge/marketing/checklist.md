@@ -907,3 +907,259 @@
 | Sales | Lead scoring, routing SLA, enablement deck |
 
 **Rule:** Không ship campaign/launch/feature nếu pre-flight ở category tương ứng còn blocker.
+
+---
+
+## 10. Marketing Security Pre-Flight (sync 2026-07-15)
+
+> Bổ sung từ [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) v2.6.0. **Bắt buộc pass trước khi ship bất kỳ marketing surface nào** (landing page, email campaign, paid ad, signup flow, analytics setup, churn flow). Cross-reference `.cursor/knowledge/marketing/best-practice.md §10`, `.cursor/knowledge/marketing/anti-pattern.md §10`, `.cursor/agents/security-auditor.md`.
+
+### 10.1 Cookie Banner & Consent Management
+
+- [ ] **Cookie banner implemented** với "Accept all" + "Reject all" buttons cùng prominence, cùng style
+- [ ] **No pre-checked boxes** cho analytics/marketing/personalization
+- [ ] **Granular consent**: tách riêng categories (essential, analytics, marketing, personalization)
+- [ ] **Persistent preference**: user choice remembered across sessions (no re-prompt every visit)
+- [ ] **Withdraw consent easy**: footer link to update preferences, không require login
+- [ ] **Server-side consent validation**: client-side consent không đủ, server phải enforce
+- [ ] **GDPR compliant** nếu target EU (record consent with timestamp + IP + UA)
+- [ ] **CCPA compliant** nếu target California (Do Not Sell link, opt-out mechanism)
+- [ ] **Consent refresh cadence**: re-prompt mỗi 12 months max, hoặc khi purposes thay đổi
+- [ ] **Cookie policy** linked từ banner, clear language, no legalese
+- [ ] **Cookie audit**: list all cookies set, categorized by purpose, retention stated
+
+### 10.2 Tracking & Analytics
+
+- [ ] **Consent-aware SDK initialization**: không load GA4, Meta Pixel, TikTok Pixel before consent
+- [ ] **Google Consent Mode v2**: implemented (ad_storage, analytics_storage signals)
+- [ ] **Meta Limited Data Use flag**: enabled cho California users
+- [ ] **Server-side tracking preferred**: GTM Server, Meta CAPI, TikTok Events API
+- [ ] **No PII as user_id**: opaque UUIDs, not email/phone
+- [ ] **IP anonymization enabled**: GA4 (ip_anonymization), custom analytics
+- [ ] **Event properties audited**: no raw email/phone/address/SSN in event payloads
+- [ ] **Retention windows defined**: analytics 14 months, marketing 24 months, financial 7 years
+- [ ] **First-party data strategy**: server-side cookies, signed identifiers, no 3p cookies
+- [ ] **Data clean rooms** cho partner data sharing (Snowflake, AWS, Habu)
+- [ ] **Cross-domain tracking**: only with explicit opt-in, not silent
+- [ ] **Subdomain tracking**: respects cookie scope correctly (not leaking across unrelated sites)
+
+### 10.3 Email Marketing Authentication
+
+- [ ] **SPF record** configured, valid, includes all sending sources
+- [ ] **DKIM signing** configured, valid, keys rotated annually
+- [ ] **DMARC record** published, minimum `p=quarantine` (recommend `p=reject`)
+- [ ] **DMARC reporting enabled**: `rua` + `ruf` addresses monitored
+- [ ] **BIMI record** (optional, recommended for brand recognition + DMARC compliance)
+- [ ] **TLS 1.2+** enforced cho outbound + inbound SMTP
+- [ ] **MTA-STS** record (optional, recommended)
+- [ ] **TLS-RPT** record (optional, recommended)
+- [ ] **Sender domain reputation**: monitored (Google Postmaster Tools, Microsoft SNDS, Validity)
+- [ ] **List-Unsubscribe-Post header**: RFC 8058 one-click unsubscribe
+- [ ] **Physical postal address** in footer (CAN-SPAM, CASL)
+- [ ] **Sender identity clear**: From header matches brand, no misleading
+- [ ] **Double opt-in** cho EU + B2B best practice
+- [ ] **Hard-bounce suppression**: immediate
+- [ ] **Soft-bounce handling**: 3 retries trong 72h, then suppress
+- [ ] **Spam complaint handling**: FBL feedback loops, immediate suppression on complaint
+- [ ] **Honor opt-out within 24h**: unsubscribe + list removal automated
+- [ ] **Suppression list sync across tools**: ESP, CRM, marketing automation all reference same list
+- [ ] **Re-engagement campaign** before final removal (90 days inactive)
+
+### 10.4 Privacy Policy & Disclosures
+
+- [ ] **Privacy policy** published, current, dated, accessible from every page (footer link)
+- [ ] **Lawful basis documented** for each processing activity (consent, contract, legitimate interest, etc.)
+- [ ] **Records of Processing Activities (ROPA)** maintained (GDPR Art. 30)
+- [ ] **Data retention schedule** published in privacy policy
+- [ ] **Third-party processors disclosed**: list of subprocessors with purposes
+- [ ] **Cross-border transfer mechanism**: SCCs, adequacy decisions (EU↔US)
+- [ ] **Data Protection Officer (DPO) appointed** if required (GDPR)
+- [ ] **DPIA** for high-risk processing (profiling, large-scale, sensitive)
+- [ ] **Children's privacy**: COPPA compliance (US < 13), GDPR-K (EU < 16 or member-state-specific)
+- [ ] **CCPA "Do Not Sell or Share" link** in footer (if California users)
+- [ ] **Cookie notice** separate from privacy policy, focused on tracking
+- [ ] **Changes to policy**: user notification + re-consent if purposes change
+- [ ] **Privacy policy reviewed annually**: legal review + version history
+
+### 10.5 Paid Ads Compliance
+
+- [ ] **Ad disclosures** present ("Ad", "Sponsored", "Paid partnership")
+- [ ] **No misleading claims**: every claim substantiated, no superlatives without proof
+- [ ] **Landing page matches ad**: same offer, same disclosure, no bait-and-switch
+- [ ] **Prohibited content check**: no discrimination, no harmful products
+- [ ] **Industry-specific rules** (alcohol, gambling, pharma, finance, healthcare): pre-approval, certifications
+- [ ] **Geographic restrictions**: respect regional regulations (EU UCPD, country-specific)
+- [ ] **Age gating**: 18+ ads shown only to 18+ audiences
+- [ ] **Conversion API server-side**: Meta CAPI, TikTok Events API, Google Enhanced Conversions
+- [ ] **Customer data hashing**: SHA-256 before upload to ad platforms (no raw PII)
+- [ ] **Limited Data Use flag** (Meta, California users)
+- [ ] **Restricted Data Processing** honored for opted-out users
+- [ ] **Creative review**: AI-generated content labeled (FTC, EU AI Act)
+- [ ] **Ad account security**: 2FA enabled, role-based access, audit logs
+- [ ] **Brand safety**: exclusion lists, content adjacency controls
+- [ ] **Frequency caps**: avoid over-exposure (esp. retargeting)
+
+### 10.6 Form & Data Collection
+
+- [ ] **Minimal fields**: only collect what you actually use (GDPR data minimization)
+- [ ] **Optional fields clearly marked** (not just placeholder)
+- [ ] **Marketing opt-in unchecked by default**
+- [ ] **Clear language** on what user is signing up for
+- [ ] **Privacy policy link** above submit button
+- [ ] **No hidden tracking fields** in form (click IDs only in URL params, disclosed)
+- [ ] **CAPTCHA / bot protection** without invasive fingerprinting
+- [ ] **Input validation**: email format, phone format (international), URL safety
+- [ ] **Honeypot field** for spam detection (invisible, not user-facing)
+- [ ] **Double opt-in flow** for EU
+- [ ] **Consent record stored**: timestamp, IP, UA, source URL, form version
+- [ ] **Right-to-access workflow**: respond trong 30 days (GDPR) / 45 days (CCPA)
+- [ ] **Right-to-deletion workflow**: full PII removal + verification
+
+### 10.7 CRM & Lead Data
+
+- [ ] **Lead source tracked**: UTM parameters, referral source, campaign
+- [ ] **Consent provenance stored**: where + when consent given, what they consented to
+- [ ] **Data minimization**: only fields sales actually uses
+- [ ] **No sensitive categories**: health, religion, political, sexual orientation, biometric
+- [ ] **Scoring rules documented**: how score is calculated, what triggers qualify
+- [ ] **Lead routing SLA**: time-to-first-touch documented and met
+- [ ] **Lead data retention policy**: 24 months max if unqualified, immediate purge on request
+- [ ] **Cross-team data sharing**: DPA + technical safeguards
+- [ ] **CRM access controls**: role-based, audit log, terminated employee removal
+- [ ] **Sales-to-CRM sync**: bidirectional, conflict resolution rules
+- [ ] **Compensation data**: not in CRM, separated system
+- [ ] **Demo data sanitized**: synthetic data in sales demos, not real customers
+
+### 10.8 Customer Research
+
+- [ ] **Recording consent** obtained before any recording (audio/video)
+- [ ] **Written consent** for sensitive research (health, financial, children)
+- [ ] **IRB review** for academic or high-risk research
+- [ ] **Recruitment vendor security reviewed**: SOC2, GDPR, IAB/ESOMAR compliance
+- [ ] **Incentive reasonable**: proportional to time ($25-100/hour standard)
+- [ ] **1099 forms** issued (US, > $600/yr per participant)
+- [ ] **Research data anonymized** in outputs (no PII in reports, presentations)
+- [ ] **Raw research data retention**: 12 months max
+- [ ] **Aggregated insights retention**: 24 months max
+- [ ] **Special category data** (health, biometric, children): extra protections per GDPR Art. 9
+- [ ] **Right to withdraw** honored mid-study (delete their data)
+- [ ] **Cross-border research**: SCCs or local research partner for non-domestic studies
+- [ ] **Panel vendor DPA** signed
+
+### 10.9 Webhooks & Integrations
+
+- [ ] **Signed webhooks** (HMAC-SHA256): Stripe, Shopify, HubSpot pattern
+- [ ] **Replay protection**: timestamp + nonce in signature
+- [ ] **IP allowlist** when possible (Stripe webhook source IPs)
+- [ ] **Secret rotation**: 90-day rotation cycle, documented
+- [ ] **TLS 1.2+ only**: no HTTP webhook receivers
+- [ ] **Idempotency keys**: deduplication on retry
+- [ ] **Audit log**: every webhook delivery + signature verification result
+- [ ] **Scoped tokens**: minimum required permissions
+- [ ] **Webhook secret in env var or secret manager**, not in code
+- [ ] **Integration vendor security reviewed**: SOC2 Type II preferred
+- [ ] **DPA signed** với mọi integration vendor
+- [ ] **Sub-processor list maintained**: all integrations in vendor registry
+
+### 10.10 Sales Enablement
+
+- [ ] **Pitch decks**: no real customer data (anonymize or consent)
+- [ ] **Demo environment**: synthetic data, not production
+- [ ] **Sales collateral**: reviewed for claims (legal sign-off)
+- [ ] **One-pagers**: substantive claims verified
+- [ ] **Objection handling docs**: updated, accurate
+- [ ] **Case studies**: explicit customer consent, anonymization if needed
+- [ ] **Pricing sheets**: aligned with pricing page, not outdated
+- [ ] **Sales training materials**: no PII from prospects/customers
+- [ ] **Internal competitive intel**: only public sources, no confidential leaks
+- [ ] **CRM discipline**: no personal spreadsheets, all in CRM
+
+### 10.11 App Store / ASO
+
+- [ ] **App privacy labels accurate** (Apple App Store, Google Play)
+- [ ] **Data Safety section** reflects actual collection
+- [ ] **App Tracking Transparency (ATT)** prompt: only when needed, clear disclosure
+- [ ] **Privacy nutrition labels**: complete, accurate
+- [ ] **No misleading screenshots**: actual UI
+- [ ] **Age rating accurate**, especially for children
+- [ ] **Children apps**: no behavioral ads, no 3p SDKs (COPPA Rule)
+- [ ] **In-app purchase disclosures** clear
+- [ ] **App size + permissions** minimized
+- [ ] **App Store review guidelines** respected
+
+### 10.12 Churn & Cancellation Flows
+
+- [ ] **Cancellation parity**: same number of clicks as signup
+- [ ] **In-app cancellation** available (no forced phone call)
+- [ ] **No pre-checked retention offers**
+- [ ] **No guilt-trip language**: factual, neutral
+- [ ] **Data deletion honored**: within 30 days, some jurisdictions immediately
+- [ ] **Confirmation of cancellation** sent (email + in-app)
+- [ ] **Refund policy** clear, honored
+- [ ] **Dunning emails respectful**: no shame, no threats
+- [ ] **Save offers fair**: opt-in, not pre-checked
+- [ ] **Win-back segmentation**: not targeting vulnerable populations
+- [ ] **Account reactivation** easy (reversible)
+
+### 10.13 AI Marketing Security
+
+- [ ] **No PII to public LLMs**: anonymize before sending to OpenAI/Anthropic public APIs
+- [ ] **Enterprise tier / zero-retention**: cho production use cases
+- [ ] **On-prem or VPC**: for regulated industries (finance, healthcare)
+- [ ] **Prompt injection defense**: validate + sanitize user inputs to AI marketing tools
+- [ ] **AI-generated content disclosure**: label ad copy, images, video
+- [ ] **Training data opt-out**: respect robots.txt + opt-out signals
+- [ ] **Hallucination guardrails**: human review for AI-generated facts
+- [ ] **Vendor security review**: data retention policy, training data use, breach history
+- [ ] **AI usage policy**: documented, communicated to team
+- [ ] **AI act compliance**: EU AI Act requirements for high-risk use cases
+
+### 10.14 Crisis Communications Readiness
+
+- [ ] **Incident response plan**: documented, includes marketing/comm role
+- [ ] **Spokesperson designated**: 1-2 trained, available 24/7
+- [ ] **Hold statements ready**: pre-approved for common scenarios
+- [ ] **Communication channels ready**: status page, in-app banner, email, social
+- [ ] **Customer notification templates**: pre-approved for incident types
+- [ ] **Legal review SLA**: defined hours for crisis comms
+- [ ] **Regulatory reporting process**: 72-hour GDPR, SEC cyber disclosure (US, 4 days)
+- [ ] **Post-incident review process**: blameless, customer follow-up
+- [ ] **Status page** hosted on separate infrastructure (survives main outage)
+- [ ] **Crisis drills**: quarterly tabletop exercises
+
+### 10.15 Marketing Operations Security
+
+- [ ] **SSO mandatory** cho mọi marketing tool (HubSpot, Mailchimp, Google Ads, Meta)
+- [ ] **Role-based access**: editor / approver / admin
+- [ ] **API key rotation**: 90-day, scoped keys (read-only when possible)
+- [ ] **Audit logging**: mọi config change logged (who, when, what)
+- [ ] **Vendor security review**: SOC2 Type II or equivalent
+- [ ] **DPA signed** with every marketing vendor
+- [ ] **Sub-processor list** maintained, customer-facing
+- [ ] **Backup + recovery**: weekly backups, quarterly restore drills
+- [ ] **Termination checklist**: when offboarding a vendor
+- [ ] **Marketing tools inventory**: reviewed quarterly, unused tools removed
+
+---
+
+## 10.16 Pre-Launch Security Summary (one-page view)
+
+| Category | Pre-launch security blockers |
+|---|---|
+| Cookie & Consent | Banner parity, granular consent, server-side enforcement, GDPR/CCPA |
+| Tracking | Consent-mode SDK init, no PII as user_id, IP anonymization, retention windows |
+| Email | SPF/DKIM/DMARC (`p=reject` ideal), TLS 1.2+, RFC 8058 unsubscribe, double opt-in |
+| Privacy | Policy current, ROPA, lawful basis, DPO if required, DPIA for high-risk |
+| Paid Ads | Substantiated claims, ad disclosure, Conversion API, LDU flag, hashing |
+| Forms | Minimal fields, no pre-checked, clear consent, privacy link |
+| CRM | Consent provenance, data minimization, no sensitive categories, RBAC |
+| Research | Recording consent, IRB if needed, anonymized outputs, vendor security |
+| Webhooks | Signed + replay protection + IP allowlist + 90-day rotation |
+| Sales | Synthetic demo data, no real customer PII, CRM discipline |
+| App Store | Privacy labels, ATT prompt, age rating, COPPA if children |
+| Churn | Cancellation parity, no dark patterns, data deletion honored |
+| AI | No PII to public LLMs, hallucination guardrails, disclosure |
+| Crisis | IR plan, spokesperson, hold statements, status page ready |
+| Ops | SSO, RBAC, audit logs, DPA, vendor security, key rotation |
+
+**Rule:** Không ship campaign/launch/feature/landing-page nếu pre-flight security còn blocker. **Security là launch blocker, không phải nice-to-have.**

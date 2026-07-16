@@ -1789,3 +1789,227 @@ class PreferenceCenterService {
 
 **Q9.10.4 — AI trong marketing — dùng ở đâu?**
 > Content gen (draft, not publish), personalization, segmentation, scoring, copy iteration. KHÔNG thay decision-making. Xem `best-practice.md §X.X` (per category).
+
+---
+
+## 10. Marketing Security & Privacy FAQ (sync 2026-07-15)
+
+> Bổ sung từ [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) v2.6.0. Mục này trả lời các câu hỏi thường gặp về security/privacy trong marketing. Cross-reference `.cursor/knowledge/marketing/best-practice.md §10`, `.cursor/agents/security-auditor.md`.
+
+### 10.1 Cookie Banner & Consent
+
+**Q10.1.1 — Cookie banner bắt buộc cho website nào?**
+> Bắt buộc nếu: (a) target EU users (GDPR + ePrivacy), (b) target California users (CCPA), (c) target UK users (PECR), (d) target Brazil users (LGPD). Best practice: luôn implement cho mọi site, bất kể region. Xem `best-practice.md §10.1`, `checklist.md §11.1`.
+
+**Q10.1.2 — "Reject all" button có bắt buộc không?**
+> Có, nếu target EU (EDPB Guidelines 03/2022). CNIL (France) đã fine Google €150M (2022), Meta €390M (2023) vì không có. Button phải cùng prominence như "Accept all". Xem `anti-pattern.md §10.1.2`.
+
+**Q10.1.3 — Consent refresh bao lâu một lần?**
+> Maximum 12 tháng, hoặc khi purposes thay đổi. Không hỏi mỗi session. Xem `best-practice.md §10.1`, `checklist.md §11.1`.
+
+**Q10.1.4 — Client-side consent gate có đủ không?**
+> KHÔNG. Phải enforce cả server-side. Client-side có thể bypass qua devtools, MITM, ad blockers. Server-side gate là bắt buộc cho production. Xem `architecture.md §5.3`, `best-practice.md §10.1`.
+
+**Q10.1.5 — TCF (Transparency & Consent Framework) là gì?**
+> Industry standard (IAB Europe) cho consent management. TCF v2.2 compliant CMP (Consent Management Platform) cần thiết cho programmatic ads. Xem `architecture.md §5.2`.
+
+### 10.2 Tracking & Analytics
+
+**Q10.2.1 — Google Consent Mode v2 là gì?**
+> API Google cung cấp để pass consent signals từ website → Google tags. Có 4 signals: ad_storage, analytics_storage, ad_user_data, ad_personalization. Required cho EU users từ March 2024. Xem `best-practice.md §10.2`, `architecture.md §5.3`.
+
+**Q10.2.2 — IP anonymization là gì và có cần không?**
+> Last octet của IP zeroed trước khi store. Required cho EU users (CJEU ruling: IP = personal data). Google Analytics có sẵn feature. Xem `best-practice.md §10.2`, `anti-pattern.md §10.2.4`.
+
+**Q10.2.3 — Server-side tracking là gì? Tại sao quan trọng?**
+> Tracking events được gửi từ server (not browser). Lợi ích: bypass ad blockers, ITP restrictions; accurate iOS 14.5+ measurement; better privacy. Examples: GTM Server, Meta CAPI, TikTok Events API. Xem `architecture.md §5.8`.
+
+**Q10.2.4 — Email có nên làm user_id trong analytics?**
+> KHÔNG. Email = PII, leak vào ad platforms và analytics vendors. Dùng opaque UUIDs. Xem `anti-pattern.md §10.2.2`, `best-practice.md §10.2`.
+
+**Q10.2.5 — First-party vs third-party cookies?**
+> First-party: set by your domain, persists longer (Safari ITP, Firefox ETP). Third-party: set by ad platforms, increasingly blocked. Strategy: first-party cho identity, server-side cho ad platforms. Xem `best-practice.md §10.2`.
+
+**Q10.2.6 — Data clean room là gì?**
+> Môi trường chia sẻ data với partners mà không ai thấy raw data của người kia. Examples: Snowflake, AWS Clean Rooms, Habu. Dùng cho partner data analysis. Xem `best-practice.md §10.2`, `architecture.md §5.4`.
+
+### 10.3 GDPR / CCPA / Regional Privacy
+
+**Q10.3.1 — GDPR áp dụng cho công ty nào?**
+> Bất kỳ công ty nào process data của EU residents, regardless of where công ty đặt. Phạt: max 4% global annual revenue hoặc €20M, tùy cái nào cao hơn. Xem `best-practice.md §10.3`.
+
+**Q10.3.2 — CCPA / CPRA áp dụng cho ai?**
+> California residents. Trigger: (a) revenue > $25M, hoặc (b) buy/sell/share data of > 100k consumers/households/devices, hoặc (c) derive > 50% revenue from selling data. Xem `best-practice.md §10.3`.
+
+**Q10.3.3 — Right to deletion workflow?**
+> 1. Verify identity (auth + security questions). 2. Log request (audit). 3. Check legal holds (tax, fraud). 4. Anonymize or delete. 5. Cascade to vendors (with DPA). 6. Notify user. 7. Audit completion. Deadline: 30 days (GDPR) / 45 days (CCPA). Xem `architecture.md §5.5`.
+
+**Q10.3.4 — DPO (Data Protection Officer) bắt buộc khi nào?**
+> Required khi: (a) public authority, (b) large-scale systematic monitoring, (c) large-scale processing of special categories (health, biometric, etc.). Xem `best-practice.md §10.3`.
+
+**Q10.3.5 — Data breach notification timing?**
+> GDPR: 72 hours từ khi biết. SEC (US public companies): 4 business days từ materiality determination. CCPA: variable. Xem `best-practice.md §10.3`, `checklist.md §11.4`.
+
+**Q10.3.6 — Cross-border data transfer (EU → US)?**
+> Cần cơ chế: SCCs (Standard Contractual Clauses), adequacy decision, BCRs (Binding Corporate Rules). Data Privacy Framework (EU-US, 2023) provides new mechanism. Xem `best-practice.md §10.3`, `architecture.md §5.4`.
+
+**Q10.3.7 — LGPD (Brazil), PIPL (China), PDPD (Vietnam) có gì khác GDPR?**
+> Tương tự GDPR nhưng có nuances: LGPD có ANPD oversight, PIPL có data localization, PDPD có cross-border restrictions. Xem `best-practice.md §10.3`.
+
+### 10.4 Email Marketing Security
+
+**Q10.4.1 — SPF, DKIM, DMARC là gì?**
+> SPF (Sender Policy Framework): DNS record cho biết IPs authorized gửi email từ domain. DKIM (DomainKeys Identified Mail): cryptographic signature verify email không bị sửa. DMARC (Domain-based Message Authentication): policy cho SPF/DKIM failures (`p=none`, `p=quarantine`, `p=reject`). Required bởi Gmail/Yahoo từ Feb 2024. Xem `best-practice.md §10.4`, `architecture.md §5.9`.
+
+**Q10.4.2 — DMARC policy nào phù hợp?**
+> Start với `p=none` để monitor. Move to `p=quarantine` sau khi clean. Recommended: `p=reject` (strictest). Xem `checklist.md §11.3`.
+
+**Q10.4.3 — Double opt-in có cần thiết không?**
+> Best practice cho EU (GDPR), Canada (CASL). Optional cho US nhưng recommended cho deliverability. Single opt-in chấp nhận được cho US với clear disclosure. Xem `best-practice.md §10.4`, `anti-pattern.md §10.3.3`.
+
+**Q10.4.4 — One-click unsubscribe (RFC 8058) là gì?**
+> Header `List-Unsubscribe-Post: List-Unsubscribe=One-Click` cho phép user unsubscribe mà không cần mở email, không cần login. Required bởi Gmail/Yahoo từ Feb 2024. Xem `best-practice.md §10.4`, `checklist.md §11.3`.
+
+**Q10.4.5 — Cold email có hợp pháp không?**
+> B2B: generally OK ở US (CAN-SPAM) với proper disclosure, opt-out, physical address. EU: requires opt-in (GDPR). Canda: requires express consent (CASL). Purchased/scraped lists: NEVER OK. Xem `anti-pattern.md §1.1`, `decision-tree.md §12.2`.
+
+**Q10.4.6 — Email open rate tracking có còn accurate?**
+> Không — Apple Mail Privacy Protection (MPP), other proxies inflate open rates. Focus on click rates, conversion rates thay vì open rates. Xem `best-practice.md §10.4`.
+
+### 10.5 Paid Ads Security
+
+**Q10.5.1 — Meta CAPI là gì? Tại sao cần?**
+> Conversions API: server-side events gửi từ your backend → Meta. Cần thiết vì iOS 14.5+ App Tracking Transparency, ad blockers, ITP. Best practice: client pixel + server CAPI với deduplication. Xem `architecture.md §5.8`, `best-practice.md §10.5`.
+
+**Q10.5.2 — Customer Match upload cần hash PII không?**
+> CÓ. SHA-256 hash email/phone trước khi upload. Raw PII vi phạm platform ToS và privacy. Xem `best-practice.md §10.5`, `anti-pattern.md §10.4.4`.
+
+**Q10.5.3 — Limited Data Use flag (Meta) là gì?**
+> Flag trong Meta CAPI/Pixel events cho California users. Honors CCPA opt-out. Required cho California compliance. Xem `best-practice.md §10.5`, `checklist.md §11.5`.
+
+**Q10.5.4 — AI-generated ad copy có cần disclose?**
+> CÓ. FTC guidance (2023) + EU AI Act yêu cầu disclosure cho AI-generated content. Label rõ ràng trong ad. Xem `best-practice.md §10.13`, `anti-pattern.md §10.4.7`.
+
+**Q10.5.5 — Discriminatory targeting bị cấm ở đâu?**
+> Everywhere. Civil Rights Act (US), EU AI Act, ad platform anti-discrimination policies. Không target theo race, religion, sexual orientation, health, etc. Xem `anti-pattern.md §10.4.5`.
+
+### 10.6 Dark Patterns & Conversion Ethics
+
+**Q10.6.1 — Dark pattern là gì?**
+> UI/UX design deceptive, manipulate users into actions họ không intended. Examples: hidden unsubscribe, pre-checked boxes, confirmshaming, fake urgency. EDPB Guidelines 03/2022 + FTC Click-to-Cancel Rule cấm. Xem `anti-pattern.md §10.6`.
+
+**Q10.6.2 — FTC Click-to-Cancel Rule là gì?**
+> Rule (2024) yêu cầu cancellation phải dễ như signup. Same number of clicks, same level of friction. Áp dụng cho subscriptions, negative option features, free-to-pay conversions. Xem `anti-pattern.md §10.6.1`, `checklist.md §11.12`.
+
+**Q10.6.3 — Roach motel pattern là gì?**
+> Easy in, hard out. Easy signup, painful cancellation. Vi phạm FTC Click-to-Cancel + EU CRD. Xem `anti-pattern.md §10.6.1`.
+
+**Q10.6.4 — Confirmshaming là gì?**
+> Opt-out language designed to shame user. VD: "No thanks, I don't want to save money" thay vì "No thanks". Vi phạm GDPR dark patterns guidance. Xem `anti-pattern.md §10.6.2`.
+
+**Q10.6.5 — Drip pricing là gì?**
+> Hidden fees added at last step. Required to show all-in price early. FTC + EU UCPD violation. Xem `anti-pattern.md §10.6.3`.
+
+### 10.7 Customer Research Privacy
+
+**Q10.7.1 — Recording customer interviews cần consent gì?**
+> Written consent (preferred) hoặc explicit verbal consent recorded. Document: who, when, what, how used, how long stored. Xem `best-practice.md §10.6`, `checklist.md §11.8`.
+
+**Q10.7.2 — Research data retention bao lâu?**
+> Raw data: 12 months max. Aggregated insights: 24 months max. Honor right to withdraw mid-study. Xem `best-practice.md §10.6`, `architecture.md §5.5`.
+
+**Q10.7.3 — Research trên children cần gì?**
+> Parental consent + IRB review + extra safeguards. GDPR Art. 8 (under 16 or member-state-specific). COPPA (US, under 13). Xem `best-practice.md §10.6`, `anti-pattern.md §10.7.3`.
+
+**Q10.7.4 — Research vendor security review?**
+> Verify SOC2 Type II, GDPR compliance, ESOMAR/IAB compliance, DPA. Xem `checklist.md §11.8`.
+
+### 10.8 Webhook & Integration Security
+
+**Q10.8.1 — Webhook signature verification hoạt động thế nào?**
+> Sender ký payload với secret (HMAC-SHA256), receiver verify signature. Thêm timestamp + nonce để prevent replay. Xem `architecture.md §5.10`, `best-practice.md §10.8`.
+
+**Q10.8.2 — Webhook secret nên lưu ở đâu?**
+> Environment variable hoặc secret manager (Vault, AWS Secrets Manager, Doppler). KHÔNG trong code. Rotate 90 ngày. Xem `best-practice.md §10.8`, `anti-pattern.md §10.8.2`.
+
+**Q10.8.3 — Webhook có cần HTTPS không?**
+> CÓ. TLS 1.2+ minimum. KHÔNG nhận HTTP webhooks. Xem `anti-pattern.md §10.8.3`, `checklist.md §11.9`.
+
+**Q10.8.4 — Idempotency key là gì? Tại sao quan trọng?**
+> Unique key per webhook event. Prevent double-processing khi sender retry. Verify qua state store (Redis, DB). Xem `architecture.md §5.10`, `anti-pattern.md §10.8.4`.
+
+### 10.9 Sales & CRM Security
+
+**Q10.9.1 — Lead data minimization principle?**
+> Chỉ collect data sales actually uses. Không collect health, religion, political affiliation, sexual orientation, biometric. Xem `best-practice.md §10.11`, `checklist.md §11.7`.
+
+**Q10.9.2 — Demo data có nên là real customer data?**
+> KHÔNG. Dùng synthetic data hoặc anonymized data. Real customer data trong demo = vi phạm customer contracts + privacy. Xem `anti-pattern.md §10.9.1`, `checklist.md §11.10`.
+
+**Q10.9.3 — Lead scoring rules có cần disclosed?**
+> Transparency là good practice. Internal documentation should explain scoring criteria. Customers don't need full transparency (proprietary). Xem `checklist.md §11.7`.
+
+### 10.10 AI Marketing Security
+
+**Q10.10.1 — Có nên gửi customer PII cho OpenAI/Anthropic public API?**
+> KHÔNG. PII leaks qua API. Dùng enterprise tier (zero retention) hoặc anonymize trước. Xem `anti-pattern.md §10.11.1`, `best-practice.md §10.13`.
+
+**Q10.10.2 — AI-generated content có cần human review?**
+> CÓ, especially cho: facts, statistics, citations, claims about products/people. Hallucination là real risk. FTC + reputational risk. Xem `anti-pattern.md §10.11.2`, `checklist.md §11.13`.
+
+**Q10.10.3 — Prompt injection là gì trong marketing?**
+> User-controlled input (email subject from form, customer name in template) passed to LLM without sanitization. Attacker injects malicious prompts. Defense: validate + sanitize, structured prompts, output validation. Xem `anti-pattern.md §10.11.4`, OWASP LLM01.
+
+**Q10.10.4 — AI training opt-out là gì?**
+> Some vendors use customer data to train models. Opt-out through DPA, vendor settings, or zero-retention contracts. Required cho compliance. Xem `anti-pattern.md §10.11.5`.
+
+### 10.11 Crisis Communications
+
+**Q10.11.1 — Data breach response timing?**
+> GDPR: notify supervisory authority within 72 hours. SEC (US public companies): 4 business days từ materiality determination. Customer notification: ASAP, clear, actionable. Xem `best-practice.md §10.7`, `checklist.md §11.14`.
+
+**Q10.11.2 — Status page nên host ở đâu?**
+> Separate infrastructure (e.g., statuspage.io, Better Uptime) — survives main outage. Pre-built templates cho common incidents. Xem `checklist.md §11.14`.
+
+**Q10.11.3 — Crisis comms spokesperson?**
+> 1-2 trained individuals, available 24/7. Pre-approved hold statements. Legal review SLA defined. Xem `best-practice.md §10.7`, `checklist.md §11.14`.
+
+### 10.12 Marketing Stack Vendor Security
+
+**Q10.12.1 — Vendor security review checklist?**
+> SOC2 Type II (or ISO 27001), GDPR compliance, DPA available, sub-processor transparency, incident response SLA, encryption, penetration tests. Xem `architecture.md §5.15`, `checklist.md §11.15`.
+
+**Q10.12.2 — DPA (Data Processing Agreement) là gì?**
+> Contract required by GDPR Art. 28 giữa data controller và data processor. Defines: purpose, scope, type of data, duration, sub-processors, security measures, deletion obligations. Xem `best-practice.md §10.3`, `checklist.md §11.15`.
+
+**Q10.12.3 — Vendor SOC2 expiry thì sao?**
+> Vendor review immediately. Some certifications have grace period. Document risk acceptance if continuing without current cert. Consider alternate vendor. Xem `architecture.md §5.15`.
+
+### 10.13 General Privacy Questions
+
+**Q10.13.1 — PII là gì?**
+> Personally Identifiable Information: any data có thể identify individual. Includes: name, email, phone, address, SSN, IP address (per CJEU), cookie IDs, device IDs. Xem `glossary.md §14`.
+
+**Q10.13.2 — Special category data là gì?**
+> GDPR Art. 9: race, ethnicity, political opinions, religious beliefs, trade union membership, genetic data, biometric data, health data, sex life, sexual orientation. Extra protections required. Xem `glossary.md §14`.
+
+**Q10.13.3 — Anonymization vs pseudonymization?**
+> Anonymization: irreversible, data no longer personal. Pseudonymization: replace identifiers with tokens, still personal but harder to link. GDPR applies to pseudonymized. Xem `glossary.md §14`.
+
+**Q10.13.4 — Right to data portability?**
+> GDPR Art. 20: user có quyền nhận data của họ trong machine-readable format (JSON, CSV). Provided free, within 30 days. Xem `glossary.md §14`.
+
+**Q10.13.5 — Lawful basis nào cho email marketing?**
+> Consent (most common for B2C), legitimate interest (sometimes B2B, but risky), contract (transactional only, not marketing). Xem `glossary.md §14`, `best-practice.md §10.3`.
+
+---
+
+## 10.14 Kết nối với file khác
+
+- **Best practice** (`best-practice.md §10`): marketing security best practices
+- **Anti-pattern** (`anti-pattern.md §10`): marketing security anti-patterns
+- **Checklist** (`checklist.md §11`): pre-launch security checklist
+- **Architecture** (`architecture.md §5`): privacy-by-design architecture
+- **Decision tree** (`decision-tree.md §12`): security-aware routing
+- **Glossary** (`glossary.md §14`): marketing security terms
+- **Cross-rule**: `.cursor/rules/security.mdc`, `.cursor/agents/security-auditor.md`

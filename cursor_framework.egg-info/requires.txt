@@ -1,14 +1,12 @@
 pydantic>=2.0.0
 
-[all]
-pytest>=7.0.0
-pytest-cov>=4.0.0
+[dev]
 requests>=2.31.0
 python-dotenv>=1.0.0
+build>=1.0
 
-[dev]
-pytest>=7.0.0
-pytest-cov>=4.0.0
+[env]
+python-dotenv>=1.0.0
 
 [http]
 requests>=2.31.0

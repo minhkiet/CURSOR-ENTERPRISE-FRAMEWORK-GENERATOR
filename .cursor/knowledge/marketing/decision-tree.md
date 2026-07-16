@@ -1333,3 +1333,411 @@ User request về marketing
 - Mỗi routing step < 100ms (lookup section, no file creation)
 - Decision tree compiled once into Python module `cursor_framework/context_router.py` §marketing
 - Edge cases logged in `decisions/marketing/<date>.md` for monthly tuning
+
+---
+
+## 12. Security-Aware Marketing Routing Tree (sync 2026-07-15)
+
+> Bổ sung từ [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) v2.6.0. Mọi marketing task phải pass security gate trước khi execute. Routing tree này xác định security review cần thiết cho mỗi loại marketing work, dựa trên mức độ privacy/compliance exposure. Cross-reference `.cursor/knowledge/marketing/best-practice.md §10`, `.cursor/knowledge/marketing/architecture.md §5`, `.cursor/agents/security-auditor.md`.
+
+### 12.1 Pre-execution Security Gate (BẮT BUỘC)
+
+**Trước khi execute bất kỳ marketing skill nào, hỏi 5 câu security screening:**
+
+```
+Marketing task → Security gate
+   │
+   ├─► Q1: Touches user data? (PII, accounts, behavior)
+   │    ├─► Yes → apply §10 best-practice + §5 architecture
+   │    └─► No  → continue
+   │
+   ├─► Q2: Sends to audience? (email, SMS, push, ads)
+   │    ├─► Yes → apply email/SMS/ad security (§10.3, §10.5)
+   │    └─► No  → continue
+   │
+   ├─► Q3: Tracks user behavior? (analytics, pixel, session)
+   │    ├─► Yes → apply consent-aware tracking (§10.2 + §5.3)
+   │    └─► No  → continue
+   │
+   ├─► Q4: Crosses regional boundaries? (EU, CA, BR, CN, VN, ...)
+   │    ├─► Yes → apply regional compliance (§10.3 — GDPR/CCPA/LGPD/PIPL/PDPD)
+   │    └─► No  → continue
+   │
+   ├─► Q5: Uses AI / automation / external LLM?
+   │    ├─► Yes → apply AI marketing security (§10.13)
+   │    └─► No  → continue
+   │
+   └─► All 5 cleared (or mitigated) → execute
+```
+
+### 12.2 Skill-Specific Security Routing
+
+```
+"Setup tracking" / "add analytics"
+   │
+   ├─► What platform? GA4, Mixpanel, Amplitude, Segment
+   │    └─► For each: consent-aware SDK init (§5.3) + IP anonymization
+   │
+   ├─► Server-side or client-side?
+   │    ├─► Server-side → preferred (§5.8)
+   │    └─► Client-side → requires consent gate before SDK load
+   │
+   └─► Data warehouse integration?
+        └─► PII segregation (§5.11)
+
+"Build landing page"
+   │
+   ├─► Has form?
+   │    ├─► Yes → consent UI on form (anti-pattern.md §10.5.2)
+   │    │        + privacy policy link above submit (checklist.md §10.6)
+   │    └─► No  → continue
+   │
+   ├─► Has tracking pixel?
+   │    └─► Consent-mode integration required (best-practice.md §10.2)
+   │
+   └─► Targets EU/CA?
+        └─► GDPR/CCPA compliance check (checklist.md §10.4)
+
+"Write email campaign"
+   │
+   ├─► List source?
+   │    ├─► Opt-in list → proceed (verify opt-in date + method)
+   │    ├─► Purchased → REJECT (anti-pattern.md §1.1)
+   │    └─► Imported → verify consent transferability (GDPR)
+   │
+   ├─► Authentication setup?
+   │    ├─► SPF/DKIM/DMARC verified → proceed
+   │    └─► Not verified → BLOCK launch, fix auth first
+   │
+   ├─► Has unsubscribe?
+   │    ├─► One-click (RFC 8058) → proceed
+   │    └─► Multi-step → FIX (CAN-SPAM violation)
+   │
+   └─► Sender identity clear?
+        ├─► Yes → proceed
+        └─► No  → FIX (CAN-SPAM/CASL/GDPR)
+
+"Setup paid ads"
+   │
+   ├─► Has substantiated claims?
+   │    ├─► All claims verified → proceed
+   │    └─► Unverified claims → REMOVE (FTC, EU UCPD)
+   │
+   ├─► Has ad disclosure?
+   │    ├─► "Ad"/"Sponsored" prominent → proceed
+   │    └─► Hidden → FIX (FTC, EU UCPD)
+   │
+   ├─► Conversion tracking?
+   │    ├─► Server-side (CAPI) preferred → proceed
+   │    └─► Pixel only → ADD server-side for iOS 14.5+ accuracy
+   │
+   ├─► Customer data upload?
+   │    └─► Hash PII (SHA-256) before upload (best-practice.md §10.5)
+   │
+   └─► Geographic restrictions?
+        └─► EU: respect UCPD; CA: LDU flag; alcohol/gambling: certifications
+
+"Optimize signup flow"
+   │
+   ├─► Consent collection point?
+   │    ├─► Pre-checked → REJECT (GDPR Art. 7)
+   │    ├─► Unchecked with clear language → proceed
+   │    └─► No consent collection → ADD consent step
+   │
+   ├─► Data minimization?
+   │    └─► Remove non-essential fields (best-practice.md §10.6)
+   │
+   └─► Cancellation parity?
+        └─► Same friction as signup (FTC Click-to-Cancel Rule)
+
+"Setup churn prevention"
+   │
+   ├─► Save offer pre-checked?
+   │    ├─► Yes → REJECT (dark pattern, GDPR/EDPB)
+   │    └─► No  → proceed
+   │
+   ├─► Cancellation flow?
+   │    ├─► 1-click in-app → proceed
+   │    └─► Phone-only or multi-step → FIX (FTC, EU CRD)
+   │
+   ├─► Dunning emails?
+   │    └─► Respectful language (anti-pattern.md §10.10.3)
+   │
+   └─► Data deletion after cancel?
+        └─► Honor trong 30 days (GDPR Art. 17, CCPA)
+
+"Build pricing page"
+   │
+   ├─► All-in price shown early?
+   │    ├─► Yes → proceed
+   │    └─► No  → FIX (FTC, EU UCPD — drip pricing violation)
+   │
+   ├─► Hidden fees?
+   │    └─► No hidden fees → proceed
+   │
+   └─► Auto-renewal disclosed?
+        ├─► Clear trial end date → proceed
+        └─► Hidden auto-renew → FIX (FTC, Restore Online Shoppers' Confidence Act)
+
+"Customer research" / "interview customers"
+   │
+   ├─► Recording?
+   │    ├─► Written consent before recording → proceed
+   │    └─► No consent → BLOCK recording
+   │
+   ├─► Sensitive topics? (health, finance, children)
+   │    └─► Extra protections + IRB review
+   │
+   ├─► Incentive?
+   │    └─► Reasonable ($25-100/hour)
+   │
+   └─► Data handling?
+        └─► Anonymized outputs, 12-month retention (best-practice.md §10.6)
+
+"Run cold email campaign"
+   │
+   ├─► List source?
+   │    ├─► Opt-in / first-party → proceed (verify)
+   │    └─► Purchased / scraped → REJECT (CAN-SPAM, GDPR)
+   │
+   ├─► Sender authentication?
+   │    └─► SPF/DKIM/DMARC verified
+   │
+   ├─► Physical address in footer?
+   │    └─► Yes → proceed
+   │
+   └─► Unsubscribe mechanism?
+        └─► One-click (CAN-SPAM)
+
+"Launch new product / feature"
+   │
+   ├─► Collects new PII?
+   │    └─► DPIA if high-risk (GDPR Art. 35)
+   │
+   ├─► Targets minors?
+   │    └─► COPPA / GDPR-K compliance + parental consent
+   │
+   ├─► Uses AI for content?
+   │    └─► AI disclosure (FTC, EU AI Act)
+   │
+   └─► Crisis comms ready?
+        └─► Pre-approved hold statements, status page, spokesperson
+
+"Setup webhook integration"
+   │
+   ├─► Signature verification?
+   │    └─► HMAC-SHA256 (architecture.md §5.10)
+   │
+   ├─► Replay protection?
+   │    └─► Timestamp + nonce
+   │
+   ├─► Secret management?
+   │    └─► Env var, not code; 90-day rotation
+   │
+   └─► TLS enforced?
+        └─► HTTPS only, TLS 1.2+
+
+"Build AI marketing tool"
+   │
+   ├─► Public LLM used?
+   │    └─► Anonymize PII before send; enterprise tier preferred
+   │
+   ├─► Hallucination risk?
+   │    └─► Human-in-loop for facts, citations, statistics
+   │
+   ├─► Prompt injection surface?
+   │    └─► Input validation, output sanitization
+   │
+   └─► Disclosure required?
+        └─► AI-generated content labeled
+
+"Setup analytics dashboard"
+   │
+   ├─► User identifiers exposed?
+   │    └─► No raw PII; aggregate only; role-based access
+   │
+   ├─► Cross-team sharing?
+   │    └─► DPA + technical safeguards
+   │
+   └─► Retention?
+        └─► 14 months default; configurable
+
+"Use customer data for ads"
+   │
+   ├─► Consent for ad targeting?
+   │    └─► Verified per-purpose
+   │
+   ├─► PII handling?
+   │    └─► Hash before upload (SHA-256 + salt)
+   │
+   ├─► Sensitive segments?
+   │    └─► No discrimination (Civil Rights Act, EU AI Act)
+   │
+   └─► CCPA California users?
+        └─► LDU flag enabled
+
+"Public relations / press outreach"
+   │
+   ├─► Embargo respected?
+   │    └─► Verify before publishing
+   │
+   ├─► Source verification?
+   │    └─► All facts verified before publication
+   │
+   ├─► Crisis comms plan ready?
+   │    └─► Pre-approved spokesperson, hold statements
+   │
+   └─► Material non-public info?
+        └─► Reg FD compliance (public companies)
+```
+
+### 12.3 Security Severity Classification
+
+**Mỗi marketing task có security severity rating:**
+
+| Severity | Definition | Examples | Required review |
+|---|---|---|---|
+| **CRITICAL** | Direct PII handling, regulated data, vulnerable populations | Health data, children, financial, EU PII at scale | Full security review + DPO + legal |
+| **HIGH** | Behavioral tracking, paid ads with targeting, mass email | Meta CAPI setup, retargeting campaigns, life-cycle emails | Security review + checklist §11 |
+| **MEDIUM** | Public content with tracking, A/B testing, basic analytics | Landing page with form, email signup, content marketing | Checklist §11 + best-practice §10 |
+| **LOW** | Public content, no tracking, no PII | Blog post, public docs, static landing | Best-practice §10 light review |
+
+### 12.4 Routing Decision Matrix
+
+**When to invoke security-auditor vs. marketing-strategist vs. both:**
+
+| Marketing task | Primary | Secondary | Note |
+|---|---|---|---|
+| Landing page with form | ui-designer | security-auditor | Form has consent + tracking |
+| Email campaign | marketing-strategist | security-auditor | SPF/DKIM/DMARC critical |
+| Paid ads | marketing-strategist | security-auditor | CAPI, LDU, claims review |
+| Analytics setup | marketing-strategist | security-auditor | Consent-mode, IP anonymization |
+| Cookie banner | ui-designer | security-auditor | GDPR/CCPA parity |
+| Pricing page | ui-designer | security-auditor | Hidden fees + auto-renewal |
+| Cancellation flow | ui-designer | security-auditor | FTC Click-to-Cancel |
+| Customer research | doc-writer | security-auditor | Recording consent + IRB |
+| Webhook integration | backend-reviewer | security-auditor | Signed + replay protection |
+| AI marketing tool | code-reviewer | security-auditor | Prompt injection + PII |
+| App launch | deployment-engineer | security-auditor + marketing-strategist | Compliance + crisis comms |
+| Schema markup | seo-specialist | security-auditor | No PII in structured data |
+
+### 12.5 Auto-Detection Patterns (cho AI routing)
+
+**Keywords that auto-trigger security review:**
+
+```yaml
+triggers:
+  gdpr: critical
+  ccpa: critical
+  lgpd: critical
+  pipl: critical
+  consent: critical
+  cookie banner: critical
+  cookie consent: critical
+  gdpr compliance: critical
+  ccpa compliance: critical
+  privacy policy: high
+  data retention: high
+  right to deletion: high
+  right to be forgotten: high
+  data subject request: high
+  
+  email campaign: high
+  email authentication: high
+  spf: high
+  dkim: high
+  dmarc: high
+  
+  paid ads: high
+  meta pixel: high
+  meta capi: high
+  tiktok pixel: high
+  google ads: high
+  customer match: high
+  
+  conversion api: high
+  enhanced conversions: high
+  ld flag: high
+  limited data use: high
+  
+  dark pattern: critical
+  roach motel: critical
+  confirmshaming: critical
+  
+  webhook: medium
+  signature verification: medium
+  
+  analytics: medium
+  tracking: medium
+  pixel: medium
+  consent mode: medium
+  
+  ai marketing: medium
+  llm: medium
+  openai: medium
+  anthropic: medium
+  
+  auto-renewal: high
+  free trial: high
+  cancellation: high
+  click-to-cancel: high
+  drip pricing: high
+  
+  recording consent: high
+  interview consent: high
+  research ethics: high
+```
+
+### 12.6 Escalation Paths
+
+**When security review finds issues:**
+
+```
+Security issue found
+   │
+   ├─► Severity: CRITICAL
+   │    └─► BLOCK launch
+   │         ├─► Notify user: "Cannot ship, security blocker"
+   │         ├─► Recommend: invoke security-auditor agent
+   │         └─► Reference: specific anti-pattern / law
+   │
+   ├─► Severity: HIGH
+   │    └─► Recommend fix before launch
+   │         ├─► Provide: specific fix steps
+   │         ├─► Reference: best-practice §10.X
+   │         └─► Verify: after fix, re-run pre-flight
+   │
+   ├─► Severity: MEDIUM
+   │    └─► Document + recommend fix
+   │         └─► Allow launch with disclosure
+   │
+   └─► Severity: LOW
+        └─► Log + monitor
+```
+
+### 12.7 Security Review Checklist (Before Skill Execution)
+
+```
+[ ] Q1: Touches user data? → §10 best-practice + §5 architecture applied
+[ ] Q2: Sends to audience? → §10.3 / §10.5 applied
+[ ] Q3: Tracks behavior? → consent-aware SDK + IP anonymization
+[ ] Q4: Crosses regions? → GDPR / CCPA / LGPD / PIPL / PDPD check
+[ ] Q5: Uses AI? → §10.13 applied (PII to LLM, hallucination guard)
+[ ] Severity classified (CRITICAL / HIGH / MEDIUM / LOW)
+[ ] Reviewer assigned (security-auditor for HIGH+)
+[ ] Compliance documents current (privacy policy, DPA list)
+[ ] Incident response plan in place
+[ ] Audit log will capture this action
+```
+
+---
+
+## 12.8 Kết nối với file khác
+
+- **Best practice** (`best-practice.md §10`): marketing security best practices
+- **Anti-pattern** (`anti-pattern.md §10`): marketing security anti-patterns
+- **Checklist** (`checklist.md §11`): pre-launch security checklist
+- **Architecture** (`architecture.md §5`): privacy-by-design architecture
+- **FAQ** (`faq.md §10`): marketing security FAQs
+- **Glossary** (`glossary.md §14`): marketing security terms
+- **Cross-rule**: `.cursor/rules/security.mdc`, `.cursor/agents/security-auditor.md`

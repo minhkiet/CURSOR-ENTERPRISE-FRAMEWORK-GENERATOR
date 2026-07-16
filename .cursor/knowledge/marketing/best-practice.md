@@ -2200,3 +2200,258 @@ Implementation:
 - **Decision tree** (`decision-tree.md`): flow chart cho "skill nào dùng khi nào"
 - **FAQ** (`faq.md`): Q&A thường gặp
 - **Glossary** (`glossary.md §9`): mapping từ skill name → section
+
+---
+
+## 10. Marketing Security & Privacy Best Practices (sync 2026-07-15)
+
+> Bổ sung từ [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) (v2.6.0, 39.5k stars). Marketing security là intersection giữa growth/UX và security/privacy. Áp dụng cho mọi campaign, landing page, email, paid ad, tracking setup. Cross-reference `.cursor/rules/security.mdc` (technical security) + `.cursor/agents/security-auditor.md` (review).
+
+**Nguyên tắc vàng (gold rules):**
+
+| # | Nguyên tắc | Áp dụng |
+|---|------------|---------|
+| 1 | **Consent first** — không thu thập data nào trước khi user opt-in rõ ràng | Tracking, email, SMS, push, cookies |
+| 2 | **Privacy by default** — strictest privacy mode là default | Cookie banner, account settings, sharing |
+| 3 | **Transparency** — nói rõ bạn thu thập gì, dùng để làm gì, share với ai | Privacy policy, cookie notice, ad disclosures |
+| 4 | **Data minimization** — chỉ thu thập data bạn thực sự dùng | Form fields, tracking events, CRM fields |
+| 5 | **Purpose limitation** — dùng data chỉ cho mục đích đã nói | Re-purposing list, behavioral ads |
+| 6 | **Right to be forgotten** — xóa data khi user yêu cầu, không hỏi lý do | Account deletion, list removal, log redaction |
+| 7 | **No dark patterns** — consent UI phải trung thực, không pre-checked, không "X" để reject | Cookie banner, unsubscribe, opt-out |
+| 8 | **Security in depth** — defense in depth, không single point of failure | Auth on webhooks, signed URLs, scoped tokens |
+
+### 10.1 Consent Management & Cookie Banners
+
+**Best practice:**
+- **Granular consent**: tách consent theo mục đích (analytics, marketing, personalization) — không all-or-nothing
+- **Reject cùng dễ như accept** (GDPR + EDPB guidelines): "Reject all" button phải cùng style, cùng vị trí, cùng số click như "Accept all"
+- **No pre-checked boxes**: tất cả opt-in phải là affirmative action
+- **Persistent preferences**: lưu consent state, không hỏi lại mỗi lần visit
+- **Easy withdrawal**: user có thể đổi ý bất kỳ lúc nào từ footer link
+- **Server-side enforcement**: không phụ thuộc client-side consent (server cũng phải respect consent state)
+
+**Implementation pattern (TCF v2.2 / IAB compliant):**
+```typescript
+// ✅ Best practice: server-side consent gate
+async function trackEvent(userId: string, event: MarketingEvent) {
+  const consent = await getConsentState(userId);
+
+  // Hard gate at server — never trust client
+  if (event.category === 'analytics' && !consent.analytics) return;
+  if (event.category === 'marketing' && !consent.marketing) return;
+  if (event.category === 'personalization' && !consent.personalization) return;
+
+  return analytics.track(userId, event);
+}
+
+// ✅ Cookie banner — equal prominence
+<CookieBanner>
+  <p>We use cookies for [purposes].</p>
+  <Button variant="primary">Accept all</Button>
+  <Button variant="primary">Reject all</Button>   {/* equal weight, equal placement */}
+  <Link href="/cookies/preferences">Customize</Link>
+</CookieBanner>
+```
+
+**Cross-reference:** `ads` skill (ad compliance), `analytics` skill (consent-aware tracking).
+
+### 10.2 Privacy-Compliant Analytics & Tracking
+
+**Best practice:**
+- **Consent-aware SDK initialization**: không load analytics SDK khi consent = false
+- **IP anonymization**: Google Analytics IP Anonymization enabled
+- **Server-side tracking preferred**: server-side GTM, server-side Meta CAPI, server-side TikTok Events API — bypasses ITP/cookie restrictions + improves accuracy
+- **First-party data strategy**: first-party cookies > third-party (post-ITP, post-3p cookie deprecation)
+- **Data clean rooms**: cho partner data sharing (Snowflake, AWS Clean Rooms, Habu) — không share raw PII
+- **PII redaction in logs**: emails, phones, addresses, IDs phải được hash/redacted trước khi log
+- **Retention windows**: define và enforce (analytics: 14 months, marketing: 24 months, financial: 7 years)
+
+**Anti-patterns to avoid:**
+- Loading Facebook Pixel before consent (violates GDPR + ePrivacy)
+- Using `email` as user_id in analytics (PII leak to ad platforms)
+- Tracking without IP anonymization
+- Storing raw PII in event properties
+- Cross-site tracking without explicit opt-in
+
+### 10.3 GDPR / CCPA / LGPD / PIPL Compliance
+
+**Best practice:**
+- **Lawful basis documented**: cho mỗi processing activity (consent, contract, legitimate interest, legal obligation)
+- **Records of Processing Activities (ROPA)**: GDPR Art. 30 — maintain internal record
+- **Data Protection Impact Assessment (DPIA)**: cho high-risk processing (profiling, large-scale, sensitive data)
+- **Privacy by design**: mọi feature mới phải pass privacy review trước launch
+- **Cross-border transfer mechanism**: SCCs, adequacy decisions, BCRs cho EU→US transfer
+- **DPO appointed**: required cho large-scale monitoring hoặc sensitive data
+- **72-hour breach notification**: clock starts khi biết về breach, không phải khi breach xảy ra
+- **Right to access**: respond trong 30 days (GDPR) / 45 days (CCPA)
+- **Right to portability**: machine-readable format (JSON, CSV)
+
+**Regional checklist:**
+| Region | Law | Key requirements |
+|---|---|---|
+| EU | GDPR | Consent, breach notification, DPO, DPIA, ROPA |
+| California | CCPA / CPRA | Opt-out, access, deletion, financial incentives disclosure |
+| Brazil | LGPD | Similar to GDPR, ANPD oversight |
+| China | PIPL | Data localization, separate consent, security assessment for cross-border |
+| Vietnam | PDPD (2023) | Consent, data subject rights, cross-border restrictions |
+| Thailand | PDPA | Similar to GDPR |
+| Global | Cookie laws | ePrivacy Directive (EU), PECR (UK), LGPD (BR) |
+
+### 10.4 Email Marketing Security & Compliance
+
+**Best practice:**
+- **Authentication mandatory**: SPF + DKIM + DMARC (DMARC policy: `p=quarantine` minimum, `p=reject` ideal)
+- **TLS for SMTP**: enforce TLS 1.2+ cho outbound + inbound SMTP
+- **List hygiene**: hard-bounce suppression, soft-bounce retry 3x trong 72h rồi suppress
+- **Confirmed opt-in (double opt-in)**: cho EU + B2B best practice
+- **One-click unsubscribe (RFC 8058)**: List-Unsubscribe-Post header, không cần login
+- **Physical address required**: CAN-SPAM (US), CASL (Canada), GDPR transparency
+- **Sender identity clear**: "From" phải là recognizable entity, không misleading
+- **Honor opt-out trong 10 days** (CAN-SPAM) / immediately (GDPR)
+- **No rented/3rd-party lists**: chỉ gửi cho opt-in contacts
+
+**DMARC record example:**
+```
+v=DMARC1; p=reject; rua=mailto:dmarc@yourdomain.com; ruf=mailto:forensic@yourdomain.com; pct=100; adkim=s; aspf=s
+```
+
+### 10.5 Paid Ads Compliance (Google, Meta, TikTok, LinkedIn)
+
+**Best practice:**
+- **Ad disclosure clear**: "Ad", "Sponsored", "Paid partnership" — không hidden
+- **No misleading claims**: substantiated claims only (FTC, EU UCPD)
+- **Prohibited content**: no discrimination, no harmful products, no misleading health/financial claims
+- **Landing page transparency**: terms, privacy, contact info visible
+- **Conversion API server-side**: prefer Meta CAPI, TikTok Events API, Google Enhanced Conversions — better privacy + accuracy
+- **Limited data use flags**: Meta LDU flag for California users (CCPA compliance)
+- **Restricted data processing**: honor user privacy choices through ad platform APIs
+- **Customer data hashing**: SHA-256 of email/phone before upload to ad platforms (no raw PII)
+- **Ad policy compliance**: respect industry-specific rules (alcohol, gambling, finance, healthcare)
+- **Creative review**: claim verification, before/after disclosure, AI-generated content labeling
+
+### 10.6 Customer Research Privacy
+
+**Best practice:**
+- **Interview consent recorded**: explicit audio/video consent before recording
+- **Anonymization in research outputs**: strip PII from quotes + research artifacts
+- **Recruitment privacy**: panel data handling per IAB + ESOMAR guidelines
+- **Incentive tax compliance**: 1099 forms (US) for > $600/yr incentives
+- **Data retention limit**: 12 months cho raw research data, 24 months cho aggregated insights
+- **Vendor assessment**: research panel vendors must pass security review (SOC2, GDPR)
+- **Special category data**: health, biometric, children — extra protections required (GDPR Art. 9)
+
+### 10.7 Public Relations & Crisis Communications
+
+**Best practice:**
+- **Embargo verified**: respect embargo dates/times (legal consequences if broken)
+- **Source verification**: verify facts before going public (reputational + legal risk)
+- **Crisis comms protocol**: pre-approved spokesperson, legal review, hold statements ready
+- **Disclosure compliance**: Reg FD (public companies), materiality standards
+- **Crisis playbook documented**: ransomware, data breach, product recall, leadership scandal
+- **Customer comms channels**: status page, in-app banner, email — all aligned
+- **Post-crisis review**: blameless postmortem, customer follow-up, regulatory reporting
+
+### 10.8 Webhook Security & Marketing Integrations
+
+**Best practice:**
+- **Signed webhooks**: HMAC-SHA256 signature verification (Stripe, Shopify, HubSpot pattern)
+- **Replay protection**: timestamp + nonce in signature payload
+- **IP allowlisting**: when possible (e.g., Stripe webhook source IPs)
+- **Secret rotation**: rotate signing keys every 90 days
+- **TLS 1.2+ only**: never accept HTTP webhooks
+- **Idempotency keys**: prevent double-processing on retry
+- **Audit log**: log all webhook deliveries + signature verification results
+- **Scoped tokens**: integration tokens với minimum required permissions only
+
+### 10.9 Schema Markup Without PII Leak
+
+**Best practice:**
+- **No PII in structured data**: schema.org không designed cho PII
+- **Aggregate ratings only**: individual reviewer names redacted
+- **Product schema**: giá + availability public, internal SKUs không public
+- **Organization schema**: public contact info only, không internal employees
+- **FAQ schema**: support knowledge base content, không customer-specific answers
+- **Review schema**: comply with FTC + Google guidelines (no incentivized reviews without disclosure)
+
+### 10.10 ASO (App Store Optimization) Compliance
+
+**Best practice:**
+- **App privacy labels accurate**: Apple App Store, Google Play data safety sections
+- **App tracking transparency (ATT)**: iOS 14.5+ requires explicit consent for IDFA access
+- **Privacy nutrition labels**: declare data collection + tracking honestly
+- **No misleading screenshots**: actual app UI, not aspirational
+- **Age rating accurate**: especially for children (COPPA, GDPR-K)
+- **Children apps**: no behavioral ads, no third-party SDKs collecting data (COPPA Rule)
+
+### 10.11 Sales Enablement Data Hygiene
+
+**Best practice:**
+- **Lead data minimization**: chỉ thu thập data sales actually uses
+- **No sensitive categories**: không collect health, religion, political, sexual orientation
+- **Consent provenance**: log where + when consent was given
+- **Cross-team data sharing**: contractual basis + technical safeguards
+- **Compensation data confidential**: không leak trong sales enablement materials
+- **Demo data sanitized**: use synthetic data, not real customer data
+
+### 10.12 SEO Privacy Considerations
+
+**Best practice:**
+- **Log redaction**: IP addresses, user agents redacted in server logs (14-month retention max)
+- **Search analytics privacy**: anonymize query data before sharing with third parties
+- **AI search optimization (AEO/GEO)**: respect robots.txt + opt-out from training
+- **Competitor research legality**: chỉ public data, không scrape behind auth
+- **Customer data in comparison pages**: aggregate only, no individual customer comparisons without consent
+- **No PII in URL slugs**: `example.com/user/john-doe` violates privacy
+
+### 10.13 Churn Prevention Data Ethics
+
+**Best practice:**
+- **Save offers fair**: không dùng dark patterns (pre-checked retention discount, hidden cancel button)
+- **Cancellation flow 1-click**: không 4-step phone tree, không "are you sure sure sure?"
+- **Dunning emails respectful**: không shame-based language, không threaten
+- **Win-back segmentation**: không target vulnerable populations (recently unemployed, health crisis)
+- **Data deletion on cancel**: hard delete PII trong 30 days (some jurisdictions: immediately)
+
+### 10.14 Marketing Operations Security
+
+**Best practice:**
+- **SSO mandatory**: cho mọi marketing tool (HubSpot, Mailchimp, Google Ads, Meta)
+- **Role-based access**: editor / approver / admin với least privilege
+- **API key rotation**: 90-day rotation, scoped keys (read-only when possible)
+- **Audit logging**: mọi config change logged (who, when, what)
+- **Vendor security review**: SOC2 Type II or equivalent cho mọi marketing vendor
+- **Data Processing Agreements (DPA)**: GDPR Art. 28 compliant contracts
+- **Incident response plan**: marketing data breach playbook (separate from engineering)
+- **Backup + recovery**: weekly backups, quarterly restore drills
+
+### 10.15 Cross-Channel Identity Resolution Privacy
+
+**Best practice:**
+- **Deterministic matching preferred**: explicit user identifier (email hash) > probabilistic
+- **Hash with SHA-256 + salt**: before sharing with ad platforms
+- **No cross-device fingerprinting without consent**: probabilistic device graphs require explicit opt-in
+- **PII isolation**: identity resolution vendor gets hashed data, not raw PII
+- **Data clean rooms for partner data**: aggregate only, no row-level sharing
+
+### 10.16 Marketing AI Security
+
+**Best practice:**
+- **No customer PII to public LLMs**: OpenAI, Anthropic APIs không phải nơi để send raw customer data
+- **On-prem or VPC for sensitive use cases**: cho regulated industries (finance, healthcare)
+- **Prompt injection defense**: validate + sanitize inputs to AI marketing tools (email subject, ad copy generation)
+- **AI-generated content labeling**: disclose khi ad copy, image, video là AI-generated (FTC, EU AI Act)
+- **Training data opt-out**: respect robots.txt + opt-out signals for AI training
+- **Hallucination guardrails**: AI-generated facts phải verified trước khi publish (legal + reputational risk)
+- **Vendor security review**: cho AI vendors (data retention policy, training data use, breach history)
+
+---
+
+## 10.17 Kết nối với file khác
+
+- **Anti-pattern** (`anti-pattern.md §10`): dark patterns, hidden tracking, PII leaks
+- **Checklist** (`checklist.md §11`): pre-launch security checklist
+- **Architecture** (`architecture.md §5`): privacy-by-design + consent mgmt architecture
+- **Decision tree** (`decision-tree.md §12`): security-aware marketing routing
+- **FAQ** (`faq.md §10`): marketing security FAQs
+- **Glossary** (`glossary.md §14`): marketing security terms (GDPR, CCPA, dark patterns, ...)
+- **Cross-rule**: `.cursor/rules/security.mdc` (technical), `.cursor/rules/auth.mdc` (auth), `.cursor/agents/security-auditor.md` (review)

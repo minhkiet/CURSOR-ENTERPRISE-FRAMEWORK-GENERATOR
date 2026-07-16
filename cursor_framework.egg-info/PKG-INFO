@@ -1,30 +1,20 @@
 Metadata-Version: 2.4
 Name: cursor-framework
-Version: 1.0.0
-Summary: Cursor Enterprise Framework - Python Library
+Version: 1.2.0
+Summary: Cursor Enterprise Framework - Python Library + CLI
 Author: Cursor Enterprise Framework
 License: MIT
-Project-URL: Homepage, https://github.com/cursor-enterprise/framework
-Keywords: cursor,framework,llm,enterprise,context,memory,skills
-Classifier: Development Status :: 4 - Beta
-Classifier: Intended Audience :: Developers
-Classifier: Programming Language :: Python :: 3
-Classifier: Programming Language :: Python :: 3.10
-Classifier: Programming Language :: Python :: 3.11
-Classifier: Programming Language :: Python :: 3.12
 Requires-Python: >=3.10
 Description-Content-Type: text/markdown
 Requires-Dist: pydantic>=2.0.0
-Provides-Extra: dev
-Requires-Dist: pytest>=7.0.0; extra == "dev"
-Requires-Dist: pytest-cov>=4.0.0; extra == "dev"
 Provides-Extra: http
 Requires-Dist: requests>=2.31.0; extra == "http"
-Provides-Extra: all
-Requires-Dist: pytest>=7.0.0; extra == "all"
-Requires-Dist: pytest-cov>=4.0.0; extra == "all"
-Requires-Dist: requests>=2.31.0; extra == "all"
-Requires-Dist: python-dotenv>=1.0.0; extra == "all"
+Provides-Extra: env
+Requires-Dist: python-dotenv>=1.0.0; extra == "env"
+Provides-Extra: dev
+Requires-Dist: requests>=2.31.0; extra == "dev"
+Requires-Dist: python-dotenv>=1.0.0; extra == "dev"
+Requires-Dist: build>=1.0; extra == "dev"
 
 # Cursor Enterprise Framework Generator
 
@@ -51,8 +41,9 @@ Instead of starting every session from zero, the framework:
 
 | Component | Files | Where |
 |---|--:|---|
-| Rules (`.mdc`) | 42 | `.cursor/rules/` |
+| Rules (`.mdc`) | 43 | `.cursor/rules/` |
 | Skills | 50 | `.cursor/skills/` |
+| Knowledge domains | 8 (incl. **Marketing** with 47 concept-refs) | `.cursor/knowledge/` |
 | Python library (`cursor_framework`) | 14 modules + 6 utils | `cursor_framework/` |
 | Vue.js dashboard | Vue 3 + Vite + Tailwind | `cursor_framework_web/` |
 | Demo projects | 5 (CRM, fitness, food-delivery, realestate, travel) | `demos/` |
@@ -61,14 +52,27 @@ Instead of starting every session from zero, the framework:
 
 The framework ships **605+ files** inside `cursor-setup.zip` (the actual `.cursor/` payload). Repo source counts higher because of demos and build artifacts.
 
+### Knowledge Domains
+
+| Domain | Subfolder | Files | Source |
+|---|---|---|---|
+| Frontend | `.cursor/knowledge/frontend/` | 5 | Internal best practices + Vercel reference |
+| Backend | `.cursor/knowledge/backend/` | 4 | Internal + framework references |
+| Database | `.cursor/knowledge/database/` | 3 | Internal + reference docs |
+| Cloud / DevOps | `.cursor/knowledge/cloud/` | 3 | Internal + reference docs |
+| Security | `.cursor/knowledge/security/` | 3 | OWASP + internal |
+| AI / ML | `.cursor/knowledge/ai/` | 2 | Internal + WeKnora docs |
+| Chatbot | `.cursor/knowledge/chatbot/` | 2 | ChatbotX reference |
+| **Marketing** | `.cursor/knowledge/marketing/` | **7 + 47 concept-refs** | **[coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) ⭐39k (sync 2026-07-15)** |
+
 ## Architecture
 
 ```
 .cursor/                        # Framework config (installed to ~/.cursor/)
-├── rules/                      # 42 .mdc rule files
+├── rules/                      # 43 .mdc rule files (incl. skill-registry §9 marketingskills)
 ├── skills/                     # 50 specialized skill folders
 ├── memory/                     # SQLite memory layer
-├── knowledge/                  # Domain knowledge base
+├── knowledge/                  # Domain knowledge base (8 domains, incl. marketing)
 ├── prompts/                    # Prompt templates
 ├── workflows/                  # Standard workflows
 ├── templates/                  # Project templates

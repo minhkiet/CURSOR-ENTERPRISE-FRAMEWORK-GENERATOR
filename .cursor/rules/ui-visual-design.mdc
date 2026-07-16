@@ -1,8 +1,9 @@
 ---
-description: Nguyên tắc và best practices cho UI/Visual Design trong Cursor Enterprise Framework - hướng dẫn tạo giao diện đẹp mắt, chuyên nghiệp như các theme thương mại cao cấp
+description: Nguyên tắc và best practices cho UI/Visual Design trong Cursor Enterprise Framework - hướng dẫn tạo giao diện đẹp mắt, chuyên nghiệp như các theme thương mại cao cấp. Tích hợp Hallmark anti-slop design (Nutlope/hallmark, 9.3k stars) với 57 slop-test gates.
 created: 2026-06-26
-version: 1.0.0
-tags: [ui, visual-design, ux, design-system, icons, typography, color, animation, theme]
+version: 1.1.0
+updated: 2026-07-16
+tags: [ui, visual-design, ux, design-system, icons, typography, color, animation, theme, hallmark, anti-slop]
 ---
 
 # UI & Visual Design
@@ -1380,47 +1381,121 @@ const PricingCard = ({ tier, price, features, isPopular }) => (
 );
 ```
 
-## Anti-Patterns (AI Slop Markers)
+## Anti-Patterns (AI Slop Markers + Hallmark Gates)
+
+> Integrated from Hallmark (Nutlope/hallmark, 9.3k stars) — 57 slop-test gates.
 
 ```typescript
 const AI_SLOP_PATTERNS = {
-  // 1. AI-purple gradients
-  gradient: 'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-  
-  // 2. Three equal feature cards
-  featureCards: '3 cards, same icon, same text structure',
-  
-  // 3. Centered hero với dark mesh
-  darkMeshHero: 'dark background + purple/blue mesh + centered text',
-  
-  // 4. Generic names
-  names: ['John Doe', 'Sarah Chan', 'Acme Corp', 'Nexus'],
-  
-  // 5. Fake precision
-  numbers: '99.99% accuracy, 10x faster, #1 rated',
-  
-  // 6. Filler verbs
-  verbs: ['Elevate', 'Seamless', 'Unleash', 'Next-Gen', 'Game-changer'],
-  
-  // 7. Inter + Slate-900
-  fontCombo: "fontFamily: 'Inter' + color: slate-900 everywhere",
-  
-  // 8. Infinite loop micro-animations
-  infiniteLoops: 'floating elements, pulsing icons everywhere',
-  
-  // 9. Beige/brass/oxblood palette
-  warmPalette: 'background: #f5f1ea, accent: #b08947, text: #1a1714',
-  
-  // 10. Fake testimonials
-  testimonial: '"This product changed my life!" - John Doe, CEO at Acme',
+  // === HALLMARK GATES (mapped from 57 slop-test protocol) ===
+
+  // COLOR DEFAULTS (12 gates)
+  C01_ai_purple_gradient: 'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  C02_blue_mesh: 'radial-gradient blue/purple mesh background',
+  C03_em_dash_overuse: 'More than 1 em-dash on page',
+  C04_generic_cream: ['#f5f1ea', '#faf7f1', '--paper', '--cream', '--sand', '--bone'],
+  C05_warm_beige_palette: 'background: #f5f1ea, accent: #b08947, text: #1a1714',
+  C06_single_accent_only: 'Only one accent, no semantic colors',
+  C07_mixed_gray_neutrals: 'Mixing warm/cool grays mid-page',
+  C08_pure_black_white: '#000000 or #ffffff',
+  C09_gradient_text: 'background-clip: text + gradient background',
+  C10_saturated_accent: 'Accent saturation >80%',
+  C11_purple_blue_glow: 'box-shadow with purple/blue glow',
+  C12_multiple_accents: '>1 accent color on page',
+
+  // TYPOGRAPHY DEFAULTS (10 gates)
+  T01_inter_default: "fontFamily: 'Inter' without brand reason",
+  T02_serif_default: "Fraunces/Instrument Serif without brief",
+  T03_em_mix_headlines: 'Serif italic in sans headlines',
+  T04_display_spacing_tight: 'H1 letter-spacing < -0.04em',
+  T05_heading_overflow: 'Long headlines overflow viewport',
+  T06_heading_ceiling: 'H1 clamp() > 6rem (~96px)',
+  T07_section_numbering: '"00 / INDEX", "001 · Capabilities" eyebrows',
+  T08_filler_verbs: ['Elevate', 'Seamless', 'Unleash', 'Next-Gen', 'Game-changer'],
+  T09_generic_names: ['John Doe', 'Sarah Chan', 'Acme Corp', 'Nexus'],
+  T10_fake_precision: '99.99%, 50%, 1234567',
+
+  // LAYOUT DEFAULTS (15 gates)
+  L01_centered_hero_bias: 'Centered hero with VARIANCE > 4',
+  L02_three_equal_cards: '3 cards, same icon, same structure',
+  L03_split_header: 'Left big headline + right explainer paragraph',
+  L04_side_stripe_borders: 'border-left/right > 1px colored accent',
+  L05_zigzag_overflow: '3+ consecutive same image+text sections',
+  L06_hero_padding: 'pt-32 or more at desktop',
+  L07_nav_overflow: "Navigation doesn't fit one line",
+  L08_nav_height: 'Height > 80px',
+  L09_bento_empty: 'Empty cells in bento grid',
+  L10_eyebrow_spam: '> ceil(sectionCount / 3) eyebrows',
+  L11_layout_repetition: '<4 layout families across 8 sections',
+  L12_version_labels: 'V0.6, BETA, INVITE-ONLY in hero',
+  L13_decoration_strips: '"BRAND. MOTION. SPATIAL." at hero',
+  L14_floating_subtext: 'Top-right sub-text in headings',
+  L15_scroll_cues: '"Scroll", "↓ scroll" in sections',
+
+  // COMPONENT DEFAULTS (10 gates)
+  P01_cta_wrap: 'Button text wraps to 2+ lines at desktop',
+  P02_duplicate_cta: '"Get in touch" + "Contact us" + "Let\'s talk"',
+  P03_fake_screenshots: 'div-based fake screenshots',
+  P04_placeholder_label: 'Placeholder text without label',
+  P05_hero_metric: 'Big number + small label + gradient accent',
+  P06_card_overuse: 'Cards where spacing would suffice',
+  P07_logo_text: 'Plain text wordmarks instead of SVG',
+  P08_pills_images: 'Labels/overlays on hero images',
+  P09_status_decoration: 'Decorative colored status dots',
+  P10_photo_credit: 'Photo credits as decoration',
+
+  // ANIMATION DEFAULTS (10 gates)
+  A01_scroll_listener: "window.addEventListener('scroll')",
+  A02_raf_state: 'requestAnimationFrame + React state',
+  A03_gsap_motion_mix: 'GSAP + Motion in same component tree',
+  A04_non_gpu_animate: "transition: top, left, width, height",
+  A05_no_reduced_motion: 'MOTION > 3 without reduced motion support',
+  A06_marquee_overflow: '>1 marquee on page',
+  A07_motion_mismatch: 'MOTION > 4 but page is static',
+  A08_gsap_non_canonical: 'GSAP without start: "top top"',
+  A09_infinite_loops: 'Pulsing glow everywhere',
+  A10_reveal_gating: 'Content invisible without animation',
 };
+```
+
+### Hallmark Slop Test Execution
+
+Run gates before emitting any frontend code:
+
+```
+SLOP TEST
+    │
+    ├── Color Gates (C01-C12) → reject if any fail
+    ├── Typography Gates (T01-T10) → correct if any fail
+    ├── Layout Gates (L01-L15) → restructure if any fail
+    ├── Component Gates (P01-P10) → replace if any fail
+    └── Animation Gates (A01-A10) → fix if any fail
+```
+
+**Pass threshold:** All 57 gates must pass.
+
+### Hallmark Two-Pass Build
+
+```
+PASS 1 — BRAINSTORM
+  ↓  Pick 4-6 named hex values
+  ↓  Pick display + body typefaces — DELIBERATE
+  ↓  One-sentence layout concept
+  ↓  ONE signature element
+  ↓  Self-critique: generic default? → revise
+
+PASS 2 — BUILD
+  ↓  Implement revised plan
+  ↓  Derive tokens — no drift
+  ↓  Run 57 gates
+  ↓  Post-review audit
 ```
 
 ## Checklist
 
 - [ ] Font family selected (not Inter as default)
 - [ ] Color palette defined with semantic tokens
-- [ ] No AI-slop patterns detected
+- [ ] **Hallmark 57 gates passed (C01-C12, T01-T10, L01-L15, P01-P10, A01-A10)**
 - [ ] Icon library chosen and consistent
 - [ ] Type scale established
 - [ ] Border radius system consistent
@@ -1433,11 +1508,15 @@ const AI_SLOP_PATTERNS = {
 - [ ] Touch targets adequate (44px+)
 - [ ] Color contrast pass WCAG AA
 - [ ] Focus indicators visible
+- [ ] **Hallmark Two-Pass Build completed**
+- [ ] **Signature element defined**
 
 ## Liên kết
 
 - [[frontend-architecture]] - Frontend Architecture Principles
 - [[vue]] - Vue.js Best Practices
-- [[frontend-taste]] - Frontend Taste Skill (Anti-Slop)
+- [[frontend-taste]] - Frontend Taste Skill (Anti-Slop + Hallmark)
 - [[frontend-review]] - Frontend Review Skill
 - [[frontend-redesign]] - Frontend Redesign Skill
+
+**Hallmark Sources:** [Nutlope/hallmark](https://github.com/Nutlope/hallmark) (9.3k stars) — Anti-AI-slop design skill with 4 verbs, 20 themes, 57 slop-test gates.

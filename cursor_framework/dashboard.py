@@ -36,6 +36,15 @@ from .memory_store import MemoryStore
 if TYPE_CHECKING:
     from .workflow import Workflow
 
+# Defer importing _build_graph to avoid circular import:
+#   __init__.py → dashboard.py → __main__.py → dashboard.py (circular)
+# _build_graph lives in __main__.py alongside the CLI code.
+# Lazy import here means it only resolves when a request actually hits /api/graph.
+def _build_graph(root: str) -> dict:
+    # Lazy import to avoid circular dependency at module load time.
+    from . import __main__ as _cm  # noqa: PLC0415
+    return _cm._build_graph(str(root))
+
 
 class Dashboard:
     """HTTP dashboard backed by Indexer + MemoryManager + Watcher."""
@@ -191,6 +200,15 @@ class Dashboard:
                     self._send(
                         200,
                         json.dumps(dashboard._read_memory()).encode("utf-8"),
+                        "application/json",
+                    )
+                    return
+
+                if path == "/api/graph":
+                    graph_data = _build_graph(dashboard.root)
+                    self._send(
+                        200,
+                        json.dumps(graph_data, ensure_ascii=False).encode("utf-8"),
                         "application/json",
                     )
                     return

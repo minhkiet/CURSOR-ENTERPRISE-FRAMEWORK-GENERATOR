@@ -887,20 +887,28 @@ export const AGENTS: FrameworkItem[] = [
     type: 'agent',
     name: 'security-auditor',
     title: 'Security Auditor',
-    subtitle: 'OWASP Top 10 · STRIDE · supply-chain',
+    subtitle: 'OWASP · STRIDE · marketing-privacy (MSA-01..30)',
     description:
-      'Security engineer: assumes breach, verifies defense. Audits auth, secrets, input validation, API security, dependency tree. Cites OWASP Top 10 for every finding.',
+      'Security engineer: assumes breach, verifies defense. Audits auth, secrets, input validation, API security, dependency tree. Cites OWASP Top 10 + 30 Marketing Security Additions (MSA-01 to MSA-30) covering cookie banner parity, GDPR/CCPA, email auth, ad platform privacy, dark patterns, AI marketing risks.',
     category: 'Security',
-    tags: ['owasp', 'secrets', 'auth', 'payment'],
+    tags: ['owasp', 'secrets', 'auth', 'payment', 'gdpr', 'consent', 'privacy', 'marketing-security'],
     role: 'secondary',
-    trigger: '/security',
+    trigger: '/security · /privacy · /gdpr · /consent',
     path: '.cursor/agents/security-auditor.md',
     bullets: [
       'Five layers: auth, input validation, data, API, supply chain',
       'OWASP Top 10 (2021) — A01 Broken Access Control → A10 SSRF',
+      '🆕 30 MSA additions: cookie banner parity, GDPR/CCPA/LGPD/PIPL/PDPD, email auth, CAPI hashing, dark patterns, AI marketing',
+      '🆕 BLOCKS deploy on dark patterns · pre-checked consent · PII to public LLM · missing SPF/DKIM/DMARC',
       'Pre-deploy gate · runs after any CVE announcement'
     ],
-    alignsWith: ['.cursor/rules/security.mdc', '.cursor/rules/auth.mdc']
+    alignsWith: [
+      '.cursor/rules/security.mdc',
+      '.cursor/rules/auth.mdc',
+      '.cursor/knowledge/marketing/best-practice.md §10',
+      '.cursor/knowledge/marketing/anti-pattern.md §10',
+      '.cursor/agents/marketing-strategist.md'
+    ]
   },
   {
     id: 'test-engineer',
@@ -1136,21 +1144,28 @@ export const AGENTS: FrameworkItem[] = [
     type: 'agent',
     name: 'marketing-strategist',
     title: 'Marketing Strategist',
-    subtitle: 'Positioning · funnels · content · measurement',
+    subtitle: 'Positioning · funnels · security-gated growth',
     description:
-      'Product marketing & growth strategist. Designs positioning, funnels, content, SEO, paid distribution, lifecycle, retention. Operates over 9 marketing categories (47 concept-refs from coreyhaines31/marketingskills). Numbers before opinions; cheapest test first.',
+      'Product marketing & growth strategist with security overlay. Designs positioning, funnels, content, SEO, paid distribution, lifecycle, retention across 9 categories (47 concept-refs from coreyhaines31/marketingskills). Every marketing task passes 5-question security gate (PII/audience/tracking/regions/AI). Numbers before opinions; cheapest test first; security is launch blocker.',
     category: 'Growth',
-    tags: ['positioning', 'funnel', 'seo', 'lifecycle', 'measurement'],
+    tags: ['positioning', 'funnel', 'seo', 'lifecycle', 'measurement', 'privacy', 'consent'],
     role: 'secondary',
     trigger: '/marketing · /growth · /positioning · /funnel',
     path: '.cursor/agents/marketing-strategist.md',
     bullets: [
       '9 categories routed via .cursor/knowledge/marketing/decision-tree.md §11',
+      '🆕 5-question security gate before any marketing skill — PII/audience/tracking/regions/AI',
+      '🆕 Severity-classified routing (CRITICAL/HIGH/MEDIUM/LOW) into security-auditor',
       'Funnel audits: 5-step template with hypothesis × impact ranking',
       'CAC ceiling set before paid launch · LTV × payback target',
       'One metric · one experiment · one decision. Test before ship.'
     ],
-    alignsWith: ['.cursor/knowledge/marketing/', '.cursor/rules/skill-registry.mdc §9']
+    alignsWith: [
+      '.cursor/knowledge/marketing/',
+      '.cursor/rules/skill-registry.mdc §9',
+      '.cursor/knowledge/marketing/best-practice.md §10',
+      '.cursor/agents/security-auditor.md'
+    ]
   }
 ];
 
@@ -1164,6 +1179,12 @@ export const AGENTS: FrameworkItem[] = [
 // Each item below is a marketing skill/category merged into an existing knowledge file.
 // NO new SKILL.md files were created — entries here exist purely so the web catalog
 // can display them under the "Marketing" category.
+//
+// 🆕 SECURITY OVERLAY (sync 2026-07-15 v2):
+// All 7 marketing knowledge files also have §10/§11/§14 security sections, derived
+// from coreyhaines31/marketingskills patterns touching consent, GDPR/CCPA, tracking,
+// email authentication, ad platform privacy, dark patterns, AI marketing risks.
+// See .cursor/rules/skill-registry.mdc §10 for full MSA-01..30 concept-ref map.
 // ────────────────────────────────────────────────────────────────────────────
 
 export type MarketingCategory =

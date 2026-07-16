@@ -2023,3 +2023,353 @@ class SecureDataService {
 - **Symptom**: Some directories flag; profile rejected
 - **Root cause**: Mass submission triggers spam detection
 - **Fix**: 1-2 submissions/week; quality bar (full profile, screenshot, link)
+
+---
+
+## 10. Marketing Security & Privacy Anti-Patterns (sync 2026-07-15)
+
+> Bổ sung từ [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) (v2.6.0) — đặc biệt các skills: `analytics`, `ads`, `cold-email`, `emails`, `customer-research`, `schema`, `prospecting`, `churn-prevention`, `sales-enablement`. Cross-reference `.cursor/knowledge/marketing/best-practice.md §10` (best practices), `.cursor/agents/security-auditor.md` (review).
+
+### 10.1 Cookie Banner & Consent Anti-Patterns
+
+**10.1.1 Pre-checked consent boxes**
+- **Vấn đề**: Cookie banner có analytics/marketing tracking pre-checked, user phải manually uncheck
+- **Vi phạm**: GDPR Art. 7 (consent must be freely given), ePrivacy Directive, CCPA
+- **Hậu quả**: regulatory fines (max 4% global revenue under GDPR), reputational damage
+- **Fix**: All checkboxes unchecked by default; "Accept all" + "Reject all" buttons cùng prominence
+
+**10.1.2 Hidden "Reject all" button**
+- **Vấn đề**: "Accept all" prominent, "Reject all" hidden behind "Customize" hoặc low-contrast link
+- **Vi phạm**: EDPB Guidelines 03/2022 on dark patterns, GDPR Art. 7
+- **Hậu quả**: CNIL (France) fined Google €150M (2022), Meta €390M (2023)
+- **Fix**: Equal prominence, equal placement, equal visual weight
+
+**10.1.3 Cookie wall without reject option**
+- **Vấn đề**: Force accept cookies to access content (cookie wall)
+- **Vi phạm**: GDPR (consent must be freely given — not a precondition)
+- **Fix**: Always provide reject option; paywall with consent acceptable, but not "accept or leave"
+
+**10.1.4 Consent refresh fatigue**
+- **Vấn đề**: Show cookie banner mỗi session/day, even after user choice
+- **Vi phạm**: GDPR, ePrivacy (consent persists until withdrawn)
+- **Fix**: Honor previous choice; only re-prompt when purpose changes or consent expires (12 months max)
+
+**10.1.5 Faking consent collection**
+- **Vấn đề**: Log "consent=true" without actually collecting consent
+- **Vi phạm**: GDPR, FTC, CCPA — false records
+- **Fix**: Real consent UI; server-side validation; audit trail
+
+### 10.2 Tracking & Analytics Anti-Patterns
+
+**10.2.1 Loading tracking SDK before consent**
+- **Vấn đề**: Google Tag Manager, Facebook Pixel, TikTok Pixel fire before consent check
+- **Vi phạm**: GDPR, ePrivacy, CCPA, multiple ad platform ToS
+- **Hậu quả**: Regulatory fines, ad account suspension, privacy complaints
+- **Fix**: Consent-mode gates (Google Consent Mode v2, Meta Limited Data Use flag); server-side validation
+
+**10.2.2 Using email as user_id in analytics**
+- **Vấn đề**: Pass `user_id: 'john@example.com'` to GA4, Mixpanel, Amplitude
+- **Vi phạm**: PII leak to ad platforms, analytics vendors
+- **Fix**: Use opaque user IDs (UUID), store email separately in CRM
+
+**10.2.3 Logging PII in events**
+- **Vấn đề**: Event properties include raw email, phone, address, SSN
+- **Vi phạm**: GDPR data minimization, CCPA, breach exposure
+- **Fix**: Redact/hash PII before logging; log only necessary fields
+
+**10.2.4 IP address logging without anonymization**
+- **Vấn đề**: Store raw IPs in server logs, analytics
+- **Vi phạm**: GDPR (IP = personal data per CJEU ruling), CCPA
+- **Fix**: IP anonymization (last octet zeroed); 14-month max retention
+
+**10.2.5 Cross-site tracking without explicit consent**
+- **Vấn đề**: Third-party cookies, fingerprinting across sites without user opt-in
+- **Vi phạm**: ePrivacy Directive, GDPR, browser policies (Safari ITP, Firefox ETP, Chrome 3p cookie deprecation)
+- **Fix**: First-party data strategy; explicit opt-in for cross-site tracking
+
+**10.2.6 Selling analytics data without disclosure**
+- **Vấn đề**: Aggregate user data shared with third parties without consent or notice
+- **Vi phạm**: GDPR Art. 6 (lawful basis), CCPA, FTC Section 5
+- **Fix**: DPA with vendors; explicit consent for data sharing; privacy policy disclosure
+
+### 10.3 Email Marketing Anti-Patterns
+
+**10.3.1 Missing SPF/DKIM/DMARC**
+- **Vấn đề**: Email authentication not configured; spoofing possible
+- **Vi phạm**: DMARC requirement from Gmail/Yahoo (Feb 2024), Microsoft Outlook
+- **Hậu quả**: Emails to spam, deliverability collapse
+- **Fix**: SPF + DKIM + DMARC `p=quarantine` (min) hoặc `p=reject` (recommended)
+
+**10.3.2 Plaintext SMTP**
+- **Vấn đề**: SMTP on port 25 without TLS
+- **Vi phạm**: Modern email security standards
+- **Fix**: TLS 1.2+ enforced on outbound + inbound SMTP
+
+**10.3.3 Sending without confirmed opt-in (B2B best practice)**
+- **Vấn đề**: Single opt-in (email signup auto-confirms)
+- **Vi phạm**: GDPR (consent must be informed + unambiguous), CASL (Canada requires express consent)
+- **Fix**: Double opt-in for EU; single opt-in acceptable for US with clear disclosure
+
+**10.3.4 Misleading From header**
+- **Vấn đề**: `From: "Account Security" <marketing@...>`
+- **Vi phạm**: CAN-SPAM, CASL, GDPR transparency
+- **Fix**: Clear sender identity; matches domain; not deceptive
+
+**10.3.5 No physical address**
+- **Vấn đề**: Footer without valid physical postal address
+- **Vi phạm**: CAN-SPAM (US), CASL (Canada)
+- **Fix**: Include valid physical address in every email footer
+
+**10.3.6 Honor opt-out > 10 days**
+- **Vấn đề**: Ignore unsubscribe requests, or process slowly
+- **Vi phạm**: CAN-SPAM (10 days max), GDPR (immediate), CASL
+- **Fix**: Process unsubscribe immediately; suppress within 24h
+
+**10.3.7 No one-click unsubscribe**
+- **Vấn đề**: Unsubscribe requires login, multi-step form
+- **Vi phạm**: Gmail/Yahoo Feb 2024 requirement (RFC 8058)
+- **Fix**: List-Unsubscribe-Post header; one-click unsubscribe link in headers + body
+
+**10.3.8 Continuing to email after unsubscribe**
+- **Vấn đề**: User unsubscribes, but still receives emails (technical bug or worse, deliberate)
+- **Vi phạm**: All major spam laws; reputational risk
+- **Fix**: Suppression list at SMTP relay level; audit log; regular suppression list verification
+
+### 10.4 Paid Ads Compliance Anti-Patterns
+
+**10.4.1 Hidden ad disclosure**
+- **Vấn đề**: Sponsored content without "Ad" or "Sponsored" label
+- **Vi phạm**: FTC Endorsement Guidelines, EU UCPD, ad platform ToS
+- **Fix**: Clear "Ad" / "Sponsored" / "Paid partnership" labels
+
+**10.4.2 Unsubstantiated claims**
+- **Vấn đề**: "Best in class", "#1 in market", "100% guaranteed" without evidence
+- **Vi phạm**: FTC Section 5, EU UCPD, Google Ads policy, Meta Ads policy
+- **Hậu quả**: Ad rejection, account suspension, regulatory action
+- **Fix**: Substantiate every claim; avoid superlatives without proof
+
+**10.4.3 Conversion API missing client-side AND server-side**
+- **Vấn đề**: Only browser pixel fires; no server-side event sharing (loses iOS 14.5+ conversions)
+- **Vi phạm**: Not a violation, but degrades measurement accuracy significantly post-ATT
+- **Fix**: Implement both client + server events; Meta CAPI, TikTok Events API, Google Enhanced Conversions
+
+**10.4.4 Raw PII upload to ad platforms**
+- **Vấn đề**: Upload CSV with `email`, `phone`, `name` to Meta/Google customer match
+- **Vi phạm**: Platform ToS, privacy best practice
+- **Fix**: SHA-256 hash before upload; salt recommended
+
+**10.4.5 Discriminatory targeting**
+- **Vấn đề**: Exclude protected categories (race, religion, sexual orientation, health) from ad targeting
+- **Vi phạm**: Civil Rights Act, EU AI Act, ad platform anti-discrimination policies
+- **Fix**: Review targeting criteria; remove protected classes; periodic audit
+
+**10.4.6 Prohibited content**
+- **Vấn đề**: Ads for regulated products (alcohol, gambling, pharma, financial) without proper authorization
+- **Vi phạm**: Industry-specific regulations, ad platform policies
+- **Fix**: Pre-approval process; age gating; geographic restrictions; certifications
+
+**10.4.7 No AI-generated content disclosure**
+- **Vấn đề**: AI-generated ad copy/image/video without disclosure
+- **Vi phạm**: FTC guidance (2023), EU AI Act, platform-specific rules
+- **Fix**: Label AI-generated content; maintain human review process
+
+### 10.5 Data Collection Form Anti-Patterns
+
+**10.5.1 Required fields beyond necessity**
+- **Vấn đề**: Phone number required for newsletter signup; SSN for free trial
+- **Vi phạm**: GDPR data minimization (Art. 5(1)(c))
+- **Fix**: Only collect what you actually use; mark optional fields clearly
+
+**10.5.2 Pre-checked marketing opt-in**
+- **Vấn đề**: Form signup auto-subscribes user to marketing emails
+- **Vi phạm**: GDPR, ePrivacy, CCPA, CAN-SPAM
+- **Fix**: Unchecked opt-in checkbox; clear language about what they're signing up for
+
+**10.5.3 No clear privacy policy link**
+- **Vấn đề**: Form without privacy policy link near submit button
+- **Vi phạm**: GDPR transparency, CCPA notice at collection
+- **Fix**: Link to privacy policy above submit button; explain data use
+
+**10.5.4 Hidden data sharing disclosure**
+- **Vấn đề**: Privacy policy buried; data sharing with third parties not prominent
+- **Vi phạm**: CCPA, GDPR, FTC
+- **Fix**: Layered privacy notice; prominent "who we share with" section
+
+**10.5.5 Form auto-fills hidden fields with tracking data**
+- **Vấn đề**: Hidden fields auto-populated with email, FB click ID, Google click ID
+- **Vi phạm**: GDPR if collected without consent; CCPA notice requirements
+- **Fix**: Only collect declared fields; click IDs in URL parameters only if needed + disclosed
+
+### 10.6 Dark Patterns in Conversion Flows
+
+**10.6.1 Roach motel (easy in, hard out)**
+- **Vấn đề**: Easy signup, painful cancellation (multi-step phone call, "are you sure?" 4x, hidden cancel button)
+- **Vi phạm**: FTC Click-to-Cancel Rule (2024), CCPA, GDPR dark patterns guidance
+- **Fix**: Cancellation parity — same number of clicks, same level of friction as signup
+
+**10.6.2 Confirmshaming**
+- **Vấn đề**: "No thanks, I don't want to save money" instead of "No thanks"
+- **Vi phạm**: GDPR dark patterns guidance, EDPB
+- **Fix**: Neutral language for opt-out options
+
+**10.6.3 Hidden costs / drip pricing**
+- **Vấn đề**: Service fee, taxes added at last step
+- **Vi phạm**: FTC, EU UCPD, Restore Online Shoppers' Confidence Act
+- **Fix**: Show all-in price early; transparency from step 1
+
+**10.6.4 Urgency fabrication**
+- **Vấn đề**: "Only 2 left!" when inventory is plentiful; fake countdown timers that reset
+- **Vi phạm**: FTC Section 5, EU UCPD, ad platform policies
+- **Fix**: Real scarcity; honest countdown; no fake urgency
+
+**10.6.5 Forced continuity / silent subscription**
+- **Vấn đề**: "Free trial" that auto-charges without clear notice; cancellation hidden
+- **Vi phạm**: FTC, Restore Online Shoppers' Confidence Act (US), CRD (EU)
+- **Fix**: Clear trial end date + reminder email; easy cancellation; consent to auto-renewal
+
+**10.6.6 Misdirection / visual hierarchy tricks**
+- **Vấn đề**: Accept button green, hidden in plain sight; Reject option grey tiny text
+- **Vi phạm**: GDPR, CCPA, EDPB
+- **Fix**: Equal visual weight for choices
+
+### 10.7 Customer Research Anti-Patterns
+
+**10.7.1 Recording interviews without consent**
+- **Vấn đề**: Record audio/video of customer interviews without explicit consent
+- **Vi phạm**: GDPR, CCPA, biometric data laws (Illinois BIPA), wiretap laws
+- **Hậu quả**: Class-action lawsuits (BIPA $1k-$5k per violation)
+- **Fix**: Written consent before recording; clear disclosure of use
+
+**10.7.2 Using incentives that coerce**
+- **Vấn đề**: $500 gift card for 30-min interview (induces participation even when uncomfortable)
+- **Vi phạm**: Research ethics guidelines (ESOMAR, Insights Association)
+- **Fix**: Reasonable compensation proportional to time
+
+**10.7.3 Researching vulnerable populations without safeguards**
+- **Vấn đề**: Research on children, health patients, economically vulnerable without extra protections
+- **Vi phạm**: GDPR Art. 8 (children), Art. 9 (special categories), COPPA, IRB requirements
+- **Fix**: IRB review, parental consent for minors, special safeguards
+
+**10.7.4 Selling research data to third parties**
+- **Vấn đề**: Aggregate research findings sold to vendors without disclosure
+- **Vi phạm**: GDPR, CCPA, contractual breach
+- **Fix**: Anonymization; explicit disclosure; opt-out mechanism
+
+### 10.8 Webhook & Integration Anti-Patterns
+
+**10.8.1 Unsigned webhooks**
+- **Vấn đề**: Webhook endpoint without signature verification
+- **Vi phạm**: PCI-DSS (if payment), security best practice
+- **Hậu quả**: Forged events; data corruption; financial loss
+- **Fix**: HMAC-SHA256 signature verification; timestamp + nonce; replay protection
+
+**10.8.2 Webhook secret in code**
+- **Vấn đề**: Signing secret hardcoded in repo
+- **Vi phạm**: Secrets management (security.mdc §8)
+- **Fix**: Environment variable or secret manager; rotated every 90 days
+
+**10.8.3 Accepting HTTP webhooks**
+- **Vấn đề**: Webhook receiver accepts plain HTTP
+- **Vi phạm**: Modern security standards
+- **Fix**: HTTPS only; TLS 1.2+ minimum
+
+**10.8.4 Idempotency not handled**
+- **Vấn đề**: Webhook retry causes duplicate processing (double charge, double notification)
+- **Vi phạm**: Reliability best practice
+- **Fix**: Idempotency keys; state tracking; deduplication
+
+### 10.9 Sales Enablement Anti-Patterns
+
+**10.9.1 Demo with real customer data**
+- **Vấn đề**: Use real customer names, data in sales demos
+- **Vi phạm**: Customer contracts (typically), GDPR, NDAs
+- **Hậu quả**: Trust loss; legal liability
+- **Fix**: Synthetic demo data; anonymized; or explicit customer consent for case study use
+
+**10.9.2 Sales data hoarding**
+- **Vấn đề**: Sales reps keep lead data in personal spreadsheets, no central CRM
+- **Vi phạm**: Data minimization principle; security risk (departing employees take data)
+- **Fix**: Central CRM; role-based access; audit logs
+
+**10.9.3 PII in sales materials**
+- **Vấn đề**: Customer name, contact info visible in pitch decks, screenshots
+- **Vi phạm**: Customer data minimization
+- **Fix**: Anonymize case studies; redacted screenshots; explicit consent for named references
+
+### 10.10 Churn & Cancellation Anti-Patterns
+
+**10.10.1 Cancellation phone-tree hell**
+- **Vấn đề**: "To cancel, call 1-800-... between 9-5 EST, hold for 45 min, talk to retention"
+- **Vi phạm**: FTC Click-to-Cancel Rule (2024), EU CRD, CCPA
+- **Fix**: In-app one-click cancel; same parity as signup
+
+**10.10.2 Pre-checked retention offers**
+- **Vấn đề**: "Stay at 50% off" pre-checked as default during cancel flow
+- **Vi phạm**: GDPR dark patterns, EDPB
+- **Fix**: Clear choice; opt-in to offers
+
+**10.10.3 Guilt-trip cancel flows**
+- **Vấn đề**: "Are you sure? Your data will be lost! You'll miss out! Your team loves you!"
+- **Vi phạm**: GDPR dark patterns
+- **Fix**: Neutral factual language; clear consequences
+
+**10.10.4 Data deletion refusal**
+- **Vấn đề**: After cancellation, company refuses to delete data "for legal reasons"
+- **Vi phạm**: GDPR Art. 17 (right to erasure), CCPA
+- **Fix**: Document retention obligations vs. user rights; legal review; honor deletion requests
+
+### 10.11 AI Marketing Anti-Patterns
+
+**10.11.1 Sending customer PII to public LLMs**
+- **Vấn đề**: Use OpenAI/Anthropic API with raw customer emails, support tickets
+- **Vi phạm**: GDPR data transfer, vendor ToS, data breach exposure
+- **Fix**: Anonymize before LLM; use enterprise tier with data retention controls; on-prem for sensitive
+
+**10.11.2 Hallucinated facts in marketing copy**
+- **Vấn đề**: AI generates statistics, quotes, citations that don't exist
+- **Vi phạm**: FTC Section 5, reputational risk
+- **Fix**: Human-in-the-loop verification; citation checking; no AI-generated facts without source
+
+**10.11.3 AI-generated content without disclosure**
+- **Vấn đề**: AI-written blog posts, social, emails without labeling
+- **Vi phạm**: FTC, EU AI Act, platform-specific rules
+- **Fix**: Transparent labeling; AI disclosure policy
+
+**10.11.4 Prompt injection in email subjects**
+- **Vấn đề**: User-controlled input (email subject from form) directly passed to LLM
+- **Vi phạm**: OWASP LLM Top 10 (LLM01: Prompt Injection)
+- **Fix**: Sanitize user inputs; structured prompts with delimiters; output validation
+
+**10.11.5 AI training on customer data without consent**
+- **Vấn đề**: Vendor uses customer data to train their models
+- **Vi phạm**: GDPR, CCPA, contractual
+- **Fix**: Zero-retention agreements; opt-out from training; vendor review
+
+### 10.12 Crisis Communications Anti-Patterns
+
+**10.12.1 Slow disclosure of data breach**
+- **Vấn đề**: Discover breach, delay public disclosure
+- **Vi phạm**: GDPR 72-hour notification, SEC cybersecurity disclosure rules (US, 2023)
+- **Fix**: Pre-built incident response plan; legal review within hours
+
+**10.12.2 Inconsistent messaging across channels**
+- **Vấn đề**: Status page says X, email says Y, social says Z
+- **Vi phạm**: Trust, regulatory scrutiny
+- **Fix**: Single source of truth; approved spokesperson; central messaging
+
+**10.12.3 Blaming customers for security incidents**
+- **Vấn đề**: "Users should have used 2FA" deflection after breach
+- **Vi phạm**: Reputational; possible regulatory
+- **Fix**: Take responsibility; explain remediation; support affected users
+
+---
+
+## 10.13 Kết nối với file khác
+
+- **Best practice** (`best-practice.md §10`): marketing security best practices
+- **Checklist** (`checklist.md §11`): pre-launch security checklist
+- **Architecture** (`architecture.md §5`): privacy-by-design architecture
+- **Decision tree** (`decision-tree.md §12`): security-aware marketing routing
+- **FAQ** (`faq.md §10`): marketing security FAQs
+- **Glossary** (`glossary.md §14`): marketing security terms
+- **Cross-rule**: `.cursor/rules/security.mdc`, `.cursor/rules/auth.mdc`

@@ -1,129 +1,355 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>Cursor Framework Dashboard</title>
-<style>
-  :root { color-scheme: light dark; }
-  body { font: 14px/1.5 system-ui, -apple-system, Segoe UI, sans-serif;
-         max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
-  h1 { font-size: 1.5rem; margin-bottom: .25rem; }
-  .sub { color: #888; margin-bottom: 1.5rem; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-          gap: .75rem; margin-bottom: 2rem; }
-  .card { border: 1px solid #8884; border-radius: 6px; padding: .75rem 1rem; }
-  .card .v { font-size: 1.6rem; font-weight: 600; }
-  .card .l { font-size: .8rem; color: #888; text-transform: uppercase;
-             letter-spacing: .04em; }
-  table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-  th, td { text-align: left; padding: .35rem .5rem; border-bottom: 1px solid #8882; }
-  th { font-size: .8rem; color: #888; text-transform: uppercase; }
-  code { background: #8882; padding: 0 .25rem; border-radius: 3px; font-size: 90%; }
-  .meta { font-size: .8rem; color: #888; }
-  .badge { display: inline-block; padding: .1rem .4rem; border-radius: 3px;
-           background: #8883; font-size: .75rem; }
-  .live::before { content: "●"; color: #0c0; margin-right: .3rem; }
-  .stale::before { content: "●"; color: #c00; margin-right: .3rem; }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cursor Framework - Live Dashboard</title>
+  <meta name="description" content="Live operational dashboard for the Cursor Enterprise Framework. Asset index, memory cache, runtime stats, and skill dependency graph.">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2356d2ff'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='18' font-weight='700' fill='%230b0d10' text-anchor='middle'%3ECF%3C/text%3E%3C/svg%3E">
 </head>
 <body>
-<h1>Cursor Framework Dashboard</h1>
-<div class="sub" id="meta">loading…</div>
+  <!-- ──────────── NAV ──────────── -->
+  <header class="nav">
+    <div class="container" style="display:flex;align-items:center;gap:var(--sp-5);width:100%;">
+      <a class="nav__brand" href="/">
+        <span class="nav__logo">CF</span>
+        <span>Cursor Framework</span>
+      </a>
 
-<h2>Assets</h2>
-<div class="grid" id="assets"></div>
+      <!-- Tab navigation -->
+      <nav class="tab-nav" role="tablist" aria-label="Dashboard views">
+        <a class="tab-nav__item is-active" id="tab-dashboard" href="#dashboard" role="tab" aria-selected="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a>
+        <a class="tab-nav__item" id="tab-graph" href="#graph" role="tab" aria-selected="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="18" r="3"/><line x1="9" y1="6" x2="15" y2="6"/><line x1="6" y1="9" x2="6" y2="15"/><line x1="18" y1="9" x2="18" y2="15"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
+          Graph
+        </a>
+      </nav>
 
-<h2>Memory</h2>
-<div class="grid" id="memory"></div>
+      <nav class="nav__status" aria-live="polite">
+        <span id="statusDot" class="nav__dot"></span>
+        <span id="statusText">connecting</span>
+      </nav>
+    </div>
+  </header>
 
-<h2>Categories</h2>
-<table>
-<thead><tr><th>Category</th><th>Count</th></tr></thead>
-<tbody id="cats"></tbody>
-</table>
+  <!-- ──────────── DASHBOARD PANEL ──────────── -->
+  <div id="panel-dashboard" role="tabpanel" aria-labelledby="tab-dashboard">
+  <main class="container">
+    <!-- HERO -->
+    <section class="hero">
+      <div>
+        <div class="hero__eyebrow">Operational Dashboard</div>
+        <h1 class="hero__title">A live view of your <em>Cursor framework</em>.</h1>
+        <p class="hero__sub">
+          Real-time asset index, memory cache, and runtime stats. Auto-refreshes every three seconds. Built for engineers who want to know what the framework knows, without opening a REPL.
+        </p>
+      </div>
+      <div class="hero__meta" id="heroMeta">
+        <span class="hero__meta-row"><strong>Status</strong> loading</span>
+      </div>
+    </section>
 
-<h2>Workflow runtime</h2>
-<div class="grid" id="workflow"></div>
+    <!-- ASSETS BENTO -->
+    <section class="section" aria-labelledby="sec-assets">
+      <div class="section__head">
+        <h2 class="section__title" id="sec-assets">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8L12 3 3 8v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v8"/></svg>
+          Asset index
+        </h2>
+        <span class="section__hint">Top categories by file count</span>
+      </div>
+      <div class="bento" id="assets">
+        <div class="bento__card bento__card--wide"><div class="bento__label">Loading</div><div class="skeleton" style="height:48px;margin-top:var(--sp-3);"></div></div>
+        <div class="bento__card"><div class="bento__label">.</div><div class="skeleton" style="height:36px;margin-top:var(--sp-3);"></div></div>
+        <div class="bento__card"><div class="bento__label">.</div><div class="skeleton" style="height:36px;margin-top:var(--sp-3);"></div></div>
+        <div class="bento__card"><div class="bento__label">.</div><div class="skeleton" style="height:36px;margin-top:var(--sp-3);"></div></div>
+        <div class="bento__card"><div class="bento__label">.</div><div class="skeleton" style="height:36px;margin-top:var(--sp-3);"></div></div>
+      </div>
+    </section>
 
-<script>
-const fmt = (n) => Number(n || 0).toLocaleString();
+    <!-- MEMORY -->
+    <section class="section" aria-labelledby="sec-memory">
+      <div class="section__head">
+        <h2 class="section__title" id="sec-memory">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>
+          Memory cache
+        </h2>
+        <span class="section__hint">Entries, hits, and tokens saved on this run</span>
+      </div>
+      <div class="bento" id="memory">
+        <div class="bento__card"><div class="bento__label">.</div><div class="skeleton" style="height:36px;margin-top:var(--sp-3);"></div></div>
+        <div class="bento__card"><div class="bento__label">.</div><div class="skeleton" style="height:36px;margin-top:var(--sp-3);"></div></div>
+        <div class="bento__card"><div class="bento__label">.</div><div class="skeleton" style="height:36px;margin-top:var(--sp-3);"></div></div>
+        <div class="bento__card"><div class="bento__label">.</div><div class="skeleton" style="height:36px;margin-top:var(--sp-3);"></div></div>
+      </div>
+    </section>
 
-// ponytail: if URL has ?token=..., forward it on every fetch so the
-// dashboard works behind Dashboard(..., auth_token="...").
-const TOKEN = new URLSearchParams(location.search).get("token") || "";
-const authHeaders = TOKEN ? { "X-Auth-Token": TOKEN } : {};
+    <!-- CATEGORIES TABLE -->
+    <section class="section" aria-labelledby="sec-cats">
+      <div class="section__head">
+        <h2 class="section__title" id="sec-cats">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          All categories
+        </h2>
+        <span class="section__hint">Sorted by file count</span>
+      </div>
+      <div style="overflow-x:auto;border:1px solid var(--border-soft);border-radius:var(--r-md);background:var(--bg-1);">
+        <table class="table" aria-label="Indexed asset counts per category">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th style="text-align:right;">Count</th>
+              <th>Distribution</th>
+            </tr>
+          </thead>
+          <tbody id="cats">
+            <tr><td colspan="3" style="color:var(--fg-2)">Loading</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-async function load(url) {
-  const sep = url.includes("?") ? "&" : "?";
-  const full = url + (TOKEN ? sep + "token=" + encodeURIComponent(TOKEN) : "");
-  const r = await fetch(full, { cache: "no-store", headers: authHeaders });
-  if (!r.ok) return null;
-  return r.json();
-}
+    <!-- WORKFLOW RUNTIME -->
+    <section class="section" aria-labelledby="sec-wf">
+      <div class="section__head">
+        <h2 class="section__title" id="sec-wf">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/></svg>
+          Workflow runtime
+        </h2>
+        <span class="section__hint">Live telemetry from the workflow engine</span>
+      </div>
+      <div class="bento" id="workflow">
+        <div class="bento__card bento__card--wide"><div class="bento__label">.</div><div class="skeleton" style="height:36px;margin-top:var(--sp-3);"></div></div>
+      </div>
+    </section>
 
-function card(label, value, extra = "") {
-  return `<div class="card"><div class="l">${label}</div>
-    <div class="v">${value}</div>${extra}</div>`;
-}
+    <!-- USAGE GUIDE -->
+    <section class="section" aria-labelledby="sec-cmd">
+      <div class="section__head">
+        <h2 class="section__title" id="sec-cmd">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          Command reference
+        </h2>
+        <span class="section__hint">Click any card to copy  &middot;  run from your repo root</span>
+      </div>
+      <div class="cmds" id="commands"></div>
+    </section>
 
-async function refresh() {
-  const idx = await load("/api/index");
-  const stats = await load("/api/stats");
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div>Cursor Enterprise Framework <code class="mono">cursor-framework</code></div>
+      <div>
+        API: <a href="/api/index"><code class="mono">/api/index</code></a> &middot;
+        <a href="/api/stats"><code class="mono">/api/stats</code></a> &middot;
+        <a href="/api/memory"><code class="mono">/api/memory</code></a> &middot;
+        <a href="/api/graph"><code class="mono">/api/graph</code></a>
+      </div>
+    </footer>
+  </main>
+  </div><!-- end panel-dashboard -->
 
-  const meta = document.getElementById("meta");
-  if (stats && stats.index_fresh) {
-    meta.innerHTML = `<span class="live">index live</span>
-      · root <code>${idx.root}</code>
-      · scanned ${idx.scanned_at}
-      · auto-refresh every 3s`;
-  } else {
-    meta.innerHTML = `<span class="stale">no index</span>
-      — run <code>python -m cursor_framework.indexer .cursor</code> first`;
-  }
+  <!-- ──────────── GRAPH PANEL ──────────── -->
+  <div id="panel-graph" role="tabpanel" aria-labelledby="tab-graph" style="display:none;">
+    <div class="graph-wrap" id="graphWrap">
+      <!-- SVG injected by graph.js -->
+      <svg id="graphSvg"></svg>
 
-  const assets = document.getElementById("assets");
-  const mem = document.getElementById("memory");
-  const cats = document.getElementById("cats");
-  const wf = document.getElementById("workflow");
+      <!-- Legend -->
+      <div class="graph-legend" aria-label="Graph legend">
+        <h3>Legend</h3>
+        <div class="graph-legend__row">
+          <span class="graph-legend__dot" style="background:var(--accent);"></span>
+          <span>skill</span>
+        </div>
+        <div class="graph-legend__row">
+          <span class="graph-legend__dot" style="background:var(--warn);"></span>
+          <span>agent</span>
+        </div>
+        <div class="graph-legend__row">
+          <span class="graph-legend__dot" style="background:var(--ok);opacity:0.6;"></span>
+          <span>knowledge</span>
+        </div>
+        <div class="graph-legend__row">
+          <span class="graph-legend__dot" style="background:var(--fg-2);"></span>
+          <span>rule</span>
+        </div>
+        <div class="graph-legend__row" style="margin-top:var(--sp-2);padding-top:var(--sp-2);border-top:1px solid var(--border-soft);">
+          <span class="graph-legend__swatch dep"></span>
+          <span>dependency</span>
+        </div>
+        <div class="graph-legend__row">
+          <span class="graph-legend__swatch co"></span>
+          <span>co-occurrence</span>
+        </div>
+      </div>
 
-  if (idx) {
-    const t = idx.totals;
-    assets.innerHTML =
-      card("Grand total", fmt(t.grand_total)) +
-      card("Skills", fmt(t.skills)) +
-      card("Rules", fmt(t.rules)) +
-      card("Knowledge", fmt(t.knowledge)) +
-      card("Commands", fmt(t.commands)) +
-      card("Hooks", fmt(t.hooks));
+      <!-- Stats bar -->
+      <div class="graph-stats" id="graphStats" aria-label="Graph statistics">
+        <span>Nodes: <strong id="graphNodeCount">&mdash;</strong></span>
+        <span>Edges: <strong id="graphEdgeCount">&mdash;</strong></span>
+        <span>Generated: <strong id="graphGeneratedAt">&mdash;</strong></span>
+      </div>
 
-    cats.innerHTML = Object.entries(t)
-      .filter(([k]) => k !== "grand_total")
-      .sort((a, b) => b[1] - a[1])
-      .map(([k, v]) => `<tr><td>${k}</td><td>${fmt(v)}</td></tr>`)
-      .join("");
-  } else {
-    assets.innerHTML = card("Grand total", "—");
-    cats.innerHTML = "";
-  }
+      <!-- Tooltip -->
+      <div class="graph-tooltip" id="graphTooltip" role="tooltip" aria-hidden="true">
+        <div class="graph-tooltip__name" id="tt-name"></div>
+        <div class="graph-tooltip__kind" id="tt-kind"></div>
+        <div class="graph-tooltip__tags" id="tt-tags"></div>
+        <div class="graph-tooltip__path" id="tt-path"></div>
+      </div>
+    </div>
+  </div><!-- end panel-graph -->
 
-  if (stats) {
-    const m = stats.memory || {};
-    mem.innerHTML =
-      card("Entries", fmt(m.entries)) +
-      card("Hits", fmt(m.hits)) +
-      card("Misses", fmt(m.misses)) +
-      card("Tokens saved", fmt(m.tokens_saved));
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-    const w = stats.workflow || {};
-    const wcards = Object.entries(w)
-      .map(([k, v]) => card(k, fmt(v)))
-      .join("");
-    wf.innerHTML = wcards || card("(no workflow)", "—");
-  }
-}
+  <script src="/app.js"></script>
+  <script src="/graph.js"></script>
+</body>
+</html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cursor Framework - Live Dashboard</title>
+  <meta name="description" content="Live operational dashboard for the Cursor Enterprise Framework. Asset index, memory cache, runtime stats, and command reference.">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2356d2ff'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='18' font-weight='700' fill='%230b0d10' text-anchor='middle'%3ECF%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+  <!-- ──────────── NAV ──────────── -->
+  <header class="nav">
+    <div class="container" style="display:flex;align-items:center;gap:var(--sp-5);width:100%;">
+      <a class="nav__brand" href="/">
+        <span class="nav__logo">CF</span>
+        <span>Cursor Framework</span>
+      </a>
+      <nav class="nav__status" aria-live="polite">
+        <span id="statusDot" class="nav__dot"></span>
+        <span id="statusText">connecting</span>
+      </nav>
+    </div>
+  </header>
 
-refresh();
-setInterval(refresh, 3000);
-</script>
+  <main class="container">
+    <!-- ──────────── HERO ──────────── -->
+    <section class="hero">
+      <div>
+        <div class="hero__eyebrow">Operational Dashboard</div>
+        <h1 class="hero__title">A live view of your <em>Cursor framework</em>.</h1>
+        <p class="hero__sub">
+          Real-time asset index, memory cache, and runtime stats. Auto-refreshes every three seconds. Built for engineers who want to know what the framework knows, without opening a REPL.
+        </p>
+      </div>
+      <div class="hero__meta" id="heroMeta">
+        <span class="hero__meta-row"><strong>Status</strong> loading…</span>
+      </div>
+    </section>
+
+    <!-- ──────────── ASSETS BENTO ──────────── -->
+    <section class="section" aria-labelledby="sec-assets">
+      <div class="section__head">
+        <h2 class="section__title" id="sec-assets">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8L12 3 3 8v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v8"/></svg>
+          Asset index
+        </h2>
+        <span class="section__hint">Top categories by file count</span>
+      </div>
+      <div class="bento" id="assets">
+        <div class="bento__card bento__card--wide"><div class="bento__label">Loading</div><div class="skeleton" style="height:48px;margin-top:var(--sp-3);"></div></div>
+        <div class="bento__card"><div class="bento__label">.</div><div class="skeleton" style="height:36px;margin-top:var(--sp-3);"></div></div>
+        <div class="bento__card"><div class="bento__label">.</div><div class="skeleton" style="height:36px;margin-top:var(--sp-3);"></div></div>
+        <div class="bento__card"><div class="bento__label">.</div><div class="skeleton" style="height:36px;margin-top:var(--sp-3);"></div></div>
+        <div class="bento__card"><div class="bento__label">.</div><div class="skeleton" style="height:36px;margin-top:var(--sp-3);"></div></div>
+      </div>
+    </section>
+
+    <!-- ──────────── MEMORY ──────────── -->
+    <section class="section" aria-labelledby="sec-memory">
+      <div class="section__head">
+        <h2 class="section__title" id="sec-memory">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>
+          Memory cache
+        </h2>
+        <span class="section__hint">Entries, hits, and tokens saved on this run</span>
+      </div>
+      <div class="bento" id="memory">
+        <div class="bento__card"><div class="bento__label">.</div><div class="skeleton" style="height:36px;margin-top:var(--sp-3);"></div></div>
+        <div class="bento__card"><div class="bento__label">.</div><div class="skeleton" style="height:36px;margin-top:var(--sp-3);"></div></div>
+        <div class="bento__card"><div class="bento__label">.</div><div class="skeleton" style="height:36px;margin-top:var(--sp-3);"></div></div>
+        <div class="bento__card"><div class="bento__label">.</div><div class="skeleton" style="height:36px;margin-top:var(--sp-3);"></div></div>
+      </div>
+    </section>
+
+    <!-- ──────────── CATEGORIES TABLE ──────────── -->
+    <section class="section" aria-labelledby="sec-cats">
+      <div class="section__head">
+        <h2 class="section__title" id="sec-cats">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          All categories
+        </h2>
+        <span class="section__hint">Sorted by file count</span>
+      </div>
+      <div style="overflow-x:auto;border:1px solid var(--border-soft);border-radius:var(--r-md);background:var(--bg-1);">
+        <table class="table" aria-label="Indexed asset counts per category">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th style="text-align:right;">Count</th>
+              <th>Distribution</th>
+            </tr>
+          </thead>
+          <tbody id="cats">
+            <tr><td colspan="3" style="color:var(--fg-2)">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ──────────── WORKFLOW RUNTIME ──────────── -->
+    <section class="section" aria-labelledby="sec-wf">
+      <div class="section__head">
+        <h2 class="section__title" id="sec-wf">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/></svg>
+          Workflow runtime
+        </h2>
+        <span class="section__hint">Live telemetry from the workflow engine</span>
+      </div>
+      <div class="bento" id="workflow">
+        <div class="bento__card bento__card--wide"><div class="bento__label">.</div><div class="skeleton" style="height:36px;margin-top:var(--sp-3);"></div></div>
+      </div>
+    </section>
+
+    <!-- ──────────── USAGE GUIDE ──────────── -->
+    <section class="section" aria-labelledby="sec-cmd">
+      <div class="section__head">
+        <h2 class="section__title" id="sec-cmd">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          Command reference
+        </h2>
+        <span class="section__hint">Click any card to copy · run from your repo root</span>
+      </div>
+      <div class="cmds" id="commands"></div>
+    </section>
+
+    <!-- ──────────── FOOTER ──────────── -->
+    <footer class="footer">
+      <div>
+        Cursor Enterprise Framework <code class="mono">cursor-framework</code>
+      </div>
+      <div>
+        API: <a href="/api/index"><code class="mono">/api/index</code></a> ·
+        <a href="/api/stats"><code class="mono">/api/stats</code></a> ·
+        <a href="/api/memory"><code class="mono">/api/memory</code></a>
+      </div>
+    </footer>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="/app.js"></script>
 </body>
 </html>

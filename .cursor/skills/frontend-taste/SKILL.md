@@ -1,6 +1,8 @@
 ﻿---
 name: frontend-taste
-description: Anti-slop frontend skill for landing pages, portfolios, and redesigns. Reads the brief, infers the design direction, sets three dials (VARIANCE/MOTION/DENSITY), and ships interfaces that do not look templated. Includes mandatory pre-review and post-review checkpoints before and after code generation. Synthesizes pbakaus/impeccable, Leonxlnx/taste-skill, anthropics/frontend-design, vercel-labs/web-design-guidelines, nextlevelbuilder/ui-ux-pro-max, and emilkowalski/emil-design-eng into a single coherent playbook. See §12 for attribution and conflict-resolution rules.
+description: Anti-slop frontend skill for landing pages, portfolios, and redesigns. Reads the brief, infers the design direction, sets three dials (VARIANCE/MOTION/DENSITY), and ships interfaces that do not look templated. Includes mandatory pre-review and post-review checkpoints before and after code generation. Synthesizes pbakaus/impeccable, Leonxlnx/taste-skill, anthropics/frontend-design, vercel-labs/web-design-guidelines, nextlevelbuilder/ui-ux-pro-max, emilkowalski/emil-design-eng, and Nutlope/hallmark (9.3k stars) into a single coherent playbook. See §12 for attribution and conflict-resolution rules.
+version: 1.8.0
+updated: 2026-07-16
 ---
 
 # Taste Frontend Skill (Anti-Slop Edition)
@@ -514,12 +516,91 @@ npm install motion gsap
 
 ---
 
-## 9. DESIGN-LEAD PHILOSOPHY (Two-Pass Build)
+## 9. DESIGN-LEAD PHILOSOPHY (Two-Pass Build + Hallmark)
 
-> Synthesized from `anthropics/frontend-design` (⭐3) and `pbakaus/impeccable` (⭐1).
+> Synthesized from `anthropics/frontend-design` (⭐3), `pbakaus/impeccable` (⭐1), and `Nutlope/hallmark` (⭐9.3k).
 > This is the *frame of mind* behind every section above. Apply it whenever §0.B produces a non-trivial design read.
 
-### 9.A Two-Pass Build (mandatory for landing pages and redesigns)
+### 9.A Hallmark Integration (v1.8.0)
+
+**Hallmark** (9.3k stars) picks a macrostructure, applies one of 20 themes, runs 57 slop-test gates. Two pages for different briefs feel like different sites.
+
+#### 9.A.1 Hallmark Themes (20 Catalog + Custom)
+
+Select theme based on brand brief:
+
+| Theme | Aesthetic | Color Anchor | Example Use Cases |
+|-------|-----------|-------------|------------------|
+| **Hum** | Warm minimal | Soft peach + sage | Sourdough app, wellness |
+| **Cobalt** | Industrial clean | Deep blue + cream | API tools, dev infra |
+| **Carnival** | Vibrant bold | Rich red + gold | Record labels, creative |
+| **Lumen** | Bright tech | White + electric blue | AI tools, dashboards |
+| **Garden** | Natural earthy | Moss + cream | Honey farms, organic |
+| **Riso** | Print-inspired | Bright spots on off-white | Print fairs, art |
+| **modern-minimal** | Clean SaaS | Neutral + accent | SaaS products |
+| **atmospheric** | Moody, immersive | Dark + glowing | Travel, experience |
+| **arctic-frost** | Cool, crisp | Ice blue + white | Tech, fintech |
+| **golden-hour** | Warm glow | Amber + cream | Lifestyle, beauty |
+| **ocean-depths** | Deep, mysterious | Navy + teal | Maritime, premium |
+| **desert-rose** | Earthy warmth | Terracotta + sand | Artisan, craft |
+| **sunset-boulevard** | Retro warmth | Orange + purple | Entertainment |
+| **dark-luxury** | Premium dark | Charcoal + gold | High-end products |
+| **neo-brutalist** | Raw, bold | High contrast | Agencies, portfolios |
+| **editorial-serif** | Classic print | Cream + black serif | Publications |
+| **swiss-grid** | Geometric | Red + black | Corporate |
+| **Custom** | Bespoke | Made-to-measure | No catalog fit |
+
+**Theme Selection Protocol:**
+```
+1. Analyze brief for brand signals
+2. Match to closest catalog theme OR trigger Custom
+3. Derive all design tokens from selected theme
+4. Run 57 slop-test gates (§9.F)
+5. Self-critique before code (§9.H)
+```
+
+#### 9.A.2 Hallmark 4 Verbs (Design Actions)
+
+| Verb | Action | When to Use |
+|------|--------|-------------|
+| *(default)* | Build new UI | New landing pages, portfolios |
+| `hallmark audit` | Score existing code | Audit current UI for slop |
+| `hallmark redesign` | Rebuild with new theme | Full redesign preserving brand |
+| `hallmark study` | Extract design DNA | Study admired designs |
+
+#### 9.A.3 Custom Theme Protocol
+
+When no catalog theme fits:
+```
+1. Design from scratch (not template)
+2. Bespoke palette: 4-5 hex values
+3. Custom type pairing
+4. Unique layout macrostructure
+5. Same 57 slop-test gates apply
+6. Document as "Custom" for future reference
+```
+
+#### 9.A.4 Hallmark DNA Extraction (Study Mode)
+
+For `hallmark study` requests:
+```
+1. Extract MACROSTRUCTURE
+   └── Layout family, section hierarchy, visual rhythm
+   
+2. Extract TYPE-PAIRING
+   └── Display font + body font combination
+   
+3. Extract COLOUR ANCHOR
+   └── Primary + accent + neutral base
+   
+4. Refuse pixel-clones
+   └── Design DNA, not visual copy
+   
+5. Optional: Emit portable design.md
+   └── For handoff to other AI tools
+```
+
+### 9.B Two-Pass Build (mandatory for landing pages and redesigns)
 
 ```
 PASS 1 — BRAINSTORM (do not write code yet)
@@ -597,6 +678,112 @@ If someone could look at the interface and say "AI made that" without doubt, it 
 
 - **First-order check:** if a viewer could guess the theme + palette from the *category alone* (e.g. "AI workflow tool", "fintech app"), it is the first training-data reflex. Rework the scene sentence and color strategy until the answer is not obvious from the domain.
 - **Second-order check:** if the viewer could guess the aesthetic family from category-plus-anti-references (e.g. "fintech that's not navy-and-gold → terminal-native dark mode"), it is the trap one tier deeper. Rework until both answers are not obvious.
+
+### 9.M Hallmark 57 Slop-Test Gates (Automated Anti-Slop Protocol)
+
+> Integrated from `Nutlope/hallmark` (9.3k stars). Hallmark runs 57 automated gates before emitting. These are mapped to framework rules.
+
+#### Color Defaults Gates (12 gates)
+| Gate | Check | Fail if... | Rule mapping |
+|------|-------|-----------|-------------|
+| C.01 | AI-purple gradient | `#667eea`, `#764ba2` gradient | `ui-visual-design §AI_SLOP_PATTERNS` |
+| C.02 | Blue mesh background | Radial gradient blue/purple mesh | `ui-visual-design §AI_SLOP_PATTERNS` |
+| C.03 | Em-dash overuse | More than 1 em-dash on page | `§3.1 EM-DASH BAN` |
+| C.04 | Generic cream | `#f5f1ea`, `#faf7f1`, `--paper` tokens | `§9.C Anti-Cream` |
+| C.05 | Warm beige palette | Beige + brass + oxblood + espresso | `§3.2 PREMIUM-CONSUMER BAN` |
+| C.06 | Single accent variety | Only one accent, no semantic colors | `ui-visual-design §Color System` |
+| C.07 | Neutral base consistency | Mixing warm/cool grays mid-page | `§3.2 One palette per project` |
+| C.08 | Pure black/white | `#000000` or `#ffffff` | `§5.C Dark Mode` |
+| C.09 | Gradient text | `background-clip: text` | `§9.I Gradient Text banned` |
+| C.10 | Saturated >80% accent | Accent saturation >80% | `§3.2 Max 1 accent, <80%` |
+| C.11 | Purple/blue glow | `box-shadow` with purple/blue | `§3.2 THE LILA RULE` |
+| C.12 | Multiple accent colors | >1 accent color on page | `§3.2 Max 1 accent` |
+
+#### Typography Defaults Gates (10 gates)
+| Gate | Check | Fail if... | Rule mapping |
+|------|-------|-----------|-------------|
+| T.01 | Inter as default | Inter used without brand reason | `§3.1 Sans fonts default away from Inter` |
+| T.02 | Serif as default | Fraunces/Instrument Serif without brief | `§3.1 SERIF RULE` |
+| T.03 | Em-mix headlines | Serif italic in sans headlines | `§3.1 EM-PHASIS same family` |
+| T.04 | Display spacing | H1 `letter-spacing` < -0.04em | `§9.E Letter-Spacing Floor` |
+| T.05 | Heading overflow | Long headlines overflow viewport | `§9.F Heading Overflow Test` |
+| T.06 | Heading ceiling | H1 `clamp()` > 6rem | `§9.G Heading Ceiling` |
+| T.07 | Section numbering | "00 / INDEX", "001 · Capabilities" | `§6.C No section-numbering eyebrows` |
+| T.08 | Filler verbs | Elevate, Seamless, Unleash, Next-Gen | `§3.5 NO filler verbs` |
+| T.09 | Generic names | John Doe, Sarah Chan, Acme | `§3.5 NO generic names` |
+| T.10 | Fake precision | 99.99%, 50%, 1234567 | `§3.5 NO fake round numbers` |
+
+#### Layout Patterns Gates (15 gates)
+| Gate | Check | Fail if... | Rule mapping |
+|------|-------|-----------|-------------|
+| L.01 | Centered hero bias | Centered hero with VARIANCE > 4 | `§3.3 ANTI-CENTER BIAS` |
+| L.02 | Three equal cards | 3 cards, same icon, same structure | `§9.D Anti-Identical-Card-Grids` |
+| L.03 | Split header pattern | Left big headline + right explainer | `§3.3 SPLIT-HEADER BAN` |
+| L.04 | Side-stripe borders | `border-left/right` > 1px colored accent | `§9.H Side-Stripe Borders banned` |
+| L.05 | Zigzag overflow | 3+ consecutive same image+text sections | `§3.3 ZIGZAG CAP` |
+| L.06 | Hero top padding | `pt-32` or more at desktop | `§3.3 HERO TOP PADDING CAP` |
+| L.07 | Nav overflow | Navigation doesn't fit one line | `§3.3 NAVIGATION 1 line` |
+| L.08 | Nav height | Height > 80px | `§3.3 NAVIGATION height cap` |
+| L.09 | Bento empty cells | Empty cells in bento grid | `§3.3 BENTO CELL COUNT` |
+| L.10 | Eyebrow spam | > ceil(sectionCount / 3) eyebrows | `§3.3 EYEBROW RESTRAINT` |
+| L.11 | Layout repetition | <4 layout families across 8 sections | `§3.3 Section-Layout-Repetition` |
+| L.12 | Version labels | V0.6, BETA, INVITE-ONLY in hero | `§6.C No version labels` |
+| L.13 | Decoration strips | "BRAND. MOTION. SPATIAL." at hero | `§6.C No decoration text` |
+| L.14 | Floating sub-text | Top-right sub-text in headings | `§6.C No floating text` |
+| L.15 | Scroll cues | "Scroll", "↓ scroll" in sections | `§6.C No scroll cues` |
+
+#### Component Patterns Gates (10 gates)
+| Gate | Check | Fail if... | Rule mapping |
+|------|-------|-----------|-------------|
+| P.01 | CTA wrap | Button text wraps to 2+ lines | `§3.4 CTA WRAP BAN` |
+| P.02 | Duplicate CTA intent | "Get in touch" + "Contact us" | `§3.4 NO DUPLICATE CTA` |
+| P.03 | Fake screenshots | div-based fake screenshots | `§3.6 Fake screenshots BANNED` |
+| P.04 | Placeholder-as-label | Placeholder text without label | `§3.7 No placeholder-as-label` |
+| P.05 | Hero-metric template | Big number + small label + gradient | `§9.J Hero-Metric Template banned` |
+| P.06 | Card overuse | Cards where spacing would suffice | `§3.3 Cards only when elevation needed` |
+| P.07 | Logo text wordmarks | Plain text instead of SVG logos | `§3.6 Real logos with Simple Icons` |
+| P.08 | Pills on images | Labels/overlays on hero images | `§6.C No pills on images` |
+| P.09 | Status dots decoration | Decorative colored status dots | `§6.C Semantic status only` |
+| P.10 | Photo-credit captions | Photo credits as decoration | `§6.C No photo-credit captions` |
+
+#### Animation Defaults Gates (10 gates)
+| Gate | Check | Fail if... | Rule mapping |
+|------|-------|-----------|-------------|
+| A.01 | Scroll listener | `window.addEventListener('scroll')` | `§4.3 HARD BAN` |
+| A.02 | RAF state loop | `requestAnimationFrame` + React state | `§4.3 Forbidden patterns` |
+| A.03 | GSAP + Motion mix | Both in same component tree | `§4.3 GSAP + Motion fight` |
+| A.04 | Non-GPU animate | `top`, `left`, `width`, `height` | `§5.A Hardware Acceleration` |
+| A.05 | Reduced motion | `MOTION > 3` without reduced motion | `§5.B Reduced Motion non-negotiable` |
+| A.06 | Marquee overflow | >1 marquee on page | `§4.5 Marquee Rule` |
+| A.07 | Motion mismatch | `MOTION > 4` but page is static | `§6.F Motion claimed ≠ shown` |
+| A.08 | GSAP non-canonical | GSAP without `start: "top top"` | `§4.2 GSAP Canonical Patterns` |
+| A.09 | Infinite loops | Pulsing glow everywhere | `§4.4 Motion Motivation Rule` |
+| A.10 | Reveal gating | Content invisible without animation | `§9.K Reveal-Safety` |
+
+#### Slop Test Execution
+
+Before emitting any frontend code, run the relevant gates:
+
+```
+SLOP TEST EXECUTION
+    │
+    ├── Color Gates (C.01-C.12)
+    │   └── If any fail: reject palette, restart from §9.A
+    │
+    ├── Typography Gates (T.01-T.10)
+    │   └── If any fail: correct type selection
+    │
+    ├── Layout Gates (L.01-L.15)
+    │   └── If any fail: restructure layout
+    │
+    ├── Component Gates (P.01-P.10)
+    │   └── If any fail: replace with approved pattern
+    │
+    └── Animation Gates (A.01-A.10)
+        └── If any fail: fix or remove animation
+```
+
+**Pass threshold:** 57/57 gates must pass. Any failure = reject and rebuild.
 
 ---
 
@@ -788,6 +975,7 @@ Note: this priority order is **embedded as reference only**. The active rules li
 | ⭐4 | web-design-guidelines | github.com/vercel-labs/agent-skills | 25k | §11.C (runtime audit pointer; not embedded — stays fresh) |
 | ⭐5 | ui-ux-pro-max | github.com/nextlevelbuilder/ui-ux-pro-max-skill | 95k | §11 (database pointer, priority table) |
 | ⭐6 | emil-design-eng | github.com/emilkowalski/skill | 2k | §10 (animation decision framework + polish layer) |
+| ⭐7 | hallmark | github.com/Nutlope/hallmark | 9.3k | §9.A (4 verbs, 20 themes, 57 slop-test gates) |
 
 ### 12.B Merge order
 
@@ -799,6 +987,7 @@ The ⭐ priority (1=highest) defines **conflict resolution** when sources disagr
 - ⭐4 wins on **a11y/perf/UX compliance rules** (any conflict with ⭐1-3 on accessibility → ⭐4 wins, no exceptions)
 - ⭐5 wins on **style/palette/font pairing lookup** (when the brief needs a database-driven recommendation, not a taste-driven one)
 - ⭐6 wins on **micro-interaction polish** (motion decisions, easing curves, button-press feedback)
+- ⭐7 wins on **slop-test gates and theme selection** (57 gates, 20 catalog themes, custom theme protocol)
 
 In practice the sources agree on most things. When they disagree, the resolution above is the rule.
 
@@ -812,6 +1001,7 @@ In practice the sources agree on most things. When they disagree, the resolution
 | `karpathy-coding` | `.cursor/skills/karpathy-coding/SKILL.md` | Overlay: pre/post reasoning gate for any code task | karpathy-pre | karpathy-post |
 | `full-output` | `.cursor/skills/full-output/SKILL.md` | Multi-file implementations | fulloutput-pre | fulloutput-post |
 | `ponytail` | `.cursor/skills/ponytail/SKILL.md` | Lazy Senior Dev — minimum viable code | ponytail-pre | ponytail-post |
+| `Hallmark` | `.cursor/skills/frontend-taste/SKILL.md §9.A` | Anti-slop themes + 57 gates | theme selection | slop-test gates |
 
 ### 12.D Why no new skill files were created
 
@@ -846,4 +1036,4 @@ In all four cases, the merge into this file is **complete enough that you do not
 - [[../skills/full-output]] - Full Output Skill
 - [[../rules/ui-visual-design]] - Workspace Visual Design Principles
 
-**Synthesized from:** [pbakaus/impeccable](https://github.com/pbakaus/impeccable) ⭐1 · [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) ⭐2 · [anthropics/frontend-design](https://github.com/anthropics/skills) ⭐3 · [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) ⭐4 · [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) ⭐5 · [emilkowalski/skill](https://github.com/emilkowalski/skill) ⭐6. See §12 for merge order and conflict resolution.
+**Synthesized from:** [pbakaus/impeccable](https://github.com/pbakaus/impeccable) ⭐1 · [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) ⭐2 · [anthropics/frontend-design](https://github.com/anthropics/skills) ⭐3 · [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) ⭐4 · [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) ⭐5 · [emilkowalski/skill](https://github.com/emilkowalski/skill) ⭐6 · [Nutlope/hallmark](https://github.com/Nutlope/hallmark) ⭐9.3k. See §12 for merge order and conflict resolution.
