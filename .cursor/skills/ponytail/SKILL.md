@@ -1,276 +1,156 @@
 ---
-description: Ponytail Skill - Lazy Senior Dev Mode for Cursor Enterprise Framework. YAGNI optimization, minimal code. Complementary to karpathy-coding (think first, then minimize).
-version: 1.1.0
-tags: [ponytail, yagni, minimalist, efficient, senior-dev, lazy-coding, code-reduction]
+description: Ponytail - Lazy Senior Dev. Minimum code, maximum effect. YAGNI optimization overlay.
+version: 2.0.0
+tags: [ponytail, yagni, minimalist, efficient, lazy-coding, code-reduction]
+source: DietrichGebert/ponytail (58k stars)
 ---
 
 # Ponytail Skill - Lazy Senior Dev Mode
 
-## Overview
+> **Overlay Skill** - Run after karpathy-coding gates. "He says nothing. He writes one line. It works."
 
-**"He says nothing. He writes one line. It works."**
-
-Ponytail brings the wisdom of the lazy senior developer to Cursor Enterprise Framework. The best code is the code you never wrote.
-
-### Benchmark Results
-
-| Metric | Improvement |
-|--------|-------------|
-| Lines of Code | **-54%** |
-| Tokens | **-22%** |
-| Cost | **-20%** |
-| Time | **-27%** |
-| Safety | **100%** |
-
-## Complementarity with Karpathy-Coding
-
-| Phase | Skill | Focus |
-|-------|-------|-------|
-| **THINK FIRST** | karpathy-coding | What to build? What are the options? Define success criteria? |
-| **THEN MINIMIZE** | ponytail | How to build with least code? Use platform features? Skip YAGNI? |
-
-**Why both?**
-- **karpathy-coding** prevents building wrong things (wrong scope, wrong direction)
-- **ponytail** prevents building things too verbosely (too much code)
-
-Together they ensure: **Right thing, right size, no waste.**
-
-**Important:** Ponytail runs AFTER karpathy gates. Don't skip thinking to save code - that's not lazy, that's careless.
-
----
-
-## The YAGNI Ladder
-
-Before writing any code, stop at the first rung that holds:
+## Quick Card
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  1. Does this need to be built?      → SKIP (YAGNI)        │
-│  2. Already in this codebase?         → REUSE, don't write  │
-│  3. Stdlib does it?                  → USE stdlib           │
-│  4. Native platform feature?         → USE platform         │
-│  5. Installed dependency?            → USE it               │
-│  6. Can this be one line?           → ONE LINE             │
-│  7. Only then: minimum that works                          │
+│  YAGNI LADDER                            CODE REDUCTION     │
+├─────────────────────────────────────────────────────────────┤
+│  1. Need it? → SKIP                   Check: abstractions? │
+│  2. Exists? → REUSE                   Check: dependencies?  │
+│  3. Stdlib? → USE IT                  Check: boilerplate?   │
+│  4. Native? → USE IT                  Check: can inline?    │
+│  5. Installed? → USE IT               Shortest diff?       │
+│  6. One-liner? → ONE LINE             Safety: validated?   │
+│  7. Only then: MINIMUM WORKS                               │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**The ladder runs AFTER you understand the problem, not instead of it.**
+## Workflow
+
+```
+Request → karpathy-pre [K.1-K.4] → ponytail-pre [P.1-P.4]
+                                       ↓
+                                IMPLEMENT
+                                       ↓
+                               ponytail-post [P.5-P.7]
+                                       ↓
+                           karpathy-post [K.5-K.7]
+                                       ↓
+                               DELIVER
+```
 
 ---
 
-## Pre-Review Gate (Before Code)
+## YAGNI Ladder
+
+**STOP at first rung that applies:**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  1. NEED IT?        → Don't build it (YAGNI)              │
+│  2. EXISTS?        → Reuse existing code                   │
+│  3. STDLIB?        → Use built-in library                  │
+│  4. NATIVE?        → Use platform feature                  │
+│  5. INSTALLED?     → Use installed dependency              │
+│  6. ONE-LINE?      → Write one line                         │
+│  7. Only then:     → MINIMUM VIABLE CODE                   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Pre-Code Gates
 
 ### P.1 YAGNI Check
 
-- [ ] Ask: "Does this need to exist at all?"
-- [ ] Check: Is there existing code that solves this?
-- [ ] Check: Does stdlib have this?
-- [ ] Check: Does the platform/framework have this built-in?
-- [ ] Check: Can this be a one-liner?
+```
+Ask: Does this need to exist?
+     ↓
+Check: Already in codebase? → REUSE
+Check: Stdlib has it? → USE IT
+Check: Platform has it? → USE IT
+Check: One-liner possible? → ONE LINE
+```
 
 ### P.2 Dependency Check
 
-- [ ] Is the functionality already in an installed package?
-- [ ] Is this adding a dependency for < 10 lines of usage?
-- [ ] Can native APIs accomplish this?
+| Scenario | Action |
+|----------|--------|
+| Already in installed package | Use it |
+| Adding for <10 lines | Don't add |
+| Native API works | Use native |
 
 ### P.3 Abstraction Check
 
-- [ ] Is this creating an abstraction layer?
-- [ ] Is this requested or necessary?
-- [ ] Is this "just in case" code?
-- [ ] Are there < 3 usages that would justify this abstraction?
+- [ ] Creating abstraction layer?
+- [ ] Requested or necessary?
+- [ ] "Just in case" code? → Skip
+- [ ] <3 usages? → Inline
 
 ### P.4 Boilerplate Check
 
-- [ ] Is this boilerplate that can be simplified?
-- [ ] Is there a framework convention that reduces this?
-- [ ] Can this be inlined?
-
-### Pre-Review Checklist
-
-```
-[PONYTAIL PRE-REVIEW]
-[ ] YAGNI check: Skip if not needed
-[ ] Dependency check: Reuse existing
-[ ] Abstraction check: Only if justified
-[ ] Boilerplate check: Minimize
-[ ] Ladder climbed to appropriate rung
-```
+- [ ] Can simplify with framework convention?
+- [ ] Can inline this?
+- [ ] Is this boilerplate?
 
 ---
 
-## Common Over-Engineering Traps
-
-| Request | Over-Built | Ponytail Solution |
-|---------|-----------|------------------|
-| Date picker | flatpickr + wrapper + stylesheet | `<input type="date">` |
-| Color picker | npm color library + custom UI | `<input type="color">` |
-| Debounce | Custom utility class | `setTimeout` in cleanup |
-| Local storage | Wrapper class (200 lines) | `localStorage.getItem/setItem` |
-| Form validation | Schema library + validators | Native HTML5 + JS |
-| HTTP client | Axios + interceptors | Native fetch |
-| Deep clone | Lodash cloneDeep | `structuredClone()` |
-| UUID | uuid library | `crypto.randomUUID()` |
-| JSON parse | try-catch wrapper class | Native try-catch |
-
-### Native Alternatives to Common Libraries
-
-```
-lodash.cloneDeep  → structuredClone()
-lodash.debounce   → setTimeout/clearTimeout
-lodash.isEmpty   → Object.keys(x).length === 0
-uuid.v4()        → crypto.randomUUID()
-axios.get()      → fetch()
-moment.js        → Intl.DateTimeFormat / date-fns
-```
-
----
-
-## Post-Review Gate (After Code)
+## Post-Code Gates
 
 ### P.5 Code Reduction Check
 
-- [ ] No abstractions without explicit request
-- [ ] No new dependencies added unnecessarily
-- [ ] No boilerplate that can be simplified
-- [ ] Deletion considered (did we remove old code?)
-- [ ] Shortest working diff achieved
+- [ ] Abstractions justified?
+- [ ] Dependencies necessary?
+- [ ] Boilerplate minimized?
+- [ ] Old code deleted?
+- [ ] **Shortest working diff achieved?**
 
-### P.6 Intentional Shortcut Documentation
-
-Mark shortcuts with `// ponytail:` comment:
+### P.6 Shortcut Documentation
 
 ```javascript
-// ponytail: global lock, upgrade path = per-request mutex
-const globalLock = new Lock();
+// ponytail: [reason]
+// Examples:
+const id = crypto.randomUUID();  // ponytail: native API
+
+// ponytail: simple validation, full schema in v2
+if (!email.includes('@')) return;
 
 // ponytail: O(n²) acceptable for n < 100
 for (const a of items) { /* ... */ }
-
-// ponytail: simple validation, full schema in v2
-if (!email.includes('@')) { /* ... */ }
-
-// ponytail: browser has one built-in
-<input type="date">
 ```
 
 ### P.7 Safety Check
 
-- [ ] Trust-boundary validation present
-- [ ] Error handling prevents data loss
-- [ ] Security controls in place
-- [ ] Accessibility minimum met
-
-### Post-Review Checklist
-
 ```
-[PONYTAIL POST-REVIEW]
-[ ] Code reduction achieved
-[ ] Dependencies justified
-[ ] Abstractions only when needed
-[ ] Boilerplate minimized
-[ ] Dead code deleted
-[ ] Shortcuts documented with ponytail:
-[ ] Safety: validation, error handling, security
+Trust boundary: validated?
+Error handling: prevents data loss?
+Security: controls in place?
+Accessibility: minimum met?
 ```
 
 ---
 
-## Ponytail Modes
+## Native Alternatives
 
-| Mode | Description |
-|------|-------------|
-| `lite` | Minimal hints, senior devs |
-| `full` | Default, most effective |
-| `ultra` | Maximum enforcement |
-| `off` | Disabled |
-
-### Mode Configuration
-
-```
-PONYTAIL_DEFAULT_MODE=full  # env var
-~/.config/ponytail/config.json  # config file
-```
-
----
-
-## Red Flags
-
-These phrases indicate over-engineering:
-
-- "Should I create a utility class?"
-- "Maybe we need an abstraction layer?"
-- "Let's make this configurable just in case"
-- "We might need this feature later"
-- "I'll add a factory pattern"
-- "This might be useful for..."
-
-### Green Lights
-
-Safe to proceed:
-
-- Native HTML elements (`<input type="date">`)
-- Built-in APIs (`fetch`, `localStorage`, `crypto`)
-- One-liner implementations
-- Framework conventions
-- Copy-paste patterns (when appropriate)
-
----
-
-## Integration with Enterprise Framework Skills
-
-### With `frontend-taste`
-
-Ponytail enhances frontend-taste by:
-- Preventing unnecessary component libraries
-- Using native HTML elements first
-- Minimizing CSS abstractions
-- Reducing animation complexity
-
-### With `frontend-redesign`
-
-Ponytail during redesign:
-- Delete dead code aggressively
-- Replace abstractions with inline code
-- Remove unused dependencies
-- Simplify complex components
-
-### With `security-review`
-
-Ponytail respects security:
-- Never skip trust-boundary validation
-- Never remove error handling
-- Never bypass security controls
-- Ponytail applies only to business logic, not safety nets
+| Instead of | Use |
+|------------|-----|
+| `lodash.cloneDeep` | `structuredClone()` |
+| `lodash.debounce` | `setTimeout/clearTimeout` |
+| `uuid.v4()` | `crypto.randomUUID()` |
+| `axios.get()` | `fetch()` |
+| `moment.js` | `Intl.DateTimeFormat` |
+| Custom date picker | `<input type="date">` |
+| Custom color picker | `<input type="color">` |
+| LocalStorage wrapper | `localStorage.getItem/setItem` |
 
 ---
 
 ## Examples
 
-### Example 1: Date Input
+### Debounce
 
-**Request:** "Add a date picker"
 **Over-built:**
 ```javascript
-// utils/datePicker.ts
-import Flatpickr from 'flatpickr';
-export class DatePicker { /* 100 lines */ }
-```
-
-**Ponytail:**
-```html
-<!-- ponytail: browser has one built-in -->
-<input type="date">
-```
-
-### Example 2: Debounce
-
-**Request:** "Add debounce to search input"
-**Over-built:**
-```javascript
-// utils/debounce.ts
 import debounce from 'lodash.debounce';
 export const debouncedSearch = debounce(searchFn, 300);
 ```
@@ -284,12 +164,23 @@ input.addEventListener('input', () => {
 });
 ```
 
-### Example 3: UUID Generation
+### Date Input
 
-**Request:** "Generate unique IDs"
 **Over-built:**
 ```javascript
-// utils/idGenerator.ts
+import Flatpickr from 'flatpickr';
+export class DatePicker { /* 100 lines */ }
+```
+
+**Ponytail:**
+```html
+<input type="date">
+```
+
+### UUID
+
+**Over-built:**
+```javascript
 import { v4 as uuidv4 } from 'uuid';
 export const generateId = () => uuidv4();
 ```
@@ -301,25 +192,58 @@ const id = crypto.randomUUID();
 
 ---
 
-## Commands
+## Red Flags
 
-| Command | Description |
-|---------|-------------|
-| `/ponytail` | Current mode status |
-| `/ponytail lite` | Minimal hints |
-| `/ponytail full` | Default mode |
-| `/ponalt ultra` | Maximum enforcement |
-| `/ponytail off` | Disable |
-| `/ponytail-review` | Review diff for over-engineering |
-| `/ponytail-audit` | Audit whole repo |
-| `/ponytail-debt` | Harvest deferred shortcuts |
-| `/ponytail-gain` | Show benchmark impact |
+**These phrases → STOP and reconsider:**
+- "Should I create a utility class?"
+- "Maybe we need an abstraction layer?"
+- "Let's make this configurable just in case"
+- "We might need this feature later"
+- "I'll add a factory pattern"
+- "This might be useful for..."
+
+**Green Lights → Proceed:**
+- Native HTML elements
+- Built-in APIs
+- One-liner implementations
+- Framework conventions
+- Copy-paste patterns
 
 ---
 
-## Links
+## Modes
 
-- [[ponytail]] - Full Ponytail rule
-- [[skill-integration]] - Skill auto-discovery protocol
-- [[coding-standards]] - Coding standards
-- [Original Ponytail](https://github.com/DietrichGebert/ponytail) - 58k stars
+| Mode | Use When |
+|------|----------|
+| `lite` | Senior devs, minimal hints |
+| `full` | Default, most effective |
+| `ultra` | Maximum enforcement |
+| `off` | Disabled (not recommended) |
+
+---
+
+## Integration
+
+```
+┌─────────────────────────────────────────────────┐
+│  karpathy-coding                               │
+│  "What to build? Is scope correct?"            │
+└──────────────────┬────────────────────────────┘
+                   ↓
+┌─────────────────────────────────────────────────┐
+│  ponytail                                   │
+│  "How to build with least code?"             │
+└─────────────────────────────────────────────────┘
+```
+
+---
+
+## Success Metrics
+
+| Metric | Target |
+|--------|--------|
+| Lines of Code | **-54%** vs verbose |
+| Tokens | **-22%** |
+| Cost | **-20%** |
+| Time | **-27%** |
+| Safety | **100%** maintained |

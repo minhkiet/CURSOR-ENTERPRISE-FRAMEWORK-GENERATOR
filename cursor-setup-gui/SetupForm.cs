@@ -64,13 +64,33 @@ namespace CursorSetup
         {
             InitializeComponent();
 
+            // Wire up modern paint hooks that the Designer can't express
+            // declaratively (OwnerDraw tab strip, themed progress bar, ghost
+            // buttons). Single line per control — keep wiring local.
+            mainTabs.DrawItem += MainTabs_DrawItem;
+            progressBar.Paint += (s, e) => SetupTheme.PaintProgress((ProgressBar)s, e);
+            cancelButton.Paint += (s, e) => SetupTheme.PaintGhostButton((Button)s, e);
+            cancelButton.MouseEnter += (s, e) => cancelButton.Invalidate();
+            cancelButton.MouseLeave += (s, e) => cancelButton.Invalidate();
+
             installTab = BuildInstallTab();
             mainTabs.TabPages.Add(installTab);
             allTabPages.Add(installTab);
 
             BuildDynamicTabs();
 
+            // Localize everything on first load (tabs are built in English by
+            // default; ApplyLocalization translates to the active Lang.Current).
+            ApplyLocalization();
+
             this.Load += SetupForm_Load;
+        }
+
+        private void MainTabs_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            if (e.Index < 0 || e.Index >= mainTabs.TabPages.Count) return;
+            string text = mainTabs.TabPages[e.Index].Text;
+            SetupTheme.PaintTab(e, mainTabs, text, e.Index == mainTabs.SelectedIndex);
         }
 
         private void BuildDynamicTabs()
@@ -108,94 +128,122 @@ namespace CursorSetup
 
         private TabPage BuildHooksTab()
         {
-            _hooksTab = new TabPage { Name = "hooksTab" };
+            _hooksTab = new TabPage { Name = "hooksTab", BackColor = SetupTheme.FormBack, Padding = new Padding(24, 20, 24, 20) };
 
             var desc = new Label
             {
                 AutoSize = true,
-                Font = new Font("Segoe UI", 9F),
-                ForeColor = Color.Gray,
-                Location = new Point(22, 14),
-                MaximumSize = new Size(930, 0),
+                Font = SetupTheme.FontBody,
+                ForeColor = SetupTheme.Slate500,
+                Location = new Point(0, 0),
+                MaximumSize = new Size(1020, 0),
                 Text = Lang.T("hooks.desc"),
             };
             _hooksTab.Controls.Add(desc);
 
-            // Pre-scan section
+            // Pre-scan card
+            Panel preCard = new Panel
+            {
+                BackColor = SetupTheme.CardBack,
+                Location = new Point(0, 56),
+                Size = new Size(960, 100),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
+            };
+            preCard.Paint += (s, e) => SetupTheme.PaintCard(preCard, e);
+
             int y = 56;
             _hooksPreScanCheckBox = new CheckBox
             {
                 AutoSize = true,
                 Checked = true,
-                Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-                Location = new Point(22, y),
+                Font = SetupTheme.FontLabel,
+                ForeColor = SetupTheme.Slate900,
+                Location = new Point(20, 14),
                 Text = Lang.T("hooks.prescan_label"),
             };
-            _hooksTab.Controls.Add(_hooksPreScanCheckBox);
+            preCard.Controls.Add(_hooksPreScanCheckBox);
 
-            y += 28;
             var preScanHint = new Label
             {
                 AutoSize = true,
-                ForeColor = Color.Gray,
-                Location = new Point(42, y),
+                ForeColor = SetupTheme.Slate500,
+                Location = new Point(40, 40),
+                Font = SetupTheme.FontBody,
                 Text = Lang.T("hooks.prescan_script_label"),
             };
-            _hooksTab.Controls.Add(preScanHint);
+            preCard.Controls.Add(preScanHint);
 
-            y += 22;
             _hooksPreScanScriptBox = new TextBox
             {
-                Font = new Font("Consolas", 9F),
-                Location = new Point(42, y),
+                Font = SetupTheme.FontMono,
+                ForeColor = SetupTheme.Slate900,
+                Location = new Point(40, 62),
                 PlaceholderText = "-m cursor_framework.indexer --validate",
-                Size = new Size(900, 27),
+                Size = new Size(900, 28),
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = Color.White,
                 Text = "-m cursor_framework.indexer --validate",
             };
-            _hooksTab.Controls.Add(_hooksPreScanScriptBox);
+            preCard.Controls.Add(_hooksPreScanScriptBox);
 
-            // Post-install section
-            y += 50;
+            _hooksTab.Controls.Add(preCard);
+
+            // Post-install card
+            y += 100 + 16;
+            Panel postCard = new Panel
+            {
+                BackColor = SetupTheme.CardBack,
+                Location = new Point(0, y),
+                Size = new Size(960, 100),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
+            };
+            postCard.Paint += (s, e) => SetupTheme.PaintCard(postCard, e);
+
             _hooksPostInstallCheckBox = new CheckBox
             {
                 AutoSize = true,
                 Checked = true,
-                Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-                Location = new Point(22, y),
+                Font = SetupTheme.FontLabel,
+                ForeColor = SetupTheme.Slate900,
+                Location = new Point(20, 14),
                 Text = Lang.T("hooks.postinstall_label"),
             };
-            _hooksTab.Controls.Add(_hooksPostInstallCheckBox);
+            postCard.Controls.Add(_hooksPostInstallCheckBox);
 
-            y += 28;
             var postHint = new Label
             {
                 AutoSize = true,
-                ForeColor = Color.Gray,
-                Location = new Point(42, y),
+                ForeColor = SetupTheme.Slate500,
+                Location = new Point(40, 40),
+                Font = SetupTheme.FontBody,
                 Text = Lang.T("hooks.postinstall_script_label"),
             };
-            _hooksTab.Controls.Add(postHint);
+            postCard.Controls.Add(postHint);
 
-            y += 22;
             _hooksPostInstallScriptBox = new TextBox
             {
-                Font = new Font("Consolas", 9F),
-                Location = new Point(42, y),
+                Font = SetupTheme.FontMono,
+                ForeColor = SetupTheme.Slate900,
+                Location = new Point(40, 62),
                 PlaceholderText = "-m cursor_framework.indexer",
-                Size = new Size(900, 27),
+                Size = new Size(900, 28),
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = Color.White,
                 Text = "-m cursor_framework.indexer",
             };
-            _hooksTab.Controls.Add(_hooksPostInstallScriptBox);
+            postCard.Controls.Add(_hooksPostInstallScriptBox);
+
+            _hooksTab.Controls.Add(postCard);
 
             // Footer hint
-            y += 56;
+            y += 100 + 24;
             _hooksHintLabel = new Label
             {
                 AutoSize = true,
-                Font = new Font("Segoe UI", 9F, FontStyle.Italic),
-                ForeColor = Color.FromArgb(100, 100, 110),
-                Location = new Point(22, y),
-                MaximumSize = new Size(930, 0),
+                Font = new Font("Segoe UI", 9.5F, FontStyle.Italic),
+                ForeColor = SetupTheme.Slate500,
+                Location = new Point(0, y),
+                MaximumSize = new Size(1020, 0),
                 Text = Lang.T("hooks.hint"),
             };
             _hooksTab.Controls.Add(_hooksHintLabel);
@@ -478,7 +526,7 @@ namespace CursorSetup
                         var lvi = new ListViewItem(index.ToString());
                         lvi.Checked = true;
                         if (lv.Items.Count % 2 == 1)
-                            lvi.BackColor = Color.FromArgb(248, 250, 253);
+                            lvi.BackColor = SetupTheme.Slate50;
                         lvi.SubItems.Add(item);
                         string showDesc = string.IsNullOrEmpty(desc) ? Lang.T("no_description") : Lang.Translate(desc);
                         lvi.SubItems.Add(showDesc);
@@ -514,7 +562,8 @@ namespace CursorSetup
             forceCheckBox.Text = Lang.T("install.force");
             cursorCheckBox.Text = Lang.T("install.skip_cursor");
             installTipLabel.Text = Lang.T("install.tip");
-            buildOptionsGroup.Text = Lang.T("install.build_options");
+            // buildOptionsGroup is now a flat Panel; the title lives in
+            // buildHeaderLabel (created in BuildInstallTab). Set via label.
             buildOptionsDescLabel.Text = Lang.T("install.build_options_desc");
             buildMemoryCheckBox.Text = Lang.T("install.build_memory");
             compileKnowledgeCheckBox.Text = Lang.T("install.compile_knowledge");
@@ -577,8 +626,8 @@ namespace CursorSetup
             int total = lv.Items.Count;
             int selected = lv.CheckedItems.Count;
             Label lbl = categoryCountLabels[cat];
-            lbl.Text = Lang.T("selected_count", selected, total);
-            lbl.ForeColor = (selected == total) ? Color.FromArgb(30, 120, 60) : Color.Gray;
+            lbl.Text = $"{selected}/{total}";
+            lbl.ForeColor = (selected == total) ? SetupTheme.Indigo600 : SetupTheme.Slate500;
 
             if (categorySelectAll.ContainsKey(cat))
             {
@@ -961,213 +1010,234 @@ namespace CursorSetup
 
         private TabPage BuildInstallTab()
         {
-            TabPage tab = new TabPage { Text = Lang.T("tab.install"), Padding = new Padding(20) };
+            TabPage tab = new TabPage { Text = Lang.T("tab.install"), Padding = new Padding(24, 20, 24, 20), BackColor = SetupTheme.FormBack };
 
+            // === Section: Installation Location ============================
             installPathLabel = new Label
             {
                 Text = Lang.T("install.location"),
-                Font = new Font("Segoe UI", 11, FontStyle.Bold),
-                Location = new Point(10, 15),
+                Font = new Font("Segoe UI Semibold", 11.5F, FontStyle.Bold),
+                ForeColor = SetupTheme.Slate900,
+                Location = new Point(0, 0),
                 AutoSize = true
             };
 
             installPathHintLabel = new Label
             {
                 Text = Lang.T("install.location_hint"),
-                Font = new Font("Segoe UI", 9),
-                ForeColor = Color.Gray,
-                Location = new Point(10, 38),
+                Font = SetupTheme.FontBody,
+                ForeColor = SetupTheme.Slate500,
+                Location = new Point(0, 26),
                 AutoSize = true
             };
 
+            // Card panel that wraps the path row — visual grouping
+            Panel pathCard = new Panel
+            {
+                BackColor = SetupTheme.CardBack,
+                Location = new Point(0, 58),
+                Size = new Size(960, 90),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right,
+            };
+            pathCard.Paint += (s, e) => SetupTheme.PaintCard(pathCard, e);
+
             pathTextBox = new TextBox
             {
-                Location = new Point(10, 62),
-                Size = new Size(640, 28),
-                Font = new Font("Segoe UI", 10),
+                Location = new Point(16, 14),
+                Size = new Size(720, 28),
+                Font = SetupTheme.FontBody,
+                ForeColor = SetupTheme.Slate900,
                 ReadOnly = true,
                 BackColor = Color.White,
-                BorderStyle = BorderStyle.FixedSingle,
+                BorderStyle = BorderStyle.None,
                 Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
             };
 
             browseButton = new Button
             {
                 Text = Lang.T("install.browse"),
-                Location = new Point(660, 60),
-                Size = new Size(120, 32),
-                FlatStyle = FlatStyle.Flat,
-                BackColor = Color.FromArgb(100, 130, 180),
-                ForeColor = Color.White,
-                Font = new Font("Segoe UI", 9),
+                Location = new Point(745, 8),
+                Size = new Size(100, 38),
                 Anchor = AnchorStyles.Top | AnchorStyles.Right
             };
-            browseButton.FlatAppearance.BorderSize = 0;
+            SetupTheme.WireFlatButton(browseButton, SetupTheme.Indigo600, SetupTheme.Indigo500,
+                (b, ev) => SetupTheme.PaintButton(b, ev, SetupTheme.Indigo600, SetupTheme.Indigo500));
+            browseButton.ForeColor = Color.White;
+            browseButton.Font = SetupTheme.FontBody;
             browseButton.Click += BrowseButton_Click;
 
             newFolderButton = new Button
             {
                 Text = Lang.T("install.new_folder"),
-                Location = new Point(660, 98),
-                Size = new Size(120, 28),
-                FlatStyle = FlatStyle.Flat,
-                BackColor = Color.FromArgb(70, 130, 80),
-                ForeColor = Color.White,
-                Font = new Font("Segoe UI", 8),
+                Location = new Point(853, 8),
+                Size = new Size(96, 38),
                 Anchor = AnchorStyles.Top | AnchorStyles.Right
             };
-            newFolderButton.FlatAppearance.BorderSize = 0;
+            SetupTheme.WireFlatButton(newFolderButton, Color.White, SetupTheme.Slate100,
+                (b, ev) => SetupTheme.PaintButton(b, ev, Color.White, SetupTheme.Slate100));
+            newFolderButton.ForeColor = SetupTheme.Slate700;
+            newFolderButton.Font = SetupTheme.FontBody;
+            newFolderButton.FlatAppearance.BorderColor = SetupTheme.Slate200;
+            newFolderButton.FlatAppearance.BorderSize = 1;
             newFolderButton.Click += NewFolderButton_Click;
+
+            pathCard.Controls.Add(pathTextBox);
+            pathCard.Controls.Add(browseButton);
+            pathCard.Controls.Add(newFolderButton);
+
+            // === Section: Toggles ===========================================
+            Panel togglePanel = new Panel
+            {
+                BackColor = Color.Transparent,
+                Location = new Point(0, 165),
+                Size = new Size(960, 64),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
+            };
 
             forceCheckBox = new CheckBox
             {
                 Text = Lang.T("install.force"),
-                Location = new Point(10, 110),
+                Location = new Point(0, 0),
                 AutoSize = true,
-                Font = new Font("Segoe UI", 9),
+                Font = SetupTheme.FontBody,
+                ForeColor = SetupTheme.Slate700,
                 Anchor = AnchorStyles.Top | AnchorStyles.Left
             };
 
             cursorCheckBox = new CheckBox
             {
                 Text = Lang.T("install.skip_cursor"),
-                Location = new Point(10, 138),
+                Location = new Point(0, 30),
                 AutoSize = true,
-                Font = new Font("Segoe UI", 9),
+                Font = SetupTheme.FontBody,
+                ForeColor = SetupTheme.Slate700,
                 Anchor = AnchorStyles.Top | AnchorStyles.Left
             };
 
+            togglePanel.Controls.Add(forceCheckBox);
+            togglePanel.Controls.Add(cursorCheckBox);
+
             installTipLabel = new Label
             {
-                Text = Lang.T("install.tip"),
-                Font = new Font("Segoe UI", 9, FontStyle.Italic),
-                ForeColor = Color.Gray,
-                Location = new Point(10, 175),
+                Text = "  " + Lang.T("install.tip"),
+                Font = new Font("Segoe UI", 9.5F, FontStyle.Italic),
+                ForeColor = SetupTheme.Slate500,
+                Location = new Point(0, 246),
                 AutoSize = true,
-                MaximumSize = new Size(740, 0),
+                MaximumSize = new Size(960, 0),
                 Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
             };
 
-            // Post-install build options (optional, default unchecked)
-            buildOptionsGroup = new GroupBox
+            // === Section: Build Options =====================================
+            buildOptionsGroup = new Panel
+            {
+                Location = new Point(0, 294),
+                Size = new Size(960, 220),
+                BackColor = SetupTheme.CardBack,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
+            };
+            buildOptionsGroup.Paint += (s, e) => SetupTheme.PaintCard(buildOptionsGroup, e);
+
+            var buildHeaderLabel = new Label
             {
                 Text = Lang.T("install.build_options"),
-                Location = new Point(10, 215),
-                Size = new Size(820, 200),
-                Font = new Font("Segoe UI", 9, FontStyle.Bold),
-                ForeColor = Color.FromArgb(30, 60, 114),
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
+                Font = new Font("Segoe UI Semibold", 11F, FontStyle.Bold),
+                ForeColor = SetupTheme.Slate900,
+                Location = new Point(20, 18),
+                AutoSize = true
             };
 
             buildOptionsDescLabel = new Label
             {
                 Text = Lang.T("install.build_options_desc"),
-                Location = new Point(15, 24),
-                Size = new Size(790, 18),
-                Font = new Font("Segoe UI", 8, FontStyle.Italic),
-                ForeColor = Color.Gray,
+                Location = new Point(20, 44),
+                Size = new Size(920, 18),
+                Font = new Font("Segoe UI", 9F, FontStyle.Italic),
+                ForeColor = SetupTheme.Slate500,
                 Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
             };
 
-            buildMemoryCheckBox = new CheckBox
-            {
-                Text = Lang.T("install.build_memory"),
-                Location = new Point(25, 50),
-                AutoSize = true,
-                Font = new Font("Segoe UI", 9),
-                Checked = false,
-                Anchor = AnchorStyles.Top | AnchorStyles.Left
-            };
-            compileKnowledgeCheckBox = new CheckBox
-            {
-                Text = Lang.T("install.compile_knowledge"),
-                Location = new Point(25, 75),
-                AutoSize = true,
-                Font = new Font("Segoe UI", 9),
-                Checked = false,
-                Anchor = AnchorStyles.Top | AnchorStyles.Left
-            };
-            buildIndexCheckBox = new CheckBox
-            {
-                Text = Lang.T("install.build_index"),
-                Location = new Point(25, 100),
-                AutoSize = true,
-                Font = new Font("Segoe UI", 9),
-                Checked = false,
-                Anchor = AnchorStyles.Top | AnchorStyles.Left
-            };
-            buildEmbeddingsCheckBox = new CheckBox
-            {
-                Text = Lang.T("install.build_embeddings"),
-                Location = new Point(25, 125),
-                AutoSize = true,
-                Font = new Font("Segoe UI", 9),
-                Checked = false,
-                Anchor = AnchorStyles.Top | AnchorStyles.Left
-            };
-            packageFrameworkCheckBox = new CheckBox
-            {
-                Text = Lang.T("install.package_framework"),
-                Location = new Point(25, 150),
-                AutoSize = true,
-                Font = new Font("Segoe UI", 9),
-                Checked = false,
-                Anchor = AnchorStyles.Top | AnchorStyles.Left
-            };
+            // Two columns of build checkboxes for a denser, cleaner look
+            int colX1 = 20, colX2 = 480;
+            int rowH = 28;
+            int startY = 76;
+
+            buildMemoryCheckBox = MakeThemedCheckbox(Lang.T("install.build_memory"), new Point(colX1, startY));
+            compileKnowledgeCheckBox = MakeThemedCheckbox(Lang.T("install.compile_knowledge"), new Point(colX2, startY));
+            buildIndexCheckBox = MakeThemedCheckbox(Lang.T("install.build_index"), new Point(colX1, startY + rowH));
+            buildEmbeddingsCheckBox = MakeThemedCheckbox(Lang.T("install.build_embeddings"), new Point(colX2, startY + rowH));
+            packageFrameworkCheckBox = MakeThemedCheckbox(Lang.T("install.package_framework"), new Point(colX1, startY + rowH * 2));
 
             buildNoteLabel = new Label
             {
-                Text = Lang.T("install.build_exe_note"),
-                Location = new Point(45, 175),
-                Size = new Size(770, 18),
-                Font = new Font("Segoe UI", 8, FontStyle.Italic),
-                ForeColor = Color.FromArgb(150, 100, 0),
+                Text = "ⓘ  " + Lang.T("install.build_exe_note"),
+                Location = new Point(20, 188),
+                Size = new Size(920, 18),
+                Font = new Font("Segoe UI", 9F, FontStyle.Italic),
+                ForeColor = Color.FromArgb(180, 130, 0),
                 Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
             };
 
-            buildOptionsGroup.Controls.AddRange(new Control[]
-            {
-                buildOptionsDescLabel,
-                buildMemoryCheckBox, compileKnowledgeCheckBox, buildIndexCheckBox,
-                buildEmbeddingsCheckBox, packageFrameworkCheckBox, buildNoteLabel
-            });
+            buildOptionsGroup.Controls.Add(buildHeaderLabel);
+            buildOptionsGroup.Controls.Add(buildOptionsDescLabel);
+            buildOptionsGroup.Controls.Add(buildMemoryCheckBox);
+            buildOptionsGroup.Controls.Add(compileKnowledgeCheckBox);
+            buildOptionsGroup.Controls.Add(buildIndexCheckBox);
+            buildOptionsGroup.Controls.Add(buildEmbeddingsCheckBox);
+            buildOptionsGroup.Controls.Add(packageFrameworkCheckBox);
+            buildOptionsGroup.Controls.Add(buildNoteLabel);
 
             tab.Controls.AddRange(new Control[]
             {
-                installPathLabel, installPathHintLabel, pathTextBox, browseButton, newFolderButton,
-                forceCheckBox, cursorCheckBox, installTipLabel, buildOptionsGroup
+                installPathLabel, installPathHintLabel, pathCard, togglePanel,
+                installTipLabel, buildOptionsGroup
             });
             return tab;
         }
 
+        private static CheckBox MakeThemedCheckbox(string text, Point location)
+        {
+            return new CheckBox
+            {
+                Text = text,
+                Location = location,
+                AutoSize = true,
+                Font = SetupTheme.FontBody,
+                ForeColor = SetupTheme.Slate700,
+                Checked = false,
+            };
+        }
+
         public TabPage BuildCategoryTab(string descKey, string[] categories)
         {
-            string tabTitle = descKey == "components_desc" ? "Thành phần" : "Nâng cao";
+            string tabTitle = descKey == "components_desc" ? Lang.T("tab.components") : Lang.T("tab.advanced");
             TabPage tab = new TabPage
             {
                 Text = tabTitle,
-                Padding = new Padding(10),
-                UseVisualStyleBackColor = true
+                Padding = new Padding(24, 20, 24, 20),
+                BackColor = SetupTheme.FormBack
             };
 
             Panel categoryScrollPanel = new Panel
             {
                 Dock = DockStyle.Fill,
                 AutoScroll = true,
-                Padding = new Padding(0)
+                Padding = new Padding(0),
+                BackColor = SetupTheme.FormBack
             };
             tab.Controls.Add(categoryScrollPanel);
 
             string descText = descKey == "components_desc"
-                ? "Chọn các thành phần bạn muốn cài đặt. Các thành phần cốt lõi (được đánh dấu) sẽ luôn được cài."
-                : "Các tùy chọn nâng cao và tùy chỉnh cho người dùng có kinh nghiệm.";
+                ? Lang.T("components_desc")
+                : Lang.T("advanced_desc");
             Label descLabel = new Label
             {
                 Text = descText,
-                Font = new System.Drawing.Font("Segoe UI", 9),
-                ForeColor = System.Drawing.Color.Gray,
-                Location = new System.Drawing.Point(10, 8),
+                Font = SetupTheme.FontBody,
+                ForeColor = SetupTheme.Slate500,
+                Location = new Point(0, 0),
                 AutoSize = true,
+                MaximumSize = new Size(960, 0),
                 Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
             };
             categoryScrollPanel.Controls.Add(descLabel);
@@ -1175,21 +1245,33 @@ namespace CursorSetup
 
             var entries = new List<(CheckBox sa, Label count, ListView list, string cat)>();
 
-            int y = 32;
+            int y = 36;
             foreach (string cat in categories)
             {
                 bool isCore = CoreCategories.Contains(cat);
 
+                // === Per-category card panel (rounded white surface) =========
+                Panel catCard = new Panel
+                {
+                    Location = new Point(0, y),
+                    Size = new Size(960, 220),
+                    BackColor = SetupTheme.CardBack,
+                    Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
+                };
+                catCard.Paint += (s, e) => SetupTheme.PaintCard(catCard, e);
+
+                // Category header (left: select-all checkbox; right: count chip)
                 string selectAllText = isCore
-                    ? $"[Cài luôn] {cat}"
-                    : $"Chọn tất cả {cat}";
+                    ? $"✓  {Lang.T("always_installed", cat)}"
+                    : Lang.T("select_all", cat);
 
                 CheckBox selectAll = new CheckBox
                 {
                     Text = selectAllText,
-                    Location = new System.Drawing.Point(10, y),
+                    Location = new Point(16, 16),
                     AutoSize = true,
-                    Font = new System.Drawing.Font("Segoe UI", 9, System.Drawing.FontStyle.Bold),
+                    Font = SetupTheme.FontLabel,
+                    ForeColor = SetupTheme.Slate900,
                     Checked = true,
                     Enabled = !isCore,
                     Anchor = AnchorStyles.Top | AnchorStyles.Left
@@ -1207,39 +1289,73 @@ namespace CursorSetup
                     }
                 };
                 categorySelectAll[cat] = selectAll;
-                categoryScrollPanel.Controls.Add(selectAll);
+                catCard.Controls.Add(selectAll);
 
                 Label countLabel = new Label
                 {
-                    Text = "...",
-                    Location = new System.Drawing.Point(740, y + 2),
-                    AutoSize = true,
-                    Font = new System.Drawing.Font("Segoe UI", 9),
-                    ForeColor = System.Drawing.Color.Gray,
+                    Text = "0/0",
+                    Location = new Point(880, 18),
+                    AutoSize = false,
+                    Size = new Size(70, 22),
+                    Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold),
+                    ForeColor = SetupTheme.Slate500,
+                    TextAlign = ContentAlignment.MiddleRight,
                     Anchor = AnchorStyles.Top | AnchorStyles.Right
                 };
                 categoryCountLabels[cat] = countLabel;
-                categoryScrollPanel.Controls.Add(countLabel);
+                catCard.Controls.Add(countLabel);
 
+                // ListView — modern flat surface, no grid lines, themed rows
                 ListView listView = new ListView
                 {
-                    Location = new System.Drawing.Point(10, y + 22),
-                    Size = new System.Drawing.Size(800, 180),
+                    Location = new Point(16, 50),
+                    Size = new Size(928, 154),
                     View = View.Details,
                     CheckBoxes = true,
                     FullRowSelect = true,
                     GridLines = false,
                     HideSelection = false,
                     MultiSelect = false,
-                    Font = new System.Drawing.Font("Segoe UI", 9),
-                    BorderStyle = BorderStyle.FixedSingle,
+                    Font = SetupTheme.FontBody,
+                    ForeColor = SetupTheme.Slate900,
+                    BorderStyle = BorderStyle.None,
                     HeaderStyle = ColumnHeaderStyle.Nonclickable,
-                    BackColor = System.Drawing.Color.White,
+                    BackColor = Color.White,
+                    OwnerDraw = true,
                     Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
                 };
+
+                // Header style: subtle, slate-100 background
                 listView.Columns.Add("#", 50);
-                listView.Columns.Add("Thành phần", 180);
-                listView.Columns.Add("Mô tả", 530);
+                listView.Columns.Add(Lang.T("column.component"), 200);
+                listView.Columns.Add(Lang.T("column.description"), 0);
+                listView.DrawColumnHeader += (s, e) =>
+                {
+                    using (var bg = new SolidBrush(SetupTheme.Slate100))
+                        e.Graphics.FillRectangle(bg, e.Bounds);
+                    TextRenderer.DrawText(e.Graphics, e.Header.Text,
+                        new Font("Segoe UI Semibold", 9F, FontStyle.Bold),
+                        new Rectangle(e.Bounds.X + 10, e.Bounds.Y, e.Bounds.Width - 10, e.Bounds.Height),
+                        SetupTheme.Slate500,
+                        TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
+                };
+                listView.DrawItem += (s, e) => e.DrawDefault = true;
+                listView.DrawSubItem += (s, e) =>
+                {
+                    if (e.ColumnIndex == 0)
+                    {
+                        // Index column — small slate text, right-aligned
+                        TextRenderer.DrawText(e.Graphics, e.SubItem.Text,
+                            new Font("Segoe UI", 8.5F), e.Bounds,
+                            SetupTheme.Slate400,
+                            TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+                    }
+                    else
+                    {
+                        e.DrawDefault = true;
+                    }
+                };
+
                 listView.ColumnWidthChanging += (s, e) =>
                 {
                     if (e.ColumnIndex == listView.Columns.Count - 1)
@@ -1262,10 +1378,11 @@ namespace CursorSetup
                     BeginInvoke(new Action(() => UpdateCategoryCount(catCopy2)));
                 };
                 categoryListBoxes[cat] = listView;
-                categoryScrollPanel.Controls.Add(listView);
+                catCard.Controls.Add(listView);
 
+                categoryScrollPanel.Controls.Add(catCard);
                 entries.Add((selectAll, countLabel, listView, cat));
-                y += 22 + 180 + 8;
+                y += 220 + 12;
             }
             tabEntries[tab] = entries;
             return tab;
@@ -1408,10 +1525,23 @@ namespace CursorSetup
                 return;
             }
             progressBar.Value = Math.Min(value, 100);
-            statusLabel.Text = "● " + status;
-            if (value >= 100) statusLabel.ForeColor = Color.FromArgb(30, 120, 60);
-            else if (value > 0) statusLabel.ForeColor = Color.FromArgb(30, 100, 180);
-            else statusLabel.ForeColor = Color.FromArgb(80, 80, 90);
+            progressBar.Invalidate(); // re-paint rounded bar
+            statusLabel.Text = "●  " + status;
+            if (value >= 100)
+            {
+                statusLabel.ForeColor = SetupTheme.StatusDone;
+                summaryLabel.ForeColor = SetupTheme.StatusDone;
+            }
+            else if (value > 0)
+            {
+                statusLabel.ForeColor = SetupTheme.StatusActive;
+                summaryLabel.ForeColor = SetupTheme.Slate900;
+            }
+            else
+            {
+                statusLabel.ForeColor = SetupTheme.StatusIdle;
+                summaryLabel.ForeColor = SetupTheme.Slate900;
+            }
             statusLabel.Refresh();
         }
 

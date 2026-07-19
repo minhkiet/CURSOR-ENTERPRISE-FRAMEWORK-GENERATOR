@@ -1,8 +1,9 @@
 ---
-description: Nguyên tắc Context Router - định tuyến context thông minh đến handlers phù hợp
+description: Nguyên tắc Context Router - định tuyến context thông minh đến handlers phù hợp. Tích hợp Antigravity-style request inference và token optimization.
 created: 2026-06-23
-version: 1.0.0
-tags: [routing, context, intelligence, cursor, enterprise]
+version: 1.1.0
+updated: 2026-07-20
+tags: [routing, context, intelligence, cursor, enterprise, token-optimization, antigravity]
 ---
 
 # Context Router
@@ -267,6 +268,348 @@ Khi MCP server unavailable:
    - `user-shadcn` → WebFetch
    - `user-typeui` → Manual UI review
 4. **Continue** với degraded mode
+
+---
+
+## PHẦN X: ANTIGRAVITY-STYLE REQUEST INFERENCE
+
+### X.1 Tổng quan
+
+> **Concept:** Khi nhận yêu cầu, phải suy luận **đúng mục đích** trước khi implement. Giống như Antigravity AI - phân tích sâu intent để đưa ra đúng solution, không chỉ làm theo yêu cầu literal.
+
+**Flow:**
+```
+USER REQUEST
+     │
+     ▼
+┌─────────────────────────────────────────┐
+│ 1. SURFACE ANALYSIS                     │
+│    • Extract keywords                    │
+│    • Detect language                     │
+│    • Translate if needed                │
+└─────────────────────────────────────────┘
+     │
+     ▼
+┌─────────────────────────────────────────┐
+│ 2. INTENT DECONSTRUCTION                │
+│    • What user SAID                    │
+│    • What user MEANT                    │
+│    • What user REALLY needs             │
+└─────────────────────────────────────────┘
+     │
+     ▼
+┌─────────────────────────────────────────┐
+│ 3. GOAL EXTRACTION                     │
+│    • Explicit goals                     │
+│    • Implicit goals                     │
+│    • Success criteria                   │
+└─────────────────────────────────────────┘
+     │
+     ▼
+┌─────────────────────────────────────────┐
+│ 4. SOLUTION SYNTHESIS                   │
+│    • Optimal solution                   │
+│    • Trade-offs                        │
+│    • Alternatives                       │
+└─────────────────────────────────────────┘
+     │
+     ▼
+┌─────────────────────────────────────────┐
+│ OUTPUT: TASK MANIFEST                   │
+│    • Skills (with token budget)        │
+│    • Tasks (atomic, 2-5min)           │
+│    • Context (minimal sufficient)      │
+└─────────────────────────────────────────┘
+```
+
+### X.2 Request Pattern Analysis
+
+#### X.2.1 Vietnamese Intent Detection
+
+```yaml
+vi_intent_patterns:
+
+  BUILD:
+    patterns:
+      - "tạo" / "tạo ra" / "xây dựng" / "phát triển"
+      - "thêm" / "bổ sung" / "implement"
+      - "cài đặt" / "thiết lập" / "setup"
+    implicit_needs:
+      - "tạo landing page" → may need: value proposition clarity
+      - "tạo API" → may need: error handling, auth
+      - "tạo database" → may need: indexing, migrations
+
+  FIX:
+    patterns:
+      - "sửa" / "sửa lỗi" / "fix" / "debug"
+      - "khắc phục" / "giải quyết"
+    implicit_needs:
+      - "sửa bug" → may need: root cause analysis
+      - "fix lỗi" → may need: test coverage
+      - "debug api" → may need: logging, monitoring
+
+  REDESIGN:
+    patterns:
+      - "cải thiện" / "nâng cấp" / "improve"
+      - "tái thiết kế" / "redesign" / "rebuild"
+      - "hiện đại hóa" / "modernize"
+    implicit_needs:
+      - "cải thiện UI" → may need: user feedback
+      - "nâng cấp" → may need: migration plan
+```
+
+#### X.2.2 Implicit Need Detection
+
+```
+═══════════════════════════════════════════════════════════════
+[IMPLICIT NEED DETECTION]
+
+Request: "Tạo một landing page cho startup AI của tôi"
+
+EXPLICIT (what user said):
+  • Create landing page
+  • For AI startup
+
+IMPLICIT (what user may actually need):
+  1. Convert visitors → leads (what's the CTA?)
+  2. Communicate value → what's unique about this AI?
+  3. Build trust → social proof, testimonials
+  4. Differentiate → why this AI vs competitors?
+
+GOALS:
+  • Landing page exists ✓
+  • Page converts visitors ✓
+  • Communicates value clearly ✓
+  • Has clear CTA ✓
+
+SUCCESS CRITERIA:
+  • Page loads < 2s
+  • CTA visible above fold
+  • Form submission works
+  • Mobile responsive
+═══════════════════════════════════════════════════════════════
+```
+
+### X.3 Alternative Proposal Triggers
+
+**Đề xuất giải pháp thay thế khi:**
+
+1. User request over-engineering
+2. Có pre-built solution tốt hơn
+3. User chưa hiểu vấn đề đủ
+
+```
+═══════════════════════════════════════════════════════════════
+[ALTERNATIVE PROPOSAL]
+
+Your request: "Build custom authentication from scratch"
+
+Analysis:
+• What you asked: Custom auth system
+• What you likely need: Secure user authentication
+• Alternative: Use existing auth solution
+
+RECOMMENDED APPROACHES:
+
+A) Use existing auth (Auth0, Clerk, NextAuth)
+   ├── Pros: Secure, fast, free tier
+   ├── Cons: Vendor lock-in (manageable)
+   └── Best for: Most SaaS apps
+
+B) Build custom (if specific requirements)
+   ├── Pros: Full control
+   ├── Cons: 2-3 weeks, security risk
+   └── Best for: Unique compliance needs
+
+I recommend: A) Use existing auth
+Rationale: Save time, security vetted
+
+Do you want to:
+[A] Use existing auth (recommended)
+[B] Build custom (specify unique requirements)
+═══════════════════════════════════════════════════════════════
+```
+
+---
+
+## PHẦN XI: TOKEN OPTIMIZATION
+
+### XI.1 Context Loading Strategy
+
+> **Rule:** Load only what you need, nothing more.
+
+```yaml
+context_tiers:
+
+  TIER_1_HOT:
+    priority: 1
+    content: Session context, recent changes
+    ttl: Current session
+    size_limit: ~10KB
+    
+  TIER_2_WARM:
+    priority: 2
+    content: Project patterns, tech stack
+    ttl: Until project changes
+    size_limit: ~50KB
+    
+  TIER_3_COLD:
+    priority: 3
+    content: Specific files, tests
+    ttl: Per task
+    size_limit: ~100KB per file
+    
+  TIER_4_EXTERNAL:
+    priority: 4
+    content: External docs, web search
+    ttl: Per query
+    cost: High (tokens)
+```
+
+### XI.2 Token Budget Per Task Type
+
+```yaml
+token_budget:
+
+  SIMPLE_FIX:
+    context: "~500-1K tokens"
+    code_output: "~1-3K tokens"
+    total: "~2-5K tokens"
+    
+  MEDIUM_FEATURE:
+    context: "~3-10K tokens"
+    code_output: "~5-15K tokens"
+    total: "~10-30K tokens"
+    
+  COMPLEX_SYSTEM:
+    context: "~15-30K tokens"
+    code_output: "~20-50K tokens"
+    total: "~40-80K tokens"
+```
+
+### XI.3 Token Saving Techniques
+
+```yaml
+techniques:
+
+  technique_1_summarize:
+    name: "Summarize before load"
+    before: "Load entire file"
+    after: "Load relevant lines + summary"
+    saved: "~70% tokens"
+    
+  technique_2_incremental:
+    name: "Incremental context"
+    before: "Load all context upfront"
+    after: "Load minimal, add as needed"
+    saved: "~40% tokens"
+    
+  technique_3_reference:
+    name: "Reference vs content"
+    before: "Paste code in prompt"
+    after: "Reference path + describe"
+    saved: "~50% tokens"
+    
+  technique_4_batch:
+    name: "Batch operations"
+    before: "Sequential tool calls"
+    after: "Batch + reuse context"
+    saved: "~30% tokens"
+```
+
+### XI.4 Context Compression Rules
+
+```yaml
+compression_rules:
+
+  code:
+    keep:
+      - Function signatures
+      - Key logic (core algorithm)
+      - Test assertions
+      - Error handling
+    remove:
+      - Verbose comments
+      - Boilerplate
+      - Imports (can infer)
+      - Dead code
+      
+  docs:
+    keep:
+      - Key decisions
+      - Constraints
+      - Patterns
+      - API contracts
+    remove:
+      - Examples (regenerate if needed)
+      - Verbose explanations
+      
+  rules:
+    keep:
+      - Gate names
+      - Key checks
+      - Pass/fail criteria
+    remove:
+      - Detailed explanations
+      - Repetitive sections
+```
+
+---
+
+## PHẦN XII: SMART ROUTING DECISION
+
+### XII.1 Decision Template
+
+```yaml
+routing_decision:
+
+  input:
+    request: "string"
+    language: "VI/EN/ZH/etc"
+    
+  analysis:
+    intent:
+      primary: "BUILD/FIX/REDESIGN/REVIEW"
+      confidence: 0.0-1.0
+      implicit_needs: ["list"]
+      
+    domain:
+      signals: ["keyword matches"]
+      confidence: 0.0-1.0
+      
+    skills:
+      - skill_id: "string"
+        score: 0.0-1.0
+        matched_on: ["keywords"]
+        
+  decision:
+    skills_to_load:
+      - skill_id: "string"
+        token_budget: "~N tokens"
+        
+    rules_to_load:
+      - rule_id: "string"
+        sections: ["§1", "§2"]
+        
+    context_files:
+      - path: "string"
+        reason: "string"
+        lines: "1-50"
+        
+    gates:
+      pre: ["gate-1"]
+      post: ["gate-2"]
+      
+  tasks:
+    - task_id: "task-1"
+      description: "string"
+      tokens: "~N"
+      
+  optimization:
+    techniques_used: ["list"]
+    tokens_saved: "~N"
+    total_estimate: "~N tokens"
+```
 
 ---
 

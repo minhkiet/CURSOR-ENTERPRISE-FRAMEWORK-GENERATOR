@@ -1,0 +1,147 @@
+<UserControl x:Class="CursorSetupWpf.Views.ComponentsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:CursorSetupWpf.ViewModels"
+             Background="{StaticResource ContentBackgroundBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Padding="32,28,32,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <TextBlock Text="Thành phần"
+                               FontFamily="{StaticResource UIFont}" FontSize="24" FontWeight="Bold"
+                               Foreground="{StaticResource Slate900Brush}" Margin="0,0,0,4"/>
+                    <TextBlock Text="Chọn rules, skills, agents, commands, và hooks muốn cài đặt."
+                               FontFamily="{StaticResource UIFont}" FontSize="14"
+                               Foreground="{StaticResource Slate500Brush}"/>
+                </StackPanel>
+
+                <!-- Quick actions -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="Chọn tất cả"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Command="{Binding DataContext.SelectAllComponentsCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                            Margin="0,0,8,0"/>
+                    <Button Content="Bỏ chọn tất cả"
+                            Style="{StaticResource GhostButtonStyle}"
+                            Command="{Binding DataContext.DeselectAllComponentsCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Category cards -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="32,0,32,32">
+            <ItemsControl ItemsSource="{Binding ComponentCategories}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16">
+                            <StackPanel>
+                                <!-- Category header -->
+                                <Grid Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <!-- Category icon (using code point) -->
+                                        <Border Width="36" Height="36" CornerRadius="8"
+                                                Background="{StaticResource Indigo50Brush}"
+                                                Margin="0,0,12,0">
+                                            <TextBlock Text="&#xE8B7;"
+                                                       FontFamily="Segoe MDL2 Assets"
+                                                       FontSize="18"
+                                                       Foreground="{StaticResource Indigo600Brush}"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Name}"
+                                                       FontFamily="{StaticResource UIFont}" FontSize="15" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource Slate900Brush}"/>
+                                            <TextBlock FontFamily="{StaticResource UIFont}" FontSize="12"
+                                                       Foreground="{StaticResource Slate500Brush}">
+                                                <Run Text="{Binding TotalCount, Mode=OneWay}"/>
+                                                <Run Text=" items"/>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <!-- Count chip -->
+                                    <Border Grid.Column="1"
+                                            Background="{StaticResource Indigo50Brush}"
+                                            CornerRadius="20"
+                                            Padding="12,4">
+                                        <TextBlock FontFamily="{StaticResource UIFont}"
+                                                   FontSize="12" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource Indigo600Brush}">
+                                            <Run Text="{Binding SelectedCount, Mode=OneWay}"/>
+                                            <Run Text="/"/>
+                                            <Run Text="{Binding TotalCount, Mode=OneWay}"/>
+                                        </TextBlock>
+                                    </Border>
+                                </Grid>
+
+                                <!-- Items list -->
+                                <ItemsControl ItemsSource="{Binding Items}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border x:Name="itemRow"
+                                                    Padding="8,6"
+                                                    CornerRadius="6"
+                                                    Margin="0,1">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <CheckBox IsChecked="{Binding IsSelected}"
+                                                              Style="{StaticResource ModernCheckBoxStyle}"/>
+
+                                                    <StackPanel Grid.Column="1" Margin="12,0">
+                                                        <TextBlock Text="{Binding Name}"
+                                                                   FontFamily="{StaticResource UIFont}" FontSize="13"
+                                                                   Foreground="{StaticResource Slate700Brush}"/>
+                                                        <TextBlock Text="{Binding Description}"
+                                                                   FontFamily="{StaticResource UIFont}" FontSize="11"
+                                                                   Foreground="{StaticResource Slate400Brush}"
+                                                                   TextTrimming="CharacterEllipsis"
+                                                                   MaxWidth="500"/>
+                                                    </StackPanel>
+
+                                                    <TextBlock Grid.Column="2"
+                                                               Text="{Binding Index}"
+                                                               FontFamily="{StaticResource UIFont}" FontSize="11"
+                                                               Foreground="{StaticResource Slate400Brush}"
+                                                               VerticalAlignment="Top"/>
+                                                </Grid>
+                                            </Border>
+                                            <DataTemplate.Triggers>
+                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                    <Setter TargetName="itemRow" Property="Background" Value="{StaticResource Indigo50Brush}"/>
+                                                </DataTrigger>
+                                            </DataTemplate.Triggers>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

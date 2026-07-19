@@ -374,7 +374,13 @@ class MemoryManager:
         """Estimate token count for value compression tracking."""
         try:
             text = json.dumps(value, default=str)
-            return len(text) // 4
+            # Use word-based estimation for accuracy
+            words = text.split()
+            if len(words) <= 5:
+                # Short values: use char-based
+                return max(1, len(text) // 4)
+            # Longer values: ~0.75 tokens per word
+            return max(len(words), int(len(words) * 0.75))
         except:
             return 100
 

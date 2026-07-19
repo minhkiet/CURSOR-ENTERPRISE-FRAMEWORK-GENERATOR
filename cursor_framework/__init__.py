@@ -4,6 +4,8 @@ Cursor Enterprise Framework - Python Core Library
 A comprehensive Python library supporting the Cursor Enterprise Framework rules and skills.
 Provides utilities for context routing, memory management, token optimization, and skill discovery.
 
+See STRUCTURE.md for full directory layout and data flow diagrams.
+
 Modules:
     context_router: Intent classification and skill routing
     memory_manager: Memory-first context management

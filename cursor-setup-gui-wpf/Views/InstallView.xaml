@@ -1,0 +1,147 @@
+<UserControl x:Class="CursorSetupWpf.Views.InstallView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:CursorSetupWpf.ViewModels"
+             Background="{StaticResource ContentBackgroundBrush}">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="32,28">
+        <StackPanel MaxWidth="900">
+
+            <!-- === Page Title === -->
+            <TextBlock Text="Cài đặt"
+                       FontFamily="{StaticResource UIFont}" FontSize="24" FontWeight="Bold"
+                       Foreground="{StaticResource Slate900Brush}" Margin="0,0,0,4"/>
+            <TextBlock Text="Chọn đường dẫn và tùy chọn cài đặt cho Cursor Enterprise Framework."
+                       FontFamily="{StaticResource UIFont}" FontSize="14"
+                       Foreground="{StaticResource Slate500Brush}" Margin="0,0,0,28"/>
+
+            <!-- === Path Card === -->
+            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20">
+                <StackPanel>
+                    <TextBlock Text="Đường dẫn cài đặt"
+                               FontFamily="{StaticResource UIFont}" FontSize="15" FontWeight="SemiBold"
+                               Foreground="{StaticResource Slate900Brush}" Margin="0,0,0,4"/>
+                    <TextBlock Text="Chọn thư mục sẽ chứa các file cấu hình framework"
+                               FontFamily="{StaticResource UIFont}" FontSize="12"
+                               Foreground="{StaticResource Slate500Brush}" Margin="0,0,0,16"/>
+
+                    <!-- Path display + buttons -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox Grid.Column="0"
+                                 Text="{Binding InstallPath, Mode=TwoWay}"
+                                 Style="{StaticResource ModernTextBoxStyle}"
+                                 IsReadOnly="True"
+                                 Margin="0,0,12,0"/>
+
+                        <Button Grid.Column="1"
+                                Content="Duyệt..."
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Command="{Binding BrowseCommand}"
+                                Margin="0,0,8,0"/>
+
+                        <Button Grid.Column="2"
+                                Content="+ Tạo thư mục"
+                                Style="{StaticResource GhostButtonStyle}"
+                                Command="{Binding NewFolderCommand}"/>
+                    </Grid>
+
+                    <!-- Toggle options -->
+                    <StackPanel Margin="0,20,0,0">
+                        <CheckBox Content="Ghi đè file hiện có (--force)"
+                                  IsChecked="{Binding ForceOverwrite}"
+                                  Style="{StaticResource ModernCheckBoxStyle}"
+                                  Margin="0,0,0,8"/>
+                        <CheckBox Content="Bỏ qua kiểm tra Cursor đang chạy"
+                                  IsChecked="{Binding SkipCursorCheck}"
+                                  Style="{StaticResource ModernCheckBoxStyle}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- === Build Options Card === -->
+            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                        <TextBlock Text="Bước build sau cài đặt"
+                                   FontFamily="{StaticResource UIFont}" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{StaticResource Slate900Brush}"/>
+                        <Border Style="{StaticResource ChipStyle}" Margin="12,0,0,0">
+                            <TextBlock Text="TUỲ CHỌN"
+                                       FontFamily="{StaticResource UIFont}" FontSize="10" FontWeight="Bold"
+                                       Foreground="{StaticResource Indigo600Brush}"/>
+                        </Border>
+                    </StackPanel>
+                    <TextBlock Text="Chạy sau khi giải nén. Để trống nếu chỉ muốn cài đơn giản."
+                               FontFamily="{StaticResource UIFont}" FontSize="12"
+                               Foreground="{StaticResource Slate500Brush}" Margin="0,0,0,16"/>
+
+                    <!-- Two-column grid of checkboxes -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <CheckBox Grid.Row="0" Grid.Column="0"
+                                  Content="Build Memory System"
+                                  IsChecked="{Binding BuildMemory}"
+                                  Style="{StaticResource ModernCheckBoxStyle}" Margin="0,0,0,10"/>
+
+                        <CheckBox Grid.Row="0" Grid.Column="1"
+                                  Content="Compile Knowledge"
+                                  IsChecked="{Binding CompileKnowledge}"
+                                  Style="{StaticResource ModernCheckBoxStyle}" Margin="0,0,0,10"/>
+
+                        <CheckBox Grid.Row="1" Grid.Column="0"
+                                  Content="Build Project Index"
+                                  IsChecked="{Binding BuildIndex}"
+                                  Style="{StaticResource ModernCheckBoxStyle}" Margin="0,0,0,10"/>
+
+                        <CheckBox Grid.Row="1" Grid.Column="1"
+                                  Content="Build Embeddings"
+                                  IsChecked="{Binding BuildEmbeddings}"
+                                  Style="{StaticResource ModernCheckBoxStyle}" Margin="0,0,0,10"/>
+
+                        <CheckBox Grid.Row="2" Grid.Column="0"
+                                  Content="Package Framework (.zip)"
+                                  IsChecked="{Binding PackageFramework}"
+                                  Style="{StaticResource ModernCheckBoxStyle}"/>
+                    </Grid>
+
+                    <!-- Note -->
+                    <Border Background="#FFF7ED" CornerRadius="8" Padding="12,8" Margin="0,16,0,0">
+                        <TextBlock Text="Lưu ý: 'Package Framework' có thể mất vài phút (tạo cursor-setup.zip)."
+                                   FontFamily="{StaticResource UIFont}" FontSize="12"
+                                   Foreground="#92400E"/>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- === Tip Card === -->
+            <Border Style="{StaticResource CardStyle}" Background="{StaticResource Indigo50Brush}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE946;"
+                               FontFamily="Segoe MDL2 Assets" FontSize="20"
+                               Foreground="{StaticResource Indigo500Brush}"
+                               VerticalAlignment="Top" Margin="0,2,16,0"/>
+                    <TextBlock Text="Mẹo: Chuyển sang tab 'Thành phần' và 'Nâng cao' để chọn rules, skills, agents và tài nguyên khác muốn cài đặt."
+                               FontFamily="{StaticResource UIFont}" FontSize="13"
+                               Foreground="{StaticResource Indigo600Brush}"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

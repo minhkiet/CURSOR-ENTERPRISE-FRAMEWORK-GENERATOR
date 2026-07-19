@@ -26,6 +26,7 @@ from pathlib import Path
 from typing import Any, Optional
 import json
 import os
+import re
 
 
 class GateType(Enum):
@@ -569,6 +570,9 @@ class GateExecutor:
         passed_items = 0
         failed_items = []
 
+        # Inject skill_name into context for section matching
+        context = {**context, "skill_name": skill.name}
+
         for section in skill.pre_review_sections:
             if self._check_pre_section(section, context):
                 passed_items += 1
@@ -608,6 +612,9 @@ class GateExecutor:
         passed_items = 0
         failed_items = []
 
+        # Inject skill_name into context for section matching
+        context = {**context, "skill_name": skill.name}
+
         for section in skill.post_review_sections:
             if self._check_post_section(section, context):
                 passed_items += 1
@@ -629,12 +636,125 @@ class GateExecutor:
         return result
 
     def _check_pre_section(self, section: str, context: dict) -> bool:
-        """Check if a pre-review section passes."""
-        return True
+        """
+        Check if a pre-review section passes validation.
+        
+        Validates that required context keys exist and have valid values
+        for the given section identifier.
+        
+        Section identifiers can be:
+        - Numeric: "0.A", "0.B", "S.1", etc. (from skill registry)
+        - Named: "taste-pre", "security-pre", etc. (for custom checks)
+        """
+        section_lower = section.lower()
+        section_clean = re.sub(r'[\d.]+', '', section_lower).strip() or section_lower
+        
+        # Common required context keys
+        required_keys = context.get("required_keys", [])
+        for key in required_keys:
+            if key not in context:
+                return False
+        
+        # Get skill name from context for better matching
+        skill_name = context.get("skill_name", "").lower().replace("-", " ")
+        
+        # Check for specific section validations based on content keywords
+        # These map section patterns to required context
+        
+        # Frontend taste / design sections
+        if any(kw in section_clean for kw in ["taste", "design", "ui", "aesthetic", "goal"]):
+            return "goal" in context or "request" in context or "design_goal" in context
+        
+        # Security sections
+        if any(kw in section_clean for kw in ["security", "auth", "vuln", "auth"]):
+            return context.get("auth_checked", False) or "auth" in context or "security" in skill_name
+        
+        # Review / quality sections
+        if any(kw in section_clean for kw in ["review", "quality", "audit", "check"]):
+            return context.get("code_baseline", False) or "code" in context or "request" in context
+        
+        # Output / implementation sections
+        if any(kw in section_clean for kw in ["output", "implement", "complete", "scope"]):
+            return "scope" in context or "request" in context
+        
+        # Debug / repro sections
+        if any(kw in section_clean for kw in ["debug", "repro", "bug", "error"]):
+            return context.get("reproducible", False) or "error" in context or "bug" in context
+        
+        # Marketing / strategy sections
+        if any(kw in section_clean for kw in ["market", "cro", "growth", "strategy"]):
+            return "goal" in context or "product" in context or "request" in context
+        
+        # Compliance / robots sections
+        if any(kw in section_clean for kw in ["compliance", "robot", "scrap"]):
+            return context.get("compliance_checked", False) or context.get("robots_checked", False) or "url" in context
+        
+        # Default: require basic request context
+        return bool(context.get("request") or context.get("text") or context.get("goal"))
 
     def _check_post_section(self, section: str, context: dict) -> bool:
-        """Check if a post-review section passes."""
-        return True
+        """
+        Check if a post-review section passes validation.
+        
+        Validates that implementation meets quality criteria for the section.
+        """
+        section_lower = section.lower()
+        section_clean = re.sub(r'[\d.]+', '', section_lower).strip() or section_lower
+        
+        # Get skill name from context for better matching
+        skill_name = context.get("skill_name", "").lower().replace("-", " ")
+        
+        # Check for specific post-section validations based on content keywords
+        
+        # Frontend taste / design sections
+        if any(kw in section_clean for kw in ["taste", "design", "ui", "aesthetic"]):
+            return context.get("taste_check", False) or "output" in context
+        
+        # Security sections - require no critical vulnerabilities
+        if any(kw in section_clean for kw in ["security", "vuln", "auth", "audit"]):
+            vulns = context.get("vulnerabilities", [])
+            critical = [v for v in vulns if v.get("severity") == "critical"]
+            return len(critical) == 0
+        
+        # Review / quality sections
+        if any(kw in section_clean for kw in ["review", "quality", "check"]):
+            return context.get("quality_pass", False) or "output" in context
+        
+        # Output / implementation sections - require complete implementation
+        if any(kw in section_clean for kw in ["output", "implement", "complete", "scope"]):
+            is_complete = context.get("is_complete", True)
+            has_todos = context.get("has_todos", False)
+            return is_complete and not has_todos
+        
+        # Marketing sections - require no anti-patterns
+        if any(kw in section_clean for kw in ["market", "cro", "antipattern"]):
+            return context.get("no_antipatterns", True)
+        
+        # Debug / verify sections - require regression test passed
+        if any(kw in section_clean for kw in ["debug", "verify", "repro"]):
+            return context.get("regression_pass", False) or context.get("tests_pass", False)
+        
+        # Compliance / scraping sections
+        if any(kw in section_clean for kw in ["compliance", "robot", "scrap", "coverage"]):
+            if "diff_acceptable" in context:
+                return context.get("diff_acceptable", True)
+            coverage = context.get("source_coverage", 0)
+            return coverage >= 0.95
+        
+        # Test / behavior sections
+        if any(kw in section_clean for kw in ["test", "behavior", "regression"]):
+            return context.get("tests_pass", False) or context.get("behavior_preserved", True)
+        
+        # Deploy / migration sections
+        if any(kw in section_clean for kw in ["deploy", "migrate", "slo", "pipeline"]):
+            return context.get("slo_verified", False) or context.get("pipeline_wired", False)
+        
+        # Payment sections
+        if any(kw in section_clean for kw in ["payment", "checkout"]):
+            return context.get("payment_flow_verified", False)
+        
+        # Default: require output exists
+        return "output" in context or "result" in context
 
     def get_results(self) -> list[GateResult]:
         """Get all gate execution results."""

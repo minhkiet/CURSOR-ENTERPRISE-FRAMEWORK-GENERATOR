@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>cursor-setup-wpf</AssemblyName>
+    <Version>4.3.0</Version>
+    <Company>Cursor Enterprise</Company>
+    <Product>Cursor Enterprise Framework Setup</Product>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <ApplicationIcon>setup.ico</ApplicationIcon>
+    <Icon>setup.ico</Icon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="setup.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="..\cursor-setup-gui\Resources\*.txt" Link="Resources\%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\*.xaml" />
+  </ItemGroup>
+</Project>

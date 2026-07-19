@@ -1,7 +1,7 @@
 ---
 description: Single Source of Truth cho tất cả skill definitions, triggers, confidence thresholds, và gate mappings. Được sử dụng bởi skill-integration, task-analyzer, và multi-language-vibe-code. Bao gồm Ponytail Lazy Senior Dev principles. Integrated với agent-skills (addyosmani/agent-skills) và ChatbotX development patterns. Tích hợp Karpathy Guidelines từ andrej-karpathy-skills và Hallmark anti-slop design skill từ Nutlope/hallmark (9.3k stars).
 created: 2026-06-26
-version: 1.8.0
+version: 2.0.0
 updated: 2026-07-16
 tags: [skill-registry, skills, auto-discovery, mandatory, overlay, ponytail, lazy-senior, code-quality, agent-skills, chatbotx, chatbot-marketing, superpowers, methodology, marketingskills, marketing, hallmark, anti-slop, design]
 ---
@@ -226,10 +226,10 @@ Mỗi skill được định nghĩa với các properties:
 - over-engineering, boilerplate, abstraction
 - utility class, wrapper, overkill
 
-**Pre-Gates:** YAGNI Ladder (7 steps)  
-**Post-Gates:** Ponytail Checklist
+**Pre-Gates:** P.1-P.4 (YAGNI, Dependency, Abstraction, Boilerplate)  
+**Post-Gates:** P.5-P.7 (Code Reduction, Shortcuts, Safety)
 
-**Purpose:** Lazy Senior Dev mode - viết code tối thiểu, hiệu quả. "The best code is the code you never wrote."
+**Purpose:** Lazy Senior Dev mode - minimum code, maximum effect. YAGNI ladder (7 steps). "The best code is the code you never wrote."
 
 **Modes:** `lite`, `full` (default), `ultra`, `off`
 
@@ -254,12 +254,37 @@ Mỗi skill được định nghĩa với các properties:
 - "don't overthink", "just do it", "clarify first"
 - surgical changes needed
 
-**Pre-Gates:** K.1-K.4 (4 sections)  
-**Post-Gates:** K.5-K.7 (3 sections)
+**Pre-Gates:** K.1-K.4 (Think, Simplicity, Scope, Goals)  
+**Post-Gates:** K.5-K.7 (Verify, Re-check, Goals) + §X (Verification before deliver)
 
-**Purpose:** Think before coding, simplicity first, surgical changes, goal-driven execution. Luôn chạy song song với các skill khác như overlay discipline.
+**Purpose:** Think before coding, simplicity first, surgical changes, goal-driven execution. Always runs as overlay with other skills.
 
 **Source:** [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) (186k stars)
+
+---
+
+#### vibe-coding
+
+| Property | Value |
+|----------|-------|
+| **ID** | `vibe-coding` |
+| **Path** | `.cursor/skills/vibe-coding/SKILL.md` |
+| **Role** | `mandatory_overlay` |
+| **Domains** | `general` (all coding tasks) |
+| **Confidence Base** | `1.0` |
+| **Threshold** | `1.0` (always selected) |
+
+**Triggers:**
+- ALL coding tasks (unified overlay)
+- "vibe coding", "efficient", "minimal"
+- "think first then code", "simple approach"
+- Combined karpathy + ponytail workflow
+
+**Gates:** T.M.S.I.V (Think, Minimize, Scope, Implement, Verify)
+
+**Purpose:** Unified overlay kết hợp karpathy-coding + ponytail. Think first, minimize code, verify surgical.
+
+**Source:** karpathy-coding (186k stars) + ponytail (58k stars)
 
 ---
 
@@ -953,10 +978,11 @@ karpathy-pre (MANDATORY) → [ponytail-pre if enabled] → IMPLEMENT → [ponyta
 | `review-post` | frontend-review B.1-B.7 | 7 sections | frontend-review |
 | `security-pre` | security-review S.1-S.3 | 3 sections | security-review |
 | `security-post` | security-review Security-1-9 | 9 layers | security-review |
-| `karpathy-pre` | karpathy-coding K.1-K.4 | 4 sections | karpathy-coding (ALL tasks) |
-| `karpathy-post` | karpathy-coding K.5-K.7 | 3 sections | karpathy-coding (ALL tasks) |
-| `ponytail-pre` | ponytail YAGNI Ladder | 7 steps | ponytail (if enabled) |
-| `ponytail-post` | ponytail Checklist | checklist | ponytail (if enabled) |
+| `karpathy-pre` | karpathy-coding K.1-K.4 | Think, Simplicity, Scope, Goals | karpathy-coding (ALL tasks) |
+| `karpathy-post` | karpathy-coding K.5-K.7 + §X | Verify, Re-check, Goals, Verify-for-real | karpathy-coding (ALL tasks) |
+| `vibe-coding` | vibe-coding T.M.S.I.V | Think, Minimize, Scope, Implement, Verify | vibe-coding (unified overlay) |
+| `ponytail-pre` | ponytail P.1-P.4 | YAGNI, Dependency, Abstraction, Boilerplate | ponytail (if enabled) |
+| `ponytail-post` | ponytail P.5-P.7 | Code Reduction, Shortcuts, Safety | ponytail (if enabled) |
 | `payment-pre` | vietnam-payment-review | pre-gate | vietnam-payment |
 | `payment-post` | vietnam-payment-review | post-gate | vietnam-payment |
 | `chatbotx-pre` | chatbot-development | feature-scaffold | chatbotx-feature |
@@ -1450,8 +1476,17 @@ No future tracking required — concept-ref mappings are stable. If Superpowers 
 
 | Date | Version | Changes |
 |------|---------|---------|
-| 2026-07-07 | 1.6.0 | Integrated Superpowers methodology (248k stars) — 4 concept-ref skills (§1.2 Meta Skills) + §8 References mapping. NO new files created. |
+| 2026-07-16 | 2.1.0 | Added unified vibe-coding skill (karpathy + ponytail combined). T.M.S.I.V workflow (Think, Minimize, Scope, Implement, Verify). |
+| 2026-07-16 | 2.0.0 | Streamlined karpathy-coding (258→~150 lines) và ponytail (326→~220 lines). Compact quick cards, visual hierarchy, simplified gates. |
+| 2026-07-15 | 1.8.0 | Integrated Hallmark anti-slop design skill (9.3k stars) — 4 verbs, 20 themes, 57 slop-test gates, custom theme protocol, DNA extraction. NO new files created. |
 | 2026-07-15 | 1.7.0 | Integrated marketingskills (39k stars) — 47 skill concept-refs across 9 categories, mapped to existing `.cursor/knowledge/marketing/*.md` sections per §9. NO new SKILL.md files created. |
+| 2026-07-07 | 1.6.0 | Integrated Superpowers methodology (248k stars) — 4 concept-ref skills (§1.2 Meta Skills) + §8 References mapping. NO new files created. |
+| 2026-07-01 | 1.5.0 | Added video-generation skill from AI-auto-generate-video (HyperFrames, OmniVoice TTS) |
+| 2026-07-01 | 1.4.0 | Integrated karpathy-guidelines rule (alwaysApply) from andrej-karpathy-skills (186k stars) |
+| 2026-06-29 | 1.3.0 | Added ChatbotX development skills (chatbotx-feature, chatbotx-database, chatbotx-worker) |
+| 2026-06-26 | 1.2.0 | Merged Vietnamese payment and address skills |
+| 2026-06-26 | 1.1.0 | Merged Ponytail Lazy Senior Dev section |
+| 2026-06-26 | 1.0.0 | Initial unified skill registry |
 
 ---
 
@@ -1622,20 +1657,14 @@ Cursor slash commands apply equally to marketing tasks:
 | 2026-07-15 | main (no version tag, post-rename v2.0) | Integrated into framework v1.7.0 |
 
 No future tracking required — concept-ref mappings are stable. If marketingskills changes upstream, only `glossary.md §12` rename map and routing table in `decision-tree.md §11` need review.
-| 2026-07-01 | 1.5.0 | Added video-generation skill from AI-auto-generate-video (HyperFrames, OmniVoice TTS) |
-| 2026-07-01 | 1.4.0 | Integrated karpathy-guidelines rule (alwaysApply) from andrej-karpathy-skills (186k stars) |
-| 2026-06-29 | 1.3.0 | Added ChatbotX development skills (chatbotx-feature, chatbotx-database, chatbotx-worker) |
-| 2026-06-26 | 1.2.0 | Merged Vietnamese payment and address skills |
-| 2026-06-26 | 1.1.0 | Merged Ponytail Lazy Senior Dev section |
-| 2026-06-26 | 1.0.0 | Initial unified skill registry |
 
 ---
 
-## 10. MARKETING SECURITY CONCEPT-REFS (sync 2026-07-15)
+## 10. MARKETING SECURITY CONCEPT-REFS
 
-> Bổ sung từ [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) v2.6.0 — extension về security/privacy cho marketing. Mọi skill và marketing surface có security exposure đều được map vào security review gates.
+> Bổ sung từ marketingskills v2.6.0 - extension về security/privacy cho marketing. Mọi skill và marketing surface có security exposure đều được map vào security review gates.
 
-### 10.1 Tổng quan Security Overlay
+### 10.1 Tổng quan
 
 Marketing skills vốn tập trung vào **growth & conversion**. Security/Privacy là **cross-cutting concern** phải được tích hợp vào mỗi skill execution để:
 
@@ -1863,3 +1892,616 @@ Marketing-related compliance deadlines:
 
 **Source:**
 - [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) v2.6.0 — referenced for compliance patterns, especially: `analytics`, `ads`, `cold-email`, `emails`, `customer-research`, `schema`, `prospecting`, `churn-prevention`, `sales-enablement`, `signup`, `cro`, `popups`, `paywalls`.
+
+---
+
+## PHẦN 12: ANTIGRAVITY-STYLE REQUEST INFERENCE
+
+### 12.1 Tổng quan
+
+> **Concept:** Khi nhận yêu cầu từ user, hệ thống phải suy luận **đúng mục đích, mục tiêu** trước khi bắt đầu bất kỳ implementation nào. Giống như Antigravity AI - phân tích sâu intent để đưa ra đúng solution.
+
+**Mục tiêu:**
+1. **Hiểu đúng vấn đề** - Không phải what user hỏi, mà là what user THỰC SỰ cần
+2. **Xác định mục tiêu rõ ràng** - Goal phải SMART (Specific, Measurable, Achievable, Relevant, Time-bound)
+3. **Đề xuất giải pháp tối ưu** - Không chỉ làm theo yêu cầu, mà là giải quyết vấn đề gốc
+4. **Tiết kiệm token** - Chỉ load những context cần thiết
+
+### 12.2 Request Inference Flow
+
+```
+USER REQUEST
+     │
+     ▼
+┌─────────────────────────────────────────────────────────────┐
+│ PHASE 1: SURFACE ANALYSIS                                 │
+│ • Extract keywords, intent signals                         │
+│ • Detect language (VI/ZH/JA/KO/EN)                       │
+│ • Translate to English if needed                          │
+└─────────────────────────────────────────────────────────────┘
+     │
+     ▼
+┌─────────────────────────────────────────────────────────────┐
+│ PHASE 2: INTENT DECONSTRUCTION                            │
+│ • Primary intent: BUILD/FIX/REDESIGN/REVIEW/EXPLAIN      │
+│ • Secondary intents: (multi-intent detection)             │
+│ • Implicit intents: (what user REALLY needs)              │
+└─────────────────────────────────────────────────────────────┘
+     │
+     ▼
+┌─────────────────────────────────────────────────────────────┐
+│ PHASE 3: GOAL EXTRACTION                                  │
+│ • Explicit goals: what user stated                        │
+│ • Implicit goals: what user implied                       │
+│ • Success criteria: measurable outcomes                    │
+└─────────────────────────────────────────────────────────────┘
+     │
+     ▼
+┌─────────────────────────────────────────────────────────────┐
+│ PHASE 4: SOLUTION SYNTHESIS                               │
+│ • Propose optimal solution (not just execution)            │
+│ • Identify trade-offs and alternatives                     │
+│ • Suggest simpler approach if applicable                  │
+└─────────────────────────────────────────────────────────────┘
+     │
+     ▼
+┌─────────────────────────────────────────────────────────────┐
+│ OUTPUT: TASK MANIFEST                                     │
+│ • Skills to activate (with confidence)                    │
+│ • Tasks to execute (atomic, 2-5min each)                 │
+│ • Token budget estimate                                    │
+│ • Context to load (minimal sufficient)                    │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 12.3 Intent Deconstruction Patterns
+
+#### 12.3.1 Primary Intent Matrix
+
+|| Request Pattern | Primary Intent | Why |
+||---------------|----------------|-----|
+|| `tạo`, `xây dựng`, `build`, `create`, `implement` | **BUILD** | User muốn tạo cái mới |
+|| `sửa`, `fix`, `bug`, `error`, `lỗi` | **FIX** | User có vấn đề cần giải quyết |
+|| `cải thiện`, `nâng cấp`, `improve`, `upgrade` | **REDESIGN** | User muốn enhancement |
+|| `kiểm tra`, `review`, `check`, `audit` | **REVIEW** | User cần đánh giá |
+|| `giải thích`, `explain`, `how`, `tại sao` | **EXPLAIN** | User cần hiểu |
+
+#### 12.3.2 Implicit Intent Detection
+
+**Quan trọng:** Đôi khi user hỏi "làm X" nhưng thực ra cần "hiểu X trước" hoặc "X không phải là giải pháp tốt nhất".
+
+```yaml
+# Example: User asks "Create a landing page"
+# Implicit: User may need:
+#   1. To understand if landing page is the right approach
+#   2. To know what makes a good landing page
+#   3. To clarify target audience first
+
+# Example: User asks "Fix the login bug"
+# Implicit: User may need:
+#   1. To understand root cause (not just symptom)
+#   2. To prevent future occurrences
+#   3. To test the fix properly
+
+# Example: User asks "Add payment integration"
+# Implicit: User may need:
+#   1. To understand payment flow
+#   2. To choose right provider
+#   3. To handle edge cases (refund, webhook failure)
+```
+
+### 12.4 Goal Extraction Protocol
+
+#### 12.4.1 Explicit vs Implicit Goals
+
+```yaml
+request: "Tạo một landing page cho startup AI của tôi"
+
+# EXPLICIT GOALS (what user stated):
+- Create landing page
+- For AI startup
+- Implied: should look professional/modern
+
+# IMPLICIT GOALS (what user actually needs):
+- Convert visitors to leads/customers
+- Communicate value proposition clearly
+- Build trust with visitors
+- Differentiate from competitors
+
+# SUCCESS CRITERIA (measurable):
+- Page loads in < 2 seconds
+- CTA click rate > 2%
+- Form submission rate > 1%
+- Mobile accessibility pass
+```
+
+#### 12.4.2 Success Criteria Template
+
+```yaml
+success_criteria_template:
+  build:
+    - "Deliverables: [list exact files/components]"
+    - "Functionality: [what it should do]"
+    - "Quality: [no skeleton, complete code, tests pass]"
+  
+  fix:
+    - "Bug reproduced: [steps to reproduce]"
+    - "Root cause: [identified cause]"
+    - "Fix verified: [test that proves fix works]"
+    - "No regression: [existing tests pass]"
+  
+  redesign:
+    - "Before state: [what exists now]"
+    - "After state: [what will be improved]"
+    - "Functionality preserved: [what must continue working]"
+    - "Design direction: [aesthetic/style]"
+  
+  review:
+    - "Scope: [what to review]"
+    - "Criteria: [what constitutes pass/fail]"
+    - "Output: [report format]"
+```
+
+### 12.5 Solution Synthesis
+
+#### 12.5.1 Alternative Proposal Pattern
+
+**Khi nào đề xuất giải pháp thay thế:**
+1. User request có thể được giải quyết đơn giản hơn
+2. User yêu cầu công nghệ/platform không phù hợp
+3. User chưa hiểu đầy đủ vấn đề
+
+```
+═══════════════════════════════════════════════════════════════
+[ALTERNATIVE PROPOSAL]
+
+Request: "Build a custom authentication system"
+
+Analysis:
+• What you asked: Custom auth from scratch
+• What you likely need: Secure user authentication
+• Simpler alternative: Use existing auth solution
+
+Recommended approach:
+[ ] Auth0 / Clerk / NextAuth for 90% of use cases
+[ ] Build custom only if you have unique requirements:
+    - Specific compliance needs (SOC2, HIPAA)
+    - Unique token mechanics
+    - Integration with legacy systems
+
+Why this matters:
+• Save 2-3 weeks of development
+• Security vetted by experts
+• Free tier available for most cases
+
+Do you want to:
+A) Use existing auth solution (recommended)
+B) Build custom auth (if you have specific reasons)
+═══════════════════════════════════════════════════════════════
+```
+
+#### 12.5.2 Trade-off Documentation
+
+```
+Before implementing, document trade-offs:
+
+IMPLEMENTATION DECISION
+├── Approach A: [Option name]
+│   ├── Pros: [list]
+│   ├── Cons: [list]
+│   ├── Time: [estimate]
+│   └── Complexity: [low/medium/high]
+│
+├── Approach B: [Option name]
+│   ├── Pros: [list]
+│   ├── Cons: [list]
+│   ├── Time: [estimate]
+│   └── Complexity: [low/medium/high]
+│
+└── Recommendation: [A/B] with reasoning
+```
+
+---
+
+## PHẦN 13: TOKEN OPTIMIZATION HINTS
+
+### 13.1 Context Loading Strategy
+
+> **Nguyên tắc:** Chỉ load những context cần thiết, không hơn không kém.
+
+#### 13.1.1 Minimal Sufficient Context
+
+```yaml
+# RULE: Load context proportional to task complexity
+
+SIMPLE TASK (fix one function):
+  └── Load: only that function + tests
+  └── Token estimate: ~500-1K tokens
+
+MEDIUM TASK (add feature):
+  └── Load: feature module + related modules + tests
+  └── Token estimate: ~2-5K tokens
+
+COMPLEX TASK (new system):
+  └── Load: architecture docs + key modules + tests
+  └── Token estimate: ~10-20K tokens
+
+ENTERPRISE TASK (full system):
+  └── Load: architecture + patterns + key implementations
+  └── Token estimate: ~30-50K tokens
+```
+
+#### 13.1.2 Context Priority Order
+
+```
+CONTEXT LOADING ORDER (by priority):
+
+1. SESSION CONTEXT
+   • Recent changes in conversation
+   • Current task state
+   • Active decisions
+   
+2. PROJECT CONTEXT
+   • Tech stack (from package.json, requirements.txt)
+   • Key patterns (from existing code)
+   • Constraints (from README, docs)
+   
+3. TASK CONTEXT (only when needed)
+   • Specific file contents
+   • Related tests
+   • Documentation
+
+4. EXTERNAL CONTEXT (last resort)
+   • Web search
+   • External docs
+   • Stack Overflow
+```
+
+### 13.2 Token Budget Estimation
+
+#### 13.2.1 Per-Phase Token Budget
+
+```yaml
+token_budget:
+  request_analysis:
+    input_tokens: "~100-500 (request text)"
+    output_tokens: "~200-500 (analysis)"
+    total: "~300-1K tokens"
+    
+  skill_detection:
+    input_tokens: "~500-1K (rules reference)"
+    output_tokens: "~100-200 (skill list)"
+    total: "~600-1.2K tokens"
+    
+  implementation:
+    input_tokens: "~1-10K (context + rules)"
+    output_tokens: "~2-20K (code)"
+    total: "~3-30K tokens"
+    
+  review:
+    input_tokens: "~5-20K (code + rules)"
+    output_tokens: "~1-5K (review)"
+    total: "~6-25K tokens"
+    
+  TOTAL_ESTIMATE:
+    simple_task: "~5-10K tokens"
+    medium_task: "~20-50K tokens"
+    complex_task: "~100-200K tokens"
+```
+
+#### 13.2.2 Token Saving Techniques
+
+```yaml
+# TECHNIQUE 1: Semantic Compression
+# Bad: Load entire file
+# Good: Load relevant sections + summary
+
+# TECHNIQUE 2: Incremental Context
+# Bad: Load all context upfront
+# Good: Load minimal, add as needed
+
+# TECHNIQUE 3: Reference vs Content
+# Bad: Paste full code in prompt
+# Good: Reference file path + describe change
+
+# TECHNIQUE 4: Parallel Processing
+# Bad: Sequential tool calls with context reload
+# Good: Batch operations, reuse context
+
+# TECHNIQUE 5: Cached References
+# Bad: Re-describe patterns each request
+# Good: "Use the auth pattern from earlier"
+```
+
+### 13.3 Context Compression Rules
+
+```yaml
+compression_rules:
+  
+  code_compression:
+    # Keep: function signatures, key logic, test assertions
+    # Remove: comments, boilerplate, imports (infer)
+    
+  documentation_compression:
+    # Keep: key decisions, constraints, patterns
+    # Remove: examples (can be regenerated), verbose explanations
+    
+  rule_compression:
+    # Keep: gate names, key checks, pass/fail criteria
+    # Remove: verbose explanations (assume understanding)
+```
+
+### 13.4 Token-Aware Task Manifest
+
+```yaml
+task_manifest_with_token_hint:
+  version: "1.0.0"
+  
+  input:
+    original_request: "string"
+    request_tokens_estimate: "~N tokens"
+    
+  analysis:
+    skills_selected:
+      - skill_id: "string"
+        token_budget: "~N tokens"  # How much context this skill needs
+        can_stream: true/false       # Can output be streamed?
+        
+    rules_needed:
+      - rule_id: "string"
+        sections_to_load: ["§1", "§2"]  # Load only needed sections
+        
+    context_to_load:
+      - path: "file path"
+        reason: "why needed"
+        lines: "1-50"  # Specific lines, not entire file
+        
+  tasks:
+    - task_id: "string"
+      token_estimate: "~N tokens"
+      context_needed:
+        - "file path"
+        - "rule section"
+      output_estimate: "~N tokens"
+      
+  token_summary:
+    total_input_estimate: "~N tokens"
+    total_output_estimate: "~N tokens"
+    grand_total: "~N tokens"
+    
+  optimization_applied:
+    - technique_used: "description"
+    - tokens_saved: "~N tokens"
+```
+
+---
+
+## PHẦN 14: ENHANCED DECISION TREE
+
+### 14.1 Multi-Language Request Flow
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ REQUEST RECEIVED                                         │
+└─────────────────────────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────────┐
+│ LANGUAGE DETECTION                                        │
+│ • Vietnamese (VI) → translate to EN                       │
+│ • Chinese (ZH) → translate to EN                        │
+│ • Japanese (JA) → translate to EN                       │
+│ • Korean (KO) → translate to EN                         │
+│ • English (EN) → use directly                           │
+└─────────────────────────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────────┐
+│ INTENT ANALYSIS                                          │
+│ • Primary intent classification                         │
+│ • Confidence score                                       │
+│ • Domain detection                                       │
+└─────────────────────────────────────────────────────────────┘
+                     │
+          ┌────────┴────────┐
+          ▼                 ▼
+     AMBIGUOUS?        CLEAR INTENT
+          │                 │
+          ▼                 │
+   ┌─────────────┐           │
+   │  ASK FOR   │           │
+   │CLARIFICATION│          │
+   │(1 question │           │
+   │ at a time) │           ▼
+   └─────────────┘    ┌─────────────────┐
+                       │ SKILL MATCHING  │
+                       │ • Match against │
+                       │   trigger matrix│
+                       │ • Calculate     │
+                       │   confidence    │
+                       │ • Apply        │
+                       │   mandatory     │
+                       │   skills        │
+                       └─────────────────┘
+                               │
+                               ▼
+                       ┌─────────────────┐
+                       │ GATE DETERMINATION
+                       │ • Pre-gates    │
+                       │ • Post-gates   │
+                       │ • Order        │
+                       └─────────────────┘
+                               │
+                               ▼
+                       ┌─────────────────┐
+                       │ TASK DECOMPOSITION
+                       │ • Atomic tasks  │
+                       │ • 2-5 min each │
+                       │ • Token budget │
+                       └─────────────────┘
+                               │
+                               ▼
+                       ┌─────────────────┐
+                       │ CONTEXT LOADING  │
+                       │ • Load minimal  │
+                       │ • Progressive  │
+                       │ • Cache hits   │
+                       └─────────────────┘
+                               │
+                               ▼
+                       ┌─────────────────┐
+                       │ EXECUTE         │
+                       │ • Run tasks    │
+                       │ • Apply gates │
+                       │ • Deliver    │
+                       └─────────────────┘
+```
+
+### 14.2 Vietnamese Keywords Enhanced
+
+```yaml
+vietnamese_keywords:
+  
+  # VERBS (Primary Intent)
+  intent_verbs:
+    BUILD:
+      - "tạo", "tạo ra", "xây dựng", "xây", "phát triển"
+      - "thêm", "bổ sung", "implement", "làm mới"
+      - "cài đặt", "thiết lập", "setup"
+      
+    FIX:
+      - "sửa", "sửa lỗi", "fix", "debug"
+      - "khắc phục", "giải quyết", "repair"
+      - "loại bỏ", "xóa lỗi"
+      
+    REDESIGN:
+      - "cải thiện", "nâng cấp", "improve"
+      - "tái thiết kế", "redesign", "rebuild"
+      - "hiện đại hóa", "modernize"
+      - "đẹp hơn", "tốt hơn"
+      
+    REVIEW:
+      - "kiểm tra", "check", "review"
+      - "đánh giá", "rà soát", "audit"
+      - "xem xét", "inspect"
+      
+    EXPLAIN:
+      - "giải thích", "explain", "how"
+      - "tại sao", "why", "vì sao"
+      - "là gì", "what is", "cho tôi biết"
+  
+  # MODIFIERS (Scope/Intensity)
+  modifiers:
+    URGENT:
+      - "gấp", "khẩn", "urgent", "asap"
+      - "ngay", "immediately", "tức thì"
+      
+    MINIMAL:
+      - "đơn giản", "simple", "basic"
+      - "tối thiểu", "minimal", "chỉ cần"
+      - "ít thôi", "just"
+      
+    COMPLETE:
+      - "đầy đủ", "complete", "full"
+      - "hoàn chỉnh", "all", "tất cả"
+      - "không thiếu", "not skeleton"
+      
+    FAST:
+      - "nhanh", "quick", "fast"
+      - "gọn", "efficient", "vibe"
+  
+  # TECHNOLOGY (Tech Stack)
+  tech_stack:
+    FRONTEND:
+      - "giao diện", "UI", "frontend"
+      - "trang web", "website", "trang"
+      - "react", "vue", "next", "nuxt"
+      
+    BACKEND:
+      - "backend", "api", "server"
+      - "database", "db", "cơ sở dữ liệu"
+      - "python", "node", "java", "go"
+      
+    MOBILE:
+      - "di động", "mobile", "app"
+      - "ios", "android", "react native"
+      
+    PAYMENT:
+      - "thanh toán", "payment"
+      - "MoMo", "SePay", "PayOS", "VNPay", "ZaloPay"
+```
+
+### 14.3 Smart Routing Decision
+
+```yaml
+routing_decision_template:
+
+  request: "string"
+  
+  analysis:
+    language: "VI/EN/ZH/etc"
+    primary_intent: "BUILD/FIX/REDESIGN/REVIEW/EXPLAIN"
+    confidence: 0.0-1.0
+    
+    domain_signals:
+      - signal: "keyword"
+        weight: 0.0-1.0
+        
+    skills_candidates:
+      - skill_id: "string"
+        score: 0.0-1.0
+        reason: "matched on [keywords]"
+        
+    mandatory_overlays:
+      - karpathy-coding  # Always
+      - ponytail  # If "simple/minimal/vibe" detected
+      - frontend-review  # If frontend domain
+      
+  decision:
+    skills_to_load:
+      - skill_id: "string"
+        priority: 1-N
+        token_budget: "~N tokens"
+        
+    rules_to_load:
+      - rule_id: "string"
+        sections: ["§1", "§2"]
+        
+    context_files:
+      - path: "string"
+        reason: "string"
+        lines: "optional range"
+        
+    gates_to_run:
+      pre: ["gate-1", "gate-2"]
+      post: ["gate-3", "gate-4"]
+      
+  tasks:
+    - task_id: "string"
+      description: "string"
+      estimated_tokens: "~N"
+      blocked_by: ["task-id"]  # Optional
+      
+  token_summary:
+    input: "~N tokens"
+    output: "~N tokens"
+    total: "~N tokens"
+    
+  warnings:
+    - type: "AMBIGUOUS/COMPLEX/SECURITY"
+      message: "string"
+      action: "recommendation"
+```
+
+---
+
+## CHANGELOG (Extended)
+
+| Date | Version | Changes |
+|------|---------|---------|
+| 2026-07-20 | 2.2.0 | Added PHẦN 12: Antigravity-style Request Inference - goal extraction, solution synthesis, alternative proposal pattern. |
+| 2026-07-20 | 2.2.0 | Added PHẦN 13: Token Optimization Hints - context loading strategy, token budget estimation, compression rules. |
+| 2026-07-20 | 2.2.0 | Added PHẦN 14: Enhanced Decision Tree - multi-language flow, Vietnamese keywords, smart routing decision template. |
+| 2026-07-16 | 2.1.0 | Added unified vibe-coding skill (karpathy + ponytail combined). |
+| 2026-07-16 | 2.0.0 | Streamlined karpathy-coding và ponytail. |
+| 2026-07-15 | 1.8.0 | Integrated Hallmark anti-slop design skill. |

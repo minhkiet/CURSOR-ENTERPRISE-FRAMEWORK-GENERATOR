@@ -99,8 +99,77 @@ class Workflow:
 
     @staticmethod
     def _request_key(request: str) -> str:
-        """Stable hash for cache lookup — same request → same key."""
+        """Stable hash for cache lookup."""
         return "request:" + hashlib.md5(request.encode("utf-8")).hexdigest()
+
+    def _compute_etag(self) -> str:
+        """
+        Compute ETag from skill file mtimes.
+        
+        Returns a hash of all skill file modification times.
+        Invalidates cache when any skill file changes.
+        """
+        etag_parts: list[str] = []
+        
+        # Walk skill directories and collect mtimes
+        skill_dirs = [
+            self.root / "skills",
+            self.root / "rules", 
+            self.root / "agents",
+        ]
+        
+        for skill_dir in skill_dirs:
+            if not skill_dir.exists():
+                continue
+            for path in sorted(skill_dir.rglob("*")):
+                if path.is_file():
+                    try:
+                        mtime = path.stat().st_mtime
+                        etag_parts.append(f"{path.relative_to(self.root)}:{mtime}")
+                    except OSError:
+                        pass
+        
+        # Also include INDEX.json mtime if exists
+        index_path = self.root / "INDEX.json"
+        if index_path.exists():
+            try:
+                mtime = index_path.stat().st_mtime
+                etag_parts.append(f"INDEX.json:{mtime}")
+            except OSError:
+                pass
+        
+        # Hash all parts together
+        combined = "|".join(sorted(etag_parts))
+        return hashlib.md5(combined.encode("utf-8")).hexdigest()
+
+    def invalidate_cache(self, key_pattern: str | None = None) -> int:
+        """
+        Invalidate cached entries.
+        
+        Args:
+            key_pattern: If provided, only invalidate keys matching this pattern.
+                        If None, invalidates all HOT tier entries.
+        
+        Returns:
+            Number of entries invalidated
+        """
+        if key_pattern:
+            # Delete specific keys matching pattern
+            deleted = 0
+            for tier in MemoryTier:
+                keys_to_delete = [
+                    k for k in self.memory._storage[tier]
+                    if key_pattern in k
+                ]
+                for k in keys_to_delete:
+                    self.memory.delete(k, tier)
+                    deleted += 1
+            return deleted
+        else:
+            # Clear all HOT tier (session cache)
+            count = len(self.memory._storage[MemoryTier.HOT])
+            self.memory._storage[MemoryTier.HOT].clear()
+            return count
 
     def ask(self, request: str) -> WorkflowResult:
         """
@@ -108,7 +177,7 @@ class Workflow:
 
         Flow:
             1. Compute request hash key
-            2. Check memory cache → if fresh HIT with valid ContextResult,
+            2. Check memory cache → if fresh HIT with valid ContextResult and matching ETag,
                return cached value
             3. Otherwise: ensure index, build context via ContextBuilder
             4. Store context in memory (HOT tier, 1h TTL)
@@ -120,15 +189,25 @@ class Workflow:
             JSON-serialized dataclass comes back as a plain dict, so
             Workflow gracefully rebuilds — `from_cache=False` but
             `memory_hits` still increments (the key lookup hit).
+            
+        Note on ETag:
+            Cache is invalidated when skill files change (based on mtime).
+            The ETag is stored alongside the cached ContextResult.
         """
         # ponytail: time the full ask() call so callers can surface
         # cache-hit vs cache-miss latency in dashboards / benchmarks.
         started = time.perf_counter()
 
         idx = self._ensure_index()
-        key = self._request_key(request)
+        
+        # Compute ETag from current skill file mtimes
+        current_etag = self._compute_etag()
+        
+        # Create cache key with ETag for proper invalidation
+        base_key = self._request_key(request)
+        cache_key = f"{base_key}:{current_etag}"
 
-        cached = self.memory.retrieve(key)
+        cached = self.memory.retrieve(cache_key)
         if cached is not None and isinstance(cached, ContextResult):
             # ponytail: persist memory on cache hit too — process crash
             # between hits should not lose stats or HOT-tier entries.
@@ -144,14 +223,16 @@ class Workflow:
             )
         # ponytail: cached value may be a plain dict after JSON round-trip
         # (dataclass loses its type through json). Fall back to rebuild.
+        # Also check for stale cache (different ETag)
         if cached is not None:
-            self.memory.delete(key)
+            self.memory.delete(cache_key)
 
         # Cache miss — build fresh
         context = self.builder.build(request, max_skills=self.max_skills)
 
         # Store in HOT tier so rapid follow-ups hit cache
-        self.memory.store(key, context, tier=MemoryTier.HOT, priority=8)
+        # Include ETag in key for proper invalidation
+        self.memory.store(cache_key, context, tier=MemoryTier.HOT, priority=8)
 
         # Persist after every successful build so we never lose state
         self.store.save(self.memory)
@@ -187,11 +268,19 @@ class Workflow:
         }
 
     def _on_watch_change(self, paths: list) -> None:
-        """Watcher callback: invalidate index so next ask() rebuilds it."""
+        """
+        Watcher callback: invalidate index so next ask() rebuilds it.
+        
+        Also invalidates HOT tier cache so stale skill files don't return
+        old cached results.
+        """
         # ponytail: don't scan inside the watcher thread — let the next
         # ask() do it on the main thread (avoid concurrency bugs in
         # Indexer.scan() which mutates self.result).
         self._index = None
+        
+        # Invalidate HOT tier cache so changed files trigger fresh builds
+        self.invalidate_cache()  # Clears all HOT tier entries
 
     def stop_watching(self) -> None:
         """Stop the background auto-watcher if running."""
