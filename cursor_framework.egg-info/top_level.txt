@@ -1,2 +1,0 @@
-cursor_framework
-cursor_framework_web
