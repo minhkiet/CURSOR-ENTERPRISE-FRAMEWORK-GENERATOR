@@ -1,0 +1,20 @@
+﻿cursor-setup-wpf
+
+
+winexe
+C#
+.cs
+D:\PROJECTS\CURSORS\CURSOR ENTERPRISE FRAMEWORK GENERATOR\cursor-setup-gui-wpf\obj\Debug\net8.0-windows\win-x64\
+CursorSetupWpf
+none
+false
+TRACE;DEBUG;NET;NET8_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
+D:\PROJECTS\CURSORS\CURSOR ENTERPRISE FRAMEWORK GENERATOR\cursor-setup-gui-wpf\App.xaml
+8-507081362
+1-1043031873
+15-1484363926
+198338916705
+MainWindow.xaml;Resources\Styles\ButtonStyles.xaml;Resources\Themes\IndigoTheme.xaml;Views\AdvancedView.xaml;Views\ComponentsView.xaml;Views\GuideView.xaml;Views\HooksView.xaml;Views\InstallView.xaml;
+
+False
+
