@@ -177,7 +177,7 @@ const titleWords2 = ['for', 'AI', 'coding', 'agents.']
               <div class="hero-window-dots">
                 <span></span><span></span><span></span>
               </div>
-              <div class="hero-window-title">.cursor/skills/frontend-taste</div>
+              <div class="hero-window-title">.cursor/skills/ui_frontend-taste</div>
               <div class="hero-window-action">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="16 18 22 12 16 6"/>

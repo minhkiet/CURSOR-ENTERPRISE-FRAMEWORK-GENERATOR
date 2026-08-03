@@ -40,7 +40,7 @@ export const RULES: FrameworkItem[] = [
       'Always-applied rule that injects the four Karpathy pillars (think before coding, simplicity, surgical changes, goal-driven execution) into every assistant turn. Bias toward caution over speed.',
     category: 'Foundations',
     tags: ['always-applied', 'coding-discipline', 'overlays'],
-    path: '.cursor/rules/karpathy-guidelines.mdc',
+    path: '.cursor/rules/rule_karpathy-guidelines.mdc',
     bullets: [
       'Think Before Coding — surface tradeoffs, ask when unclear',
       'Simplicity First — minimum code that solves the problem',
@@ -58,7 +58,7 @@ export const RULES: FrameworkItem[] = [
       'Project-wide conventions on naming, comments, error handling, async patterns, and file layout. The baseline every other rule references.',
     category: 'Foundations',
     tags: ['style', 'conventions', 'cross-cutting'],
-    path: '.cursor/rules/coding-standards.mdc'
+    path: '.cursor/rules/rule_coding-standards.mdc'
   },
   {
     id: 'intent-detection',
@@ -70,7 +70,7 @@ export const RULES: FrameworkItem[] = [
       'Identifies the user intent, auto-loads relevant skills/rules, and triggers clarification when the request is ambiguous. Combines with the translation layer for multi-language input.',
     category: 'Routing',
     tags: ['router', 'multi-language', 'clarification'],
-    path: '.cursor/rules/intent-detection.mdc'
+    path: '.cursor/rules/proto_intent-detection.mdc'
   },
   {
     id: 'context-router',
@@ -82,7 +82,7 @@ export const RULES: FrameworkItem[] = [
       'Forwards only the domain knowledge needed for a task — backend work loads backend rules, frontend work loads frontend rules. Cuts context by up to 40%.',
     category: 'Routing',
     tags: ['token-optimization', 'router'],
-    path: '.cursor/rules/context-router.mdc',
+    path: '.cursor/rules/proto_context-router.mdc',
     bullets: ['Reduces token usage by ~40%', 'Pulls only relevant domain MDCs', 'Pairs with memory-first to skip already-decided topics']
   },
   {
@@ -95,7 +95,7 @@ export const RULES: FrameworkItem[] = [
       'Checks the local SQLite memory store (ADRs, bug fixes, prior decisions) before doing any other lookup. Avoids relitigating settled questions.',
     category: 'Routing',
     tags: ['memory', 'knowledge'],
-    path: '.cursor/rules/memory-first.mdc'
+    path: '.cursor/rules/proto_memory-first.mdc'
   },
   {
     id: 'task-analyzer',
@@ -107,7 +107,7 @@ export const RULES: FrameworkItem[] = [
       'Splits incoming requests into a structured task manifest with subtasks, owners, and verification steps. Feeds multi-language-vibe-code and the skill registry.',
     category: 'Routing',
     tags: ['planning', 'manifest', 'auto-discovery'],
-    path: '.cursor/rules/task-analyzer.mdc'
+    path: '.cursor/rules/proto_task-analyzer.mdc'
   },
   {
     id: 'multi-language-processing',
@@ -119,7 +119,7 @@ export const RULES: FrameworkItem[] = [
       'Translation layer that converts a request from any supported language into English before processing, so downstream prompts and rules behave consistently.',
     category: 'Routing',
     tags: ['i18n', 'vietnamese', 'chinese'],
-    path: '.cursor/rules/multi-language-processing.mdc'
+    path: '.cursor/rules/proto_multi-language-processing.mdc'
   },
   {
     id: 'skill-integration',
@@ -131,7 +131,7 @@ export const RULES: FrameworkItem[] = [
       'Routes work to the right skill, then enforces pre-review and post-review gates before and after code generation. Every task passes both gates.',
     category: 'Routing',
     tags: ['skills', 'gates', 'lifecycle'],
-    path: '.cursor/rules/skill-integration.mdc'
+    path: '.cursor/rules/proto_skill-integration.mdc'
   },
   {
     id: 'skill-registry',
@@ -143,7 +143,7 @@ export const RULES: FrameworkItem[] = [
       'Defines every skill, its triggers, confidence thresholds, role (primary/overlay/mandatory), and gate mappings. Everything else imports from here.',
     category: 'Routing',
     tags: ['sot', 'registry', 'metadata'],
-    path: '.cursor/rules/skill-registry.mdc'
+    path: '.cursor/rules/rule_skill-registry.mdc'
   },
   {
     id: 'architecture-patterns',
@@ -155,7 +155,7 @@ export const RULES: FrameworkItem[] = [
       'Reference architectures and decision frameworks for choosing between monolith/microservices, layering, and isolation strategies.',
     category: 'Architecture',
     tags: ['clean', 'hexagonal', 'cqrs', 'event-sourcing', 'ddd'],
-    path: '.cursor/rules/architecture-patterns.mdc',
+    path: '.cursor/rules/ref_architecture-patterns.mdc',
     bullets: ['Decision trees for layer split', 'When to use CQRS vs simple CRUD', 'Boundary and anti-corruption layer patterns']
   },
   {
@@ -168,7 +168,7 @@ export const RULES: FrameworkItem[] = [
       'System-architecture guidance for large teams: service boundaries, data ownership, deployment topology, and migration playbooks.',
     category: 'Architecture',
     tags: ['monolith', 'microservices', 'core-architecture'],
-    path: '.cursor/rules/enterprise-patterns.mdc'
+    path: '.cursor/rules/ref_enterprise-patterns.mdc'
   },
   {
     id: 'frontend-frameworks',
@@ -180,7 +180,7 @@ export const RULES: FrameworkItem[] = [
       'Conventions and tradeoffs for the three supported meta-frameworks. Covers App Router, server components, state management, and form patterns.',
     category: 'Architecture',
     tags: ['nextjs', 'nuxt', 'vue', 'ssr', 'ssg'],
-    path: '.cursor/rules/frontend-frameworks.mdc'
+    path: '.cursor/rules/ref_frontend-frameworks.mdc'
   },
   {
     id: 'backend-frameworks',
@@ -192,7 +192,7 @@ export const RULES: FrameworkItem[] = [
       'Reference patterns for the three supported backends — controller/service/repository layout, request validation, transactional boundaries.',
     category: 'Architecture',
     tags: ['nestjs', 'laravel', 'aspnet'],
-    path: '.cursor/rules/backend-frameworks.mdc'
+    path: '.cursor/rules/ref_backend-frameworks.mdc'
   },
   {
     id: 'api-patterns',
@@ -204,7 +204,7 @@ export const RULES: FrameworkItem[] = [
       'Contract design, versioning strategies, error envelopes (RFC 7807), pagination, and webhook signing. Pairs with the api-designer agent.',
     category: 'Architecture',
     tags: ['rest', 'graphql', 'grpc', 'webhooks'],
-    path: '.cursor/rules/api-patterns.mdc'
+    path: '.cursor/rules/ref_api-patterns.mdc'
   },
   {
     id: 'auth',
@@ -216,7 +216,7 @@ export const RULES: FrameworkItem[] = [
       'JWT, OAuth2, OIDC, session, RBAC/ABAC. Covers refresh token rotation, PKCE, secure cookie flags, and authorization checks at the boundary.',
     category: 'Architecture',
     tags: ['jwt', 'oauth', 'rbac'],
-    path: '.cursor/rules/auth.mdc'
+    path: '.cursor/rules/ref_auth.mdc'
   },
   {
     id: 'multi-tenant',
@@ -228,7 +228,7 @@ export const RULES: FrameworkItem[] = [
       'Silo, bridge, pool models with Postgres RLS patterns. When to share vs isolate, tenant-aware migrations, and tenant-bound audit logs.',
     category: 'Architecture',
     tags: ['saas', 'rls', 'isolation'],
-    path: '.cursor/rules/multi-tenant.mdc'
+    path: '.cursor/rules/ref_multi-tenant.mdc'
   },
   {
     id: 'databases',
@@ -240,7 +240,7 @@ export const RULES: FrameworkItem[] = [
       'Schema design, query optimization, migrations, and row-level security. Pair with the database-reviewer agent for any DDL change.',
     category: 'Data',
     tags: ['postgres', 'mysql', 'sqlserver', 'rls'],
-    path: '.cursor/rules/databases.mdc'
+    path: '.cursor/rules/ref_databases.mdc'
   },
   {
     id: 'redis',
@@ -252,7 +252,7 @@ export const RULES: FrameworkItem[] = [
       'Read-through, write-through, cache-aside, stampede protection, keyspace partitioning, and tag-based invalidation.',
     category: 'Data',
     tags: ['cache', 'redis', 'invalidation'],
-    path: '.cursor/rules/redis.mdc'
+    path: '.cursor/rules/ref_redis.mdc'
   },
   {
     id: 'supabase',
@@ -264,7 +264,7 @@ export const RULES: FrameworkItem[] = [
       'Auth + RLS policies, edge functions, realtime channels, storage buckets, and migrations tied to the Supabase CLI.',
     category: 'Data',
     tags: ['supabase', 'rls', 'realtime'],
-    path: '.cursor/rules/supabase.mdc'
+    path: '.cursor/rules/ref_supabase.mdc'
   },
   {
     id: 'security',
@@ -276,7 +276,7 @@ export const RULES: FrameworkItem[] = [
       'OWASP Top 10, secrets handling, supply-chain hardening, CSP, CORS. Pair with the security-auditor agent for any auth or payment work.',
     category: 'Security',
     tags: ['owasp', 'secrets', 'csp'],
-    path: '.cursor/rules/security.mdc'
+    path: '.cursor/rules/ref_security.mdc'
   },
   {
     id: 'performance',
@@ -288,7 +288,7 @@ export const RULES: FrameworkItem[] = [
       'Bundle budgets, N+1 detection, cache layering, and rate-limit design (token bucket, leaky bucket, fixed window).',
     category: 'Security',
     tags: ['perf', 'rate-limit', 'caching'],
-    path: '.cursor/rules/performance.mdc'
+    path: '.cursor/rules/ref_performance.mdc'
   },
   {
     id: 'container-orchestration',
@@ -300,7 +300,7 @@ export const RULES: FrameworkItem[] = [
       'Image building, multi-stage patterns, pod security, networking, and rollout strategies (blue/green, canary).',
     category: 'Infrastructure',
     tags: ['docker', 'k8s', 'rollouts'],
-    path: '.cursor/rules/container-orchestration.mdc'
+    path: '.cursor/rules/ref_container-orchestration.mdc'
   },
   {
     id: 'cloud-providers',
@@ -312,7 +312,7 @@ export const RULES: FrameworkItem[] = [
       'Provider-specific primitives, IAM nuances, network topology, and managed-service comparison cheatsheets.',
     category: 'Infrastructure',
     tags: ['aws', 'azure', 'gcp'],
-    path: '.cursor/rules/cloud-providers.mdc'
+    path: '.cursor/rules/ref_cloud-providers.mdc'
   },
   {
     id: 'cloud-infra',
@@ -324,7 +324,7 @@ export const RULES: FrameworkItem[] = [
       'Account topology, VPC design, shared services, and infra-as-code patterns (Terraform, CDK).',
     category: 'Infrastructure',
     tags: ['vpc', 'iac', 'terraform'],
-    path: '.cursor/rules/cloud-infra.mdc'
+    path: '.cursor/rules/ref_cloud-infra.mdc'
   },
   {
     id: 'serverless',
@@ -336,7 +336,7 @@ export const RULES: FrameworkItem[] = [
       'Cold-start mitigation, function boundaries, IaC module layout, and state management.',
     category: 'Infrastructure',
     tags: ['lambda', 'serverless', 'iac'],
-    path: '.cursor/rules/serverless.mdc'
+    path: '.cursor/rules/ref_serverless.mdc'
   },
   {
     id: 'cloudflare',
@@ -348,7 +348,7 @@ export const RULES: FrameworkItem[] = [
       'Workers, Pages, R2, KV, D1, cache rules, and edge observability.',
     category: 'Infrastructure',
     tags: ['cloudflare', 'cdn', 'edge'],
-    path: '.cursor/rules/cloudflare.mdc'
+    path: '.cursor/rules/ref_cloudflare.mdc'
   },
   {
     id: 'deployment',
@@ -360,7 +360,7 @@ export const RULES: FrameworkItem[] = [
       'Release pipelines, environment promotion, rollback, and progressive delivery. Templates for GitHub Actions and GitLab CI.',
     category: 'Infrastructure',
     tags: ['cicd', 'release', 'rollback'],
-    path: '.cursor/rules/deployment.mdc'
+    path: '.cursor/rules/ref_deployment.mdc'
   },
   {
     id: 'version-control',
@@ -372,7 +372,7 @@ export const RULES: FrameworkItem[] = [
       'Trunk-based, branch naming, PR conventions, and merge strategies. Pair with split-to-prs skill for large refactors.',
     category: 'Infrastructure',
     tags: ['git', 'github', 'pr'],
-    path: '.cursor/rules/version-control.mdc'
+    path: '.cursor/rules/ref_version-control.mdc'
   },
   {
     id: 'observability',
@@ -384,7 +384,7 @@ export const RULES: FrameworkItem[] = [
       'Three-pillar setup: metrics (Prometheus), logs (structured), and traces (OTel). Alert routing and SLO design.',
     category: 'Infrastructure',
     tags: ['otel', 'prometheus', 'logs'],
-    path: '.cursor/rules/observability.mdc'
+    path: '.cursor/rules/ref_observability.mdc'
   },
   {
     id: 'operations',
@@ -396,7 +396,7 @@ export const RULES: FrameworkItem[] = [
       'Pager setup, runbooks, sev levels, retrospectives, and communication cadence.',
     category: 'Infrastructure',
     tags: ['incident', 'runbook', 'sev'],
-    path: '.cursor/rules/operations.mdc'
+    path: '.cursor/rules/ref_operations.mdc'
   },
   {
     id: 'workflow-engines',
@@ -408,7 +408,7 @@ export const RULES: FrameworkItem[] = [
       'When to use which engine. Patterns for retries, idempotency, durable execution, and webhook ingress.',
     category: 'Integration',
     tags: ['n8n', 'triggerdev', 'temporal'],
-    path: '.cursor/rules/workflow-engines.mdc'
+    path: '.cursor/rules/ref_workflow-engines.mdc'
   },
   {
     id: 'vibe-code-protocol',
@@ -420,7 +420,7 @@ export const RULES: FrameworkItem[] = [
       'Workflow-execution protocol with pre-review and post-review gates, retry with fallback strategies, and safe-handling for auth/payment.',
     category: 'Integration',
     tags: ['vibe-code', 'retry', 'auth'],
-    path: '.cursor/rules/vibe-code-protocol.mdc'
+    path: '.cursor/rules/ref_vibe-code-protocol.mdc'
   },
   {
     id: 'billing',
@@ -432,7 +432,7 @@ export const RULES: FrameworkItem[] = [
       'Plans, proration, invoices, dunning, MRR/ARR reporting, and Stripe-specific pitfalls. Pair with the vietnam-payment-review skill for local gateways.',
     category: 'Integration',
     tags: ['stripe', 'saas-billing'],
-    path: '.cursor/rules/billing.mdc'
+    path: '.cursor/rules/ref_billing.mdc'
   },
   {
     id: 'chatbot-development',
@@ -444,7 +444,7 @@ export const RULES: FrameworkItem[] = [
       'Patterns for feature scaffold, Drizzle ORM, BullMQ workers, and Next.js routing inside the ChatbotX platform (ManyChat alternative).',
     category: 'Integration',
     tags: ['chatbotx', 'manychat', 'drizzle'],
-    path: '.cursor/rules/chatbot-development.mdc'
+    path: '.cursor/rules/ref_chatbot-development.mdc'
   },
   {
     id: 'crm-saas',
@@ -456,7 +456,7 @@ export const RULES: FrameworkItem[] = [
       'Vertical-specific patterns for CRM SaaS: pipeline stages, lead scoring, segmentation, and activity logging.',
     category: 'Integration',
     tags: ['crm', 'lead', 'pipeline'],
-    path: '.cursor/rules/crm-saas.mdc'
+    path: '.cursor/rules/ref_crm-saas.mdc'
   },
   {
     id: 'ui-visual-design',
@@ -468,7 +468,7 @@ export const RULES: FrameworkItem[] = [
       'Reference language for the framework landing pages and tools: tokens, motion, density, and anti-slop defaults.',
     category: 'Experience',
     tags: ['design', 'ui', 'tokens'],
-    path: '.cursor/rules/ui-visual-design.mdc'
+    path: '.cursor/rules/ref_ui-visual-design.mdc'
   },
   {
     id: 'ai-knowledge',
@@ -480,7 +480,7 @@ export const RULES: FrameworkItem[] = [
       'RAG orchestration with WeKnora, pgvector, hybrid retrieval, and PDF ingestion pipeline for document-grounded chat.',
     category: 'AI',
     tags: ['rag', 'weknora', 'pgvector'],
-    path: '.cursor/rules/ai-knowledge.mdc'
+    path: '.cursor/rules/ref_ai-knowledge.mdc'
   },
   {
     id: 'llm-providers',
@@ -492,7 +492,7 @@ export const RULES: FrameworkItem[] = [
       'Provider APIs, retry semantics, streaming, function/tool calling, and fallback chains across the three majors.',
     category: 'AI',
     tags: ['openai', 'gemini', 'claude'],
-    path: '.cursor/rules/llm-providers.mdc'
+    path: '.cursor/rules/ref_llm-providers.mdc'
   },
   {
     id: 'testing',
@@ -504,7 +504,7 @@ export const RULES: FrameworkItem[] = [
       'Test pyramid, naming, mocking strategies, property-based testing, and the test-as-proof mantra. Pair with the test-engineer agent.',
     category: 'Quality',
     tags: ['tdd', 'unit', 'e2e'],
-    path: '.cursor/rules/testing.mdc'
+    path: '.cursor/rules/ref_testing.mdc'
   },
   {
     id: 'cost-optimization',
@@ -516,7 +516,7 @@ export const RULES: FrameworkItem[] = [
       'Budget ceilings, prompt compression, response caching, and token accounting per workflow.',
     category: 'Quality',
     tags: ['cost', 'tokens', 'budget'],
-    path: '.cursor/rules/cost-optimization.mdc'
+    path: '.cursor/rules/ref_cost-optimization.mdc'
   }
 ]
 
@@ -536,7 +536,7 @@ export const SKILLS: FrameworkItem[] = [
     category: 'Coding Discipline',
     tags: ['overlay', 'mandatory', 'karpathy'],
     role: 'overlay',
-    path: '.cursor/skills/karpathy-coding/SKILL.md',
+    path: '.cursor/skills/code_karpathy-coding/SKILL.md',
     gates: ['karpathy-pre', 'karpathy-post'],
     metrics: [
       { label: 'Lines of code', value: '-54%' },
@@ -561,7 +561,7 @@ export const SKILLS: FrameworkItem[] = [
     category: 'Coding Discipline',
     tags: ['yagni', 'minimal', 'senior'],
     role: 'secondary',
-    path: '.cursor/skills/ponytail/SKILL.md',
+    path: '.cursor/skills/special_ponytail/SKILL.md',
     gates: ['ponytail-pre', 'ponytail-post'],
     bullets: [
       'YAGNI Ladder (skip → reuse → stdlib → native → dependency → one line)',
@@ -580,7 +580,7 @@ export const SKILLS: FrameworkItem[] = [
     category: 'Coding Discipline',
     tags: ['completeness', 'no-skeleton'],
     role: 'primary',
-    path: '.cursor/skills/full-output/SKILL.md',
+    path: '.cursor/skills/special_full-output/SKILL.md',
     gates: ['fulloutput-pre', 'fulloutput-post']
   },
   {
@@ -594,7 +594,7 @@ export const SKILLS: FrameworkItem[] = [
     category: 'Frontend',
     tags: ['anti-slop', 'taste', 'landing-page'],
     role: 'primary',
-    path: '.cursor/skills/frontend-taste/SKILL.md',
+    path: '.cursor/skills/ui_frontend-taste/SKILL.md',
     gates: ['taste-pre', 'taste-post'],
     bullets: [
       'Brief inference before code',
@@ -613,7 +613,7 @@ export const SKILLS: FrameworkItem[] = [
     category: 'Frontend',
     tags: ['review', 'dual-gate', 'a11y'],
     role: 'primary',
-    path: '.cursor/skills/frontend-review/SKILL.md',
+    path: '.cursor/skills/ui_frontend-review/SKILL.md',
     gates: ['review-pre', 'review-post']
   },
   {
@@ -627,7 +627,7 @@ export const SKILLS: FrameworkItem[] = [
     category: 'Frontend',
     tags: ['redesign', 'audit'],
     role: 'secondary',
-    path: '.cursor/skills/frontend-redesign/SKILL.md',
+    path: '.cursor/skills/ui_frontend-redesign/SKILL.md',
     gates: ['redesign-pre', 'redesign-post']
   },
   {
@@ -641,7 +641,7 @@ export const SKILLS: FrameworkItem[] = [
     category: 'Security',
     tags: ['owasp', 'pre-deploy'],
     role: 'primary',
-    path: '.cursor/skills/security-review/SKILL.md',
+    path: '.cursor/skills/sec_security-review/SKILL.md',
     gates: ['security-pre', 'security-post']
   },
   {
@@ -655,7 +655,7 @@ export const SKILLS: FrameworkItem[] = [
     category: 'Security',
     tags: ['payment', 'vietnam', 'webhook'],
     role: 'primary',
-    path: '.cursor/skills/vietnam-payment-review/SKILL.md',
+    path: '.cursor/skills/sec_vietnam-payment-review/SKILL.md',
     gates: ['payment-pre', 'payment-post']
   },
   {
@@ -669,7 +669,7 @@ export const SKILLS: FrameworkItem[] = [
     category: 'Domain',
     tags: ['vietnam', 'address'],
     role: 'secondary',
-    path: '.cursor/skills/vietnam-address/SKILL.md'
+    path: '.cursor/skills/ai_vietnam-address/SKILL.md'
   },
   {
     id: 'bazi',
@@ -682,7 +682,7 @@ export const SKILLS: FrameworkItem[] = [
     category: 'Domain',
     tags: ['bazi', 'astrology', 'tu-vi'],
     role: 'primary',
-    path: '.cursor/skills/bazi/SKILL.md'
+    path: '.cursor/skills/ai_bazi/SKILL.md'
   },
   {
     id: 'document-ocr',
@@ -695,7 +695,7 @@ export const SKILLS: FrameworkItem[] = [
     category: 'Domain',
     tags: ['ocr', 'invoice'],
     role: 'primary',
-    path: '.cursor/skills/document-ocr/SKILL.md'
+    path: '.cursor/skills/doc_document-ocr/SKILL.md'
   },
   {
     id: 'weknora-kb',
@@ -708,7 +708,7 @@ export const SKILLS: FrameworkItem[] = [
     category: 'AI',
     tags: ['rag', 'kb', 'weknora'],
     role: 'primary',
-    path: '.cursor/skills/weknora-kb/SKILL.md'
+    path: '.cursor/skills/ai_weknora-kb/SKILL.md'
   },
   {
     id: 'weknora-agent',
@@ -721,7 +721,7 @@ export const SKILLS: FrameworkItem[] = [
     category: 'AI',
     tags: ['agent', 'rag'],
     role: 'primary',
-    path: '.cursor/skills/weknora-agent/SKILL.md'
+    path: '.cursor/skills/ai_weknora-agent/SKILL.md'
   },
   {
     id: 'video-generation',
@@ -734,7 +734,7 @@ export const SKILLS: FrameworkItem[] = [
     category: 'AI',
     tags: ['video', 'short-form'],
     role: 'primary',
-    path: '.cursor/skills/video-generation/SKILL.md'
+    path: '.cursor/skills/special_video-generation/SKILL.md'
   },
   {
     id: 'pixelrag',
@@ -747,7 +747,7 @@ export const SKILLS: FrameworkItem[] = [
     category: 'AI',
     tags: ['image', 'rag'],
     role: 'secondary',
-    path: '.cursor/skills/pixelrag/SKILL.md'
+    path: '.cursor/skills/ai_pixelrag/SKILL.md'
   },
   {
     id: 'visual-explainer',
@@ -760,7 +760,7 @@ export const SKILLS: FrameworkItem[] = [
     category: 'Experience',
     tags: ['diagram', 'docs'],
     role: 'secondary',
-    path: '.cursor/skills/visual-explainer/SKILL.md'
+    path: '.cursor/skills/special_visual-explainer/SKILL.md'
   },
   {
     id: 'open-design',
@@ -773,7 +773,7 @@ export const SKILLS: FrameworkItem[] = [
     category: 'Experience',
     tags: ['design-tokens', 'primitives'],
     role: 'secondary',
-    path: '.cursor/skills/open-design/SKILL.md'
+    path: '.cursor/skills/special_open-design/SKILL.md'
   },
   {
     id: 'skill-installer',
@@ -786,7 +786,7 @@ export const SKILLS: FrameworkItem[] = [
     category: 'Meta',
     tags: ['meta', 'install'],
     role: 'secondary',
-    path: '.cursor/skills/skill-installer/SKILL.md'
+    path: '.cursor/skills/util_skill-installer/SKILL.md'
   }
 ]
 
@@ -814,7 +814,7 @@ export const AGENTS: FrameworkItem[] = [
       'Targets ≤3 actionable items — manufactures issues if any are missing',
       'Blocks merge when diff exceeds 500 lines without split'
     ],
-    alignsWith: ['.cursor/rules/coding-standards.mdc', '.cursor/rules/karpathy-guidelines.mdc']
+    alignsWith: ['.cursor/rules/rule_coding-standards.mdc', '.cursor/rules/rule_karpathy-guidelines.mdc']
   },
   {
     id: 'api-designer',
@@ -835,7 +835,7 @@ export const AGENTS: FrameworkItem[] = [
       'Versioning strategies (URI for public, header for internal)',
       'Webhook signature verification + delivery retries + replay endpoint'
     ],
-    alignsWith: ['.cursor/rules/api-patterns.mdc', '.cursor/rules/auth.mdc']
+    alignsWith: ['.cursor/rules/ref_api-patterns.mdc', '.cursor/rules/ref_auth.mdc']
   },
   {
     id: 'backend-reviewer',
@@ -850,7 +850,7 @@ export const AGENTS: FrameworkItem[] = [
     role: 'secondary',
     trigger: '/backend',
     path: '.cursor/agents/backend-reviewer.md',
-    alignsWith: ['.cursor/rules/backend-frameworks.mdc', '.cursor/rules/api-patterns.mdc']
+    alignsWith: ['.cursor/rules/ref_backend-frameworks.mdc', '.cursor/rules/ref_api-patterns.mdc']
   },
   {
     id: 'frontend-architect',
@@ -865,7 +865,7 @@ export const AGENTS: FrameworkItem[] = [
     role: 'secondary',
     trigger: '/frontend',
     path: '.cursor/agents/frontend-architect.md',
-    alignsWith: ['.cursor/rules/frontend-frameworks.mdc', '.cursor/rules/ui-visual-design.mdc']
+    alignsWith: ['.cursor/rules/ref_frontend-frameworks.mdc', '.cursor/rules/ref_ui-visual-design.mdc']
   },
   {
     id: 'database-reviewer',
@@ -880,7 +880,7 @@ export const AGENTS: FrameworkItem[] = [
     role: 'secondary',
     trigger: '/db',
     path: '.cursor/agents/database-reviewer.md',
-    alignsWith: ['.cursor/rules/databases.mdc', '.cursor/rules/redis.mdc']
+    alignsWith: ['.cursor/rules/ref_databases.mdc', '.cursor/rules/ref_redis.mdc']
   },
   {
     id: 'security-auditor',
@@ -928,7 +928,7 @@ export const AGENTS: FrameworkItem[] = [
       'Coverage: 100% happy path, 80%+ error paths',
       'Reject tests without assertions, brittle mocks, mock-everything anti-patterns'
     ],
-    alignsWith: ['.cursor/rules/testing.mdc']
+    alignsWith: ['.cursor/rules/ref_testing.mdc']
   },
   {
     id: 'web-performance-auditor',
@@ -948,7 +948,7 @@ export const AGENTS: FrameworkItem[] = [
       'Audit modes: quick (Lighthouse + bundle) and deep (full perf trace)',
       'Flags: bundles > 500KB gz, render-blocking 3rd party, layout thrash'
     ],
-    alignsWith: ['.cursor/rules/performance.mdc']
+    alignsWith: ['.cursor/rules/ref_performance.mdc']
   },
   {
     id: 'debugger',
@@ -969,7 +969,7 @@ export const AGENTS: FrameworkItem[] = [
       'Hypotheses ranked by likelihood; cheapest probe first',
       'Refuses to ship a fix without regression test + 5-step verification'
     ],
-    alignsWith: ['.cursor/rules/coding-standards.mdc', '.cursor/rules/karpathy-guidelines.mdc']
+    alignsWith: ['.cursor/rules/rule_coding-standards.mdc', '.cursor/rules/rule_karpathy-guidelines.mdc']
   },
   {
     id: 'ui-designer',
@@ -990,7 +990,7 @@ export const AGENTS: FrameworkItem[] = [
       'States per component: empty · loading · error · success · hover · focus · disabled',
       'WCAG 2.1 AA baseline; never ship without a11y check'
     ],
-    alignsWith: ['.cursor/rules/ui-visual-design.mdc', '.cursor/skills/web-design-guidelines/SKILL.md']
+    alignsWith: ['.cursor/rules/ref_ui-visual-design.mdc', '.cursor/skills/special_web-design-guidelines/SKILL.md']
   },
   {
     id: 'web-cloner',
@@ -1011,7 +1011,7 @@ export const AGENTS: FrameworkItem[] = [
       'Visual diff ≤ 2% via toHaveScreenshot(maxDiffPixelRatio: 0.02)',
       'Self-contained: assets local, no external CDN, no tracking scripts'
     ],
-    alignsWith: ['.cursor/commands/clone/command.md', '.cursor/skills/playwright/SKILL.md']
+    alignsWith: ['.cursor/commands/clone/command.md', '.cursor/skills/special_playwright/SKILL.md']
   },
   {
     id: 'web-scraper',
@@ -1032,7 +1032,7 @@ export const AGENTS: FrameworkItem[] = [
       'Cleanup preserves structure; never strips code, attribution, alt-text',
       'Output schema predictable: same category → same folder under .cursor/knowledge/{domain}/'
     ],
-    alignsWith: ['.cursor/commands/scrape/command.md', '.cursor/skills/playwright/SKILL.md']
+    alignsWith: ['.cursor/commands/scrape/command.md', '.cursor/skills/special_playwright/SKILL.md']
   },
   {
     id: 'refactor-specialist',
@@ -1053,7 +1053,7 @@ export const AGENTS: FrameworkItem[] = [
       'One commit per smell · never mixed with feature work',
       'Refuses to refactor without an existing test safety net'
     ],
-    alignsWith: ['.cursor/skills/ponytail/SKILL.md', '.cursor/agents/code-reviewer.md']
+    alignsWith: ['.cursor/skills/special_ponytail/SKILL.md', '.cursor/agents/code-reviewer.md']
   },
   {
     id: 'deployment-engineer',
@@ -1074,7 +1074,7 @@ export const AGENTS: FrameworkItem[] = [
       'Rollback rehearsed ≤ 1 min for every change',
       'Coordinates with migration-specialist for schema changes'
     ],
-    alignsWith: ['.cursor/rules/deployment.mdc', '.cursor/rules/observability.mdc']
+    alignsWith: ['.cursor/rules/ref_deployment.mdc', '.cursor/rules/ref_observability.mdc']
   },
   {
     id: 'migration-specialist',
@@ -1095,7 +1095,7 @@ export const AGENTS: FrameworkItem[] = [
       'CREATE INDEX CONCURRENTLY, never lock writes on prod tables',
       'Reversibility plan required for every migration'
     ],
-    alignsWith: ['.cursor/rules/databases.mdc', '.cursor/agents/deployment-engineer.md']
+    alignsWith: ['.cursor/rules/ref_databases.mdc', '.cursor/agents/deployment-engineer.md']
   },
   {
     id: 'doc-writer',
@@ -1137,7 +1137,7 @@ export const AGENTS: FrameworkItem[] = [
       'Container security: non-root · distroless · resource limits · probes',
       'Reproducible from scratch ≤ 1 hour; tagged resources; SLOs mandatory'
     ],
-    alignsWith: ['.cursor/rules/container-orchestration.mdc', '.cursor/rules/cloud-infra.mdc']
+    alignsWith: ['.cursor/rules/ref_container-orchestration.mdc', '.cursor/rules/ref_cloud-infra.mdc']
   },
   {
     id: 'marketing-strategist',
@@ -1162,7 +1162,7 @@ export const AGENTS: FrameworkItem[] = [
     ],
     alignsWith: [
       '.cursor/knowledge/marketing/',
-      '.cursor/rules/skill-registry.mdc §9',
+      '.cursor/rules/rule_skill-registry.mdc §9',
       '.cursor/knowledge/marketing/best-practice.md §10',
       '.cursor/agents/security-auditor.md'
     ]
@@ -1175,7 +1175,7 @@ export const AGENTS: FrameworkItem[] = [
 //
 // Source: https://github.com/coreyhaines31/marketingskills (39k stars, MIT)
 //
-// Follows the Superpowers concept-ref pattern (see .cursor/rules/skill-registry.mdc §8).
+    // Follows the Superpowers concept-ref pattern (see .cursor/rules/rule_skill-registry.mdc §8).
 // Each item below is a marketing skill/category merged into an existing knowledge file.
 // NO new SKILL.md files were created — entries here exist purely so the web catalog
 // can display them under the "Marketing" category.
@@ -1184,7 +1184,7 @@ export const AGENTS: FrameworkItem[] = [
 // All 7 marketing knowledge files also have §10/§11/§14 security sections, derived
 // from coreyhaines31/marketingskills patterns touching consent, GDPR/CCPA, tracking,
 // email authentication, ad platform privacy, dark patterns, AI marketing risks.
-// See .cursor/rules/skill-registry.mdc §10 for full MSA-01..30 concept-ref map.
+    // See .cursor/rules/rule_skill-registry.mdc §10 for full MSA-01..30 concept-ref map.
 // ────────────────────────────────────────────────────────────────────────────
 
 export type MarketingCategory =

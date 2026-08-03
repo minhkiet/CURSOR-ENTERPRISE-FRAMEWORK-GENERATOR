@@ -97,7 +97,7 @@ class SkillRegistry:
                 version="1.0.0",
                 description="Anti-slop frontend for landing pages and portfolios",
                 tags=["frontend", "design", "landing", "taste"],
-                path=".cursor/skills/frontend-taste/SKILL.md",
+                path=".cursor/skills/ui_frontend-taste/SKILL.md",
                 pre_review_sections=["0.A", "0.B", "0.C", "0.D", "0.E", "0.F"],
                 post_review_sections=["6.A", "6.B", "6.C", "6.D", "6.E", "6.F", "6.G", "6.H"],
                 trigger_keywords=[
@@ -111,7 +111,7 @@ class SkillRegistry:
                 version="1.0.0",
                 description="Upgrade UI on existing codebase",
                 tags=["frontend", "redesign", "upgrade", "improve"],
-                path=".cursor/skills/frontend-redesign/SKILL.md",
+                path=".cursor/skills/ui_frontend-redesign/SKILL.md",
                 pre_review_sections=["0.A", "0.B", "0.C", "0.D", "0.E"],
                 post_review_sections=["4.A", "4.B", "4.C", "4.D", "4.E"],
                 trigger_keywords=[
@@ -124,7 +124,7 @@ class SkillRegistry:
                 version="1.0.0",
                 description="Quality gate for all frontend tasks",
                 tags=["frontend", "review", "quality", "gate"],
-                path=".cursor/skills/frontend-review/SKILL.md",
+                path=".cursor/skills/ui_frontend-review/SKILL.md",
                 pre_review_sections=["A.1", "A.2", "A.3"],
                 post_review_sections=["B.1", "B.2", "B.3", "B.4", "B.5", "B.6", "B.7"],
                 trigger_keywords=[
@@ -137,7 +137,7 @@ class SkillRegistry:
                 version="1.0.0",
                 description="Ensure full implementation without truncation",
                 tags=["output", "completeness", "implementation"],
-                path=".cursor/skills/full-output/SKILL.md",
+                path=".cursor/skills/special_full-output/SKILL.md",
                 pre_review_sections=["0.A", "0.B"],
                 post_review_sections=["5.A", "5.B", "5.C"],
                 trigger_keywords=[
@@ -154,7 +154,7 @@ class SkillRegistry:
                     "email auth, ad platform privacy, dark patterns, AI marketing risks)"
                 ),
                 tags=["security", "vulnerability", "audit", "owasp", "gdpr", "consent", "privacy", "marketing-security"],
-                path=".cursor/skills/security-review/SKILL.md",
+                path=".cursor/skills/sec_security-review/SKILL.md",
                 pre_review_sections=["S.1", "S.2", "S.3"],
                 post_review_sections=["Security-1", "Security-2", "Security-3", "Security-4", "Security-5", "Security-6", "Security-7", "Security-8", "Security-9"],
                 trigger_keywords=[
@@ -207,7 +207,7 @@ class SkillRegistry:
                 version="1.0.0",
                 description="Vietnam payment provider review",
                 tags=["payment", "vietnam", "momo", "sepay"],
-                path=".cursor/skills/vietnam-payment-review/SKILL.md",
+                path=".cursor/skills/sec_vietnam-payment-review/SKILL.md",
                 pre_review_sections=["payment-pre"],
                 post_review_sections=["payment-post"],
                 trigger_keywords=[
