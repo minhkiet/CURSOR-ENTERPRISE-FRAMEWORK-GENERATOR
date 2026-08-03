@@ -56,10 +56,6 @@ except (AttributeError, OSError):
     pass
 
 from . import __version__
-from .dashboard import Dashboard
-from .indexer import Indexer
-from .skill_discovery import SkillRegistry, SkillDiscovery
-from .workflow import Workflow
 
 
 def _common_flags() -> argparse.ArgumentParser:
@@ -153,6 +149,9 @@ def _build_parser() -> argparse.ArgumentParser:
 
 
 def _serve(args: argparse.Namespace) -> int:
+    from .dashboard import Dashboard
+    from .workflow import Workflow
+
     wf = Workflow(root=args.root, memory_path=args.memory_path, max_tokens=args.max_tokens)
     wf.warm()  # ponytail: warm before serving so first /api/index is instant
     dashboard = Dashboard(
@@ -167,9 +166,11 @@ def _serve(args: argparse.Namespace) -> int:
 
 
 def _ask(args: argparse.Namespace) -> int:
+    from .workflow import Workflow
+
     wf = Workflow(root=args.root, memory_path=args.memory_path, max_tokens=args.max_tokens)
     result = wf.ask(args.request)
-    summary = {
+    payload = {
         "from_cache": result.from_cache,
         "memory_hits": result.memory_hits,
         "memory_misses": result.memory_misses,
@@ -178,11 +179,16 @@ def _ask(args: argparse.Namespace) -> int:
         "context_tokens": result.context.tokens if hasattr(result.context, "tokens") else None,
         "context_text": getattr(result.context, "text", str(result.context)),
     }
-    print(json.dumps(summary, indent=2, ensure_ascii=False))
+    extras = getattr(result, "phase_ms", None)
+    if isinstance(extras, dict):
+        payload["phase_ms"] = {k: round(v, 2) for k, v in extras.items()}
+    print(json.dumps(payload, indent=2, ensure_ascii=False))
     return 0
 
 
 def _warm(args: argparse.Namespace) -> int:
+    from .workflow import Workflow
+
     wf = Workflow(root=args.root, memory_path=args.memory_path, max_tokens=args.max_tokens)
     stats = wf.warm()
     print(json.dumps(stats, indent=2))
@@ -190,12 +196,16 @@ def _warm(args: argparse.Namespace) -> int:
 
 
 def _stats(args: argparse.Namespace) -> int:
+    from .workflow import Workflow
+
     wf = Workflow(root=args.root, memory_path=args.memory_path, max_tokens=args.max_tokens)
     print(json.dumps(wf.stats(), indent=2))
     return 0
 
 
 def _scan(args: argparse.Namespace) -> int:
+    from .indexer import Indexer
+
     idx = Indexer(args.root)
     idx.scan()
     totals = idx.result.totals if idx.result else {}
@@ -205,6 +215,8 @@ def _scan(args: argparse.Namespace) -> int:
 
 def _index(args: argparse.Namespace) -> int:
     """Scan + persist INDEX.json + INDEX.md, return paths + counts."""
+    from .indexer import Indexer
+
     idx = Indexer(args.root)
     idx.scan()
     json_path = idx.write_json()
@@ -288,6 +300,8 @@ def _build_graph(root: str) -> dict[str, Any]:
 
     No text scanning — only structured fields that the framework tracks.
     """
+    from .skill_discovery import SkillDiscovery, SkillRegistry
+
     root_path = Path(root).resolve()
     registry = SkillRegistry()
     skills = registry.get_all()

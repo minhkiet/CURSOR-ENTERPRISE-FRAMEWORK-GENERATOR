@@ -19,9 +19,11 @@ Usage:
     [Skill.FRONTEND_TASTE, Skill.FULL_OUTPUT, Skill.FRONTEND_REVIEW]
 """
 
+from collections import deque
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Optional
 import json
@@ -598,6 +600,21 @@ class SkillRegistry:
         return skill.dependencies if skill else []
 
 
+# ponytail: shared registry — SkillRegistry() rebuilds ~50 SkillMetadata
+# objects and the keyword/dependency graph each call. `_shared_registry`
+# returns a process-wide singleton so Workflow / ContextBuilder / CLI
+# don't pay 50× per process. Construct via `SkillRegistry()` still works
+# for users who want isolation.
+@lru_cache(maxsize=1)
+def _shared_registry() -> "SkillRegistry":
+    return SkillRegistry()
+
+
+def get_shared_registry() -> SkillRegistry:
+    """Return the process-wide shared SkillRegistry (lazy)."""
+    return _shared_registry()
+
+
 class GateExecutor:
     """
     Executes pre-review and post-review gates for skills.
@@ -887,10 +904,17 @@ class SkillDiscovery:
         Args:
             base_path: Base path for skill files
         """
-        self.registry = SkillRegistry()
+        # ponytail: use the shared registry so successive SkillDiscovery
+        # instances (one per Workflow / ContextBuilder) don't rebuild the
+        # 50+ skill metadata objects. The cache invalidation contract
+        # remains: callers that need an isolated registry can pass their
+        # own via `SkillRegistry()` and assign to `self.registry`.
+        self.registry = get_shared_registry()
         self.gate_executor = GateExecutor()
         self.base_path = base_path or os.getcwd()
-        self._discovery_history: list[DetectedSkill] = []
+        # ponytail: bounded history prevents unbounded growth on long-running
+        # processes (skill discovery tracks every detection for stats).
+        self._discovery_history: deque[DetectedSkill] = deque(maxlen=1000)
         self._skill_file_cache: dict[str, tuple[float, str]] = {}
 
     def detect_skills(self, request: str) -> list[DetectedSkill]:

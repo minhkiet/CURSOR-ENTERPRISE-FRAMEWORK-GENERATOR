@@ -22,7 +22,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from .indexer import Indexer
-from .skill_discovery import SkillDiscovery
+from .skill_discovery import SkillDiscovery, get_shared_registry
 from .token_optimizer import CompressionStrategy, TokenOptimizer
 
 
@@ -82,8 +82,6 @@ class ContextBuilder:
                 text="", tokens=0, skill_count=0,
                 truncated=False, skills_used=[], skipped=[],
             )
-
-        self._ensure_index()  # warm index for any future queries
 
         picked = [d.skill for d in detected[:max_skills]]
         skipped = [d.skill for d in detected[max_skills:]]

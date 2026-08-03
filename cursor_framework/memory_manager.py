@@ -149,6 +149,10 @@ class MemoryManager:
         self._hits = 0
         self._misses = 0
         self._total_tokens_saved = 0
+        # ponytail: persistence dirty flag. `MemoryStore.save_if_dirty` skips
+        # the O(entries) JSON write when nothing has been mutated since the
+        # last save. Cuts cache-hit disk I/O from ~few-ms to 0.
+        self._dirty = False
 
     def store(
         self,
@@ -183,6 +187,7 @@ class MemoryManager:
         )
 
         self._storage[tier][key] = entry
+        self._dirty = True
 
         if self._should_evict(tier):
             self._evict_low_priority(tier)
@@ -233,11 +238,16 @@ class MemoryManager:
             key: The key to delete
             tier: Optional specific tier, or all tiers if None
         """
+        deleted = False
         if tier is not None:
-            self._storage[tier].pop(key, None)
+            if self._storage[tier].pop(key, None) is not None:
+                deleted = True
         else:
             for t in MemoryTier:
-                self._storage[t].pop(key, None)
+                if self._storage[t].pop(key, None) is not None:
+                    deleted = True
+        if deleted:
+            self._dirty = True
 
     def invalidate(self, key: str, tier: Optional[MemoryTier] = None):
         """
@@ -247,15 +257,20 @@ class MemoryManager:
             key: The key to invalidate
             tier: Optional specific tier
         """
+        changed = False
         if tier is not None:
             entry = self._storage[tier].get(key)
-            if entry:
+            if entry and not entry.stale:
                 entry.mark_stale()
+                changed = True
         else:
             for t in MemoryTier:
                 entry = self._storage[t].get(key)
-                if entry:
+                if entry and not entry.stale:
                     entry.mark_stale()
+                    changed = True
+        if changed:
+            self._dirty = True
 
     def link_entries(self, key1: str, key2: str):
         """

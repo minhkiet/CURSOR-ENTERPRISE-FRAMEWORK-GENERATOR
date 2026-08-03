@@ -23,26 +23,52 @@ Author: Cursor Enterprise Framework
 Version: 1.2.0
 """
 
-__version__ = "1.2.0"
+__version__ = "1.2.1"
 __author__ = "Cursor Enterprise Framework"
 
-from .context_router import (
-    ContextRouter,
-    IntentClassifier,
-    IntentType,
-    Domain,
-    Skill,
-    SkillRoute,
-)
-from .memory_manager import MemoryManager, MemoryEntry, MemoryTier
-from .memory_store import MemoryStore
-from .token_optimizer import TokenOptimizer, TokenBudget, CompressionStrategy, CompressionResult
-from .skill_discovery import SkillDiscovery, SkillRegistry
-from .indexer import Indexer, IndexResult, AssetEntry
-from .context_builder import ContextBuilder, ContextResult
-from .workflow import Workflow, WorkflowResult
-from .watcher import Watcher
-from .dashboard import Dashboard
+# Lazy attribute access (PEP 562): importing `cursor_framework` does not
+# load Dashboard/Workflow/Watcher/Indexer. Submodules are imported on
+# first attribute access so cold-start CLI subcommands that only need
+# argparse + __version__ stay fast.
+_LAZY_EXPORTS = {
+    "ContextRouter": "cursor_framework.context_router",
+    "IntentClassifier": "cursor_framework.context_router",
+    "IntentType": "cursor_framework.context_router",
+    "Domain": "cursor_framework.context_router",
+    "Skill": "cursor_framework.context_router",
+    "SkillRoute": "cursor_framework.context_router",
+    "MemoryManager": "cursor_framework.memory_manager",
+    "MemoryEntry": "cursor_framework.memory_manager",
+    "MemoryTier": "cursor_framework.memory_manager",
+    "MemoryStore": "cursor_framework.memory_store",
+    "TokenOptimizer": "cursor_framework.token_optimizer",
+    "TokenBudget": "cursor_framework.token_optimizer",
+    "CompressionStrategy": "cursor_framework.token_optimizer",
+    "CompressionResult": "cursor_framework.token_optimizer",
+    "SkillDiscovery": "cursor_framework.skill_discovery",
+    "SkillRegistry": "cursor_framework.skill_discovery",
+    "Indexer": "cursor_framework.indexer",
+    "IndexResult": "cursor_framework.indexer",
+    "AssetEntry": "cursor_framework.indexer",
+    "ContextBuilder": "cursor_framework.context_builder",
+    "ContextResult": "cursor_framework.context_builder",
+    "Workflow": "cursor_framework.workflow",
+    "WorkflowResult": "cursor_framework.workflow",
+    "Watcher": "cursor_framework.watcher",
+    "Dashboard": "cursor_framework.dashboard",
+}
+
+
+def __getattr__(name: str):
+    module_name = _LAZY_EXPORTS.get(name)
+    if module_name is None:
+        raise AttributeError(f"module 'cursor_framework' has no attribute {name!r}")
+    import importlib
+    module = importlib.import_module(module_name)
+    value = getattr(module, name)
+    globals()[name] = value  # cache for subsequent access
+    return value
+
 
 __all__ = [
     "ContextRouter",

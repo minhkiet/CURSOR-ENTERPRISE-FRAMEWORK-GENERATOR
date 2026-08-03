@@ -58,7 +58,7 @@ def test_graceful_fallback_after_restart(sandbox_cursor: Path, memory_path: Path
 def test_cache_hit_persists_memory_to_disk(sandbox_cursor: Path, memory_path: Path):
     """Step 1/3: cache hit branch must save memory to disk so a process
     crash between hits doesn't lose stats or HOT-tier entries."""
-    wf1 = Workflow(root=sandbox_cursor, memory_path=memory_path)
+    wf1 = Workflow(root=sandbox_cursor, memory_path=memory_path, strict_persist=True)
     r1 = wf1.ask("redesign landing page for SaaS")
     assert r1.from_cache is False  # first call: miss
 

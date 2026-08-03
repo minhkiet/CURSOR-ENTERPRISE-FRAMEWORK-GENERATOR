@@ -37,10 +37,15 @@ if TYPE_CHECKING:
 
 def _serialize_entry(entry: "MemoryEntry") -> dict[str, Any]:
     """MemoryEntry → plain dict. Datetimes become ISO strings."""
+    # ponytail: store `tier.value` explicitly so JSON doesn't fall back to
+    # `default=str` (which would emit `<MemoryTier.HOT: 'hot'>` via repr).
+    # That bug only surfaces when `value` itself is JSON-clean but `tier`
+    # is the enum alone — `_serialize_entry` is shared by every path
+    # though, so we fix it once, here.
     return {
         "key": entry.key,
         "value": entry.value,
-        "tier": entry.tier.value,
+        "tier": entry.tier.value if hasattr(entry.tier, "value") else entry.tier,
         "created_at": entry.created_at.isoformat(),
         "last_accessed": entry.last_accessed.isoformat(),
         "access_count": entry.access_count,
@@ -86,7 +91,23 @@ class MemoryStore:
 
         Returns the number of entries written.
         """
-        payload = {
+        payload = self._build_payload(manager)
+        self._write_atomic(payload)
+        manager._dirty = False
+        return len(payload["entries"])
+
+    def save_if_dirty(self, manager: "MemoryManager") -> int:
+        """
+        Persist only when `manager._dirty` is set. Returns 0 (= no-op) on
+        clean path. Frameworks with many cache hits use this to skip the
+        full JSON write on every request.
+        """
+        if not manager._dirty:
+            return 0
+        return self.save(manager)
+
+    def _build_payload(self, manager: "MemoryManager") -> dict[str, Any]:
+        return {
             "schema_version": self.SCHEMA_VERSION,
             "saved_at": datetime.now().isoformat(timespec="seconds"),
             "hits": manager._hits,
@@ -99,6 +120,7 @@ class MemoryStore:
             ],
         }
 
+    def _write_atomic(self, payload: dict[str, Any]) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         # ponytail: atomic write avoids half-written files on crash.
         fd, tmp_name = tempfile.mkstemp(
@@ -119,8 +141,6 @@ class MemoryStore:
             if os.path.exists(tmp_name):
                 os.unlink(tmp_name)
             raise
-
-        return len(payload["entries"])
 
     # ponytail: 50MB cap. Anything larger almost certainly means a runaway
     # cache that needs manual intervention, not silent load + OOM. Real

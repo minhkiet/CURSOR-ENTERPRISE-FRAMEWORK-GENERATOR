@@ -17,6 +17,7 @@ Usage:
     >>> compressed = optimizer.compress(context, target_tokens=8000)
 """
 
+from collections import deque
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
@@ -154,11 +155,14 @@ class TokenOptimizer:
     # Fallback char-based ratio for short texts or mixed content
     TOKENS_PER_CHAR_FALLBACK = 0.25
 
+    # ponytail: frozenset for O(1) char membership in estimate_tokens.
+    _SPECIAL_CHARS = frozenset(".,;:!?()[]{}\n")
+
     # Priority keywords for different content types
     PRIORITY_INDICATORS = {
-        "high": ["critical", "essential", "required", "must", "important", "key"],
-        "medium": ["should", "recommended", "useful", "relevant"],
-        "low": ["optional", "maybe", "possible", "example"],
+        "high": frozenset(("critical", "essential", "required", "must", "important", "key")),
+        "medium": frozenset(("should", "recommended", "useful", "relevant")),
+        "low": frozenset(("optional", "maybe", "possible", "example")),
     }
 
     def __init__(
@@ -176,7 +180,10 @@ class TokenOptimizer:
         self.max_tokens = max_tokens
         self.compression_threshold = compression_threshold
         self.budget = TokenBudget(max_tokens)
-        self._compression_history: list[CompressionResult] = []
+        # ponytail: bounded history prevents unbounded growth on long-running
+        # processes. 1000 entries is far above any realistic per-process
+        # compression count and keeps memory footprint negligible.
+        self._compression_history: deque[CompressionResult] = deque(maxlen=1000)
 
     def estimate_tokens(self, text: str) -> int:
         """
@@ -185,7 +192,7 @@ class TokenOptimizer:
         Uses word-based estimation for accuracy:
         - GPT models average ~0.75 tokens/word for English
         - Multilingual/short text falls back to char-based estimation
-        
+
         For code content, tokens are estimated higher due to special characters
         and shorter variable names.
 
@@ -197,33 +204,50 @@ class TokenOptimizer:
         """
         if not text:
             return 0
-            
-        # Detect content type for more accurate estimation
-        is_code = text.startswith("```") or any(
-            lang in text[:500] for lang in ["def ", "function ", "const ", "class ", "import "]
-        )
-        
-        # Count words (split on whitespace, filter empty)
-        words = text.split()
-        word_count = len(words)
-        
+
+        # ponytail: single char-scan that counts both whitespace (for
+        # word count) and special chars in one pass. Replaces the older
+        # text.split() + sum(...) loop pair.
+        word_count = 0
+        special_count = 0
+        in_word = False
+        special = self._SPECIAL_CHARS
+        for ch in text:
+            if ch.isspace():
+                if in_word:
+                    word_count += 1
+                    in_word = False
+            else:
+                in_word = True
+                if ch in special:
+                    special_count += 1
+        if in_word:
+            word_count += 1
+
         if word_count == 0:
             # Fallback for very short or no-whitespace text
             return max(1, int(len(text) * self.TOKENS_PER_CHAR_FALLBACK))
-        
+
+        # Detect content type for more accurate estimation
+        head = text[:500]
+        is_code = (
+            text.startswith("```")
+            or "def " in head
+            or "function " in head
+            or "const " in head
+            or "class " in head
+            or "import " in head
+        )
+
         if is_code:
             # Code tends to have shorter "words" but more tokens
             # Estimate ~1.5 tokens per code "word"
             return max(word_count, int(word_count * 1.5))
-        
+
         # Standard text: ~0.75 tokens per word
         # Add overhead for punctuation and formatting
         base_tokens = word_count * self.TOKENS_PER_WORD
-        
-        # Add tokens for special characters (commas, periods add ~0.1 each)
-        special_count = sum(1 for c in text if c in '.,;:!?()[]{}\n')
         special_tokens = special_count * 0.1
-        
         return max(word_count, int(base_tokens + special_tokens))
 
     def compress(
@@ -371,10 +395,12 @@ class TokenOptimizer:
 
     def _calculate_priority(self, line: str) -> int:
         """Calculate priority score for a line."""
-        line_lower = line.lower()
+        line_lower = line.casefold()
         priority = 5
 
         for level, keywords in self.PRIORITY_INDICATORS.items():
+            # ponytail: substring membership check (casefold already applied).
+            # frozenset iter is fine here — keywords are short and small.
             if any(kw in line_lower for kw in keywords):
                 if level == "high":
                     priority = 9

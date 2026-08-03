@@ -4,23 +4,31 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cursor-framework"
-version = "1.2.0"
+version = "1.2.1"
 description = "Cursor Enterprise Framework - Python Library + CLI"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "Cursor Enterprise Framework" }]
-dependencies = [
-    "pydantic>=2.0.0",
-]
+# Ponytail: zero mandatory runtime deps. Core stays stdlib-only.
+# pydantic is opt-in for users who want typed ContextResult models.
+dependencies = []
 
 [project.optional-dependencies]
 http = ["requests>=2.31.0"]
 env = ["python-dotenv>=1.0.0"]
-dev = ["requests>=2.31.0", "python-dotenv>=1.0.0", "build>=1.0"]
+pydantic = ["pydantic>=2.0.0"]
+dev = ["requests>=2.31.0", "python-dotenv>=1.0.0", "build>=1.0", "pytest>=7.0"]
+all = ["requests>=2.31.0", "python-dotenv>=1.0.0", "pydantic>=2.0.0"]
 
 [project.scripts]
 cursor-framework = "cursor_framework.__main__:main"
 
+[tool.setuptools]
+zip-safe = true
+
 [tool.setuptools.packages.find]
 include = ["cursor_framework*"]
+
+[tool.setuptools.package-data]
+cursor_framework = ["*.md"]
