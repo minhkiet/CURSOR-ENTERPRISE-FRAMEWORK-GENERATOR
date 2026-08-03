@@ -36,6 +36,10 @@ namespace CursorSetupWpf.ViewModels
         public string VersionChip => "v4.3";
 
         public string InstallButtonText => LocalizationService.T("btn.install");
+        public string LanguageLabel => LocalizationService.T("combobox.lang");
+        public string WindowTitle => LocalizationService.T("app.title");
+        public string AppBrand => LocalizationService.T("app.title_short");
+        public string AppBrandSubtitle => LocalizationService.T("app.subtitle");
 
         // Localization
         ObservableCollection<LanguageItem> _languages = new();
@@ -461,6 +465,10 @@ namespace CursorSetupWpf.ViewModels
             OnPropertyChanged(nameof(Step3Label));
             OnPropertyChanged(nameof(Step4Label));
             OnPropertyChanged(nameof(InstallButtonText));
+            OnPropertyChanged(nameof(LanguageLabel));
+            OnPropertyChanged(nameof(WindowTitle));
+            OnPropertyChanged(nameof(AppBrand));
+            OnPropertyChanged(nameof(AppBrandSubtitle));
             OnPropertyChanged(nameof(CanInstall));
             OnPropertyChanged(nameof(StatusText));
             OnPropertyChanged(nameof(SummaryText));

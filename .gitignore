@@ -123,3 +123,5 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 /demos/fitness/node_modules
+/cursor-setup-gui-wpf/bin
+/cursor-setup-gui-wpf/obj
