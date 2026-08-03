@@ -1,4 +1,4 @@
-# Cursor Enterprise Framework - Agent Personas & Lifecycle Protocol
+﻿# Cursor Enterprise Framework - Agent Personas & Lifecycle Protocol
 
 > Based on [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) (67k stars) and [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) (186k stars)
 
@@ -430,8 +430,8 @@ Delivery
 ## Links
 
 - [agent-skills](https://github.com/addyosmani/agent-skills) - Source reference (67k stars)
-- [[skill-registry]] - Single source of truth for skills
-- [[skill-integration]] - Skill auto-discovery protocol
+- [[rule_skill-registry]] - Single source of truth for skills
+- [[rule_skill-integration]] - Skill auto-discovery protocol
 - [[ponytail]] - Lazy Senior Dev principles
 - [[frontend-taste]] - Frontend design skill (synthesizes pbakaus/impeccable ⭐1, Leonxlnx/taste-skill ⭐2, anthropics/frontend-design ⭐3, vercel-labs/web-design-guidelines ⭐4, nextlevelbuilder/ui-ux-pro-max ⭐5, emilkowalski/emil-design-eng ⭐6 — see SKILL.md §12 for merge order)
 - [[security-review]] - Security review skill

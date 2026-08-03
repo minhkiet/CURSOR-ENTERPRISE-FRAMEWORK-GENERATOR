@@ -1,8 +1,8 @@
----
-description: Nguyên tắc và best practices cho UI/Visual Design trong Cursor Enterprise Framework - hướng dẫn tạo giao diện đẹp mắt, chuyên nghiệp như các theme thương mại cao cấp. Tích hợp Hallmark anti-slop design (Nutlope/hallmark, 9.3k stars) với 57 slop-test gates.
+﻿---
+description: Nguyên tắc và best practices cho UI/Visual Design trong Cursor Enterprise Framework - hướng dẫn tạo giao diện đẹp mắt, chuyên nghiệp như các theme thương mại cao cấp. Tích hợp Hallmark anti-slop design (Nutlope/hallmark, 9.3k stars) với 57 slop-test gates. Xem `.cursor/skills/ui_ui_hallmark/SKILL.md` cho anti-slop design guidance.
 created: 2026-06-26
 version: 1.1.0
-updated: 2026-07-16
+updated: 2026-08-03
 tags: [ui, visual-design, ux, design-system, icons, typography, color, animation, theme, hallmark, anti-slop]
 ---
 
