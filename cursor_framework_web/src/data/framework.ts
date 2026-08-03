@@ -787,6 +787,86 @@ export const SKILLS: FrameworkItem[] = [
     tags: ['meta', 'install'],
     role: 'secondary',
     path: '.cursor/skills/util_skill-installer/SKILL.md'
+  },
+  {
+    id: 'test-analysis',
+    type: 'skill',
+    name: 'test-analysis',
+    title: 'Test Analysis',
+    subtitle: 'Comprehensive testing: functional, UI, integration, e2e',
+    description:
+      'Comprehensive test analysis covering functional, UI, integration, and e2e testing. Ensures code correctness through systematic test design and verification.',
+    category: 'Quality',
+    tags: ['testing', 'quality', 'functional', 'UI-test', 'integration', 'e2e'],
+    role: 'mandatory',
+    path: '.cursor/skills/test_test-analysis/SKILL.md',
+    gates: ['T.1', 'T.2'],
+    bullets: [
+      'Unit tests for individual functions/modules',
+      'UI component and interaction testing',
+      'API and integration testing',
+      'E2E full user journey testing'
+    ]
+  },
+  {
+    id: 'perf-optimization',
+    type: 'skill',
+    name: 'perf-optimization',
+    title: 'Performance Optimization',
+    subtitle: 'Memory, speed, token efficiency, caching',
+    description:
+      'Performance optimization covering memory, speed, token efficiency, and caching strategies. Ensures applications run efficiently and cost-effectively.',
+    category: 'Performance',
+    tags: ['performance', 'optimization', 'memory', 'speed', 'token', 'caching'],
+    role: 'mandatory',
+    path: '.cursor/skills/perf_perf-optimization/SKILL.md',
+    gates: ['P.1', 'P.2'],
+    bullets: [
+      'Memory optimization and leak prevention',
+      'Speed optimization and parallel execution',
+      'Token reduction and context management',
+      'Caching strategies (memory, CDN, service worker)'
+    ]
+  },
+  {
+    id: 'stability',
+    type: 'skill',
+    name: 'stability',
+    title: 'Stability & Reliability',
+    subtitle: 'Error handling, resilience, monitoring',
+    description:
+      'Stability and reliability through error handling, resilience patterns, monitoring, and graceful degradation. Ensures applications remain operational under adverse conditions.',
+    category: 'Operations',
+    tags: ['stability', 'reliability', 'error-handling', 'resilience', 'monitoring'],
+    role: 'mandatory',
+    path: '.cursor/skills/util_stability/SKILL.md',
+    gates: ['S.1', 'S.2'],
+    bullets: [
+      'Error classification and recovery patterns',
+      'Circuit breaker and bulkhead patterns',
+      'Health checks and monitoring',
+      'Graceful degradation strategies'
+    ]
+  },
+  {
+    id: 'data-quality',
+    type: 'skill',
+    name: 'data-quality',
+    title: 'Data Quality',
+    subtitle: 'Database schema, validation, migrations, query optimization',
+    description:
+      'Data quality and database skill covering validation, schema design, migrations, and query optimization. Ensures data correctness and reliability.',
+    category: 'Data',
+    tags: ['data', 'database', 'validation', 'schema', 'migration', 'sql'],
+    role: 'mandatory',
+    path: '.cursor/skills/db_data-quality/SKILL.md',
+    gates: ['D.1', 'D.2'],
+    bullets: [
+      'Input validation layers (client, API, service, database)',
+      'Schema design and naming conventions',
+      'Safe migrations with rollback strategy',
+      'Query optimization and indexing'
+    ]
   }
 ]
 
@@ -1166,6 +1246,90 @@ export const AGENTS: FrameworkItem[] = [
       '.cursor/knowledge/marketing/best-practice.md §10',
       '.cursor/agents/security-auditor.md'
     ]
+  },
+  {
+    id: 'api-security',
+    type: 'agent',
+    name: 'api-security',
+    title: 'API Security Auditor',
+    subtitle: 'REST/GraphQL/WebSocket API security review',
+    description:
+      'Comprehensive security review for REST, GraphQL, and WebSocket APIs. Covers authentication, authorization, rate limiting, input validation, and secure communication. OWASP API Security Top 10 compliant.',
+    category: 'Security',
+    tags: ['security', 'api', 'REST', 'GraphQL', 'authentication', 'authorization'],
+    role: 'primary',
+    trigger: '/api-security',
+    path: '.cursor/agents/agent_api-security.md',
+    bullets: [
+      'Authentication layer: JWT, OAuth2, API Keys',
+      'Authorization: RBAC, ABAC, IDOR prevention',
+      'Rate limiting: Token bucket, sliding window',
+      'Input validation: Schema, sanitization, injection prevention'
+    ],
+    alignsWith: ['.cursor/rules/ref_security.mdc', '.cursor/rules/ref_auth.mdc']
+  },
+  {
+    id: 'ui-design',
+    type: 'agent',
+    name: 'ui-design',
+    title: 'UI/Design Specialist',
+    subtitle: 'Visual design, animation, anti-slop principles',
+    description:
+      'Creates visually stunning, professional interfaces with anti-slop design principles. Focuses on aesthetics, animations, typography, and user experience. 57 slop-detection gates.',
+    category: 'Design',
+    tags: ['design', 'UI', 'UX', 'aesthetic', 'animation', 'typography'],
+    role: 'primary',
+    trigger: '/design',
+    path: '.cursor/agents/agent_ui-design.md',
+    bullets: [
+      'Visual hierarchy and component design',
+      'Animation and motion patterns',
+      'Typography excellence and spacing',
+      '57 anti-slop detection gates'
+    ],
+    alignsWith: ['.cursor/rules/ref_ui-visual-design.mdc', '.cursor/skills/ui_hallmark/SKILL.md']
+  },
+  {
+    id: 'data-quality-agent',
+    type: 'agent',
+    name: 'data-quality-agent',
+    title: 'Data Quality Agent',
+    subtitle: 'Database schema, validation, migrations',
+    description:
+      'Ensures data correctness and integrity through database schema design, validation patterns, migration safety, and query optimization. PostgreSQL, MySQL, MongoDB expertise.',
+    category: 'Data',
+    tags: ['database', 'schema', 'validation', 'migration', 'sql'],
+    role: 'primary',
+    trigger: '/data-quality',
+    path: '.cursor/skills/db_data-quality/SKILL.md',
+    bullets: [
+      'Schema design and naming conventions',
+      'Input validation at every layer',
+      'Safe migrations with rollback',
+      'Query optimization and indexing'
+    ],
+    alignsWith: ['.cursor/rules/ref_databases.mdc', '.cursor/rules/ref_redis.mdc']
+  },
+  {
+    id: 'stability-agent',
+    type: 'agent',
+    name: 'stability-agent',
+    title: 'Stability Agent',
+    subtitle: 'Error handling, resilience, monitoring',
+    description:
+      'Ensures application stability through error handling, resilience patterns, monitoring, and graceful degradation. Golden signals: latency, errors, traffic, saturation.',
+    category: 'Operations',
+    tags: ['stability', 'reliability', 'error-handling', 'monitoring'],
+    role: 'primary',
+    trigger: '/stability',
+    path: '.cursor/skills/util_stability/SKILL.md',
+    bullets: [
+      'Error classification and recovery',
+      'Circuit breaker and retry patterns',
+      'Health checks and monitoring',
+      'Golden signals monitoring'
+    ],
+    alignsWith: ['.cursor/rules/ref_observability.mdc', '.cursor/rules/ref_operations.mdc']
   }
 ];
 

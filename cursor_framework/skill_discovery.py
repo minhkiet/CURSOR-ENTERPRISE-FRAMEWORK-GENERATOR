@@ -503,6 +503,64 @@ class SkillRegistry:
                     "chiến lược marketing", "/marketing", "/growth"
                 ],
             ),
+            # Test Analysis Skill
+            SkillMetadata(
+                name="test-analysis",
+                version="1.0.0",
+                description="Comprehensive test analysis covering functional, UI, integration, and e2e testing",
+                tags=["testing", "quality", "functional", "UI-test", "integration", "e2e"],
+                path=".cursor/skills/test_test-analysis/SKILL.md",
+                pre_review_sections=["T.1"],
+                post_review_sections=["T.2"],
+                trigger_keywords=[
+                    "test", "testing", "unit test", "integration test", "e2e test",
+                    "ui test", "component test", "functional test", "verify",
+                    "test case", "test coverage", "regression", "mock", "fixture",
+                    "tdd", "bdd", "vitest", "jest", "playwright", "cypress"
+                ],
+            ),
+            # Performance Optimization Skill
+            SkillMetadata(
+                name="perf-optimization",
+                version="1.0.0",
+                description="Performance optimization covering memory, speed, token efficiency, and caching",
+                tags=["performance", "optimization", "memory", "speed", "token", "caching"],
+                path=".cursor/skills/perf_perf-optimization/SKILL.md",
+                pre_review_sections=["P.1"],
+                post_review_sections=["P.2"],
+                trigger_keywords=[
+                    "performance", "optimize", "memory", "speed", "fast", "slow",
+                    "token", "cost", "cache", "profiling", "benchmark", "bundle", "size"
+                ],
+            ),
+            # Stability Skill
+            SkillMetadata(
+                name="stability",
+                version="1.0.0",
+                description="Stability and reliability through error handling, resilience patterns, and monitoring",
+                tags=["stability", "reliability", "error-handling", "resilience", "monitoring"],
+                path=".cursor/skills/util_stability/SKILL.md",
+                pre_review_sections=["S.1"],
+                post_review_sections=["S.2"],
+                trigger_keywords=[
+                    "stability", "reliability", "error", "exception", "crash", "fail",
+                    "resilience", "retry", "fallback", "circuit breaker", "timeout"
+                ],
+            ),
+            # Data Quality Skill
+            SkillMetadata(
+                name="data-quality",
+                version="1.0.0",
+                description="Data quality and database skill covering validation, schema design, migrations",
+                tags=["data", "database", "validation", "schema", "migration", "sql"],
+                path=".cursor/skills/db_data-quality/SKILL.md",
+                pre_review_sections=["D.1"],
+                post_review_sections=["D.2"],
+                trigger_keywords=[
+                    "data", "database", "schema", "migration", "validation",
+                    "sql", "query", "orm", "prisma", "drizzle", "index", "integrity"
+                ],
+            ),
         ]
 
         for skill in default_skills:
