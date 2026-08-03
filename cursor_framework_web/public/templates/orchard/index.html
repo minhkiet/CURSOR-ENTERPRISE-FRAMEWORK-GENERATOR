@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TropicFruit — Vườn Trái Cây Miền Tây, Du Lịch采摘 & Giao Hàng</title>
+  <meta name="description" content="TropicFruit quản lý vườn trái cây tại miền Tây Nam Bộ. Du lịch采摘, bán buôn sỉ, và giao hàng tươi đến tay khắp miền. Tham quan vườn, hái trái, thưởng thức tại chỗ." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Nunito+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="#" class="logo">
+      <svg class="logo-mark" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="18" fill="#f97316"/>
+        <path d="M20 10 Q22 16 20 20 Q18 24 20 30" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <ellipse cx="20" cy="18" rx="6" ry="8" fill="#fff" opacity="0.9"/>
+      </svg>
+      <span>tropic<span class="logo-accent">fruit</span></span>
+    </a>
+    <ul class="nav-menu">
+      <li><a href="#fruits">Trái cây theo mùa</a></li>
+      <li><a href="#experience">Trải nghiệm</a></li>
+      <li><a href="#wholesale">Bán sỉ</a></li>
+      <li><a href="#visit">Tham quan</a></li>
+      <li><a href="#contact">Liên hệ</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="#" class="nav-ghost">Đăng nhập</a>
+      <a href="#visit" class="nav-cta">
+        Đặt lịch tham quan
+        <i class="ph ph-calendar-check"></i>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<header class="hero">
+  <div class="hero-bg">
+    <img src="https://picsum.photos/seed/mekong-fruit-orchard-tropical/1920/1080" alt="Vườn trái cây miền Tây" loading="eager"/>
+    <div class="hero-overlay"></div>
+  </div>
+  <div class="container hero-content">
+    <div class="hero-text">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        25 hecta vườn tại Tiền Giang và Bến Tre
+      </div>
+
+      <h1 class="hero-title">
+        Hái trái cây<br/>
+        <span class="hl">miền sông nước</span>
+      </h1>
+
+      <p class="hero-desc">
+        Vườn thanh long, xoài, sầu riêng tại miền Tây Nam Bộ. Đặt lịch tham quan采摘, thưởng thức tại chỗ,
+        hoặc đặt giao hàng tươi đến nhà. Hơn 3,200 khách mỗi tháng.
+      </p>
+
+      <div class="hero-cta">
+        <a href="#visit" class="btn btn-primary btn-lg">
+          <i class="ph ph-calendar-check"></i>
+          Đặt lịch tham quan
+        </a>
+        <a href="#fruits" class="btn btn-ghost btn-lg">
+          Xem trái cây theo mùa
+        </a>
+      </div>
+
+      <div class="hero-season">
+        <span class="season-label">Đang vào mùa:</span>
+        <div class="season-fruits">
+          <span class="fruit-tag">Thanh long</span>
+          <span class="fruit-tag">Xoài Cát Hòa Lộc</span>
+          <span class="fruit-tag">Bưởi Năm Roi</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ─── SEASON CALENDAR ─── -->
+<section class="calendar" id="fruits">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        Lịch trái cây
+      </div>
+      <h2 class="section-title">Trái cây theo mùa quanh năm</h2>
+      <p class="section-desc">Từ thanh long đầu năm đến sầu riêng tháng 6-8, vườn luôn có trái để hái.</p>
+    </div>
+
+    <div class="month-tabs">
+      <button class="month-tab active">T1-T3</button>
+      <button class="month-tab">T4-T6</button>
+      <button class="month-tab">T7-T9</button>
+      <button class="month-tab">T10-T12</button>
+    </div>
+
+    <div class="fruit-grid">
+      <article class="fruit-card fruit-highlight">
+        <div class="fc-season">Tháng 1-3</div>
+        <div class="fc-icon">
+          <img src="https://picsum.photos/seed/white-dragon-fruit-pink/200/200" alt="Thanh long"/>
+        </div>
+        <h3 class="fc-name">Thanh Long</h3>
+        <p class="fc-desc">Vỏ đỏ ruột trắng, ngọt thanh, giàu vitamin C</p>
+        <div class="fc-price">35.000đ <span>/kg</span></div>
+        <div class="fc-status available">
+          <i class="ph-fill ph-check-circle"></i> Đang vào mùa
+        </div>
+      </article>
+
+      <article class="fruit-card">
+        <div class="fc-season">Tháng 4-6</div>
+        <div class="fc-icon">
+          <img src="https://picsum.photos/seed/hoa-loc-mango-yellow/200/200" alt="Xoài"/>
+        </div>
+        <h3 class="fc-name">Xoài Cát Hòa Lộc</h3>
+        <p class="fc-desc">Thơm ngọt, thịt dẻo, đặc sản miền Tây</p>
+        <div class="fc-price">55.000đ <span>/kg</span></div>
+        <div class="fc-status">
+          <i class="ph ph-clock"></i> Còn 2 tháng nữa
+        </div>
+      </article>
+
+      <article class="fruit-card fruit-highlight">
+        <div class="fc-season">Tháng 6-8</div>
+        <div class="fc-icon">
+          <img src="https://picsum.photos/seed/durian-durio-fruit/200/200" alt="Sầu riêng"/>
+        </div>
+        <h3 class="fc-name">Sầu Riêng Ri6</h3>
+        <p class="fc-desc">Cơm vàng, béo ngậy, hương thơm đặc trưng</p>
+        <div class="fc-price">120.000đ <span>/kg</span></div>
+        <div class="fc-status available">
+          <i class="ph-fill ph-check-circle"></i> Đang vào mùa
+        </div>
+      </article>
+
+      <article class="fruit-card">
+        <div class="fc-season">Quanh năm</div>
+        <div class="fc-icon">
+          <img src="https://picsum.photos/seed/pomelo-grapefruit-green/200/200" alt="Bưởi"/>
+        </div>
+        <h3 class="fc-name">Bưởi Năm Roi</h3>
+        <p class="fc-desc">Vỏ mỏng, tép giòn, ngọt dịu</p>
+        <div class="fc-price">28.000đ <span>/kg</span></div>
+        <div class="fc-status available">
+          <i class="ph-fill ph-check-circle"></i> Quanh năm
+        </div>
+      </article>
+
+      <article class="fruit-card">
+        <div class="fc-season">Tháng 8-10</div>
+        <div class="fc-icon">
+          <img src="https://picsum.photos/seed/longan-fruit-cluster/200/200" alt="Nhãn"/>
+        </div>
+        <h3 class="fc-name">Nhãn Lồng Tiền Giang</h3>
+        <p class="fc-desc">Ngọt đậm, tép dày, hạt nhỏ</p>
+        <div class="fc-price">42.000đ <span>/kg</span></div>
+        <div class="fc-status">
+          <i class="ph ph-clock"></i> Còn 1 tháng nữa
+        </div>
+      </article>
+
+      <article class="fruit-card">
+        <div class="fc-season">Tháng 9-12</div>
+        <div class="fc-icon">
+          <img src="https://picsum.photos/seed/cam-sinh-tok/200/200" alt="Cam"/>
+        </div>
+        <h3 class="fc-name">Cam Vinh Sơn</h3>
+        <p class="fc-desc">Ngọt thơm, nhiều nước, giàu vitamin C</p>
+        <div class="fc-price">38.000đ <span>/kg</span></div>
+        <div class="fc-status">
+          <i class="ph ph-clock"></i> Chuẩn bị vào mùa
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ─── STATS ─── -->
+<section class="stats">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="si-icon"><i class="ph ph-tree"></i></div>
+        <div class="si-num" data-target="25">0</div>
+        <div class="si-label">Hecta vườn</div>
+      </div>
+      <div class="stat-item">
+        <div class="si-icon"><i class="ph ph-fruit"></i></div>
+        <div class="si-num" data-target="15">0</div>
+        <div class="si-label">Loại trái cây</div>
+      </div>
+      <div class="stat-item">
+        <div class="si-icon"><i class="ph ph-users"></i></div>
+        <div class="si-num" data-target="3200">0</div>
+        <div class="si-label">Khách/tháng</div>
+      </div>
+      <div class="stat-item">
+        <div class="si-icon"><i class="ph-fill ph-star"></i></div>
+        <div class="si-num" data-target="49">0</div>
+        <div class="si-label">Điểm đánh giá</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── EXPERIENCE ─── -->
+<section class="experience" id="experience">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        Trải nghiệm độc đáo
+      </div>
+      <h2 class="section-title">Một ngày tại vườn trái cây miền Tây</h2>
+      <p class="section-desc">Không chỉ hái trái. Tham quan, nấu ăn, và thưởng thức tại chỗ.</p>
+    </div>
+
+    <div class="exp-grid">
+      <div class="exp-main">
+        <img src="https://picsum.photos/seed/fruit-picking-mekongorchard/800/600" alt="Hái trái cây" loading="lazy"/>
+        <div class="exp-badge">
+          <i class="ph-fill ph-star"></i> 4.9/5 từ 842 đánh giá
+        </div>
+      </div>
+
+      <div class="exp-features">
+        <article class="exp-card">
+          <div class="exp-icon"><i class="ph-fill ph-basket"></i></div>
+          <div class="exp-content">
+            <h4>Hái trái cây</h4>
+            <p>Được vào vườn hái trái chín cây. Hướng dẫn viên địa phương chia sẻ cách chọn trái ngon.</p>
+            <div class="exp-price">Miễn phí với vé vào cổng</div>
+          </div>
+        </article>
+
+        <article class="exp-card">
+          <div class="exp-icon"><i class="ph-fill ph-cooking-pot"></i></div>
+          <div class="exp-content">
+            <h4>Nấu ăn miền Tây</h4>
+            <p>Học nấu canh chua cá lóc, tôm rim me với nguyên liệu từ vườn. Ăn trưa tại chỗ.</p>
+            <div class="exp-price">+150.000đ/người</div>
+          </div>
+        </article>
+
+        <article class="exp-card">
+          <div class="exp-icon"><i class="ph-fill ph-boat"></i></div>
+          <div class="exp-content">
+            <h4>Chèo xuồng trên sông</h4>
+            <p>Thả thuyền trên sông Tiền, ngắm cảnh vườn cây hai bên bờ. Hoàng hôn trên sông.</p>
+            <div class="exp-price">+80.000đ/người</div>
+          </div>
+        </article>
+
+        <article class="exp-card">
+          <div class="exp-icon"><i class="ph-fill ph-wine"></i></div>
+          <div class="exp-content">
+            <h4>Thưởng thức tại chỗ</h4>
+            <p>Thử thanh long đỏ, nước ép xoài tươi, sữa chua trái cây. Khu picnic ven vườn.</p>
+            <div class="exp-price">+50.000đ/người</div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── VISIT PACKAGES ─── -->
+<section class="visit" id="visit">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        Gói tham quan
+      </div>
+      <h2 class="section-title">Chọn cách trải nghiệm phù hợp</h2>
+      <p class="section-desc">Từ vé đơn giản đến tour trọn gói một ngày.</p>
+    </div>
+
+    <div class="visit-grid">
+      <article class="visit-card">
+        <div class="vc-badge">Tự túc</div>
+        <div class="vc-header">
+          <h3>Vé vào cổng</h3>
+          <div class="vc-price">80.000<span>đ/người</span></div>
+        </div>
+        <ul class="vc-features">
+          <li><i class="ph ph-check"></i> Vào vườn hái trái</li>
+          <li><i class="ph ph-check"></i> Tham quan tự do 3 tiếng</li>
+          <li><i class="ph ph-check"></i> Chụp ảnh tại vườn</li>
+          <li><i class="ph ph-x"></i> Ăn trưa</li>
+          <li><i class="ph ph-x"></i> Chèo thuyền</li>
+        </ul>
+        <a href="#" class="btn btn-outline btn-full">Đặt vé</a>
+      </article>
+
+      <article class="visit-card vc-featured">
+        <div class="vc-ribbon"><i class="ph-fill ph-heart"></i> Phổ biến nhất</div>
+        <div class="vc-badge">Trọn gói</div>
+        <div class="vc-header">
+          <h3>Tour nửa ngày</h3>
+          <div class="vc-price">350.000<span>đ/người</span></div>
+        </div>
+        <ul class="vc-features">
+          <li><i class="ph ph-check"></i> Vào vườn hái trái</li>
+          <li><i class="ph ph-check"></i> Ăn trưa miền Tây</li>
+          <li><i class="ph ph-check"></i> Chèo thuyền 30 phút</li>
+          <li><i class="ph ph-check"></i> Nước ép trái cây</li>
+          <li><i class="ph ph-x"></i> Nấu ăn</li>
+        </ul>
+        <a href="#" class="btn btn-primary btn-full">Đặt tour</a>
+      </article>
+
+      <article class="visit-card">
+        <div class="vc-badge">VIP</div>
+        <div class="vc-header">
+          <h3>Tour trọn ngày</h3>
+          <div class="vc-price">550.000<span>đ/người</span></div>
+        </div>
+        <ul class="vc-features">
+          <li><i class="ph ph-check"></i> Tất cả trong gói nửa ngày</li>
+          <li><i class="ph ph-check"></i> Workshop nấu ăn</li>
+          <li><i class="ph ph-check"></i> Chèo thuyền không giới hạn</li>
+          <li><i class="ph ph-check"></i> Quà tặng 500g trái cây</li>
+          <li><i class="ph ph-check"></i> HDV riêng</li>
+        </ul>
+        <a href="#" class="btn btn-outline btn-full">Đặt tour</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ─── WHOLESALE ─── -->
+<section class="wholesale" id="wholesale">
+  <div class="container">
+    <div class="wholesale-grid">
+      <div class="wholesale-content">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          Bán sỉ
+        </div>
+        <h2>Cung cấp sỉ trái cây cho nhà hàng, siêu thị</h2>
+        <p>TropicFruit cung cấp trái cây sỉ cho hơn 40 nhà hàng, 12 siêu thị tại TP.HCM và các tỉnh miền Nam.</p>
+
+        <ul class="wholesale-benefits">
+          <li>
+            <i class="ph-fill ph-truck"></i>
+            <div>
+              <strong>Giao hàng miễn phí</strong>
+              <span>Đơn từ 500kg trở lên</span>
+            </div>
+          </li>
+          <li>
+            <i class="ph-fill ph-seal-check"></i>
+            <div>
+              <strong>Chứng nhận an toàn</strong>
+              <span>VietGAP, kiểm tra nguồn gốc</span>
+            </div>
+          </li>
+          <li>
+            <i class="ph-fill ph-currency-dollar"></i>
+            <div>
+              <strong>Giá sỉ cạnh tranh</strong>
+              <span>Từ 15-30% thấp hơn thị trường</span>
+            </div>
+          </li>
+          <li>
+            <i class="ph-fill ph-phone"></i>
+            <div>
+              <strong>Liên hệ tư vấn</strong>
+              <span>0912 345 678 (Ms. Hương)</span>
+            </div>
+          </li>
+        </ul>
+
+        <a href="#contact" class="btn btn-primary btn-lg">
+          Liên hệ báo giá
+          <i class="ph ph-arrow-right"></i>
+        </a>
+      </div>
+
+      <div class="wholesale-visual">
+        <img src="https://picsum.photos/seed/fruit-wholesale-market/600/500" alt="Bán sỉ trái cây" loading="lazy"/>
+        <div class="wv-partners">
+          <span>Các đối tác:</span>
+          <div class="wv-logos">
+            <div class="wv-logo">Co.opmart</div>
+            <div class="wv-logo">BigC</div>
+            <div class="wv-logo">Lotte</div>
+            <div class="wv-logo">WinMart</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── REVIEWS ─── -->
+<section class="reviews" id="reviews">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        Cảm nhận khách
+      </div>
+      <h2 class="section-title">Ký ức từ những chuyến tham quan</h2>
+    </div>
+
+    <div class="review-grid">
+      <article class="review-card">
+        <div class="rc-stars"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
+        <p class="rc-quote">"Con nít được hái thanh long trực tiếp từ cây, vui quá trời. Ăn trưa miền Tây ngon tuyệt. Sẽ quay lại vào mùa sầu riêng."</p>
+        <div class="rc-author">
+          <img src="https://i.pravatar.cc/48?img=35" alt=""/>
+          <div>
+            <div class="rc-name">Nguyễn Thị Mai Lan</div>
+            <div class="rc-meta">Gia đình 5 người · Tour nửa ngày</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="review-card">
+        <div class="rc-stars"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
+        <p class="rc-quote">"Nhân viên nhiệt tình, vườn rộng, trái cây ngon. Mua sỉ 200kg thanh long cho nhà hàng, giá tốt, giao đúng hẹn."</p>
+        <div class="rc-author">
+          <img src="https://i.pravatar.cc/48?img=51" alt=""/>
+          <div>
+            <div class="rc-name">Trần Văn Đức</div>
+            <div class="rc-meta">Chủ nhà hàng · Mua sỉ</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="review-card">
+        <div class="rc-stars"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
+        <p class="rc-quote">"Chèo thuyền trên sông lúc hoàng hôn, view đẹp như tranh vẽ. Chụp ảnh sống ảo cực đẹp. Mùa nào cũng nên đến."</p>
+        <div class="rc-author">
+          <img src="https://i.pravatar.cc/48?img=21" alt=""/>
+          <div>
+            <div class="rc-name">Lê Hoàng Minh</div>
+            <div class="rc-meta">Travel blogger · Tour VIP</div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CONTACT ─── -->
+<section class="contact" id="contact">
+  <div class="container">
+    <div class="contact-grid">
+      <div class="contact-info">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          Liên hệ
+        </div>
+        <h2>Đặt lịch tham quan hoặc báo giá</h2>
+
+        <div class="contact-details">
+          <div class="cd-item">
+            <i class="ph-fill ph-map-pin"></i>
+            <div>
+              <strong>Địa chỉ</strong>
+              <span>Xã Tân Thanh, huyện Cái Bè, Tiền Giang</span>
+            </div>
+          </div>
+          <div class="cd-item">
+            <i class="ph-fill ph-phone"></i>
+            <div>
+              <strong>Điện thoại</strong>
+              <span>0912 345 678 (Ms. Hương)</span>
+            </div>
+          </div>
+          <div class="cd-item">
+            <i class="ph-fill ph-envelope"></i>
+            <div>
+              <strong>Email</strong>
+              <span>contact@tropicfruit.vn</span>
+            </div>
+          </div>
+          <div class="cd-item">
+            <i class="ph-fill ph-clock"></i>
+            <div>
+              <strong>Giờ mở cửa</strong>
+              <span>7:00 - 18:00 hàng ngày</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <form class="contact-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Họ tên</label>
+            <input type="text" placeholder="Nhập họ tên của bạn"/>
+          </div>
+          <div class="form-group">
+            <label>Số điện thoại</label>
+            <input type="tel" placeholder="0912 345 678"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Bạn quan tâm đến</label>
+          <select>
+            <option>Tham quan vườn (cá nhân/gia đình)</option>
+            <option>Tour trọn gói</option>
+            <option>Mua sỉ trái cây</option>
+            <option>Khác</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Số lượng người</label>
+          <select>
+            <option>1-5 người</option>
+            <option>6-15 người</option>
+            <option>16-30 người</option>
+            <option>Trên 30 người (đoàn)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Ngày dự kiến</label>
+          <input type="date"/>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full btn-lg">
+          <i class="ph ph-paper-plane-tilt"></i>
+          Gửi yêu cầu
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo">
+          <svg class="logo-mark" viewBox="0 0 40 40" fill="none">
+            <circle cx="20" cy="20" r="18" fill="#f97316"/>
+            <ellipse cx="20" cy="18" rx="6" ry="8" fill="#fff" opacity="0.9"/>
+          </svg>
+          <span>tropic<span class="logo-accent">fruit</span></span>
+        </div>
+        <p>Vườn trái cây miền Tây. Tham quan, hái trái, thưởng thức tại chỗ.</p>
+        <div class="footer-social">
+          <a href="#"><i class="ph-fill ph-facebook-logo"></i></a>
+          <a href="#"><i class="ph-fill ph-instagram-logo"></i></a>
+          <a href="#"><i class="ph-fill ph-youtube-logo"></i></a>
+        </div>
+      </div>
+      <div>
+        <h5>Trải nghiệm</h5>
+        <ul>
+          <li><a href="#">Hái trái cây</a></li>
+          <li><a href="#">Nấu ăn miền Tây</a></li>
+          <li><a href="#">Chèo thuyền</a></li>
+          <li><a href="#">Picnic tại vườn</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Dịch vụ</h5>
+        <ul>
+          <li><a href="#">Vé vào cổng</a></li>
+          <li><a href="#">Tour nửa ngày</a></li>
+          <li><a href="#">Tour trọn ngày</a></li>
+          <li><a href="#">Bán sỉ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Hỗ trợ</h5>
+        <ul>
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Chính sách</a></li>
+          <li><a href="#">Liên hệ</a></li>
+          <li><a href="#">Tuyển dụng</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2026 TropicFruit Vietnam. MST: 0108246891.</div>
+      <div class="footer-legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Security</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
