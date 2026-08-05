@@ -9,11 +9,12 @@ interface Stat {
 }
 
 const stats: Stat[] = [
-  { target: 668, label: 'Total files' },
-  { target: 41, label: 'Rules' },
-  { target: 18, label: 'Skills' },
-  { target: 272, label: 'Knowledge files' },
-  { target: 8, label: 'Agents' }
+  { target: 720, label: 'Total files' },
+  { target: 39, label: 'Rules' },
+  { target: 22, label: 'Skills' },
+  { target: 329, label: 'Knowledge files' },
+  { target: 18, label: 'Agents' },
+  { target: 4, label: 'TDAM layers', suffix: '' }
 ]
 
 const displayValues = ref<number[]>(stats.map(() => 0))
@@ -129,9 +130,15 @@ onUnmounted(() => {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   align-items: center;
   position: relative;
+}
+
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .stat-item {

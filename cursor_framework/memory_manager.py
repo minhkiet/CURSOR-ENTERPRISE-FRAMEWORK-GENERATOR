@@ -10,20 +10,40 @@ Features:
     - Semantic compression
     - Context invalidation and freshness tracking
     - Cross-reference linking
+    - TDAM Layered Memory integration (L0-L3)
 
 Usage:
     >>> from cursor_framework import MemoryManager, MemoryTier
     >>> manager = MemoryManager()
     >>> manager.store("project_info", {"name": "myapp"}, tier=MemoryTier.SESSION)
     >>> context = manager.retrieve("project_info")
+    
+    # With TDAM integration:
+    >>> from cursor_framework import MemoryManager, TDAMIntegration
+    >>> manager = MemoryManager()
+    >>> tdam = TDAMIntegration()
+    >>> manager.set_tdam_integration(tdam)
+    >>> manager.sync_to_tdam("session-1")  # Sync hot tier to TDAM L0
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta
-from enum import Enum
-from typing import Any, Optional
+import fnmatch
 import hashlib
 import json
+import logging
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any, Optional
+
+from .tdam_integration import (
+    TDAMIntegration,
+    MemoryLayer,
+    MemoryItem,
+    ConversationTurn,
+    OffloadResult,
+)
+
+logger = logging.getLogger(__name__)
 
 
 class MemoryTier(Enum):
@@ -443,6 +463,176 @@ class MemoryManager:
             ]
             for key in keys_to_delete:
                 del self._storage[tier][key]
+
+    # === TDAM Integration Methods ===
+
+    def set_tdam_integration(self, tdam: TDAMIntegration) -> None:
+        """
+        Attach TDAM integration for layered memory.
+
+        Args:
+            tdam: TDAMIntegration instance
+        """
+        self._tdam = tdam
+        logger.info("TDAM integration attached to MemoryManager")
+
+    def sync_to_tdam(self, session_id: str) -> dict:
+        """
+        Sync local HOT tier to TDAM L0 conversation layer.
+
+        Args:
+            session_id: Session identifier
+
+        Returns:
+            Sync result with counts
+        """
+        if not hasattr(self, "_tdam") or self._tdam is None:
+            logger.warning("TDAM integration not set, skipping sync")
+            return {"synced": 0, "error": "TDAM not configured"}
+
+        messages = []
+        for key, entry in self._storage[MemoryTier.HOT].items():
+            if not entry.is_expired:
+                messages.append(
+                    ConversationTurn(
+                        role="system",
+                        content=str(entry.value),
+                        timestamp=entry.created_at,
+                    )
+                )
+
+        if messages:
+            result = self._tdam.capture_conversation(session_id, messages)
+            logger.info(
+                "Synced %d entries to TDAM L0 for session %s",
+                len(messages),
+                session_id,
+            )
+            return {"synced": len(messages), "result": result}
+
+        return {"synced": 0}
+
+    def recall_from_tdam(
+        self,
+        query: str,
+        layers: Optional[list[MemoryLayer]] = None,
+        limit: int = 5,
+    ) -> list[MemoryItem]:
+        """
+        Recall memories from TDAM layered storage.
+
+        Args:
+            query: Search query
+            layers: Specific layers to search
+            limit: Maximum results
+
+        Returns:
+            List of matching memory items
+        """
+        if not hasattr(self, "_tdam") or self._tdam is None:
+            logger.warning("TDAM integration not set, cannot recall")
+            return []
+
+        return self._tdam.recall(query, layers=layers, limit=limit)
+
+    def extract_atomic_from_tdam(self, session_id: str, messages: list[ConversationTurn]) -> bool:
+        """
+        Trigger L1 atomic memory extraction from conversation.
+
+        This should be called periodically (e.g., every N turns)
+        to distill conversation into atomic facts.
+
+        Args:
+            session_id: Session identifier
+            messages: Conversation turns to extract from
+
+        Returns:
+            True if extraction triggered
+        """
+        if not hasattr(self, "_tdam") or self._tdam is None:
+            return False
+
+        # Add to L0 first
+        self._tdam.capture_conversation(session_id, messages)
+        return True
+
+    def get_persona_from_tdam(self) -> Optional[str]:
+        """
+        Get user persona from TDAM L3 layer.
+
+        Returns:
+            Persona content or None
+        """
+        if not hasattr(self, "_tdam") or self._tdam is None:
+            return None
+        return self._tdam.get_persona()
+
+    def update_persona_to_tdam(self, content: str) -> bool:
+        """
+        Update user persona in TDAM L3 layer.
+
+        Args:
+            content: New persona content
+
+        Returns:
+            True if updated
+        """
+        if not hasattr(self, "_tdam") or self._tdam is None:
+            return False
+        return self._tdam.update_persona(content)
+
+    def compact_context_to_tdam(
+        self,
+        session_id: str,
+        messages: list[ConversationTurn],
+        ratio: float = 0.7,
+        context_window: int = 128000,
+    ) -> Optional[OffloadResult]:
+        """
+        Compact conversation into Mermaid canvas via TDAM.
+
+        This is the short-term memory compression:
+        - Offloads verbose logs to external storage
+        - Converts state to lightweight Mermaid symbols
+        - Preserves node_id for traceability
+
+        Args:
+            session_id: Session identifier
+            messages: Conversation to compact
+            ratio: Target compression ratio
+            context_window: Context window size
+
+        Returns:
+            OffloadResult with compressed content and canvas
+        """
+        if not hasattr(self, "_tdam") or self._tdam is None:
+            return None
+        return self._tdam.compact_context(session_id, messages, ratio, context_window)
+
+    def get_tdam_stats(self) -> dict:
+        """
+        Get combined stats from local memory and TDAM.
+
+        Returns:
+            Stats dict with local and TDAM metrics
+        """
+        stats = self.get_stats()
+
+        tdam_stats = {}
+        if hasattr(self, "_tdam") and self._tdam is not None:
+            tdam_stats = {
+                "tdam_available": self._tdam.is_available(),
+                "tdam_persona_cached": self._tdam._persona_cache is not None,
+            }
+
+        return {
+            "local": {
+                "total_entries": stats.total_entries,
+                "hit_rate": stats.hit_rate,
+                "token_savings": stats.token_savings,
+            },
+            "tdam": tdam_stats,
+        }
 
 
 def create_memory_manager() -> MemoryManager:

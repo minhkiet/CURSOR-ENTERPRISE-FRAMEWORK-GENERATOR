@@ -19,13 +19,14 @@ const bars = [
   { label: 'Baseline agent', before: 100, after: 100, color: 'var(--text-faint)' },
   { label: 'With memory retrieval', before: 100, after: 78, color: '#60a5fa' },
   { label: 'With context router', before: 100, after: 64, color: '#a78bfa' },
-  { label: 'With token optimization', before: 100, after: 47, color: 'var(--accent)' }
+  { label: 'With TDAM layered memory', before: 100, after: 41, color: '#34d399' },
+  { label: 'With full token optimization', before: 100, after: 33, color: 'var(--accent)' }
 ]
 
 const metrics = [
-  { value: '47.2%', label: 'Tokens saved', desc: 'Per complex multi-step task' },
+  { value: '67%', label: 'Tokens saved', desc: 'Per complex multi-step task' },
   { value: '2.8×', label: 'Retrieval accuracy', desc: 'vs naive full-context' },
-  { value: '$0.31', label: 'Avg cost / task', desc: 'GPT-4o class models' },
+  { value: '$0.21', label: 'Avg cost / task', desc: 'GPT-4o class models' },
   { value: '34ms', label: 'P50 retrieval', desc: 'In-memory SQLite + vector' }
 ]
 </script>

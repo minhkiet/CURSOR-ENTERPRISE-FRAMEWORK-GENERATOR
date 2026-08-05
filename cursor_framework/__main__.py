@@ -31,8 +31,25 @@ Run modes (minimal, stdlib-only):
     python -m cursor_framework graph [--root .cursor]
         Build skill dependency graph and print nodes/edges JSON to stdout.
 
-    python -m cursor_framework --version
-        Print version and exit.
+TDAM Commands (requires rich library):
+
+    python -m cursor_framework tdam status
+        Show TDAM connection status and configuration.
+
+    python -m cursor_framework tdam capture --session SESSION --message "Hello"
+        Capture conversation messages.
+
+    python -m cursor_framework tdam recall --query "preferences"
+        Recall memories by query.
+
+    python -m cursor_framework tdam compact --session SESSION --ratio 0.7
+        Compact context into Mermaid canvas.
+
+    python -m cursor_framework tdam persona --read
+        Read user persona.
+
+    python -m cursor_framework tdam persona --interactive
+        Interactive persona editor.
 
 No third-party deps — argparse + stdlib http.server only.
 Designed for `python -m cursor_framework` and the `cursor-framework`
@@ -144,6 +161,12 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     graph_serve.add_argument("--host", default="127.0.0.1", help="Bind host (default: 127.0.0.1)")
     graph_serve.add_argument("--port", type=int, default=8766, help="Bind port (default: 8766)")
+
+    # tdam: TDAM (TencentDB Agent Memory) CLI — status, capture, recall, compact, persona
+    sub.add_parser(
+        "tdam",
+        help="TencentDB Agent Memory CLI (Rich-powered). Run `python -m cursor_framework tdam --help`.",
+    )
 
     return parser
 
@@ -465,6 +488,14 @@ def _serve_graph(args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # When invoked as `python -m cursor_framework tdam <subcmd> ...`,
+    # the TDAM CLI parses its own subcommand via sys.argv.
+    if argv is None:
+        argv = sys.argv[1:]
+    if argv and argv[0] == "tdam":
+        from .tdam_cli import main as tdam_main
+        return tdam_main()
+
     parser = _build_parser()
     args = parser.parse_args(argv)
 
@@ -479,6 +510,7 @@ def main(argv: list[str] | None = None) -> int:
         "clear-cache": _clear_cache,
         "graph": _graph,
     }
+
     return dispatch[args.cmd](args)
 
 

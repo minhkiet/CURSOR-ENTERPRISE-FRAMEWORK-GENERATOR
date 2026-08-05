@@ -10,20 +10,35 @@ Features:
     - Context window optimization
     - Smart summarization
     - Priority-based context retention
+    - TDAM Symbolic Memory integration (Mermaid Canvas)
 
 Usage:
     >>> from cursor_framework import TokenOptimizer, TokenBudget
     >>> optimizer = TokenOptimizer(max_tokens=100000)
     >>> compressed = optimizer.compress(context, target_tokens=8000)
+    
+    # With TDAM Symbolic Memory:
+    >>> from cursor_framework import TokenOptimizer, TDAMIntegration
+    >>> optimizer = TokenOptimizer()
+    >>> optimizer.set_tdam(tdam)
+    >>> result = optimizer.compact_with_mermaid(messages, ratio=0.7)
 """
 
+import json
+import logging
+import re
 from collections import deque
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Optional
-import json
-import re
+from typing import TYPE_CHECKING, Any, Optional
+
+if TYPE_CHECKING:
+    from .tdam_integration import TDAMIntegration, OffloadResult, ConversationTurn
+
+from .tdam_integration import OffloadStrategy
+
+logger = logging.getLogger(__name__)
 
 
 class TokenBudget:
@@ -592,6 +607,171 @@ class TokenOptimizer:
     def available_for_context(self) -> int:
         """Get available tokens for context."""
         return self.budget.available_for_context
+
+    # === TDAM Symbolic Memory Integration ===
+
+    def set_tdam(self, tdam: "TDAMIntegration") -> None:
+        """
+        Attach TDAM integration for symbolic memory compression.
+
+        Args:
+            tdam: TDAMIntegration instance
+        """
+        self._tdam = tdam
+
+    def compact_with_mermaid(
+        self,
+        session_id: str,
+        messages: list[dict],
+        ratio: float = 0.7,
+        context_window: int = 128000,
+    ) -> Optional["OffloadResult"]:
+        """
+        Compact conversation using TDAM Mermaid Canvas.
+
+        This uses TDAM's offload API to:
+        1. Offload verbose tool logs to external storage
+        2. Convert state to lightweight Mermaid symbols
+        3. Return compressed messages + canvas for traceability
+
+        Args:
+            session_id: Session identifier
+            messages: Conversation messages (list of dicts with role/content)
+            ratio: Target compression ratio (0.0-1.0)
+            context_window: Context window size
+
+        Returns:
+            OffloadResult with compressed content and canvas
+        """
+        if not hasattr(self, "_tdam") or self._tdam is None:
+            logger.warning("TDAM not configured, using local compression")
+            return None
+
+        # Convert dict messages to ConversationTurn
+        from .tdam_integration import ConversationTurn
+
+        turns = [
+            ConversationTurn(
+                role=m.get("role", "user"),
+                content=m.get("content", ""),
+                tool_name=m.get("tool_name"),
+                tool_result=m.get("tool_result"),
+            )
+            for m in messages
+        ]
+
+        result = self._tdam.compact_context(
+            session_id, turns, ratio=ratio, context_window=context_window
+        )
+
+        if result:
+            # Update compression stats
+            self._compression_history.append(
+                CompressionResult(
+                    original_tokens=result.tokens_before,
+                    compressed_tokens=result.tokens_after,
+                    compression_ratio=result.compression_ratio,
+                    strategy_used=CompressionStrategy.SEMANTIC,
+                    summary=f"Mermaid compact: {len(messages)} → {len(result.messages)} messages",
+                )
+            )
+
+        return result
+
+    def build_mermaid_context(
+        self,
+        session_id: str,
+        current_task: str,
+        max_tokens: int = 4000,
+    ) -> dict[str, Any]:
+        """
+        Build context with Mermaid canvas for task execution.
+
+        Combines TDAM layered memory recall with Mermaid canvas
+        for efficient context window usage.
+
+        Args:
+            session_id: Session identifier
+            current_task: Current task description
+            max_tokens: Maximum tokens for context
+
+        Returns:
+            Dict with {persona, memories, canvas, text, tokens}
+        """
+        if not hasattr(self, "_tdam") or self._tdam is None:
+            return {"error": "TDAM not configured"}
+
+        # Get full context from TDAM
+        tdam_context = self._tdam.build_context(session_id, current_task, max_tokens)
+
+        # Format as text
+        parts: list[str] = []
+
+        # Add persona if available
+        if tdam_context.get("persona"):
+            parts.append(f"## User Persona\n{tdam_context['persona']}")
+
+        # Add memories
+        memories = tdam_context.get("memories", [])
+        if memories:
+            parts.append(f"## Relevant Memories ({len(memories)})")
+            for m in memories[:5]:  # Top 5
+                parts.append(f"- {m['content'][:200]}")
+
+        # Add canvas
+        canvas = tdam_context.get("canvas", "")
+        if canvas:
+            parts.append(f"## Task State (Mermaid)\n```mermaid\n{canvas}\n```")
+
+        text = "\n\n".join(parts)
+        tokens = self.estimate_tokens(text)
+
+        return {
+            "text": text,
+            "tokens": tokens,
+            "persona": tdam_context.get("persona"),
+            "memories": memories,
+            "canvas": canvas,
+        }
+
+    def should_trigger_offload(self, current_tokens: int) -> bool:
+        """
+        Check if offload should be triggered based on context usage.
+
+        Args:
+            current_tokens: Current token count
+
+        Returns:
+            True if offload recommended
+        """
+        threshold = int(self.max_tokens * self.compression_threshold)
+        return current_tokens >= threshold
+
+    def get_symbolic_stats(self) -> dict:
+        """
+        Get statistics about symbolic memory compression.
+
+        Returns:
+            Stats dict with mermaid and tdam metrics
+        """
+        stats = self.get_compression_stats()
+
+        tdam_stats = {}
+        if hasattr(self, "_tdam") and self._tdam is not None:
+            tdam_stats = {
+                "tdam_available": self._tdam.is_available(),
+                "persona_cached": self._tdam._persona_cache is not None,
+            }
+
+        return {
+            "compression": stats,
+            "tdam": tdam_stats,
+            "context_window": {
+                "max_tokens": self.max_tokens,
+                "compression_threshold": self.compression_threshold,
+                "available": self.available_for_context,
+            },
+        }
 
 
 def create_optimizer(max_tokens: int = 100000) -> TokenOptimizer:

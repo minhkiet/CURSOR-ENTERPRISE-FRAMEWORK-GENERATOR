@@ -23,7 +23,7 @@ Author: Cursor Enterprise Framework
 Version: 1.2.0
 """
 
-__version__ = "1.2.1"
+__version__ = "1.3.0"
 __author__ = "Cursor Enterprise Framework"
 
 # Lazy attribute access (PEP 562): importing `cursor_framework` does not
@@ -56,6 +56,16 @@ _LAZY_EXPORTS = {
     "WorkflowResult": "cursor_framework.workflow",
     "Watcher": "cursor_framework.watcher",
     "Dashboard": "cursor_framework.dashboard",
+    # TencentDB Agent Memory integration
+    "TDAMIntegration": "cursor_framework.tdam_integration",
+    "TDAMClient": "cursor_framework.tdam_integration",
+    "TDAMConfig": "cursor_framework.tdam_integration",
+    "MemoryLayer": "cursor_framework.tdam_integration",
+    "MemoryItem": "cursor_framework.tdam_integration",
+    "ConversationTurn": "cursor_framework.tdam_integration",
+    "OffloadResult": "cursor_framework.tdam_integration",
+    "create_tdam_integration": "cursor_framework.tdam_integration",
+    "create_tdam_integration_from_env": "cursor_framework.tdam_integration",
 }
 
 
@@ -96,4 +106,14 @@ __all__ = [
     "WorkflowResult",
     "Watcher",
     "Dashboard",
+    # TencentDB Agent Memory integration
+    "TDAMIntegration",
+    "TDAMClient",
+    "TDAMConfig",
+    "MemoryLayer",
+    "MemoryItem",
+    "ConversationTurn",
+    "OffloadResult",
+    "create_tdam_integration",
+    "create_tdam_integration_from_env",
 ]

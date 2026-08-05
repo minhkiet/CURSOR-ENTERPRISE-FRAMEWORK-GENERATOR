@@ -867,6 +867,52 @@ export const SKILLS: FrameworkItem[] = [
       'Safe migrations with rollback strategy',
       'Query optimization and indexing'
     ]
+  },
+  {
+    id: 'tdam-integration',
+    type: 'skill',
+    name: 'tdam-integration',
+    title: 'TencentDB Agent Memory (TDAM)',
+    subtitle: 'Layered memory hub for AI agents',
+    description:
+      'Integrates TencentCloud/TencentDB-Agent-Memory for advanced agent memory: 4 layers (L0 conversation → L3 persona), symbolic Mermaid Canvas compression, atomic fact extraction. Reduces token spend up to 92% on long sessions.',
+    category: 'AI',
+    tags: ['memory', 'tencentdb', 'tdam', 'token-savings', 'mermaid', 'layered-memory'],
+    role: 'primary',
+    path: '.cursor/skills/ai_tdam-integration/SKILL.md',
+    gates: ['tdam-pre', 'tdam-post'],
+    metrics: [
+      { label: 'Token savings', value: '92%' },
+      { label: 'Task success', value: '+47%' },
+      { label: 'Latency', value: '<50ms' },
+      { label: 'Memory layers', value: '4' }
+    ],
+    bullets: [
+      '🆕 L0 — Raw conversation turns (compressed)',
+      '🆕 L1 — Atomic facts extraction (entities, decisions)',
+      '🆕 L2 — Scenario blocks (multi-turn context)',
+      '🆕 L3 — User persona (long-term traits)',
+      '🆕 Symbolic Mermaid Canvas — short-term context compression'
+    ]
+  },
+  {
+    id: 'tdam-cli',
+    type: 'skill',
+    name: 'tdam-cli',
+    title: 'TDAM CLI',
+    subtitle: 'Beautiful terminal UI for memory management',
+    description:
+      'Rich-powered CLI for interacting with TDAM directly from the terminal. Commands: status, capture, recall, compact, persona, scenarios, tool-call, build-context. Windows encoding-safe.',
+    category: 'AI',
+    tags: ['cli', 'rich', 'tdam', 'terminal-ui', 'productivity'],
+    role: 'secondary',
+    path: '.cursor_framework/tdam_cli.py',
+    bullets: [
+      'Rich-powered tables, trees, markdown rendering',
+      'Cross-platform: Windows UTF-8 + Linux/macOS',
+      'Operations: capture · recall · compact · persona · scenarios',
+      'Workflow integration via build-context command'
+    ]
   }
 ]
 

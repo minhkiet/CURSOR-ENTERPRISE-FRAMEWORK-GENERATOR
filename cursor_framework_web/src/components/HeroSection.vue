@@ -20,10 +20,10 @@ const mouseY = ref(50)
 const prefersReducedMotion = ref(false)
 
 const metrics: Metric[] = [
-  { value: '41', label: 'MDC rules' },
-  { value: '18', label: 'Skills' },
-  { value: '272', label: 'Knowledge files' },
-  { value: '8', label: 'Specialist agents' }
+  { value: '39', label: 'MDC rules' },
+  { value: '22', label: 'Skills' },
+  { value: '329', label: 'Knowledge files' },
+  { value: '18', label: 'Specialist agents' }
 ]
 
 const capabilities: Capability[] = [
@@ -34,13 +34,13 @@ const capabilities: Capability[] = [
   },
   {
     icon: 'memory',
-    title: 'Memory First',
-    desc: 'Reuses past decisions, ADRs, and bug fixes from local SQLite.'
+    title: 'Memory First + TDAM',
+    desc: 'Layered memory (L0–L3) with symbolic Mermaid canvas — up to 92% token savings.'
   },
   {
     icon: 'token',
     title: 'Token Optimized',
-    desc: 'Compression and lazy loading cuts context use by up to 40%.'
+    desc: 'TDAM offloading + compression + lazy loading cuts context use by up to 47%.'
   }
 ]
 

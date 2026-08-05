@@ -2,6 +2,7 @@
 import HeroSection from '../components/HeroSection.vue'
 import StatsBar from '../components/StatsBar.vue'
 import ExplorerSection from '../components/ExplorerSection.vue'
+import TdamSection from '../components/TdamSection.vue'
 import PrinciplesSection from '../components/PrinciplesSection.vue'
 import ArchitectureSection from '../components/ArchitectureSection.vue'
 import ComponentsSection from '../components/ComponentsSection.vue'
@@ -17,6 +18,7 @@ import GettingStartedSection from '../components/GettingStartedSection.vue'
     <HeroSection />
     <StatsBar />
     <ExplorerSection />
+    <TdamSection />
     <PrinciplesSection />
     <ArchitectureSection />
     <ComponentsSection />
