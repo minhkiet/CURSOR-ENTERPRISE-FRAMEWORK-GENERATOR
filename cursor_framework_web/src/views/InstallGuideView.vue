@@ -5,7 +5,7 @@ import { useIntersectionObserver } from '../composables/useIntersectionObserver'
 const sectionRef = ref<HTMLElement | null>(null)
 const isVisible = ref(false)
 
-type MethodKey = 'gui' | 'powershell' | 'manual'
+type MethodKey = 'gui' | 'powershell' | 'python' | 'manual'
 const activeMethod = ref<MethodKey>('gui')
 
 type Tone = 'success' | 'warning' | 'danger' | 'info'
@@ -155,6 +155,93 @@ const methods: InstallMethod[] = [
       {
         problem: 'Không thấy file .cursor sau khi cài',
         solution: 'Folder ẩn? Bật "Show hidden files" trong Explorer, hoặc gõ echo $env:USERPROFILE trong PowerShell để xem đường dẫn thật.'
+      }
+    ]
+  },
+  {
+    key: 'python',
+    badge: 'For devs',
+    badgeTone: 'info',
+    title: 'Python package (cursor_framework)',
+    oneLiner: 'Cài pip package, chạy Dashboard, scan & index. Cho dev muốn inspect / customize',
+    forWho: 'Dev Python, muốn dùng CLI, dashboard, indexer, hoặc TDAM.',
+    duration: '4 phút',
+    difficulty: 'Medium',
+    os: ['Windows', 'macOS', 'Linux'],
+    steps: [
+      {
+        title: 'Yêu cầu môi trường',
+        detail: 'Python 3.10+ (3.11 / 3.12 khuyến nghị). pip có sẵn. Khuyến nghị dùng virtualenv hoặc uv để cô lập dependency.',
+        code: 'python --version\npip --version',
+        codeLabel: 'Kiểm tra'
+      },
+      {
+        title: 'Clone repo và cài dependencies',
+        detail: 'Khác với cài Cursor IDE: lần này bạn clone repo để lấy Python package ở source. Sau đó cài requirements. Tất cả subcommands CLI dùng được ngay.',
+        code: 'git clone https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR.git\ncd CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR\npip install -r cursor_framework/requirements.txt',
+        codeLabel: 'Terminal',
+        tip: 'Repo đặt ở đâu cũng được — không bắt buộc phải là C:\\.cursor. Đây là tool cho dev, không phải rules cho IDE.'
+      },
+      {
+        title: 'Cài đặt package ở chế độ editable',
+        detail: 'Editable mode (-e) giúp bạn sửa source code trong cursor_framework/ mà không cần reinstall. Phù hợp khi bạn muốn customize framework.',
+        code: 'pip install -e ./cursor_framework',
+        codeLabel: 'Terminal'
+      },
+      {
+        title: 'Verify CLI hoạt động',
+        detail: 'Sau khi cài, lệnh cursor-framework và python -m cursor_framework đều khả dụng. Version phải khớp với __version__ trong package.',
+        code: 'cursor-framework --version\n# hoặc\npython -m cursor_framework --version\n# Cursor Enterprise Framework 1.3.0',
+        codeLabel: 'Verify'
+      },
+      {
+        title: 'Khởi động Dashboard',
+        detail: 'Chạy serve trong thư mục repo vừa clone. Server stdlib không cần thư viện ngoài. Mở trình duyệt theo URL in trên terminal.',
+        code: 'python -m cursor_framework serve --root .cursor --port 8765',
+        codeLabel: 'CLI',
+        tip: 'Mặc định bind 127.0.0.1 (localhost). Đổi sang --host 0.0.0.0 để truy cập từ máy khác. Production: đặt --auth-token để bảo vệ /api/*.'
+      },
+      {
+        title: 'Thử một số lệnh CLI',
+        detail: 'cursor_framework CLI có 11 subcommands. Phổ biến nhất: warm (preload cache), stats (xem số liệu), scan (INDEX khô), ask (one-shot Workflow).',
+        code: 'python -m cursor_framework --help\npython -m cursor_framework stats\npython -m cursor_framework ask "summarize the framework"',
+        codeLabel: 'Khám phá'
+      },
+      {
+        title: 'Restart Cursor IDE để reload rules',
+        detail: 'Package Python là dev tool riêng. Nó KHÔNG tự động cài rules .cursor/ vào Cursor IDE. Nếu bạn muốn dùng rules trong IDE, làm theo 1 trong 3 cách ở tab đầu (GUI / PowerShell / manual).'
+      }
+    ],
+    verify: [
+      { ok: true, label: 'cursor-framework --version in đúng số version', hint: 'Hiện tại là 1.3.0' },
+      { ok: true, label: 'python -m cursor_framework --help liệt kê 11 subcommands', hint: 'serve, ask, warm, stats, scan, index, graph, clear-cache, serve-graph, tdam' },
+      { ok: true, label: 'python -m cursor_framework serve mở được dashboard', hint: 'Truy cập http://127.0.0.1:8765' },
+      { ok: true, label: 'python -m cursor_framework stats in JSON số liệu', hint: 'Phải có keys: assets, memory, cache' }
+    ],
+    troubleshooting: [
+      {
+        problem: 'ModuleNotFoundError: No module named \'cursor_framework\'',
+        solution: 'Bạn quên bước pip install -e ./cursor_framework. Hoặc venv đang không active. Kiểm tra: which python và which pip phải cùng venv.'
+      },
+      {
+        problem: 'pydantic VersionConflict hoặc ImportError pydantic',
+        solution: 'Cài đúng phiên bản: pip install "pydantic>=2.0.0". Pydantic v1 và v2 không tương thích — framework yêu cầu v2.'
+      },
+      {
+        problem: 'Lỗi "Permission denied" khi pip install trên Linux/macOS',
+        solution: 'KHÔNG dùng sudo pip. Dùng venv: python -m venv .venv && source .venv/bin/activate rồi pip install như bình thường.'
+      },
+      {
+        problem: 'Serve báo "Address already in use"',
+        solution: 'Port 8765 đã bị chiếm. Đổi: --port 8766. Hoặc tìm process: netstat -ano | findstr 8765 (Windows), lsof -i :8765 (macOS/Linux).'
+      },
+      {
+        problem: 'tdam subcommand báo "rich not installed"',
+        solution: 'TDAM là tùy chọn. Cài thêm: pip install rich. Hoặc bỏ qua nếu không dùng TencentDB Agent Memory.'
+      },
+      {
+        problem: 'Sau khi sửa source code, CLI vẫn chạy code cũ',
+        solution: 'Editable mode tự reload khi import. Nếu không: pip install -e ./cursor_framework --force-reinstall --no-deps.'
       }
     ]
   },
@@ -375,8 +462,8 @@ async function handleCopy(code: string, key: string) {
             <span class="ins-title-accent">Ba cách, tùy bạn chọn.</span>
           </h1>
           <p class="ins-subtitle">
-            Hướng dẫn đầy đủ cho cả người mới và dev có kinh nghiệm. Mỗi bước đều có screenshot mô tả,
-            lệnh copy được, và mục kiểm tra xác minh. Không cần dò code cũng làm được.
+            Hướng dẫn đầy đủ cho cả người mới và dev có kinh nghiệm.     Mỗi bước đều có screenshot mô tả,
+    lệnh copy được, và mục kiểm tra xác minh. Không cần dò code cũng làm được.
           </p>
 
           <div class="ins-quickstats">
@@ -384,10 +471,10 @@ async function handleCopy(code: string, key: string) {
               <div class="ins-quickstat-value">3 phút</div>
               <div class="ins-quickstat-label">Thời gian trung bình</div>
             </div>
-            <div class="ins-quickstat">
-              <div class="ins-quickstat-value">3</div>
-              <div class="ins-quickstat-label">Cách cài đặt</div>
-            </div>
+          <div class="ins-quickstat">
+            <div class="ins-quickstat-value">4</div>
+            <div class="ins-quickstat-label">Cách cài đặt</div>
+          </div>
             <div class="ins-quickstat">
               <div class="ins-quickstat-value">3 OS</div>
               <div class="ins-quickstat-label">Win / macOS / Linux</div>
@@ -472,6 +559,25 @@ async function handleCopy(code: string, key: string) {
                     trên Windows, <code>~/.cursor/</code> trên macOS/Linux). Nó áp dụng cho tất cả
                     project bạn mở trong Cursor, nhưng project-level <code>.cursor/</code> (nếu có)
                     sẽ được ưu tiên hơn.
+                  </p>
+                </div>
+              </div>
+
+              <div class="ins-callout ins-callout-dev">
+                <div class="ins-callout-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <polyline points="16 18 22 12 16 6" />
+                    <polyline points="8 6 2 12 8 18" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="ins-callout-title">Bạn là dev Python? Bạn cần thêm bước này.</div>
+                  <p class="ins-callout-text">
+                    Framework có 2 phần: <strong>rules/skills</strong> (file văn bản, đọc bằng Cursor)
+                    và <strong>Python package <code>cursor_framework</code></strong> (CLI &
+                    dashboard cho dev muốn build / scan / index). 3 cách cài bên dưới (GUI / PowerShell
+                    / manual) chỉ cài phần rules. Để cài thêm Python package, chuyển sang tab
+                    <strong>Python package (cursor_framework)</strong> ở mục 02.
                   </p>
                 </div>
               </div>
@@ -1114,10 +1220,20 @@ async function handleCopy(code: string, key: string) {
   margin: 0;
 }
 
+.ins-callout-dev {
+  margin-top: 12px;
+  background: rgba(251, 191, 36, 0.04);
+  border-color: rgba(251, 191, 36, 0.22);
+}
+
+.ins-callout-dev .ins-callout-icon {
+  color: var(--color-warning);
+}
+
 /* ─── METHOD GRID ────────────────────────────────────────────────────── */
 .ins-method-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
 }
 
