@@ -46,11 +46,15 @@ cursor_framework/*.egg-info/
 cursor_framework/review/
 cursor_framework/tests/
 cursor_framework/utils/__pycache__/
+**/__pycache__/
+*.pyc
+*.egg-info/
 cursor_framework_web/dist/
 cursor_framework_web/node_modules/
 cursor_framework_web/scripts/
 cursor_framework_web/public/templates/
 cursor_framework_web/*.tsbuildinfo
+*.tsbuildinfo
 
 # --- .NET build artifacts ---
 cursor-setup-gui/bin/
