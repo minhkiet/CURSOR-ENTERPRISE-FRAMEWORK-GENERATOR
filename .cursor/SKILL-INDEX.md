@@ -1,7 +1,13 @@
 # Cursor Enterprise Framework - Skill Index
 
-> **Phiên bản:** 3.0.0 | **Cập nhật:** 2026-08-03
-> **Total Skills:** 50+ | **Rules:** 43 | **Agents:** 18 | **Commands:** 28
+> **Phiên bản:** 3.1.0 | **Cập nhật:** 2026-08-07
+> **Total Skills:** 92+ | **Rules:** 43 | **Agents:** 18 | **Commands:** 29
+>
+> **Mới (2026-08-07):** Framework bridge `.cursor/skills/bazi/` wraps
+> [guojiahh/bazi-analysis-skill](https://github.com/guojiahh/bazi-analysis-skill) — deterministic
+> Python calculator (`tools/bazi-plugin/scripts/calculate_bazi.py`, vendored
+> `lunar_python 1.4.8`) + 9 references + 5 regression tests. Đồng hành với
+> prompt-time fallback `.cursor/skills/special_bazi/`. Slash command `/bazi`.
 
 ---
 
@@ -9,10 +15,10 @@
 
 ```
 .cursor/
-├── skills/           # 50+ skills (tự động gọi theo context)
+├── skills/           # 92+ skills (tự động gọi theo context)
 ├── rules/            # 43 rules (luật theo domain)
 ├── agents/           # 18 agent personas (chuyên gia)
-├── commands/          # 28 slash commands (workflows)
+├── commands/          # 29+ slash commands (workflows)
 ├── hooks/            # 15 hooks (CI/CD, git, dev)
 ├── knowledge/         # 329 knowledge bases (theo ngôn ngữ/framework)
 ├── workflows/         # 11 workflows (standard processes)
@@ -217,8 +223,9 @@
 | Skill | Path | Description |
 |-------|------|-------------|
 | `security-review` | `skills/security-review/` | OWASP Top 10, ASI Top 10, supply chain |
-| `security-auditor` | `agents/security-auditor.md` | Threat modeling, auth, secrets |
+| `sec_security-review` | `skills/sec_security-review/` | Active framework security review (OWASP, payment, AD) |
 | `vietnam-payment-review` | `skills/vietnam-payment-review/` | MoMo, SePay, PayOS, ZaloPay |
+| `hackingtool` | `skills/sec_hackingtool/` | **Pentest/OSINT bridge** — 183 tools (nmap, nuclei, sherlock, subfinder, maigret, sqlmap, impacket, …) via `tools/hackingtool-plugin/`. Use `/pentest` slash command. Active scan cần authorization. |
 
 ### 6.2 Security Rules
 
@@ -397,6 +404,38 @@
 | `web-scraper` | Content extraction |
 | `marketing-strategist` | Positioning, SEO, lifecycle |
 | `doc-writer` | API docs, READMEs, ADRs |
+
+---
+
+## NHÓM 10: KNOWLEDGE — TRADITIONAL SYSTEMS
+
+### 10.1 Chinese Metaphysics (Bazi / Four Pillars)
+
+| Skill | Path | Description |
+|-------|------|-------------|
+| `bazi` (bridge) | `skills/bazi/` | **Framework bridge** wrapping `guojiahh/bazi-analysis-skill`. Deterministic Python calculator (pinned `lunar_python 1.4.8`, vendored offline) for tứ trụ, 大运, 流年. 9 references for evidence-first reasoning. Use `/bazi` slash command. |
+| `bazi` (prompt-time) | `skills/special_bazi/` | **Prompt-time fallback** with lightweight references (五鼠遁元、调候用神). Use when runtime cannot run Python or for quick general reading. |
+| `bazi` (registry) | `rules/rule_skill-registry.mdc` §"bazi" | Single source of truth, two parallel skills, choose by ask. |
+
+**Sources:**
+- Upstream: [guojiahh/bazi-analysis-skill](https://github.com/guojiahh/bazi-analysis-skill) (MIT, vendored at `tools/bazi-plugin/`)
+- Original prompt-time: [bazi-skill](https://github.com/jinchenma94/bazi-skill) (2k stars, MIT)
+
+**How they differ:**
+
+| | bridge (`bazi/`) | prompt-time (`special_bazi/`) |
+|---|---|---|
+| Chart calculation | `lunar_python 1.4.8` (offline) | Manual table lookup + LLM |
+| Day pillar / 节气交月 | **Deterministic** | Error-prone |
+| Tests | 5 regression tests | None |
+| Output | JSON with full provenance | Free-form text |
+| Reference loading | On-demand (3-5 files / analysis) | Often read at once |
+| Best for | Real consultations, MCQ benchmarks | Quick read, no Python runtime |
+
+**Run preflight before any analysis:**
+```bash
+python tools/bazi-plugin/scripts/bazi_status.py
+```
 
 ---
 

@@ -1,30 +1,34 @@
 # Cursor Enterprise Framework - Auto Index
 
-> Auto-generated: 2026-07-16T02:02:30
+> Auto-generated: 2026-08-07T17:47:49 (updated bazi integration 2026-08-07)
 > Root: `D:\PROJECTS\CURSORS\CURSOR ENTERPRISE FRAMEWORK GENERATOR\.cursor`
+>
+> **Bazi integration (2026-08-07):** +1 skill (`.cursor/skills/bazi/`), +1 command (`.cursor/commands/bazi.md`), +1 vendored tool (`.cursor/../tools/bazi-plugin/`), updated 1 rule entry (`rule_skill-registry.mdc` §bazi).
 
 ## Totals
 
 | Category | Count |
 |----------|-------|
-| agents | 18 |
-| commands | 28 |
+| agents | 20 |
+| commands | 30 |
 | hooks | 15 |
 | knowledge | 329 |
 | memory | 14 |
 | prompts | 31 |
 | references | 4 |
 | rules | 43 |
-| scripts | 34 |
-| skills | 50 |
+| scripts | 41 |
+| skills | 93 |
 | templates | 6 |
 | workflows | 11 |
-| **grand_total** | **583** |
+| **grand_total** | **637** |
 
-## Agents (18)
+## Agents (20)
 
 | Name | Path | Description |
 |------|------|-------------|
+| `agent_api-security.md` | `agents\agent_api-security.md` | API Security Auditor - Comprehensive security review for REST, GraphQL, and WebSocket APIs. Covers authentication, autho |
+| `agent_ui-design.md` | `agents\agent_ui-design.md` | UI/Design Specialist Agent - Creates visually stunning, professional interfaces with anti-slop design principles. Focuse |
 | `api-designer.md` | `agents\api-designer.md` | API Designer for REST/GraphQL contracts, versioning, error models, and OpenAPI. Use for designing new APIs, reviewing co |
 | `backend-reviewer.md` | `agents\backend-reviewer.md` | Backend specialist for NestJS, Laravel, ASP.NET Core. Reviews API design, business logic, error handling, transactions,  |
 | `code-reviewer.md` | `agents\code-reviewer.md` | Senior Staff Engineer reviewing code changes with rigorous five-axis standards. Use proactively after any non-trivial co |
@@ -44,13 +48,14 @@
 | `web-performance-auditor.md` | `agents\web-performance-auditor.md` | Web Performance Engineer for Core Web Vitals, bundle analysis, and rendering performance. Use for any frontend perf audi |
 | `web-scraper.md` | `agents\web-scraper.md` | Extracts structured content from websites using Playwright. Targets SDK/API/UI/test/qc documentation, articles, tables,  |
 
-## Commands (28)
+## Commands (29)
 
 | Name | Path | Description |
 |------|------|-------------|
 | `command.md` | `commands\adr\command.md` | ADR - Tạo Architecture Decision Record |
 | `command.md` | `commands\audit\command.md` | Audit - Security, Performance, Architecture, Database audit |
 | `command.md` | `commands\bazi\command.md` | Bazi - Tính Bát Tự (Four Pillars of Destiny) |
+| `bazi.md` | `commands\bazi.md` | **Bazi / 四柱** — tính tứ trụ deterministic bằng calculator vendored, đọc references theo câu hỏi, trả lời có trích dẫn và phản chứng (framework bridge cho guojiahh/bazi-analysis-skill) |
 | `command.md` | `commands\build\command.md` | Build Feature - Xây dựng feature mới từ requirement đến implementation |
 | `command.md` | `commands\clone\command.md` |  |
 | `command.md` | `commands\deploy\command.md` | Deploy - Deployment workflow từ build đến production |
@@ -64,6 +69,7 @@
 | `command.md` | `commands\numerology\command.md` | Numerology - Thần Số Học (Numerology) |
 | `command.md` | `commands\ocr\command.md` |  |
 | `command.md` | `commands\payment\command.md` | Payment - Review payment integration Việt Nam (MoMo, SePay, PayOS, ZaloPay, VNPay, VietQR) |
+| `pentest.md` | `commands\pentest.md` | Pentest / OSINT — run real tools via AKCodez/hackingtool-plugin (nmap, nuclei, subfinder, sherlock, maigret, sqlmap, imp |
 | `command.md` | `commands\perf\command.md` | Perf - Performance audit và optimization |
 | `command.md` | `commands\rag\command.md` | RAG - Xây dựng RAG system với embedding và retrieval |
 | `README.md` | `commands\README.md` |  |
@@ -499,51 +505,51 @@
 
 | Name | Path | Description |
 |------|------|-------------|
-| `ai-knowledge.mdc` | `rules\ai-knowledge.mdc` | AI Knowledge Stack - hợp nhất từ RAG, Vector Search, WeKnora, pgvector và PDF Engine cho document processing |
-| `api-patterns.mdc` | `rules\api-patterns.mdc` | API Patterns - hợp nhất từ GraphQL, API Gateway, Service Mesh, REST API trong Cursor Enterprise Framework |
-| `architecture-patterns.mdc` | `rules\architecture-patterns.mdc` | Architecture Patterns - hợp nhất từ Clean Architecture, Hexagonal Architecture (Ports & Adapters), CQRS Pattern, Event S |
-| `auth.mdc` | `rules\auth.mdc` | Authentication & Authorization - hợp nhất từ authentication.mdc và authorization.mdc |
-| `backend-frameworks.mdc` | `rules\backend-frameworks.mdc` | Backend Frameworks - hợp nhất từ NestJS, Laravel, ASP.NET Core trong Cursor Enterprise Framework |
-| `billing.mdc` | `rules\billing.mdc` | Nguyên tắc và best practices cho Billing Implementation trong Cursor Enterprise Framework |
-| `chatbot-development.mdc` | `rules\chatbot-development.mdc` | ChatbotX Development Patterns - Omnichannel Chatbot Marketing Platform. Tích hợp feature scaffold, Drizzle ORM, BullMQ w |
-| `cloud-infra.mdc` | `rules\cloud-infra.mdc` | Cloud Infrastructure Architecture - hợp nhất từ Cloud Architecture và Infrastructure Architecture |
-| `cloud-providers.mdc` | `rules\cloud-providers.mdc` | Cloud Providers - hợp nhất từ AWS, Azure, GCP trong Cursor Enterprise Framework |
-| `cloudflare.mdc` | `rules\cloudflare.mdc` | Cloudflare & CDN - hợp nhất từ cloudflare.mdc và cdn.mdc. Nguyên tắc và best practices cho Cloudflare edge platform và C |
-| `coding-standards.mdc` | `rules\coding-standards.mdc` | Tiêu chuẩn viết code thống nhất cho Cursor Enterprise Framework |
-| `container-orchestration.mdc` | `rules\container-orchestration.mdc` | Container Orchestration - hợp nhất từ Docker và Kubernetes trong Cursor Enterprise Framework |
-| `context-router.mdc` | `rules\context-router.mdc` | Nguyên tắc Context Router - định tuyến context thông minh đến handlers phù hợp |
 | `core.mdc` | `rules\core.mdc` |  |
-| `cost-optimization.mdc` | `rules\cost-optimization.mdc` | Cost & Token Optimization - hợp nhất từ cost-optimization.mdc và token-optimization.mdc |
-| `crm-saas.mdc` | `rules\crm-saas.mdc` | Nguyên tắc và best practices cho CRM SaaS Implementation trong Cursor Enterprise Framework |
 | `databases.mdc` | `rules\databases.mdc` | Databases - hợp nhất từ Database Overview, PostgreSQL, MySQL, SQL Server, bao gồm Row Level Security |
-| `deployment.mdc` | `rules\deployment.mdc` | Deployment & CI/CD - hợp nhất từ deployment.mdc và ci-cd.mdc |
-| `enterprise-patterns.mdc` | `rules\enterprise-patterns.mdc` | Enterprise Architecture Patterns - hợp nhất từ Monolith, Microservices, Core Architecture, Enterprise Architecture |
-| `frontend-frameworks.mdc` | `rules\frontend-frameworks.mdc` | Frontend Frameworks - hợp nhất từ Next.js, Nuxt.js, Vue.js, Frontend Architecture trong Cursor Enterprise Framework |
-| `intent-detection.mdc` | `rules\intent-detection.mdc` | Intent Detection, Skill Auto-Discovery, and Clarification Flow - xác định intent, tự động phát hiện skills/rules, và cla |
-| `karpathy-guidelines.mdc` | `rules\karpathy-guidelines.mdc` | Karpathy Behavioral Guidelines - Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution. Auto-ap |
+| `karpathy-guidelines.mdc` | `rules\karpathy-guidelines.mdc` |  |
 | `llm-providers.mdc` | `rules\llm-providers.mdc` | LLM Providers - hợp nhất từ OpenAI, Gemini, Claude trong Cursor Enterprise Framework |
-| `memory-first.mdc` | `rules\memory-first.mdc` | Nguyên tắc Memory First - ưu tiên context từ memory trước mọi truy vấn |
-| `multi-language-processing.mdc` | `rules\multi-language-processing.mdc` | Multi-Language Processing - Translation Layer cho Vietnamese, Chinese, Japanese, Korean, Arabic. Chuyển đổi request từ a |
-| `multi-language-vibe-code.mdc` | `rules\multi-language-vibe-code.mdc` | Multi-Language Request Processing - Redirect to new modular files |
-| `multi-tenant.mdc` | `rules\multi-tenant.mdc` | Nguyên tắc và best practices cho Multi-Tenant Architecture trong Cursor Enterprise Framework |
-| `observability.mdc` | `rules\observability.mdc` | Observability - hợp nhất từ observability, monitoring, logging. Bao gồm metrics, logs, traces, health checks, alerting,  |
-| `operations.mdc` | `rules\operations.mdc` | Operations - hợp nhất từ Alerting và Incident Response trong Cursor Enterprise Framework |
-| `performance.mdc` | `rules\performance.mdc` | Performance & Rate Limiting - hợp nhất từ performance.mdc và rate-limiting.mdc |
-| `redis.mdc` | `rules\redis.mdc` | Redis Cache & Caching Strategy - hợp nhất từ redis.mdc và caching-strategy.mdc |
+| `meta_ai-knowledge.mdc` | `rules\meta_ai-knowledge.mdc` | AI Knowledge Stack - hợp nhất từ RAG, Vector Search, WeKnora, pgvector và PDF Engine cho document processing |
+| `meta_auth.mdc` | `rules\meta_auth.mdc` | Authentication & Authorization - hợp nhất từ authentication.mdc và authorization.mdc |
+| `meta_billing.mdc` | `rules\meta_billing.mdc` | Nguyên tắc và best practices cho Billing Implementation trong Cursor Enterprise Framework |
+| `meta_chatbot-development.mdc` | `rules\meta_chatbot-development.mdc` |  |
+| `meta_cloud-infra.mdc` | `rules\meta_cloud-infra.mdc` | Cloud Infrastructure Architecture - hợp nhất từ Cloud Architecture và Infrastructure Architecture |
+| `meta_cloud-providers.mdc` | `rules\meta_cloud-providers.mdc` | Cloud Providers - hợp nhất từ AWS, Azure, GCP trong Cursor Enterprise Framework |
+| `meta_cloudflare.mdc` | `rules\meta_cloudflare.mdc` | Cloudflare & CDN - hợp nhất từ cloudflare.mdc và cdn.mdc. Nguyên tắc và best practices cho Cloudflare edge platform và C |
+| `meta_coding-standards.mdc` | `rules\meta_coding-standards.mdc` | Tiêu chuẩn viết code thống nhất cho Cursor Enterprise Framework |
+| `meta_container-orchestration.mdc` | `rules\meta_container-orchestration.mdc` | Container Orchestration - hợp nhất từ Docker và Kubernetes trong Cursor Enterprise Framework |
+| `meta_cost-optimization.mdc` | `rules\meta_cost-optimization.mdc` |  |
+| `meta_crm-saas.mdc` | `rules\meta_crm-saas.mdc` | Nguyên tắc và best practices cho CRM SaaS Implementation trong Cursor Enterprise Framework |
+| `meta_deployment.mdc` | `rules\meta_deployment.mdc` | Deployment & CI/CD - hợp nhất từ deployment.mdc và ci-cd.mdc |
+| `meta_multi-tenant.mdc` | `rules\meta_multi-tenant.mdc` | Nguyên tắc và best practices cho Multi-Tenant Architecture trong Cursor Enterprise Framework |
+| `meta_observability.mdc` | `rules\meta_observability.mdc` | Observability - hợp nhất từ observability, monitoring, logging. Bao gồm metrics, logs, traces, health checks, alerting,  |
+| `meta_operations.mdc` | `rules\meta_operations.mdc` | Operations - hợp nhất từ Alerting và Incident Response trong Cursor Enterprise Framework |
+| `meta_performance.mdc` | `rules\meta_performance.mdc` | Performance & Rate Limiting - hợp nhất từ performance.mdc và rate-limiting.mdc |
+| `meta_redis.mdc` | `rules\meta_redis.mdc` | Redis Cache & Caching Strategy - hợp nhất từ redis.mdc và caching-strategy.mdc |
+| `meta_security.mdc` | `rules\meta_security.mdc` | Security - hợp nhất từ security.mdc, web-security.mdc, secrets-management.mdc. Nguyên tắc và best practices cho bảo mật  |
+| `meta_serverless.mdc` | `rules\meta_serverless.mdc` | Serverless & IaC - hợp nhất từ serverless.mdc và infrastructure-as-code.mdc |
+| `meta_testing.mdc` | `rules\meta_testing.mdc` | Testing Best Practices - bao gồm unit test, integration test, E2E, và TDD |
+| `meta_version-control.mdc` | `rules\meta_version-control.mdc` | Version Control - bao gồm Git, GitHub, Git workflow |
+| `meta_vibe-code-protocol.mdc` | `rules\meta_vibe-code-protocol.mdc` |  |
+| `meta_workflow-engines.mdc` | `rules\meta_workflow-engines.mdc` | Workflow Engines - hợp nhất từ n8n, Trigger.dev, Temporal |
+| `proto_context-router.mdc` | `rules\proto_context-router.mdc` |  |
+| `proto_memory-first.mdc` | `rules\proto_memory-first.mdc` |  |
+| `proto_multi-language-processing.mdc` | `rules\proto_multi-language-processing.mdc` |  |
+| `proto_multi-language-vibe-code.mdc` | `rules\proto_multi-language-vibe-code.mdc` |  |
+| `ref_api-patterns.mdc` | `rules\ref_api-patterns.mdc` | API Patterns - hợp nhất từ GraphQL, API Gateway, Service Mesh, REST API trong Cursor Enterprise Framework |
+| `ref_architecture-patterns.mdc` | `rules\ref_architecture-patterns.mdc` | Architecture Patterns - hợp nhất từ Clean Architecture, Hexagonal Architecture (Ports & Adapters), CQRS Pattern, Event S |
+| `ref_backend-frameworks.mdc` | `rules\ref_backend-frameworks.mdc` | Backend Frameworks - hợp nhất từ NestJS, Laravel, ASP.NET Core trong Cursor Enterprise Framework |
+| `ref_enterprise-patterns.mdc` | `rules\ref_enterprise-patterns.mdc` |  |
+| `ref_frontend-frameworks.mdc` | `rules\ref_frontend-frameworks.mdc` |  |
+| `rule_intent-detection.mdc` | `rules\rule_intent-detection.mdc` |  |
+| `rule_skill-integration.mdc` | `rules\rule_skill-integration.mdc` |  |
+| `rule_skill-registry.mdc` | `rules\rule_skill-registry.mdc` |  |
+| `rule_task-analyzer.mdc` | `rules\rule_task-analyzer.mdc` |  |
 | `RULES-OPTIMIZATION-REPORT.md` | `rules\RULES-OPTIMIZATION-REPORT.md` |  |
-| `security.mdc` | `rules\security.mdc` | Security - hợp nhất từ security.mdc, web-security.mdc, secrets-management.mdc. Nguyên tắc và best practices cho bảo mật  |
-| `serverless.mdc` | `rules\serverless.mdc` | Serverless & IaC - hợp nhất từ serverless.mdc và infrastructure-as-code.mdc |
-| `skill-integration.mdc` | `rules\skill-integration.mdc` | Hướng dẫn skill auto-discovery và execution cho Cursor Enterprise Framework. Định tuyến tự động đến skills phù hợp với p |
-| `skill-registry.mdc` | `rules\skill-registry.mdc` | Single Source of Truth cho tất cả skill definitions, triggers, confidence thresholds, và gate mappings. Được sử dụng bởi |
 | `supabase.mdc` | `rules\supabase.mdc` | Nguyên tắc và best practices cho Supabase trong Cursor Enterprise Framework |
-| `task-analyzer.mdc` | `rules\task-analyzer.mdc` | Task Analyzer & Synchronized Context System - Phân tích yêu cầu, tự động phát hiện rules/skills, sinh task manifest với  |
-| `testing.mdc` | `rules\testing.mdc` | Testing Best Practices - bao gồm unit test, integration test, E2E, và TDD |
-| `ui-visual-design.mdc` | `rules\ui-visual-design.mdc` | Nguyên tắc và best practices cho UI/Visual Design trong Cursor Enterprise Framework - hướng dẫn tạo giao diện đẹp mắt, c |
-| `version-control.mdc` | `rules\version-control.mdc` | Version Control - bao gồm Git, GitHub, Git workflow |
-| `vibe-code-protocol.mdc` | `rules\vibe-code-protocol.mdc` | Vibe Code Execution Protocol, Pre/Post Execution Validation, Auth & Payment Handling - workflow execution với pre-review |
-| `workflow-engines.mdc` | `rules\workflow-engines.mdc` | Workflow Engines - hợp nhất từ n8n, Trigger.dev, Temporal |
+| `ui-visual-design.mdc` | `rules\ui-visual-design.mdc` |  |
 
-## Scripts (34)
+## Scripts (41)
 
 | Name | Path | Description |
 |------|------|-------------|
@@ -562,14 +568,17 @@
 | `warn-cursor-setup.txt` | `scripts\build\cursor-setup\warn-cursor-setup.txt` |  |
 | `xref-cursor-setup.html` | `scripts\build\cursor-setup\xref-cursor-setup.html` |  |
 | `command-registry.ps1` | `scripts\command-registry.ps1` |  |
+| `create-compatibility-layer.ps1` | `scripts\create-compatibility-layer.ps1` |  |
 | `cursor-setup.spec` | `scripts\cursor-setup.spec` |  |
 | `cursor-setup.exe` | `scripts\dist\cursor-setup.exe` |  |
 | `build-embeddings.ps1` | `scripts\embedding-builder\build-embeddings.ps1` |  |
 | `compile-knowledge.ps1` | `scripts\knowledge-compiler\compile-knowledge.ps1` |  |
+| `Master-Rename-Orchestrator.ps1` | `scripts\Master-Rename-Orchestrator.ps1` |  |
 | `build-memory.ps1` | `scripts\memory-builder\build-memory.ps1` |  |
 | `ocr_tool.py` | `scripts\ocr_tool.py` |  |
 | `packager.ps1` | `scripts\packager.ps1` |  |
 | `build-index.ps1` | `scripts\project-index-builder\build-index.ps1` |  |
+| `rename-skills-rules.ps1` | `scripts\rename-skills-rules.ps1` |  |
 | `setup-local-config.json` | `scripts\setup-local-config.json` |  |
 | `setup-local.md` | `scripts\setup-local.md` |  |
 | `setup-local.ps1` | `scripts\setup-local.ps1` |  |
@@ -577,25 +586,47 @@
 | `setup_local_installer.py` | `scripts\setup_local_installer.py` |  |
 | `skill-dependencies.json` | `scripts\skill-dependencies.json` |  |
 | `skill-installer.py` | `scripts\skill-installer.py` |  |
+| `sync-2026.ps1` | `scripts\sync-2026.ps1` |  |
+| `sync-repos.ps1` | `scripts\sync-repos.ps1` |  |
 | `task-analyzer.md` | `scripts\task-analyzer.md` |  |
 | `task-analyzer.ps1` | `scripts\task-analyzer.ps1` |  |
+| `update-references.ps1` | `scripts\update-references.ps1` |  |
+| `update-skill-registry.py` | `scripts\update-skill-registry.py` |  |
 | `setup-mcp.ps1` | `scripts\weknora\setup-mcp.ps1` |  |
 | `setup-mcp.sh` | `scripts\weknora\setup-mcp.sh` |  |
 
-## Skills (50)
+## Skills (92)
 
 | Name | Path | Description |
 |------|------|-------------|
-| `adbc` | `skills\adbc` | >- |
+| `adbc` | `skills\adbc` |  |
+| `ai_pixelrag` | `skills\ai_pixelrag` | PixelRAG skill cho Visual Retrieval-Augmented Generation - đọc tài liệu bằng hình ảnh (PDF, website, bảng biểu, sơ đồ).  |
+| `ai_video-generation` | `skills\ai_video-generation` |  |
+| `ai_weknora-agent` | `skills\ai_weknora-agent` | WeKnora Agent Skill - ReAct autonomous reasoning agent với multi-step planning, tool calling, web search, và MCP tools i |
+| `ai_weknora-kb` | `skills\ai_weknora-kb` | WeKnora Knowledge Base Skill - RAG implementation, document Q&A, FAQ system, enterprise wiki, hybrid search với Vector + |
 | `aoti-debug` | `skills\aoti-debug` | >- |
 | `artifacts-builder` | `skills\artifacts-builder` | >- |
 | `aws-cognito-admin` | `skills\aws-cognito-admin` | >- |
-| `bazi` | `skills\bazi` | > |
-| `canvas-design` | `skills\canvas-design` | >- |
-| `create-pull-request` | `skills\create-pull-request` | >- |
-| `csv-wrangling` | `skills\csv-wrangling` | >- |
+| `bazi` | `skills\bazi` | **Framework bridge** wrapping guojiahh/bazi-analysis-skill — deterministic Python calculator (lunar_python 1.4.8 vendored) + 9 references + 5 tests. Evidence-first tứ trụ / 大运 / 流年 analysis. Use `/bazi`. |
+| `canvas-design` | `skills\canvas-design` |  |
+| `code_full-output` | `skills\code_full-output` |  |
+| `code_karpathy` | `skills\code_karpathy` | Karpathy Coding - Think Before Code. Minimal overlay skill cho mọi task. 5 phút review trước/sau code. |
+| `code_ponytail` | `skills\code_ponytail` | Ponytail - Lazy Senior Dev. Minimum code, maximum effect. YAGNI optimization overlay. |
+| `code_vibe-coding` | `skills\code_vibe-coding` | Vibe Coding - Unified overlay skill kết hợp Think First (karpathy) + Minimize Code (ponytail). Luôn chạy với mọi task. |
+| `create-pull-request` | `skills\create-pull-request` |  |
+| `csv-wrangling` | `skills\csv-wrangling` |  |
+| `dashboard-ui` | `skills\dashboard-ui` |  |
 | `data-distributed-storage` | `skills\data-distributed-storage` | >- |
-| `deploy-to-vercel` | `skills\deploy-to-vercel` | >- |
+| `db_adbc` | `skills\db_adbc` | >- |
+| `db_data-quality` | `skills\db_data-quality` | Data quality and database skill covering data validation, integrity, database schema design, migrations, and query optim |
+| `db_mysql` | `skills\db_mysql` | >- |
+| `db_mysql-patterns` | `skills\db_mysql-patterns` | >- |
+| `db_redis-observability` | `skills\db_redis-observability` | >- |
+| `db_sql-server-table-reconciliation` | `skills\db_sql-server-table-reconciliation` | >- |
+| `doc_ai-copywriter` | `skills\doc_ai-copywriter` | Write copy that converts and doesn't sound like a robot. Two jobs in one skill: a reader-first copywriter for clickbait  |
+| `doc_book-to-skill` | `skills\doc_book-to-skill` | Converts books and documents (PDF, EPUB, DOCX, HTML, Markdown, plain text, RTF, MOBI/AZW with Calibre) into structured a |
+| `doc_microsoft-docs` | `skills\doc_microsoft-docs` | >- |
+| `doc_simple-english` | `skills\doc_simple-english` | Transforms complex technical content into clear, accessible Simple English following Wikipedia's Simple English guidelin |
 | `document-ocr` | `skills\document-ocr` |  |
 | `fastapi-martinholovsky` | `skills\fastapi-martinholovsky` | >- |
 | `frontend-redesign` | `skills\frontend-redesign` |  |
@@ -603,38 +634,63 @@
 | `frontend-taste` | `skills\frontend-taste` |  |
 | `full-output` | `skills\full-output` |  |
 | `graphql` | `skills\graphql` | Expert in GraphQL API development with type-safe patterns and optimization |
+| `hallmark` | `skills\hallmark` |  |
 | `image-enhancer` | `skills\image-enhancer` | >- |
+| `infra_deploy-vercel` | `skills\infra_deploy-vercel` | >- |
+| `infra_prefect` | `skills\infra_prefect` | > |
 | `jq-json-processing` | `skills\jq-json-processing` | >- |
-| `karpathy-coding` | `skills\karpathy-coding` | Karpathy Coding Discipline - Think Before Coding, simplicity, surgical changes, goal-driven execution. Mandatory overlay |
+| `karpathy-coding` | `skills\karpathy-coding` |  |
+| `landing-page-pro` | `skills\landing-page-pro` |  |
 | `mcp-builder` | `skills\mcp-builder` | >- |
 | `microsoft-code-reference` | `skills\microsoft-code-reference` | >- |
-| `microsoft-docs` | `skills\microsoft-docs` | >- |
-| `mysql` | `skills\mysql` | >- |
-| `mysql-patterns` | `skills\mysql-patterns` | >- |
+| `mysql` | `skills\mysql` |  |
+| `mysql-patterns` | `skills\mysql-patterns` |  |
 | `open-design` | `skills\open-design` |  |
-| `pixelrag` | `skills\pixelrag` | PixelRAG skill cho Visual Retrieval-Augmented Generation - đọc tài liệu bằng hình ảnh (PDF, website, bảng biểu, sơ đồ).  |
-| `ponytail` | `skills\ponytail` | Ponytail Skill - Lazy Senior Dev Mode for Cursor Enterprise Framework. YAGNI optimization, minimal code. Complementary t |
-| `prefect` | `skills\prefect` | > |
+| `perf_composition-patterns` | `skills\perf_composition-patterns` | >- |
+| `perf_perf-optimization` | `skills\perf_perf-optimization` | Performance optimization skill covering memory optimization, speed enhancement, token reduction, and caching strategies. |
+| `perf_react-best-practices` | `skills\perf_react-best-practices` | >- |
+| `pixelrag` | `skills\pixelrag` |  |
+| `ponytail` | `skills\ponytail` |  |
 | `pytorch-patterns` | `skills\pytorch-patterns` | >- |
-| `redis-observability` | `skills\redis-observability` | >- |
+| `redis-observability` | `skills\redis-observability` |  |
+| `sec_hackingtool` | `skills\sec_hackingtool` | Pentesting and OSINT bridge to AKCodez/hackingtool-plugin (183 tools from Z4nzu/hackingtool). Use when the user asks to  |
+| `sec_security-review` | `skills\sec_security-review` |  |
+| `sec_vietnam-payment-review` | `skills\sec_vietnam-payment-review` |  |
 | `security-review` | `skills\security-review` |  |
 | `senior-data-engineer` | `skills\senior-data-engineer` | >- |
 | `skill-installer` | `skills\skill-installer` |  |
 | `skill-share` | `skills\skill-share` | >- |
-| `sql-server-table-reconciliation` | `skills\sql-server-table-reconciliation` | >- |
+| `special_bazi` | `skills\special_bazi` | > |
+| `special_vietnam-address` | `skills\special_vietnam-address` | Skill chuyên về xử lý địa chỉ Việt Nam - autocomplete, validation, phân tích địa chỉ, tích hợp với vietnamese-provinces- |
 | `tensorflow-data-pipelines` | `skills\tensorflow-data-pipelines` | Create efficient data pipelines with tf.data |
 | `tensorflow-model-deployment` | `skills\tensorflow-model-deployment` | Deploy and serve TensorFlow models |
-| `theme-factory` | `skills\theme-factory` | >- |
-| `vercel-composition-patterns` | `skills\vercel-composition-patterns` | >- |
-| `vercel-react-best-practices` | `skills\vercel-react-best-practices` | >- |
-| `video-generation` | `skills\video-generation` | AI Video Generation Skill - Auto-generate short videos (9:16) from URLs or text using HyperFrames rendering, OmniVoice T |
-| `vietnam-address` | `skills\vietnam-address` | Skill chuyên về xử lý địa chỉ Việt Nam - autocomplete, validation, phân tích địa chỉ, tích hợp với vietnamese-provinces- |
+| `test_test-analysis` | `skills\test_test-analysis` | Comprehensive test analysis skill covering functional, UI, integration, and e2e testing. Ensures code correctness throug |
+| `theme-factory` | `skills\theme-factory` |  |
+| `ui_canvas-design` | `skills\ui_canvas-design` | >- |
+| `ui_dashboard-ui` | `skills\ui_dashboard-ui` | Dashboard & Form UI optimization skill. Professional component design với synchronized icons, consistent images, clear c |
+| `ui_frontend-redesign` | `skills\ui_frontend-redesign` |  |
+| `ui_frontend-review` | `skills\ui_frontend-review` |  |
+| `ui_frontend-taste` | `skills\ui_frontend-taste` |  |
+| `ui_hallmark` | `skills\ui_hallmark` | Design taste skill for anti-slop UI. Based on Nutlope/hallmark (9.3k stars), detects AI slop aesthetics and builds disti |
+| `ui_landing-page-pro` | `skills\ui_landing-page-pro` | Professional Landing Page Skill cho SaaS, Products, E-commerce. Sections: Hero, Features, Products, Pricing, Blog, Conta |
+| `ui_open-design` | `skills\ui_open-design` |  |
+| `ui_theme-factory` | `skills\ui_theme-factory` | >- |
+| `ui_visual-explainer` | `skills\ui_visual-explainer` | Generate self-contained HTML visual explanations for systems, code changes, plans, data, and technical concepts. Use for |
+| `ui_web-design-guidelines` | `skills\ui_web-design-guidelines` | >- |
+| `util_create-pull-request` | `skills\util_create-pull-request` | >- |
+| `util_csv-wrangling` | `skills\util_csv-wrangling` | >- |
+| `util_document-ocr` | `skills\util_document-ocr` |  |
+| `util_skill-installer` | `skills\util_skill-installer` |  |
+| `util_stability` | `skills\util_stability` | Stability and reliability skill covering error handling, resilience patterns, monitoring, and graceful degradation. Ensu |
+| `util_utility-helpers` | `skills\util_utility-helpers` | Utility helpers skill covering common utilities, synchronization tools, code generators, and helper functions. Provides  |
+| `util_webapp-testing` | `skills\util_webapp-testing` | >- |
+| `vibe-coding` | `skills\vibe-coding` |  |
+| `video-generation` | `skills\video-generation` |  |
 | `vietnam-payment-review` | `skills\vietnam-payment-review` |  |
-| `visual-explainer` | `skills\visual-explainer` | Generate self-contained HTML visual explanations for systems, code changes, plans, data, and technical concepts. Use for |
-| `web-design-guidelines` | `skills\web-design-guidelines` | >- |
-| `webapp-testing` | `skills\webapp-testing` | >- |
-| `weknora-agent` | `skills\weknora-agent` | WeKnora Agent Skill - ReAct autonomous reasoning agent với multi-step planning, tool calling, web search, và MCP tools i |
-| `weknora-kb` | `skills\weknora-kb` | WeKnora Knowledge Base Skill - RAG implementation, document Q&A, FAQ system, enterprise wiki, hybrid search với Vector + |
+| `visual-explainer` | `skills\visual-explainer` |  |
+| `webapp-testing` | `skills\webapp-testing` |  |
+| `weknora-agent` | `skills\weknora-agent` |  |
+| `weknora-kb` | `skills\weknora-kb` |  |
 | `youtube-downloader` | `skills\youtube-downloader` | >- |
 
 ## Templates (6)
