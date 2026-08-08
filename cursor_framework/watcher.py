@@ -49,6 +49,7 @@ class Watcher:
         self._stop_event = threading.Event()
         self._thread: threading.Thread | None = None
         self._changes_detected = 0
+        self._changes_failed = 0
         self._scans_run = 0
 
     def _walk(self) -> dict[str, float]:
@@ -99,9 +100,12 @@ class Watcher:
             self._changes_detected += len(changed)
             try:
                 self.on_change(changed)
-            except Exception:
-                # ponytail: never let a callback crash the watcher loop.
-                pass
+            except Exception as e:
+                # ponytail: never let a callback crash the watcher loop,
+                # but DO log + count so silent failures are debuggable.
+                self._changes_failed += 1
+                import logging
+                logging.warning("Watcher on_change callback failed: %s", e)
             return changed
         return None
 
@@ -135,5 +139,6 @@ class Watcher:
         return {
             "scans_run": self._scans_run,
             "changes_detected": self._changes_detected,
+            "changes_failed": self._changes_failed,
             "tracked_files": len(self._snapshot),
         }

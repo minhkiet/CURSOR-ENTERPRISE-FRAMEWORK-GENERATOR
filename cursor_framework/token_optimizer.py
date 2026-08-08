@@ -389,7 +389,7 @@ class TokenOptimizer:
                 content_lines.append(segment.content)
                 current_tokens += segment.tokens
 
-        return f"{summary_segment}\n\n{''.join(content_lines)}"
+        return f"{summary_segment}\n\n{'\n'.join(content_lines)}"
 
     def _create_segments(self, lines: list[str]) -> list[TokenSegment]:
         """Create prioritized segments from text lines."""

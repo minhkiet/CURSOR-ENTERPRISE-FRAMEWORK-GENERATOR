@@ -393,8 +393,8 @@ class MemoryManager:
         """Check if eviction is needed for a tier."""
         return len(self._storage[tier]) >= self._max_entries[tier]
 
-    def _evict_low_priority(self, tier: MemoryTier, keep_ratio: float = 1.0):
-        """Evict low priority entries when needed."""
+    def _evict_low_priority(self, tier: MemoryTier, keep_ratio: float = 0.9):
+        """Evict low priority entries. Default keep 90% (evict 10%)."""
         entries = list(self._storage[tier].values())
         entries.sort(key=lambda e: (e.priority, e.access_count, e.last_accessed))
 

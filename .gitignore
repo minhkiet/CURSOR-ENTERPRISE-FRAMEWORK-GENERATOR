@@ -41,6 +41,8 @@
 .cursor/scripts/weknora/
 
 # --- Python build / package artifacts ---
+build/
+dist/
 cursor_framework/__pycache__/
 cursor_framework/*.egg-info/
 cursor_framework/review/

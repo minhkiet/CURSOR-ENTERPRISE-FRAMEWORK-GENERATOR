@@ -1,23 +1,62 @@
 {
   "root": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\.cursor",
-  "scanned_at": "2026-07-16T02:02:30",
+  "scanned_at": "2026-08-07T17:47:49",
   "totals": {
-    "agents": 18,
-    "commands": 28,
+    "agents": 20,
+    "commands": 29,
     "hooks": 15,
     "knowledge": 329,
     "memory": 14,
     "prompts": 31,
     "references": 4,
     "rules": 43,
-    "scripts": 34,
-    "skills": 50,
+    "scripts": 41,
+    "skills": 92,
     "templates": 6,
     "workflows": 11,
-    "grand_total": 583
+    "grand_total": 635
   },
   "categories": {
     "agents": [
+      {
+        "name": "agent_api-security.md",
+        "path": "agents\\agent_api-security.md",
+        "category": "agents",
+        "kind": "file",
+        "description": "API Security Auditor - Comprehensive security review for REST, GraphQL, and WebSocket APIs. Covers authentication, authorization, rate limiting, input validation, and secure communication.",
+        "version": "1.0.0",
+        "tags": [
+          "agent",
+          "security",
+          "API",
+          "REST",
+          "GraphQL",
+          "WebSocket",
+          "authentication",
+          "authorization",
+          "rate-limiting"
+        ],
+        "size_bytes": 8732
+      },
+      {
+        "name": "agent_ui-design.md",
+        "path": "agents\\agent_ui-design.md",
+        "category": "agents",
+        "kind": "file",
+        "description": "UI/Design Specialist Agent - Creates visually stunning, professional interfaces with anti-slop design principles. Focuses on aesthetics, animations, and user experience.",
+        "version": "1.0.0",
+        "tags": [
+          "agent",
+          "design",
+          "UI",
+          "UX",
+          "aesthetic",
+          "animation",
+          "visual",
+          "polish"
+        ],
+        "size_bytes": 5654
+      },
       {
         "name": "api-designer.md",
         "path": "agents\\api-designer.md",
@@ -359,6 +398,16 @@
         "version": "1.0.0",
         "tags": [],
         "size_bytes": 1897
+      },
+      {
+        "name": "pentest.md",
+        "path": "commands\\pentest.md",
+        "category": "commands",
+        "kind": "file",
+        "description": "Pentest / OSINT — run real tools via AKCodez/hackingtool-plugin (nmap, nuclei, subfinder, sherlock, maigret, sqlmap, impacket, etc.) with framework gates",
+        "version": "1.0.0",
+        "tags": [],
+        "size_bytes": 6478
       },
       {
         "name": "command.md",
@@ -5429,256 +5478,6 @@
     ],
     "rules": [
       {
-        "name": "ai-knowledge.mdc",
-        "path": "rules\\ai-knowledge.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "AI Knowledge Stack - hợp nhất từ RAG, Vector Search, WeKnora, pgvector và PDF Engine cho document processing",
-        "version": "1.1.0",
-        "tags": [
-          "ai",
-          "rag",
-          "vector-search",
-          "weknora",
-          "pgvector",
-          "knowledge-base",
-          "llm",
-          "embeddings",
-          "similarity",
-          "machine-learning",
-          "pdf",
-          "document-processing"
-        ],
-        "size_bytes": 61954
-      },
-      {
-        "name": "api-patterns.mdc",
-        "path": "rules\\api-patterns.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "API Patterns - hợp nhất từ GraphQL, API Gateway, Service Mesh, REST API trong Cursor Enterprise Framework",
-        "version": "2.0.0",
-        "tags": [
-          "api",
-          "graphql",
-          "api-gateway",
-          "service-mesh",
-          "rest",
-          "grpc",
-          "microservices"
-        ],
-        "size_bytes": 43880
-      },
-      {
-        "name": "architecture-patterns.mdc",
-        "path": "rules\\architecture-patterns.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "Architecture Patterns - hợp nhất từ Clean Architecture, Hexagonal Architecture (Ports & Adapters), CQRS Pattern, Event Sourcing, và Domain-Driven Design trong Cursor Enterprise Framework",
-        "version": "2.0.0",
-        "tags": [
-          "architecture",
-          "clean-architecture",
-          "hexagonal",
-          "cqrs",
-          "event-sourcing",
-          "ddd",
-          "patterns",
-          "ports-adapters"
-        ],
-        "size_bytes": 91239
-      },
-      {
-        "name": "auth.mdc",
-        "path": "rules\\auth.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "Authentication & Authorization - hợp nhất từ authentication.mdc và authorization.mdc",
-        "version": "2.0.0",
-        "tags": [
-          "auth",
-          "authentication",
-          "authorization",
-          "security",
-          "identity",
-          "jwt",
-          "oauth",
-          "rbac",
-          "abac",
-          "permissions"
-        ],
-        "size_bytes": 53388
-      },
-      {
-        "name": "backend-frameworks.mdc",
-        "path": "rules\\backend-frameworks.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "Backend Frameworks - hợp nhất từ NestJS, Laravel, ASP.NET Core trong Cursor Enterprise Framework",
-        "version": "1.0.0",
-        "tags": [
-          "backend",
-          "nestjs",
-          "laravel",
-          "aspnet-core",
-          "api",
-          "framework",
-          "nodejs",
-          "php",
-          "dotnet"
-        ],
-        "size_bytes": 37278
-      },
-      {
-        "name": "billing.mdc",
-        "path": "rules\\billing.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "Nguyên tắc và best practices cho Billing Implementation trong Cursor Enterprise Framework",
-        "version": "1.0.0",
-        "tags": [
-          "billing",
-          "subscription",
-          "payment",
-          "invoice",
-          "saas"
-        ],
-        "size_bytes": 30827
-      },
-      {
-        "name": "chatbot-development.mdc",
-        "path": "rules\\chatbot-development.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "ChatbotX Development Patterns - Omnichannel Chatbot Marketing Platform. Tích hợp feature scaffold, Drizzle ORM, BullMQ workers, và Next.js patterns cho ChatbotX platform (ManyChat alternative).",
-        "version": "1.0.0",
-        "tags": [
-          "chatbotx",
-          "chatbot",
-          "omnichannel",
-          "manychat",
-          "drizzle",
-          "bullmq",
-          "nextjs",
-          "typescript",
-          "turborepo",
-          "marketing-automation"
-        ],
-        "size_bytes": 20657
-      },
-      {
-        "name": "cloud-infra.mdc",
-        "path": "rules\\cloud-infra.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "Cloud Infrastructure Architecture - hợp nhất từ Cloud Architecture và Infrastructure Architecture",
-        "version": "1.0.0",
-        "tags": [
-          "cloud",
-          "infrastructure",
-          "architecture",
-          "iac",
-          "terraform",
-          "cloud-native",
-          "aws",
-          "azure",
-          "gcp",
-          "multi-cloud",
-          "networking"
-        ],
-        "size_bytes": 39940
-      },
-      {
-        "name": "cloud-providers.mdc",
-        "path": "rules\\cloud-providers.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "Cloud Providers - hợp nhất từ AWS, Azure, GCP trong Cursor Enterprise Framework",
-        "version": "1.0.0",
-        "tags": [
-          "cloud",
-          "aws",
-          "azure",
-          "gcp",
-          "multi-cloud",
-          "cloud-providers"
-        ],
-        "size_bytes": 15456
-      },
-      {
-        "name": "cloudflare.mdc",
-        "path": "rules\\cloudflare.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "Cloudflare & CDN - hợp nhất từ cloudflare.mdc và cdn.mdc. Nguyên tắc và best practices cho Cloudflare edge platform và CDN content delivery trong Cursor Enterprise Framework",
-        "version": "1.1.0",
-        "tags": [
-          "cloudflare",
-          "cdn",
-          "merged",
-          "workers",
-          "edge-computing",
-          "dns",
-          "ssl",
-          "content-delivery",
-          "caching",
-          "performance"
-        ],
-        "size_bytes": 17759
-      },
-      {
-        "name": "coding-standards.mdc",
-        "path": "rules\\coding-standards.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "Tiêu chuẩn viết code thống nhất cho Cursor Enterprise Framework",
-        "version": "1.0.0",
-        "tags": [
-          "coding",
-          "standards",
-          "quality",
-          "consistency",
-          "enterprise"
-        ],
-        "size_bytes": 13190
-      },
-      {
-        "name": "container-orchestration.mdc",
-        "path": "rules\\container-orchestration.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "Container Orchestration - hợp nhất từ Docker và Kubernetes trong Cursor Enterprise Framework",
-        "version": "1.0.0",
-        "tags": [
-          "docker",
-          "kubernetes",
-          "k8s",
-          "container",
-          "orchestration",
-          "dockerfile",
-          "docker-compose",
-          "helm",
-          "gitops"
-        ],
-        "size_bytes": 24935
-      },
-      {
-        "name": "context-router.mdc",
-        "path": "rules\\context-router.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "Nguyên tắc Context Router - định tuyến context thông minh đến handlers phù hợp",
-        "version": "1.0.0",
-        "tags": [
-          "routing",
-          "context",
-          "intelligence",
-          "cursor",
-          "enterprise"
-        ],
-        "size_bytes": 16706
-      },
-      {
         "name": "core.mdc",
         "path": "rules\\core.mdc",
         "category": "rules",
@@ -5687,42 +5486,6 @@
         "version": "",
         "tags": [],
         "size_bytes": 13
-      },
-      {
-        "name": "cost-optimization.mdc",
-        "path": "rules\\cost-optimization.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "Cost & Token Optimization - hợp nhất từ cost-optimization.mdc và token-optimization.mdc",
-        "version": "1.1.0",
-        "tags": [
-          "cost",
-          "optimization",
-          "cloud",
-          "aws",
-          "gcp",
-          "azure",
-          "token",
-          "llm-cost",
-          "merged"
-        ],
-        "size_bytes": 33476
-      },
-      {
-        "name": "crm-saas.mdc",
-        "path": "rules\\crm-saas.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "Nguyên tắc và best practices cho CRM SaaS Implementation trong Cursor Enterprise Framework",
-        "version": "1.0.0",
-        "tags": [
-          "crm",
-          "saas",
-          "sales",
-          "customer",
-          "enterprise"
-        ],
-        "size_bytes": 25633
       },
       {
         "name": "databases.mdc",
@@ -5745,91 +5508,14 @@
         "size_bytes": 49947
       },
       {
-        "name": "deployment.mdc",
-        "path": "rules\\deployment.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "Deployment & CI/CD - hợp nhất từ deployment.mdc và ci-cd.mdc",
-        "version": "1.1.0",
-        "tags": [
-          "deployment",
-          "ci-cd",
-          "release",
-          "rollback",
-          "infrastructure",
-          "merged",
-          "continuous-integration",
-          "continuous-delivery",
-          "devops",
-          "automation"
-        ],
-        "size_bytes": 36519
-      },
-      {
-        "name": "enterprise-patterns.mdc",
-        "path": "rules\\enterprise-patterns.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "Enterprise Architecture Patterns - hợp nhất từ Monolith, Microservices, Core Architecture, Enterprise Architecture",
-        "version": "2.0.0",
-        "tags": [
-          "architecture",
-          "monolith",
-          "microservices",
-          "enterprise",
-          "patterns",
-          "core"
-        ],
-        "size_bytes": 33323
-      },
-      {
-        "name": "frontend-frameworks.mdc",
-        "path": "rules\\frontend-frameworks.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "Frontend Frameworks - hợp nhất từ Next.js, Nuxt.js, Vue.js, Frontend Architecture trong Cursor Enterprise Framework",
-        "version": "1.0.0",
-        "tags": [
-          "frontend",
-          "nextjs",
-          "nuxt",
-          "vue",
-          "react",
-          "framework",
-          "architecture",
-          "ssr",
-          "ssg"
-        ],
-        "size_bytes": 13690
-      },
-      {
-        "name": "intent-detection.mdc",
-        "path": "rules\\intent-detection.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "Intent Detection, Skill Auto-Discovery, and Clarification Flow - xác định intent, tự động phát hiện skills/rules, và clarification khi request ambiguous. Kết hợp với translation layer để xử lý multi-l",
-        "version": "2.0.0",
-        "tags": [
-          "intent-detection",
-          "skill-discovery",
-          "clarification",
-          "ambiguity",
-          "language-processing",
-          "auto-discovery",
-          "rules",
-          "skills"
-        ],
-        "size_bytes": 32490
-      },
-      {
         "name": "karpathy-guidelines.mdc",
         "path": "rules\\karpathy-guidelines.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "Karpathy Behavioral Guidelines - Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution. Auto-applied to all coding tasks.",
+        "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 3358
+        "size_bytes": 3357
       },
       {
         "name": "llm-providers.mdc",
@@ -5852,59 +5538,221 @@
         "size_bytes": 38831
       },
       {
-        "name": "memory-first.mdc",
-        "path": "rules\\memory-first.mdc",
+        "name": "meta_ai-knowledge.mdc",
+        "path": "rules\\meta_ai-knowledge.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "Nguyên tắc Memory First - ưu tiên context từ memory trước mọi truy vấn",
+        "description": "AI Knowledge Stack - hợp nhất từ RAG, Vector Search, WeKnora, pgvector và PDF Engine cho document processing",
+        "version": "1.1.0",
+        "tags": [
+          "ai",
+          "rag",
+          "vector-search",
+          "weknora",
+          "pgvector",
+          "knowledge-base",
+          "llm",
+          "embeddings",
+          "similarity",
+          "machine-learning",
+          "pdf",
+          "document-processing"
+        ],
+        "size_bytes": 61954
+      },
+      {
+        "name": "meta_auth.mdc",
+        "path": "rules\\meta_auth.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "Authentication & Authorization - hợp nhất từ authentication.mdc và authorization.mdc",
+        "version": "2.0.0",
+        "tags": [
+          "auth",
+          "authentication",
+          "authorization",
+          "security",
+          "identity",
+          "jwt",
+          "oauth",
+          "rbac",
+          "abac",
+          "permissions"
+        ],
+        "size_bytes": 53388
+      },
+      {
+        "name": "meta_billing.mdc",
+        "path": "rules\\meta_billing.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "Nguyên tắc và best practices cho Billing Implementation trong Cursor Enterprise Framework",
         "version": "1.0.0",
         "tags": [
-          "memory",
-          "context",
-          "optimization",
-          "cursor",
+          "billing",
+          "subscription",
+          "payment",
+          "invoice",
+          "saas"
+        ],
+        "size_bytes": 30827
+      },
+      {
+        "name": "meta_chatbot-development.mdc",
+        "path": "rules\\meta_chatbot-development.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 20673
+      },
+      {
+        "name": "meta_cloud-infra.mdc",
+        "path": "rules\\meta_cloud-infra.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "Cloud Infrastructure Architecture - hợp nhất từ Cloud Architecture và Infrastructure Architecture",
+        "version": "1.0.0",
+        "tags": [
+          "cloud",
+          "infrastructure",
+          "architecture",
+          "iac",
+          "terraform",
+          "cloud-native",
+          "aws",
+          "azure",
+          "gcp",
+          "multi-cloud",
+          "networking"
+        ],
+        "size_bytes": 39940
+      },
+      {
+        "name": "meta_cloud-providers.mdc",
+        "path": "rules\\meta_cloud-providers.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "Cloud Providers - hợp nhất từ AWS, Azure, GCP trong Cursor Enterprise Framework",
+        "version": "1.0.0",
+        "tags": [
+          "cloud",
+          "aws",
+          "azure",
+          "gcp",
+          "multi-cloud",
+          "cloud-providers"
+        ],
+        "size_bytes": 15456
+      },
+      {
+        "name": "meta_cloudflare.mdc",
+        "path": "rules\\meta_cloudflare.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "Cloudflare & CDN - hợp nhất từ cloudflare.mdc và cdn.mdc. Nguyên tắc và best practices cho Cloudflare edge platform và CDN content delivery trong Cursor Enterprise Framework",
+        "version": "1.1.0",
+        "tags": [
+          "cloudflare",
+          "cdn",
+          "merged",
+          "workers",
+          "edge-computing",
+          "dns",
+          "ssl",
+          "content-delivery",
+          "caching",
+          "performance"
+        ],
+        "size_bytes": 17759
+      },
+      {
+        "name": "meta_coding-standards.mdc",
+        "path": "rules\\meta_coding-standards.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "Tiêu chuẩn viết code thống nhất cho Cursor Enterprise Framework",
+        "version": "1.0.0",
+        "tags": [
+          "coding",
+          "standards",
+          "quality",
+          "consistency",
           "enterprise"
         ],
-        "size_bytes": 18149
+        "size_bytes": 13190
       },
       {
-        "name": "multi-language-processing.mdc",
-        "path": "rules\\multi-language-processing.mdc",
+        "name": "meta_container-orchestration.mdc",
+        "path": "rules\\meta_container-orchestration.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "Multi-Language Processing - Translation Layer cho Vietnamese, Chinese, Japanese, Korean, Arabic. Chuyển đổi request từ any language sang English để xử lý nhất quán.",
-        "version": "2.0.0",
+        "description": "Container Orchestration - hợp nhất từ Docker và Kubernetes trong Cursor Enterprise Framework",
+        "version": "1.0.0",
         "tags": [
-          "multilingual",
-          "translation",
-          "language-detection",
-          "vietnamese",
-          "chinese",
-          "japanese",
-          "korean",
-          "arabic",
-          "language-processing"
+          "docker",
+          "kubernetes",
+          "k8s",
+          "container",
+          "orchestration",
+          "dockerfile",
+          "docker-compose",
+          "helm",
+          "gitops"
         ],
-        "size_bytes": 16273
+        "size_bytes": 24935
       },
       {
-        "name": "multi-language-vibe-code.mdc",
-        "path": "rules\\multi-language-vibe-code.mdc",
+        "name": "meta_cost-optimization.mdc",
+        "path": "rules\\meta_cost-optimization.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "Multi-Language Request Processing - Redirect to new modular files",
-        "version": "2.0.0",
-        "tags": [
-          "multilingual",
-          "translation",
-          "vibe-code",
-          "redirect"
-        ],
-        "size_bytes": 2722
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 33491
       },
       {
-        "name": "multi-tenant.mdc",
-        "path": "rules\\multi-tenant.mdc",
+        "name": "meta_crm-saas.mdc",
+        "path": "rules\\meta_crm-saas.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "Nguyên tắc và best practices cho CRM SaaS Implementation trong Cursor Enterprise Framework",
+        "version": "1.0.0",
+        "tags": [
+          "crm",
+          "saas",
+          "sales",
+          "customer",
+          "enterprise"
+        ],
+        "size_bytes": 25633
+      },
+      {
+        "name": "meta_deployment.mdc",
+        "path": "rules\\meta_deployment.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "Deployment & CI/CD - hợp nhất từ deployment.mdc và ci-cd.mdc",
+        "version": "1.1.0",
+        "tags": [
+          "deployment",
+          "ci-cd",
+          "release",
+          "rollback",
+          "infrastructure",
+          "merged",
+          "continuous-integration",
+          "continuous-delivery",
+          "devops",
+          "automation"
+        ],
+        "size_bytes": 36519
+      },
+      {
+        "name": "meta_multi-tenant.mdc",
+        "path": "rules\\meta_multi-tenant.mdc",
         "category": "rules",
         "kind": "file",
         "description": "Nguyên tắc và best practices cho Multi-Tenant Architecture trong Cursor Enterprise Framework",
@@ -5919,8 +5767,8 @@
         "size_bytes": 25588
       },
       {
-        "name": "observability.mdc",
-        "path": "rules\\observability.mdc",
+        "name": "meta_observability.mdc",
+        "path": "rules\\meta_observability.mdc",
         "category": "rules",
         "kind": "file",
         "description": "Observability - hợp nhất từ observability, monitoring, logging. Bao gồm metrics, logs, traces, health checks, alerting, và dashboards.",
@@ -5940,8 +5788,8 @@
         "size_bytes": 27947
       },
       {
-        "name": "operations.mdc",
-        "path": "rules\\operations.mdc",
+        "name": "meta_operations.mdc",
+        "path": "rules\\meta_operations.mdc",
         "category": "rules",
         "kind": "file",
         "description": "Operations - hợp nhất từ Alerting và Incident Response trong Cursor Enterprise Framework",
@@ -5959,8 +5807,8 @@
         "size_bytes": 29222
       },
       {
-        "name": "performance.mdc",
-        "path": "rules\\performance.mdc",
+        "name": "meta_performance.mdc",
+        "path": "rules\\meta_performance.mdc",
         "category": "rules",
         "kind": "file",
         "description": "Performance & Rate Limiting - hợp nhất từ performance.mdc và rate-limiting.mdc",
@@ -5977,8 +5825,8 @@
         "size_bytes": 21361
       },
       {
-        "name": "redis.mdc",
-        "path": "rules\\redis.mdc",
+        "name": "meta_redis.mdc",
+        "path": "rules\\meta_redis.mdc",
         "category": "rules",
         "kind": "file",
         "description": "Redis Cache & Caching Strategy - hợp nhất từ redis.mdc và caching-strategy.mdc",
@@ -5998,18 +5846,8 @@
         "size_bytes": 20242
       },
       {
-        "name": "RULES-OPTIMIZATION-REPORT.md",
-        "path": "rules\\RULES-OPTIMIZATION-REPORT.md",
-        "category": "rules",
-        "kind": "file",
-        "description": "",
-        "version": "",
-        "tags": [],
-        "size_bytes": 22278
-      },
-      {
-        "name": "security.mdc",
-        "path": "rules\\security.mdc",
+        "name": "meta_security.mdc",
+        "path": "rules\\meta_security.mdc",
         "category": "rules",
         "kind": "file",
         "description": "Security - hợp nhất từ security.mdc, web-security.mdc, secrets-management.mdc. Nguyên tắc và best practices cho bảo mật trong Cursor Enterprise Framework",
@@ -6027,8 +5865,8 @@
         "size_bytes": 37186
       },
       {
-        "name": "serverless.mdc",
-        "path": "rules\\serverless.mdc",
+        "name": "meta_serverless.mdc",
+        "path": "rules\\meta_serverless.mdc",
         "category": "rules",
         "kind": "file",
         "description": "Serverless & IaC - hợp nhất từ serverless.mdc và infrastructure-as-code.mdc",
@@ -6052,47 +5890,234 @@
         "size_bytes": 33963
       },
       {
-        "name": "skill-integration.mdc",
-        "path": "rules\\skill-integration.mdc",
+        "name": "meta_testing.mdc",
+        "path": "rules\\meta_testing.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "Hướng dẫn skill auto-discovery và execution cho Cursor Enterprise Framework. Định tuyến tự động đến skills phù hợp với pre-review và post-review gates. Mọi task phải pass qua cả hai gates trước khi de",
-        "version": "1.3.0",
+        "description": "Testing Best Practices - bao gồm unit test, integration test, E2E, và TDD",
+        "version": "1.1.0",
         "tags": [
-          "skill",
-          "auto-discovery",
-          "frontend",
-          "review",
+          "testing",
+          "unit-test",
+          "integration-test",
+          "e2e",
           "quality",
-          "cursor",
-          "pre-review",
-          "post-review",
-          "skill-selection",
-          "intent-analysis"
+          "tdd",
+          "merged"
         ],
-        "size_bytes": 91226
+        "size_bytes": 35657
       },
       {
-        "name": "skill-registry.mdc",
-        "path": "rules\\skill-registry.mdc",
+        "name": "meta_version-control.mdc",
+        "path": "rules\\meta_version-control.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "Single Source of Truth cho tất cả skill definitions, triggers, confidence thresholds, và gate mappings. Được sử dụng bởi skill-integration, task-analyzer, và multi-language-vibe-code. Bao gồm Ponytail",
-        "version": "1.7.0",
+        "description": "Version Control - bao gồm Git, GitHub, Git workflow",
+        "version": "1.1.0",
         "tags": [
-          "skill-registry",
-          "skills",
-          "auto-discovery",
-          "mandatory",
-          "overlay",
-          "ponytail",
-          "lazy-senior",
-          "code-quality",
-          "agent-skills",
-          "chatbotx",
-          "chatbot-marketing"
+          "git",
+          "version-control",
+          "branching-strategy",
+          "commit-messages",
+          "code-review",
+          "workflow",
+          "merged"
         ],
-        "size_bytes": 83222
+        "size_bytes": 22132
+      },
+      {
+        "name": "meta_vibe-code-protocol.mdc",
+        "path": "rules\\meta_vibe-code-protocol.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 61256
+      },
+      {
+        "name": "meta_workflow-engines.mdc",
+        "path": "rules\\meta_workflow-engines.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "Workflow Engines - hợp nhất từ n8n, Trigger.dev, Temporal",
+        "version": "1.0.0",
+        "tags": [
+          "workflow",
+          "automation",
+          "n8n",
+          "trigger-dev",
+          "temporal",
+          "background-jobs"
+        ],
+        "size_bytes": 58998
+      },
+      {
+        "name": "proto_context-router.mdc",
+        "path": "rules\\proto_context-router.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 26844
+      },
+      {
+        "name": "proto_memory-first.mdc",
+        "path": "rules\\proto_memory-first.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 18158
+      },
+      {
+        "name": "proto_multi-language-processing.mdc",
+        "path": "rules\\proto_multi-language-processing.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 16308
+      },
+      {
+        "name": "proto_multi-language-vibe-code.mdc",
+        "path": "rules\\proto_multi-language-vibe-code.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 2780
+      },
+      {
+        "name": "ref_api-patterns.mdc",
+        "path": "rules\\ref_api-patterns.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "API Patterns - hợp nhất từ GraphQL, API Gateway, Service Mesh, REST API trong Cursor Enterprise Framework",
+        "version": "2.0.0",
+        "tags": [
+          "api",
+          "graphql",
+          "api-gateway",
+          "service-mesh",
+          "rest",
+          "grpc",
+          "microservices"
+        ],
+        "size_bytes": 43880
+      },
+      {
+        "name": "ref_architecture-patterns.mdc",
+        "path": "rules\\ref_architecture-patterns.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "Architecture Patterns - hợp nhất từ Clean Architecture, Hexagonal Architecture (Ports & Adapters), CQRS Pattern, Event Sourcing, và Domain-Driven Design trong Cursor Enterprise Framework",
+        "version": "2.0.0",
+        "tags": [
+          "architecture",
+          "clean-architecture",
+          "hexagonal",
+          "cqrs",
+          "event-sourcing",
+          "ddd",
+          "patterns",
+          "ports-adapters"
+        ],
+        "size_bytes": 91239
+      },
+      {
+        "name": "ref_backend-frameworks.mdc",
+        "path": "rules\\ref_backend-frameworks.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "Backend Frameworks - hợp nhất từ NestJS, Laravel, ASP.NET Core trong Cursor Enterprise Framework",
+        "version": "1.0.0",
+        "tags": [
+          "backend",
+          "nestjs",
+          "laravel",
+          "aspnet-core",
+          "api",
+          "framework",
+          "nodejs",
+          "php",
+          "dotnet"
+        ],
+        "size_bytes": 37278
+      },
+      {
+        "name": "ref_enterprise-patterns.mdc",
+        "path": "rules\\ref_enterprise-patterns.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 33338
+      },
+      {
+        "name": "ref_frontend-frameworks.mdc",
+        "path": "rules\\ref_frontend-frameworks.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 13707
+      },
+      {
+        "name": "rule_intent-detection.mdc",
+        "path": "rules\\rule_intent-detection.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 37249
+      },
+      {
+        "name": "rule_skill-integration.mdc",
+        "path": "rules\\rule_skill-integration.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 91408
+      },
+      {
+        "name": "rule_skill-registry.mdc",
+        "path": "rules\\rule_skill-registry.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 123935
+      },
+      {
+        "name": "rule_task-analyzer.mdc",
+        "path": "rules\\rule_task-analyzer.mdc",
+        "category": "rules",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 39934
+      },
+      {
+        "name": "RULES-OPTIMIZATION-REPORT.md",
+        "path": "rules\\RULES-OPTIMIZATION-REPORT.md",
+        "category": "rules",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 22278
       },
       {
         "name": "supabase.mdc",
@@ -6111,118 +6136,14 @@
         "size_bytes": 21106
       },
       {
-        "name": "task-analyzer.mdc",
-        "path": "rules\\task-analyzer.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "Task Analyzer & Synchronized Context System - Phân tích yêu cầu, tự động phát hiện rules/skills, sinh task manifest với subtasks",
-        "version": "1.0.0",
-        "tags": [
-          "task-analyzer",
-          "context-sync",
-          "skill-auto-discovery",
-          "multi-language",
-          "vibe-code",
-          "automation",
-          "rules",
-          "skills",
-          "dependencies",
-          "mcp"
-        ],
-        "size_bytes": 39880
-      },
-      {
-        "name": "testing.mdc",
-        "path": "rules\\testing.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "Testing Best Practices - bao gồm unit test, integration test, E2E, và TDD",
-        "version": "1.1.0",
-        "tags": [
-          "testing",
-          "unit-test",
-          "integration-test",
-          "e2e",
-          "quality",
-          "tdd",
-          "merged"
-        ],
-        "size_bytes": 35657
-      },
-      {
         "name": "ui-visual-design.mdc",
         "path": "rules\\ui-visual-design.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "Nguyên tắc và best practices cho UI/Visual Design trong Cursor Enterprise Framework - hướng dẫn tạo giao diện đẹp mắt, chuyên nghiệp như các theme thương mại cao cấp",
-        "version": "1.0.0",
-        "tags": [
-          "ui",
-          "visual-design",
-          "ux",
-          "design-system",
-          "icons",
-          "typography",
-          "color",
-          "animation",
-          "theme"
-        ],
-        "size_bytes": 35187
-      },
-      {
-        "name": "version-control.mdc",
-        "path": "rules\\version-control.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "Version Control - bao gồm Git, GitHub, Git workflow",
-        "version": "1.1.0",
-        "tags": [
-          "git",
-          "version-control",
-          "branching-strategy",
-          "commit-messages",
-          "code-review",
-          "workflow",
-          "merged"
-        ],
-        "size_bytes": 22132
-      },
-      {
-        "name": "vibe-code-protocol.mdc",
-        "path": "rules\\vibe-code-protocol.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "Vibe Code Execution Protocol, Pre/Post Execution Validation, Auth & Payment Handling - workflow execution với pre-review và post-review gates, retry logic với fallback strategies.",
-        "version": "2.0.0",
-        "tags": [
-          "vibe-code",
-          "execution",
-          "validation",
-          "auth",
-          "payment",
-          "retry",
-          "pre-review",
-          "post-review",
-          "gates"
-        ],
-        "size_bytes": 61231
-      },
-      {
-        "name": "workflow-engines.mdc",
-        "path": "rules\\workflow-engines.mdc",
-        "category": "rules",
-        "kind": "file",
-        "description": "Workflow Engines - hợp nhất từ n8n, Trigger.dev, Temporal",
-        "version": "1.0.0",
-        "tags": [
-          "workflow",
-          "automation",
-          "n8n",
-          "trigger-dev",
-          "temporal",
-          "background-jobs"
-        ],
-        "size_bytes": 58998
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 39439
       }
     ],
     "scripts": [
@@ -6377,6 +6298,16 @@
         "size_bytes": 29661
       },
       {
+        "name": "create-compatibility-layer.ps1",
+        "path": "scripts\\create-compatibility-layer.ps1",
+        "category": "scripts",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 8535
+      },
+      {
         "name": "cursor-setup.spec",
         "path": "scripts\\cursor-setup.spec",
         "category": "scripts",
@@ -6417,6 +6348,16 @@
         "size_bytes": 4042
       },
       {
+        "name": "Master-Rename-Orchestrator.ps1",
+        "path": "scripts\\Master-Rename-Orchestrator.ps1",
+        "category": "scripts",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 6981
+      },
+      {
         "name": "build-memory.ps1",
         "path": "scripts\\memory-builder\\build-memory.ps1",
         "category": "scripts",
@@ -6455,6 +6396,16 @@
         "version": "",
         "tags": [],
         "size_bytes": 5145
+      },
+      {
+        "name": "rename-skills-rules.ps1",
+        "path": "scripts\\rename-skills-rules.ps1",
+        "category": "scripts",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 8856
       },
       {
         "name": "setup-local-config.json",
@@ -6514,7 +6465,7 @@
         "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 17357
+        "size_bytes": 23506
       },
       {
         "name": "skill-installer.py",
@@ -6525,6 +6476,26 @@
         "version": "",
         "tags": [],
         "size_bytes": 17833
+      },
+      {
+        "name": "sync-2026.ps1",
+        "path": "scripts\\sync-2026.ps1",
+        "category": "scripts",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 5127
+      },
+      {
+        "name": "sync-repos.ps1",
+        "path": "scripts\\sync-repos.ps1",
+        "category": "scripts",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 6148
       },
       {
         "name": "task-analyzer.md",
@@ -6545,6 +6516,26 @@
         "version": "",
         "tags": [],
         "size_bytes": 15550
+      },
+      {
+        "name": "update-references.ps1",
+        "path": "scripts\\update-references.ps1",
+        "category": "scripts",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 8353
+      },
+      {
+        "name": "update-skill-registry.py",
+        "path": "scripts\\update-skill-registry.py",
+        "category": "scripts",
+        "kind": "file",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 10731
       },
       {
         "name": "setup-mcp.ps1",
@@ -6573,10 +6564,87 @@
         "path": "skills\\adbc",
         "category": "skills",
         "kind": "directory",
-        "description": ">-",
+        "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 58291
+        "size_bytes": 432
+      },
+      {
+        "name": "ai_pixelrag",
+        "path": "skills\\ai_pixelrag",
+        "category": "skills",
+        "kind": "directory",
+        "description": "PixelRAG skill cho Visual Retrieval-Augmented Generation - đọc tài liệu bằng hình ảnh (PDF, website, bảng biểu, sơ đồ). Cải thiện độ chính xác retrieval 18.1% so với Text RAG truyền thống. Tích hợp pi",
+        "version": "1.0.0",
+        "tags": [
+          "pixelrag",
+          "visual-rag",
+          "screenshot",
+          "document",
+          "pdf",
+          "vision",
+          "multimodal",
+          "embedding",
+          "faiss",
+          "retrieval",
+          "tables",
+          "charts",
+          "diagrams"
+        ],
+        "size_bytes": 10519
+      },
+      {
+        "name": "ai_video-generation",
+        "path": "skills\\ai_video-generation",
+        "category": "skills",
+        "kind": "directory",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 9118
+      },
+      {
+        "name": "ai_weknora-agent",
+        "path": "skills\\ai_weknora-agent",
+        "category": "skills",
+        "kind": "directory",
+        "description": "WeKnora Agent Skill - ReAct autonomous reasoning agent với multi-step planning, tool calling, web search, và MCP tools integration",
+        "version": "1.0.0",
+        "tags": [
+          "weknora",
+          "react-agent",
+          "autonomous",
+          "reasoning",
+          "agent",
+          "tool-calling",
+          "web-search",
+          "mcp",
+          "multi-step",
+          "workflow"
+        ],
+        "size_bytes": 10574
+      },
+      {
+        "name": "ai_weknora-kb",
+        "path": "skills\\ai_weknora-kb",
+        "category": "skills",
+        "kind": "directory",
+        "description": "WeKnora Knowledge Base Skill - RAG implementation, document Q&A, FAQ system, enterprise wiki, hybrid search với Vector + BM25 + GraphRAG + Knowledge Graph",
+        "version": "1.0.0",
+        "tags": [
+          "weknora",
+          "rag",
+          "knowledge-base",
+          "hybrid-search",
+          "vector-search",
+          "bm25",
+          "graphrag",
+          "knowledge-graph",
+          "document-qa",
+          "faq",
+          "wiki"
+        ],
+        "size_bytes": 6413
       },
       {
         "name": "aoti-debug",
@@ -6609,44 +6677,107 @@
         "size_bytes": 7794
       },
       {
-        "name": "bazi",
-        "path": "skills\\bazi",
-        "category": "skills",
-        "kind": "directory",
-        "description": ">",
-        "version": "",
-        "tags": [],
-        "size_bytes": 31554
-      },
-      {
         "name": "canvas-design",
         "path": "skills\\canvas-design",
         "category": "skills",
         "kind": "directory",
-        "description": ">-",
+        "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 5565553
+        "size_bytes": 450
+      },
+      {
+        "name": "code_full-output",
+        "path": "skills\\code_full-output",
+        "category": "skills",
+        "kind": "directory",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 6183
+      },
+      {
+        "name": "code_karpathy",
+        "path": "skills\\code_karpathy",
+        "category": "skills",
+        "kind": "directory",
+        "description": "Karpathy Coding - Think Before Code. Minimal overlay skill cho mọi task. 5 phút review trước/sau code.",
+        "version": "2.0.0",
+        "tags": [
+          "karpathy",
+          "coding-discipline",
+          "think-first",
+          "minimal",
+          "goal-driven",
+          "surgical",
+          "verification"
+        ],
+        "size_bytes": 5742
+      },
+      {
+        "name": "code_ponytail",
+        "path": "skills\\code_ponytail",
+        "category": "skills",
+        "kind": "directory",
+        "description": "Ponytail - Lazy Senior Dev. Minimum code, maximum effect. YAGNI optimization overlay.",
+        "version": "2.0.0",
+        "tags": [
+          "ponytail",
+          "yagni",
+          "minimalist",
+          "efficient",
+          "lazy-coding",
+          "code-reduction"
+        ],
+        "size_bytes": 7359
+      },
+      {
+        "name": "code_vibe-coding",
+        "path": "skills\\code_vibe-coding",
+        "category": "skills",
+        "kind": "directory",
+        "description": "Vibe Coding - Unified overlay skill kết hợp Think First (karpathy) + Minimize Code (ponytail). Luôn chạy với mọi task.",
+        "version": "1.0.0",
+        "tags": [
+          "vibe-coding",
+          "efficient",
+          "think-first",
+          "minimize",
+          "yagni",
+          "surgical",
+          "goal-driven"
+        ],
+        "size_bytes": 9470
       },
       {
         "name": "create-pull-request",
         "path": "skills\\create-pull-request",
         "category": "skills",
         "kind": "directory",
-        "description": ">-",
+        "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 17797
+        "size_bytes": 464
       },
       {
         "name": "csv-wrangling",
         "path": "skills\\csv-wrangling",
         "category": "skills",
         "kind": "directory",
-        "description": ">-",
+        "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 6996
+        "size_bytes": 452
+      },
+      {
+        "name": "dashboard-ui",
+        "path": "skills\\dashboard-ui",
+        "category": "skills",
+        "kind": "directory",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 448
       },
       {
         "name": "data-distributed-storage",
@@ -6659,14 +6790,121 @@
         "size_bytes": 58394
       },
       {
-        "name": "deploy-to-vercel",
-        "path": "skills\\deploy-to-vercel",
+        "name": "db_adbc",
+        "path": "skills\\db_adbc",
         "category": "skills",
         "kind": "directory",
         "description": ">-",
-        "version": "3.0.0",
+        "version": "",
         "tags": [],
-        "size_bytes": 8261
+        "size_bytes": 58291
+      },
+      {
+        "name": "db_data-quality",
+        "path": "skills\\db_data-quality",
+        "category": "skills",
+        "kind": "directory",
+        "description": "Data quality and database skill covering data validation, integrity, database schema design, migrations, and query optimization. Ensures data correctness and reliability.",
+        "version": "1.0.0",
+        "tags": [
+          "data",
+          "database",
+          "validation",
+          "integrity",
+          "schema",
+          "migration",
+          "query",
+          "sql",
+          "nosql"
+        ],
+        "size_bytes": 7263
+      },
+      {
+        "name": "db_mysql",
+        "path": "skills\\db_mysql",
+        "category": "skills",
+        "kind": "directory",
+        "description": ">-",
+        "version": "",
+        "tags": [],
+        "size_bytes": 59834
+      },
+      {
+        "name": "db_mysql-patterns",
+        "path": "skills\\db_mysql-patterns",
+        "category": "skills",
+        "kind": "directory",
+        "description": ">-",
+        "version": "",
+        "tags": [],
+        "size_bytes": 13331
+      },
+      {
+        "name": "db_redis-observability",
+        "path": "skills\\db_redis-observability",
+        "category": "skills",
+        "kind": "directory",
+        "description": ">-",
+        "version": "0.1.0",
+        "tags": [],
+        "size_bytes": 7464
+      },
+      {
+        "name": "db_sql-server-table-reconciliation",
+        "path": "skills\\db_sql-server-table-reconciliation",
+        "category": "skills",
+        "kind": "directory",
+        "description": ">-",
+        "version": "",
+        "tags": [],
+        "size_bytes": 20313
+      },
+      {
+        "name": "doc_ai-copywriter",
+        "path": "skills\\doc_ai-copywriter",
+        "category": "skills",
+        "kind": "directory",
+        "description": "Write copy that converts and doesn't sound like a robot. Two jobs in one skill: a reader-first copywriter for clickbait titles, headlines, short descriptions, microcopy, CTAs, error messages, subject ",
+        "version": "1.6.0",
+        "tags": [
+          "copywriting",
+          "humanizer",
+          "marketing",
+          "ai-writing",
+          "anti-slop",
+          "writing"
+        ],
+        "size_bytes": 46661
+      },
+      {
+        "name": "doc_book-to-skill",
+        "path": "skills\\doc_book-to-skill",
+        "category": "skills",
+        "kind": "directory",
+        "description": "Converts books and documents (PDF, EPUB, DOCX, HTML, Markdown, plain text, RTF, MOBI/AZW with Calibre) into structured agent skills, extracting frameworks, mental models, principles, techniques, and a",
+        "version": "",
+        "tags": [],
+        "size_bytes": 7664
+      },
+      {
+        "name": "doc_microsoft-docs",
+        "path": "skills\\doc_microsoft-docs",
+        "category": "skills",
+        "kind": "directory",
+        "description": ">-",
+        "version": "",
+        "tags": [],
+        "size_bytes": 22432
+      },
+      {
+        "name": "doc_simple-english",
+        "path": "skills\\doc_simple-english",
+        "category": "skills",
+        "kind": "directory",
+        "description": "Transforms complex technical content into clear, accessible Simple English following Wikipedia's Simple English guidelines. Use when writing for non-native speakers, accessibility, children's educatio",
+        "version": "",
+        "tags": [],
+        "size_bytes": 5340
       },
       {
         "name": "document-ocr",
@@ -6676,7 +6914,7 @@
         "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 13181
+        "size_bytes": 450
       },
       {
         "name": "fastapi-martinholovsky",
@@ -6696,7 +6934,7 @@
         "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 13135
+        "size_bytes": 458
       },
       {
         "name": "frontend-review",
@@ -6706,7 +6944,7 @@
         "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 14259
+        "size_bytes": 454
       },
       {
         "name": "frontend-taste",
@@ -6716,7 +6954,7 @@
         "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 44761
+        "size_bytes": 452
       },
       {
         "name": "full-output",
@@ -6726,7 +6964,7 @@
         "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 6183
+        "size_bytes": 448
       },
       {
         "name": "graphql",
@@ -6739,6 +6977,16 @@
         "size_bytes": 13342
       },
       {
+        "name": "hallmark",
+        "path": "skills\\hallmark",
+        "category": "skills",
+        "kind": "directory",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 440
+      },
+      {
         "name": "image-enhancer",
         "path": "skills\\image-enhancer",
         "category": "skills",
@@ -6747,6 +6995,26 @@
         "version": "",
         "tags": [],
         "size_bytes": 2764
+      },
+      {
+        "name": "infra_deploy-vercel",
+        "path": "skills\\infra_deploy-vercel",
+        "category": "skills",
+        "kind": "directory",
+        "description": ">-",
+        "version": "3.0.0",
+        "tags": [],
+        "size_bytes": 8261
+      },
+      {
+        "name": "infra_prefect",
+        "path": "skills\\infra_prefect",
+        "category": "skills",
+        "kind": "directory",
+        "description": ">",
+        "version": "1.0.0",
+        "tags": [],
+        "size_bytes": 17751
       },
       {
         "name": "jq-json-processing",
@@ -6763,22 +7031,20 @@
         "path": "skills\\karpathy-coding",
         "category": "skills",
         "kind": "directory",
-        "description": "Karpathy Coding Discipline - Think Before Coding, simplicity, surgical changes, goal-driven execution. Mandatory overlay for all coding tasks. Complements ponytail for YAGNI optimization.",
-        "version": "1.3.0",
-        "tags": [
-          "karpathy",
-          "coding-discipline",
-          "vibe-code",
-          "simplicity",
-          "minimal",
-          "goal-driven",
-          "surgical",
-          "think-first",
-          "superpowers-aligned",
-          "verification",
-          "code-review"
-        ],
-        "size_bytes": 10498
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 449
+      },
+      {
+        "name": "landing-page-pro",
+        "path": "skills\\landing-page-pro",
+        "category": "skills",
+        "kind": "directory",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 456
       },
       {
         "name": "mcp-builder",
@@ -6801,34 +7067,24 @@
         "size_bytes": 23354
       },
       {
-        "name": "microsoft-docs",
-        "path": "skills\\microsoft-docs",
-        "category": "skills",
-        "kind": "directory",
-        "description": ">-",
-        "version": "",
-        "tags": [],
-        "size_bytes": 22432
-      },
-      {
         "name": "mysql",
         "path": "skills\\mysql",
         "category": "skills",
         "kind": "directory",
-        "description": ">-",
+        "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 59834
+        "size_bytes": 434
       },
       {
         "name": "mysql-patterns",
         "path": "skills\\mysql-patterns",
         "category": "skills",
         "kind": "directory",
-        "description": ">-",
+        "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 13331
+        "size_bytes": 452
       },
       {
         "name": "open-design",
@@ -6838,59 +7094,65 @@
         "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 7039
+        "size_bytes": 446
+      },
+      {
+        "name": "perf_composition-patterns",
+        "path": "skills\\perf_composition-patterns",
+        "category": "skills",
+        "kind": "directory",
+        "description": ">-",
+        "version": "1.0.0",
+        "tags": [],
+        "size_bytes": 50507
+      },
+      {
+        "name": "perf_perf-optimization",
+        "path": "skills\\perf_perf-optimization",
+        "category": "skills",
+        "kind": "directory",
+        "description": "Performance optimization skill covering memory optimization, speed enhancement, token reduction, and caching strategies. Ensures applications run efficiently and cost-effectively.",
+        "version": "1.0.0",
+        "tags": [
+          "performance",
+          "optimization",
+          "memory",
+          "speed",
+          "token",
+          "caching",
+          "profiling"
+        ],
+        "size_bytes": 3582
+      },
+      {
+        "name": "perf_react-best-practices",
+        "path": "skills\\perf_react-best-practices",
+        "category": "skills",
+        "kind": "directory",
+        "description": ">-",
+        "version": "1.0.0",
+        "tags": [],
+        "size_bytes": 119842
       },
       {
         "name": "pixelrag",
         "path": "skills\\pixelrag",
         "category": "skills",
         "kind": "directory",
-        "description": "PixelRAG skill cho Visual Retrieval-Augmented Generation - đọc tài liệu bằng hình ảnh (PDF, website, bảng biểu, sơ đồ). Cải thiện độ chính xác retrieval 18.1% so với Text RAG truyền thống. Tích hợp pi",
-        "version": "1.0.0",
-        "tags": [
-          "pixelrag",
-          "visual-rag",
-          "screenshot",
-          "document",
-          "pdf",
-          "vision",
-          "multimodal",
-          "embedding",
-          "faiss",
-          "retrieval",
-          "tables",
-          "charts",
-          "diagrams"
-        ],
-        "size_bytes": 10519
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 440
       },
       {
         "name": "ponytail",
         "path": "skills\\ponytail",
         "category": "skills",
         "kind": "directory",
-        "description": "Ponytail Skill - Lazy Senior Dev Mode for Cursor Enterprise Framework. YAGNI optimization, minimal code. Complementary to karpathy-coding (think first, then minimize).",
-        "version": "1.1.0",
-        "tags": [
-          "ponytail",
-          "yagni",
-          "minimalist",
-          "efficient",
-          "senior-dev",
-          "lazy-coding",
-          "code-reduction"
-        ],
-        "size_bytes": 9142
-      },
-      {
-        "name": "prefect",
-        "path": "skills\\prefect",
-        "category": "skills",
-        "kind": "directory",
-        "description": ">",
-        "version": "1.0.0",
+        "description": "",
+        "version": "",
         "tags": [],
-        "size_bytes": 17751
+        "size_bytes": 442
       },
       {
         "name": "pytorch-patterns",
@@ -6907,10 +7169,40 @@
         "path": "skills\\redis-observability",
         "category": "skills",
         "kind": "directory",
-        "description": ">-",
-        "version": "0.1.0",
+        "description": "",
+        "version": "",
         "tags": [],
-        "size_bytes": 7464
+        "size_bytes": 462
+      },
+      {
+        "name": "sec_hackingtool",
+        "path": "skills\\sec_hackingtool",
+        "category": "skills",
+        "kind": "directory",
+        "description": "Pentesting and OSINT bridge to AKCodez/hackingtool-plugin (183 tools from Z4nzu/hackingtool). Use when the user asks to recon a target, scan a network, enumerate subdomains, investigate a username or ",
+        "version": "",
+        "tags": [],
+        "size_bytes": 8651
+      },
+      {
+        "name": "sec_security-review",
+        "path": "skills\\sec_security-review",
+        "category": "skills",
+        "kind": "directory",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 43581
+      },
+      {
+        "name": "sec_vietnam-payment-review",
+        "path": "skills\\sec_vietnam-payment-review",
+        "category": "skills",
+        "kind": "directory",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 33250
       },
       {
         "name": "security-review",
@@ -6920,7 +7212,7 @@
         "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 43581
+        "size_bytes": 455
       },
       {
         "name": "senior-data-engineer",
@@ -6940,7 +7232,7 @@
         "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 5857
+        "size_bytes": 456
       },
       {
         "name": "skill-share",
@@ -6953,14 +7245,35 @@
         "size_bytes": 3104
       },
       {
-        "name": "sql-server-table-reconciliation",
-        "path": "skills\\sql-server-table-reconciliation",
+        "name": "special_bazi",
+        "path": "skills\\special_bazi",
         "category": "skills",
         "kind": "directory",
-        "description": ">-",
+        "description": ">",
         "version": "",
         "tags": [],
-        "size_bytes": 20313
+        "size_bytes": 31554
+      },
+      {
+        "name": "special_vietnam-address",
+        "path": "skills\\special_vietnam-address",
+        "category": "skills",
+        "kind": "directory",
+        "description": "Skill chuyên về xử lý địa chỉ Việt Nam - autocomplete, validation, phân tích địa chỉ, tích hợp với vietnamese-provinces-database. Kích hoạt khi cần làm việc với địa chỉ, tỉnh/thành phố, quận/huyện, ph",
+        "version": "1.0.0",
+        "tags": [
+          "vietnam",
+          "address",
+          "province",
+          "district",
+          "ward",
+          "autocomplete",
+          "validation",
+          "location",
+          "geocoding",
+          "form"
+        ],
+        "size_bytes": 7747
       },
       {
         "name": "tensorflow-data-pipelines",
@@ -6983,8 +7296,117 @@
         "size_bytes": 22883
       },
       {
+        "name": "test_test-analysis",
+        "path": "skills\\test_test-analysis",
+        "category": "skills",
+        "kind": "directory",
+        "description": "Comprehensive test analysis skill covering functional, UI, integration, and e2e testing. Ensures code correctness through systematic test design and verification.",
+        "version": "1.0.0",
+        "tags": [
+          "testing",
+          "quality",
+          "functional",
+          "UI-test",
+          "integration",
+          "e2e",
+          "verification",
+          "QA"
+        ],
+        "size_bytes": 2812
+      },
+      {
         "name": "theme-factory",
         "path": "skills\\theme-factory",
+        "category": "skills",
+        "kind": "directory",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 450
+      },
+      {
+        "name": "ui_canvas-design",
+        "path": "skills\\ui_canvas-design",
+        "category": "skills",
+        "kind": "directory",
+        "description": ">-",
+        "version": "",
+        "tags": [],
+        "size_bytes": 5565553
+      },
+      {
+        "name": "ui_dashboard-ui",
+        "path": "skills\\ui_dashboard-ui",
+        "category": "skills",
+        "kind": "directory",
+        "description": "Dashboard & Form UI optimization skill. Professional component design với synchronized icons, consistent images, clear colors. Không AI-slop, không generic. Tối ưu cho dashboard, admin panel, forms, i",
+        "version": "",
+        "tags": [],
+        "size_bytes": 223190
+      },
+      {
+        "name": "ui_frontend-redesign",
+        "path": "skills\\ui_frontend-redesign",
+        "category": "skills",
+        "kind": "directory",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 13135
+      },
+      {
+        "name": "ui_frontend-review",
+        "path": "skills\\ui_frontend-review",
+        "category": "skills",
+        "kind": "directory",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 14259
+      },
+      {
+        "name": "ui_frontend-taste",
+        "path": "skills\\ui_frontend-taste",
+        "category": "skills",
+        "kind": "directory",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 55411
+      },
+      {
+        "name": "ui_hallmark",
+        "path": "skills\\ui_hallmark",
+        "category": "skills",
+        "kind": "directory",
+        "description": "Design taste skill for anti-slop UI. Based on Nutlope/hallmark (9.3k stars), detects AI slop aesthetics and builds distinctive, professional interfaces. Use when building landing pages, portfolios, ma",
+        "version": "",
+        "tags": [],
+        "size_bytes": 7228
+      },
+      {
+        "name": "ui_landing-page-pro",
+        "path": "skills\\ui_landing-page-pro",
+        "category": "skills",
+        "kind": "directory",
+        "description": "Professional Landing Page Skill cho SaaS, Products, E-commerce. Sections: Hero, Features, Products, Pricing, Blog, Contact, Auth. 3D effects, smooth animations, SEO content, image generation integrati",
+        "version": "",
+        "tags": [],
+        "size_bytes": 100166
+      },
+      {
+        "name": "ui_open-design",
+        "path": "skills\\ui_open-design",
+        "category": "skills",
+        "kind": "directory",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 7039
+      },
+      {
+        "name": "ui_theme-factory",
+        "path": "skills\\ui_theme-factory",
         "category": "skills",
         "kind": "directory",
         "description": ">-",
@@ -6993,79 +7415,8 @@
         "size_bytes": 155675
       },
       {
-        "name": "vercel-composition-patterns",
-        "path": "skills\\vercel-composition-patterns",
-        "category": "skills",
-        "kind": "directory",
-        "description": ">-",
-        "version": "1.0.0",
-        "tags": [],
-        "size_bytes": 50507
-      },
-      {
-        "name": "vercel-react-best-practices",
-        "path": "skills\\vercel-react-best-practices",
-        "category": "skills",
-        "kind": "directory",
-        "description": ">-",
-        "version": "1.0.0",
-        "tags": [],
-        "size_bytes": 119842
-      },
-      {
-        "name": "video-generation",
-        "path": "skills\\video-generation",
-        "category": "skills",
-        "kind": "directory",
-        "description": "AI Video Generation Skill - Auto-generate short videos (9:16) from URLs or text using HyperFrames rendering, OmniVoice TTS, and FFmpeg. Integrated from AI-auto-generate-video (huytranvan2010).",
-        "version": "1.0.0",
-        "tags": [
-          "video",
-          "hyperframes",
-          "omnivoice",
-          "tts",
-          "short-video",
-          "tiktok",
-          "youtube-shorts",
-          "vietnamese",
-          "ffmpeg"
-        ],
-        "size_bytes": 9107
-      },
-      {
-        "name": "vietnam-address",
-        "path": "skills\\vietnam-address",
-        "category": "skills",
-        "kind": "directory",
-        "description": "Skill chuyên về xử lý địa chỉ Việt Nam - autocomplete, validation, phân tích địa chỉ, tích hợp với vietnamese-provinces-database. Kích hoạt khi cần làm việc với địa chỉ, tỉnh/thành phố, quận/huyện, ph",
-        "version": "1.0.0",
-        "tags": [
-          "vietnam",
-          "address",
-          "province",
-          "district",
-          "ward",
-          "autocomplete",
-          "validation",
-          "location",
-          "geocoding",
-          "form"
-        ],
-        "size_bytes": 7747
-      },
-      {
-        "name": "vietnam-payment-review",
-        "path": "skills\\vietnam-payment-review",
-        "category": "skills",
-        "kind": "directory",
-        "description": "",
-        "version": "",
-        "tags": [],
-        "size_bytes": 33250
-      },
-      {
-        "name": "visual-explainer",
-        "path": "skills\\visual-explainer",
+        "name": "ui_visual-explainer",
+        "path": "skills\\ui_visual-explainer",
         "category": "skills",
         "kind": "directory",
         "description": "Generate self-contained HTML visual explanations for systems, code changes, plans, data, and technical concepts. Use for diagrams, architecture overviews, diff or plan reviews, project recaps, compari",
@@ -7083,8 +7434,8 @@
         "size_bytes": 245063
       },
       {
-        "name": "web-design-guidelines",
-        "path": "skills\\web-design-guidelines",
+        "name": "ui_web-design-guidelines",
+        "path": "skills\\ui_web-design-guidelines",
         "category": "skills",
         "kind": "directory",
         "description": ">-",
@@ -7093,8 +7444,84 @@
         "size_bytes": 1439
       },
       {
-        "name": "webapp-testing",
-        "path": "skills\\webapp-testing",
+        "name": "util_create-pull-request",
+        "path": "skills\\util_create-pull-request",
+        "category": "skills",
+        "kind": "directory",
+        "description": ">-",
+        "version": "",
+        "tags": [],
+        "size_bytes": 17797
+      },
+      {
+        "name": "util_csv-wrangling",
+        "path": "skills\\util_csv-wrangling",
+        "category": "skills",
+        "kind": "directory",
+        "description": ">-",
+        "version": "",
+        "tags": [],
+        "size_bytes": 6996
+      },
+      {
+        "name": "util_document-ocr",
+        "path": "skills\\util_document-ocr",
+        "category": "skills",
+        "kind": "directory",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 13181
+      },
+      {
+        "name": "util_skill-installer",
+        "path": "skills\\util_skill-installer",
+        "category": "skills",
+        "kind": "directory",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 5857
+      },
+      {
+        "name": "util_stability",
+        "path": "skills\\util_stability",
+        "category": "skills",
+        "kind": "directory",
+        "description": "Stability and reliability skill covering error handling, resilience patterns, monitoring, and graceful degradation. Ensures applications remain operational under adverse conditions.",
+        "version": "1.0.0",
+        "tags": [
+          "stability",
+          "reliability",
+          "error-handling",
+          "resilience",
+          "monitoring",
+          "graceful-degradation",
+          "fault-tolerance"
+        ],
+        "size_bytes": 4120
+      },
+      {
+        "name": "util_utility-helpers",
+        "path": "skills\\util_utility-helpers",
+        "category": "skills",
+        "kind": "directory",
+        "description": "Utility helpers skill covering common utilities, synchronization tools, code generators, and helper functions. Provides reusable components for common development tasks.",
+        "version": "1.0.0",
+        "tags": [
+          "utility",
+          "helpers",
+          "tools",
+          "sync",
+          "generator",
+          "common",
+          "reusable"
+        ],
+        "size_bytes": 4854
+      },
+      {
+        "name": "util_webapp-testing",
+        "path": "skills\\util_webapp-testing",
         "category": "skills",
         "kind": "directory",
         "description": ">-",
@@ -7103,47 +7530,74 @@
         "size_bytes": 33976
       },
       {
+        "name": "vibe-coding",
+        "path": "skills\\vibe-coding",
+        "category": "skills",
+        "kind": "directory",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 448
+      },
+      {
+        "name": "video-generation",
+        "path": "skills\\video-generation",
+        "category": "skills",
+        "kind": "directory",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 456
+      },
+      {
+        "name": "vietnam-payment-review",
+        "path": "skills\\vietnam-payment-review",
+        "category": "skills",
+        "kind": "directory",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 469
+      },
+      {
+        "name": "visual-explainer",
+        "path": "skills\\visual-explainer",
+        "category": "skills",
+        "kind": "directory",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 456
+      },
+      {
+        "name": "webapp-testing",
+        "path": "skills\\webapp-testing",
+        "category": "skills",
+        "kind": "directory",
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 454
+      },
+      {
         "name": "weknora-agent",
         "path": "skills\\weknora-agent",
         "category": "skills",
         "kind": "directory",
-        "description": "WeKnora Agent Skill - ReAct autonomous reasoning agent với multi-step planning, tool calling, web search, và MCP tools integration",
-        "version": "1.0.0",
-        "tags": [
-          "weknora",
-          "react-agent",
-          "autonomous",
-          "reasoning",
-          "agent",
-          "tool-calling",
-          "web-search",
-          "mcp",
-          "multi-step",
-          "workflow"
-        ],
-        "size_bytes": 10574
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 450
       },
       {
         "name": "weknora-kb",
         "path": "skills\\weknora-kb",
         "category": "skills",
         "kind": "directory",
-        "description": "WeKnora Knowledge Base Skill - RAG implementation, document Q&A, FAQ system, enterprise wiki, hybrid search với Vector + BM25 + GraphRAG + Knowledge Graph",
-        "version": "1.0.0",
-        "tags": [
-          "weknora",
-          "rag",
-          "knowledge-base",
-          "hybrid-search",
-          "vector-search",
-          "bm25",
-          "graphrag",
-          "knowledge-graph",
-          "document-qa",
-          "faq",
-          "wiki"
-        ],
-        "size_bytes": 6413
+        "description": "",
+        "version": "",
+        "tags": [],
+        "size_bytes": 444
       },
       {
         "name": "youtube-downloader",

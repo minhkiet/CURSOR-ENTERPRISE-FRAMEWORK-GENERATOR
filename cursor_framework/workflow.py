@@ -26,6 +26,7 @@ import hashlib
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any, Optional
 
 from .context_builder import ContextBuilder, ContextResult
 from .indexer import Indexer
@@ -201,6 +202,21 @@ class Workflow:
             self.memory._storage[MemoryTier.HOT].clear()
             return count
 
+    def _coerce_to_context_result(self, cached: Any) -> Optional[ContextResult]:
+        """Re-wrap a JSON-deserialized dict into ContextResult for cross-process cache hits."""
+        if isinstance(cached, ContextResult):
+            return cached
+        if isinstance(cached, dict) and cached.get("text") is not None:
+            return ContextResult(
+                text=cached.get("text", ""),
+                tokens=cached.get("tokens", 0),
+                skill_count=cached.get("skill_count", 0),
+                truncated=cached.get("truncated", False),
+                skills_used=cached.get("skills_used", []),
+                skipped=cached.get("skipped", []),
+            )
+        return None
+
     def ask(self, request: str) -> WorkflowResult:
         """
         Process a user request and return budgeted context.
@@ -241,7 +257,10 @@ class Workflow:
         cache_key = f"{base_key}:{current_etag}"
 
         cached = self.memory.retrieve(cache_key)
-        if cached is not None and isinstance(cached, ContextResult):
+        raw_cached = cached
+        if cached is not None:
+            cached = self._coerce_to_context_result(cached)
+        if cached is not None:
             # ponytail: persist-on-hit is now optional via save_if_dirty.
             # Cache hits don't mutate memory, so the dirty flag stays
             # False and the JSON write is skipped — unless the caller
@@ -268,7 +287,7 @@ class Workflow:
         # ponytail: cached value may be a plain dict after JSON round-trip
         # (dataclass loses its type through json). Fall back to rebuild.
         # Also check for stale cache (different ETag).
-        if cached is not None:
+        if raw_cached is not None:
             self.memory.delete(cache_key)
 
         # Cache miss — build fresh. Indexer.scan only runs here.
