@@ -1,0 +1,36 @@
+{
+  "name": "cursor-framework-mcp",
+  "version": "1.0.0",
+  "description": "Cursor Enterprise Framework MCP server. Lazy-loads and caches rules, skills, and agents with LRU eviction, token budgeting, and auto-detection of the right skill for a free-form task.",
+  "author": {
+    "name": "thaofvn-coca06"
+  },
+  "homepage": "https://github.com/thaofvn-coca06/2026",
+  "keywords": [
+    "cursor",
+    "framework",
+    "mcp",
+    "rules",
+    "skills",
+    "agents",
+    "lru-cache",
+    "token-optimization",
+    "auto-discovery"
+  ],
+  "entry": "cursor_framework_mcp.server:run",
+  "config": {
+    "workspace_root_env": "CURSOR_WORKSPACE_ROOT",
+    "default_workspace_root": ".",
+    "cache": {
+      "max_rules": 20,
+      "max_skills": 30,
+      "max_agents": 10,
+      "ttl_seconds": 1800
+    },
+    "tokens": {
+      "rule_avg": 600,
+      "skill_avg": 1200,
+      "agent_avg": 400
+    }
+  }
+}
