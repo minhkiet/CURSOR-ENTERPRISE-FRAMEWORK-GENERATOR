@@ -1,0 +1,1105 @@
+---
+description: Testing Best Practices - bao gồm unit test, integration test, E2E, và TDD
+created: 2026-06-23
+version: 1.1.0
+tags: [testing, unit-test, integration-test, e2e, quality, tdd, merged]
+---
+
+# Testing
+
+## Mục tiêu
+
+Testing là cornerstone của software quality và confidence. Một comprehensive testing strategy không chỉ giúp catch bugs trước khi reach production mà còn enable confident refactoring, document behavior, và improve code design. Trong Cursor Enterprise Framework, testing được approach như một first-class concern với proper test pyramid, automated testing, và continuous quality verification.
+
+Mục tiêu của rule này là establish testing principles và practices that scale with the organization. Từ unit tests đến end-to-end tests, từ manual testing đến automated quality gates, tất cả đều được cover để ensure consistent quality across projects.
+
+## Nguyên tắc
+
+**1. Test Pyramid**
+
+Unit tests form the base - many, fast, cheap. Integration tests in the middle - fewer, slower, more comprehensive. E2E tests at the top - few, slow, expensive. Maintain proper balance. Too many E2E tests is a anti-pattern. Most tests should be unit tests.
+
+**2. Test Driven Development**
+
+Write tests before implementation. Tests define expected behavior. Red-Green-Refactor cycle. Tests drive design. This ensures testability. Helps avoid over-engineering.
+
+**3. Arrange-Act-Assert Pattern**
+
+Structure tests consistently. Arrange: setup test data. Act: execute the behavior. Assert: verify the outcome. Clear test names describe scenario. Each test should test one thing.
+
+**4. Test Isolation**
+
+Tests must not depend on each other. Each test should setup its own data. Clean up after tests. No shared mutable state. Parallel test execution possible. Tests should be order-independent.
+
+**5. Test Data Management**
+
+Use factories, not fixtures. Create minimal data needed. Keep test data realistic. Consider test data generation. Manage test data lifecycle. Avoid database dependency when possible.
+
+**6. Mocking Strategy**
+
+Mock external dependencies. Don't mock internals. Use interfaces for testability. Partial mocks are code smell. Avoid over-mocking. Real objects when feasible.
+
+**7. Coverage Goals**
+
+Coverage is a metric, not a goal. 100% coverage doesn't mean good tests. Focus on critical paths. Higher coverage for critical code. Don't sacrifice test quality for coverage. Review tests for effectiveness.
+
+**8. Test Stability**
+
+Flaky tests erode confidence. Eliminate test flakiness. Fix or remove flaky tests. Tests should be deterministic. Control timing dependencies. Use test isolation.
+
+**9. Continuous Testing**
+
+Run tests on every commit. Gate merges on test pass. Automated quality gates. Fast feedback loop. Tests in CI/CD pipeline. Quality is everyone's responsibility.
+
+**10. Test Readability**
+
+Tests are documentation. Clear test names. Well-structured code. Comments for complex logic. Test code should be clean. Maintainable tests are essential.
+
+## Checklist
+
+- [ ] Test pyramid defined và balanced
+- [ ] Unit tests for business logic
+- [ ] Integration tests for data access
+- [ ] E2E tests for critical flows
+- [ ] Test data management strategy
+- [ ] Mocking strategy documented
+- [ ] Test coverage targets set
+- [ ] Flaky tests identified và fixed
+- [ ] CI/CD testing pipeline configured
+- [ ] Test documentation complete
+- [ ] Code review includes test review
+- [ ] Testing training completed
+
+## Anti Pattern
+
+**1. Testing Everything**
+
+Writing tests for trivial code. Testing getters và setters. No value from such tests. Focus on behavior, not implementation. Test contracts, not details.
+
+**2. Brittle Tests**
+
+Tests break on unrelated changes. Over-specific assertions. Testing implementation details. Tests coupled to code structure. Makes refactoring difficult.
+
+**3. Complex Test Setup**
+
+Tests buried in setup code. Hard to understand test intent. Excessive mocking. Setup more complex than test logic. Makes tests hard to maintain.
+
+**4. No E2E Tests**
+
+Only unit tests. No verification of system working together. False confidence. Critical bugs slip through. Some E2E tests are essential.
+
+**5. Skipped Tests**
+
+Commented out tests. Tests marked to skip. Technical debt in tests. Technical debt accumulates. Fix or remove skipped tests.
+
+## Best Practice
+
+**1. Unit Test Structure**
+
+```typescript
+// Using Jest
+describe('OrderService', () => {
+  let orderService: OrderService;
+  let mockOrderRepository: jest.Mocked<OrderRepository>;
+  let mockPaymentService: jest.Mocked<PaymentService>;
+  let mockNotificationService: jest.Mocked<NotificationService>;
+  
+  beforeEach(() => {
+    // Arrange: Create fresh mocks for each test
+    mockOrderRepository = {
+      create: jest.fn(),
+      findById: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn()
+    };
+    
+    mockPaymentService = {
+      charge: jest.fn(),
+      refund: jest.fn()
+    };
+    
+    mockNotificationService = {
+      sendOrderConfirmation: jest.fn(),
+      sendOrderShipped: jest.fn()
+    };
+    
+    orderService = new OrderService(
+      mockOrderRepository,
+      mockPaymentService,
+      mockNotificationService
+    );
+  });
+  
+  describe('createOrder', () => {
+    it('should create order with valid data', async () => {
+      // Arrange
+      const orderData: CreateOrderDTO = {
+        customerId: 'customer-123',
+        items: [
+          { productId: 'product-1', quantity: 2, price: 29.99 },
+          { productId: 'product-2', quantity: 1, price: 49.99 }
+        ],
+        shippingAddress: {
+          street: '123 Main St',
+          city: 'Hanoi',
+          country: 'VN'
+        }
+      };
+      
+      const createdOrder: Order = {
+        id: 'order-456',
+        ...orderData,
+        total: 109.97,
+        status: 'pending',
+        createdAt: new Date()
+      };
+      
+      mockOrderRepository.create.mockResolvedValue(createdOrder);
+      mockPaymentService.charge.mockResolvedValue({ success: true });
+      
+      // Act
+      const result = await orderService.createOrder(orderData);
+      
+      // Assert
+      expect(result).toEqual(createdOrder);
+      expect(mockOrderRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          customerId: orderData.customerId,
+          items: orderData.items
+        })
+      );
+      expect(mockPaymentService.charge).toHaveBeenCalledWith(
+        orderData.customerId,
+        createdOrder.total
+      );
+    });
+    
+    it('should throw ValidationError for empty items', async () => {
+      // Arrange
+      const invalidOrderData: CreateOrderDTO = {
+        customerId: 'customer-123',
+        items: [],
+        shippingAddress: {
+          street: '123 Main St',
+          city: 'Hanoi',
+          country: 'VN'
+        }
+      };
+      
+      // Act & Assert
+      await expect(orderService.createOrder(invalidOrderData))
+        .rejects
+        .toThrow(ValidationError);
+    });
+    
+    it('should rollback order creation on payment failure', async () => {
+      // Arrange
+      const orderData: CreateOrderDTO = {
+        customerId: 'customer-123',
+        items: [{ productId: 'product-1', quantity: 1, price: 99.99 }],
+        shippingAddress: { street: '123 Main St', city: 'Hanoi', country: 'VN' }
+      };
+      
+      const createdOrder: Order = {
+        id: 'order-456',
+        ...orderData,
+        total: 99.99,
+        status: 'pending',
+        createdAt: new Date()
+      };
+      
+      mockOrderRepository.create.mockResolvedValue(createdOrder);
+      mockPaymentService.charge.mockRejectedValue(
+        new PaymentError('Card declined')
+      );
+      
+      // Act & Assert
+      await expect(orderService.createOrder(orderData))
+        .rejects
+        .toThrow(PaymentError);
+      
+      expect(mockOrderRepository.delete).toHaveBeenCalledWith('order-456');
+    });
+  });
+  
+  describe('cancelOrder', () => {
+    it('should cancel pending order successfully', async () => {
+      // Arrange
+      const order: Order = {
+        id: 'order-456',
+        customerId: 'customer-123',
+        items: [{ productId: 'product-1', quantity: 1, price: 99.99 }],
+        shippingAddress: { street: '123 Main St', city: 'Hanoi', country: 'VN' },
+        total: 99.99,
+        status: 'pending',
+        createdAt: new Date()
+      };
+      
+      mockOrderRepository.findById.mockResolvedValue(order);
+      mockPaymentService.refund.mockResolvedValue({ success: true });
+      mockOrderRepository.update.mockResolvedValue({
+        ...order,
+        status: 'cancelled'
+      });
+      
+      // Act
+      const result = await orderService.cancelOrder('order-456');
+      
+      // Assert
+      expect(result.status).toBe('cancelled');
+      expect(mockPaymentService.refund).toHaveBeenCalledWith('customer-123', 99.99);
+    });
+    
+    it('should throw error when cancelling shipped order', async () => {
+      // Arrange
+      const shippedOrder: Order = {
+        id: 'order-456',
+        customerId: 'customer-123',
+        items: [],
+        shippingAddress: { street: '123 Main St', city: 'Hanoi', country: 'VN' },
+        total: 99.99,
+        status: 'shipped',
+        createdAt: new Date()
+      };
+      
+      mockOrderRepository.findById.mockResolvedValue(shippedOrder);
+      
+      // Act & Assert
+      await expect(orderService.cancelOrder('order-456'))
+        .rejects
+        .toThrow(InvalidOperationError);
+    });
+  });
+});
+```
+
+**2. Integration Testing with TestContainers**
+
+```typescript
+// Integration test setup with TestContainers
+import { PostgreSqlContainer } from '@testcontainers/postgresql';
+import { RedisContainer } from '@testcontainers/redis';
+import { StartedTestContainer } from 'testcontainers';
+
+describe('OrderRepository Integration', () => {
+  let postgresContainer: StartedTestContainer;
+  let redisContainer: StartedTestContainer;
+  let prisma: PrismaClient;
+  let orderRepository: OrderRepository;
+  
+  beforeAll(async () => {
+    // Start PostgreSQL container
+    postgresContainer = await new PostgreSqlContainer()
+      .withDatabase('test_db')
+      .withUsername('test')
+      .withPassword('test')
+      .start();
+    
+    // Start Redis container
+    redisContainer = await new RedisContainer()
+      .start();
+    
+    // Setup Prisma
+    const connectionString = postgresContainer.getConnectionUri();
+    
+    prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: connectionString
+        }
+      }
+    });
+    
+    // Run migrations
+    await prisma.$executeRaw`
+      CREATE TABLE IF NOT EXISTS orders (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        customer_id UUID NOT NULL,
+        total DECIMAL(10, 2) NOT NULL,
+        status VARCHAR(50) NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `;
+    
+    orderRepository = new OrderRepository(prisma);
+  });
+  
+  afterAll(async () => {
+    await prisma.$disconnect();
+    await postgresContainer.stop();
+    await redisContainer.stop();
+  });
+  
+  beforeEach(async () => {
+    // Clean database before each test
+    await prisma.$executeRaw`TRUNCATE orders CASCADE`;
+  });
+  
+  describe('create', () => {
+    it('should create order successfully', async () => {
+      // Arrange
+      const orderData = {
+        customerId: '550e8400-e29b-41d4-a716-446655440000',
+        total: new Decimal(99.99),
+        status: OrderStatus.PENDING
+      };
+      
+      // Act
+      const result = await orderRepository.create(orderData);
+      
+      // Assert
+      expect(result.id).toBeDefined();
+      expect(result.customerId).toBe(orderData.customerId);
+      expect(result.total).toEqual(orderData.total);
+      expect(result.status).toBe(OrderStatus.PENDING);
+      
+      // Verify persisted
+      const persisted = await prisma.$queryRaw`
+        SELECT * FROM orders WHERE id = ${result.id}
+      `;
+      expect(persisted).toHaveLength(1);
+    });
+    
+    it('should generate UUID if not provided', async () => {
+      // Act
+      const result = await orderRepository.create({
+        customerId: '550e8400-e29b-41d4-a716-446655440000',
+        total: new Decimal(50.00),
+        status: OrderStatus.PENDING
+      });
+      
+      // Assert
+      expect(result.id).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      );
+    });
+  });
+  
+  describe('findByCustomerId', () => {
+    beforeEach(async () => {
+      // Insert test data
+      await prisma.$executeRaw`
+        INSERT INTO orders (id, customer_id, total, status)
+        VALUES 
+          ('order-1', '550e8400-e29b-41d4-a716-446655440000', 100.00, 'pending'),
+          ('order-2', '550e8400-e29b-41d4-a716-446655440000', 50.00, 'completed'),
+          ('order-3', 'different-customer', 75.00, 'pending')
+      `;
+    });
+    
+    it('should return all orders for customer', async () => {
+      // Act
+      const result = await orderRepository.findByCustomerId(
+        '550e8400-e29b-41d4-a716-446655440000'
+      );
+      
+      // Assert
+      expect(result).toHaveLength(2);
+      expect(result.map(o => o.total.toNumber())).toEqual([100, 50]);
+    });
+    
+    it('should return empty array for customer with no orders', async () => {
+      // Act
+      const result = await orderRepository.findByCustomerId(
+        'non-existent-customer'
+      );
+      
+      // Assert
+      expect(result).toHaveLength(0);
+    });
+  });
+});
+```
+
+**3. E2E Testing with Playwright**
+
+```typescript
+// E2E test structure
+import { test, expect, Page } from '@playwright/test';
+
+test.describe('Order Flow', () => {
+  test.beforeEach(async ({ page }) => {
+    // Login before each test
+    await page.goto('/login');
+    await page.fill('[name="email"]', 'test@example.com');
+    await page.fill('[name="password"]', 'password123');
+    await page.click('[type="submit"]');
+    await expect(page).toHaveURL('/dashboard');
+  });
+  
+  test('should complete order flow end-to-end', async ({ page }) => {
+    // Navigate to products
+    await page.click('text=Shop');
+    await expect(page).toHaveURL('/products');
+    
+    // Add product to cart
+    await page.click('[data-testid="product-1"] [data-testid="add-to-cart"]');
+    await expect(page.locator('[data-testid="cart-count"]')).toHaveText('1');
+    
+    // View cart
+    await page.click('[data-testid="cart-icon"]');
+    await expect(page).toHaveURL('/cart');
+    await expect(page.locator('[data-testid="cart-item"]')).toHaveCount(1);
+    
+    // Proceed to checkout
+    await page.click('text=Checkout');
+    await expect(page).toHaveURL('/checkout');
+    
+    // Fill shipping address
+    await page.fill('[name="address.street"]', '123 Main St');
+    await page.fill('[name="address.city"]', 'Hanoi');
+    await page.selectOption('[name="address.country"]', 'VN');
+    
+    // Place order
+    await page.click('text=Place Order');
+    
+    // Verify success
+    await expect(page.locator('[data-testid="order-success"]')).toBeVisible();
+    await expect(page.locator('[data-testid="order-number"]')).toBeVisible();
+    
+    // Verify in order history
+    await page.click('text=My Orders');
+    await expect(page.locator('[data-testid="order-list"]')).toContainText('123 Main St');
+  });
+  
+  test('should validate checkout form', async ({ page }) => {
+    await page.goto('/checkout');
+    
+    // Try to submit without required fields
+    await page.click('text=Place Order');
+    
+    // Verify validation errors
+    await expect(page.locator('[name="address.street"]')).toHaveAttribute(
+      'aria-invalid',
+      'true'
+    );
+    await expect(page.locator('.error-message')).toContainText(
+      'Street address is required'
+    );
+  });
+  
+  test('should handle payment failure gracefully', async ({ page }) => {
+    // Intercept payment API
+    await page.route('**/api/payments', async (route) => {
+      await route.fulfill({
+        status: 402,
+        body: JSON.stringify({
+          error: 'Card declined',
+          code: 'PAYMENT_DECLINED'
+        })
+      });
+    });
+    
+    await page.goto('/checkout');
+    await fillCheckoutForm(page);
+    await page.click('text=Place Order');
+    
+    // Verify error message
+    await expect(page.locator('[data-testid="payment-error"]')).toContainText(
+      'Payment failed'
+    );
+    
+    // Should be able to retry
+    await page.click('text=Try Again');
+    await expect(page.locator('[data-testid="payment-form"]')).toBeVisible();
+  });
+});
+
+// Page Objects pattern
+class CheckoutPage {
+  constructor(private page: Page) {}
+  
+  async fillShippingAddress(address: ShippingAddress) {
+    await this.page.fill('[name="address.street"]', address.street);
+    await this.page.fill('[name="address.city"]', address.city);
+    await this.page.selectOption('[name="address.country"]', address.country);
+    await this.page.fill('[name="address.postalCode"]', address.postalCode);
+  }
+  
+  async selectPaymentMethod(method: PaymentMethod) {
+    await this.page.click(`[data-testid="payment-method-${method}"]`);
+  }
+  
+  async placeOrder() {
+    await this.page.click('text=Place Order');
+  }
+  
+  async getOrderNumber(): Promise<string> {
+    return await this.page.locator('[data-testid="order-number"]').textContent();
+  }
+}
+
+// Using Page Objects
+test('checkout flow with page objects', async ({ page }) => {
+  const checkoutPage = new CheckoutPage(page);
+  
+  await page.goto('/checkout');
+  await checkoutPage.fillShippingAddress({
+    street: '123 Main St',
+    city: 'Hanoi',
+    country: 'VN',
+    postalCode: '10000'
+  });
+  await checkoutPage.selectPaymentMethod('credit_card');
+  await checkoutPage.placeOrder();
+  
+  const orderNumber = await checkoutPage.getOrderNumber();
+  expect(orderNumber).toMatch(/^ORD-\d+$/);
+});
+```
+
+**4. API Contract Testing**
+
+```typescript
+// API contract testing with Pact
+import { Pact } from '@pact-foundation/pact';
+
+const provider = new Pact({
+  consumer: 'web-frontend',
+  provider: 'order-service',
+  port: 1234,
+  log: path.resolve(process.cwd(), 'logs', 'pact.log'),
+  dir: path.resolve(process.cwd(), 'pacts'),
+  spec: 2
+});
+
+describe('Order Service Contract', () => {
+  beforeAll(() => provider.setup());
+  afterAll(() => provider.finalize());
+  
+  describe('creating an order', () => {
+    beforeEach(() =>
+      provider.addInteraction({
+        state: 'user exists and has a valid cart',
+        uponReceiving: 'a request to create an order',
+        withRequest: {
+          method: 'POST',
+          path: '/api/orders',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer valid-token'
+          },
+          body: {
+            customerId: 'customer-123',
+            items: [
+              { productId: 'product-1', quantity: 2 }
+            ],
+            shippingAddress: {
+              street: '123 Main St',
+              city: 'Hanoi',
+              country: 'VN'
+            }
+          }
+        },
+        willRespondWith: {
+          status: 201,
+          headers: { 'Content-Type': 'application/json' },
+          body: {
+            id: like('order-456'),
+            status: 'pending',
+            total: 99.99,
+            createdAt: iso8601DateTime()
+          }
+        }
+      })
+    );
+    
+    it('should create order according to contract', async () => {
+      const response = await fetch('http://localhost:1234/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer valid-token'
+        },
+        body: JSON.stringify({
+          customerId: 'customer-123',
+          items: [{ productId: 'product-1', quantity: 2 }],
+          shippingAddress: {
+            street: '123 Main St',
+            city: 'Hanoi',
+            country: 'VN'
+          }
+        })
+      });
+      
+      expect(response.status).toBe(201);
+      
+      const body = await response.json();
+      expect(body.id).toBeDefined();
+      expect(body.status).toBe('pending');
+      expect(body.total).toBeCloseTo(99.99);
+    });
+  });
+});
+```
+
+**5. Performance Testing**
+
+```typescript
+// Performance testing with k6
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+
+export const options = {
+  stages: [
+    { duration: '2m', target: 100 },  // Ramp up
+    { duration: '5m', target: 100 },  // Steady state
+    { duration: '2m', target: 200 },  // Spike
+    { duration: '5m', target: 200 },  // Steady state at spike
+    { duration: '2m', target: 0 }    // Ramp down
+  ],
+  thresholds: {
+    http_req_duration: ['p(95)<500'],  // 95% under 500ms
+    http_req_failed: ['rate<0.01'],    // Error rate < 1%
+    'group_duration': ['p(95)<300']
+  }
+};
+
+const BASE_URL = __ENV.BASE_URL || 'https://api.example.com';
+
+export default function () {
+  constScenarios = [
+    { name: 'Browse Products', weight: 40 },
+    { name: 'Add to Cart', weight: 20 },
+    { name: 'Checkout', weight: 10 },
+    { name: 'View Order', weight: 20 },
+    { name: 'Search', weight: 10 }
+  ];
+  
+  const scenario = weightedRandom(scenarios);
+  
+  switch (scenario) {
+    case 'Browse Products':
+      browseProducts();
+      break;
+    case 'Add to Cart':
+      addToCart();
+      break;
+    case 'Checkout':
+      checkout();
+      break;
+    case 'View Order':
+      viewOrder();
+      break;
+    case 'Search':
+      searchProducts();
+      break;
+  }
+  
+  sleep(1);
+}
+
+function browseProducts() {
+  const res = http.get(`${BASE_URL}/api/products?page=1&limit=20`);
+  check(res, {
+    'browse products status 200': (r) => r.status === 200,
+    'browse products has data': (r) => JSON.parse(r.body).data.length > 0
+  });
+}
+
+function addToCart() {
+  const productId = `product-${Math.floor(Math.random() * 100)}`;
+  
+  const res = http.post(
+    `${BASE_URL}/api/cart/items`,
+    JSON.stringify({ productId, quantity: 1 }),
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+  
+  check(res, {
+    'add to cart status 201': (r) => r.status === 201
+  });
+}
+
+function checkout() {
+  // Requires authenticated user
+  const res = http.post(
+    `${BASE_URL}/api/orders`,
+    JSON.stringify({
+      items: [{ productId: 'product-1', quantity: 1 }],
+      shippingAddress: { street: '123 Main', city: 'Hanoi', country: 'VN' }
+    }),
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${__ENV.AUTH_TOKEN}`
+      }
+    }
+  );
+  
+  check(res, {
+    'checkout status 201': (r) => r.status === 201
+  });
+}
+```
+
+## Workflow
+
+**Phase 1: Test Strategy**
+
+Define testing pyramid. Set coverage targets. Choose testing tools. Plan test environments. Define quality gates.
+
+**Phase 2: Unit Tests**
+
+Write unit tests for business logic. Use TDD for new features. Maintain test quality. Review test coverage. Refactor tests with code.
+
+**Phase 3: Integration Tests**
+
+Write integration tests for data layer. Test service interactions. Use test containers. Maintain test isolation.
+
+**Phase 4: E2E Tests**
+
+Identify critical user journeys. Write E2E tests for these paths. Keep E2E tests stable. Use Page Objects. Run E2E in CI.
+
+**Phase 5: Performance Tests**
+
+Define performance requirements. Write performance tests. Run under load. Analyze results. Optimize based on findings.
+
+**Phase 6: Continuous Testing**
+
+Integrate tests in CI/CD. Set quality gates. Monitor test results. Fix flaky tests. Iterate on strategy.
+
+## Ví dụ
+
+**Ví dụ 1: Property-Based Testing**
+
+```typescript
+// Using fast-check for property-based testing
+import fc from 'fast-check';
+
+describe('Order validation', () => {
+  it('should validate any valid order', () => {
+    const validOrder = fc.record({
+      customerId: fc.uuid(),
+      items: fc.array(
+        fc.record({
+          productId: fc.uuid(),
+          quantity: fc.integer({ min: 1, max: 100 }),
+          price: fc.float({ min: 0.01, max: 10000 })
+        }),
+        { minLength: 1, maxLength: 100 }
+      ),
+      shippingAddress: fc.record({
+        street: fc.string({ minLength: 1, maxLength: 200 }),
+        city: fc.string({ minLength: 1, maxLength: 100 }),
+        country: fc.string({ minLength: 2, maxLength: 2 })
+      })
+    });
+    
+    fc.assert(
+      fc.property(validOrder, (order) => {
+        const result = validateOrder(order);
+        expect(result.isValid).toBe(true);
+      })
+    );
+  });
+  
+  it('should reject orders with negative quantities', () => {
+    const invalidOrder = fc.record({
+      customerId: fc.uuid(),
+      items: fc.array(
+        fc.record({
+          productId: fc.uuid(),
+          quantity: fc.integer({ min: -100, max: 0 }), // Invalid
+          price: fc.float({ min: 0.01 })
+        })
+      ),
+      shippingAddress: validAddress
+    });
+    
+    fc.assert(
+      fc.property(invalidOrder, (order) => {
+        const result = validateOrder(order);
+        expect(result.isValid).toBe(false);
+        expect(result.errors).toContain('Quantity must be positive');
+      })
+    );
+  });
+});
+```
+
+**Ví dụ 2: Mutation Testing**
+
+```typescript
+// Using Stryker for mutation testing
+// stryker.config.json
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker.conf.json",
+  "testRunner": "jest",
+  "jest": {
+    "projectType": "typescript"
+  },
+  "mutators": {
+    "exclusions": ["*.d.ts", "*.test.ts", "*.spec.ts"]
+  },
+  "thresholds": {
+    "high": 80,
+    "low": 60,
+    "break": 50
+  },
+  "reporters": ["html", "clear-text"]
+}
+
+/*
+Mutation testing results:
+- Total mutants: 1,234
+- Killed: 1,156 (93.7%)
+- Survived: 45
+- No coverage: 33
+
+Surviving mutants indicate potential test gaps:
+1. Order total calculation mutation survived
+   - Need additional test for total precision
+   
+2. Empty items validation mutation survived
+   - Missing edge case test
+*/
+```
+
+## Test-Driven Development (TDD)
+
+### TDD Cycle
+
+Red-Green-Refactor là core cycle của TDD:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      TDD Cycle                                   │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  1. RED Phase                                                   │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  Write a failing test that describes the desired         │   │
+│  │  behavior. The test should fail for the right reason.    │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                              │                                   │
+│                              ▼                                   │
+│  2. GREEN Phase                                                 │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  Write the minimum code necessary to make the test       │   │
+│  │  pass. Don't worry about perfect code, just make it      │   │
+│  │  work.                                                   │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                              │                                   │
+│                              ▼                                   │
+│  3. REFACTOR Phase                                             │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  Improve the code while keeping tests passing.           │   │
+│  │  Remove duplication, improve naming, simplify logic.     │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                              │                                   │
+│                              ▼                                   │
+│                         Repeat...                                │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### TDD Workflow
+
+1. Write failing test (Red)
+2. Run test to verify failure
+3. Write minimal code (Green)
+4. Run test to verify pass
+5. Refactor code (Refactor)
+6. Run tests to verify
+7. Repeat
+
+### TDD Example
+
+```typescript
+// STEP 1: Write failing test (Red)
+describe('Money', () => {
+    describe('add', () => {
+        it('should add two money values with same currency', () => {
+            const m1 = new Money(100, Currency.USD);
+            const m2 = new Money(50, Currency.USD);
+
+            const result = m1.add(m2);
+
+            expect(result.amount).toBe(150);
+            expect(result.currency).toBe(Currency.USD);
+        });
+    });
+});
+
+// Test fails: Money class doesn't exist yet
+
+// STEP 2: Write minimal code (Green)
+class Money {
+    constructor(
+        public readonly amount: number,
+        public readonly currency: Currency
+    ) {}
+
+    add(other: Money): Money {
+        return new Money(this.amount + other.amount, this.currency);
+    }
+}
+
+// Test passes
+
+// STEP 3: Add more tests
+it('should throw when adding different currencies', () => {
+    const m1 = new Money(100, Currency.USD);
+    const m2 = new Money(50, Currency.EUR);
+
+    expect(() => m1.add(m2)).toThrow(CurrencyMismatchException);
+});
+
+// Test fails: No currency check
+
+// STEP 4: Refactor
+class Money {
+    constructor(
+        public readonly amount: number,
+        public readonly currency: Currency
+    ) {}
+
+    add(other: Money): Money {
+        if (!this.currency.equals(other.currency)) {
+            throw new CurrencyMismatchException(this.currency, other.currency);
+        }
+        return new Money(this.amount + other.amount, this.currency);
+    }
+}
+
+// All tests pass
+```
+
+### Test Naming Conventions
+
+```typescript
+// Test naming pattern: describe + it
+describe('OrderAggregate', () => {
+    describe('addItem', () => {
+        it('should add item to draft order', () => {
+            // Test implementation
+        });
+
+        it('should throw error when adding item to confirmed order', () => {
+            // Test implementation
+        });
+    });
+
+    describe('confirm', () => {
+        it('should confirm order with items and valid payment', () => {
+            // Test implementation
+        });
+
+        it('should throw error when confirming empty order', () => {
+            // Test implementation
+        });
+    });
+});
+
+// BDD-style naming
+describe('Order Creation', () => {
+    scenario('customer can create order with valid items', () => {
+        given('a customer with valid cart items');
+        when('they submit order');
+        then('order should be created with status DRAFT');
+    });
+
+    scenario('customer cannot create empty order', () => {
+        given('a customer with empty cart');
+        when('they submit order');
+        then('error should be returned');
+    });
+});
+```
+
+### TDD Coverage Strategy
+
+```
+                    ┌──────────────┐
+                    │     E2E      │  5-10% (few, critical flows)
+                    │    Tests     │
+                    ├──────────────┤
+                    │  Integration │  20-30% (API, DB interactions)
+                    │    Tests     │
+                    ├──────────────┤
+                    │   Unit       │  60-70% (business logic)
+                    │   Tests      │
+                    └──────────────┘
+```
+
+| Layer | Coverage Target |
+|-------|-----------------|
+| Domain Layer | 100% |
+| Application Layer | 90% |
+| Infrastructure Layer | 70% |
+
+### Test Data Builders
+
+```typescript
+class OrderBuilder {
+    private id: OrderId = OrderId.generate();
+    private customerId: CustomerId = new CustomerId('default-customer');
+    private items: OrderItem[] = [];
+    private status: OrderStatus = OrderStatus.DRAFT;
+
+    withId(id: OrderId): this {
+        this.id = id;
+        return this;
+    }
+
+    withCustomer(customerId: CustomerId): this {
+        this.customerId = customerId;
+        return this;
+    }
+
+    withItem(product: Product, quantity: number): this {
+        this.items.push(OrderItem.create(product, new Quantity(quantity)));
+        return this;
+    }
+
+    withStatus(status: OrderStatus): this {
+        this.status = status;
+        return this;
+    }
+
+    build(): Order {
+        const order = Order.create(this.customerId, testAddress());
+        for (const item of this.items) {
+            order.addItem(item.product, item.quantity);
+        }
+        if (this.status === OrderStatus.CONFIRMED) {
+            order.confirm('pay-123');
+        }
+        return order;
+    }
+}
+
+// Usage in tests
+describe('Order Tests', () => {
+    it('should calculate total correctly', () => {
+        const order = new OrderBuilder()
+            .withCustomer(new CustomerId('cust-123'))
+            .withItem(testProduct('A', 100), 2)
+            .withItem(testProduct('B', 50), 1)
+            .build();
+
+        expect(order.total.amount).toBe(250);
+    });
+});
+```
+
+### Test Selection Priority
+
+1. Start with happy path
+2. Add edge cases
+3. Add error cases
+4. Add boundary conditions
+5. Test critical paths
+
+## Liên kết
+
+- [[performance]] - Performance testing
+- [[api]] - API testing
+- [[security]] - Security testing
+- [[database]] - Database testing
+- [[ci-cd]] - CI/CD testing integration
+- [[quality]] - Quality assurance
+- [[automation]] - Test automation
+- [[tdd]] - TDD (merged into this file)

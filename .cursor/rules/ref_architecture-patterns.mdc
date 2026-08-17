@@ -1,0 +1,2752 @@
+---
+description: Architecture Patterns - hợp nhất từ Clean Architecture, Hexagonal Architecture (Ports & Adapters), CQRS Pattern, Event Sourcing, và Domain-Driven Design trong Cursor Enterprise Framework
+created: 2026-06-26
+merged_from:
+  - clean-architecture.mdc
+  - hexagonal-architecture.mdc
+  - cqrs.mdc
+  - event-sourcing.mdc
+  - ddd.mdc
+version: 2.0.0
+tags: [architecture, clean-architecture, hexagonal, cqrs, event-sourcing, ddd, patterns, ports-adapters]
+---
+
+# Architecture Patterns
+
+## Tổng quan
+
+5 patterns kiến trúc được hợp nhất trong tài liệu này, mỗi pattern giải quyết một khía cạnh khác nhau của việc tổ chức và thiết kế hệ thống:
+
+| Pattern | Focus | Primary Benefit |
+|---------|-------|-----------------|
+| **Clean Architecture** | Layer separation, dependency rule | Independence của frameworks, UI, database |
+| **Hexagonal Architecture** | Ports & Adapters | Testability, swappable external dependencies |
+| **CQRS Pattern** | Read/Write separation | Optimized models cho từng operation type |
+| **Event Sourcing** | State as events | Complete audit trail, temporal queries |
+| **Domain-Driven Design** | Business domain modeling | Ubiquitous language, bounded contexts |
+
+### Khi nào sử dụng pattern nào?
+
+- **Clean Architecture**: Mọi project cần separation of concerns cơ bản
+- **Hexagonal**: Khi cần thay đổi external systems (DB, payment) dễ dàng
+- **CQRS**: Khi read/write có patterns khác nhau đáng kể, cần scale riêng
+- **Event Sourcing**: Khi cần audit trail đầy đủ, replay capability
+- **DDD**: Khi domain phức tạp, cần collaboration với domain experts
+
+---
+
+## 1. Clean Architecture
+
+### Mục tiêu
+
+Clean Architecture là một architectural pattern tổ chức code thành các layers với dependencies chỉ đi theo một hướng, hướng vào trong. Trong Cursor Enterprise Framework, Clean Architecture giúp tách biệt concerns, làm cho code dễ test, dễ maintain, và independent của frameworks.
+
+Clean Architecture không phải là một blueprint cứng nhắc mà là một set của principles có thể được adapted tùy theo project.
+
+### Nguyên tắc cơ bản
+
+**1. Dependency Rule**
+
+Source code dependencies chỉ có thể point inward. Inner circles không biết gì về outer circles. Entities của domain là center. Frameworks và tools ở outer layers.
+
+**2. Layers**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     Outer Layers                                 │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │              Interface Adapters                         │    │
+│  │         Controllers, Presenters, Gateways               │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │              Application Layer                          │    │
+│  │              Use Cases, Commands, Queries               │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │                 Domain Layer                            │    │
+│  │         Entities, Value Objects, Domain Services        │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                        Inner (Center)                           │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**3. Domain Layer**
+
+Contains enterprise-wide business rules. Entities and value objects. Domain interfaces. Domain services. Minimal dependencies.
+
+**4. Application Layer**
+
+Contains application-specific business rules. Use cases and commands. Orchestration. Depends only on domain interfaces.
+
+**5. Interface Adapters**
+
+Converts data between formats. Controllers and presenters. Gateways and interfaces. DTOs and mappers.
+
+**6. Infrastructure Layer**
+
+Implements interfaces defined in inner layers. External concerns. Frameworks. Databases. Web. UI.
+
+**7. Dependency Inversion**
+
+Abstractions thay vì concretions. Define interfaces in inner layers. Implementations in outer layers. Allow swapping implementations.
+
+### Best Practice
+
+**1. Project Structure**
+
+```
+src/
+├── domain/                    # Enterprise Business Rules
+│   ├── entities/
+│   │   └── Order.ts
+│   ├── value-objects/
+│   │   ├── Money.ts
+│   │   └── Address.ts
+│   ├── interfaces/
+│   │   ├── IOrderRepository.ts
+│   │   └── INotificationService.ts
+│   ├── services/
+│   │   └── OrderDomainService.ts
+│   └── events/
+│       └── OrderCreatedEvent.ts
+│
+├── application/               # Application Business Rules
+│   ├── use-cases/
+│   │   ├── CreateOrderUseCase.ts
+│   │   └── CancelOrderUseCase.ts
+│   ├── commands/
+│   │   └── CreateOrderCommand.ts
+│   ├── queries/
+│   │   └── GetOrderQuery.ts
+│   ├── dtos/
+│   │   └── OrderDTO.ts
+│   └── ports/
+│       ├── IOrderCommandHandler.ts
+│       └── IOrderQueryHandler.ts
+│
+├── interface-adapters/         # Interface Adapters
+│   ├── controllers/
+│   │   └── OrderController.ts
+│   ├── presenters/
+│   │   └── OrderPresenter.ts
+│   ├── gateways/
+│   │   └── OrderRepository.ts
+│   ├── mappers/
+│   │   └── OrderMapper.ts
+│   └── http/
+│       └── OrderHttpAdapter.ts
+│
+├── infrastructure/            # Frameworks & Drivers
+│   ├── persistence/
+│   │   ├── Database.ts
+│   │   └── repositories/
+│   │       └── PostgresOrderRepository.ts
+│   ├── external/
+│   │   ├── NotificationService.ts
+│   │   └── PaymentGateway.ts
+│   ├── framework/
+│   │   ├── ExpressServer.ts
+│   │   └── DI Container.ts
+│   └── config/
+│       └── Environment.ts
+│
+└── main.ts
+```
+
+**2. Domain Entity Example**
+
+```typescript
+// domain/entities/Order.ts
+export class Order extends Entity<OrderId> {
+  private _customerId: CustomerId;
+  private _items: OrderItem[];
+  private _status: OrderStatus;
+  private _total: Money;
+  
+  private constructor(
+    id: OrderId,
+    customerId: CustomerId,
+    items: OrderItem[],
+    status: OrderStatus,
+    total: Money
+  ) {
+    super(id);
+    this._customerId = customerId;
+    this._items = items;
+    this._status = status;
+    this._total = total;
+  }
+
+  // Factory method
+  static create(props: CreateOrderProps): Order {
+    const orderId = OrderId.create();
+    const items = props.items.map(OrderItem.create);
+    const total = Money.sum(items.map(i => i.subtotal));
+    
+    return new Order(orderId, props.customerId, items, OrderStatus.PENDING, total);
+  }
+
+  // Business methods
+  confirm(): void {
+    if (this._status !== OrderStatus.PENDING) {
+      throw new DomainException('Cannot confirm a non-pending order');
+    }
+    this._status = OrderStatus.CONFIRMED;
+  }
+
+  cancel(): void {
+    if (!this.canBeCancelled()) {
+      throw new DomainException('Cannot cancel this order');
+    }
+    this._status = OrderStatus.CANCELLED;
+  }
+
+  canBeCancelled(): boolean {
+    return this._status === OrderStatus.PENDING;
+  }
+
+  // Getters
+  get customerId(): CustomerId { return this._customerId; }
+  get items(): OrderItem[] { return [...this._items]; }
+  get status(): OrderStatus { return this._status; }
+  get total(): Money { return this._total; }
+}
+```
+
+**3. Application Layer Use Case**
+
+```typescript
+// application/use-cases/CreateOrderUseCase.ts
+export class CreateOrderUseCase implements IUseCase<CreateOrderCommand, CreateOrderResult> {
+  constructor(
+    private orderRepository: IOrderRepository,
+    private notificationService: INotificationService
+  ) {}
+
+  async execute(command: CreateOrderCommand): Promise<CreateOrderResult> {
+    // Create order entity
+    const order = Order.create({
+      customerId: command.customerId,
+      items: command.items,
+      shippingAddress: command.shippingAddress
+    });
+
+    // Persist
+    await this.orderRepository.save(order);
+
+    // Send notification
+    await this.notificationService.sendOrderConfirmation(order);
+
+    // Return result
+    return {
+      orderId: order.id.value,
+      total: order.total.amount,
+      status: order.status
+    };
+  }
+}
+```
+
+### Anti Patterns
+
+**1. Anemic Domain**
+
+Domain objects chỉ có getters và setters. Business logic ở nơi khác. Violates encapsulation. Add behavior to entities.
+
+**2. Leaky Abstractions**
+
+Inner layers phụ thuộc outer layers. Violates dependency rule. Infrastructure leaks. Proper layering.
+
+**3. God Objects**
+
+Too much logic in one place. Violates SRP. Hard to test. Break into smaller pieces.
+
+**4. Feature Envy**
+
+Objects quan tâm nhiều đến data của objects khác. Data/behavior separation. Move behavior to data.
+
+### Checklist
+
+- [ ] Layer structure defined
+- [ ] Domain layer implemented
+- [ ] Application layer implemented
+- [ ] Interface adapters implemented
+- [ ] Infrastructure layer implemented
+- [ ] Dependency direction enforced
+- [ ] Interfaces defined properly
+- [ ] Testing strategy defined
+- [ ] Project structure established
+
+---
+
+## 2. Hexagonal Architecture (Ports & Adapters)
+
+### Mục tiêu
+
+Hexagonal Architecture tách biệt application core (domain logic) khỏi external systems thông qua ports và adapters. Điều này tạo ra highly testable và maintainable systems. Application có thể được drive bởi users, programs, tests, hoặc batch scripts một cách independent của actual runtime databases và services.
+
+### Nguyên tắc cơ bản
+
+### 1. Hexagonal Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                   Hexagonal Architecture                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│                    ┌─────────────────────┐                      │
+│                    │                     │                      │
+│                    │      Application    │                      │
+│                    │        Core         │                      │
+│                    │                     │                      │
+│                    │  ┌───────────────┐  │                      │
+│                    │  │   Domain      │  │                      │
+│                    │  │   Services    │  │                      │
+│                    │  └───────────────┘  │                      │
+│                    │                     │                      │
+│                    └─────────┬───────────┘                      │
+│                              │                                    │
+│           ┌──────────────────┼──────────────────┐               │
+│           │                  │                  │                │
+│    ┌──────▼──────┐   ┌───────▼──────┐  ┌──────▼──────┐        │
+│    │    Port     │   │    Port      │  │    Port     │        │
+│    │  (Driving)  │   │  (Driving)   │  │  (Driven)   │        │
+│    │             │   │              │  │             │        │
+│    │  REST API   │   │   GraphQL    │  │ Repository  │        │
+│    │  Controller │   │   Resolver   │  │  Interface   │        │
+│    └──────┬──────┘   └───────┬──────┘  └──────┬──────┘        │
+│           │                  │                  │                │
+│    ┌──────▼──────┐   ┌───────▼──────┐  ┌──────▼──────┐        │
+│    │   Adapter    │   │   Adapter    │  │   Adapter   │        │
+│    │   (Driving)  │   │   (Driving)  │  │   (Driven)  │        │
+│    │             │   │              │  │             │        │
+│    │   Express   │   │   Apollo    │  │  PostgreSQL │        │
+│    │   Router    │   │   Server    │  │   Driver    │        │
+│    └─────────────┘   └──────────────┘  └─────────────┘        │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 2. Ports Definition
+
+Define ports as interfaces.
+
+```typescript
+// ports/input/IOrderService.ts (Driving Port)
+export interface IOrderService {
+    createOrder(input: CreateOrderInput): Promise<OrderOutput>;
+    getOrder(id: string): Promise<OrderOutput | null>;
+    cancelOrder(id: string, reason: string): Promise<void>;
+    listOrders(filter: OrderFilter): Promise<OrderListOutput>;
+}
+
+// ports/output/IOrderRepository.ts (Driven Port)
+export interface IOrderRepository {
+    save(order: Order): Promise<void>;
+    findById(id: OrderId): Promise<Order | null>;
+    findByCustomer(customerId: CustomerId): Promise<Order[]>;
+    findByStatus(status: OrderStatus): Promise<Order[]>;
+    delete(id: OrderId): Promise<void>;
+}
+
+// ports/output/IPaymentGateway.ts (Driven Port)
+export interface IPaymentGateway {
+    processPayment(request: PaymentRequest): Promise<PaymentResponse>;
+    refundPayment(paymentId: string): Promise<RefundResponse>;
+    getPaymentStatus(paymentId: string): Promise<PaymentStatus>;
+}
+
+// ports/output/INotificationPort.ts (Driven Port)
+export interface INotificationPort {
+    sendEmail(to: string, template: string, data: any): Promise<void>;
+    sendSMS(phone: string, message: string): Promise<void>;
+    sendPushNotification(userId: string, notification: PushNotification): Promise<void>;
+}
+
+// ports/output/IEventPublisher.ts (Driven Port)
+export interface IEventPublisher {
+    publish(event: DomainEvent): Promise<void>;
+    publishBatch(events: DomainEvent[]): Promise<void>;
+}
+```
+
+### 3. Application Layer
+
+Implement application services với ports.
+
+```typescript
+// application/OrderApplicationService.ts
+export class OrderApplicationService implements IOrderService {
+    constructor(
+        private orderRepository: IOrderRepository,
+        private paymentGateway: IPaymentGateway,
+        private notificationPort: INotificationPort,
+        private eventPublisher: IEventPublisher
+    ) {}
+
+    async createOrder(input: CreateOrderInput): Promise<OrderOutput> {
+        // Create domain order
+        const order = Order.create({
+            customerId: new CustomerId(input.customerId),
+            shippingAddress: Address.create(input.shippingAddress)
+        });
+
+        // Add items
+        for (const itemInput of input.items) {
+            const product = await this.getProduct(itemInput.productId);
+            order.addItem(product, new Quantity(itemInput.quantity));
+        }
+
+        // Process payment
+        const paymentResult = await this.paymentGateway.processPayment({
+            orderId: order.id.value,
+            amount: order.total.amount,
+            currency: order.total.currency
+        });
+
+        if (!paymentResult.success) {
+            throw new PaymentFailedException(paymentResult.error);
+        }
+
+        // Confirm order
+        order.confirm(paymentResult.paymentId);
+
+        // Persist
+        await this.orderRepository.save(order);
+
+        // Publish event
+        await this.eventPublisher.publish(OrderCreatedEvent.create(order));
+
+        // Notify
+        await this.notificationPort.sendEmail(
+            order.customerEmail,
+            'order-confirmation',
+            { orderId: order.id.value }
+        );
+
+        return this.toOutput(order);
+    }
+
+    async cancelOrder(id: string, reason: string): Promise<void> {
+        const order = await this.orderRepository.findById(new OrderId(id));
+
+        if (!order) {
+            throw new OrderNotFoundException(id);
+        }
+
+        order.cancel(new CancellationReason(reason));
+
+        // Process refund
+        if (order.paymentId) {
+            await this.paymentGateway.refundPayment(order.paymentId);
+        }
+
+        await this.orderRepository.save(order);
+        await this.eventPublisher.publish(OrderCancelledEvent.create(order, reason));
+    }
+
+    async getOrder(id: string): Promise<OrderOutput | null> {
+        const order = await this.orderRepository.findById(new OrderId(id));
+        return order ? this.toOutput(order) : null;
+    }
+
+    async listOrders(filter: OrderFilter): Promise<OrderListOutput> {
+        const orders = filter.customerId
+            ? await this.orderRepository.findByCustomer(new CustomerId(filter.customerId))
+            : filter.status
+                ? await this.orderRepository.findByStatus(filter.status)
+                : await this.orderRepository.findAll();
+
+        return {
+            orders: orders.map(o => this.toOutput(o)),
+            total: orders.length
+        };
+    }
+
+    private toOutput(order: Order): OrderOutput {
+        return {
+            id: order.id.value,
+            status: order.status.value,
+            items: order.items.map(i => ({
+                productId: i.productId.value,
+                quantity: i.quantity.value,
+                price: i.price.amount
+            })),
+            total: order.total.amount,
+            createdAt: order.createdAt.toISOString()
+        };
+    }
+}
+```
+
+### 4. Adapters Implementation
+
+Implement adapters cho external systems.
+
+```typescript
+// adapters/persistence/PostgresOrderRepository.ts
+export class PostgresOrderRepository implements IOrderRepository {
+    constructor(private db: Database) {}
+
+    async save(order: Order): Promise<void> {
+        const data = {
+            id: order.id.value,
+            customer_id: order.customerId.value,
+            status: order.status.value,
+            total: order.total.amount,
+            currency: order.total.currency.value,
+            shipping_address: JSON.stringify(order.shippingAddress),
+            payment_id: order.paymentId?.value,
+            created_at: order.createdAt,
+            updated_at: new Date()
+        };
+
+        await this.db.query(`
+            INSERT INTO orders (id, customer_id, status, total, currency, shipping_address, payment_id, created_at, updated_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            ON CONFLICT (id) DO UPDATE SET
+                status = EXCLUDED.status,
+                total = EXCLUDED.total,
+                updated_at = EXCLUDED.updated_at
+        `, [data.id, data.customer_id, data.status, data.total, data.currency, data.shipping_address, data.payment_id, data.created_at, data.updated_at]);
+
+        // Save items
+        await this.db.query('DELETE FROM order_items WHERE order_id = $1', [data.id]);
+
+        for (const item of order.items) {
+            await this.db.query(`
+                INSERT INTO order_items (id, order_id, product_id, quantity, price)
+                VALUES ($1, $2, $3, $4, $5)
+            `, [item.id.value, data.id, item.productId.value, item.quantity.value, item.price.amount]);
+        }
+    }
+
+    async findById(id: OrderId): Promise<Order | null> {
+        const result = await this.db.query(
+            'SELECT * FROM orders WHERE id = $1',
+            [id.value]
+        );
+
+        if (result.rows.length === 0) {
+            return null;
+        }
+
+        const orderData = result.rows[0];
+        const items = await this.getOrderItems(orderData.id);
+
+        return this.mapToDomain(orderData, items);
+    }
+
+    async findByCustomer(customerId: CustomerId): Promise<Order[]> {
+        const result = await this.db.query(
+            'SELECT * FROM orders WHERE customer_id = $1 ORDER BY created_at DESC',
+            [customerId.value]
+        );
+
+        return Promise.all(result.rows.map(async row => {
+            const items = await this.getOrderItems(row.id);
+            return this.mapToDomain(row, items);
+        }));
+    }
+
+    async delete(id: OrderId): Promise<void> {
+        await this.db.query('DELETE FROM orders WHERE id = $1', [id.value]);
+    }
+}
+
+// adapters/external/StripePaymentGateway.ts
+export class StripePaymentGateway implements IPaymentGateway {
+    constructor(private stripe: Stripe, private logger: Logger) {}
+
+    async processPayment(request: PaymentRequest): Promise<PaymentResponse> {
+        try {
+            const charge = await this.stripe.charges.create({
+                amount: Math.round(request.amount * 100),
+                currency: request.currency.toLowerCase(),
+                metadata: { orderId: request.orderId }
+            });
+
+            return {
+                success: true,
+                paymentId: charge.id,
+                status: charge.status
+            };
+        } catch (error) {
+            this.logger.error('Payment failed', { error });
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    async refundPayment(paymentId: string): Promise<RefundResponse> {
+        try {
+            const refund = await this.stripe.refunds.create({
+                charge: paymentId
+            });
+
+            return {
+                success: true,
+                refundId: refund.id
+            };
+        } catch (error) {
+            this.logger.error('Refund failed', { error });
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+}
+
+// adapters/messaging/RabbitMQEventPublisher.ts
+export class RabbitMQEventPublisher implements IEventPublisher {
+    constructor(
+        private channel: Channel,
+        private exchange: string
+    ) {}
+
+    async publish(event: DomainEvent): Promise<void> {
+        this.channel.publish(
+            this.exchange,
+            event.eventType,
+            Buffer.from(JSON.stringify(event)),
+            { persistent: true }
+        );
+    }
+
+    async publishBatch(events: DomainEvent[]): Promise<void> {
+        for (const event of events) {
+            await this.publish(event);
+        }
+    }
+}
+```
+
+### 5. Primary Adapters (Driving)
+
+Implement driving adapters (UI layer).
+
+```typescript
+// adapters/primary/http/OrderHttpAdapter.ts
+export class OrderHttpAdapter {
+    constructor(
+        private orderService: IOrderService,
+        private logger: Logger
+    ) {}
+
+    async handleCreateOrder(req: Request, res: Response): Promise<void> {
+        try {
+            const input: CreateOrderInput = {
+                customerId: req.body.customerId,
+                shippingAddress: req.body.shippingAddress,
+                items: req.body.items
+            };
+
+            const output = await this.orderService.createOrder(input);
+
+            res.status(201).json({
+                success: true,
+                data: output
+            });
+        } catch (error) {
+            this.handleError(res, error);
+        }
+    }
+
+    async handleGetOrder(req: Request, res: Response): Promise<void> {
+        try {
+            const output = await this.orderService.getOrder(req.params.id);
+
+            if (!output) {
+                res.status(404).json({
+                    success: false,
+                    error: 'Order not found'
+                });
+                return;
+            }
+
+            res.json({
+                success: true,
+                data: output
+            });
+        } catch (error) {
+            this.handleError(res, error);
+        }
+    }
+
+    private handleError(res: Response, error: Error): void {
+        this.logger.error('Request failed', { error });
+
+        if (error instanceof ValidationException) {
+            res.status(400).json({ success: false, error: error.message });
+            return;
+        }
+
+        if (error instanceof PaymentFailedException) {
+            res.status(402).json({ success: false, error: error.message });
+            return;
+        }
+
+        res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+}
+
+// adapters/primary/graphql/OrderGraphQLAdapter.ts
+export class OrderGraphQLAdapter {
+    constructor(private orderService: IOrderService) {}
+
+    Query = {
+        order: async (_: any, { id }: { id: string }) => {
+            return this.orderService.getOrder(id);
+        },
+
+        orders: async (_: any, { filter }: { filter: OrderFilter }) => {
+            return this.orderService.listOrders(filter);
+        }
+    };
+
+    Mutation = {
+        createOrder: async (_: any, { input }: { input: CreateOrderInput }) => {
+            return this.orderService.createOrder(input);
+        },
+
+        cancelOrder: async (_: any, { id, reason }: { id: string; reason: string }) => {
+            await this.orderService.cancelOrder(id, reason);
+            return { success: true };
+        }
+    };
+}
+```
+
+### 6. Directory Structure
+
+Organize code by hexagonal structure.
+
+```
+src/
+├── domain/                    # Pure domain (no dependencies)
+│   ├── model/
+│   │   ├── Order.ts
+│   │   ├── Product.ts
+│   │   └── Customer.ts
+│   ├── value-objects/
+│   │   ├── Money.ts
+│   │   ├── Address.ts
+│   │   └── OrderId.ts
+│   ├── events/
+│   │   └── OrderEvents.ts
+│   └── exceptions/
+│       └── DomainExceptions.ts
+│
+├── application/               # Application services (depends only on ports)
+│   ├── ports/
+│   │   ├── input/
+│   │   │   └── IOrderService.ts
+│   │   └── output/
+│   │       ├── IOrderRepository.ts
+│   │       ├── IPaymentGateway.ts
+│   │       └── INotificationPort.ts
+│   ├── services/
+│   │   └── OrderApplicationService.ts
+│   └── dto/
+│       ├── CreateOrderDTO.ts
+│       └── OrderDTO.ts
+│
+├── adapters/                  # Adapters (implement ports)
+│   ├── primary/              # Driving adapters
+│   │   ├── http/
+│   │   │   └── OrderHttpAdapter.ts
+│   │   ├── graphql/
+│   │   │   └── OrderGraphQLAdapter.ts
+│   │   └── cli/
+│   │       └── OrderCliAdapter.ts
+│   └── secondary/           # Driven adapters
+│       ├── persistence/
+│       │   ├── postgres/
+│       │   │   └── PostgresOrderRepository.ts
+│       │   └── mongodb/
+│       │       └── MongoOrderRepository.ts
+│       ├── external/
+│       │   ├── payment/
+│       │   │   └── StripePaymentGateway.ts
+│       │   └── notification/
+│       │       └── SendGridNotificationAdapter.ts
+│       └── messaging/
+│           └── RabbitMQEventPublisher.ts
+│
+├── config/                    # Configuration
+│   ├── container.ts
+│   └── database.ts
+│
+└── main.ts                   # Entry point
+```
+
+### Anti Patterns
+
+**1. Leaking Infrastructure into Domain**
+
+```typescript
+// Không nên - infrastructure in domain
+class Order {
+    saveToDatabase() {
+        const db = new PostgresConnection();
+        db.query('INSERT INTO orders...');
+    }
+}
+
+// Nên - domain is pure
+class Order {
+    // Only domain logic
+}
+```
+
+**2. Missing Ports**
+
+```typescript
+// Không nên - direct dependency
+class OrderService {
+    constructor(
+        private db: PostgresConnection,  // Too concrete
+        private stripe: Stripe          // Too concrete
+    ) {}
+}
+
+// Nên - use ports
+class OrderService {
+    constructor(
+        private repository: IOrderRepository,    // Port
+        private paymentGateway: IPaymentGateway // Port
+    ) {}
+}
+```
+
+**3. Heavy Application Layer**
+
+```typescript
+// Không nên - application layer does everything
+class OrderService {
+    async createOrder(input) {
+        // Validation logic
+        // Business logic
+        // Database operations
+        // Payment processing
+        // Notification sending
+        // All in one!
+    }
+}
+
+// Nên - delegate to domain
+class OrderService {
+    async createOrder(input) {
+        const order = this.createOrderDomain(input);
+        order.confirm(this.paymentGateway.charge(...));
+        this.repository.save(order);
+    }
+}
+```
+
+### Checklist
+
+- [ ] Define ports as interfaces
+- [ ] Implement domain without external dependencies
+- [ ] Create application services using ports
+- [ ] Implement driving adapters (UI)
+- [ ] Implement driven adapters (external systems)
+- [ ] Wire dependencies properly
+- [ ] Test ports in isolation
+- [ ] Test adapters independently
+- [ ] Keep domain pure
+- [ ] Document ports
+
+---
+
+## 3. CQRS Pattern
+
+### Mục tiêu
+
+Command Query Responsibility Segregation (CQRS) là pattern tách biệt read và write operations thành các models riêng biệt. CQRS được sử dụng khi read và write có các yêu cầu khác nhau đáng kể về data model, performance, hoặc scalability.
+
+CQRS không phải lúc nào cũng cần thiết. Áp dụng khi có clear benefits như different read/write patterns, performance optimization, hoặc complex domain models.
+
+### Nguyên tắc
+
+**1. Separate Models**
+
+Different models for reads and writes. Write model for commands. Read model for queries. Each optimized for its purpose. Independent evolution.
+
+**2. Command Model**
+
+Focus on business logic. Enforce invariants. Maintain consistency. Contains domain logic. Should be clean and simple.
+
+**3. Query Model**
+
+Optimized for queries. Denormalized data. Projections from events. Fast reads. Can be eventually consistent.
+
+**4. Synchronization**
+
+Keep read models in sync. Event-driven updates. Projection services. Handle failures. Eventually consistent.
+
+**5. Event Sourcing Integration**
+
+Commands create events. Events update read models. Full audit trail. Event replay. Time-travel debugging.
+
+**6. Scalability**
+
+Scale reads independently. Scale writes independently. Optimize each side. Match to access patterns.
+
+**7. Consistency Considerations**
+
+Commands may be strongly consistent. Queries may be eventually consistent. Accept inconsistency. Handle race conditions.
+
+### Best Practice
+
+**1. CQRS Architecture**
+
+```typescript
+// Command Side - Models and Handlers
+
+// Commands
+interface CreateOrderCommand {
+  type: 'CREATE_ORDER';
+  payload: {
+    customerId: string;
+    items: OrderItemDTO[];
+    shippingAddress: AddressDTO;
+  };
+}
+
+interface AddOrderItemCommand {
+  type: 'ADD_ORDER_ITEM';
+  payload: {
+    orderId: string;
+    productId: string;
+    quantity: number;
+  };
+}
+
+interface ConfirmOrderCommand {
+  type: 'CONFIRM_ORDER';
+  payload: {
+    orderId: string;
+  };
+}
+
+// Command Handler
+class OrderCommandHandler {
+  constructor(
+    private eventStore: EventStore,
+    private aggregateStore: AggregateStore
+  ) {}
+
+  async handle(command: CreateOrderCommand): Promise<CommandResult> {
+    const orderId = OrderId.create();
+    
+    const order = Order.create({
+      customerId: CustomerId.from(command.payload.customerId),
+      items: command.payload.items.map(this.mapItem),
+      shippingAddress: Address.from(command.payload.shippingAddress)
+    });
+
+    const events = order.domainEvents;
+    
+    // Persist events
+    await this.eventStore.append(orderId, events);
+    
+    // Update aggregate snapshot
+    await this.aggregateStore.save(order);
+
+    return {
+      success: true,
+      orderId: orderId.value
+    };
+  }
+}
+
+// Query Side - Read Models and Projections
+
+interface OrderReadModel {
+  orderId: string;
+  customerId: string;
+  customerName: string;
+  customerEmail: string;
+  status: string;
+  statusLabel: string;
+  items: OrderItemReadModel[];
+  itemCount: number;
+  subtotal: number;
+  tax: number;
+  total: number;
+  shippingAddress: AddressDTO;
+  createdAt: Date;
+  updatedAt: Date;
+  confirmedAt?: Date;
+  shippedAt?: Date;
+}
+
+interface OrderListView {
+  orders: OrderListItem[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+interface OrderListItem {
+  orderId: string;
+  customerName: string;
+  status: string;
+  total: number;
+  itemCount: number;
+  createdAt: Date;
+}
+
+// Query Handlers
+class OrderQueryHandler {
+  constructor(
+    private readDb: ReadDatabase,
+    private cache: Cache
+  ) {}
+
+  async getOrderById(orderId: string): Promise<OrderReadModel | null> {
+    // Check cache first
+    const cacheKey = `order:${orderId}`;
+    const cached = await this.cache.get<OrderReadModel>(cacheKey);
+    if (cached) return cached;
+
+    const order = await this.readDb.queryOne<OrderReadModel>(
+      `SELECT * FROM order_read_model WHERE order_id = $1`,
+      [orderId]
+    );
+
+    if (order) {
+      await this.cache.set(cacheKey, order, { ttl: 300 });
+    }
+
+    return order;
+  }
+
+  async getOrderList(filters: OrderListFilters): Promise<OrderListView> {
+    let query = `SELECT * FROM order_read_model WHERE 1=1`;
+    const params: any[] = [];
+
+    if (filters.status) {
+      params.push(filters.status);
+      query += ` AND status = $${params.length}`;
+    }
+
+    if (filters.customerId) {
+      params.push(filters.customerId);
+      query += ` AND customer_id = $${params.length}`;
+    }
+
+    query += ` ORDER BY created_at DESC`;
+
+    // Count total
+    const countQuery = query.replace('SELECT *', 'SELECT COUNT(*)');
+    const { count } = await this.readDb.queryOne<{ count: number }>(countQuery, params);
+
+    // Add pagination
+    params.push(filters.page * filters.pageSize);
+    query += ` LIMIT $${params.length}`;
+    params.push(filters.page * filters.pageSize);
+    query += ` OFFSET $${params.length}`;
+
+    const orders = await this.readDb.query<OrderListItem>(query, params);
+
+    return {
+      orders,
+      totalCount: count,
+      page: filters.page,
+      pageSize: filters.pageSize
+    };
+  }
+}
+```
+
+**2. Event Definitions**
+
+```typescript
+// domain/order/events/OrderEvents.ts
+
+export interface OrderEvent extends DomainEvent {
+  aggregateId: OrderId;
+  occurredAt: Date;
+}
+
+export class OrderCreatedEvent implements OrderEvent {
+  constructor(
+    public readonly orderId: OrderId,
+    public readonly customerId: CustomerId,
+    public readonly items: OrderItem[],
+    public readonly shippingAddress: Address,
+    public readonly occurredAt: Date = new Date()
+  ) {
+    super(orderId, 'OrderCreated');
+  }
+
+  toPayload(): OrderCreatedPayload {
+    return {
+      orderId: this.orderId.value,
+      customerId: this.customerId.value,
+      customerName: this.customerId.name,
+      items: this.items.map(i => i.toSnapshot()),
+      shippingAddress: this.shippingAddress.toSnapshot(),
+      occurredAt: this.occurredAt
+    };
+  }
+}
+
+// Event serialization
+export abstract class DomainEvent {
+  abstract readonly eventType: string;
+  abstract toPayload(): Record<string, any>;
+  
+  toEventRecord(): EventRecord {
+    return {
+      eventId: EventId.create().value,
+      aggregateType: 'Order',
+      aggregateId: this.aggregateId.value,
+      eventType: this.eventType,
+      occurredAt: this.occurredAt,
+      payload: this.toPayload(),
+      version: 1
+    };
+  }
+}
+```
+
+**3. Projection Services**
+
+```typescript
+// infrastructure/projections/OrderProjectionService.ts
+
+export class OrderProjectionService {
+  constructor(
+    private eventStore: EventStore,
+    private readDb: WriteDatabase
+  ) {}
+
+  async projectOrder(event: OrderEvent): Promise<void> {
+    switch (event.eventType) {
+      case 'OrderCreated':
+        await this.projectOrderCreated(event as OrderCreatedEvent);
+        break;
+      case 'OrderItemAdded':
+        await this.projectOrderItemAdded(event as OrderItemAddedEvent);
+        break;
+      case 'OrderConfirmed':
+        await this.projectOrderConfirmed(event as OrderConfirmedEvent);
+        break;
+    }
+  }
+
+  private async projectOrderCreated(event: OrderCreatedEvent): Promise<void> {
+    const payload = event.toPayload();
+    
+    await this.readDb.execute(`
+      INSERT INTO order_read_model (
+        order_id, customer_id, customer_name, customer_email,
+        status, items, item_count, subtotal, tax, total,
+        shipping_address, created_at, updated_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+      ON CONFLICT (order_id) DO UPDATE SET
+        status = EXCLUDED.status,
+        items = EXCLUDED.items,
+        updated_at = EXCLUDED.updated_at
+    `, [
+      payload.orderId,
+      payload.customerId,
+      payload.customerName,
+      payload.customerEmail,
+      'pending',
+      JSON.stringify(payload.items),
+      payload.items.length,
+      this.calculateSubtotal(payload.items),
+      this.calculateTax(payload.items),
+      this.calculateTotal(payload.items),
+      JSON.stringify(payload.shippingAddress),
+      payload.occurredAt,
+      payload.occurredAt
+    ]);
+  }
+}
+
+// Projector that listens to events
+export class OrderProjector {
+  constructor(
+    private eventStore: EventStore,
+    private projectionService: OrderProjectionService
+  ) {}
+
+  async start(projectFrom: Date = new Date(0)): Promise<void> {
+    const events = await this.eventStore.getEventsSince(projectFrom);
+    
+    for (const eventRecord of events) {
+      const event = this.deserializeEvent(eventRecord);
+      await this.projectionService.projectOrder(event);
+    }
+  }
+
+  async processEvent(eventRecord: EventRecord): Promise<void> {
+    const event = this.deserializeEvent(eventRecord);
+    await this.projectionService.projectOrder(event);
+  }
+}
+```
+
+**4. API Implementation**
+
+```typescript
+// api/commands/OrderCommandsController.ts
+
+export class OrderCommandsController {
+  constructor(
+    private commandBus: CommandBus
+  ) {}
+
+  @Post('/orders')
+  async createOrder(@Body() dto: CreateOrderDTO): Promise<CreateOrderResponse> {
+    const command: CreateOrderCommand = {
+      type: 'CREATE_ORDER',
+      payload: {
+        customerId: dto.customerId,
+        items: dto.items,
+        shippingAddress: dto.shippingAddress
+      }
+    };
+
+    const result = await this.commandBus.execute(command);
+
+    return {
+      success: true,
+      orderId: result.orderId
+    };
+  }
+
+  @Post('/orders/{orderId}/confirm')
+  async confirmOrder(
+    @PathParam('orderId') orderId: string
+  ): Promise<CommandResponse> {
+    const command: ConfirmOrderCommand = {
+      type: 'CONFIRM_ORDER',
+      payload: { orderId }
+    };
+
+    return this.commandBus.execute(command);
+  }
+}
+
+// api/queries/OrderQueriesController.ts
+
+export class OrderQueriesController {
+  constructor(
+    private queryBus: QueryBus
+  ) {}
+
+  @Get('/orders/{orderId}')
+  async getOrder(
+    @PathParam('orderId') orderId: string
+  ): Promise<OrderReadModel> {
+    const query = new GetOrderByIdQuery(orderId);
+    return this.queryBus.execute(query);
+  }
+
+  @Get('/orders')
+  async getOrders(
+    @QueryParam('status') status?: string,
+    @QueryParam('page') page: number = 1,
+    @QueryParam('pageSize') pageSize: number = 20
+  ): Promise<OrderListView> {
+    const query = new GetOrderListQuery({ status, page, pageSize });
+    return this.queryBus.execute(query);
+  }
+}
+
+// Command and Query Buses
+export class CommandBus {
+  constructor(
+    private handlers: Map<string, CommandHandler>,
+    private eventBus: EventBus
+  ) {}
+
+  async execute<T extends Command>(command: T): Promise<CommandResult> {
+    const handler = this.handlers.get(command.type);
+    if (!handler) {
+      throw new HandlerNotFoundError(command.type);
+    }
+
+    return handler.handle(command);
+  }
+}
+
+export class QueryBus {
+  constructor(
+    private handlers: Map<string, QueryHandler>
+  ) {}
+
+  async execute<T>(query: Query<T>): Promise<T> {
+    const handler = this.handlers.get(query.type);
+    if (!handler) {
+      throw new HandlerNotFoundError(query.type);
+    }
+
+    return handler.handle(query);
+  }
+}
+```
+
+**5. Handling Consistency**
+
+```typescript
+// frontend/OrderPage.tsx
+
+export function OrderPage({ orderId }: { orderId: string }) {
+  const [order, setOrder] = useState<OrderReadModel | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Initial load
+    fetchOrder(orderId)
+      .then(setOrder)
+      .catch(err => setError(err.message))
+      .finally(() => setLoading(false));
+
+    // Subscribe to updates via WebSocket
+    const ws = connectToOrderUpdates(orderId);
+    
+    ws.onmessage = (event) => {
+      const update = JSON.parse(event.data);
+      setOrder(prev => ({ ...prev, ...update }));
+    };
+
+    return () => ws.close();
+  }, [orderId]);
+
+  if (loading) return <OrderSkeleton />;
+  if (error) return <OrderError message={error} onRetry={() => fetchOrder(orderId)} />;
+  if (!order) return <OrderNotFound />;
+
+  return <OrderDetails order={order} />;
+}
+```
+
+### Anti Patterns
+
+**1. CQRS Everywhere**
+
+Applying CQRS to everything. Unnecessary complexity. Over-engineering. Use when benefits outweigh costs.
+
+**2. Different Teams for Reads and Writes**
+
+Artificial separation. Integration challenges. Coordination overhead. Work together.
+
+**3. Forgetting about Consistency**
+
+Assuming eventual consistency. Not handling it. Race conditions. Design for it.
+
+**4. Complex Synchronization**
+
+Overly complex projections. Difficult to debug. Hard to maintain. Keep simple.
+
+### Checklist
+
+- [ ] Read/write boundaries identified
+- [ ] Command model designed
+- [ ] Query models designed
+- [ ] Event definitions created
+- [ ] Projection services implemented
+- [ ] Synchronization strategy defined
+- [ ] Consistency model documented
+- [ ] Testing approach defined
+- [ ] Performance testing done
+- [ ] Documentation complete
+
+---
+
+## 4. Event Sourcing
+
+### Mục tiêu
+
+Event Sourcing là pattern lưu trữ thay đổi state của application dưới dạng một chuỗi các events thay vì chỉ lưu current state. Điều này cho phép complete reconstruction của state tại bất kỳ thời điểm nào và enables powerful temporal queries.
+
+### Nguyên tắc cơ bản
+
+### 1. Event Store Design
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Event Store Architecture                  │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    │
+│  │   Events    │───▶│  Aggregate  │───▶│   Snapshot  │    │
+│  │  (Append)   │    │   Root      │    │  (Optimize) │    │
+│  └─────────────┘    └─────────────┘    └─────────────┘    │
+│         │                  │                                │
+│         ▼                  ▼                                │
+│  ┌─────────────┐    ┌─────────────┐                       │
+│  │ Projection  │───▶│    Read     │                       │
+│  │  (Build)   │    │    Model    │                       │
+│  └─────────────┘    └─────────────┘                       │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 2. Event Structure
+
+```typescript
+// Base event interface
+interface DomainEvent {
+    id: string;                    // Unique event ID (UUID)
+    eventType: string;            // Event type name
+    aggregateId: string;           // ID của aggregate gốc
+    aggregateType: string;         // Type của aggregate
+    version: number;               // Aggregate version tại thời điểm event
+    timestamp: Date;               // Khi event được tạo
+    metadata: EventMetadata;       // Context information
+    payload: any;                 // Event-specific data
+}
+
+interface EventMetadata {
+    correlationId?: string;       // For tracing
+    causationId?: string;         // What caused this event
+    userId?: string;              // Who triggered this
+    ipAddress?: string;
+    userAgent?: string;
+    schemaVersion: string;         // For schema evolution
+}
+
+// Event type definitions
+type OrderEvent =
+    | OrderCreatedEvent
+    | OrderItemAddedEvent
+    | OrderItemRemovedEvent
+    | OrderConfirmedEvent
+    | OrderShippedEvent
+    | OrderDeliveredEvent
+    | OrderCancelledEvent;
+
+interface OrderCreatedEvent extends DomainEvent {
+    eventType: 'ORDER_CREATED';
+    payload: {
+        orderId: string;
+        customerId: string;
+        shippingAddress: Address;
+        items: OrderItem[];
+        totalAmount: Money;
+    };
+}
+
+interface OrderConfirmedEvent extends DomainEvent {
+    eventType: 'ORDER_CONFIRMED';
+    payload: {
+        orderId: string;
+        paymentId: string;
+        confirmedAt: Date;
+    };
+}
+```
+
+### 3. Aggregate Implementation
+
+```typescript
+// Aggregate base class
+abstract class AggregateRoot<TEvent extends DomainEvent> {
+    protected id: string;
+    protected version: number = 0;
+    private uncommittedEvents: TEvent[] = [];
+
+    abstract aggregateType: string;
+
+    getId(): string { return this.id; }
+    getVersion(): number { return this.version; }
+    getUncommittedEvents(): TEvent[] { return [...this.uncommittedEvents]; }
+    markEventsAsCommitted(): void { this.uncommittedEvents = []; }
+
+    protected addEvent(event: TEvent): void {
+        this.validateEvent(event);
+        this.applyEvent(event);
+        this.uncommittedEvents.push(event);
+    }
+
+    protected abstract applyEvent(event: TEvent): void;
+    protected abstract validateEvent(event: TEvent): void;
+    protected incrementVersion(): void { this.version++; }
+
+    static fromEvents<T extends AggregateRoot<any>>(
+        this: new (id: string) => T,
+        id: string,
+        events: DomainEvent[]
+    ): T {
+        const aggregate = new this(id);
+        for (const event of events) {
+            aggregate.applyEvent(event);
+        }
+        aggregate.version = events.length;
+        return aggregate;
+    }
+}
+
+// Order aggregate implementation
+class OrderAggregate extends AggregateRoot<OrderEvent> {
+    aggregateType = 'Order';
+
+    private status: OrderStatus = 'DRAFT';
+    private items: OrderItem[] = [];
+    private customerId: string | null = null;
+    private shippingAddress: Address | null = null;
+    private totalAmount: Money = { amount: 0, currency: 'USD' };
+
+    createOrder(customerId: string, shippingAddress: Address): void {
+        if (this.status !== 'DRAFT') {
+            throw new InvalidOperationError('Order already created');
+        }
+
+        const event: OrderCreatedEvent = {
+            id: generateUUID(),
+            eventType: 'ORDER_CREATED',
+            aggregateId: this.id,
+            aggregateType: this.aggregateType,
+            version: this.version + 1,
+            timestamp: new Date(),
+            metadata: {},
+            payload: {
+                orderId: this.id,
+                customerId,
+                shippingAddress,
+                items: [],
+                totalAmount: { amount: 0, currency: 'USD' }
+            }
+        };
+
+        this.addEvent(event);
+    }
+
+    addItem(product: Product, quantity: number): void {
+        if (this.status !== 'DRAFT') {
+            throw new InvalidOperationError('Cannot modify confirmed order');
+        }
+
+        const existingItem = this.items.find(i => i.productId === product.id);
+        const quantityToAdd = existingItem ? existingItem.quantity + quantity : quantity;
+        const totalPrice = product.unitPrice.multiply(quantityToAdd);
+
+        const event: OrderItemAddedEvent = {
+            id: generateUUID(),
+            eventType: 'ORDER_ITEM_ADDED',
+            aggregateId: this.id,
+            aggregateType: this.aggregateType,
+            version: this.version + 1,
+            timestamp: new Date(),
+            metadata: {},
+            payload: {
+                orderId: this.id,
+                productId: product.id,
+                productName: product.name,
+                quantity: quantityToAdd,
+                unitPrice: product.unitPrice,
+                totalPrice
+            }
+        };
+
+        this.addEvent(event);
+    }
+
+    confirm(paymentId: string): void {
+        if (this.status !== 'DRAFT') {
+            throw new InvalidOperationError('Order is not in draft status');
+        }
+
+        if (this.items.length === 0) {
+            throw new InvalidOperationError('Cannot confirm empty order');
+        }
+
+        const event: OrderConfirmedEvent = {
+            id: generateUUID(),
+            eventType: 'ORDER_CONFIRMED',
+            aggregateId: this.id,
+            aggregateType: this.aggregateType,
+            version: this.version + 1,
+            timestamp: new Date(),
+            metadata: {},
+            payload: {
+                orderId: this.id,
+                paymentId,
+                confirmedAt: new Date()
+            }
+        };
+
+        this.addEvent(event);
+    }
+
+    protected applyEvent(event: OrderEvent): void {
+        this.incrementVersion();
+
+        switch (event.eventType) {
+            case 'ORDER_CREATED':
+                this.status = 'DRAFT';
+                this.customerId = event.payload.customerId;
+                this.shippingAddress = event.payload.shippingAddress;
+                break;
+
+            case 'ORDER_ITEM_ADDED':
+                const existingIndex = this.items.findIndex(
+                    i => i.productId === event.payload.productId
+                );
+                if (existingIndex >= 0) {
+                    this.items[existingIndex] = {
+                        ...this.items[existingIndex],
+                        quantity: event.payload.quantity,
+                        totalPrice: event.payload.totalPrice
+                    };
+                } else {
+                    this.items.push({
+                        productId: event.payload.productId,
+                        productName: event.payload.productName,
+                        quantity: event.payload.quantity,
+                        unitPrice: event.payload.unitPrice,
+                        totalPrice: event.payload.totalPrice
+                    });
+                }
+                this.totalAmount = this.totalAmount.add(event.payload.totalPrice);
+                break;
+
+            case 'ORDER_CONFIRMED':
+                this.status = 'CONFIRMED';
+                break;
+        }
+    }
+
+    protected validateEvent(event: OrderEvent): void {
+        switch (event.eventType) {
+            case 'ORDER_ITEM_ADDED':
+                if (event.payload.quantity <= 0) {
+                    throw new ValidationError('Quantity must be positive');
+                }
+                break;
+        }
+    }
+}
+```
+
+### 4. Event Store Implementation
+
+```typescript
+// Event store interface
+interface EventStore {
+    save<TEvent extends DomainEvent>(events: TEvent[]): Promise<void>;
+    getById(aggregateId: string, fromVersion?: number): Promise<DomainEvent[]>;
+    getAll(eventTypes?: string[], fromTimestamp?: Date): Promise<DomainEvent[]>;
+    getByCorrelationId(correlationId: string): Promise<DomainEvent[]>;
+}
+
+// PostgreSQL implementation
+class PostgresEventStore implements EventStore {
+    constructor(private pool: Pool) {}
+
+    async save<TEvent extends DomainEvent>(events: TEvent[]): Promise<void> {
+        const client = await this.pool.connect();
+
+        try {
+            await client.query('BEGIN');
+
+            for (const event of events) {
+                await client.query(
+                    `INSERT INTO events (
+                        id, event_type, aggregate_id, aggregate_type,
+                        version, timestamp, metadata, payload
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+                    [
+                        event.id,
+                        event.eventType,
+                        event.aggregateId,
+                        event.aggregateType,
+                        event.version,
+                        event.timestamp,
+                        JSON.stringify(event.metadata),
+                        JSON.stringify(event.payload)
+                    ]
+                );
+            }
+
+            await client.query('COMMIT');
+        } catch (error) {
+            await client.query('ROLLBACK');
+            throw error;
+        } finally {
+            client.release();
+        }
+    }
+
+    async getById(aggregateId: string, fromVersion: number = 0): Promise<DomainEvent[]> {
+        const result = await this.pool.query(
+            `SELECT * FROM events
+             WHERE aggregate_id = $1 AND version > $2
+             ORDER BY version ASC`,
+            [aggregateId, fromVersion]
+        );
+
+        return result.rows.map(this.mapRowToEvent);
+    }
+
+    async getByCorrelationId(correlationId: string): Promise<DomainEvent[]> {
+        const result = await this.pool.query(
+            `SELECT * FROM events
+             WHERE metadata->>'correlationId' = $1
+             ORDER BY timestamp ASC`,
+            [correlationId]
+        );
+
+        return result.rows.map(this.mapRowToEvent);
+    }
+
+    private mapRowToEvent(row: any): DomainEvent {
+        return {
+            id: row.id,
+            eventType: row.event_type,
+            aggregateId: row.aggregate_id,
+            aggregateType: row.aggregate_type,
+            version: row.version,
+            timestamp: row.timestamp,
+            metadata: JSON.parse(row.metadata),
+            payload: JSON.parse(row.payload)
+        };
+    }
+}
+```
+
+### 5. Projections
+
+```typescript
+// Projection interface
+interface Projection<T> {
+    name: string;
+    handles: (event: DomainEvent) => Promise<void>;
+    getState(): T;
+}
+
+// Order projection - builds order read model
+class OrderProjection implements Projection<OrderReadModel> {
+    name = 'OrderProjection';
+
+    private orders: Map<string, OrderReadModel> = new Map();
+
+    async handles(event: DomainEvent): Promise<void> {
+        switch (event.eventType) {
+            case 'ORDER_CREATED':
+                await this.onOrderCreated(event as OrderCreatedEvent);
+                break;
+            case 'ORDER_ITEM_ADDED':
+                await this.onItemAdded(event as OrderItemAddedEvent);
+                break;
+            case 'ORDER_CONFIRMED':
+                await this.onOrderConfirmed(event as OrderConfirmedEvent);
+                break;
+        }
+    }
+
+    private async onOrderCreated(event: OrderCreatedEvent): Promise<void> {
+        const order: OrderReadModel = {
+            id: event.payload.orderId,
+            customerId: event.payload.customerId,
+            shippingAddress: event.payload.shippingAddress,
+            items: [],
+            status: 'DRAFT',
+            totalAmount: { amount: 0, currency: 'USD' },
+            createdAt: event.timestamp,
+            updatedAt: event.timestamp,
+            version: event.version
+        };
+
+        this.orders.set(order.id, order);
+    }
+
+    private async onItemAdded(event: OrderItemAddedEvent): Promise<void> {
+        const order = this.orders.get(event.aggregateId);
+        if (!order) return;
+
+        const existingIndex = order.items.findIndex(
+            i => i.productId === event.payload.productId
+        );
+
+        if (existingIndex >= 0) {
+            order.items[existingIndex] = {
+                productId: event.payload.productId,
+                productName: event.payload.productName,
+                quantity: event.payload.quantity,
+                unitPrice: event.payload.unitPrice,
+                totalPrice: event.payload.totalPrice
+            };
+        } else {
+            order.items.push({
+                productId: event.payload.productId,
+                productName: event.payload.productName,
+                quantity: event.payload.quantity,
+                unitPrice: event.payload.unitPrice,
+                totalPrice: event.payload.totalPrice
+            });
+        }
+
+        order.totalAmount = order.totalAmount.add(event.payload.totalPrice);
+        order.updatedAt = event.timestamp;
+        order.version = event.version;
+    }
+
+    getState(): Map<string, OrderReadModel> {
+        return this.orders;
+    }
+}
+```
+
+### 6. Snapshots
+
+```typescript
+// Snapshot strategy
+interface SnapshotStrategy {
+    shouldSnapshot(aggregate: AggregateRoot<any>): boolean;
+    getSnapshotInterval(): number;
+}
+
+// Version-based snapshot
+class VersionBasedSnapshotStrategy implements SnapshotStrategy {
+    constructor(private interval: number = 100) {}
+
+    shouldSnapshot(aggregate: AggregateRoot<any>): boolean {
+        const eventsSinceSnapshot = aggregate.version - (aggregate.lastSnapshotVersion || 0);
+        return eventsSinceSnapshot >= this.interval;
+    }
+
+    getSnapshotInterval(): number {
+        return this.interval;
+    }
+}
+
+// Snapshot storage
+interface SnapshotStore {
+    save(snapshot: AggregateSnapshot): Promise<void>;
+    get(aggregateId: string): Promise<AggregateSnapshot | null>;
+}
+
+class PostgresSnapshotStore implements SnapshotStore {
+    constructor(private pool: Pool) {}
+
+    async save(snapshot: AggregateSnapshot): Promise<void> {
+        await this.pool.query(
+            `INSERT INTO snapshots (aggregate_id, aggregate_type, version, state, created_at)
+             VALUES ($1, $2, $3, $4, $5)
+             ON CONFLICT (aggregate_id)
+             DO UPDATE SET version = $3, state = $4, created_at = $5`,
+            [
+                snapshot.aggregateId,
+                snapshot.aggregateType,
+                snapshot.version,
+                JSON.stringify(snapshot.state),
+                snapshot.createdAt
+            ]
+        );
+    }
+
+    async get(aggregateId: string): Promise<AggregateSnapshot | null> {
+        const result = await this.pool.query(
+            `SELECT * FROM snapshots WHERE aggregate_id = $1`,
+            [aggregateId]
+        );
+
+        if (result.rows.length === 0) return null;
+
+        const row = result.rows[0];
+        return {
+            aggregateId: row.aggregate_id,
+            aggregateType: row.aggregate_type,
+            version: row.version,
+            state: JSON.parse(row.state),
+            createdAt: row.created_at
+        };
+    }
+}
+```
+
+### 7. Event Versioning
+
+```typescript
+// Event versioning
+interface EventUpcaster {
+    canUpgrade(event: DomainEvent): boolean;
+    upgrade(event: DomainEvent): DomainEvent;
+}
+
+// Upcaster example - v1 to v2
+class OrderCreatedEventUpcaster implements EventUpcaster {
+    canUpgrade(event: DomainEvent): boolean {
+        return event.eventType === 'ORDER_CREATED' &&
+               event.metadata.schemaVersion === '1.0';
+    }
+
+    upgrade(event: OrderCreatedEvent): OrderCreatedEvent {
+        return {
+            ...event,
+            payload: {
+                ...event.payload,
+                channel: 'WEB',
+                source: 'UNKNOWN'
+            },
+            metadata: {
+                ...event.metadata,
+                schemaVersion: '2.0'
+            }
+        };
+    }
+}
+
+// Event registry with upcasters
+class EventRegistry {
+    private upcasters: EventUpcaster[] = [];
+
+    register(upcaster: EventUpcaster): void {
+        this.upcasters.push(upcaster);
+    }
+
+    upcast(event: DomainEvent): DomainEvent {
+        let currentEvent = event;
+
+        for (const upcaster of this.upcasters) {
+            if (upcaster.canUpgrade(currentEvent)) {
+                currentEvent = upcaster.upgrade(currentEvent);
+            }
+        }
+
+        return currentEvent;
+    }
+}
+```
+
+### 8. CQRS Integration
+
+```typescript
+// CQRS with Event Sourcing
+class CQRSUnitOfWork {
+    constructor(
+        private eventStore: EventStore,
+        private eventBus: EventBus,
+        private aggregates: Map<string, AggregateRoot<any>>
+    ) {}
+
+    async add(aggregate: AggregateRoot<any>): Promise<void> {
+        this.aggregates.set(aggregate.getId(), aggregate);
+    }
+
+    async commit(): Promise<void> {
+        const allEvents: DomainEvent[] = [];
+
+        for (const aggregate of this.aggregates.values()) {
+            const events = aggregate.getUncommittedEvents();
+            allEvents.push(...events);
+        }
+
+        if (allEvents.length === 0) return;
+
+        await this.eventStore.save(allEvents);
+        await this.eventBus.publishBatch(allEvents);
+
+        for (const aggregate of this.aggregates.values()) {
+            aggregate.markEventsAsCommitted();
+        }
+
+        this.aggregates.clear();
+    }
+
+    async rollback(): Promise<void> {
+        this.aggregates.clear();
+    }
+}
+```
+
+### Best Practices
+
+**1. Event Naming Conventions**
+
+```typescript
+// Consistent event naming
+const eventNaming = {
+    // Past tense, domain-prefixed
+    create: 'EntityCreated',
+    update: 'EntityUpdated',
+    delete: 'EntityDeleted',
+
+    // State transitions
+    confirm: 'EntityConfirmed',
+    cancel: 'EntityCancelled',
+    approve: 'EntityApproved',
+    reject: 'EntityRejected',
+    complete: 'EntityCompleted',
+};
+
+// Examples
+'OrderCreated'
+'OrderItemAdded'
+'OrderPaymentReceived'
+'OrderShipped'
+'OrderDelivered'
+'UserRegistered'
+'PaymentProcessed'
+```
+
+**2. Optimistic Concurrency**
+
+```typescript
+// Conflict detection
+interface ConcurrencyConflict {
+    expectedVersion: number;
+    actualVersion: number;
+    aggregateId: string;
+}
+
+// Repository with concurrency check
+class ConcurrencyAwareRepository {
+    async save(aggregate: AggregateRoot<any>): Promise<void> {
+        const events = aggregate.getUncommittedEvents();
+
+        try {
+            await this.eventStore.saveWithConcurrencyCheck(
+                aggregate.getId(),
+                aggregate.getVersion() - events.length,
+                events
+            );
+        } catch (error) {
+            if (error.code === 'OPTIMISTIC_CONCURRENCY') {
+                throw new ConcurrencyConflictError(
+                    aggregate.getId(),
+                    aggregate.getVersion() - events.length,
+                    aggregate.getVersion()
+                );
+            }
+            throw error;
+        }
+    }
+}
+```
+
+### Anti Patterns
+
+**1. Storing Private Data in Events**
+
+```typescript
+// Không nên - sensitive data in events
+interface UserCreatedEvent {
+    payload: {
+        userId: string;
+        email: string;
+        passwordHash: 'sha256:abc123...', // Don't store!
+        ssn: '123-45-6789', // Don't store!
+    }
+}
+
+// Nên - only store necessary data
+interface UserCreatedEvent {
+    payload: {
+        userId: string;
+        email: string;
+    }
+}
+```
+
+**2. Events that Mutate Other Aggregates**
+
+```typescript
+// Không nên - cross-aggregate mutation
+interface OrderConfirmedEvent {
+    payload: {
+        orderId: string;
+        inventoryUpdated: true,  // Don't include!
+        stockLevel: 100
+    }
+}
+
+// Nên - single aggregate responsibility
+interface OrderConfirmedEvent {
+    payload: {
+        orderId: string;
+        paymentId: string;
+    }
+}
+```
+
+**3. Command vs Event Confusion**
+
+```typescript
+// Không nên - naming as command
+const event = { eventType: 'CreateUserCommand' }; // Wrong!
+
+// Nên - use past tense for events
+const event = { eventType: 'UserCreated' }; // Correct
+```
+
+### Checklist
+
+- [ ] Design event schema với versioning
+- [ ] Implement event store
+- [ ] Create aggregate classes
+- [ ] Build projections for read models
+- [ ] Implement snapshot strategy
+- [ ] Set up event bus integration
+- [ ] Handle event schema evolution
+- [ ] Implement CQRS integration
+- [ ] Write tests for aggregates
+- [ ] Test projections
+- [ ] Document event schema
+- [ ] Plan migration strategies
+- [ ] Set up monitoring
+- [ ] Implement Idempotency
+- [ ] Handle concurrency
+
+---
+
+## 5. Domain-Driven Design (DDD)
+
+### Mục tiêu
+
+Domain-Driven Design (DDD) là approach cho việc design software systems tập trung vào domain logic và business rules. DDD giúp tổ chức code theo business capabilities thay vì technical layers, làm cho hệ thống dễ hiểu, dễ thay đổi, và phản ánh đúng nghiệp vụ.
+
+DDD không phải là silver bullet và không phù hợp cho mọi project. Rule này giúp identify khi nào nên sử dụng DDD và how to apply các patterns một cách practical.
+
+### Nguyên tắc
+
+**1. Ubiquitous Language**
+
+Use common language everywhere. Developers, domain experts, and code use same terms. Clarify meanings. Document terms. Evolve language.
+
+**2. Bounded Contexts**
+
+Define clear boundaries. Each context has its own model. Contexts map to business capabilities. Clear ownership. Minimize dependencies.
+
+**3. Aggregates**
+
+Group related entities. Aggregate root controls access. invariants protected. Eventual consistency within aggregate. Strong consistency at boundary.
+
+**4. Value Objects**
+
+Immutable objects defined by attributes. No identity. Value equality. Encapsulate validation. Use for concepts like money, date range.
+
+**5. Entities**
+
+Objects with identity. Distinguished by ID. Lifecycle tracked. Mutable state. Represent domain objects.
+
+**6. Domain Events**
+
+Capture significant occurrences. Immutable. Named in past tense. Include relevant data. Used for integration.
+
+**7. Domain Services**
+
+Operations that don't belong to entities. Stateless. Encapsulate complex logic. Coordinate across aggregates.
+
+**8. Repositories**
+
+Abstract persistence. Work with aggregates. CRUD operations. Collection-like interface. Hide implementation.
+
+**9. Application Services**
+
+Orchestrate domain operations. Transaction boundaries. Coordinate services. Return DTOs. Thin implementation.
+
+**10. Strategic vs Tactical Design**
+
+Strategic: big picture decisions. Bounded contexts, integration. Long-term structure. Tactical: code-level patterns. Aggregates, entities, services. Day-to-day implementation.
+
+### Best Practice
+
+**1. Domain Model Structure**
+
+```typescript
+// domain model structure
+// domain/
+// ├── context/
+// │   ├── order/
+// │   │   ├── model/
+// │   │   │   ├── Order.ts (Aggregate Root)
+// │   │   │   ├── OrderItem.ts (Entity)
+// │   │   │   ├── Money.ts (Value Object)
+// │   │   │   └── Address.ts (Value Object)
+// │   │   ├── events/
+// │   │   │   ├── OrderCreatedEvent.ts
+// │   │   │   └── OrderShippedEvent.ts
+// │   │   ├── services/
+// │   │   │   └── OrderDomainService.ts
+// │   │   ├── repositories/
+// │   │   │   └── IOrderRepository.ts
+// │   │   ├── exceptions/
+// │   │   │   └── OrderDomainException.ts
+// │   │   └── value-objects/
+// │   │       ├── OrderStatus.ts
+// │   │       └── OrderId.ts
+// │   └── customer/
+// │       └── ...
+// ├── shared/
+// │   ├── value-objects/
+// │   │   └── EntityId.ts
+// │   ├── events/
+// │   │   └── DomainEvent.ts
+// │   └── exceptions/
+// │       └── DomainRuleViolation.ts
+```
+
+**2. Aggregate Implementation**
+
+```typescript
+// domain/order/model/Order.ts
+export class Order extends AggregateRoot<OrderId> {
+  private _customerId: CustomerId;
+  private _items: OrderItem[];
+  private _status: OrderStatus;
+  private _shippingAddress: Address;
+  private _total: Money;
+  private _notes?: string;
+  
+  private constructor(
+    id: OrderId,
+    customerId: CustomerId,
+    items: OrderItem[],
+    shippingAddress: Address,
+    status: OrderStatus = OrderStatus.PENDING
+  ) {
+    super(id);
+    this._customerId = customerId;
+    this._items = items;
+    this._status = status;
+    this._shippingAddress = shippingAddress;
+    this._total = this.calculateTotal();
+  }
+
+  // Factory method
+  static create(props: CreateOrderProps): Order {
+    // Validate business rules
+    OrderValidator.validateItems(props.items);
+    OrderValidator.validateAddress(props.shippingAddress);
+    
+    const order = new Order(
+      OrderId.create(),
+      props.customerId,
+      props.items,
+      props.shippingAddress
+    );
+    
+    order.addDomainEvent(
+      new OrderCreatedEvent(order.id, order.customerId, order.total)
+    );
+    
+    return order;
+  }
+
+  // Business methods
+  addItem(product: Product, quantity: number): void {
+    if (this._status !== OrderStatus.PENDING) {
+      throw new OrderDomainException('Cannot add items to a non-pending order');
+    }
+    
+    const existingItem = this._items.find(
+      item => item.productId.equals(product.id)
+    );
+    
+    if (existingItem) {
+      existingItem.increaseQuantity(quantity);
+    } else {
+      this._items.push(OrderItem.create(product, quantity));
+    }
+    
+    this._total = this.calculateTotal();
+  }
+
+  confirm(): void {
+    if (this._status !== OrderStatus.PENDING) {
+      throw new OrderDomainException('Can only confirm pending orders');
+    }
+    
+    if (this._items.length === 0) {
+      throw new OrderDomainException('Cannot confirm an empty order');
+    }
+    
+    this._status = OrderStatus.CONFIRMED;
+    this.addDomainEvent(new OrderConfirmedEvent(this.id, this.customerId));
+  }
+
+  cancel(reason: string): void {
+    if (!this.canBeCancelled()) {
+      throw new OrderDomainException(
+        `Order in status ${this._status} cannot be cancelled`
+      );
+    }
+    
+    this._status = OrderStatus.CANCELLED;
+    this._notes = reason;
+    this.addDomainEvent(new OrderCancelledEvent(this.id, reason));
+  }
+
+  canBeCancelled(): boolean {
+    return [OrderStatus.PENDING, OrderStatus.CONFIRMED].includes(this._status);
+  }
+
+  // Getters
+  get customerId(): CustomerId { return this._customerId; }
+  get items(): OrderItem[] { return [...this._items]; }
+  get status(): OrderStatus { return this._status; }
+  get shippingAddress(): Address { return this._shippingAddress; }
+  get total(): Money { return this._total; }
+}
+```
+
+**3. Value Objects**
+
+```typescript
+// domain/shared/value-objects/Money.ts
+export class Money {
+  private constructor(
+    private readonly _amount: number,
+    private readonly _currency: string
+  ) {}
+
+  static create(amount: number, currency: string): Money {
+    if (amount < 0) {
+      throw new DomainRuleViolation('Money amount cannot be negative');
+    }
+    if (!CURRENCIES.includes(currency)) {
+      throw new DomainRuleViolation(`Invalid currency: ${currency}`);
+    }
+    
+    const rounded = Math.round(amount * 100) / 100;
+    return new Money(rounded, currency);
+  }
+
+  add(other: Money): Money {
+    this.ensureSameCurrency(other);
+    return new Money(this._amount + other._amount, this._currency);
+  }
+
+  subtract(other: Money): Money {
+    this.ensureSameCurrency(other);
+    const result = this._amount - other._amount;
+    if (result < 0) {
+      throw new DomainRuleViolation('Cannot subtract more than available');
+    }
+    return new Money(result, this._currency);
+  }
+
+  multiply(factor: number): Money {
+    return new Money(this._amount * factor, this._currency);
+  }
+
+  equals(other: Money): boolean {
+    if (!(other instanceof Money)) return false;
+    return this._amount === other._amount && this._currency === other._currency;
+  }
+
+  format(locale: string = 'en-US'): string {
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: this._currency
+    }).format(this._amount);
+  }
+
+  private ensureSameCurrency(other: Money): void {
+    if (this._currency !== other._currency) {
+      throw new DomainRuleViolation(
+        `Cannot operate on different currencies: ${this._currency} and ${other._currency}`
+      );
+    }
+  }
+
+  get amount(): number { return this._amount; }
+  get currency(): string { return this._currency; }
+}
+
+// domain/order/value-objects/Address.ts
+export class Address extends ValueObject {
+  constructor(
+    private readonly _street: string,
+    private readonly _city: string,
+    private readonly _state: string,
+    private readonly _country: string,
+    private readonly _postalCode: string
+  ) {
+    super();
+    this.validate();
+  }
+
+  private validate(): void {
+    if (!this._street || this._street.length > 200) {
+      throw new DomainRuleViolation('Invalid street address');
+    }
+    if (!this._city || this._city.length > 100) {
+      throw new DomainRuleViolation('Invalid city');
+    }
+    if (!this._country || this._country.length !== 2) {
+      throw new DomainRuleViolation('Country must be 2-letter code');
+    }
+  }
+
+  equals(other: Address): boolean {
+    if (!(other instanceof Address)) return false;
+    return (
+      this._street === other._street &&
+      this._city === other._city &&
+      this._state === other._state &&
+      this._country === other._country &&
+      this._postalCode === other._postalCode
+    );
+  }
+}
+```
+
+**4. Domain Events**
+
+```typescript
+// domain/order/events/OrderCreatedEvent.ts
+export class OrderCreatedEvent extends DomainEvent {
+  constructor(
+    public readonly orderId: OrderId,
+    public readonly customerId: CustomerId,
+    public readonly total: Money,
+    public readonly occurredAt: Date = new Date()
+  ) {
+    super(orderId, 'order', 'OrderCreated', occurredAt);
+  }
+
+  toEventRecord(): EventRecord {
+    return {
+      eventId: this.eventId,
+      aggregateId: this.orderId.value,
+      eventType: this.eventType,
+      occurredAt: this.occurredAt,
+      payload: {
+        orderId: this.orderId.value,
+        customerId: this.customerId.value,
+        total: this.total.toSnapshot()
+      }
+    };
+  }
+}
+
+// domain/BaseEventBus.ts
+export abstract class EventBus {
+  abstract publish<T extends DomainEvent>(event: T): Promise<void>;
+  abstract subscribe<T extends DomainEvent>(
+    eventType: string,
+    handler: EventHandler<T>
+  ): Subscription;
+  abstract unsubscribe(subscription: Subscription): void;
+}
+```
+
+**5. Repository Pattern**
+
+```typescript
+// domain/order/repositories/IOrderRepository.ts
+export interface IOrderRepository {
+  findById(id: OrderId): Promise<Order | null>;
+  findByCustomer(customerId: CustomerId): Promise<Order[]>;
+  findByStatus(status: OrderStatus): Promise<Order[]>;
+  findByDateRange(start: Date, end: Date): Promise<Order[]>;
+  save(order: Order): Promise<void>;
+  delete(id: OrderId): Promise<void>;
+}
+
+// infrastructure/persistence/OrderRepository.ts
+export class OrderRepository implements IOrderRepository {
+  constructor(
+    private db: Database,
+    private eventBus: EventBus
+  ) {}
+
+  async findById(id: OrderId): Promise<Order | null> {
+    const row = await this.db.queryOne(
+      'SELECT * FROM orders WHERE id = $1',
+      [id.value]
+    );
+    
+    if (!row) return null;
+    
+    const items = await this.loadItems(id);
+    return this.mapToOrder(row, items);
+  }
+
+  async save(order: Order): Promise<void> {
+    const snapshot = order.toSnapshot();
+    
+    await this.db.transaction(async (tx) => {
+      await tx.execute(`
+        INSERT INTO orders (id, customer_id, status, shipping_address, total, notes, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        ON CONFLICT (id) DO UPDATE SET
+          status = EXCLUDED.status,
+          total = EXCLUDED.total,
+          updated_at = EXCLUDED.updated_at
+      `, [snapshot.id, snapshot.customerId, snapshot.status, JSON.stringify(snapshot.shippingAddress), snapshot.total.amount, snapshot.notes, snapshot.createdAt, snapshot.updatedAt]);
+
+      await this.syncItems(order.id, order.items);
+    });
+
+    const events = order.domainEvents;
+    order.clearDomainEvents();
+    
+    for (const event of events) {
+      await this.eventBus.publish(event);
+    }
+  }
+}
+```
+
+**6. Domain Services**
+
+```typescript
+// domain/order/services/OrderDomainService.ts
+export class OrderDomainService {
+  constructor(
+    private orderRepository: IOrderRepository,
+    private productRepository: IProductRepository,
+    private inventoryService: InventoryService
+  ) {}
+
+  async createOrderFromCart(cart: Cart, shippingAddress: Address): Promise<Order> {
+    const productIds = cart.items.map(item => item.productId);
+    const products = await this.productRepository.findByIds(productIds);
+    
+    const orderItems = cart.items.map(cartItem => {
+      const product = products.find(p => p.id.equals(cartItem.productId));
+      if (!product) {
+        throw new OrderDomainException(`Product not found: ${cartItem.productId.value}`);
+      }
+      if (!product.isAvailable) {
+        throw new OrderDomainException(`Product not available: ${product.name}`);
+      }
+      return OrderItem.create(product, cartItem.quantity);
+    });
+
+    const order = Order.create({
+      customerId: cart.customerId,
+      items: orderItems,
+      shippingAddress
+    });
+
+    return order;
+  }
+
+  async cancelOrderAndReleaseInventory(orderId: OrderId, reason: string): Promise<void> {
+    const order = await this.orderRepository.findById(orderId);
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    order.cancel(reason);
+    
+    for (const item of order.items) {
+      await this.inventoryService.release(item.productId, item.quantity);
+    }
+
+    await this.orderRepository.save(order);
+  }
+}
+```
+
+**7. Application Service**
+
+```typescript
+// application/OrderApplicationService.ts
+export class OrderApplicationService {
+  constructor(
+    private orderDomainService: OrderDomainService,
+    private orderRepository: IOrderRepository,
+    private eventBus: EventBus
+  ) {}
+
+  async createOrder(dto: CreateOrderDTO): Promise<OrderDTO> {
+    const order = await this.orderDomainService.createOrderFromCart(
+      dto.cart,
+      Address.fromSnapshot(dto.shippingAddress)
+    );
+
+    await this.orderRepository.save(order);
+
+    return this.mapToDTO(order);
+  }
+
+  async confirmOrder(orderId: string): Promise<OrderDTO> {
+    const order = await this.orderRepository.findById(OrderId.from(orderId));
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    order.confirm();
+    await this.orderRepository.save(order);
+
+    return this.mapToDTO(order);
+  }
+
+  async cancelOrder(dto: CancelOrderDTO): Promise<OrderDTO> {
+    const orderId = OrderId.from(dto.orderId);
+    
+    await this.orderDomainService.cancelOrderAndReleaseInventory(orderId, dto.reason);
+
+    const order = await this.orderRepository.findById(orderId);
+    return this.mapToDTO(order);
+  }
+
+  private mapToDTO(order: Order): OrderDTO {
+    return {
+      id: order.id.value,
+      customerId: order.customerId.value,
+      status: order.status,
+      items: order.items.map(item => ({
+        productId: item.productId.value,
+        productName: item.productName,
+        quantity: item.quantity.value,
+        unitPrice: item.unitPrice.format(),
+        subtotal: item.subtotal.format()
+      })),
+      shippingAddress: order.shippingAddress.toSnapshot(),
+      total: order.total.format(),
+      notes: order.notes,
+      createdAt: order.createdAt
+    };
+  }
+}
+```
+
+### Anti Patterns
+
+**1. Anemic Domain Model**
+
+Objects with no behavior. Just getters and setters. Business logic in services. Misses DDD benefits. Add behavior to entities.
+
+**2. God Aggregates**
+
+Too many entities in one aggregate. Complex invariants. Poor performance. Split aggregates. Keep aggregates small.
+
+**3. Smart UI**
+
+Business logic in UI layer. Domain model empty. Duplicated logic. Move logic to domain.
+
+**4. Anemic Services**
+
+Services with no logic. Just pass-through. Logic in wrong place. Add logic to domain.
+
+**5. Ignored Bounded Contexts**
+
+Everything in one model. Shared everything. No clear boundaries. Proliferation of concepts.
+
+### Checklist
+
+- [ ] Domain model identified
+- [ ] Bounded contexts defined
+- [ ] Ubiquitous language documented
+- [ ] Aggregates designed
+- [ ] Value objects identified
+- [ ] Domain events defined
+- [ ] Repositories interfaces created
+- [ ] Domain services identified
+- [ ] Application services designed
+- [ ] Integration patterns defined
+
+---
+
+## So sánh các Patterns
+
+| Aspect | Clean Architecture | Hexagonal | CQRS | Event Sourcing | DDD |
+|--------|-------------------|-----------|------|----------------|-----|
+| **Primary Focus** | Layer separation | Port/Adapter decoupling | Read/Write separation | State as events | Domain modeling |
+| **Dependency Direction** | Inward only | Inward (core) | Bidirectional (via events) | Inward (domain) | Bounded contexts inward |
+| **Best For** | General purpose | External system swaps | Different R/W patterns | Audit trails | Complex domains |
+| **Complexity** | Medium | Medium | High | High | Medium-High |
+| **Testing** | Easy (layers isolated) | Very easy (ports mockable) | Moderate | Moderate | Moderate |
+| **State Management** | Current state only | Current state only | Separate models | Full event history | Current state |
+| **Reconstruction** | N/A | N/A | Via projections | Full replay | N/A |
+| **Team Size** | Any | Any | 3+ recommended | 3+ recommended | 2+ recommended |
+| **Storage** | Standard DB | Standard DB | Separate R/W DBs | Event store | Standard DB |
+| **Eventual Consistency** | Optional | Optional | Common | Native | Optional |
+
+### Complementary Usage
+
+Các patterns có thể được kết hợp:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Combined Architecture                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────────┐ │
+│  │                    Presentation Layer                       │ │
+│  │               (REST API, GraphQL, CLI)                       │ │
+│  └───────────────────────────┬─────────────────────────────────┘ │
+│                              │                                    │
+│  ┌───────────────────────────▼─────────────────────────────────┐ │
+│  │               Application Layer (CQRS)                      │ │
+│  │           Commands/Queries → Event Handlers                  │ │
+│  └───────────────────────────┬─────────────────────────────────┘ │
+│                              │                                    │
+│  ┌───────────────────────────▼─────────────────────────────────┐ │
+│  │                    Domain Layer (DDD)                       │ │
+│  │     Aggregates, Entities, Value Objects, Domain Events      │ │
+│  └───────────────────────────┬─────────────────────────────────┘ │
+│                              │                                    │
+│  ┌───────────────────────────▼─────────────────────────────────┐ │
+│  │              Infrastructure (Hexagonal + Clean)              │ │
+│  │              Ports/Adapters, Repositories                   │ │
+│  └─────────────────────────────────────────────────────────────┘ │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Workflow - Tổng hợp
+
+### Phase 1: Strategic Design (DDD + Clean Architecture)
+
+1. Meet with domain experts
+2. Identify bounded contexts
+3. Define ubiquitous language
+4. Map context integration
+5. Design layer structure
+
+### Phase 2: Tactical Design (DDD + Hexagonal)
+
+1. Define aggregates within contexts
+2. Identify entities and value objects
+3. Design ports (interfaces)
+4. Plan adapters
+5. Define domain events
+
+### Phase 3: Implementation (CQRS + Event Sourcing)
+
+1. Design command and query models
+2. Implement aggregates with events
+3. Build projections for queries
+4. Set up event store
+5. Implement read models
+
+### Phase 4: Integration (All Patterns)
+
+1. Wire adapters to ports
+2. Configure dependency injection
+3. Set up event bus
+4. Implement CQRS handlers
+5. Add monitoring
+
+### Phase 5: Testing (All Patterns)
+
+1. Unit test domain logic
+2. Integration test adapters
+3. Test projections
+4. Test eventual consistency
+5. Performance testing
+
+---
+
+## Liên kết
+
+- [Clean Architecture - Robert C. Martin](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+- [Hexagonal Architecture - Alistair Cockburn](https://alistair.cockburn.us/hexagonal-architecture/)
+- [CQRS - Martin Fowler](https://martinfowler.com/articles/cqrs.html)
+- [Event Sourcing - Martin Fowler](https://martinfowler.com/eaaDev/EventSourcing.html)
+- [Domain-Driven Design - Eric Evans](https://www.domainlanguage.com/ddd/)
+- [[backend-architecture]] - Backend Architecture
+- [[microservices]] - Microservices patterns
+- [[testing]] - Testing strategies

@@ -1,0 +1,1757 @@
+﻿---
+description: Hướng dẫn skill auto-discovery và execution cho Cursor Enterprise Framework. Định tuyến tự động đến skills phù hợp với pre-review và post-review gates. Mọi task phải pass qua cả hai gates trước khi deliver.
+created: 2026-06-23
+version: 1.3.0
+updated: 2026-06-26
+tags: [skill, auto-discovery, frontend, review, quality, cursor, pre-review, post-review, skill-selection, intent-analysis]
+depends: [skill-registry]
+---
+
+# Skill Auto-Discovery & Execution Protocol
+
+## Mục tiêu & Tổng quan
+
+Hệ thống skill cho Cursor Enterprise Framework bao gồm **17 skills**, mỗi skill đều có:
+- **Pre-Review Gate** — chạy TRƯỚC khi viết code (lập kế hoạch, lock scope, declare design direction)
+- **Post-Review Gate** — chạy SAU KHI viết code, TRƯỚC KHI deliver (kiểm tra chất lượng)
+
+**Single Source of Truth:** Tất cả skill definitions, trigger matrices, confidence thresholds, và gate mappings được quản lý tập trung trong [[rule_skill-registry]].
+
+**Multi-Language Support:**
+Hệ thống hỗ trợ **bất kỳ ngôn ngữ nào** (tiếng Việt, Trung Quốc, Nhật Bản, Hàn Quốc, v.v.) thông qua [[proto_multi-language-vibe-code]] protocol.
+
+**Không có ngoại lệ.** Mọi task phải pass cả hai gates. Bypass dưới mọi hình thức đều bị cấm.
+
+---
+
+## PHẦN A: SKILL DETECTION ENGINE
+
+> **Xem [[rule_skill-registry]] §1-§6 cho đầy đủ:**
+> - Skill Definitions (§1)
+> - Trigger Matrix (§2)
+> - Confidence Thresholds (§3)
+> - Skill Combinations (§4)
+> - Gate Mappings (§5)
+> - Decision Tree (§6)
+
+### A.1 Skill Detection Flow
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    SKILL DETECTION FLOW                             │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  1. REQUEST PARSING                                                 │
+│     └── Extract keywords, intent signals, domain context           │
+│                                                                     │
+│  2. SKILL MATCHING                                                  │
+│     └── Match against [[rule_skill-registry]] §2 Trigger Matrix         │
+│                                                                     │
+│  3. CONFIDENCE SCORING                                              │
+│     └── Calculate scores using §3 thresholds                         │
+│                                                                     │
+│  4. SKILL ACTIVATION                                                │
+│     ├── Primary skill selected                                      │
+│     ├── Secondary skills identified                                 │
+│     ├── karpathy-coding (MANDATORY OVERLAY)                        │
+│     └── Gates determined from §5                                    │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### A.2 Confidence Thresholds
+
+| Threshold | Value | Action |
+|-----------|-------|--------|
+| `AUTO_SELECT` | >= 0.75 | Auto-select (no confirmation needed) |
+| `SUGGEST` | 0.50-0.74 | Suggest to user |
+| `AMBIGUOUS` | < 0.40 | Ask for clarification |
+
+### A.3 Mandatory Skills
+
+| Skill | Role | Always Runs |
+|-------|------|-------------|
+| karpathy-coding | **mandatory_overlay** | Yes (all coding tasks) |
+| frontend-review | **mandatory** | Yes (all frontend tasks) |
+
+| Keyword / Pattern | Primary Skill | Confidence | Notes |
+|---|---|---|---|
+| **VISUAL - Diagrams & Visual Explanations** | | | |
+| `diagram` | visual-explainer | 0.95 | Architecture/system diagrams |
+| `architecture overview` | visual-explainer | 0.95 | System architecture |
+| `flowchart` | visual-explainer | 0.95 | Process flows |
+| `diff review` | visual-explainer | 0.95 | Visual diff review |
+| `plan review` | visual-explainer | 0.95 | Plan vs code comparison |
+| `slide deck` | visual-explainer | 0.95 | Presentation slides |
+| `project recap` | visual-explainer | 0.90 | Mental model snapshot |
+| `visual plan` | visual-explainer | 0.90 | Visual implementation plan |
+| `comparison table` | visual-explainer | 0.85 | Visual table (4+ rows) |
+| **FRONTEND - Landing Pages** ||||
+| `landing page` | frontend-taste | 0.95 | Landing/hero pages |
+| `portfolio` | frontend-taste | 0.95 | Personal/company portfolios |
+| `homepage` | frontend-taste | 0.90 | Website homepage |
+| `marketing site` | frontend-taste | 0.90 | Marketing/splash pages |
+| `SaaS landing` | frontend-taste | 0.95 | SaaS product landing |
+| `launch page` | frontend-taste | 0.90 | Product launch pages |
+| **FRONTEND - Redesign** ||||
+| `redesign` | frontend-redesign | 0.95 | Full redesign task |
+| `upgrade` | frontend-redesign | 0.85 | UI/UX upgrade |
+| `improve existing` | frontend-redesign | 0.90 | Improve current UI |
+| `modernize` | frontend-redesign | 0.90 | Make it modern |
+| `improve UI` | frontend-redesign | 0.85 | UI improvements |
+| `improve UX` | frontend-redesign | 0.85 | UX improvements |
+| `refresh` | frontend-redesign | 0.80 | Visual refresh |
+| **FRONTEND - Build/Create** ||||
+| `build` + `frontend` | frontend-taste | 0.90 | Build frontend |
+| `create` + `component` | frontend-taste | 0.85 | Create components |
+| `implement` + `UI` | frontend-taste | 0.85 | Implement UI |
+|| **OPEN DESIGN - Design Automation** ||||
+| `open-design` | open-design | 0.95 | Open Design integration |
+| `design system` + `UI` | open-design + frontend-taste | 0.90 | Brand-grade design |
+| `prototype` | open-design (web-prototype) | 0.90 | Web prototype |
+| `mobile app` | open-design (mobile-app) | 0.90 | Mobile prototype |
+| `dashboard` | open-design (dashboard) | 0.90 | Admin/analytics dashboard |
+| `deck` / `presentation` | open-design (guizang-ppt) | 0.90 | Presentation deck |
+| `hyperframes` | open-design (hyperframes) | 0.95 | HTML to MP4 motion |
+| **FULL OUTPUT - Output Quality** ||||
+| `full implementation` | full-output | 0.95 | Explicit full impl |
+| `complete` | full-output | 0.90 | Complete task |
+| `not skeleton` | full-output | 0.95 | No skeleton |
+| `no TODO` | full-output | 0.95 | No TODOs |
+| `not placeholder` | full-output | 0.95 | No placeholders |
+| `full code` | full-output | 0.90 | Full code output |
+| `not truncated` | full-output | 0.90 | No truncation |
+| `entire` + `file` | full-output | 0.90 | Full files |
+| `build from scratch` | full-output | 0.85 | Greenfield build |
+| **REVIEW - Quality Check** ||||
+| `review` | frontend-review | 0.95 | Code review request |
+| `quality check` | frontend-review | 0.95 | Quality audit |
+| `audit` | frontend-review | 0.90 | Audit request |
+| `check quality` | frontend-review | 0.90 | Quality check |
+| `taste check` | frontend-review | 0.90 | Design taste review |
+| **SECURITY - Security Tasks** ||||
+| `security` + `review` | security-review | 0.95 | Security review |
+| `vulnerability` | security-review | 0.95 | Vulnerability check |
+| `penetration test` | security-review | 0.95 | Pentest |
+| `OWASP` | security-review | 0.95 | OWASP compliance |
+| `XSS` | security-review | 0.95 | XSS vulnerability |
+| `SQL injection` | security-review | 0.95 | SQLi vulnerability |
+| `SSRF` | security-review | 0.95 | SSRF vulnerability |
+| `CSRF` | security-review | 0.95 | CSRF vulnerability |
+| `authentication` | security-review | 0.90 | Auth implementation |
+| `authorization` | security-review | 0.90 | Authz implementation |
+| `JWT` | security-review | 0.85 | JWT handling |
+| `OAuth` | security-review | 0.90 | OAuth implementation |
+| `API key` + `security` | security-review | 0.90 | API key security |
+| `secret` + `leak` | security-review | 0.95 | Secret exposure |
+| `CVE` | security-review | 0.95 | CVE vulnerability |
+| `exploit` | security-review | 0.95 | Exploit analysis |
+| `reverse engineer` | security-review | 0.90 | RE task |
+| `APK` + `decompile` | security-review | 0.95 | APK analysis |
+| `Frida` | security-review | 0.95 | Dynamic analysis |
+| `prompt injection` | security-review | 0.95 | LLM security |
+| `malware` | security-review | 0.95 | Malware analysis |
+| **PAYMENT - Vietnam Payment** ||||
+| `MoMo` | vietnam-payment-review | 0.95 | MoMo integration |
+| `SePay` | vietnam-payment-review | 0.95 | SePay integration |
+| `PayOS` | vietnam-payment-review | 0.95 | PayOS integration |
+| `ZaloPay` | vietnam-payment-review | 0.95 | ZaloPay integration |
+| `VNPay` | vietnam-payment-review | 0.95 | VNPay integration |
+| `VietQR` | vietnam-payment-review | 0.95 | VietQR integration |
+| `thanh toán` + `Việt Nam` | vietnam-payment-review | 0.95 | Vietnam payment |
+| `webhook` + `payment` | vietnam-payment-review | 0.90 | Payment webhook |
+| `payment gateway` | security-review | 0.85 | Payment security |
+| **PONYTAIL - Efficiency** ||||
+| `less code` | ponytail | 0.95 | Minimize code |
+| `yagni` | ponytail | 0.95 | YAGNI principle |
+| `over-engineering` | ponytail | 0.95 | Prevent over-build |
+| `boilerplate` | ponytail | 0.90 | Avoid boilerplate |
+| `abstraction` + `utility` | ponytail | 0.85 | Over-abstraction |
+| `wrapper` + `class` | ponytail | 0.85 | Wrapper pattern |
+| `vibe code` | ponytail | 0.90 | Efficient coding |
+| **VIETNAM ADDRESS - Location Data** ||||
+| `địa chỉ` + `Việt Nam` | vietnam-address | 0.95 | Vietnamese address |
+| `tỉnh` + `thành phố` | vietnam-address | 0.90 | Province/city selection |
+| `quận` + `huyện` | vietnam-address | 0.90 | District selection |
+| `phường` + `xã` | vietnam-address | 0.90 | Ward/commune selection |
+| `shipping address` | vietnam-address | 0.90 | Shipping address |
+| `address autocomplete` | vietnam-address | 0.95 | Address search |
+| `province` + `district` + `ward` | vietnam-address | 0.95 | Full address hierarchy |
+| `vietnamese-provinces` | vietnam-address | 0.95 | Vietnam provinces data |
+| `simple` | karpathy-coding | 0.95 | Simple approach |
+| `straightforward` | karpathy-coding | 0.95 | Direct solution |
+| `not overthink` | karpathy-coding | 0.95 | Keep it simple |
+| `minimal` | karpathy-coding + ponytail | 0.95 | Minimal code |
+| `just` + `do it` | karpathy-coding | 0.90 | Vibe coding |
+| `build` + `me` | karpathy-coding | 0.85 | Build request |
+| `trading` + `cognitive` | karpathy-coding | 0.90 | Reduce mental load |
+| `don’t assume` | karpathy-coding | 0.90 | Ask before assuming |
+| `clarify first` | karpathy-coding | 0.90 | Ask before coding |
+| **DOCUMENT OCR - Text Extraction** ||||
+| `ocr` | document-ocr | 0.95 | OCR text extraction |
+| `text extraction` | document-ocr | 0.95 | Extract text from images |
+| `image to text` | document-ocr | 0.90 | Image text conversion |
+| `read text from image` | document-ocr | 0.95 | Image text reading |
+| `screenshot text` | document-ocr | 0.90 | Extract from screenshot |
+| `scanned document` | document-ocr | 0.85 | Scanned PDF/image OCR |
+| `vietnamese ocr` | document-ocr | 0.95 | Vietnamese document OCR |
+| **KNOWLEDGE BASE - WeKnora RAG** |||||
+| `knowledge base` | weknora-kb | 0.95 | Knowledge base operations |
+| `rag` | weknora-kb | 0.95 | RAG implementation |
+| `document q&a` | weknora-kb | 0.95 | Document Q&A system |
+| `faq` + `system` | weknora-kb | 0.95 | FAQ knowledge base |
+| `enterprise wiki` | weknora-kb | 0.95 | Wiki knowledge base |
+| `weknora` | weknora-kb | 0.95 | WeKnora platform |
+| `hybrid search` | weknora-kb | 0.90 | Vector + BM25 search |
+| `graphrag` | weknora-kb | 0.90 | GraphRAG retrieval |
+| `knowledge graph` | weknora-kb | 0.85 | Knowledge graph |
+| `document ingestion` | weknora-kb | 0.90 | Document upload/process |
+| `pdf` + `knowledge` | weknora-kb | 0.85 | PDF knowledge extraction |
+| `internal q&a` | weknora-kb | 0.90 | Internal Q&A system |
+| `research assistant` | weknora-kb | 0.90 | Research automation |
+| **PIXELRAG - Visual RAG** |||||
+| `pixelrag` | pixelrag | 0.95 | PixelRAG visual RAG |
+| `visual rag` | pixelrag | 0.95 | Visual retrieval |
+| `screenshot` + `rag` | pixelrag | 0.95 | Screenshot-based RAG |
+| `visual search` | pixelrag | 0.90 | Visual content search |
+| `pixel-native` | pixelrag | 0.95 | Pixel-native search |
+| `read document` + `visual` | pixelrag | 0.90 | Visual document reading |
+| `pdf` + `table` | pixelrag | 0.90 | PDF table extraction |
+| `pdf` + `chart` | pixelrag | 0.90 | PDF chart extraction |
+| `pdf` + `diagram` | pixelrag | 0.90 | PDF diagram extraction |
+| `đọc file` + `pdf` | pixelrag | 0.95 | Đọc tài liệu PDF |
+| `phân tích` + `bảng` | pixelrag | 0.90 | Phân tích bảng biểu |
+| `hỏi về` + `biểu đồ` | pixelrag | 0.90 | Hỏi về biểu đồ |
+| `financial report` + `analysis` | pixelrag | 0.90 | Financial report analysis |
+| `document q&a` + `visual` | pixelrag | 0.90 | Visual document Q&A |
+| `website` + `screenshot` | pixelrag | 0.85 | Website screenshot |
+| `vision embedding` | pixelrag | 0.95 | Vision embedding |
+| `qwen3-vl` | pixelrag | 0.95 | Qwen3-VL model |
+| **AGENT MODE - ReAct Agent** |||||
+| `agent mode` | weknora-agent | 0.95 | Autonomous agent |
+| `react agent` | weknora-agent | 0.95 | ReAct reasoning |
+| `autonomous reasoning` | weknora-agent | 0.95 | Multi-step reasoning |
+| `agentic workflow` | weknora-agent | 0.95 | Autonomous workflow |
+| `tool calling` | weknora-agent | 0.90 | Tool orchestration |
+| `web search` + `agent` | weknora-agent | 0.90 | Web search agent |
+| `mcp tools` | weknora-agent | 0.90 | MCP integration |
+| **BAZI - Fortune Telling** ||||
+| `算八字` | bazi | 0.95 | Chinese Bazi fortune telling |
+| `看八字` | bazi | 0.95 | Bazi analysis |
+| `批八字` | bazi | 0.95 | Bazi reading |
+| `排八字` | bazi | 0.95 | Bazi chart calculation |
+| `四柱` | bazi | 0.95 | Four pillars of destiny |
+| `命盘` | bazi | 0.95 | Destiny chart |
+| `算命` | bazi | 0.95 | Fortune telling |
+| `命理` | bazi | 0.90 | Destiny analysis |
+| `运势` | bazi | 0.85 | Fortune/luck prediction |
+| `大运` | bazi | 0.85 | Decade luck cycles |
+| `流年` | bazi | 0.85 | Yearly fortune |
+| `bazi` | bazi | 0.95 | Bazi (Chinese astrology) |
+| `birth chart` | bazi | 0.85 | Birth chart analysis |
+| `fortune telling` | bazi | 0.85 | Fortune telling |
+| **SKILL INSTALLER - Auto Dependencies** ||||
+| `install deps` | skill-installer | 0.95 | Install skill dependencies |
+| `check deps` | skill-installer | 0.95 | Check dependencies |
+| `setup skill` | skill-installer | 0.90 | Setup skill environment |
+| `install dependencies` | skill-installer | 0.95 | Install dependencies |
+
+### A.3 Confidence Scoring Algorithm
+
+Confidence score cho mỗi skill được tính dựa trên:
+
+```python
+# Confidence Calculation Formula
+def calculate_confidence(skill: str, request: str) -> float:
+    base_score = BASE_CONFIDENCE[skill]  # 0.70 - 0.80 base
+    keyword_matches = count_keyword_matches(skill, request)
+    context_bonus = assess_context_signals(request)
+    domain_penalty = apply_domain_penalty(skill, request)
+    
+    # Weighted formula
+    raw_score = (
+        keyword_matches * 0.15 +      # Keyword weight
+        context_bonus * 0.20 +        # Context bonus
+        base_score * 0.30 +           # Base skill confidence
+        domain_penalty * 0.35          # Domain fit
+    )
+    
+    # Normalize to 0-1 range
+    return min(1.0, max(0.0, raw_score))
+
+# Base Confidence by Skill
+BASE_CONFIDENCE = {
+    "frontend-taste": 0.75,
+    "frontend-redesign": 0.75,
+    "full-output": 0.80,        # Full output always applies
+    "frontend-review": 0.70,    # Review is fallback
+    "security-review": 0.80,    # Security is specialized
+    "vietnam-payment-review": 0.85,  # Very specific domain
+    "karpathy-coding": 0.90     # Universal coding discipline
+}
+
+# Confidence Thresholds
+THRESHOLD_AUTO_SELECT = 0.75   # Auto-select if confidence >= this
+THRESHOLD_REVIEW_SUGGEST = 0.50  # Suggest review if confidence >= this
+THRESHOLD_AMBIGUOUS = 0.40    # Ambiguous if confidence < this
+```
+
+### A.4 Skill Combination Rules (Auto-Detected)
+
+Dựa trên keyword matching và confidence scores, skill combinations được xác định tự động:
+
+#### A.4.1 Frontend Combinations
+
+| Request Pattern | Primary | Secondary | Review Gates |
+|---|---|---|---|
+| Landing/Portfolio/Greenfield | frontend-taste | full-output + frontend-review | taste-pre + taste-post + fulloutput-pre + fulloutput-post + review-pre + review-post |
+| Redesign Existing | frontend-redesign | full-output + frontend-review | redesign-pre + redesign-post + fulloutput-pre + fulloutput-post + review-pre + review-post |
+| Build/Create Components | frontend-taste | full-output + frontend-review | taste-pre + fulloutput-pre + review-pre + all post |
+| Code Review Only | frontend-review | (standalone) | review-pre + review-post |
+| Quality Check Only | frontend-review | (standalone) | review-pre + review-post |
+
+#### A.4.2 Security Combinations
+
+| Request Pattern | Primary | Secondary | Review Gates |
+|---|---|---|---|
+| Security Vulnerability | security-review | (standalone) | security-pre + security-post |
+| Payment + Security | security-review | vietnam-payment-review | security-pre + payment-pre + security-post + payment-post |
+| Vietnam Payment Only | vietnam-payment-review | security-review | payment-pre + security-pre + payment-post + security-post |
+| API Security | security-review | (standalone) | security-pre + security-post |
+| Auth Implementation | security-review | frontend-review (if UI) | security-pre + [frontend-pre] + security-post + [frontend-post] |
+
+#### A.4.3 Full Output Combinations
+
+| Request Pattern | Primary | Secondary | Review Gates |
+|---|---|---|---|
+| Full Impl (Frontend) | full-output | frontend-review | fulloutput-pre + review-pre + fulloutput-post + review-post |
+| Full Impl (Backend) | full-output | security-review (if auth/payment) | fulloutput-pre + [security-pre] + fulloutput-post + [security-post] |
+| Full Impl (Multi-file) | full-output | frontend-review | fulloutput-pre + review-pre + all post |
+
+### A.5 Context Signals (Beyond Keywords)
+
+Ngoài keywords, các context signals sau được sử dụng để refine skill selection:
+
+#### A.5.1 Implicit Signals
+
+```yaml
+# Signal → Skill Inference Mapping
+
+Signal: "file extension in request"
+  - .vue, .tsx, .jsx → frontend-taste/frontend-redesign
+  - .py, .java, .go → backend (no frontend skill)
+
+Signal: "design system mentioned"
+  - Tailwind, shadcn, Radix → frontend-taste
+  - Fluent UI, Material → frontend-taste (official design system)
+
+Signal: "existing codebase reference"
+  - "current app", "existing site" → frontend-redesign
+  - "our website" → frontend-redesign
+  - "new project", "from scratch" → frontend-taste + full-output
+
+Signal: "quality/standard language"
+  - "enterprise", "production-ready" → full-output + frontend-review
+  - "shippable", "ready to deploy" → full-output
+
+Signal: "visual/aesthetic language"
+  - "beautiful", "premium", "polished" → frontend-taste
+  - "ugly", "outdated" → frontend-redesign
+  - "modern", "sleek" → frontend-redesign
+
+Signal: "security language"
+  - "protect", "secure", "encrypt" → security-review
+  - "leak", "breach", "vulnerable" → security-review
+```
+
+#### A.5.2 Anti-Signals (Skills to NOT Apply)
+
+```yaml
+# Negative Signals → Skill Exclusion
+
+Signal: "backend only" → Exclude frontend skills
+  - "API only", "REST endpoint", "database migration"
+  
+Signal: "infrastructure" → Exclude frontend/security skills
+  - "docker", "kubernetes", "CI/CD", "deployment"
+  
+Signal: "pure logic" → Exclude frontend-taste
+  - "algorithm", "data processing", "computation"
+  
+Signal: "documentation" → Exclude frontend skills
+  - "write docs", "API documentation", "README"
+```
+
+### A.6 Skill Detection Decision Tree
+
+```
+START: Request Received
+│
+├── Is request about PAYMENT (MoMo, SePay, PayOS, ZaloPay, VNPay, VietQR)?
+│   └── YES → Is request about SECURITY (vulnerability, auth, secrets)?
+│       ├── YES → security-review + vietnam-payment-review
+│       └── NO → vietnam-payment-review + [security-review if auth/payment]
+│
+├── Is request about SECURITY (vulnerability, pentest, OWASP, CVE, etc.)?
+│   └── YES → security-review
+│       └── Is task APK/binary RE?
+│           ├── YES → security-review + reverse-skill routing
+│           └── NO → security-review standalone
+│
+├── Is request about FRONTEND (UI, landing, redesign, component)?
+│   ├── YES → Is request about REDESIGN (existing site, improve, upgrade)?
+│   │   ├── YES → frontend-redesign + full-output + frontend-review
+│   │   └── NO → Is request about BUILD/CREATE (landing, portfolio, new)?
+│   │       ├── YES → frontend-taste + full-output + frontend-review
+│   │       └── NO → Is request about REVIEW (quality check, audit)?
+│   │           ├── YES → frontend-review (standalone)
+│   │           └── NO → frontend-taste + frontend-review
+│   └── NO → Is request about FULL OUTPUT (full implementation, complete)?
+│       ├── YES → full-output + [domain-specific review]
+│       └── NO → Apply default based on implicit signals
+│
+└── Is request AMBIGUOUS (low confidence for all skills)?
+    └── YES → Ask clarifying question, then apply based on response
+```
+
+### A.7 Skill Detection Examples
+
+#### Example 1: Landing Page Request
+
+```
+User: "Tạo một landing page cho startup AI của tôi với design hiện đại"
+
+Analysis:
+├── Keywords detected: "landing page" (0.95), "design" (0.80), "startup" (0.70)
+├── Context: New project, visual/aesthetic language
+├── Signals: greenfield, premium design language
+│
+├── Skill Match Scores:
+│   ├── frontend-taste: 0.92 ← HIGHEST
+│   ├── frontend-redesign: 0.15 (no existing site)
+│   ├── full-output: 0.80
+│   └── frontend-review: 0.70
+│
+├── Decision:
+│   ├── Primary: frontend-taste (0.92 >= 0.75)
+│   ├── Secondary: full-output + frontend-review
+│   └── Gates: taste-pre + fulloutput-pre + review-pre
+│
+└── Output:
+    ╔════════════════════════════════════════════════════╗
+    ║ [SKILL DETECTION COMPLETE]                         ║
+    ╠════════════════════════════════════════════════════╣
+    ║ Primary:    frontend-taste (0.92)                 ║
+    ║ Secondary:  full-output, frontend-review            ║
+    ║ Confidence: HIGH - Auto-selected                   ║
+    ╚════════════════════════════════════════════════════╝
+```
+
+#### Example 2: Security Review Request
+
+```
+User: "Review code này xem có SQL injection vulnerability không"
+
+Analysis:
+├── Keywords detected: "review" (0.95), "SQL injection" (0.95), "vulnerability" (0.95)
+├── Context: Security, vulnerability assessment
+├── Signals: security-focused language
+│
+├── Skill Match Scores:
+│   ├── security-review: 0.95 ← HIGHEST
+│   ├── frontend-review: 0.60 (review keyword, but security context)
+│   ├── frontend-taste: 0.20 (no frontend context)
+│   └── vietnam-payment-review: 0.30 (no payment context)
+│
+├── Decision:
+│   ├── Primary: security-review (0.95 >= 0.75)
+│   ├── Secondary: (none - standalone security)
+│   └── Gates: security-pre + security-post
+│
+└── Output:
+    ╔════════════════════════════════════════════════════╗
+    ║ [SKILL DETECTION COMPLETE]                         ║
+    ╠════════════════════════════════════════════════════╣
+    ║ Primary:    security-review (0.95)                ║
+    ║ Secondary:   (none - standalone security task)      ║
+    ║ Confidence:  HIGH - Auto-selected                  ║
+    ╚════════════════════════════════════════════════════╝
+```
+
+#### Example 3: Multi-Skill Detection
+
+```
+User: "Tích hợp thanh toán MoMo vào app, đảm bảo secure và không có vulnerability"
+
+Analysis:
+├── Keywords detected: 
+│   ├── "MoMo" (0.95), "payment" (0.95) → vietnam-payment-review
+│   ├── "secure" (0.90), "vulnerability" (0.95) → security-review
+│   └── "integration" (0.85) → full-output
+├── Context: Payment + Security + Implementation
+├── Signals: Both payment and security context
+│
+├── Skill Match Scores:
+│   ├── vietnam-payment-review: 0.93 ← HIGHEST (payment domain)
+│   ├── security-review: 0.90 ← HIGHEST (security domain)
+│   └── full-output: 0.85 (implementation requested)
+│
+├── Decision:
+│   ├── Primary: vietnam-payment-review (payment domain)
+│   ├── Secondary: security-review (security overlay)
+│   ├── Tertiary: full-output (implementation completeness)
+│   └── Gates: payment-pre + security-pre + payment-post + security-post
+│
+└── Output:
+    ╔════════════════════════════════════════════════════╗
+    ║ [SKILL DETECTION COMPLETE]                         ║
+    ╠════════════════════════════════════════════════════╣
+    ║ Primary:    vietnam-payment-review (0.93)         ║
+    ║ Secondary:  security-review (0.90)                ║
+    ║ Tertiary:   full-output (0.85)                    ║
+    ║ Confidence: HIGH - Multi-skill detected            ║
+    ║ Gates:      4 (payment-pre/post + security-pre/post)║
+    ╚════════════════════════════════════════════════════╝
+```
+
+#### Example 4: Ambiguous Request
+
+```
+User: "Cải thiện app này"
+
+Analysis:
+├── Keywords detected: "cải thiện" (improve) - ambiguous
+├── Context: Unclear - could be redesign, feature add, bug fix
+├── Signals: Existing project reference ("app này")
+│
+├── Skill Match Scores:
+│   ├── frontend-redesign: 0.55 (existing project, but "improve" vague)
+│   ├── frontend-taste: 0.40 (could be UI focus)
+│   ├── frontend-review: 0.50 (could be quality check)
+│   └── full-output: 0.45 (could be implementation)
+│
+├── Decision:
+│   ├── All scores < 0.75 (THRESHOLD_AUTO_SELECT)
+│   └── AMBIGUOUS - Need clarification
+│
+└── Output:
+    ╔════════════════════════════════════════════════════╗
+    ║ [SKILL DETECTION: AMBIGUOUS]                      ║
+    ╠════════════════════════════════════════════════════╣
+    ║ Best match:  frontend-redesign (0.55)            ║
+    ║ Confidence: LOW - Clarification needed            ║
+    ║                                                  ║
+    ║ Clarification needed:                             ║
+    ║ "Bạn muốn cải thiện điều gì cụ thể?"            ║
+    ║ - Thiết kế/UI (redesign)                         ║
+    ║ - Tính năng mới (implementation)                 ║
+    ║ - Chất lượng code (review)                       ║
+    ║ - Hiệu năng (performance review)                 ║
+    ╚════════════════════════════════════════════════════╝
+```
+
+### A.8 Auto-Detection Output Format
+
+Khi skill detection hoàn thành, output format chuẩn:
+
+```
+══════════════════════════════════════════════════════════════
+[SKILL DETECTION] — ANALYSIS COMPLETE
+══════════════════════════════════════════════════════════════
+
+Request Summary: [brief summary of what user wants]
+Primary Intent:  [main intent identified]
+Domain:          [frontend/backend/security/payment/etc.]
+
+──────────────────────────────────────────────────────────────
+SKILLS SELECTED
+──────────────────────────────────────────────────────────────
+
+  ★ PRIMARY:      [skill-name] (confidence: 0.XX)
+  ○ SECONDARY:    [skill-name] (confidence: 0.XX) [if applicable]
+  ○ TERTIARY:     [skill-name] (confidence: 0.XX) [if applicable]
+
+──────────────────────────────────────────────────────────────
+REVIEW GATES TO RUN
+──────────────────────────────────────────────────────────────
+
+  PRE-REVIEW (before code):
+    [ ] [Skill-1] Pre-Review Gate
+    [ ] [Skill-2] Pre-Review Gate
+    [ ] [Skill-N] Pre-Review Gate
+
+  POST-REVIEW (after code):
+    [ ] [Skill-1] Post-Review Gate
+    [ ] [Skill-2] Post-Review Gate
+    [ ] [Skill-N] Post-Review Gate
+
+──────────────────────────────────────────────────────────────
+NEXT ACTION: Load SKILL.md files and begin PRE-REVIEW
+══════════════════════════════════════════════════════════════
+```
+
+---
+
+## Skill Registry
+
+> **Đầy đủ: [[rule_skill-registry]] §1 - §7**
+> File này là single source of truth cho tất cả skill definitions.
+
+### Quick Reference
+
+| ID | Path | Role | Threshold | Pre-Gates | Post-Gates |
+|----|------|------|-----------|------------|------------|
+| frontend-taste | `ui_frontend-taste/SKILL.md` | primary | 0.75 | §0.A-0.F | §6.A-6.H |
+| frontend-redesign | `ui_frontend-redesign/SKILL.md` | primary | 0.75 | §0.A-0.E | §4.A-4.E |
+| full-output | `code_full-output/SKILL.md` | secondary | 0.80 | §0.A-0.B | §5.A-5.C |
+| frontend-review | `ui_frontend-review/SKILL.md` | **mandatory** | 0.50 | A.1-A.3 | B.1-B.7 |
+| security-review | `sec_security-review/SKILL.md` | primary | 0.85 | S.1-S.3 | Security-1-9 |
+| vietnam-payment-review | `sec_vietnam-payment-review/SKILL.md` | primary | 0.90 | payment-pre | payment-post |
+| ponytail | `code_ponytail/SKILL.md` | overlay | 0.85 | YAGNI Ladder | Checklist |
+| karpathy-coding | `code_karpathy/SKILL.md` | **mandatory_overlay** | 1.0 | K.1-K.4 | K.5-K.7 |
+| visual-explainer | `ui_visual-explainer/SKILL.md` | secondary | 0.90 | (standalone) | (standalone) |
+| open-design | `ui_open-design/SKILL.md` | secondary | 0.85 | (standalone) | (standalone) |
+| document-ocr | `util_document-ocr/SKILL.md` | secondary | 0.90 | ocr-pre | ocr-post |
+| bazi | `special_bazi/SKILL.md` | secondary | 0.95 | bazi-pre | bazi-post |
+| vietnam-address | `special_vietnam-address/SKILL.md` | secondary | 0.90 | address-pre | address-post |
+| weknora-kb | `ai_weknora-kb/SKILL.md` | primary | 0.90 | weknora-pre | weknora-post |
+| weknora-agent | `ai_weknora-agent/SKILL.md` | primary | 0.90 | agent-pre | agent-post |
+| pixelrag | `ai_pixelrag/SKILL.md` | secondary | 0.90 | pixelrag-pre | pixelrag-post |
+
+### Overlay Rules
+
+**karpathy-coding LUÔN chạy như mandatory overlay với mọi coding task.**
+
+**ponytail là optional overlay** - enable khi user nhắc: simple, minimal, less code, yagni.
+
+---
+
+## Skill Combination Rules
+
+> **Đầy đủ: [[rule_skill-registry]] §4 Skill Combinations**
+
+Xem skill-registry cho đầy đủ task combinations và gate mappings.
+
+---
+
+## Quick Reference Card
+|---|---|---|---|
+| Landing page mới | frontend-taste + open-design | full-output + frontend-review | taste-pre + od-pre + fulloutput-pre + review-pre |
+| Prototype với design system | open-design | frontend-taste + full-output | od-pre + taste-pre + fulloutput-pre + review-pre |
+| Mobile app prototype | open-design (mobile-app) | full-output + frontend-review | od-pre + fulloutput-pre + review-pre |
+| Dashboard với design system | open-design (dashboard) | frontend-review | od-pre + review-pre + review-post |
+| Presentation deck | open-design (guizang-ppt) | full-output | od-pre + fulloutput-pre + fulloutput-post |
+| Redesign với design system | open-design + frontend-redesign | full-output + frontend-review | od-pre + redesign-pre + fulloutput-pre + review-pre |
+| Redesign existing site | frontend-redesign | full-output + frontend-review | redesign-pre + redesign-post + fulloutput-pre + fulloutput-post + review-pre + review-post |
+| Greenfield frontend build | frontend-taste | full-output + frontend-review | taste-pre + taste-post + fulloutput-pre + fulloutput-post + review-pre + review-post |
+| Multi-file implementation | full-output | frontend-review | fulloutput-pre + fulloutput-post + review-pre + review-post |
+| Code review / quality check | frontend-review | (standalone) | review-pre + review-post |
+| Vietnam payment integration | vietnam-payment-review | security-review + billing-review | payment-review-pre + payment-review-post + security-review-pre + security-review-post |
+| Payment code review | vietnam-payment-review | security-review | payment-review-pre + payment-review-post + security-review-pre + security-review-post |
+| Security vulnerability review | security-review | (standalone or combined with relevant domain skill) | security-review-pre + security-review-post + [domain skill gates] |
+| API security review | security-review | (standalone) | security-review-pre + security-review-post + API-specific checks |
+| APK/binary/JS reverse-engineering | security-review | reverse-skill routing | security-review-pre + RE skill gate + security-review-post |
+| Bazi fortune analysis | bazi | (standalone) | bazi-pre + bazi-post |
+| Vietnam address form | vietnam-address | (standalone) + full-output | address-pre + address-post + fulloutput-pre + fulloutput-post |
+| Knowledge base setup | weknora-kb | (standalone) + full-output | weknora-pre + weknora-post + fulloutput-pre + fulloutput-post |
+| RAG implementation | weknora-kb | rag + full-output | weknora-pre + rag-pre + weknora-post + rag-post |
+| FAQ system | weknora-kb | (standalone) | weknora-pre + weknora-post |
+| Enterprise wiki | weknora-kb | weknora-agent | weknora-pre + agent-pre + weknora-post + agent-post |
+| Document Q&A | weknora-kb | (standalone) | weknora-pre + weknora-post |
+| ReAct agent task | weknora-agent | (standalone) + weknora-kb | agent-pre + weknora-pre + agent-post + weknora-post |
+| Complex research task | weknora-agent | weknora-kb + web-search | agent-pre + weknora-pre + research-pre + agent-post + weknora-post |
+| **Visual Document Analysis** ||||
+| PDF/bảng/biểu/phức tạp | pixelrag | (standalone) + full-output | pixelrag-pre + pixelrag-post + fulloutput-pre + fulloutput-post |
+| Visual RAG setup | pixelrag | weknora-kb (hybrid) | pixelrag-pre + pixelrag-post + weknora-pre + weknora-post |
+| Financial report analysis | pixelrag | (standalone) | pixelrag-pre + pixelrag-post |
+| Knowledge base + visual | pixelrag + weknora-kb | full-output | pixelrag-pre + weknora-pre + pixelrag-post + weknora-post + fulloutput-pre |
+| Any coding task (vibe code) | karpathy-coding | (overlay - always runs with primary skill) | karpathy-pre + [primary skill gates] + karpathy-post |
+
+---
+
+## PHẦN D: EXECUTION PROTOCOL (Chi tiết 6 Bước)
+
+### Bước 0: SKILL DETECTION (Auto-Discovery)
+
+**TRƯỚC KHI bất kỳ pre-review nào, luôn chạy Skill Detection Engine:**
+
+```
+Khi nhận request:
+1. Parse request → extract keywords, intent signals, domain context
+2. Match against Skill Keyword Matrix (Section A.2)
+3. Calculate confidence scores (Section A.3)
+4. Determine skill combination (Section A.4)
+5. Check context signals (Section A.5)
+6. Apply decision tree (Section A.6)
+7. Output: Skills Selected + Review Gates to Run
+8. Load SKILL.md files cho tất cả selected skills
+```
+
+**Output format cho Skill Detection:**
+```
+══════════════════════════════════════════════════════════════
+[SKILL DETECTION] — ANALYSIS COMPLETE
+══════════════════════════════════════════════════════════════
+
+Request Summary: [brief summary]
+Primary Intent:  [main intent]
+Domain:          [frontend/backend/security/payment]
+
+──────────────────────────────────────────────────────────────
+SKILLS SELECTED
+──────────────────────────────────────────────────────────────
+
+  ★ PRIMARY:      [skill-name] (confidence: 0.XX)
+  ○ SECONDARY:   [skill-name] (confidence: 0.XX)
+  ○ TERTIARY:    [skill-name] (confidence: 0.XX)
+
+──────────────────────────────────────────────────────────────
+REVIEW GATES TO RUN
+──────────────────────────────────────────────────────────────
+
+  PRE-REVIEW: [list all pre-review gates]
+  POST-REVIEW: [list all post-review gates]
+
+══════════════════════════════════════════════════════════════
+```
+
+### Bước 1: Pre-Review Gate(s) — TRƯỚC KHI VIẾT CODE
+
+Output header:
+```
+══════════════════════════════════════
+[PRE-REVIEW GATE]
+══════════════════════════════════════
+```
+
+**Với mỗi skill được activate, chạy đầy đủ pre-review checklist của skill đó:**
+
+#### A. frontend-taste Pre-Review (Section 0.A - 0.F)
+
+**0.A Brief Inference:**
+- [ ] Page kind: landing (SaaS/consumer/agency/event), portfolio, redesign, editorial
+- [ ] Vibe words: aesthetic direction keywords
+- [ ] Reference signals: URLs, screenshots, named products/brands
+- [ ] Audience: ai sẽ xem (procurement panel, consumer, recruiter)
+- [ ] Brand assets: logo, color, type, photography có sẵn
+- [ ] Quiet constraints: accessibility-first, public-sector, regulated industries
+
+**0.B Design Read Declaration (bắt buộc, 1 dòng):**
+```
+"Reading this as: [B2B SaaS landing] for [technical buyers], 
+ with a [Linear-style minimalist] language, 
+ leaning toward [Tailwind + Geist + restrained motion]."
+```
+- [ ] Design read declared (verbatim, không được phép suy ra sau khi code)
+
+**0.C Ambiguous Brief Protocol:**
+- [ ] Nếu brief ambiguous → hỏi đúng 1 câu hỏi làm rõ, không đoán
+
+**0.D Anti-Default Discipline:**
+- [ ] Không có AI-purple gradients / centered hero over dark mesh trong plan
+- [ ] Không có Three equal feature cards / generic glassmorphism trong plan
+- [ ] Không có Inter + slate-900 / infinite-loop micro-animations trong plan
+- [ ] Nếu có → loại bỏ trước khi proceed
+
+**0.E Design System Check:**
+- [ ] Brief có match official design system không? Nếu có → dùng official package
+  - Microsoft/enterprise → `@fluentui/react-components`
+  - Google/Material → `@material/web`
+  - IBM/B2B → `@carbon/react`
+  - Shopify → `polaris.js`
+  - Modern SaaS → `shadcn/ui`
+  - Modern accessible → `@radix-ui/themes`
+  - Modern SaaS/AI → Tailwind v4 + `dark:` variant
+
+**0.F Pre-Code Review Checklist (PASS GATE):**
+- [ ] Design read declared (Section 0.B) ✓
+- [ ] No AI-default patterns in draft plan (0.D checked) ✓
+- [ ] Design system selected if applicable (0.E) ✓
+- [ ] Dial values set: VARIANCE (1-10), MOTION (1-10), DENSITY (1-10) ✓
+- [ ] Hero plan fits viewport (headline max 2 lines, subtext max 20 words) ✓
+- [ ] Section layout diversity planned (no 3+ consecutive same-layout sections) ✓
+
+#### B. frontend-redesign Pre-Review (Section 0.A - 0.E)
+
+**0.A Scan the Codebase:**
+- [ ] Framework identified (React/Vue/Next.js/Nuxt/vanilla)
+- [ ] Styling method identified (Tailwind/CSS modules/styled-components/vanilla CSS)
+- [ ] Current design patterns and component structure documented
+- [ ] `package.json` dependencies checked
+- [ ] Tailwind version checked (v3 vs v4) before modifying config
+
+**0.B Audit the Current State:**
+- [ ] Brand tokens: primary/accent colors, type stack, logo treatment, radii
+- [ ] Information architecture: page tree, primary nav, conversion paths
+- [ ] Content blocks: what exists, what's working, what's filler
+- [ ] Patterns to preserve: signature interactions, recognizable hero, copy voice
+- [ ] Patterns to retire: AI-slop tells, broken layouts, dead links, generic imagery
+- [ ] Dial reading: infer VARIANCE/MOTION/DENSITY of existing site
+- [ ] SEO baseline: ranking pages, meta titles, structured data, OG cards
+
+**0.C Classify Redesign Mode:**
+- [ ] **Preserve** — modernize without breaking brand → extract tokens first
+- [ ] **Overhaul** — new visual language on top of existing content → visuals greenfield, preserve content/IA
+
+**0.D Pre-Redesign Review Checklist (PASS GATE):**
+- [ ] Framework and styling method identified ✓
+- [ ] Existing brand tokens extracted ✓
+- [ ] Redesign mode classified ✓
+- [ ] SEO baseline documented ✓
+- [ ] Accessibility baseline noted ✓
+- [ ] Analytics dependencies identified ✓
+- [ ] Dial reading performed ✓
+
+**0.E What Never Changes Without Explicit Approval:**
+- [ ] URL structure / route slugs — protected
+- [ ] Primary nav labels — protected
+- [ ] Form field names or order — protected
+- [ ] Brand logo or wordmark — protected
+- [ ] Existing legal / consent / cookie copy — protected
+
+#### C. full-output Pre-Review (Section 0.A - 0.B)
+
+**0.A Scope Lock:**
+- [ ] Full request read and understood
+- [ ] Deliverable count locked: **"Delivering N deliverables:"** + list each by name
+- [ ] This count is a contract — every item must appear in output
+
+**0.B Pre-Generation Checklist (PASS GATE):**
+- [ ] Full request read and understood ✓
+- [ ] Deliverable count locked (N items) ✓
+- [ ] All dependencies identified (packages, environment, tools) ✓
+- [ ] Framework/stack confirmed from codebase or request ✓
+- [ ] Output file paths confirmed ✓
+- [ ] Test strategy identified ✓
+
+#### D. frontend-review Pre-Review (Part A: A.1 - A.3)
+
+**A.1 Scope Analysis:**
+- [ ] Full request read — understand every requirement, constraint, deliverable
+- [ ] All files to touch listed (components, styles, config, tests)
+- [ ] Dependencies identified (packages, env setup, API contracts)
+- [ ] Existing codebase checked (components, design tokens, patterns)
+
+**A.2 Quality Plan (áp dụng đúng checks dựa trên task type):**
+- [ ] Landing page → taste-skill pre-flight
+- [ ] Redesign → frontend-redesign pre-audit
+- [ ] Full implementation (multi-file) → full-output pre-generation
+- [ ] API + UI → correctness, error handling, loading states
+- [ ] Animation/motion → reduced motion, GSAP patterns, no jank
+- [ ] Forms → validation, WCAG AA contrast, accessibility
+- [ ] Dark mode → both modes, prefers-color-scheme, token strategy
+
+**A.3 Pre-Review Checklist (PASS GATE):**
+
+*Scope:*
+- [ ] All deliverables listed and counted ✓
+- [ ] All file paths confirmed ✓
+- [ ] All dependencies identified ✓
+- [ ] Framework/stack confirmed ✓
+
+*Design (nếu UI task):*
+- [ ] Design read declared ✓
+- [ ] Dial values: VARIANCE / MOTION / DENSITY ✓
+- [ ] Design system selected if applicable ✓
+- [ ] Anti-default discipline applied ✓
+
+*Architecture:*
+- [ ] State management strategy defined ✓
+- [ ] Component hierarchy planned ✓
+- [ ] API integration strategy defined ✓
+- [ ] Error handling strategy defined ✓
+- [ ] Loading/empty/error states planned ✓
+
+*Quality:*
+- [ ] Testing strategy defined ✓
+- [ ] Accessibility requirements identified ✓
+- [ ] Performance budget identified ✓
+
+#### E. security-review Pre-Review (S.1 - S.3)
+
+**S.1 Threat Modeling:**
+- [ ] Attack surface documented (untrusted inputs, external data)
+- [ ] Trust boundaries identified
+- [ ] Top 3 potential threats listed based on feature type
+- [ ] Assets at risk assessed
+
+**S.2 Security Requirements:**
+- [ ] Authentication requirements defined
+- [ ] Authorization model selected (RBAC, ABAC, ownership)
+- [ ] Data classification determined
+- [ ] Compliance requirements identified (GDPR, PCI-DSS, SOC2)
+- [ ] Encryption requirements defined (at rest, in transit)
+- [ ] Secrets storage strategy defined
+- [ ] Audit logging requirements identified
+
+**S.3 Security Design Review:**
+- [ ] Input validation strategy defined
+- [ ] Output encoding strategy defined
+- [ ] Error handling does not leak sensitive info
+- [ ] Rate limiting strategy defined
+- [ ] Authentication method selected (JWT, sessions, API keys, OAuth2)
+- [ ] Authorization model defined
+- [ ] Secrets storage: env vars / vault / KMS decided
+- [ ] Logging strategy for security events defined
+
+**Pre-Review Checklist (PASS GATE):**
+- [ ] Threat model documented ✓
+- [ ] Security requirements locked ✓
+- [ ] Design review PASS ✓
+- [ ] Auth model defined ✓
+- [ ] Secrets strategy defined ✓
+- [ ] Logging strategy defined ✓
+
+#### F. karpathy-coding Pre-Review (Overlay - Always Runs with Primary Skill)
+
+**K.1 Think Before Coding:**
+- [ ] State assumptions explicitly — what am I assuming about the request?
+- [ ] If uncertain about any interpretation → STOP and ask
+- [ ] If multiple valid interpretations exist → present options, don't pick silently
+- [ ] If a simpler approach exists → say so, push back when warranted
+- [ ] If something is unclear → stop, name what's confusing, ask
+
+**K.2 Simplicity Check:**
+- [ ] Is this over-engineered? Ask: "Would a senior engineer say this is overcomplicated?"
+- [ ] No speculative features beyond what was asked
+- [ ] No abstractions for single-use code
+- [ ] No "flexibility" or "configurability" that wasn't requested
+- [ ] No error handling for impossible scenarios
+- [ ] If 200 lines can be 50 → rewrite
+
+**K.3 Surgical Scope:**
+- [ ] What MUST be changed? (list only the required changes)
+- [ ] What should NOT be touched? (preserve existing code)
+- [ ] Will every changed line trace directly to the user's request?
+- [ ] Match existing style — don't impose personal preferences
+- [ ] If unrelated dead code noticed → mention it, don't delete
+
+**K.4 Goal Definition:**
+- [ ] Success criteria defined in verifiable terms:
+  - "Add validation" → "Write tests for invalid inputs, then make them pass"
+  - "Fix the bug" → "Write a test that reproduces it, then make it pass"
+  - "Refactor X" → "Ensure tests pass before and after"
+- [ ] Multi-step plan with verification points:
+  ```
+  1. [Step] → verify: [check]
+  2. [Step] → verify: [check]
+  3. [Step] → verify: [check]
+  ```
+
+**Pre-Review Checklist (PASS GATE) - karpathy-coding Overlay:**
+- [ ] Assumptions stated explicitly ✓
+- [ ] No ambiguous interpretations → asked if needed ✓
+- [ ] Simplicity check PASS ✓
+- [ ] Scope is surgical (only required changes) ✓
+- [ ] Success criteria defined ✓
+
+---
+
+**Pre-Review Summary Output:**
+```
+──────────────────────────────────────
+[PRE-REVIEW GATE] — ALL PASS
+──────────────────────────────────────
+
+Skill(s) Active:  [list skills] + karpathy-coding (overlay)
+Overlay:          karpathy-coding (always runs with primary)
+Deliverables:      N items (scope locked)
+Design Direction:  [from taste-skill 0.B]
+Dial Values:       VARIANCE / MOTION / DENSITY
+Review Gates:      [list all post-review gates to run]
+
+Items Verified:
+  ✓ karpathy-coding: Assumptions stated, Simplicity checked, Scope surgical, Goals defined
+  ✓ Design read declared
+  ✓ Scope locked (N deliverables)
+  ✓ Anti-default patterns checked
+  ✓ Design system selected
+  ✓ Framework/stack confirmed
+  ✓ Dependencies identified
+  ✓ Quality plan defined
+
+>>> IMPLEMENTATION APPROVED — Proceed to code
+──────────────────────────────────────
+```
+
+**Nếu BẤT KỲ item nào fail:**
+- Dừng lại, KHÔNG viết code
+- Fix hoặc document intentional exception
+- Re-run gate cho đến khi PASS hoàn toàn
+
+---
+
+### Bước 2: Implementation — VIẾT CODE
+
+Sau khi tất cả pre-review gates PASS:
+
+1. Theo thứ tự skill combination, viết code cho từng deliverable
+2. Áp dụng đầy đủ rules từ từng skill:
+   - **frontend-taste**: Three Dials, Design Engineering, Animation, Performance
+   - **frontend-redesign**: Fix Priority order, Upgrade Techniques
+   - **full-output**: KHÔNG có `// ...`, `// TODO`, skeleton, placeholder, "continue later"
+3. Track từng deliverable đã hoàn thành (cross off trong manifest)
+4. Nếu approach bị chặn bởi ambiguous requirement → hỏi user 1 câu rõ ràng
+5. Nếu approach vi phạm anti-default → stop, revert, restart từ design read
+
+**Bắt buộc tuân thủ:**
+- RSC Safety: Global state chỉ trong Client Components
+- Icons: 1 family per project, không hand-roll SVG
+- Motion: `prefers-reduced-motion` cho MOTION > 3
+- Dark mode: design for BOTH modes từ đầu
+- No em-dash (`—`) — zero tolerance
+- No AI-slop patterns
+
+---
+
+### Bước 3: Post-Review Gate(s) — SAU KHI VIẾT CODE, TRƯỚC KHI DELIVER
+
+Output header:
+```
+══════════════════════════════════════
+[POST-REVIEW GATE]
+══════════════════════════════════════
+```
+
+**Với mỗi skill được activate, chạy đầy đủ post-review checklist:**
+
+#### A. frontend-taste Post-Review (Section 6.A - 6.H)
+
+**6.A Layout & Structure:**
+- [ ] Design read declared at start of response
+- [ ] Dial values (VARIANCE/MOTION/DENSITY) explicit and reasoned
+- [ ] Design system selected if applicable
+- [ ] Hero fits viewport (headline max 2 lines, subtext max 20 words AND max 4 lines)
+- [ ] Hero top padding max `pt-24` at desktop
+- [ ] Hero stack discipline: max 4 text elements (eyebrow OR brand strip, headline, subtext, CTAs)
+- [ ] Navigation on ONE line at desktop, height 64-80px
+- [ ] Section layout diversity: at least 4 different layout families across 8 sections
+- [ ] Zigzag alternation cap: no 3+ consecutive same image+text-split sections
+- [ ] Bento grid: N items → N cells, no empty cells, uses `grid-flow-dense`
+- [ ] No split-header pattern ("left big headline + right small explainer paragraph")
+- [ ] Eyebrow count: `uppercase tracking` labels ≤ ceil(sectionCount / 3)
+- [ ] Mobile collapse explicit for every multi-column layout
+- [ ] Viewport stability: `min-h-[100dvh]`, never `h-screen`
+
+**6.B Design System & Consistency:**
+- [ ] ZERO em-dashes (`—`) anywhere — headlines, eyebrows, pills, body, quotes, attribution, buttons, alt text. Zero.
+- [ ] Page theme lock: ONE theme for whole page, no mid-page inversion
+- [ ] Color consistency lock: one accent color used identically across all sections
+- [ ] Shape consistency lock: one corner-radius system applied consistently
+- [ ] No Inter as default (unless brief is public-sector / Linear-style)
+- [ ] No Fraunces / Instrument_Serif as default serif
+- [ ] Premium-consumer brief: NOT using beige+brass+oxblood+espresso palette family
+- [ ] Different serif from the previous project (if serif is used)
+- [ ] Premium-consumer: different palette family from previous premium-consumer project
+
+**6.C Typography & Content:**
+- [ ] Italic descender clearance: every italic word with y/g/j/p/q has `leading-[1.1]` min + `pb-1` reserve
+- [ ] Copy self-audit: no grammatically broken, AI-hallucinated, or filler-verb strings shipped
+- [ ] No fake-precise numbers without justification
+- [ ] No generic names (John Doe, Acme Corp, Lorem Ipsum)
+- [ ] No startup-slop brand names
+- [ ] No section-numbering eyebrows ("00 / INDEX", "001 · Capabilities", "06 · how it works")
+- [ ] No version labels in hero (V0.6, BETA, INVITE-ONLY) unless brief is a launch
+- [ ] No decoration text strip at hero bottom ("BRAND. MOTION. SPATIAL.")
+- [ ] No floating top-right sub-text in section headings
+- [ ] No scroll cues ("Scroll", "↓ scroll", "Scroll to explore")
+- [ ] No locale / city-name / weather strips unless brief is genuinely place-focused
+- [ ] No version footers on marketing pages
+- [ ] No photo-credit captions as decoration
+- [ ] No pills/labels overlaid on images
+- [ ] No decorative colored status dots (only for real semantic state)
+
+**6.D CTA & Form:**
+- [ ] Button contrast: every CTA text readable against background (WCAG AA 4.5:1)
+- [ ] CTA wrap: no label wraps to 2+ lines at desktop
+- [ ] No duplicate CTA intent on the page
+- [ ] Form contrast: all inputs, placeholders, focus rings, labels pass WCAG AA
+- [ ] Label above input, error below input
+- [ ] No placeholder-as-label
+
+**6.E Assets & Images:**
+- [ ] Real images used (gen-tool first, then Picsum-seed with descriptive seeds)
+- [ ] No div-based fake screenshots
+- [ ] No hand-rolled decorative SVG illustrations
+- [ ] Logo wall = logos only (no industry labels below logos)
+- [ ] "Trusted by / Used by" logo wall lives UNDER hero, not inside it
+- [ ] Bento background diversity: at least 2-3 cells have real visual variation
+
+**6.F Animation & Motion:**
+- [ ] Motion claimed = motion shown (if MOTION > 4, page actually animates)
+- [ ] GSAP patterns use canonical skeleton with `start: "top top"`, `pin: true`
+- [ ] No `window.addEventListener('scroll')` — using allowed alternatives only
+- [ ] Reduced motion wrapped for all MOTION > 3
+- [ ] Dark mode tokens defined and tested in both modes
+- [ ] All animations use only `transform` and `opacity`
+- [ ] `useEffect` animations have strict cleanup functions
+
+**6.G States & Polish:**
+- [ ] Empty / loading / error states provided
+- [ ] Cards omitted in favor of spacing where elevation doesn't communicate hierarchy
+- [ ] Icons from allowed library only (no hand-rolled paths)
+- [ ] Motion isolated in client-leaf components with `'use client'` at top
+- [ ] No AI Tells (three-equal cards, Jane Doe, Acme, "Quietly in use at")
+
+**6.H Performance:**
+- [ ] Core Web Vitals plausibly hit (LCP < 2.5s, INP < 200ms, CLS < 0.1)
+- [ ] One design system per project (no Material + shadcn mixed)
+- [ ] No arbitrary z-index spam
+- [ ] Grain/noise only on fixed `pointer-events-none` layers
+
+#### B. frontend-redesign Post-Review (Section 4.A - 4.E)
+
+**4.A Functionality Preserved:**
+- [ ] Existing navigation works correctly (all links functional)
+- [ ] Forms submit and validate correctly
+- [ ] No broken links introduced
+- [ ] Analytics events still firing correctly (no renamed buttons/fields/IDs)
+- [ ] Focus states, alt text, keyboard nav not regressed
+- [ ] Mobile layout functions correctly
+
+**4.B Design Quality:**
+- [ ] No new AI-default patterns introduced during upgrade
+- [ ] Font has character (not browser default or generic Inter)
+- [ ] Color palette unified (one accent, consistent gray family)
+- [ ] Spacing doubled (sections breathe, not cramped)
+- [ ] Hover states on all interactive elements
+- [ ] Active/pressed feedback on buttons
+- [ ] Smooth transitions on interactive elements (not instant)
+- [ ] Visible focus rings for keyboard navigation
+- [ ] Loading, empty, and error states designed
+
+**4.C Accessibility:**
+- [ ] Alt text on all meaningful images
+- [ ] Color contrast passes WCAG AA (4.5:1 body, 3:1 large text)
+- [ ] Focus order logical
+- [ ] Skip-to-content link present
+- [ ] No `alt=""` or `alt="image"` on meaningful images
+
+**4.D SEO Preserved:**
+- [ ] Meta titles unchanged
+- [ ] Meta descriptions unchanged
+- [ ] OG tags unchanged
+- [ ] URL structure unchanged
+- [ ] Structured data intact
+
+**4.E Code Quality:**
+- [ ] No inline styles introduced
+- [ ] No hardcoded pixel widths introduced
+- [ ] Semantic HTML used
+- [ ] No dead/commented-out code left behind
+- [ ] All imports actually exist in package.json
+
+#### C. full-output Post-Review (Section 5.A - 5.C)
+
+**5.A Completeness Check:**
+- [ ] No banned patterns from Section 2 appear anywhere in output
+  - `// ...`, `// TODO`, `/* ... */`, `// rest of code`, `// implement here`
+  - `// [code omitted]`, `// [skipped]`
+  - "Let me know if you want me to continue", "I can provide more details if needed"
+  - "For brevity", "for simplicity", "similarly for the remaining"
+  - "I'll leave that as an exercise", "You can extend this by..."
+- [ ] Every item from scope list present and finished
+- [ ] Code blocks contain actual runnable code, not descriptions
+- [ ] Nothing was shortened to save space
+- [ ] No skeleton code when full implementation was requested
+- [ ] No skipped sections or "similarly for the rest" replacements
+
+**5.B Quality Check:**
+- [ ] All imports exist in package.json or are standard library
+- [ ] No hardcoded values that should be environment variables
+- [ ] Error handling present for all async operations
+- [ ] Type definitions complete (for TypeScript)
+- [ ] Tests written for all new functions/components
+- [ ] No commented-out debug code left in
+- [ ] No TODO comments remaining
+
+**5.C File Structure Check:**
+- [ ] All file paths match the requested structure
+- [ ] Entry points (index, main, app) correctly exported
+- [ ] No circular import issues
+- [ ] All referenced files actually exist in output
+
+#### D. frontend-review Post-Review (Part B: B.1 - B.7)
+
+**B.1 Correctness Review:**
+- [ ] Code compiles / builds without errors
+- [ ] No TypeScript errors (or all non-null assertions justified)
+- [ ] All imports resolve (packages exist in package.json)
+- [ ] No hardcoded values that should be environment variables
+- [ ] No console.log, debugger, or console.warn left in production code
+- [ ] Error boundaries / try-catch for all async operations
+- [ ] API calls have proper error handling and retry logic
+- [ ] No race conditions in async code
+- [ ] No security vulnerabilities (XSS, injection, exposed secrets)
+
+**B.2 Design & Taste Review:**
+- [ ] Design read declared at the start of the response
+- [ ] Dial values (VARIANCE/MOTION/DENSITY) declared
+- [ ] ZERO em-dashes (`—`) anywhere in code or visible text
+- [ ] Page theme lock: ONE theme for whole page, no mid-page inversion
+- [ ] Color consistency: one accent color used identically across all sections
+- [ ] Shape consistency: one corner-radius system applied consistently
+- [ ] No Inter as default (unless explicitly asked or Linear-style)
+- [ ] No Fraunces/Instrument_Serif as default serif
+- [ ] Premium-consumer brief: NOT using beige+brass+oxblood+espresso palette family
+- [ ] No AI Tells (three-equal cards, Jane Doe, Acme Corp, AI-purple, "Quietly in use at")
+- [ ] Hero fits viewport (headline max 2 lines, subtext max 20 words)
+- [ ] Navigation on ONE line at desktop, height 64-80px
+- [ ] Eyebrow count ≤ ceil(sectionCount / 3)
+- [ ] No split-header pattern
+- [ ] No 3+ consecutive same-layout sections
+- [ ] Bento grid: N items → N cells, no empty cells
+- [ ] Copy self-audit: no grammatically broken or AI-hallucinated strings shipped
+- [ ] No fake-precise numbers without justification
+- [ ] No generic names (John Doe, Lorem Ipsum, Acme Corp)
+- [ ] No filler verbs (Elevate, Seamless, Unleash, Next-Gen, Game-changer)
+- [ ] No section-numbering eyebrows ("00 / INDEX", "001 · Capabilities")
+- [ ] No scroll cues ("Scroll", "↓ scroll")
+- [ ] No locale/city/weather strips
+- [ ] No version footers on marketing pages
+- [ ] Logo wall = logos only (no industry labels below logos)
+- [ ] "Trusted by" lives UNDER hero, not inside hero
+- [ ] Bento background diversity: real visual variation in cells
+
+**B.3 Accessibility Review:**
+- [ ] All images have meaningful alt text (no `alt=""` on meaningful images)
+- [ ] Color contrast passes WCAG AA: 4.5:1 body text, 3:1 large text
+- [ ] Form labels associated with inputs (htmlFor/id or aria-label)
+- [ ] Focus indicators visible for keyboard navigation
+- [ ] Skip-to-content link present for keyboard users
+- [ ] No `tabindex` values > 0 (natural DOM order)
+- [ ] ARIA attributes used correctly (no role conflicts, proper aria-expanded)
+- [ ] Button contrast: every CTA text readable (WCAG AA)
+- [ ] Form contrast: inputs, placeholders, focus rings pass WCAG AA
+- [ ] Motion respects `prefers-reduced-motion` (MOTION > 3)
+- [ ] Semantic HTML (`<button>`, `<a>`, `<nav>`, etc.)
+
+**B.4 Performance Review:**
+- [ ] LCP < 2.5s (hero image priority / preloaded)
+- [ ] Images have width/height to prevent CLS
+- [ ] No layout-triggering animations (transform/opacity only)
+- [ ] No `window.addEventListener('scroll')` — Motion/ScrollTrigger/IntersectionObserver only
+- [ ] Bundle size reasonable (no unnecessary large deps)
+- [ ] Lazy loading for below-the-fold content
+- [ ] No grain/noise on scrolling containers
+- [ ] Google Fonts via `next/font` or `@font-face` with `font-display: swap`
+- [ ] Icons from allowed library only
+- [ ] Motion isolated in client-leaf components with `'use client'`
+
+**B.5 State & Interaction Review:**
+- [ ] Loading state: skeletal loaders matching final layout shape
+- [ ] Empty state: composed view with clear "how to populate" guidance
+- [ ] Error state: clear inline messages (no `window.alert()`)
+- [ ] Button hover states: background shift, scale, or translate
+- [ ] Button active/pressed feedback: `scale(0.98)` or `-translate-y-[1px]`
+- [ ] Smooth transitions on all interactive elements (200-300ms, not instant)
+- [ ] Active nav link styled differently
+- [ ] CTA wrap: no label wraps to 2+ lines at desktop
+- [ ] No duplicate CTA intent on the page
+- [ ] Form: label above input, error below input, no placeholder-as-label
+
+**B.6 Testing Review:**
+- [ ] Unit tests for utility functions and hooks
+- [ ] Component tests for complex UI components
+- [ ] Test coverage for error paths (not just happy path)
+- [ ] No commented-out tests left behind
+- [ ] Mock setup for external dependencies
+
+**B.7 Full-Output Verification (if multi-file task):**
+- [ ] All planned files delivered
+- [ ] All planned functions fully implemented
+- [ ] No `// ...`, `// TODO`, `/* ... */`, `// implement here` patterns
+- [ ] No skeleton when full implementation was requested
+- [ ] No "continue later", "you can extend this", "for brevity" patterns
+
+#### E. security-review Post-Review (Security-1 through Security-9)
+
+**Security-1: Authentication & Authorization:**
+- [ ] No hardcoded credentials, API keys, or secrets in code
+- [ ] Auth tokens have appropriate expiration (access: 15-60min, refresh: 7-30 days)
+- [ ] Passwords hashed with bcrypt (cost >= 10) or Argon2
+- [ ] Session tokens are random, non-guessable (crypto.randomBytes)
+- [ ] Authorization checks on every protected endpoint
+- [ ] Ownership/resource-level authorization enforced
+- [ ] Privilege escalation prevented (least privilege principle)
+- [ ] No authentication bypass in edge cases
+
+**Security-2: Input Validation & Injection:**
+- [ ] All user input validated before use
+- [ ] SQL injection prevention (parameterized queries, ORM)
+- [ ] No string concatenation in SQL, HTML, or shell commands
+- [ ] XSS prevention (output encoding, CSP header)
+- [ ] Command injection prevention (no exec/eval with user input)
+- [ ] Path traversal prevention (canonicalize paths)
+- [ ] File upload validation (type, size, content scan)
+- [ ] Number/range validation on all numeric inputs
+- [ ] Email/URL validation uses established libraries
+
+**Security-3: Data Protection:**
+- [ ] Sensitive data not logged (passwords, tokens, PII)
+- [ ] Sensitive data encrypted at rest
+- [ ] TLS 1.2+ enforced on all external connections
+- [ ] Certificate validation enabled (no `verify: false` in production)
+- [ ] PII handled per GDPR/compliance requirements
+- [ ] Data minimization: only collect/store necessary data
+- [ ] API responses do not leak internal details (no stack traces)
+
+**Security-4: API & Webhook Security:**
+- [ ] All endpoints require authentication (except intentional public ones)
+- [ ] Rate limiting on all endpoints
+- [ ] CORS policy correctly configured (not `*` for sensitive APIs)
+- [ ] CSRF protection on state-changing operations
+- [ ] Webhook signatures verified (HMAC validation)
+- [ ] Idempotency enforced on webhook/payment handlers
+- [ ] No sensitive data in URLs
+- [ ] API versioning in place
+
+**Security-5: LLM / AI Security (ASI Top 10):**
+- [ ] Prompt injection: user input sanitized before LLM context
+- [ ] No system prompt leakage
+- [ ] Output filtering: LLM responses sanitized before display/storage
+- [ ] Rate limiting on LLM calls (token budget, request budget)
+- [ ] Sensitive data not sent to LLM (PII redaction before context)
+- [ ] Tool/function call validation (no unsafe tool execution)
+- [ ] Resource exhaustion prevention (max tokens, max steps)
+- [ ] Agentic action approval: sensitive actions require human confirmation
+
+**Security-6: Supply Chain & Dependencies:**
+- [ ] Lock files committed (`package-lock.json`, `requirements.lock`)
+- [ ] Dependency audit run: `npm audit` / `pip check` / `safety check`
+- [ ] No `@ts-ignore` masking security warnings
+- [ ] No deprecated cryptographic libraries
+- [ ] Third-party scripts/CDN resources verified (SRI hashes)
+- [ ] License compliance checked for all dependencies
+
+**Security-7: Cryptographic Practices:**
+- [ ] No custom cryptographic implementations
+- [ ] Strong random number generation (`crypto.getRandomValues`, `secrets.token_bytes`)
+- [ ] Keys stored securely (env vars, KMS, vault — not in code)
+- [ ] Deprecated algorithms avoided (MD5, SHA1 for hashing, DES, 3DES)
+- [ ] IV/nonce is unique per encryption operation
+- [ ] JWT signed with RS256/ES256 (not HS256 across services)
+- [ ] HTTPS enforced in production (HSTS header)
+
+**Security-8: Error Handling & Logging:**
+- [ ] No stack traces or internal paths in error responses
+- [ ] User-friendly error messages (no system internals)
+- [ ] All security events logged (auth failures, authorization denials)
+- [ ] Logs do not contain sensitive data (redacted PII, tokens, passwords)
+- [ ] Alerting configured for security anomaly patterns
+
+**Security-9: Advanced RE Review** (if applicable):
+- [ ] APK: SSL pinning implemented, no hardcoded secrets in APK
+- [ ] Binary: Firmware integrity verified, no hardcoded backdoors
+- [ ] JS: No secrets in frontend code, CSP configured, source maps disabled
+- [ ] LLM Security: prompt injection defenses, output sanitization
+
+#### F. karpathy-coding Post-Review (Overlay - Always Runs with Primary Skill)
+
+**K.5 Implementation Verification:**
+- [ ] Code traces to request: every line connects to user's ask
+- [ ] No adjacent code "improved" (formatting, comments, style)
+- [ ] No unrelated refactoring
+- [ ] Unused imports/variables from MY changes → removed
+- [ ] Dead code from MY changes → removed
+- [ ] Pre-existing dead code → preserved (unless asked to clean)
+
+**K.6 Simplicity Re-Check:**
+- [ ] If 200 lines written but could be 50 → rewrite now
+- [ ] No speculative abstractions added
+- [ ] No "flexibility" that wasn't requested
+- [ ] No error handling for impossible scenarios
+- [ ] No single-use abstractions
+
+**K.7 Goal Achievement:**
+- [ ] Success criteria verified (the ones stated in K.4)
+- [ ] Tests pass (if verification tests were written)
+- [ ] No regressions introduced
+- [ ] Changes are minimal and surgical
+
+**Post-Review Checklist (PASS GATE) - karpathy-coding Overlay:**
+- [ ] Implementation is surgical (only required changes) ✓
+- [ ] Simplicity maintained (no over-engineering) ✓
+- [ ] Goals achieved (success criteria met) ✓
+- [ ] No orphaned code from changes ✓
+
+---
+
+**Post-Review Summary Output:**
+```
+──────────────────────────────────────
+[POST-REVIEW GATE] — RESULTS
+──────────────────────────────────────
+
+Skill(s) Applied: [list skills] + karpathy-coding (overlay)
+
+Gate Results:
+  ✓ frontend-taste Post-Review: PASS (6/6 sections)
+  ✓ frontend-redesign Post-Review: PASS (4/4 sections)
+  ✓ full-output Post-Review: PASS (3/3 sections)
+  ✓ frontend-review Post-Review: PASS (7/7 sections)
+  ✓ security-review Post-Review: PASS (9/9 layers)
+  ✓ karpathy-coding Post-Review: PASS (K.5-K.7 overlay)
+
+Total Items Checked: N+
+  ✓ Correctness:              PASS (B.1)
+  ✓ Design & Taste:          PASS (B.2)
+  ✓ Accessibility:            PASS (B.3)
+  ✓ Performance:              PASS (B.4)
+  ✓ State & Interaction:      PASS (B.5)
+  ✓ Testing:                  PASS (B.6)
+  ✓ Full-Output:              PASS (B.7)
+  ✓ Auth & Authorization:     PASS (Security-1)
+  ✓ Input Validation:         PASS (Security-2)
+  ✓ Data Protection:          PASS (Security-3)
+  ✓ API & Webhook Security:   PASS (Security-4)
+  ✓ LLM/AI Security:          PASS (Security-5, if applicable)
+  ✓ Supply Chain:             PASS (Security-6)
+  ✓ Cryptography:             PASS (Security-7)
+  ✓ Error Handling & Logging: PASS (Security-8)
+  ✓ Advanced RE:              PASS (Security-9, if applicable)
+  ✓ Karpathy Simplicity:      PASS (K.5-K.7 overlay)
+
+Reviewer Notes:
+  - Fixed: [specific items fixed during post-review]
+  - Fixed: [specific items fixed during post-review]
+
+──────────────────────────────────────
+[POST-REVIEW] ALL GATES PASS — DELIVERING
+──────────────────────────────────────
+```
+
+**Nếu BẤT KỲ item nào fail:**
+1. KHÔNG deliver
+2. Fix ngay lập tức
+3. Re-run post-review gate
+4. Chỉ deliver khi TẤT CẢ items PASS
+
+---
+
+### Bước 4: Delivery
+
+Sau khi tất cả post-review gates PASS:
+1. Gửi code cho user
+2. Nêu rõ files đã deliver
+3. Nêu review notes nếu có items đã fix trong quá trình review
+4. Nêu rõ any intentional exceptions (documented và justified)
+
+### Bước 5: Long-Output Handling (PAUSE/RESUME)
+
+Khi response tiệm cận token limit:
+
+1. **KHÔNG nén** các phần còn lại
+2. **KHÔNG skip** ahead đến conclusion
+3. **Viết full quality** đến clean breakpoint (end of function, end of file, end of section)
+4. **Kết thúc bằng PAUSE marker:**
+
+```
+══════════════════════════════════════
+[PAUSED] — X of Y deliverables complete
+Send "continue" to resume from: [next deliverable name]
+══════════════════════════════════════
+```
+
+5. On "continue": pick up **exactly** where stopped. No recap, no repetition.
+
+---
+
+## Anti-Pattern: Bypass Gates
+
+### Tuyệt đối cấm:
+
+| Bypass | Lý do cấm |
+|---|---|
+| Skip pre-review để nhảy thẳng vào code | Không có design direction, scope không locked, không có baseline để verify |
+| Skip post-review để deliver ngay | Không verify correctness, design quality, accessibility, performance |
+| Partial review ("check important ones only") | Review gates có dependency — mỗi item bảo vệ một quality dimension |
+| Review-after-delivery ("let me know if needs fixing") | Bug/issue được discover sau khi user đã nhận code = bad UX + tech debt |
+| "I'll add the review checks at the end" | Pre-review gate chạy sau khi design decision đã được make = không có tác dụng |
+| Deliver partial output (1 of 3 files) without pause | Violates full-output enforcement + breaks user expectation |
+| Skip anti-default discipline | AI-slop patterns được "reviewed" = vẫn còn trong output |
+| Bỏ qua em-dash ban | Zero tolerance policy — nếu có 1 cái lọt qua = standard không đáng tin |
+
+### Consequences của Bypass:
+
+- Output không đạt enterprise quality standards
+- Design inconsistency (AI-slop patterns lọt qua)
+- Missed accessibility issues → production violation
+- Performance problems → bad user experience
+- Incomplete implementations → technical debt
+- Security vulnerabilities → production risk
+
+### Legitimate Exceptions (documented only):
+
+| Exception | Khi nào allowed | Phải document |
+|---|---|---|
+| Intentional design choice | Khi brief đặc biệt yêu cầu | Design read phải ghi rõ tại sao |
+| Performance trade-off | Khi có measurable justification | Ghi rõ trade-off và audience impact |
+| Legacy constraint | Khi legacy code không cho phép | Document constraint và workaround plan |
+
+---
+
+## Scope của System
+
+### Áp dụng cho:
+
+- **Tất cả coding tasks** → karpathy-coding luôn chạy như overlay
+- Landing pages, portfolios, marketing sites
+- Redesign existing web/app surfaces
+- Multi-file frontend implementations
+- Full implementation tasks (not skeleton)
+- Quality reviews and audits
+- Bất kỳ task nào user yêu cầu "review", "quality check", "check quality"
+- **Security reviews, vulnerability assessments, penetration testing**
+- **API/webhook implementations, authentication/authorization code**
+- **Payment integrations (bất kỳ payment provider nào)**
+- **APK/binary/JS reverse-engineering cho mục đích bảo mật**
+- **LLM/AI integrations, prompt engineering, agentic workflows**
+
+### Karpathy-coding Overlay (LUÔN ÁP DỤNG)
+
+Mọi coding task đều phải chạy karpathy-coding như overlay discipline:
+- **Pre-Review:** Think before coding, Simplicity check, Surgical scope, Goal definition
+- **Post-Review:** Verify surgical changes, Re-check simplicity, Confirm goals achieved
+
+**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
+
+### Không áp dụng (standalone):
+
+- Backend-only tasks (API, database, infrastructure)
+- Non-frontend tasks không liên quan đến design/UI
+- Exploratory/debugging tasks
+- Questions-only tasks (không generate code)
+
+**Nhưng:** Nếu task có frontend component, áp dụng frontend-review pre + post gates.
+
+**Nhưng:** Nếu task có security component (auth, payment, API, secrets, external data), áp dụng security-review pre + post gates song song với domain skill gates.
+
+---
+
+## Quick Reference Card
+
+```
+╔══════════════════════════════════════════════════════════════╗
+║            SKILL EXECUTION FLOWCHART                          ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  REQUEST RECEIVED                                            ║
+║       │                                                      ║
+║       ▼                                                      ║
+║  ┌─────────────────────────┐                                 ║
+║  │ 0. SKILL DETECTION      │  Phase A: Auto-Discovery        ║
+║  │    [SKILL DETECTION]   │  - Parse keywords + signals     ║
+║  │    ─────────────────── │  - Match Skill Matrix            ║
+║  │    ★ PRIMARY: [skill]  │  - Calculate confidence         ║
+║  │    ○ SECONDARY: [...]  │  - Determine combination        ║
+║  │    Confidence: X%       │  - Load SKILL.md files         ║
+║  └──────────┬──────────────┘                                 ║
+║             ▼                                                 ║
+║  ┌─────────────────────────┐                                 ║
+║  │ 1. PRE-REVIEW GATE     │  TRƯỚC KHI VIẾT CODE           ║
+║  │    [PRE-REVIEW] header │  Run ALL pre-review checklists   ║
+║  │    ALL items PASS →    │  Lock scope + design direction  ║
+║  │    else STOP            │  Dial values + anti-default     ║
+║  └──────────┬──────────────┘                                 ║
+║             ▼                                                 ║
+║  ┌─────────────────────────┐                                 ║
+║  │ 2. IMPLEMENTATION      │  Viết code theo skill guidelines ║
+║  │    Track deliverables  │  Full code, NO placeholders      ║
+║  │    If approaching limit │  NO em-dashes, NO AI-slop      ║
+║  │    → PAUSE marker      │  Follow anti-default discipline  ║
+║  └──────────┬──────────────┘                                 ║
+║             ▼                                                 ║
+║  ┌─────────────────────────┐                                 ║
+║  │ 3. POST-REVIEW GATE    │  SAU KHI VIẾT CODE             ║
+║  │    [POST-REVIEW] header│  Run ALL post-review checklists  ║
+║  │    ALL items PASS →    │  Design/Taste/Accessibility/Perf ║
+║  │    else FIX + re-run   │  Correctness/State/Testing      ║
+║  └──────────┬──────────────┘                                 ║
+║             ▼                                                 ║
+║  ┌─────────────────────────┐                                 ║
+║  │ 4. DELIVERY            │  Code + review notes             ║
+║  │    + summary output    │  Files delivered + count         ║
+║  └─────────────────────────┘                                 ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+SKILL DETECTION DECISION TREE:
+══════════════════════════════════════════════════════════════
+
+START: Request Received
+│
+├─► Is PAYMENT context? (MoMo, SePay, PayOS, ZaloPay, VNPay, VietQR)
+│   ├─► YES + SECURITY → security-review + vietnam-payment-review
+│   └─► YES → vietnam-payment-review + security-review (if auth)
+│
+├─► Is SECURITY context? (vulnerability, pentest, CVE, OWASP)
+│   └─► YES → security-review (standalone or + reverse-skill)
+│
+├─► Is FRONTEND context? (UI, landing, redesign, component)
+│   ├─► REDESIGN (existing site) → frontend-redesign + full-output + review
+│   ├─► BUILD/CREATE (new) → frontend-taste + full-output + review
+│   └─► REVIEW ONLY → frontend-review (standalone)
+│
+└─► Is FULL OUTPUT request? (full impl, complete, not skeleton)
+    └─► YES → full-output + [domain-specific skill]
+
+SKILL KEYWORD MATRIX:
+══════════════════════════════════════════════════════════════
+
+│ Pattern                    │ Primary Skill              │ Conf │
+├───────────────────────────┼───────────────────────────┼──────┤
+│ landing page, portfolio   │ frontend-taste            │ 0.95 │
+│ redesign, upgrade, improve │ frontend-redesign         │ 0.90 │
+│ full implementation      │ full-output               │ 0.95 │
+│ review, quality check     │ frontend-review           │ 0.95 │
+│ security, vulnerability   │ security-review           │ 0.95 │
+│ MoMo, SePay, PayOS, etc. │ vietnam-payment-review   │ 0.95 │
+│ less code, yagni, vibe   │ ponytail                  │ 0.95 │
+│ simple, minimal, don't assume │ karpathy-coding       │ 0.95 │
+│ bazi, 四柱, 算命, 命盘   │ bazi                     │ 0.95 │
+| Vietnam address, địa chỉ │ vietnam-address          │ 0.95 │
+
+CONFIDENCE THRESHOLDS:
+══════════════════════════════════════════════════════════════
+
+  ≥ 0.75  → AUTO-SELECT (no confirmation needed)
+  0.50-0.74 → SUGGEST (offer to apply)
+  < 0.50  → AMBIGUOUS (ask for clarification)
+
+FRONTEND TASK?
+  ├── Landing/Portfolio/Greenfield
+  │     → karpathy + frontend-taste + full-output + frontend-review
+  │     → PRE: karpathy §K.1-K.4 + taste §0.F + fulloutput §0.B + review §A.3
+  │     → POST: taste §6.A-H + fulloutput §5.A-C + review §B.1-7 + karpathy §K.5-K.7
+  │
+  ├── Redesign/Upgrade existing
+  │     → karpathy + frontend-redesign + full-output + frontend-review
+  │     → PRE: karpathy §K.1-K.4 + redesign §0.D + fulloutput §0.B + review §A.3
+  │     → POST: redesign §4.A-E + fulloutput §5.A-C + review §B.1-7 + karpathy §K.5-K.7
+  │
+  ├── Code Review / Quality Check
+  │     → karpathy + frontend-review (standalone)
+  │     → PRE: karpathy §K.1-K.4 + review §A.1-A.3
+  │     → POST: review §B.1-B.7 + karpathy §K.5-K.7
+  │
+  └── Multi-file / Full impl
+        → karpathy + full-output + frontend-review
+        → PRE: karpathy §K.1-K.4 + fulloutput §0.B + review §A.1-A.3
+        → POST: fulloutput §5.A-C + review §B.1-B.7 + karpathy §K.5-K.7
+
+SECURITY TASK?
+  ├── Vulnerability / CVE / Exploit
+  │     → karpathy + security-review (standalone)
+  │     → PRE: karpathy §K.1-K.4 + §S.1-S.3
+  │     → POST: §Security-1-8 + karpathy §K.5-K.7
+  │
+  ├── API / Auth / Webhook Security
+  │     → karpathy + security-review + [relevant domain skill]
+  │     → PRE: karpathy §K.1-K.4 + §S.1-S.3 + domain skill gate
+  │     → POST: §Security-1-8 + domain skill gate + karpathy §K.5-K.7
+  │
+  ├── Payment / Vietnam Payment
+  │     → karpathy + security-review + vietnam-payment-review
+  │     → PRE: karpathy §K.1-K.4 + payment §pre + security §S.1-S.3
+  │     → POST: §Security-1-8 + payment §post + karpathy §K.5-K.7
+  │
+  ├── APK / Binary / JS / Firmware RE
+  │     → karpathy + security-review + reverse-skill routing
+  │     → PRE: karpathy §K.1-K.4 + §S.1-S.3 + RE skill gate
+  │     → POST: §Security-1-9 + RE skill post + karpathy §K.5-K.7
+  │
+  └── LLM / AI Security
+        → karpathy + security-review (§Security-5 + §S.5 LLM)
+        → PRE: karpathy §K.1-K.4 + §S.1-S.3 + LLM threat model
+        → POST: §Security-5 + OWASP LLM Top 10 + ASI Top 10 + karpathy §K.5-K.7
+
+BAZI TASK?
+  ├── Bazi Fortune Analysis
+  │     → bazi (standalone)
+  │     → PRE: collect birth info (name, birthdays, time, gender, location)
+  │     → POST: present chart, analyze with classical texts
+  │
+  └── Bazi + Historical Calibration
+        → bazi (with event verification)
+        → PRE: collect birth info
+        → POST: present chart + predict 3-5 past events for verification
+
+ANY CODING TASK?
+  → karpathy-coding runs as OVERLAY with every primary skill
+  → PRE: §K.1-K.4 (always)
+  → POST: §K.5-K.7 (always)
+  → Purpose: Keep code simple, surgical, goal-driven
+
+ANTI-BYPASS RULES:
+  ✗ Never skip pre-review (no design direction, no scope lock)
+  ✗ Never skip post-review (no quality verification)
+  ✗ Never partial review ("check important ones only")
+  ✗ Never review-after-delivery ("let me know if needs fixing")
+  ✗ Zero em-dash tolerance — any found = FAIL
+  ✗ Zero placeholder tolerance — any found = FAIL
+  ✗ Never deliver while post-review items are failing
+  ✗ Never skip karpathy-coding overlay (always runs with every skill)
+  ✗ Never over-engineer when simplicity suffices
+  ✗ Never touch unrelated code (stay surgical)
+
+PAUSE/RESUME: If approaching token limit, PAUSE at clean
+breakpoint, resume on "continue". No recap, no repetition.
+```
+
+---
+
+## Mixed Domain Gate Ordering
+
+Khi task có cả frontend + backend, áp dụng gate ordering:
+
+1. **Backend gates** chạy TRƯỚC (security_pre, security_post)
+2. **Frontend gates** chạy SAU (frontend-review-pre/post)
+3. **karpathy gates** bao trùm toàn bộ
+4. **Common gates** (full-output, ponytail) chạy xuyên suốt
+
+Execution Order:
+```
+karpathy-pre → security-pre → frontend-review-pre → IMPLEMENT
+            → full-output-post → frontend-review-post → security-post → karpathy-post
+```
+
+---
+
+## Skill Conflict Resolution
+
+Priority khi 2 primary skills conflict:
+
+| Priority | Skill | Lý do |
+|----------|-------|-------|
+| 1 | security-review | Bảo mật quan trọng nhất |
+| 2 | vietnam-payment-review | Liên quan tiền |
+| 3 | frontend-review | Chất lượng UI |
+| 4 | frontend-taste | Design premium |
+| 5 | full-output | Implementation |
+| 6 | karpathy-coding | Efficiency (always overlay) |
+| 7 | ponytail | Minimize code (always overlay) |
+
+**Rule:** Khi conflict, skill có priority cao hơn trigger gates trước.
+
+---
+
+## Liên kết
+
+- [[rule_skill-registry]] — **Single Source of Truth** cho tất cả skill definitions
+- [[proto_context-router]] — Context routing rules
+- [[proto_memory-first]] — Memory context management
+- [[proto_multi-language-vibe-code]] — Multi-language request processing & vibe code protocol
+- [[coding-standards]] — Coding standards
+- [[frontend-taste]] — `.cursor/skills/ui_ui_frontend-taste/SKILL.md`
+- [[frontend-redesign]] — `.cursor/skills/ui_ui_frontend-redesign/SKILL.md`
+- [[full-output]] — `.cursor/skills/code_code_full-output/SKILL.md`
+- [[frontend-review]] — `.cursor/skills/ui_ui_frontend-review/SKILL.md`
+- [[vietnam-payment-review]] — `.cursor/skills/sec_sec_vietnam-payment-review/SKILL.md`
+- [[security-review]] — `.cursor/skills/sec_sec_security-review/SKILL.md`
+- [[visual-explainer]] — `.cursor/skills/ui_ui_visual-explainer/SKILL.md` (từ [visual-explainer](https://github.com/nicobailon/visual-explainer))
+- [[karpathy-coding]] — `.cursor/skills/code_karpathy/SKILL.md` (từ [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) 182k stars)
+- [[bazi]] — `.cursor/skills/special_special_bazi/SKILL.md` (từ [bazi-skill](https://github.com/jinchenma94/bazi-skill) 2k stars - Chinese Bazi fortune telling)
+- [[chatbot-development]] — `.cursor/rules/chatbot-development.mdc` (ChatbotX patterns: feature scaffold, Drizzle, BullMQ)
+- [ChatbotX GitHub](https://github.com/ChatbotXIO/ChatbotX) — Open-source ManyChat alternative (304 stars)
+- [reverse-skill](https://github.com/zhaoxuya520/reverse-skill) — Cybersecurity Skills Router (APK RE, Binary Analysis, JS Reverse, Pentest, EDR Bypass, Firmware, LLM Security)

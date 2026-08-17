@@ -1,0 +1,1017 @@
+﻿---
+description: Task Analyzer & Synchronized Context System - Phân tích yêu cầu, tự động phát hiện rules/skills, sinh task manifest với subtasks
+created: 2026-06-26
+version: 1.0.0
+tags: [task-analyzer, context-sync, skill-auto-discovery, multi-language, vibe-code, automation, rules, skills, dependencies, mcp]
+---
+
+# Task Analyzer & Synchronized Context System
+
+## Tổng quan
+
+Task Analyzer là hệ thống **end-to-end** cho phép:
+1. Nhận yêu cầu bằng **bất kỳ ngôn ngữ nào** (tiếng Việt, Trung Quốc, Nhật Bản, Hàn Quốc, v.v.)
+2. **Tự động sync** tất cả rules, skills, MCP servers, dependencies
+3. **Phân tích intent** và **phát hiện skills** phù hợp
+4. **Sinh task manifest** với các subtasks chi tiết
+5. **Tự động cài đặt dependencies** khi cần
+6. **Phân phối và thực thi** tasks một cách mượt mà
+
+```
+╔════════════════════════════════════════════════════════════════════════════════════╗
+║                    TASK ANALYZER FLOW                                            ║
+╠════════════════════════════════════════════════════════════════════════════════════╣
+║                                                                              ║
+║  ┌──────────────────────────────────────────────────────────────────────────┐  ║
+║  │ 1. REQUEST RECEIVED (Any Language)                                     │  ║
+║  │    "Tạo một landing page cho startup AI của tôi"                        │  ║
+║  └──────────────────────────────────────────────────────────────────────────┘  ║
+║                                      │                                        ║
+║                                      ▼                                        ║
+║  ┌──────────────────────────────────────────────────────────────────────────┐  ║
+║  │ 2. CONTEXT SYNC                                                        │  ║
+║  │    • Rules: 84 rules (auto-loaded)                                    │  ║
+║  │    • Skills: 17 skills (auto-loaded)                                   │  ║
+║  │    • MCP: 5 servers (auto-detected)                                   │  ║
+║  │    • Dependencies: cached                                               │  ║
+║  └──────────────────────────────────────────────────────────────────────────┘  ║
+║                                      │                                        ║
+║                                      ▼                                        ║
+║  ┌──────────────────────────────────────────────────────────────────────────┐  ║
+║  │ 3. LANGUAGE DETECTION & TRANSLATION                                    │  ║
+║  │    Vietnamese → English (semantic-preserving)                          │  ║
+║  │    "Create a landing page for my AI startup"                           │  ║
+║  └──────────────────────────────────────────────────────────────────────────┘  ║
+║                                      │                                        ║
+║                                      ▼                                        ║
+║  ┌──────────────────────────────────────────────────────────────────────────┐  ║
+║  │ 4. INTENT & SKILL DETECTION                                           │  ║
+║  │    • Intent: BUILD (0.85)                                              │  ║
+║  │    • Domain: FRONTEND (0.90)                                           │  ║
+║  │    • Skills: frontend-taste, full-output, frontend-review, karpathy    │  ║
+║  │    • Rules: frontend-architecture, ui-visual-design, coding-standards    │  ║
+║  └──────────────────────────────────────────────────────────────────────────┘  ║
+║                                      │                                        ║
+║                                      ▼                                        ║
+║  ┌──────────────────────────────────────────────────────────────────────────┐  ║
+║  │ 5. TASK DECOMPOSITION                                                  │  ║
+║  │    ┌───────────────────────────────────────────────────────────────┐   │  ║
+║  │    │ TASK-1: Pre-Review Gates (karpathy + taste + fulloutput)    │   │  ║
+║  │    │ TASK-2: Hero Section Implementation                          │   │  ║
+║  │    │ TASK-3: Features Section Implementation                        │   │  ║
+║  │    │ TASK-4: CTA Section Implementation                            │   │  ║
+║  │    │ TASK-5: Post-Review Gates (all skills)                       │   │  ║
+║  │    │ TASK-6: Delivery                                              │   │  ║
+║  │    └───────────────────────────────────────────────────────────────┘   │  ║
+║  └──────────────────────────────────────────────────────────────────────────┘  ║
+║                                      │                                        ║
+║                                      ▼                                        ║
+║  ┌──────────────────────────────────────────────────────────────────────────┐  ║
+║  │ 6. DEPENDENCY CHECK & AUTO-INSTALL                                     │  ║
+║  │    • npm: tailwindcss, framer-motion, lucide-react                    │  ║
+║  │    • python: (none required)                                           │  ║
+║  │    • system: (none required)                                           │  ║
+║  │    → Auto-install if missing                                           │  ║
+║  └──────────────────────────────────────────────────────────────────────────┘  ║
+║                                      │                                        ║
+║                                      ▼                                        ║
+║  ┌──────────────────────────────────────────────────────────────────────────┐  ║
+║  │ 7. EXECUTION                                                          │  ║
+║  │    Sequential: TASK-1 → TASK-2 → TASK-3 → TASK-4 → TASK-5 → TASK-6   │  ║
+║  │    Each task with subtasks and checkpoints                              │  ║
+║  └──────────────────────────────────────────────────────────────────────────┘  ║
+║                                                                              ║
+╚════════════════════════════════════════════════════════════════════════════════════╝
+```
+
+---
+
+## PHẦN 1: CONTEXT SYNC ENGINE
+
+### 1.1 Auto-Discovery Sources
+
+| Source | Location | Count | Auto-Sync |
+|--------|----------|-------|-----------|
+| Rules | `.cursor/rules/*.mdc` | 84 | Yes |
+| Skills | `.cursor/skills/*/SKILL.md` | 17 | Yes |
+| Knowledge | `.cursor/knowledge/**/*` | 100+ | Yes |
+| MCP Servers | `mcps/*/SERVER_METADATA.json` | 5 | Yes |
+| Dependencies | `.cursor/scripts/skill-dependencies.json` | Auto | Yes |
+
+### 1.2 Sync Pipeline
+
+```yaml
+sync_pipeline:
+  enabled: true
+  cache_ttl: 3600  # 1 hour
+  
+  stages:
+    - name: "Rules Sync"
+      source: ".cursor/rules/*.mdc"
+      action: "Load all .mdc files, extract tags, index by category"
+      
+    - name: "Skills Sync"
+      source: ".cursor/skills/*/SKILL.md"
+      action: "Load SKILL.md, extract keywords, gates, dependencies"
+      
+    - name: "Knowledge Sync"
+      source: ".cursor/knowledge/**/*"
+      action: "Index all knowledge files for semantic search"
+      
+    - name: "MCP Sync"
+      source: "mcps/*/SERVER_METADATA.json"
+      action: "Load MCP server metadata, check availability"
+      
+    - name: "Dependency Sync"
+      source: ".cursor/scripts/skill-dependencies.json"
+      action: "Parse dependency manifest, cache package states"
+```
+
+### 1.3 Cached Context Structure
+
+```json
+{
+  "timestamp": "2026-06-26T13:00:00Z",
+  "rules": {
+    "total": 84,
+    "by_category": {
+      "architecture": 15,
+      "frontend": 8,
+      "backend": 12,
+      "security": 6,
+      "devops": 10,
+      "database": 7
+    }
+  },
+  "skills": {
+    "total": 17,
+    "by_category": {
+      "frontend": 2,
+      "review": 3,
+      "efficiency": 2,
+      "domain": 4,
+      "knowledge": 3,
+      "special": 3
+    }
+  },
+  "mcp": {
+    "total": 5,
+    "servers": [
+      {"name": "cursor-ide-browser", "status": "available"},
+      {"name": "user-codegraph", "status": "available"},
+      {"name": "user-vercel", "status": "available"}
+    ]
+  },
+  "dependencies": {
+    "python": ["pytesseract", "Pillow", "opencv-python", "bandit"],
+    "npm": ["tailwindcss", "framer-motion", "lucide-react"],
+    "system": ["tesseract", "docker"]
+  }
+}
+```
+
+---
+
+## PHẦN 2: LANGUAGE DETECTION
+
+### 2.1 Supported Languages
+
+| Code | Language | Native Name | Detection Method |
+|------|----------|-------------|-----------------|
+| vi | Vietnamese | Tiếng Việt | Keyword + Pattern matching |
+| zh | Chinese | 中文 | CJK character detection |
+| ja | Japanese | 日本語 | Hiragana/Katakana detection |
+| ko | Korean | 한국어 | Hangul character detection |
+| en | English | English | Default fallback |
+
+### 2.2 Detection Algorithm
+
+```
+INPUT: "Tạo một landing page đẹp cho startup AI"
+OUTPUT: {
+  language: "vietnamese",
+  confidence: 0.92,
+  scores: {
+    vietnamese: 8,
+    english: 3,
+    chinese: 0,
+    japanese: 0,
+    korean: 0
+  }
+}
+```
+
+### 2.3 Translation Matrix (Vietnamese → English)
+
+```yaml
+translation_matrix:
+  intent_verbs:
+    "tạo" → "create"
+    "xây dựng" → "build"
+    "cải thiện" → "improve"
+    "sửa lỗi" → "fix bug"
+    "sửa" → "fix"
+    "thiết kế" → "design"
+    "phát triển" → "develop"
+    "thêm" → "add"
+    "cập nhật" → "update"
+    "nâng cấp" → "upgrade"
+    
+  tech_terms:
+    "trang web" → "website"
+    "trang" → "page"
+    "app" → "app"
+    "hệ thống" → "system"
+    "giao diện" → "UI"
+    "backend" → "backend"
+    "frontend" → "frontend"
+    "database" → "database"
+    "api" → "API"
+    
+  project_types:
+    "landing page" → "landing page"
+    "trang đích" → "landing page"
+    "portfolio" → "portfolio"
+    "danh mục" → "portfolio"
+    "dashboard" → "dashboard"
+    "thương mại điện tử" → "e-commerce"
+    
+  payment:
+    "thanh toán" → "payment"
+    "MoMo" → "MoMo"
+    "SePay" → "SePay"
+    "VNPay" → "VNPay"
+    "ZaloPay" → "ZaloPay"
+    
+  address:
+    "địa chỉ Việt Nam" → "Vietnam address"
+    "tỉnh" → "province"
+    "thành phố" → "city"
+    "quận" → "district"
+    "huyện" → "district"
+```
+
+---
+
+## PHẦN 3: INTENT & SKILL DETECTION
+
+### 3.1 Intent Classification
+
+```yaml
+intents:
+  build:
+    keywords: ["create", "build", "make", "add", "implement", "develop", "tạo", "xây dựng", "创建"]
+    weight: 0.25
+    
+  redesign:
+    keywords: ["improve", "upgrade", "redesign", "modernize", "enhance", "cải thiện", "改进"]
+    weight: 0.20
+    
+  fix:
+    keywords: ["fix", "bug", "error", "issue", "repair", "debug", "sửa lỗi", "修复"]
+    weight: 0.20
+    
+  review:
+    keywords: ["review", "check", "audit", "analyze", "assess", "kiểm tra", "审查"]
+    weight: 0.15
+    
+  security:
+    keywords: ["security", "vulnerability", "auth", "JWT", "bảo mật", "安全"]
+    weight: 0.10
+```
+
+### 3.2 Domain Detection
+
+```yaml
+domains:
+  frontend:
+    keywords: ["frontend", "UI", "UX", "landing", "page", "component", "react", "vue", "next", "nuxt"]
+    skills: ["frontend-taste", "frontend-redesign", "frontend-review"]
+    
+  backend:
+    keywords: ["backend", "API", "server", "endpoint", "database", "REST", "GraphQL"]
+    
+  security:
+    keywords: ["security", "auth", "vulnerability", "JWT", "XSS", "SQL injection"]
+    skills: ["security-review", "vietnam-payment-review"]
+    
+  payment:
+    keywords: ["payment", "MoMo", "SePay", "PayOS", "VNPay", "ZaloPay", "VietQR"]
+    skills: ["vietnam-payment-review", "security-review"]
+    
+  knowledge:
+    keywords: ["knowledge base", "RAG", "wiki", "FAQ", "weknora", "rag"]
+    skills: ["weknora-kb", "weknora-agent", "pixelrag"]
+    
+  ocr:
+    keywords: ["ocr", "text extraction", "image to text", "scanned"]
+    skills: ["document-ocr", "pixelrag"]
+```
+
+### 3.3 Skill Auto-Discovery Matrix
+
+```yaml
+skill_detection:
+  rules:
+    - name: "Mandatory Skills"
+      description: "Always applied regardless of detection"
+      skills:
+        - karpathy-coding  # All coding tasks
+        - frontend-review  # All frontend tasks
+    
+    - name: "Threshold-Based"
+      description: "Applied when confidence >= threshold"
+      rules:
+        - skill: "frontend-taste"
+          threshold: 0.75
+          keywords: ["landing page", "portfolio", "homepage", "marketing site", "trang đích"]
+          
+        - skill: "frontend-redesign"
+          threshold: 0.75
+          keywords: ["redesign", "upgrade", "improve existing", "modernize", "cải thiện"]
+          
+        - skill: "full-output"
+          threshold: 0.80
+          keywords: ["full implementation", "complete", "not skeleton", "no TODO", "hoàn chỉnh"]
+          
+        - skill: "security-review"
+          threshold: 0.85
+          keywords: ["security", "vulnerability", "auth", "JWT", "pentest", "bảo mật"]
+          
+        - skill: "vietnam-payment-review"
+          threshold: 0.90
+          keywords: ["MoMo", "SePay", "PayOS", "VNPay", "ZaloPay", "VietQR", "thanh toán"]
+          
+        - skill: "weknora-kb"
+          threshold: 0.90
+          keywords: ["knowledge base", "RAG", "wiki", "FAQ", "weknora"]
+          
+        - skill: "pixelrag"
+          threshold: 0.90
+          keywords: ["pixelrag", "visual rag", "screenshot rag", "table extraction"]
+          
+        - skill: "document-ocr"
+          threshold: 0.90
+          keywords: ["ocr", "text extraction", "image to text", "đọc text"]
+```
+
+### 3.4 Skill Combination Rules
+
+> **Đầy đủ: [[rule_skill-registry]] §4**
+
+| Request Type | Primary | Mandatory Overlay |
+|-------------|---------|------------------|
+| Landing/Portfolio | frontend-taste | karpathy-coding |
+| Redesign Existing | frontend-redesign | karpathy-coding |
+| Security Review | security-review | karpathy-coding |
+| Vietnam Payment | vietnam-payment-review | karpathy-coding |
+| Knowledge Base | weknora-kb | karpathy-coding |
+
+---
+
+## PHẦN 4: TASK DECOMPOSITION
+
+### 4.1 Task Manifest Schema
+
+```yaml
+task_manifest:
+  version: "1.0.0"
+  generated_at: "ISO-8601 timestamp"
+  request_id: "UUID v4"
+  
+  input:
+    original_request: "string"
+    detected_language: "vi|en|zh|ja|ko"
+    translated_request: "string"
+    primary_intent: "build|redesign|fix|review|explain|security"
+    primary_domain: "string"
+    
+  analysis:
+    skills_selected:
+      - skill_id: "string"
+        confidence: 0.0-1.0
+        role: "primary|secondary|mandatory|overlay"
+        
+    rules_matched:
+      - rule_id: "string"
+        
+    gates_required:
+      pre: ["gate-1", "gate-2"]
+      post: ["gate-3", "gate-4"]
+      
+    dependencies:
+      python: ["pkg1", "pkg2"]
+      npm: ["pkg1", "pkg2"]
+      system: ["tesseract", "docker"]
+      
+  tasks:
+    - task_id: "task-1"
+      task_name: "string"
+      task_type: "pre-gate|implementation|post-gate|delivery"
+      description: "string"
+      estimated_time: "string"
+      skills_applied: ["skill1", "skill2"]
+      subtasks:
+        - subtask_id: "sub-1"
+          name: "string"
+          checkpoints: ["check1", "check2"]
+      dependencies: ["task-id"]
+      status: "pending|in_progress|completed|failed"
+```
+
+### 4.2 Gate Checkpoint Library
+
+#### Pre-Review Gates
+
+```yaml
+karpathy_pre:
+  name: "Karpathy Pre-Review Gate"
+  checkpoints:
+    - "State Assumptions"
+    - "Simplicity Check"
+    - "Surgical Scope Defined"
+    - "Goals Defined"
+
+taste_pre:
+  name: "Frontend Taste Pre-Review Gate"
+  checkpoints:
+    - "Brief Inference (Page kind, Vibe, Audience)"
+    - "Design Read Declaration"
+    - "Anti-Default Discipline Applied"
+    - "Dial Values Set (VARIANCE/MOTION/DENSITY)"
+
+fulloutput_pre:
+  name: "Full Output Pre-Review Gate"
+  checkpoints:
+    - "Scope Locked"
+    - "Deliverable Count Confirmed"
+    - "Dependencies Identified"
+
+review_pre:
+  name: "Frontend Review Pre-Review Gate"
+  checkpoints:
+    - "Scope Analysis Complete"
+    - "Quality Plan Defined"
+    - "Files to Touch Listed"
+
+security_pre:
+  name: "Security Review Pre-Review Gate"
+  checkpoints:
+    - "Threat Modeling Complete"
+    - "Security Requirements Defined"
+    - "Attack Surface Documented"
+```
+
+#### Post-Review Gates
+
+```yaml
+karpathy_post:
+  name: "Karpathy Post-Review Gate"
+  checkpoints:
+    - "Implementation is Surgical"
+    - "Simplicity Maintained"
+    - "Goals Achieved"
+
+taste_post:
+  name: "Frontend Taste Post-Review Gate"
+  checkpoints:
+    - "Layout & Structure: PASS"
+    - "Typography & Content: PASS"
+    - "Animation & Motion: PASS"
+    - "Assets & Images: PASS"
+
+fulloutput_post:
+  name: "Full Output Post-Review Gate"
+  checkpoints:
+    - "No // ... patterns"
+    - "No // TODO comments"
+    - "All imports exist"
+    - "No skeleton code"
+
+review_post:
+  name: "Frontend Review Post-Review Gate"
+  checkpoints:
+    - "Correctness: PASS"
+    - "Design & Taste: PASS"
+    - "Accessibility: PASS"
+    - "Performance: PASS"
+    - "State & Interaction: PASS"
+
+security_post:
+  name: "Security Review Post-Review Gate"
+  checkpoints:
+    - "Authentication & Authorization: PASS"
+    - "Input Validation: PASS"
+    - "Data Protection: PASS"
+    - "API & Webhook Security: PASS"
+    - "Cryptographic Practices: PASS"
+```
+
+### 4.3 Example Task Manifest
+
+```json
+{
+  "version": "1.0.0",
+  "generated_at": "2026-06-26T13:00:00Z",
+  "request_id": "550e8400-e29b-41d4-a716-446655440000",
+  
+  "input": {
+    "original_request": "Tạo một landing page đẹp cho startup AI của tôi",
+    "detected_language": "vi",
+    "translated_request": "Create a beautiful landing page for my AI startup",
+    "primary_intent": "build",
+    "primary_domain": "frontend"
+  },
+  
+  "analysis": {
+    "skills_selected": [
+      {"skill_id": "frontend-taste", "confidence": 0.92, "role": "primary"},
+      {"skill_id": "full-output", "confidence": 0.85, "role": "secondary"},
+      {"skill_id": "frontend-review", "confidence": 1.0, "role": "mandatory"},
+      {"skill_id": "karpathy-coding", "confidence": 1.0, "role": "overlay"}
+    ],
+    "rules_matched": ["frontend-architecture", "ui-visual-design", "coding-standards"],
+    "gates_required": {
+      "pre": ["karpathy-pre", "taste-pre", "fulloutput-pre", "review-pre"],
+      "post": ["taste-post", "fulloutput-post", "review-post", "karpathy-post"]
+    },
+    "dependencies": {
+      "npm": ["tailwindcss", "framer-motion", "lucide-react"],
+      "python": [],
+      "system": []
+    }
+  },
+  
+  "tasks": [
+    {
+      "task_id": "task-1",
+      "task_name": "Pre-Review Gates",
+      "task_type": "pre-gate",
+      "description": "Run all pre-review gates before implementation",
+      "estimated_time": "10 minutes",
+      "skills_applied": ["karpathy-coding", "frontend-taste", "full-output", "frontend-review"],
+      "subtasks": [
+        {"subtask_id": "sub-1-kpre", "name": "Karpathy Pre-Gate", "checkpoints": ["Assumptions stated", "Simplicity checked", "Scope defined"]},
+        {"subtask_id": "sub-1-tpre", "name": "Taste Pre-Gate", "checkpoints": ["Design read declared", "Anti-default checked", "Dials set"]},
+        {"subtask_id": "sub-1-fpre", "name": "Full Output Pre-Gate", "checkpoints": ["Scope locked", "Deliverables counted"]},
+        {"subtask_id": "sub-1-rpre", "name": "Review Pre-Gate", "checkpoints": ["Scope analyzed", "Quality plan defined"]}
+      ],
+      "status": "pending"
+    },
+    {
+      "task_id": "task-2",
+      "task_name": "Hero Section",
+      "task_type": "implementation",
+      "description": "Create hero section with headline, subtext, CTA",
+      "estimated_time": "20 minutes",
+      "skills_applied": ["frontend-taste", "karpathy-coding"],
+      "subtasks": [
+        {"subtask_id": "sub-2-nav", "name": "Navigation Bar", "checkpoints": ["Logo", "Nav links", "Mobile menu"]},
+        {"subtask_id": "sub-2-hero", "name": "Hero Content", "checkpoints": ["Headline", "Subtext", "CTA button"]}
+      ],
+      "dependencies": ["task-1"],
+      "status": "pending"
+    },
+    {
+      "task_id": "task-3",
+      "task_name": "Features Section",
+      "task_type": "implementation",
+      "description": "Create features showcase section",
+      "estimated_time": "25 minutes",
+      "skills_applied": ["frontend-taste", "karpathy-coding"],
+      "subtasks": [
+        {"subtask_id": "sub-3-feat", "name": "Feature Cards", "checkpoints": ["4 feature cards", "Icons", "Hover states"]}
+      ],
+      "dependencies": ["task-2"],
+      "status": "pending"
+    },
+    {
+      "task_id": "task-4",
+      "task_name": "CTA Section",
+      "task_type": "implementation",
+      "description": "Create call-to-action section",
+      "estimated_time": "15 minutes",
+      "skills_applied": ["frontend-taste", "karpathy-coding"],
+      "subtasks": [
+        {"subtask_id": "sub-4-cta", "name": "Final CTA", "checkpoints": ["CTA text", "Button", "Background"]}
+      ],
+      "dependencies": ["task-3"],
+      "status": "pending"
+    },
+    {
+      "task_id": "task-5",
+      "task_name": "Post-Review Gates",
+      "task_type": "post-gate",
+      "description": "Run all post-review gates after implementation",
+      "estimated_time": "15 minutes",
+      "skills_applied": ["karpathy-coding", "frontend-taste", "full-output", "frontend-review"],
+      "subtasks": [
+        {"subtask_id": "sub-5-tpost", "name": "Taste Post-Gate", "checkpoints": ["Layout", "Typography", "Animation", "Assets"]},
+        {"subtask_id": "sub-5-fpost", "name": "Full Output Post-Gate", "checkpoints": ["No skeletons", "No TODOs", "Complete"]},
+        {"subtask_id": "sub-5-rpost", "name": "Review Post-Gate", "checkpoints": ["Correctness", "Design", "A11y", "Performance"]},
+        {"subtask_id": "sub-5-kpost", "name": "Karpathy Post-Gate", "checkpoints": ["Surgical", "Simple", "Goals met"]}
+      ],
+      "dependencies": ["task-4"],
+      "status": "pending"
+    },
+    {
+      "task_id": "task-6",
+      "task_name": "Delivery",
+      "task_type": "delivery",
+      "description": "Deliver final code to user",
+      "estimated_time": "5 minutes",
+      "subtasks": [
+        {"subtask_id": "sub-6-review", "name": "Final Review", "checkpoints": ["Code reviewed", "Changes documented"]},
+        {"subtask_id": "sub-6-deliver", "name": "Deliver", "checkpoints": ["Code delivered", "Summary provided"]}
+      ],
+      "dependencies": ["task-5"],
+      "status": "pending"
+    }
+  ],
+  
+  "execution_order": ["task-1", "task-2", "task-3", "task-4", "task-5", "task-6"],
+  
+  "output": {
+    "summary": "Landing page for AI startup with hero, features, CTA",
+    "deliverables": ["Hero section", "Features section", "CTA section"],
+    "warnings": [],
+    "next_steps": ["Run pre-review gates", "Implement feature", "Run post-review gates", "Deliver code"]
+  }
+}
+```
+
+### 4.4 Writing-Plans Discipline (from Superpowers)
+
+> **Source:** [obra/superpowers](https://github.com/obra/superpowers) `writing-plans` skill (248k stars) — "Breaks work into bite-sized tasks (2-5 minutes each). Every task has exact file paths, complete code, verification steps."
+
+When `/plan` is invoked, the generated task manifest MUST follow this discipline:
+
+| Rule | Description |
+|---|---|
+| Atomic tasks | Each task 2-5 minutes of focused work |
+| Exact file paths | No ambiguity (`src/auth/login.ts`, not "the auth code") |
+| Complete code in plan | Each task carries the full code snippet to add — not "implement X" |
+| Verification per task | Each task has a `verify:` clause (run tests, hit URL, etc.) |
+| Tests first | New behavior gets a failing test before implementation |
+| Acceptance criteria | Each task states an objective "Done when …" condition |
+
+This aligns with framework's existing `karpathy-coding §K.4 Goal Definition` (success criteria + verification points).
+
+---
+
+## PHẦN 5: DEPENDENCY AUTO-INSTALL
+
+### 5.1 Dependency Resolver
+
+```yaml
+dependency_resolver:
+  check_order:
+    - system
+    - python
+    - npm
+    - docker
+    - mcp
+    
+  resolution_rules:
+    python:
+      check_command: "pip show {package}"
+      install_command: "pip install {packages}"
+      
+    npm:
+      check_command: "npm list {package} --depth=0"
+      install_command: "npm install {packages}"
+      
+    system:
+      tesseract:
+        windows: "tesseract --version"
+        macos: "brew list tesseract"
+        linux: "tesseract --version"
+```
+
+### 5.2 Skill Dependencies Mapping
+
+| Skill | Python | npm | System |
+|-------|--------|-----|--------|
+| frontend-taste | - | tailwindcss, framer-motion, lucide-react | - |
+| frontend-redesign | - | tailwindcss, prettier, eslint | - |
+| security-review | bandit, safety | npm audit | - |
+| document-ocr | pytesseract, Pillow, opencv-python | - | tesseract |
+| pixelrag | pixelrag, playwright | - | chromium |
+| weknora-kb | - | - | weknora-cli, docker |
+
+---
+
+## PHẦN 6: EXECUTION ENGINE
+
+### 6.1 Execution Modes
+
+| Mode | Description | Use Case |
+|------|-------------|----------|
+| Sequential | Tasks run one after another | Default for most tasks |
+| Parallel | Independent tasks run concurrently | Multiple independent sections |
+| Gated | Tasks wait for gate approval | Security-sensitive operations |
+
+### 6.2 Gate Verification Flow
+
+```
+TASK EXECUTION
+     │
+     ▼
+┌─────────────────┐
+│ Run Pre-Gates  │ ← All gates must PASS
+└────────┬────────┘
+         │ PASS
+         ▼
+┌─────────────────┐
+│ Implement Task  │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Run Post-Gates  │ ← All gates must PASS
+└────────┬────────┘
+         │ PASS
+         ▼
+    NEXT TASK
+```
+
+### 6.3 Gate Pass Criteria
+
+| Gate Type | Pass Criteria |
+|------------|---------------|
+| karpathy-pre | All K.1-K.4 checkpoints PASS |
+| taste-pre | All 0.A-0.F checkpoints PASS |
+| fulloutput-pre | Scope locked, deliverables counted |
+| review-pre | Scope analyzed, quality plan defined |
+| security-pre | Threat model, security requirements defined |
+| karpathy-post | All K.5-K.7 checkpoints PASS |
+| taste-post | All 6.A-6.H checkpoints PASS |
+| fulloutput-post | No truncation patterns, complete code |
+| review-post | All B.1-B.7 sections PASS |
+| security-post | All Security-1-9 layers PASS |
+
+---
+
+## PHẦN 7: CLI USAGE
+
+### 7.1 PowerShell CLI
+
+```powershell
+# Basic analysis
+.\.cursor\scripts\task-analyzer.ps1 -Request "Tạo landing page"
+
+# Analyze with task generation
+.\.cursor\scripts\task-analyzer.ps1 -GenerateTasks -Request "Build API endpoint"
+
+# Full execution with deps install
+.\.cursor\scripts\task-analyzer.ps1 -Execute -InstallDeps -Request "Add MoMo payment"
+
+# Check context registry
+.\.cursor\scripts\task-analyzer.ps1 -CheckContext
+
+# List available skills
+.\.cursor\scripts\task-analyzer.ps1 -ListSkills
+
+# List MCP servers
+.\.cursor\scripts\task-analyzer.ps1 -ListMCP
+```
+
+### 7.2 Python CLI
+
+```bash
+# Basic analysis
+python task_analyzer.py "Tạo landing page"
+
+# JSON output
+python task_analyzer.py "Build API endpoint" --json
+
+# Save to file
+python task_analyzer.py "Add payment" -o manifest.json
+
+# Verbose output
+python task_analyzer.py "Fix bug" -v
+```
+
+### 7.3 Python API
+
+```python
+from task_analyzer import TaskAnalyzer
+
+# Create analyzer
+analyzer = TaskAnalyzer(dependencies_path="skill-dependencies.json")
+
+# Analyze request
+manifest = analyzer.analyze("Tạo landing page đẹp cho startup AI")
+
+# Access results
+print(f"Detected: {manifest.input['detected_language']}")
+print(f"Primary Intent: {manifest.input['primary_intent']}")
+print(f"Skills: {[s['skill_id'] for s in manifest.analysis['skills_selected']]}")
+print(f"Tasks: {len(manifest.tasks)}")
+
+# Export to JSON
+json_output = analyzer.to_json(manifest)
+```
+
+---
+
+## PHẦN 8: INTEGRATION WITH EXISTING RULES
+
+### 8.1 Integration Points
+
+| Rule | Integration |
+|------|-------------|
+| [[proto_multi-language-vibe-code]] | Language detection, translation |
+| [[rule_skill-integration]] | Skill auto-discovery, gate mapping |
+| [[proto_context-router]] | Request routing |
+| [[proto_memory-first]] | Context caching |
+| [[token-optimization]] | Efficient context usage |
+
+### 8.2 Execution Order
+
+```
+1. multi-language-vibe-code.mdc
+   └── Language Detection → Translation
+   
+2. skill-integration.mdc
+   └── Intent Analysis → Skill Detection → Gate Mapping
+   
+3. THIS RULE (task-analyzer.mdc)
+   └── Context Sync → Task Decomposition → Dependency Resolution
+   
+4. skill-execution.mdc
+   └── Gate Execution → Implementation → Gate Verification → Delivery
+```
+
+---
+
+## PHẦN 9: FILES REFERENCE
+
+| File | Path | Purpose |
+|------|------|---------|
+| task-analyzer.md | .cursor/scripts/task-analyzer.md | Documentation (this file) |
+| task-analyzer.ps1 | .cursor/scripts/task-analyzer.ps1 | PowerShell CLI |
+| task_analyzer.py | .cursor/scripts/task_analyzer.py | Python CLI & API |
+| skill-dependencies.json | .cursor/scripts/skill-dependencies.json | Dependency manifest |
+| skill-installer.ps1 | .cursor/scripts/skill-installer.ps1 | Dependency installer |
+| setup-mcp.ps1 | .cursor/scripts/weknora/setup-mcp.ps1 | MCP setup |
+| context-sync.json | .cursor/cache/context-sync.json | Cached context (auto-generated) |
+
+---
+
+## PHẦN 10: QUICK REFERENCE
+
+### 10.1 Detection Flow
+
+```
+REQUEST (Any Language)
+         │
+         ▼
+┌─────────────────────────┐
+│ LANGUAGE DETECTION       │
+│ Vietnamese, Chinese, etc. │
+└────────────┬────────────┘
+             │ English text
+             ▼
+┌─────────────────────────┐
+│ INTENT ANALYSIS          │
+│ Build/Redesign/Fix/...  │
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│ DOMAIN DETECTION         │
+│ Frontend/Backend/Sec... │
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│ SKILL AUTO-DISCOVERY     │
+│ Match against matrix     │
+│ + Mandatory skills       │
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│ TASK DECOMPOSITION       │
+│ Generate subtasks        │
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│ DEPENDENCY CHECK         │
+│ Auto-install if needed   │
+└────────────┬────────────┘
+             │
+             ▼
+      TASK EXECUTION
+```
+
+### 10.2 Skill Decision Tree
+
+```
+IS REQUEST ABOUT...
+│
+├─► PAYMENT? (MoMo, SePay, PayOS, VNPay, ZaloPay, VietQR)
+│   └─► vietnam-payment-review + security-review + full-output
+│
+├─► SECURITY? (vulnerability, pentest, CVE, OWASP)
+│   └─► security-review + karpathy-coding
+│
+├─► FRONTEND? (UI, landing, redesign, component)
+│   ├─► REDESIGN? → frontend-redesign + full-output + frontend-review
+│   ├─► BUILD? → frontend-taste + full-output + frontend-review
+│   └─► REVIEW? → frontend-review (standalone)
+│
+├─► KNOWLEDGE? (RAG, wiki, FAQ, weknora)
+│   └─► weknora-kb + karpathy-coding
+│
+├─► OCR? (text extraction, image to text)
+│   └─► document-ocr + karpathy-coding
+│
+└─► DEFAULT?
+    └─► karpathy-coding (overlay)
+```
+
+### 10.3 Gate Checklist
+
+**Pre-Review (Before Code):**
+- [ ] karpathy-coding: Assumptions stated, Simplicity checked, Scope defined, Goals set
+- [ ] frontend-taste: Design read declared, Anti-default applied, Dials set
+- [ ] full-output: Scope locked, Deliverables counted
+- [ ] frontend-review: Scope analyzed, Quality plan defined
+- [ ] security-review: Threat model, Security requirements defined
+
+**Post-Review (After Code):**
+- [ ] karpathy-coding: Surgical changes, Simplicity maintained, Goals met
+- [ ] frontend-taste: Layout, Typography, Animation, Assets verified
+- [ ] full-output: No skeletons, No TODOs, Complete code
+- [ ] frontend-review: Correctness, Design, A11y, Performance verified
+- [ ] security-review: Auth, Validation, Data protection, Crypto verified
+
+---
+
+## PHẦN X.1: SYSTEMATIC DEBUGGING (from Superpowers)
+
+> **Source:** [obra/superpowers](https://github.com/obra/superpowers) `systematic-debugging` skill (248k stars) — "4-phase root cause process. Includes root-cause-tracing, defense-in-depth, condition-based-waiting techniques."
+
+The `/debug` command (see AGENTS.md) follows this 4-phase process. It is invoked when:
+- Tests are failing for unclear reasons
+- Bug reported without obvious cause
+- Production error with stack trace
+
+### Phase 1: Reproduce
+
+- [ ] Get a consistent reproduction (deterministic, repeatable)
+- [ ] Identify exact inputs that trigger the bug
+- [ ] Capture error message, stack trace, environment state
+- [ ] **Stop here if not reproducible** — don't guess from symptoms alone
+
+### Phase 2: Isolate
+
+- [ ] Narrow down to smallest failing case (minimal reproduction)
+- [ ] Binary search the code path (which layer/module causes the failure?)
+- [ ] Remove variables: same input, different environment? Same input, different code path?
+- [ ] Log intermediate values at boundaries
+- [ ] **Output:** 1-3 line statement of "this fails in module X when condition Y"
+
+### Phase 3: Hypothesize + Test
+
+- [ ] List 2-3 candidate root causes ranked by likelihood
+- [ ] For each hypothesis, write the cheapest test that proves/disproves it
+  - Add a log line, run one test, inspect, revert
+  - Use a debugger breakpoint, not print spam
+- [ ] **Disprove > confirm** — if you can't write a test that fails for the right reason, your hypothesis is incomplete
+
+### Phase 4: Fix + Verify Root Cause
+
+- [ ] Fix the root cause, not the symptom
+  - Symptom: "test fails" → wrong fix: skip the test
+  - Symptom: "API returns 500" → wrong fix: catch the exception
+  - **Root cause:** why does the exception happen in the first place?
+- [ ] Verify the failing test now passes
+- [ ] Verify NO OTHER tests regressed
+- [ ] Add a regression test that would have caught this bug
+- [ ] Defense-in-depth: at what OTHER points could this same bug exist?
+
+### Anti-Patterns to Reject
+
+| Anti-pattern | Why bad |
+|---|---|
+| Random code changes hoping the bug goes away | Wastes time, hides the real issue |
+| Adding `try/catch` to suppress errors | Hides the bug, makes next debugging harder |
+| "Works on my machine" closure | Bug is real, environment is the symptom, not the cause |
+| Suppressing the failing test | Defeats the entire test suite |
+
+---
+
+## Liên kết
+
+- [[proto_multi-language-vibe-code]] - Multi-language request processing
+- [[rule_skill-integration]] - Skill auto-discovery protocol
+- [[proto_context-router]] - Context routing rules
+- [[proto_memory-first]] - Memory context management
+- [[karpathy-coding]] - Vibe coding discipline
+- [[frontend-taste]] - Frontend design skill
+- [[frontend-review]] - Quality review skill
+- [[security-review]] - Security review skill

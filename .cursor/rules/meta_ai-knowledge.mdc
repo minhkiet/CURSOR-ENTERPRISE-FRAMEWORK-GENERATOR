@@ -1,0 +1,2158 @@
+---
+description: AI Knowledge Stack - hợp nhất từ RAG, Vector Search, WeKnora, pgvector và PDF Engine cho document processing
+created: 2026-06-26
+merged_from: [rag.mdc, vector-search.mdc, weknora.mdc, pgvector.mdc, pdf-engine.mdc]
+version: 1.1.0
+tags: [ai, rag, vector-search, weknora, pgvector, knowledge-base, llm, embeddings, similarity, machine-learning, pdf, document-processing]
+---
+
+# AI Knowledge Stack
+
+Hợp nhất từ:
+- [[rag]] - RAG Implementation
+- [[vector-search]] - Vector Search Patterns
+- [[weknora]] - WeKnora Integration (Enterprise RAG với Hybrid Search + GraphRAG + ReAct Agent)
+- [[pgvector]] - pgvector PostgreSQL Extension
+
+## Tổng quan
+
+AI Knowledge Stack cung cấp các nguyên tắc và best practices cho việc xây dựng hệ thống AI-powered knowledge retrieval, bao gồm:
+
+- **RAG (Retrieval-Augmented Generation)** - Kết hợp retrieval systems với LLMs
+- **Vector Search** - Semantic search sử dụng embeddings
+- **pgvector** - PostgreSQL extension cho vector storage
+- **WeKnora** - Enterprise RAG platform với Hybrid Search, GraphRAG, và ReAct Agent
+
+---
+
+## 1. RAG (Retrieval-Augmented Generation)
+
+### Mục tiêu
+
+Retrieval-Augmented Generation (RAG) là một pattern kết hợp retrieval systems với LLMs để generate responses dựa trên retrieved information. RAG giúp LLMs access current information, reduce hallucinations, và provide cited answers.
+
+### Nguyên tắc
+
+**1. Document Processing Pipeline**
+
+Clean and normalize documents. Split into appropriate chunks. Preserve metadata. Handle various formats. Quality control.
+
+**2. Chunking Strategy**
+
+Choose chunk size carefully. 512-1024 tokens typical. Overlap for continuity. Consider semantic boundaries. Test different strategies.
+
+**3. Embedding Quality**
+
+Use appropriate embedding model. Match model to use case. Consider multilingual needs. Evaluate embedding quality. Update embeddings when needed.
+
+**4. Vector Storage**
+
+Choose appropriate vector database. Optimize for retrieval speed. Consider hybrid search. Index for performance. Monitor index health.
+
+**5. Retrieval Strategy**
+
+Use appropriate similarity metric. Combine with keyword search. Implement reranking. Consider user context. Optimize for recall/precision.
+
+**6. Context Assembly**
+
+Assemble retrieved context. Manage token budget. Prioritize relevant chunks. Add citations. Format for LLM.
+
+**7. Generation with RAG**
+
+Craft prompts with context. Instruct LLM to cite sources. Handle contradictions. Set appropriate temperature. Validate responses.
+
+**8. Evaluation**
+
+Measure retrieval quality. Evaluate generation quality. Use RAG metrics. A/B test strategies. Gather user feedback.
+
+**9. Maintenance**
+
+Update documents. Refresh embeddings. Monitor drift. Handle deletions. Maintain data quality.
+
+**10. Scalability**
+
+Design for document volume. Batch processing. Incremental updates. Distributed retrieval. Cost optimization.
+
+### Checklist
+
+- [ ] Document processing pipeline designed
+- [ ] Chunking strategy selected
+- [ ] Embedding model chosen
+- [ ] Vector database configured
+- [ ] Retrieval logic implemented
+- [ ] Reranking strategy defined
+- [ ] Prompt template designed
+- [ ] Evaluation metrics set up
+- [ ] Monitoring configured
+- [ ] Update pipeline implemented
+
+### Anti Pattern
+
+**1. Poor Chunking** - Too large/small chunks, breaking semantic units, no overlap
+
+**2. Single Retrieval** - No reranking, no hybrid search, no context weighting
+
+**3. Ignoring Token Limits** - No context budget, exceeding LLM limits
+
+**4. Stale Knowledge** - No update pipeline, outdated embeddings
+
+**5. No Evaluation** - No retrieval/generation metrics
+
+### Best Practice - Document Processing
+
+```typescript
+// services/document-processor.service.ts
+import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
+import { PDFLoader } from 'langchain/document_loaders/fs/pdf';
+import { DocxLoader } from 'langchain/document_loaders/fs/docx';
+
+interface ProcessedDocument {
+  id: string;
+  chunks: DocumentChunk[];
+  metadata: DocumentMetadata;
+}
+
+interface DocumentChunk {
+  id: string;
+  content: string;
+  embedding?: number[];
+  metadata: ChunkMetadata;
+}
+
+interface DocumentMetadata {
+  source: string;
+  title?: string;
+  author?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  type: 'pdf' | 'docx' | 'txt' | 'html';
+}
+
+interface ChunkMetadata {
+  chunkIndex: number;
+  totalChunks: number;
+  charCount: number;
+  tokenEstimate: number;
+}
+
+class DocumentProcessor {
+  private textSplitter: RecursiveCharacterTextSplitter;
+  private embeddingService: EmbeddingService;
+
+  constructor(
+    chunkSize: number = 1000,
+    chunkOverlap: number = 200
+  ) {
+    this.textSplitter = new RecursiveCharacterTextSplitter({
+      chunkSize,
+      chunkOverlap,
+      separators: ['\n\n', '\n', '. ', ' ', ''],
+    });
+    this.embeddingService = new EmbeddingService();
+  }
+
+  async processDocument(
+    filePath: string,
+    metadata: Partial<DocumentMetadata>
+  ): Promise<ProcessedDocument> {
+    const extension = filePath.split('.').pop()?.toLowerCase();
+    let loader;
+
+    switch (extension) {
+      case 'pdf':
+        loader = new PDFLoader(filePath);
+        break;
+      case 'docx':
+        loader = new DocxLoader(filePath);
+        break;
+      default:
+        loader = new TextLoader(filePath);
+    }
+
+    const docs = await loader.load();
+    const fullText = docs.map(d => d.pageContent).join('\n\n');
+
+    const chunks = await this.textSplitter.splitText(fullText);
+    const embeddings = await this.embeddingService.createBatchEmbeddings(chunks);
+
+    const processedChunks: DocumentChunk[] = chunks.map((content, index) => {
+      const tokenEstimate = Math.ceil(content.length / 4);
+      
+      return {
+        id: `${metadata.source}-chunk-${index}`,
+        content,
+        embedding: embeddings[index],
+        metadata: {
+          chunkIndex: index,
+          totalChunks: chunks.length,
+          charCount: content.length,
+          tokenEstimate,
+        },
+      };
+    });
+
+    return {
+      id: metadata.source || crypto.randomUUID(),
+      chunks: processedChunks,
+      metadata: {
+        source: metadata.source || 'unknown',
+        title: metadata.title,
+        author: metadata.author,
+        createdAt: metadata.createdAt || new Date(),
+        updatedAt: new Date(),
+        type: (extension || 'txt') as any,
+      },
+    };
+  }
+
+  async processText(
+    text: string,
+    source: string,
+    additionalMetadata: Record<string, any> = {}
+  ): Promise<ProcessedDocument> {
+    const chunks = await this.textSplitter.splitText(text);
+    const embeddings = await this.embeddingService.createBatchEmbeddings(chunks);
+
+    const processedChunks: DocumentChunk[] = chunks.map((content, index) => ({
+      id: `${source}-chunk-${index}`,
+      content,
+      embedding: embeddings[index],
+      metadata: {
+        chunkIndex: index,
+        totalChunks: chunks.length,
+        charCount: content.length,
+        tokenEstimate: Math.ceil(content.length / 4),
+      },
+    }));
+
+    return {
+      id: source,
+      chunks: processedChunks,
+      metadata: {
+        source,
+        ...additionalMetadata,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        type: 'txt' as const,
+      },
+    };
+  }
+}
+```
+
+### Best Practice - Vector Storage
+
+```typescript
+// services/vector-store.service.ts
+import { Pinecone } from '@pinecone-database/pinecone';
+import { supabase } from '@/lib/supabase';
+
+interface VectorRecord {
+  id: string;
+  values: number[];
+  metadata?: Record<string, any>;
+}
+
+interface RetrievalResult {
+  id: string;
+  score: number;
+  content: string;
+  metadata: Record<string, any>;
+}
+
+class VectorStore {
+  private pinecone: Pinecone;
+  private indexName: string;
+  private useSupabase: boolean;
+
+  constructor(useSupabase: boolean = false) {
+    this.pinecone = new Pinecone({
+      apiKey: process.env.PINECONE_API_KEY!,
+    });
+    this.useSupabase = useSupabase;
+    this.indexName = process.env.PINECONE_INDEX || 'knowledge-base';
+  }
+
+  async upsertChunks(chunks: DocumentChunk[]): Promise<void> {
+    if (this.useSupabase) {
+      await this.upsertToSupabase(chunks);
+    } else {
+      await this.upsertToPinecone(chunks);
+    }
+  }
+
+  private async upsertToPinecone(chunks: DocumentChunk[]): Promise<void> {
+    const index = this.pinecone.Index(this.indexName);
+
+    const vectors: VectorRecord[] = chunks.map(chunk => ({
+      id: chunk.id,
+      values: chunk.embedding || [],
+      metadata: {
+        content: chunk.content,
+        ...chunk.metadata,
+      },
+    }));
+
+    const batchSize = 100;
+    for (let i = 0; i < vectors.length; i += batchSize) {
+      const batch = vectors.slice(i, i + batchSize);
+      await index.upsert(batch);
+    }
+  }
+
+  private async upsertToSupabase(chunks: DocumentChunk[]): Promise<void> {
+    const records = chunks.map(chunk => ({
+      id: chunk.id,
+      content: chunk.content,
+      embedding: chunk.embedding,
+      metadata: chunk.metadata,
+    }));
+
+    const { error } = await supabase
+      .from('document_chunks')
+      .upsert(records, { onConflict: 'id' });
+
+    if (error) throw error;
+  }
+
+  async retrieve(
+    queryEmbedding: number[],
+    options: {
+      topK?: number;
+      filter?: Record<string, any>;
+      namespace?: string;
+    } = {}
+  ): Promise<RetrievalResult[]> {
+    if (this.useSupabase) {
+      return this.retrieveFromSupabase(queryEmbedding, options);
+    } else {
+      return this.retrieveFromPinecone(queryEmbedding, options);
+    }
+  }
+
+  private async retrieveFromPinecone(
+    queryEmbedding: number[],
+    options: { topK?: number; filter?: Record<string, any>; namespace?: string }
+  ): Promise<RetrievalResult[]> {
+    const index = this.pinecone.Index(this.indexName);
+    
+    const queryResponse = await index.query({
+      vector: queryEmbedding,
+      topK: options.topK || 10,
+      filter: options.filter,
+      namespace: options.namespace,
+      includeMetadata: true,
+    });
+
+    return (queryResponse.matches || []).map(match => ({
+      id: match.id,
+      score: match.score || 0,
+      content: match.metadata?.content || '',
+      metadata: match.metadata || {},
+    }));
+  }
+
+  private async retrieveFromSupabase(
+    queryEmbedding: number[],
+    options: { topK?: number; filter?: Record<string, any> }
+  ): Promise<RetrievalResult[]> {
+    const { data, error } = await supabase.rpc('match_documents', {
+      query_embedding: queryEmbedding,
+      match_threshold: 0.7,
+      match_count: options.topK || 10,
+    });
+
+    if (error) throw error;
+
+    return (data || []).map(row => ({
+      id: row.id,
+      score: row.similarity,
+      content: row.content,
+      metadata: row.metadata || {},
+    }));
+  }
+
+  async deleteBySource(source: string): Promise<void> {
+    if (this.useSupabase) {
+      await supabase
+        .from('document_chunks')
+        .delete()
+        .eq('metadata->>source', source);
+    } else {
+      const index = this.pinecone.Index(this.indexName);
+      await index.deleteMany({ filter: { source } });
+    }
+  }
+}
+```
+
+### Best Practice - RAG Generation
+
+```typescript
+// services/rag.service.ts
+interface RAGOptions {
+  query: string;
+  maxContextTokens?: number;
+  temperature?: number;
+  model?: string;
+  filters?: Record<string, any>;
+}
+
+interface RAGResponse {
+  answer: string;
+  sources: Array<{
+    id: string;
+    content: string;
+    score: number;
+    metadata: Record<string, any>;
+  }>;
+  tokensUsed: {
+    prompt: number;
+    completion: number;
+  };
+}
+
+class RAGService {
+  constructor(
+    private retrievalService: RetrievalService,
+    private llmService: ClaudeService | OpenAIService,
+    private embeddingService: EmbeddingService,
+    private maxContextTokens: number = 150000
+  ) {}
+
+  async query(options: RAGOptions): Promise<RAGResponse> {
+    const {
+      query,
+      maxContextTokens = 120000,
+      temperature = 0.3,
+      model = 'claude-sonnet-4',
+      filters
+    } = options;
+
+    const queryEmbedding = await this.embeddingService.createEmbedding(query);
+
+    const retrieved = await this.retrievalService.retrieve({
+      query,
+      queryEmbedding,
+      filters,
+      maxResults: 20,
+      rerank: true,
+      rerankTopK: 10,
+    });
+
+    const context = this.assembleContext(retrieved, maxContextTokens - 2000);
+
+    const systemPrompt = `You are a helpful AI assistant. Use the provided context to answer the user's question. Follow these rules:
+
+1. Only use information from the provided context
+2. If the context doesn't contain enough information, say so
+3. Always cite your sources using [Source N] notation
+4. Be concise but thorough
+5. If you're uncertain, acknowledge it`;
+
+    const userPrompt = `Context:
+${context}
+
+Question: ${query}
+
+Answer the question based on the context above.`;
+
+    const response = await this.llmService.createMessage(
+      [
+        { role: 'user', content: userPrompt }
+      ],
+      systemPrompt,
+      { model, temperature, maxTokens: 2048 }
+    );
+
+    return {
+      answer: response.content[0].text || response.choices?.[0]?.message?.content || '',
+      sources: retrieved.slice(0, 5).map((r, i) => ({
+        id: r.id,
+        content: r.content.slice(0, 500) + (r.content.length > 500 ? '...' : ''),
+        score: r.score,
+        metadata: r.metadata,
+      })),
+      tokensUsed: {
+        prompt: response.usage?.input_tokens || 0,
+        completion: response.usage?.output_tokens || 0,
+      },
+    };
+  }
+
+  private assembleContext(
+    results: RetrievalResult[],
+    maxTokens: number
+  ): string {
+    const chunks: string[] = [];
+    let totalTokens = 0;
+
+    for (const result of results) {
+      const tokenEstimate = Math.ceil(result.content.length / 4);
+      
+      if (totalTokens + tokenEstimate > maxTokens) {
+        break;
+      }
+
+      chunks.push(`[Source ${chunks.length + 1}]: ${result.content}`);
+      totalTokens += tokenEstimate;
+    }
+
+    return chunks.join('\n\n');
+  }
+}
+```
+
+### PixelRAG: Visual RAG Complementary
+
+PixelRAG là **bổ sung hoàn hảo** cho Text RAG truyền thống, đặc biệt khi:
+
+| Use Case | Recommendation | Lý do |
+|----------|----------------|-------|
+| Tài liệu có bảng biểu | **PixelRAG** | Text RAG mất cấu trúc bảng |
+| Báo cáo tài chính | **PixelRAG** | Đọc số liệu chính xác |
+| PDF khoa học | **PixelRAG** | Hiểu hình vẽ, công thức |
+| Website phức tạp | **PixelRAG** | Giữ layout, hiểu visual context |
+| Tài liệu đơn giản | Text RAG | Nhanh hơn, đơn giản hơn |
+
+---
+
+## 2. Vector Search
+
+### Mục tiêu
+
+Vector search là kỹ thuật tìm kiếm sử dụng vector representations (embeddings) để tìm items tương tự dựa trên semantic meaning thay vì keyword matching.
+
+### Nguyên tắc
+
+**1. Embedding Model Selection**
+
+Choose appropriate embedding model. Consider dimension requirements. Match to content type. Evaluate quality. Consider multilingual needs.
+
+**2. Distance Metrics**
+
+Cosine similarity for normalized vectors. Euclidean distance for geometric similarity. Dot product for recommendation. Match to use case.
+
+**3. Indexing Strategy**
+
+HNSW for high quality. IVFFlat for large datasets. Consider memory usage. Balance speed vs accuracy. Test with real data.
+
+**4. Hybrid Search**
+
+Combine vector and keyword search. Use late fusion or early fusion. Consider BM25. Optimize for both. Test relevance.
+
+**5. Reranking**
+
+Use cross-encoder reranking. Combine with vector scores. Optimize rerank count. Balance quality vs speed.
+
+**6. Chunking Strategy**
+
+Chunk size affects recall. Consider semantic boundaries. Add overlap. Match chunk size to query complexity.
+
+**7. Filtering**
+
+Pre-filter vs post-filter. Impact on recall. Optimize with filtered indexes. Consider metadata indexing.
+
+**8. Evaluation**
+
+Measure recall. Measure latency. Test different configurations. Use A/B testing. Monitor quality.
+
+**9. Scalability**
+
+Design for data growth. Consider sharding. Batch processing. Incremental updates. Cost management.
+
+**10. Maintenance**
+
+Refresh embeddings. Update indexes. Monitor drift. Handle deletions. Maintain quality.
+
+### Checklist
+
+- [ ] Embedding model selected
+- [ ] Vector database configured
+- [ ] Index strategy defined
+- [ ] Distance metric chosen
+- [ ] Hybrid search implemented
+- [ ] Reranking strategy set
+- [ ] Filtering configured
+- [ ] Evaluation metrics set up
+- [ ] Scaling plan defined
+- [ ] Monitoring configured
+
+### Best Practice - Embedding Generation
+
+```typescript
+// services/embedding.service.ts
+import OpenAI from 'openai';
+import { CohereClient } from 'cohere-ai';
+
+interface EmbeddingConfig {
+  provider: 'openai' | 'cohere' | 'huggingface';
+  model: string;
+  dimensions?: number;
+  normalize?: boolean;
+}
+
+class EmbeddingService {
+  private openai: OpenAI;
+  private cohere: CohereClient;
+  private config: EmbeddingConfig;
+
+  constructor(config: EmbeddingConfig) {
+    this.config = config;
+    this.openai = new OpenAI();
+    this.cohere = new CohereClient();
+  }
+
+  async createEmbedding(
+    text: string,
+    options?: { normalize?: boolean }
+  ): Promise<number[]> {
+    switch (this.config.provider) {
+      case 'openai':
+        return this.createOpenAIEmbedding(text, options);
+      case 'cohere':
+        return this.createCohereEmbedding(text, options);
+      default:
+        return this.createOpenAIEmbedding(text, options);
+    }
+  }
+
+  private async createOpenAIEmbedding(
+    text: string,
+    options?: { normalize?: boolean }
+  ): Promise<number[]> {
+    const response = await this.openai.embeddings.create({
+      model: this.config.model || 'text-embedding-3-small',
+      input: text,
+      ...(this.config.dimensions && { dimensions: this.config.dimensions }),
+      encoding_format: 'float',
+    });
+
+    let embedding = response.data[0].embedding;
+
+    if (options?.normalize || this.config.normalize) {
+      embedding = this.normalizeVector(embedding);
+    }
+
+    return embedding;
+  }
+
+  private normalizeVector(vector: number[]): number[] {
+    const magnitude = Math.sqrt(
+      vector.reduce((sum, val) => sum + val * val, 0)
+    );
+    return vector.map(val => val / magnitude);
+  }
+
+  async createBatchEmbeddings(
+    texts: string[],
+    batchSize: number = 100
+  ): Promise<number[][]> {
+    const results: number[][] = [];
+
+    for (let i = 0; i < texts.length; i += batchSize) {
+      const batch = texts.slice(i, i + batchSize);
+      const batchResults = await this.createOpenAIEmbedding(batch.join('\n'));
+      results.push(batchResults);
+    }
+
+    return results;
+  }
+}
+```
+
+### Best Practice - Hybrid Search
+
+```typescript
+// services/hybrid-search.service.ts
+interface HybridSearchOptions {
+  query: string;
+  queryEmbedding: number[];
+  vectorWeight?: number;
+  keywordWeight?: number;
+  limit?: number;
+  filters?: Record<string, any>;
+}
+
+interface HybridSearchResult {
+  id: string;
+  content: string;
+  score: number;
+  vectorScore: number;
+  keywordScore: number;
+  metadata: Record<string, any>;
+}
+
+class HybridSearchService {
+  constructor(
+    private vectorStore: PGVectorService | PineconeService,
+    private keywordIndex: KeywordSearchService
+  ) {}
+
+  async search(options: HybridSearchOptions): Promise<HybridSearchResult[]> {
+    const {
+      query,
+      queryEmbedding,
+      vectorWeight = 0.7,
+      keywordWeight = 0.3,
+      limit = 10,
+      filters
+    } = options;
+
+    const [vectorResults, keywordResults] = await Promise.all([
+      this.vectorStore.search(queryEmbedding, { limit: limit * 2, filter }),
+      this.keywordIndex.search(query, { limit: limit * 2, filters }),
+    ]);
+
+    const vectorScores = new Map(
+      vectorResults.map(r => [r.id, r.score])
+    );
+
+    const keywordScores = new Map(
+      keywordResults.map(r => [r.id, r.score])
+    );
+
+    const allIds = new Set([
+      ...vectorResults.map(r => r.id),
+      ...keywordResults.map(r => r.id),
+    ]);
+
+    const combinedResults: HybridSearchResult[] = [];
+
+    for (const id of allIds) {
+      const vectorScore = vectorScores.get(id) || 0;
+      const keywordScore = keywordScores.get(id) || 0;
+
+      const normalizedVector = vectorScore;
+      const normalizedKeyword = keywordScore / (keywordResults[0]?.score || 1);
+
+      const combinedScore = 
+        normalizedVector * vectorWeight + 
+        normalizedKeyword * keywordWeight;
+
+      const vectorResult = vectorResults.find(r => r.id === id);
+      const keywordResult = keywordResults.find(r => r.id === id);
+
+      combinedResults.push({
+        id,
+        content: vectorResult?.content || keywordResult?.content || '',
+        score: combinedScore,
+        vectorScore: normalizedVector,
+        keywordScore: normalizedKeyword,
+        metadata: vectorResult?.metadata || keywordResult?.metadata || {},
+      });
+    }
+
+    return combinedResults
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit);
+  }
+
+  // Late fusion using Reciprocal Rank Fusion
+  async searchRRF(
+    options: HybridSearchOptions
+  ): Promise<HybridSearchResult[]> {
+    const { query, queryEmbedding, limit = 10, filters } = options;
+
+    const [vectorResults, keywordResults] = await Promise.all([
+      this.vectorStore.search(queryEmbedding, { limit: limit * 2, filter: filters }),
+      this.keywordIndex.search(query, { limit: limit * 2, filters }),
+    ]);
+
+    const rrfScores = new Map<string, number>();
+    const k = 60;
+
+    vectorResults.forEach((r, i) => {
+      const current = rrfScores.get(r.id) || 0;
+      rrfScores.set(r.id, current + 1 / (k + i + 1));
+    });
+
+    keywordResults.forEach((r, i) => {
+      const current = rrfScores.get(r.id) || 0;
+      rrfScores.set(r.id, current + 1 / (k + i + 1));
+    });
+
+    const vectorScores = new Map(vectorResults.map(r => [r.id, r.score]));
+    const keywordScores = new Map(keywordResults.map(r => [r.id, r.score]));
+
+    const results: HybridSearchResult[] = [];
+
+    for (const [id, rrfScore] of rrfScores) {
+      const vectorResult = vectorResults.find(r => r.id === id);
+      const keywordResult = keywordResults.find(r => r.id === id);
+
+      results.push({
+        id,
+        content: vectorResult?.content || keywordResult?.content || '',
+        score: rrfScore,
+        vectorScore: vectorScores.get(id) || 0,
+        keywordScore: keywordScores.get(id) || 0,
+        metadata: vectorResult?.metadata || keywordResult?.metadata || {},
+      });
+    }
+
+    return results
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit);
+  }
+}
+```
+
+---
+
+## 3. pgvector (PostgreSQL Vector Extension)
+
+### Mục tiêu
+
+pgvector là một PostgreSQL extension cho phép store và query vector embeddings trực tiếp trong database. pgvector enable developers để xây dựng AI features mà không cần separate vector database.
+
+### Nguyên tắc
+
+**1. Vector Dimension Planning**
+
+Choose appropriate dimensions. 768 for text-embedding-3. 1536 for text-embedding-ada-002. 384-1024 for small models. Consider storage vs accuracy.
+
+**2. Index Selection**
+
+HNSW for best quality. IVFFlat for faster inserts. Consider memory usage. Test with real data. Choose based on use case.
+
+**3. Distance Metrics**
+
+Cosine similarity for normalized vectors. L2 distance for geometric similarity. Inner product for recommendation. Match to embedding model.
+
+**4. Hybrid Search**
+
+Combine vector and keyword search. Use pre-filtering. Consider late filtering. Balance relevance. Optimize for both.
+
+**5. Data Consistency**
+
+Synchronize embeddings with source data. Handle updates carefully. Delete orphaned embeddings. Use transactions. Monitor consistency.
+
+**6. Performance Optimization**
+
+Batch embedding generation. Use connection pooling. Index maintenance. Monitor query performance. Optimize batch size.
+
+**7. Schema Design**
+
+Co-locate vectors with source data. Use proper data types. Add metadata columns. Index appropriately. Consider partitioning.
+
+**8. Embedding Management**
+
+Use consistent embedding model. Version embeddings. Monitor embedding quality. Regenerate when needed. Document model choices.
+
+### Checklist
+
+- [ ] pgvector extension installed
+- [ ] Schema designed for vectors
+- [ ] Indexes created
+- [ ] Embedding pipeline implemented
+- [ ] Hybrid search configured
+- [ ] Performance tested
+- [ ] Monitoring set up
+- [ ] Backup strategy defined
+
+### Best Practice - Schema Design
+
+```sql
+-- Enable extension
+CREATE EXTENSION IF NOT EXISTS vector;
+
+-- Documents table with vectors
+CREATE TABLE documents (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  metadata JSONB DEFAULT '{}',
+  embedding vector(1536),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Create index for vector search (HNSW)
+CREATE INDEX idx_documents_embedding_hnsw ON documents 
+  USING hnsw (embedding vector_cosine_ops)
+  WITH (m = 16, ef_construction = 64);
+
+-- Create index for metadata filtering
+CREATE INDEX idx_documents_tenant ON documents(tenant_id);
+CREATE INDEX idx_documents_updated ON documents(updated_at DESC);
+
+-- Knowledge base with categories
+CREATE TABLE knowledge_base (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  category TEXT NOT NULL,
+  question TEXT NOT NULL,
+  answer TEXT NOT NULL,
+  embedding vector(1536),
+  usage_count INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_kb_embedding_hnsw ON knowledge_base 
+  USING hnsw (embedding vector_cosine_ops)
+  WITH (m = 16, ef_construction = 64);
+
+CREATE INDEX idx_kb_category ON knowledge_base(category);
+CREATE INDEX idx_kb_usage ON knowledge_base(usage_count DESC);
+```
+
+### Best Practice - Vector Search Functions
+
+```sql
+-- Similarity search function
+CREATE OR REPLACE FUNCTION search_documents(
+  p_query_embedding vector(1536),
+  p_tenant_id UUID,
+  p_limit INTEGER DEFAULT 10,
+  p_min_similarity FLOAT DEFAULT 0.7
+)
+RETURNS TABLE (
+  id UUID,
+  title TEXT,
+  content TEXT,
+  metadata JSONB,
+  similarity FLOAT
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    d.id,
+    d.title,
+    d.content,
+    d.metadata,
+    1 - (d.embedding <=> p_query_embedding) AS similarity
+  FROM documents d
+  WHERE d.tenant_id = p_tenant_id
+    AND d.embedding IS NOT NULL
+    AND 1 - (d.embedding <=> p_query_embedding) >= p_min_similarity
+  ORDER BY d.embedding <=> p_query_embedding
+  LIMIT p_limit;
+END;
+$$ LANGUAGE plpgsql STABLE;
+
+-- Hybrid search (vector + keyword)
+CREATE OR REPLACE FUNCTION hybrid_search_documents(
+  p_query_embedding vector(1536),
+  p_tenant_id UUID,
+  p_search_query TEXT,
+  p_limit INTEGER DEFAULT 10,
+  p_similarity_threshold FLOAT DEFAULT 0.5
+)
+RETURNS TABLE (
+  id UUID,
+  title TEXT,
+  content TEXT,
+  metadata JSONB,
+  rank_score FLOAT
+) AS $$
+BEGIN
+  RETURN QUERY
+  WITH vector_results AS (
+    SELECT
+      d.id,
+      d.title,
+      d.content,
+      d.metadata,
+      (1 - (d.embedding <=> p_query_embedding)) AS similarity
+    FROM documents d
+    WHERE d.tenant_id = p_tenant_id
+      AND d.embedding IS NOT NULL
+  ),
+  text_results AS (
+    SELECT
+      id,
+      ts_rank(to_tsvector('english', title || ' ' || content), 
+               plainto_tsquery('english', p_search_query)) AS text_score
+    FROM documents
+    WHERE tenant_id = p_tenant_id
+      AND to_tsvector('english', title || ' ' || content) @@ 
+          plainto_tsquery('english', p_search_query)
+  ),
+  combined AS (
+    SELECT
+      v.id,
+      v.title,
+      v.content,
+      v.metadata,
+      v.similarity,
+      COALESCE(t.text_score, 0) AS text_score,
+      (v.similarity * 0.7 + COALESCE(t.text_score, 0) * 0.3) AS rank_score
+    FROM vector_results v
+    LEFT JOIN text_results t ON v.id = t.id
+    WHERE v.similarity >= p_similarity_threshold
+  )
+  SELECT
+    id,
+    title,
+    content,
+    metadata,
+    rank_score
+  FROM combined
+  ORDER BY rank_score DESC
+  LIMIT p_limit;
+END;
+$$ LANGUAGE plpgsql STABLE;
+
+-- RAG retrieval function
+CREATE OR REPLACE FUNCTION retrieve_for_rag(
+  p_query_embedding vector(1536),
+  p_tenant_id UUID,
+  p_max_results INTEGER DEFAULT 5,
+  p_max_total_chars INTEGER DEFAULT 4000
+)
+RETURNS TABLE (
+  id UUID,
+  content TEXT,
+  source TEXT,
+  similarity FLOAT
+) AS $$
+DECLARE
+  v_result RECORD;
+  v_total_chars INTEGER := 0;
+BEGIN
+  FOR v_result IN (
+    SELECT
+      id,
+      content,
+      title AS source,
+      1 - (embedding <=> p_query_embedding) AS similarity
+    FROM knowledge_base
+    WHERE tenant_id = p_tenant_id
+      AND is_active = TRUE
+      AND embedding IS NOT NULL
+    ORDER BY embedding <=> p_query_embedding
+    LIMIT p_max_results
+  ) LOOP
+    IF v_total_chars + LENGTH(v_result.content) <= p_max_total_chars THEN
+      id := v_result.id;
+      content := v_result.content;
+      source := v_result.source;
+      similarity := v_result.similarity;
+      v_total_chars := v_total_chars + LENGTH(v_result.content);
+      RETURN NEXT;
+    ELSE
+      RETURN;
+    END IF;
+  END LOOP;
+END;
+$$ LANGUAGE plpgsql STABLE;
+```
+
+### Best Practice - Performance Tuning
+
+```sql
+-- Monitor vector index usage
+SELECT 
+  schemaname,
+  tablename,
+  indexname,
+  idx_scan,
+  idx_tup_read,
+  idx_tup_fetch
+FROM pg_stat_user_indexes
+WHERE indexname LIKE '%embedding%';
+
+-- Check index size
+SELECT 
+  pg_size_pretty(pg_relation_size('idx_documents_embedding_hnsw'));
+
+-- Rebuild index if fragmented
+REINDEX INDEX CONCURRENTLY idx_documents_embedding_hnsw;
+
+-- Analyze table for query planner
+ANALYZE documents;
+
+-- High recall (quality):
+CREATE INDEX idx_docs_emb ON documents 
+  USING hnsw (embedding vector_cosine_ops)
+  WITH (m = 32, ef_construction = 128);
+
+-- High speed:
+CREATE INDEX idx_docs_emb ON documents 
+  USING hnsw (embedding vector_cosine_ops)
+  WITH (m = 8, ef_construction = 32);
+```
+
+---
+
+## 4. WeKnora (RAG Platform)
+
+### Mục tiêu
+
+**WeKnora** là open-source LLM knowledge platform mạnh mẽ từ Tencent với 17.3k GitHub stars, cung cấp:
+
+- **RAG-based Quick Q&A** - Tra cứu kiến thức nhanh chóng từ documents
+- **ReAct Agent Mode** - Autonomous reasoning với multi-step planning
+- **Wiki Mode** - Tự động tạo interlinked Markdown wiki từ raw documents
+- **Hybrid Retrieval** - Vector Search + BM25 + GraphRAG + Knowledge Graph
+- **MCP Server** - Tích hợp MCP Tools cho Cursor agent
+
+### Nguyên tắc
+
+**1. Document Processing Pipeline**
+
+WeKnora hỗ trợ 10+ document formats:
+- PDF / Word / Txt / Markdown / HTML
+- Images (OCR) / CSV / Excel / PPT / JSON
+
+Xây dựng pipeline theo thứ tự:
+```
+Document Upload → Parser → Chunking → Embedding → Vector Store → Knowledge Graph
+```
+
+**2. Knowledge Base Types**
+
+| Type | Use Case | Features |
+|------|----------|----------|
+| FAQ | Q&A systems | Structured Q&A pairs |
+| Document | General KB | Full document search |
+| Wiki | Self-maintaining KB | Auto-generated interlinked pages |
+
+**3. Retrieval Strategies**
+
+```python
+# Hybrid Retrieval kết hợp:
+1. Vector Search (semantic similarity)
+2. BM25 (keyword matching)
+3. GraphRAG (graph traversal)
+4. Knowledge Graph (entity relationships)
+```
+
+**4. ReAct Agent Architecture**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    ReAct Loop                               │
+├─────────────────────────────────────────────────────────────┤
+│  1. Think    → Reasoning about next action                 │
+│  2. Act      → Execute tool / retrieve / search           │
+│  3. Observe  → Get result from action                      │
+│  4. Repeat   → Continue until task complete               │
+└─────────────────────────────────────────────────────────────┘
+
+Tools available:
+- Built-in tools (knowledge retrieval, web search)
+- MCP tools (custom extensions)
+- Document parsing (PDF, Word, images)
+```
+
+**5. Wiki Mode Workflow**
+
+```
+Raw Documents → Agent Analysis → Entity Extraction → 
+Knowledge Graph Construction → Interlinked Markdown Generation → 
+Wiki Browser + Visual Graph
+```
+
+**6. MCP Server Integration**
+
+WeKnora cung cấp MCP server với multi-transport:
+- stdio (local CLI)
+- SSE (Server-Sent Events)
+- HTTP (remote API)
+
+### Checklist
+
+- [ ] WeKnora server deployed (Docker/local)
+- [ ] MCP server configured và running
+- [ ] Knowledge Base created (FAQ/Document/Wiki)
+- [ ] Document types supported: PDF, Word, Markdown, Images
+- [ ] LLM provider configured (OpenAI/DeepSeek/Ollama)
+- [ ] Vector store configured (pgvector/Elasticsearch/Milvus)
+- [ ] Retrieval strategy selected (Vector + BM25 + GraphRAG)
+- [ ] Web search integrated (DuckDuckGo/Bing/Google)
+- [ ] Langfuse tracing configured (optional)
+- [ ] Multi-tenant RBAC configured (optional)
+
+### Best Practice - WeKnora Deployment
+
+```bash
+# Quick Start (Docker)
+git clone https://github.com/Tencent/WeKnora.git
+cd WeKnora
+cp .env.example .env  # Edit with your config
+docker compose up -d
+
+# With optional profiles
+docker compose --profile neo4j up -d    # Knowledge Graph
+docker compose --profile langfuse up -d # Tracing
+```
+
+### Best Practice - MCP Server Configuration
+
+```json
+// .cursor/mcp.json
+{
+  "mcpServers": {
+    "weknora": {
+      "command": "weknora",
+      "args": ["mcp", "serve"],
+      "env": {
+        "WEKNORA_HOST": "http://localhost:8080",
+        "WEKNORA_API_KEY": "${WEKNORA_API_KEY}"
+      }
+    }
+  }
+}
+```
+
+### Best Practice - CLI Usage
+
+```bash
+# Authentication
+weknora auth login --host https://kb.example.com
+
+# Knowledge Base Management
+weknora kb list
+weknora kb create --name "My Knowledge Base" --type document
+
+# Document Operations
+weknora doc upload document.pdf
+weknora doc list --kb "My Knowledge Base"
+
+# Chat with Knowledge
+weknora chat "What is the main topic of the documents?"
+```
+
+### Best Practice - API Integration
+
+```typescript
+// typescript client
+import { WeKnoraClient } from '@weknora/client';
+
+const client = new WeKnoraClient({
+  host: process.env.WEKNORA_HOST,
+  apiKey: process.env.WEKNORA_API_KEY
+});
+
+// Create knowledge base
+const kb = await client.kb.create({
+  name: 'Enterprise Docs',
+  type: 'document'
+});
+
+// Upload documents
+await client.doc.upload('manual.pdf', { kbId: kb.id });
+
+// Chat with KB
+const response = await client.chat({
+  kbId: kb.id,
+  message: 'Summarize the key findings',
+  mode: 'agent' // or 'qa' for simple RAG
+});
+```
+
+### Best Practice - Retrieval Configuration
+
+```yaml
+# Configurable per KB retrieval
+retrieval:
+  strategy: hybrid  # hybrid | vector | bm25 | graphrag
+  vector:
+    weight: 0.4
+    top_k: 20
+  bm25:
+    weight: 0.3
+    top_k: 20
+  graphrag:
+    weight: 0.3
+    depth: 3
+  rerank:
+    enabled: true
+    top_k: 10
+```
+
+---
+
+## Implementation Patterns
+
+### Complete RAG Pipeline
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│                    AI KNOWLEDGE STACK                          │
+├────────────────────────────────────────────────────────────────┤
+│                                                                │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐   │
+│  │   Document   │───►│   Parser &   │───►│   Chunking   │   │
+│  │   Sources    │    │   Cleaner    │    │   Strategy   │   │
+│  └──────────────┘    └──────────────┘    └──────┬───────┘   │
+│                                                  │            │
+│                                                  ▼            │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐   │
+│  │    RAG        │◄───│    LLM       │◄───│   Context    │   │
+│  │   Response    │    │   Generation │    │   Assembly   │   │
+│  └──────┬───────┘    └──────────────┘    └──────┬───────┘   │
+│         │                                         │            │
+│         │          ┌──────────────┐              │            │
+│         └────────►│   Retrieval  │◄─────────────┘            │
+│                   │   & Rerank   │                           │
+│                   └──────┬───────┘                           │
+│                          │                                    │
+│         ┌────────────────┼────────────────┐                   │
+│         │                │                │                   │
+│         ▼                ▼                ▼                   │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
+│  │    Vector    │  │    BM25      │  │   GraphRAG   │     │
+│  │    Search    │  │    Search    │  │   Retrieval  │     │
+│  └──────┬───────┘  └──────────────┘  └──────┬───────┘     │
+│         │                                     │              │
+│         └─────────────────┬───────────────────┘              │
+│                           │                                  │
+│                           ▼                                  │
+│                   ┌──────────────┐                           │
+│                   │   Vector /   │                           │
+│                   │   Graph DB   │                           │
+│                   └──────────────┘                           │
+│                                                                │
+└────────────────────────────────────────────────────────────────┘
+```
+
+### Technology Selection Guide
+
+| Use Case | Recommended | Notes |
+|----------|-------------|-------|
+| Simple RAG | pgvector | Built-in, no extra DB |
+| Enterprise RAG | WeKnora | Hybrid Search, GraphRAG, Wiki Mode |
+| High-scale Vector Search | Pinecone/Milvus | Managed, scalable |
+| Semantic + Keyword | Hybrid (pgvector + BM25) | Best of both worlds |
+| Knowledge Graph | WeKnora + Neo4j | Entity relationships |
+
+### Evaluation Metrics
+
+```typescript
+interface RAGEvaluationResult {
+  retrieval: {
+    precision: number;
+    recall: number;
+    f1: number;
+    mrr: number;
+    ndcg: number;
+  };
+  generation: {
+    faithfulness: number;
+    answerRelevancy: number;
+    contextPrecision: number;
+  };
+  overall: number;
+}
+```
+
+---
+
+## Workflow Summary
+
+### Phase 1: Planning
+- Choose embedding model
+- Select vector database
+- Define data schema
+- Plan indexing strategy
+
+### Phase 2: Implementation
+- Set up vector database
+- Implement embedding pipeline
+- Create search service
+- Add filtering
+
+### Phase 3: Optimization
+- Configure indexes
+- Add reranking
+- Implement hybrid search
+- Optimize queries
+
+### Phase 4: Evaluation
+- Create test set
+- Measure metrics
+- Compare strategies
+- Iterate
+
+### Phase 5: Scaling
+- Plan for growth
+- Implement batching
+- Configure sharding
+- Monitor costs
+
+### Phase 6: Maintenance
+- Monitor quality
+- Update embeddings
+- Refresh indexes
+- Handle deletions
+
+---
+
+## Liên kết
+
+- [[postgres]] - PostgreSQL best practices
+- [[openai]] - OpenAI integration
+- [[claude]] - Claude integration
+- [[pinecone]] - Pinecone
+- [[knowledge-graph]] - Knowledge Graph Construction
+- [[mcp]] - MCP Server Integration
+- [[evaluation]] - Search evaluation
+- [[performance]] - Performance optimization
+- [[pixelrag]] - PixelRAG (Visual RAG for documents with tables, charts)
+
+---
+
+## 11. PDF Engine
+
+### Mục tiêu
+
+PDF Engine là hệ thống xử lý tài liệu PDF cho việc tạo, chỉnh sửa, trích xuất nội dung, và chuyển đổi. Trong Cursor Enterprise Framework, PDF Engine được sử dụng cho các ứng dụng như invoice generation, report creation, document merging, OCR processing, và data extraction.
+
+### Nguyên tắc
+
+**1. Library Selection**
+
+Choose appropriate PDF library. Consider performance needs. Evaluate rendering quality. Check browser compatibility. Consider commercial vs open source.
+
+**2. Document Generation**
+
+Use templates for consistency. Handle complex layouts. Support dynamic content. Include proper fonts. Optimize for file size.
+
+**3. Text Extraction**
+
+Extract text accurately. Handle multiple encodings. Preserve structure. Support OCR when needed. Handle images with text.
+
+**4. Security Considerations**
+
+Sanitize PDF inputs. Prevent malicious PDFs. Handle password-protected files. Validate content. Monitor for exploits.
+
+**5. Performance Optimization**
+
+Use streaming for large files. Cache rendered pages. Optimize memory usage. Use worker threads. Process in batches.
+
+**6. Template Management**
+
+Store templates securely. Version control templates. Validate template syntax. Support template inheritance. Monitor template usage.
+
+**7. Data Binding**
+
+Bind data to templates. Handle nested data. Support conditions. Include formatting. Validate data types.
+
+**8. Conversion Formats**
+
+Support multiple output formats. PDF/A for archival. PDF/UA for accessibility. Optimize for web. Handle conversion errors.
+
+**9. Accessibility**
+
+Support screen readers. Include alt text. Create tagged PDFs. Follow PDF/UA standards. Test accessibility.
+
+**10. Compliance**
+
+Follow PDF standards. Support PDF/A, PDF/X. Include metadata. Support digital signatures. Maintain audit trails.
+
+### Checklist
+
+- [ ] PDF library selected
+- [ ] Document generation implemented
+- [ ] Text extraction set up
+- [ ] OCR integration configured
+- [ ] Template system designed
+- [ ] Security measures implemented
+- [ ] Performance optimized
+- [ ] Accessibility supported
+- [ ] Conversion formats defined
+- [ ] Monitoring set up
+
+### Anti Pattern
+
+**1. Loading Entire PDFs into Memory**
+
+Loading large PDFs fully into memory. Memory exhaustion. Performance degradation. Use streaming instead.
+
+**2. Ignoring Font Embedding**
+
+Not embedding fonts. Cross-platform issues. Missing characters. Embed all fonts.
+
+**3. No Input Validation**
+
+Processing untrusted PDFs. Security vulnerabilities. Malicious content. Always validate.
+
+**4. Synchronous Processing**
+
+Processing PDFs on main thread. UI blocking. Poor responsiveness. Use async/workers.
+
+**5. Hardcoded Templates**
+
+Embedding templates in code. No reusability. Difficult updates. Use template management system.
+
+### Best Practice
+
+**1. PDF Generation với Puppeteer**
+
+```typescript
+// services/pdf-generator.service.ts
+import puppeteer, { Browser, PDFOptions } from 'puppeteer';
+import { compile } from 'handlebars';
+import fs from 'fs/promises';
+import path from 'path';
+
+interface PDFTemplate {
+  name: string;
+  html: string;
+  styles?: string;
+}
+
+interface PDFData {
+  [key: string]: any;
+}
+
+class PDFGeneratorService {
+  private browser: Browser | null = null;
+  private templates: Map<string, HandlebarsTemplateDelegate> = new Map();
+
+  async initialize(): Promise<void> {
+    this.browser = await puppeteer.launch({
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage'
+      ]
+    });
+  }
+
+  async registerTemplate(name: string, html: string, styles?: string): Promise<void> {
+    const fullHtml = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            ${styles || ''}
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .content { line-height: 1.6; }
+            .footer { position: fixed; bottom: 0; width: 100%; }
+          </style>
+        </head>
+        <body>
+          ${html}
+        </body>
+      </html>
+    `;
+
+    const template = compile(fullHtml);
+    this.templates.set(name, template);
+  }
+
+  async generatePDF(
+    templateName: string,
+    data: PDFData,
+    options: PDFOptions = {}
+  ): Promise<Buffer> {
+    if (!this.browser) {
+      await this.initialize();
+    }
+
+    const template = this.templates.get(templateName);
+    if (!template) {
+      throw new Error(`Template not found: ${templateName}`);
+    }
+
+    const html = template(data);
+    const page = await this.browser.newPage();
+
+    try {
+      await page.setContent(html, {
+        waitUntil: 'networkidle0'
+      });
+
+      const pdfOptions: PDFOptions = {
+        format: 'A4',
+        printBackground: true,
+        margin: {
+          top: '20mm',
+          bottom: '20mm',
+          left: '15mm',
+          right: '15mm'
+        },
+        ...options
+      };
+
+      const pdfBuffer = await page.pdf(pdfOptions);
+      return Buffer.from(pdfBuffer);
+    } finally {
+      await page.close();
+    }
+  }
+
+  async generateBulkPDFs(
+    documents: Array<{ templateName: string; data: PDFData; filename: string }>,
+    options: PDFOptions = {}
+  ): Promise<Map<string, Buffer>> {
+    const results = new Map<string, Buffer>();
+    const concurrency = 3;
+    const chunks = this.chunkArray(documents, concurrency);
+
+    for (const chunk of chunks) {
+      const promises = chunk.map(async (doc) => {
+        const buffer = await this.generatePDF(doc.templateName, doc.data, options);
+        return { filename: doc.filename, buffer };
+      });
+
+      const chunkResults = await Promise.all(promises);
+      chunkResults.forEach(({ filename, buffer }) => {
+        results.set(filename, buffer);
+      });
+    }
+
+    return results;
+  }
+
+  private chunkArray<T>(array: T[], size: number): T[][] {
+    const chunks: T[][] = [];
+    for (let i = 0; i < array.length; i += size) {
+      chunks.push(array.slice(i, i + size));
+    }
+    return chunks;
+  }
+
+  async shutdown(): Promise<void> {
+    if (this.browser) {
+      await this.browser.close();
+      this.browser = null;
+    }
+  }
+}
+```
+
+**2. Text Extraction với pdf-parse**
+
+```typescript
+// services/pdf-extractor.service.ts
+import fs from 'fs/promises';
+import path from 'path';
+import pdf from 'pdf-parse';
+
+interface ExtractionResult {
+  text: string;
+  pages: PageContent[];
+  metadata: PDFMetadata;
+  outlines: Outline[];
+}
+
+interface PageContent {
+  pageNumber: number;
+  text: string;
+  images: ImageInfo[];
+  tables: TableInfo[];
+}
+
+interface ImageInfo {
+  pageNumber: number;
+  index: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  base64?: string;
+}
+
+interface TableInfo {
+  pageNumber: number;
+  rows: string[][];
+  boundingBox: BoundingBox;
+}
+
+interface BoundingBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+interface PDFMetadata {
+  title?: string;
+  author?: string;
+  subject?: string;
+  keywords?: string;
+  creator?: string;
+  producer?: string;
+  creationDate?: Date;
+  modificationDate?: Date;
+}
+
+interface Outline {
+  title: string;
+  level: number;
+  pageNumber: number;
+  children?: Outline[];
+}
+
+class PDFExtractorService {
+  async extractText(filePath: string): Promise<string> {
+    const dataBuffer = await fs.readFile(filePath);
+    const data = await pdf(dataBuffer);
+    return data.text;
+  }
+
+  async extractFullContent(filePath: string): Promise<ExtractionResult> {
+    const dataBuffer = await fs.readFile(filePath);
+    const data = await pdf(dataBuffer);
+
+    const pages = await this.extractPageContents(dataBuffer, data);
+    const metadata = this.extractMetadata(data);
+    const outlines = this.extractOutlines(data);
+
+    return {
+      text: data.text,
+      pages,
+      metadata,
+      outlines
+    };
+  }
+
+  private async extractPageContents(
+    dataBuffer: Buffer,
+    data: any
+  ): Promise<PageContent[]> {
+    const pages: PageContent[] = [];
+
+    for (let i = 0; i < data.numpages; i++) {
+      const pageText = data.pages[i]?.replace(/\s+/g, ' ').trim() || '';
+
+      pages.push({
+        pageNumber: i + 1,
+        text: pageText,
+        images: [],
+        tables: []
+      });
+    }
+
+    return pages;
+  }
+
+  private extractMetadata(data: any): PDFMetadata {
+    return {
+      title: data.info?.Title,
+      author: data.info?.Author,
+      subject: data.info?.Subject,
+      keywords: data.info?.Keywords,
+      creator: data.info?.Creator,
+      producer: data.info?.Producer,
+      creationDate: data.info?.CreationDate,
+      modificationDate: data.info?.ModDate
+    };
+  }
+
+  private extractOutlines(data: any): Outline[] {
+    return [];
+  }
+
+  async extractTextByPage(filePath: string): Promise<string[]> {
+    const dataBuffer = await fs.readFile(filePath);
+    const data = await pdf(dataBuffer);
+    return data.pages.map((page: string) => page.replace(/\s+/g, ' ').trim());
+  }
+}
+```
+
+**3. PDF Merger và Splitter**
+
+```typescript
+// services/pdf-manipulation.service.ts
+import PDFMerger from 'pdf-merger-js';
+import { PDFDocument } from 'pdf-lib';
+
+class PDFManipulationService {
+  async mergePDFs(filePaths: string[]): Promise<Buffer> {
+    const merger = new PDFMerger();
+
+    for (const filePath of filePaths) {
+      merger.add(filePath);
+    }
+
+    const mergedBuffer = await merger.save();
+    return Buffer.from(mergedBuffer);
+  }
+
+  async splitPDF(
+    filePath: string,
+    splitPages: number[]
+  ): Promise<Map<number, Buffer>> {
+    const pdfBytes = await fs.readFile(filePath);
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+    const results = new Map<number, Buffer>();
+
+    for (const pageNum of splitPages) {
+      if (pageNum < 1 || pageNum > pdfDoc.getPageCount()) {
+        throw new Error(`Invalid page number: ${pageNum}`);
+      }
+
+      const newPdf = await PDFDocument.create();
+      const [copiedPage] = await newPdf.copyPages(pdfDoc, [pageNum - 1]);
+      newPdf.addPage(copiedPage);
+
+      const pdfBytes = await newPdf.save();
+      results.set(pageNum, Buffer.from(pdfBytes));
+    }
+
+    return results;
+  }
+
+  async splitPDFByRanges(
+    filePath: string,
+    ranges: Array<{ start: number; end: number }>
+  ): Promise<Buffer> {
+    const pdfBytes = await fs.readFile(filePath);
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+    const newPdf = await PDFDocument.create();
+
+    for (const range of ranges) {
+      for (let i = range.start; i <= range.end; i++) {
+        if (i >= 1 && i <= pdfDoc.getPageCount()) {
+          const [copiedPage] = await newPdf.copyPages(pdfDoc, [i - 1]);
+          newPdf.addPage(copiedPage);
+        }
+      }
+    }
+
+    const mergedPdf = await newPdf.save();
+    return Buffer.from(mergedPdf);
+  }
+
+  async extractPages(
+    filePath: string,
+    startPage: number,
+    endPage: number
+  ): Promise<Buffer> {
+    const ranges: Array<{ start: number; end: number }> = [];
+    for (let i = startPage; i <= endPage; i++) {
+      ranges.push({ start: i, end: i });
+    }
+    return this.splitPDFByRanges(filePath, ranges);
+  }
+
+  async addPageNumbers(
+    filePath: string,
+    options: {
+      position?: 'top' | 'bottom';
+      startNumber?: number;
+      format?: string;
+    } = {}
+  ): Promise<Buffer> {
+    const { position = 'bottom', startNumber = 1, format = '{n} of {total}' } = options;
+
+    const pdfBytes = await fs.readFile(filePath);
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+    const pages = pdfDoc.getPages();
+    const totalPages = pages.length;
+
+    for (let i = 0; i < pages.length; i++) {
+      const page = pages[i];
+      const pageNum = startNumber + i;
+      const text = format
+        .replace('{n}', pageNum.toString())
+        .replace('{total}', totalPages.toString());
+
+      const font = await pdfDoc.embedFont(PDFDocument.FONT_IDENTITY_H);
+      const { height } = page.getSize();
+
+      page.drawText(text, {
+        x: 50,
+        y: position === 'top' ? height - 50 : 50,
+        size: 12,
+        font
+      });
+    }
+
+    const numberedPdf = await pdfDoc.save();
+    return Buffer.from(numberedPdf);
+  }
+}
+```
+
+**4. OCR với Tesseract**
+
+```typescript
+// services/pdf-ocr.service.ts
+import Tesseract from 'tesseract.js';
+import { createCanvas, loadImage } from 'canvas';
+import path from 'path';
+
+interface OCRResult {
+  text: string;
+  confidence: number;
+  blocks: OCRBlock[];
+  boundingBoxes: BoundingBox[][];
+}
+
+interface OCRBlock {
+  text: string;
+  confidence: number;
+  bbox: BoundingBox;
+}
+
+interface BoundingBox {
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+}
+
+class PDFOCRService {
+  private worker: Tesseract.Worker | null = null;
+  private language: string;
+
+  constructor(language: string = 'eng') {
+    this.language = language;
+  }
+
+  async initialize(): Promise<void> {
+    this.worker = await Tesseract.createWorker(this.language, 1, {
+      logger: (m) => console.log(m)
+    });
+  }
+
+  async recognizeFromImage(
+    imagePath: string,
+    options: {
+      enhance?: boolean;
+      scale?: number;
+    } = {}
+  ): Promise<OCRResult> {
+    if (!this.worker) {
+      await this.initialize();
+    }
+
+    const { data } = await this.worker.recognize(imagePath);
+
+    return {
+      text: data.text,
+      confidence: data.confidence,
+      blocks: data.blocks?.map(block => ({
+        text: block.text,
+        confidence: block.confidence,
+        bbox: block.bbox
+      })) || [],
+      boundingBoxes: data.words?.map(word => [word.bbox]) || []
+    };
+  }
+
+  async recognizeFromPDF(
+    pdfPath: string,
+    options: {
+      startPage?: number;
+      endPage?: number;
+      enhance?: boolean;
+    } = {}
+  ): Promise<OCRResult[]> {
+    const images = await this.convertPDFToImages(pdfPath, options);
+    
+    const results: OCRResult[] = [];
+
+    for (const image of images) {
+      const result = await this.recognizeFromImage(image, options);
+      results.push(result);
+    }
+
+    return results;
+  }
+
+  private async convertPDFToImages(
+    pdfPath: string,
+    options: { startPage?: number; endPage?: number }
+  ): Promise<string[]> {
+    return [];
+  }
+
+  async recognizeBatch(
+    images: string[],
+    options: { onProgress?: (progress: number) => void } = {}
+  ): Promise<OCRResult[]> {
+    if (!this.worker) {
+      await this.initialize();
+    }
+
+    const results: OCRResult[] = [];
+
+    for (let i = 0; i < images.length; i++) {
+      const result = await this.recognizeFromImage(images[i]);
+      results.push(result);
+      
+      if (options.onProgress) {
+        options.onProgress((i + 1) / images.length);
+      }
+    }
+
+    return results;
+  }
+
+  async terminate(): Promise<void> {
+    if (this.worker) {
+      await this.worker.terminate();
+      this.worker = null;
+    }
+  }
+}
+```
+
+**5. PDF Security**
+
+```typescript
+// services/pdf-security.service.ts
+import { PDFDocument, StandardEncryption, AES256Encryption } from 'pdf-lib';
+
+interface EncryptionOptions {
+  userPassword?: string;
+  ownerPassword?: string;
+  permissions?: PDFPermissions;
+  encryptionLevel?: 'medium' | 'high';
+}
+
+interface PDFPermissions {
+  print?: boolean;
+  modify?: boolean;
+  copy?: boolean;
+  annotate?: boolean;
+  fillForms?: boolean;
+  extract?: boolean;
+  assemble?: boolean;
+  printFaithful?: boolean;
+}
+
+class PDFSecurityService {
+  async encryptPDF(
+    filePath: string,
+    options: EncryptionOptions
+  ): Promise<Buffer> {
+    const pdfBytes = await fs.readFile(filePath);
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+
+    const encryption = options.encryptionLevel === 'high'
+      ? AES256Encryption.new()
+      : StandardEncryption.new();
+
+    encryption.setUserPassword(options.userPassword || '');
+    encryption.setOwnerPassword(options.ownerPassword || '');
+
+    const permissions = this.buildPermissions(options.permissions || {});
+    encryption.setPermissions(permissions);
+
+    pdfDoc.attach(encryption);
+
+    const encryptedPdf = await pdfDoc.save();
+    return Buffer.from(encryptedPdf);
+  }
+
+  private buildPermissions(perms: PDFPermissions): number {
+    let flags = 0;
+    
+    if (perms.print) flags |= 0b0000000100;
+    if (perms.modify) flags |= 0b0000001000;
+    if (perms.copy) flags |= 0b0000010000;
+    if (perms.annotate) flags |= 0b0000100000;
+    if (perms.fillForms) flags |= 0b0001000000;
+    if (perms.extract) flags |= 0b0010000000;
+    if (perms.assemble) flags |= 0b0100000000;
+    if (perms.printFaithful) flags |= 0b1000000000;
+    
+    return flags;
+  }
+
+  async removePassword(
+    filePath: string,
+    ownerPassword: string
+  ): Promise<Buffer> {
+    const pdfBytes = await fs.readFile(filePath);
+    const pdfDoc = await PDFDocument.load(pdfBytes, {
+      password: ownerPassword
+    });
+
+    const unlockedPdf = await pdfDoc.save();
+    return Buffer.from(unlockedPdf);
+  }
+
+  async verifyPDFSafety(filePath: string): Promise<{
+    isSafe: boolean;
+    issues: string[];
+  }> {
+    const issues: string[] = [];
+
+    try {
+      const pdfBytes = await fs.readFile(filePath);
+      
+      if (pdfBytes.length > 100 * 1024 * 1024) {
+        issues.push('File size exceeds safe limit');
+      }
+
+      return {
+        isSafe: issues.length === 0,
+        issues
+      };
+    } catch (error) {
+      return {
+        isSafe: false,
+        issues: [`Error analyzing PDF: ${error.message}`]
+      };
+    }
+  }
+}
+```
+
+### Workflow
+
+**Phase 1: Requirements Analysis**
+
+Define PDF processing needs. Choose appropriate libraries. Plan architecture. Estimate scale.
+
+**Phase 2: Implementation**
+
+Set up PDF library. Implement generation. Add extraction. Configure OCR. Set up security.
+
+**Phase 3: Template Development**
+
+Design templates. Implement template system. Add data binding. Test templates.
+
+**Phase 4: Optimization**
+
+Implement caching. Optimize performance. Add streaming. Configure workers.
+
+**Phase 5: Testing**
+
+Test with various PDFs. Test generation. Test extraction. Test OCR. Performance testing.
+
+**Phase 6: Deployment**
+
+Deploy PDF services. Configure scaling. Set up monitoring. Document usage.
+
+### Ví dụ
+
+**Ví dụ 1: Automated Report Generation**
+
+```typescript
+async function generateMonthlyReport(data: ReportData): Promise<Buffer> {
+  const template = await pdfService.getTemplate('monthly-report');
+  
+  const reportData = {
+    reportTitle: 'Monthly Sales Report',
+    period: `${data.month} ${data.year}`,
+    generatedAt: new Date().toISOString(),
+    summary: data.summary,
+    charts: await Promise.all(
+      data.charts.map(chart => generateChartImage(chart))
+    ),
+    tables: data.tables,
+    footer: `Generated on ${new Date().toLocaleDateString()}`
+  };
+  
+  return pdfService.generatePDF(template, reportData, {
+    format: 'A4',
+    landscape: true
+  });
+}
+```
+
+### Liên kết
+
+- [[document-processing]] - Document processing
+- [[ocr]] - OCR integration
+- [[storage]] - File storage
+- [[security]] - PDF security
+- [[performance]] - Performance optimization
+- [[templates]] - Template management

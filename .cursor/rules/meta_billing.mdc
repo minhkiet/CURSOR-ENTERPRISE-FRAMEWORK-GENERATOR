@@ -1,0 +1,1089 @@
+---
+description: Nguyên tắc và best practices cho Billing Implementation trong Cursor Enterprise Framework
+created: 2026-06-23
+version: 1.0.0
+tags: [billing, subscription, payment, invoice, saas]
+---
+
+# Billing
+
+## Mục tiêu
+
+Billing system là heart của SaaS monetization, quản lý subscriptions, payments, invoices, và revenue recognition. Trong Cursor Enterprise Framework, billing được thiết kế để support multiple pricing models, flexible plans, usage-based billing, và seamless payment processing. Mục tiêu của rule này là hướng dẫn developers trong việc implement một billing system complete và reliable.
+
+Một billing system tốt cần balance giữa flexibility cho pricing models, reliability cho payment processing, và compliance cho financial transactions. Rule này cover từ subscription management, payment processing, invoice generation, đến revenue reporting.
+
+## Nguyên tắc
+
+**1. Subscription Management**
+
+Support multiple plans. Handle plan changes. Track subscription lifecycle. Manage renewals. Handle cancellations.
+
+**2. Pricing Models**
+
+Support recurring pricing. Implement usage-based. Offer one-time purchases. Create custom pricing. Handle trials.
+
+**3. Payment Processing**
+
+Integrate payment gateways. Handle multiple methods. Manage failed payments. Support refunds. Ensure PCI compliance.
+
+**4. Invoice Generation**
+
+Generate invoices automatically. Support multiple currencies. Include tax calculations. Track payment status. Support invoice templates.
+
+**5. Revenue Recognition**
+
+Track revenue accurately. Support ASC 606. Handle prepaid revenue. Calculate MRR/ARR. Report on revenue.
+
+**6. Dunning Management**
+
+Handle failed payments. Send reminders. Manage retry logic. Escalate issues. Prevent churn.
+
+**7. Usage Tracking**
+
+Track metered usage. Calculate usage charges. Support quota systems. Enable real-time usage. Bill accurately.
+
+**8. Tax Compliance**
+
+Calculate taxes. Support multiple jurisdictions. Handle tax exemptions. Generate tax reports. Ensure compliance.
+
+**9. Customer Self-Service**
+
+Allow plan changes. Enable payment updates. Support upgrade/downgrade. Provide billing history. Enable invoice download.
+
+**10. Financial Reporting**
+
+Track MRR/ARR. Report on churn. Analyze LTV. Forecast revenue. Support audits.
+
+## Checklist
+
+- [ ] Pricing plans configured
+- [ ] Subscription management implemented
+- [ ] Payment gateway integration
+- [ ] Invoice generation set up
+- [ ] Dunning workflow configured
+- [ ] Usage tracking implemented
+- [ ] Tax calculations configured
+- [ ] Self-service portal built
+- [ ] Reporting system set up
+- [ ] Compliance features implemented
+
+## Anti Pattern
+
+**1. Manual Billing**
+
+Manual invoice creation. Human errors. Inconsistent billing. Automate billing processes.
+
+**2. No Trial Management**
+
+No free trial tracking. Unexpected charges. Poor UX. Implement proper trials.
+
+**3. Ignoring Failed Payments**
+
+Lost revenue. Poor collections. Implement dunning. Handle failures gracefully.
+
+**4. No Proration**
+
+Incorrect charges on plan changes. Customer complaints. Implement proration. Handle mid-cycle changes.
+
+**5. Poor Audit Trail**
+
+No billing history. Compliance issues. Difficult debugging. Maintain complete audit trail.
+
+## Best Practice
+
+**1. Subscription Management**
+
+```typescript
+// services/subscription.service.ts
+export interface Subscription {
+  id: string;
+  tenantId: string;
+  planId: string;
+  status: SubscriptionStatus;
+  currentPeriodStart: Date;
+  currentPeriodEnd: Date;
+  cancelAtPeriodEnd: boolean;
+  cancelledAt?: Date;
+  trialEndsAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export enum SubscriptionStatus {
+  ACTIVE = 'active',
+  PAST_DUE = 'past_due',
+  CANCELLED = 'cancelled',
+  TRIALING = 'trialing',
+  INCOMPLETE = 'incomplete',
+  INCOMPLETE_EXPIRED = 'incomplete_expired'
+}
+
+export class SubscriptionService {
+  constructor(
+    private subscriptionRepository: SubscriptionRepository,
+    private planService: PlanService,
+    private paymentService: PaymentService,
+    private invoiceService: InvoiceService,
+    private eventBus: EventBus
+  ) {}
+
+  async createSubscription(
+    tenantId: string,
+    planId: string,
+    options: {
+      trialDays?: number;
+      paymentMethodId?: string;
+      couponCode?: string;
+    } = {}
+  ): Promise<Subscription> {
+    // Validate plan
+    const plan = await this.planService.getPlan(planId);
+    if (!plan) {
+      throw new NotFoundError('Plan not found');
+    }
+
+    // Check for existing subscription
+    const existing = await this.subscriptionRepository.findActiveByTenant(tenantId);
+    if (existing) {
+      throw new ConflictError('Tenant already has an active subscription');
+    }
+
+    // Calculate dates
+    const now = new Date();
+    const trialEnd = options.trialDays 
+      ? addDays(now, options.trialDays) 
+      : undefined;
+
+    const periodStart = trialEnd || now;
+    const periodEnd = addDays(periodStart, plan.billingInterval === 'monthly' ? 30 : 365);
+
+    // Create subscription
+    const subscription = await this.subscriptionRepository.create({
+      tenantId,
+      planId,
+      status: trialEnd ? SubscriptionStatus.TRIALING : SubscriptionStatus.ACTIVE,
+      currentPeriodStart: now,
+      currentPeriodEnd: periodEnd,
+      trialEndsAt: trialEnd,
+      createdAt: now,
+      updatedAt: now
+    });
+
+    // Apply coupon if provided
+    if (options.couponCode) {
+      await this.applyCoupon(subscription.id, options.couponCode);
+    }
+
+    // Set payment method if provided
+    if (options.paymentMethodId) {
+      await this.paymentService.setDefaultPaymentMethod(tenantId, options.paymentMethodId);
+    }
+
+    // Generate first invoice if not trialing
+    if (!trialEnd) {
+      await this.invoiceService.generateInvoice(subscription.id);
+    }
+
+    // Publish event
+    await this.eventBus.publish(new SubscriptionCreatedEvent(subscription));
+
+    return subscription;
+  }
+
+  async changePlan(
+    subscriptionId: string,
+    newPlanId: string,
+    options: {
+      prorate?: boolean;
+      immediate?: boolean;
+    } = {}
+  ): Promise<{ subscription: Subscription; invoice?: Invoice }> {
+    const subscription = await this.subscriptionRepository.findById(subscriptionId);
+    if (!subscription) {
+      throw new NotFoundError('Subscription not found');
+    }
+
+    const oldPlan = await this.planService.getPlan(subscription.planId);
+    const newPlan = await this.planService.getPlan(newPlanId);
+
+    if (!oldPlan || !newPlan) {
+      throw new NotFoundError('Plan not found');
+    }
+
+    let invoice: Invoice | undefined;
+
+    if (options.prorate) {
+      // Calculate proration
+      const proration = this.calculateProration(subscription, oldPlan, newPlan);
+      
+      if (proration !== 0) {
+        invoice = await this.invoiceService.generateProrationInvoice(
+          subscriptionId,
+          proration,
+          newPlan
+        );
+      }
+    }
+
+    // Update subscription
+    const updated = await this.subscriptionRepository.update(subscriptionId, {
+      planId: newPlanId,
+      updatedAt: new Date()
+    });
+
+    // Publish event
+    await this.eventBus.publish(new SubscriptionPlanChangedEvent(
+      subscriptionId,
+      oldPlan.id,
+      newPlan.id
+    ));
+
+    return { subscription: updated, invoice };
+  }
+
+  async cancelSubscription(
+    subscriptionId: string,
+    options: {
+      cancelAtPeriodEnd?: boolean;
+      reason?: string;
+    } = {}
+  ): Promise<Subscription> {
+    const subscription = await this.subscriptionRepository.findById(subscriptionId);
+    if (!subscription) {
+      throw new NotFoundError('Subscription not found');
+    }
+
+    if (options.cancelAtPeriodEnd) {
+      // Schedule cancellation
+      const updated = await this.subscriptionRepository.update(subscriptionId, {
+        cancelAtPeriodEnd: true,
+        cancelledAt: new Date(),
+        updatedAt: new Date()
+      });
+
+      await this.eventBus.publish(new SubscriptionCancellationScheduledEvent(
+        subscriptionId,
+        subscription.currentPeriodEnd
+      ));
+
+      return updated;
+    } else {
+      // Immediate cancellation with prorated refund
+      const refundAmount = this.calculateRefund(subscription);
+      
+      if (refundAmount > 0) {
+        await this.paymentService.processRefund(subscription.tenantId, refundAmount);
+      }
+
+      const updated = await this.subscriptionRepository.update(subscriptionId, {
+        status: SubscriptionStatus.CANCELLED,
+        cancelledAt: new Date(),
+        updatedAt: new Date()
+      });
+
+      await this.eventBus.publish(new SubscriptionCancelledEvent(
+        subscriptionId,
+        refundAmount,
+        options.reason
+      ));
+
+      return updated;
+    }
+  }
+
+  async reactivateSubscription(subscriptionId: string): Promise<Subscription> {
+    const subscription = await this.subscriptionRepository.findById(subscriptionId);
+    if (!subscription) {
+      throw new NotFoundError('Subscription not found');
+    }
+
+    if (subscription.status !== SubscriptionStatus.CANCELLED) {
+      throw new ValidationError('Can only reactivate cancelled subscriptions');
+    }
+
+    // Check if within grace period
+    const gracePeriodDays = 30;
+    const gracePeriodEnd = addDays(subscription.cancelledAt, gracePeriodDays);
+    
+    if (new Date() > gracePeriodEnd) {
+      throw new ValidationError('Grace period has expired');
+    }
+
+    const updated = await this.subscriptionRepository.update(subscriptionId, {
+      status: SubscriptionStatus.ACTIVE,
+      cancelAtPeriodEnd: false,
+      cancelledAt: null,
+      updatedAt: new Date()
+    });
+
+    await this.eventBus.publish(new SubscriptionReactivatedEvent(subscriptionId));
+
+    return updated;
+  }
+
+  private calculateProration(
+    subscription: Subscription,
+    oldPlan: Plan,
+    newPlan: Plan
+  ): number {
+    const now = new Date();
+    const periodStart = subscription.currentPeriodStart;
+    const periodEnd = subscription.currentPeriodEnd;
+    const totalDays = differenceInDays(periodEnd, periodStart);
+    const daysRemaining = differenceInDays(periodEnd, now);
+
+    const oldPlanDaily = oldPlan.price / totalDays;
+    const newPlanDaily = newPlan.price / totalDays;
+
+    // Credit for unused old plan
+    const credit = oldPlanDaily * daysRemaining;
+    // Charge for remaining new plan
+    const charge = newPlanDaily * daysRemaining;
+
+    return charge - credit;
+  }
+
+  private calculateRefund(subscription: Subscription): number {
+    const now = new Date();
+    const periodEnd = subscription.currentPeriodEnd;
+    const totalDays = differenceInDays(periodEnd, subscription.currentPeriodStart);
+    const daysRemaining = differenceInDays(periodEnd, now);
+
+    const plan = await this.planService.getPlan(subscription.planId);
+    const dailyRate = plan.price / totalDays;
+
+    return dailyRate * daysRemaining;
+  }
+}
+```
+
+**2. Invoice Generation**
+
+```typescript
+// services/invoice.service.ts
+export interface Invoice {
+  id: string;
+  tenantId: string;
+  subscriptionId: string;
+  number: string;
+  status: InvoiceStatus;
+  currency: string;
+  subtotal: number;
+  tax: number;
+  total: number;
+  dueDate: Date;
+  paidAt?: Date;
+  lineItems: InvoiceLineItem[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export enum InvoiceStatus {
+  DRAFT = 'draft',
+  OPEN = 'open',
+  PAID = 'paid',
+  VOID = 'void',
+  UNCOLLECTIBLE = 'uncollectible'
+}
+
+export interface InvoiceLineItem {
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  amount: number;
+  taxRate?: number;
+  period?: { start: Date; end: Date };
+}
+
+export class InvoiceService {
+  constructor(
+    private invoiceRepository: InvoiceRepository,
+    private subscriptionService: SubscriptionService,
+    private taxService: TaxService,
+    private pdfService: PDFService,
+    private emailService: EmailService
+  ) {}
+
+  async generateInvoice(subscriptionId: string): Promise<Invoice> {
+    const subscription = await this.subscriptionService.getSubscription(subscriptionId);
+    const plan = await this.planService.getPlan(subscription.planId);
+
+    // Create line items
+    const lineItems: InvoiceLineItem[] = [
+      {
+        description: `${plan.name} - ${plan.billingInterval}ly subscription`,
+        quantity: 1,
+        unitPrice: plan.price,
+        amount: plan.price,
+        period: {
+          start: subscription.currentPeriodStart,
+          end: subscription.currentPeriodEnd
+        }
+      }
+    ];
+
+    // Calculate subtotal
+    const subtotal = lineItems.reduce((sum, item) => sum + item.amount, 0);
+
+    // Calculate tax
+    const taxAmount = await this.taxService.calculateTax(
+      subscription.tenantId,
+      subtotal
+    );
+
+    // Generate invoice number
+    const invoiceNumber = await this.generateInvoiceNumber();
+
+    // Create invoice
+    const invoice = await this.invoiceRepository.create({
+      tenantId: subscription.tenantId,
+      subscriptionId,
+      number: invoiceNumber,
+      status: InvoiceStatus.OPEN,
+      currency: 'USD',
+      subtotal,
+      tax: taxAmount,
+      total: subtotal + taxAmount,
+      dueDate: addDays(new Date(), 30),
+      lineItems,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+
+    // Send invoice email
+    await this.sendInvoiceEmail(invoice);
+
+    return invoice;
+  }
+
+  async generateProrationInvoice(
+    subscriptionId: string,
+    amount: number,
+    newPlan: Plan
+  ): Promise<Invoice> {
+    const subscription = await this.subscriptionService.getSubscription(subscriptionId);
+
+    const lineItems: InvoiceLineItem[] = [
+      {
+        description: `Proration for ${newPlan.name}`,
+        quantity: 1,
+        unitPrice: amount,
+        amount,
+        period: {
+          start: new Date(),
+          end: subscription.currentPeriodEnd
+        }
+      }
+    ];
+
+    const subtotal = amount;
+    const taxAmount = await this.taxService.calculateTax(
+      subscription.tenantId,
+      subtotal
+    );
+
+    const invoiceNumber = await this.generateInvoiceNumber();
+
+    return this.invoiceRepository.create({
+      tenantId: subscription.tenantId,
+      subscriptionId,
+      number: invoiceNumber,
+      status: InvoiceStatus.OPEN,
+      currency: 'USD',
+      subtotal,
+      tax: taxAmount,
+      total: subtotal + taxAmount,
+      dueDate: addDays(new Date(), 7),
+      lineItems,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+  }
+
+  async markAsPaid(invoiceId: string, paymentId: string): Promise<Invoice> {
+    const invoice = await this.invoiceRepository.findById(invoiceId);
+    if (!invoice) {
+      throw new NotFoundError('Invoice not found');
+    }
+
+    const updated = await this.invoiceRepository.update(invoiceId, {
+      status: InvoiceStatus.PAID,
+      paidAt: new Date(),
+      updatedAt: new Date()
+    });
+
+    await this.eventBus.publish(new InvoicePaidEvent(invoiceId, paymentId));
+
+    return updated;
+  }
+
+  async voidInvoice(invoiceId: string): Promise<Invoice> {
+    const invoice = await this.invoiceRepository.findById(invoiceId);
+    if (!invoice) {
+      throw new NotFoundError('Invoice not found');
+    }
+
+    if (invoice.status === InvoiceStatus.PAID) {
+      throw new ValidationError('Cannot void a paid invoice');
+    }
+
+    const updated = await this.invoiceRepository.update(invoiceId, {
+      status: InvoiceStatus.VOID,
+      updatedAt: new Date()
+    });
+
+    await this.eventBus.publish(new InvoiceVoidedEvent(invoiceId));
+
+    return updated;
+  }
+
+  async generatePDF(invoiceId: string): Promise<Buffer> {
+    const invoice = await this.invoiceRepository.findById(invoiceId);
+    if (!invoice) {
+      throw new NotFoundError('Invoice not found');
+    }
+
+    const tenant = await this.tenantService.getById(invoice.tenantId);
+
+    return this.pdfService.generateFromTemplate('invoice', {
+      invoiceNumber: invoice.number,
+      issueDate: invoice.createdAt,
+      dueDate: invoice.dueDate,
+      company: {
+        name: 'Your Company',
+        address: '123 Business St',
+        city: 'San Francisco, CA 94102'
+      },
+      customer: {
+        name: tenant.name,
+        address: tenant.billingAddress
+      },
+      lineItems: invoice.lineItems,
+      subtotal: invoice.subtotal,
+      tax: invoice.tax,
+      total: invoice.total,
+      currency: invoice.currency
+    });
+  }
+
+  async sendInvoiceEmail(invoice: Invoice): Promise<void> {
+    const tenant = await this.tenantService.getById(invoice.tenantId);
+    const billingEmail = tenant.billingEmail || tenant.ownerEmail;
+
+    const pdfBuffer = await this.generatePDF(invoice.id);
+
+    await this.emailService.sendWithAttachment({
+      to: billingEmail,
+      subject: `Invoice ${invoice.number} from Your Company`,
+      template: 'invoice-notification',
+      attachments: [{
+        filename: `invoice-${invoice.number}.pdf`,
+        content: pdfBuffer
+      }]
+    });
+  }
+
+  private async generateInvoiceNumber(): Promise<string> {
+    const year = new Date().getFullYear();
+    const lastInvoice = await this.invoiceRepository.findLastOfYear(year);
+    const sequence = (lastInvoice?.number.split('-')[2] || 0) + 1;
+    
+    return `INV-${year}-${String(sequence).padStart(4, '0')}`;
+  }
+}
+```
+
+**3. Payment Processing**
+
+```typescript
+// services/payment.service.ts
+export interface PaymentMethod {
+  id: string;
+  tenantId: string;
+  type: 'card' | 'bank_account';
+  isDefault: boolean;
+  card?: {
+    brand: string;
+    last4: string;
+    expMonth: number;
+    expYear: number;
+  };
+  bankAccount?: {
+    bankName: string;
+    last4: string;
+    routingNumber: string;
+  };
+}
+
+export class PaymentService {
+  constructor(
+    private paymentGateway: PaymentGateway,
+    private paymentMethodRepository: PaymentMethodRepository,
+    private invoiceService: InvoiceService
+  ) {}
+
+  async createPaymentMethod(
+    tenantId: string,
+    token: string,
+    setAsDefault: boolean = true
+  ): Promise<PaymentMethod> {
+    // Create payment method with gateway
+    const gatewayMethod = await this.paymentGateway.createPaymentMethod(token);
+
+    // Create local record
+    const paymentMethod = await this.paymentMethodRepository.create({
+      tenantId,
+      type: gatewayMethod.type,
+      gatewayId: gatewayMethod.id,
+      isDefault: setAsDefault,
+      card: gatewayMethod.card,
+      bankAccount: gatewayMethod.bankAccount,
+      createdAt: new Date()
+    });
+
+    // Update default if needed
+    if (setAsDefault) {
+      await this.clearDefaultPaymentMethods(tenantId);
+      await this.paymentMethodRepository.update(paymentMethod.id, { isDefault: true });
+    }
+
+    return paymentMethod;
+  }
+
+  async chargeInvoice(
+    invoiceId: string,
+    options: {
+      paymentMethodId?: string;
+      retry?: boolean;
+    } = {}
+  ): Promise<PaymentResult> {
+    const invoice = await this.invoiceService.getInvoice(invoiceId);
+    
+    // Get payment method
+    const paymentMethodId = options.paymentMethodId 
+      || await this.getDefaultPaymentMethodId(invoice.tenantId);
+
+    if (!paymentMethodId) {
+      return { success: false, error: 'No payment method on file' };
+    }
+
+    try {
+      // Charge with payment gateway
+      const charge = await this.paymentGateway.charge({
+        amount: Math.round(invoice.total * 100), // Convert to cents
+        currency: invoice.currency,
+        paymentMethodId,
+        description: `Invoice ${invoice.number}`,
+        metadata: {
+          invoiceId: invoice.id,
+          tenantId: invoice.tenantId
+        }
+      });
+
+      // Mark invoice as paid
+      await this.invoiceService.markAsPaid(invoiceId, charge.id);
+
+      return {
+        success: true,
+        chargeId: charge.id,
+        amount: charge.amount / 100
+      };
+    } catch (error) {
+      // Log failed payment
+      await this.logFailedPayment(invoiceId, error);
+
+      // Update invoice status
+      await this.invoiceService.markAsUncollectible(invoiceId);
+
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  async retryPayment(invoiceId: string): Promise<PaymentResult> {
+    const invoice = await this.invoiceService.getInvoice(invoiceId);
+    
+    // Get payment method
+    const paymentMethod = await this.getDefaultPaymentMethod(invoice.tenantId);
+
+    if (!paymentMethod) {
+      return { success: false, error: 'No payment method on file' };
+    }
+
+    // Attempt charge
+    const result = await this.chargeInvoice(invoiceId, {
+      paymentMethodId: paymentMethod.id
+    });
+
+    if (!result.success) {
+      // Schedule retry with exponential backoff
+      await this.scheduleRetry(invoiceId);
+    }
+
+    return result;
+  }
+
+  async processRefund(
+    tenantId: string,
+    amount: number,
+    options: {
+      invoiceId?: string;
+      reason?: string;
+    } = {}
+  ): Promise<RefundResult> {
+    // Get original payment
+    const originalPayment = await this.getLastSuccessfulPayment(tenantId);
+    if (!originalPayment) {
+      throw new NotFoundError('No successful payment found');
+    }
+
+    const refund = await this.paymentGateway.refund({
+      chargeId: originalPayment.gatewayId,
+      amount: Math.round(amount * 100),
+      reason: options.reason
+    });
+
+    await this.paymentMethodRepository.createRefundRecord({
+      tenantId,
+      originalPaymentId: originalPayment.id,
+      refundId: refund.id,
+      amount,
+      reason: options.reason
+    });
+
+    return {
+      success: true,
+      refundId: refund.id,
+      amount: refund.amount / 100
+    };
+  }
+}
+```
+
+**4. Dunning Management**
+
+```typescript
+// services/dunning.service.ts
+export interface DunningPolicy {
+  id: string;
+  attempts: DunningAttempt[];
+  finalAction: 'cancel' | 'suspend' | 'flag';
+}
+
+export interface DunningAttempt {
+  day: number;
+  action: 'email' | 'retry' | 'suspend';
+  template?: string;
+}
+
+class DunningService {
+  constructor(
+    private invoiceService: InvoiceService,
+    private emailService: EmailService,
+    private subscriptionService: SubscriptionService
+  ) {}
+
+  async processOverdueInvoices(): Promise<void> {
+    const overdueInvoices = await this.invoiceService.getOverdueInvoices();
+    
+    for (const invoice of overdueInvoices) {
+      await this.evaluateDunningActions(invoice);
+    }
+  }
+
+  private async evaluateDunningActions(invoice: Invoice): Promise<void> {
+    const daysOverdue = differenceInDays(new Date(), invoice.dueDate);
+    const policy = await this.getDunningPolicy(invoice.tenantId);
+
+    for (const attempt of policy.attempts) {
+      if (daysOverdue >= attempt.day) {
+        await this.executeAttempt(invoice, attempt);
+      }
+    }
+
+    // Check final action
+    const maxDays = Math.max(...policy.attempts.map(a => a.day));
+    if (daysOverdue > maxDays) {
+      await this.executeFinalAction(invoice, policy.finalAction);
+    }
+  }
+
+  private async executeAttempt(
+    invoice: Invoice,
+    attempt: DunningAttempt
+  ): Promise<void> {
+    // Check if already executed
+    const alreadyExecuted = await this.hasAttemptBeenExecuted(invoice.id, attempt.day);
+    if (alreadyExecuted) {
+      return;
+    }
+
+    switch (attempt.action) {
+      case 'email':
+        await this.sendDunningEmail(invoice, attempt.template);
+        break;
+      case 'retry':
+        await this.paymentService.retryPayment(invoice.id);
+        break;
+      case 'suspend':
+        await this.subscriptionService.suspendSubscription(invoice.subscriptionId);
+        break;
+    }
+
+    await this.recordAttemptExecuted(invoice.id, attempt.day);
+  }
+
+  private async sendDunningEmail(
+    invoice: Invoice,
+    template?: string
+  ): Promise<void> {
+    const tenant = await this.tenantService.getById(invoice.tenantId);
+    const daysOverdue = differenceInDays(new Date(), invoice.dueDate);
+
+    await this.emailService.send({
+      to: tenant.billingEmail,
+      subject: `Payment Overdue - Invoice ${invoice.number}`,
+      template: template || 'dunning-reminder',
+      data: {
+        invoiceNumber: invoice.number,
+        amount: invoice.total,
+        dueDate: invoice.dueDate,
+        daysOverdue,
+        paymentUrl: await this.generatePaymentUrl(invoice)
+      }
+    });
+  }
+
+  private async executeFinalAction(
+    invoice: Invoice,
+    action: 'cancel' | 'suspend' | 'flag'
+  ): Promise<void> {
+    switch (action) {
+      case 'cancel':
+        await this.subscriptionService.cancelSubscription(
+          invoice.subscriptionId,
+          { reason: 'Payment failed' }
+        );
+        break;
+      case 'suspend':
+        await this.subscriptionService.suspendSubscription(invoice.subscriptionId);
+        break;
+      case 'flag':
+        await this.flagAccountForReview(invoice.tenantId);
+        break;
+    }
+
+    await this.eventBus.publish(new DunningFinalActionEvent(
+      invoice.id,
+      action
+    ));
+  }
+}
+```
+
+**5. Usage-Based Billing**
+
+```typescript
+// services/usage.service.ts
+export interface UsageRecord {
+  id: string;
+  tenantId: string;
+  metric: string;
+  quantity: number;
+  timestamp: Date;
+  periodStart: Date;
+  periodEnd: Date;
+}
+
+export interface MeteredBillingConfig {
+  metric: string;
+  displayName: string;
+  unit: string;
+  pricing: {
+    tiers: Array<{
+      upTo: number | null;
+      unitPrice: number;
+    }>;
+  };
+}
+
+class UsageBasedBillingService {
+  constructor(
+    private usageRepository: UsageRepository,
+    private invoiceService: InvoiceService
+  ) {}
+
+  async recordUsage(
+    tenantId: string,
+    metric: string,
+    quantity: number,
+    options: {
+      timestamp?: Date;
+      idempotencyKey?: string;
+    } = {}
+  ): Promise<UsageRecord> {
+    // Check for duplicate (idempotency)
+    if (options.idempotencyKey) {
+      const existing = await this.usageRepository.findByIdempotencyKey(
+        tenantId,
+        options.idempotencyKey
+      );
+      if (existing) {
+        return existing;
+      }
+    }
+
+    // Get current period
+    const period = await this.getCurrentBillingPeriod(tenantId);
+
+    const record = await this.usageRepository.create({
+      tenantId,
+      metric,
+      quantity,
+      timestamp: options.timestamp || new Date(),
+      periodStart: period.start,
+      periodEnd: period.end,
+      idempotencyKey: options.idempotencyKey
+    });
+
+    // Publish event for real-time tracking
+    await this.eventBus.publish(new UsageRecordedEvent(
+      tenantId,
+      metric,
+      quantity
+    ));
+
+    return record;
+  }
+
+  async getUsageSummary(
+    tenantId: string,
+    period?: BillingPeriod
+  ): Promise<UsageSummary> {
+    const billingPeriod = period || await this.getCurrentBillingPeriod(tenantId);
+
+    const usage = await this.usageRepository.getByTenantAndPeriod(
+      tenantId,
+      billingPeriod.start,
+      billingPeriod.end
+    );
+
+    // Group by metric
+    const byMetric = new Map<string, number>();
+    for (const record of usage) {
+      const current = byMetric.get(record.metric) || 0;
+      byMetric.set(record.metric, current + record.quantity);
+    }
+
+    // Calculate costs
+    const costs: Record<string, number> = {};
+    for (const [metric, quantity] of byMetric) {
+      const config = await this.getMeteredConfig(metric);
+      costs[metric] = this.calculateTieredCost(quantity, config.pricing.tiers);
+    }
+
+    return {
+      tenantId,
+      period: billingPeriod,
+      byMetric: Object.fromEntries(byMetric),
+      costs,
+      totalCost: Object.values(costs).reduce((sum, c) => sum + c, 0)
+    };
+  }
+
+  async generateUsageInvoice(
+    tenantId: string,
+    period: BillingPeriod
+  ): Promise<Invoice> {
+    const summary = await this.getUsageSummary(tenantId, period);
+
+    const lineItems: InvoiceLineItem[] = [];
+    for (const [metric, quantity] of Object.entries(summary.byMetric)) {
+      const config = await this.getMeteredConfig(metric);
+      lineItems.push({
+        description: `${config.displayName} - ${quantity} ${config.unit}`,
+        quantity,
+        unitPrice: summary.costs[metric] / quantity,
+        amount: summary.costs[metric]
+      });
+    }
+
+    const subtotal = summary.totalCost;
+    const tax = await this.taxService.calculateTax(tenantId, subtotal);
+
+    return this.invoiceRepository.create({
+      tenantId,
+      subscriptionId: null, // Usage-based
+      number: await this.generateInvoiceNumber(),
+      status: InvoiceStatus.OPEN,
+      currency: 'USD',
+      subtotal,
+      tax,
+      total: subtotal + tax,
+      dueDate: addDays(new Date(), 30),
+      lineItems,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+  }
+
+  private calculateTieredCost(
+    quantity: number,
+    tiers: Array<{ upTo: number | null; unitPrice: number }>
+  ): number {
+    let cost = 0;
+    let remaining = quantity;
+
+    for (const tier of tiers) {
+      const tierQuantity = tier.upTo 
+        ? Math.min(remaining, tier.upTo)
+        : remaining;
+      
+      cost += tierQuantity * tier.unitPrice;
+      remaining -= tierQuantity;
+
+      if (remaining <= 0) break;
+    }
+
+    return cost;
+  }
+}
+```
+
+## Workflow
+
+**Phase 1: Pricing Design**
+
+Define pricing models. Create plans. Configure features. Set up trials.
+
+**Phase 2: Payment Integration**
+
+Select payment gateway. Implement integration. Configure webhooks. Set up payment methods.
+
+**Phase 3: Billing Logic**
+
+Implement subscriptions. Build invoice generation. Add tax calculations. Configure proration.
+
+**Phase 4: Dunning**
+
+Design dunning policy. Implement retries. Build notifications. Configure final actions.
+
+**Phase 5: Reporting**
+
+Build MRR/ARR tracking. Create revenue reports. Set up dashboards. Configure alerts.
+
+**Phase 6: Self-Service**
+
+Build customer portal. Add plan management. Implement invoice downloads. Enable payment updates.
+
+## Liên kết
+
+- [[multi-tenant]] - Multi-tenant billing
+- [[subscription]] - Subscription management
+- [[invoice]] - Invoice generation
+- [[payment]] - Payment processing
+- [[dunning]] - Dunning workflows
+- [[pricing]] - Pricing strategy

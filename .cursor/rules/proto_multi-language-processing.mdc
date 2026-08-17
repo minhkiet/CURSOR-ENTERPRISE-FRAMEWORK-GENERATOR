@@ -1,0 +1,411 @@
+﻿---
+description: Multi-Language Processing - Translation Layer cho Vietnamese, Chinese, Japanese, Korean, Arabic. Chuyển đổi request từ any language sang English để xử lý nhất quán.
+created: 2026-06-26
+version: 2.0.0
+tags: [multilingual, translation, language-detection, vietnamese, chinese, japanese, korean, arabic, language-processing]
+---
+
+# Multi-Language Processing
+
+## Mục tiêu
+
+Xử lý request từ **bất kỳ ngôn ngữ nào** (tiếng Việt, Trung Quốc, Nhật Bản, Hàn Quốc, Ả Rập, v.v.) và chuyển đổi chúng thành tiếng Anh để:
+
+1. **Phân tích ngôn ngữ** — tự động nhận diện ngôn ngữ đầu vào
+2. **Dịch và chuẩn hóa** — chuyển đổi nội dung sang tiếng Anh với semantic preservation
+3. **Preserve tech terms** — giữ nguyên technical vocabulary
+
+---
+
+## PHẦN A: LANGUAGE DETECTION ENGINE
+
+### A.1 Supported Languages
+
+| Language | Code | Native Name | Tech Terms Pattern |
+|----------|------|-------------|-------------------|
+| Vietnamese | vi | Tiếng Việt | tạo, xây dựng, cải thiện, sửa lỗi, thiết kế |
+| Chinese | zh | 中文 | 创建, 构建, 改进, 修复, 设计 |
+| Japanese | ja | 日本語 | 作成, 構築, 改善, 修正, 設計 |
+| Korean | ko | 한국어 | 생성, 구축, 개선, 수정, 설계 |
+| Arabic | ar | العربية | إنشاء, بناء, تحسين, إصلاح, تصميم |
+| Russian | ru | Русский | создать, построить, улучшить, исправить |
+| German | de | Deutsch | erstellen, bauen, verbessern, reparieren |
+| French | fr | Français | créer, construire, améliorer, réparer |
+| Spanish | es | Español | crear, construir, mejorar, reparar |
+| Portuguese | pt | Português | criar, construir, melhorar, corrigir |
+| Hindi | hi | हिन्दी | बनाना, निर्माण, सुधार, मरम्मत |
+| Thai | th | ไทย | สร้าง, สร้างสรรค์, ปรับปรุง, ซ่อมแซม |
+| Indonesian | id | Bahasa Indonesia | membuat, membangun, meningkatkan |
+
+### A.2 Language Detection Patterns
+
+```yaml
+# Vietnamese Detection
+vietnamese_signals:
+  keywords: ["tạo", "xây dựng", "cải thiện", "sửa lỗi", "thiết kế", "app", "web", "trang", "trang web", "code", "lập trình", "phát triển", "component", "ứng dụng", "hệ thống", "api", "database", "backend", "frontend"]
+  patterns: ["^tạo ", "^xây ", "^cải ", "^sửa ", "^thiết kế"]
+  frequency_indicators: ["không", "có", "và", "hoặc", "với", "để", "của", "là", "được", "này", "đó"]
+
+# Chinese Detection
+chinese_signals:
+  keywords: ["创建", "构建", "改进", "修复", "设计", "应用", "网站", "代码", "编程", "开发", "组件", "系统", "接口", "数据库"]
+  character_set: "[\u4e00-\u9fff]"  # CJK Unified Ideographs
+  frequency_indicators: ["的", "是", "在", "有", "和", "与", "为", "了", "对", "中", "这", "那"]
+
+# Japanese Detection
+japanese_signals:
+  keywords: ["作成", "構築", "改善", "修正", "設計", "アプリ", "ウェブサイト", "コード", "プログラミング", "開発", "コンポーネント", "システム"]
+  character_set: "[\u3040-\u309f\u30a0-\u30ff]"  # Hiragana + Katakana
+  kanji_common: ["作成", "構築", "開発", "設計", "修正", "改善", "実装"]
+
+# Korean Detection
+korean_signals:
+  keywords: ["생성", "구축", "개선", "수정", "설계", "앱", "웹", "코드", "프로그래밍", "개발", "컴포넌트", "시스템"]
+  character_set: "[\uac00-\ud7af]"  # Hangul Syllables
+  frequency_indicators: ["의", "이", "가", "을", "를", "에", "와", "과", "는", "은"]
+
+# Arabic Detection
+arabic_signals:
+  keywords: ["إنشاء", "بناء", "تحسين", "إصلاح", "تصميم", "تطبيق", "موقع", "كود", "برمجة", "تطوير", "نظام"]
+  character_set: "[\u0600-\u06ff]"  # Arabic
+  rtl: true
+```
+
+### A.3 Language Detection Algorithm
+
+```python
+def detect_language(text: str) -> dict:
+    """
+    Detect source language with confidence score
+    Returns: { "language": str, "confidence": float, "indicators": list }
+    """
+    scores = {}
+    
+    # Check character set patterns
+    if re.search(r"[\u4e00-\u9fff]", text):  # Chinese
+        scores["zh"] = 0.95
+    if re.search(r"[\u3040-\u309f\u30a0-\u30ff]", text):  # Japanese
+        scores["ja"] = 0.90
+    if re.search(r"[\uac00-\ud7af]", text):  # Korean
+        scores["ko"] = 0.90
+    if re.search(r"[\u0600-\u06ff]", text):  # Arabic
+        scores["ar"] = 0.95
+        
+    # Check language-specific keywords
+    for lang, signals in LANGUAGE_SIGNALS.items():
+        keyword_matches = sum(1 for kw in signals["keywords"] if kw in text.lower())
+        pattern_matches = sum(1 for pattern in signals["patterns"] if re.search(pattern, text.lower()))
+        frequency_matches = sum(1 for fi in signals["frequency_indicators"] if fi in text)
+        
+        scores[lang] = (
+            keyword_matches * 2.0 +
+            pattern_matches * 3.0 +
+            frequency_matches * 0.5
+        ) / (len(signals["keywords"]) + len(signals["patterns"]) + len(signals["frequency_indicators"]))
+    
+    # Normalize and return
+    best_lang = max(scores, key=scores.get)
+    confidence = min(1.0, scores[best_lang])
+    
+    return {
+        "language": best_lang,
+        "confidence": confidence,
+        "all_scores": scores,
+        "detection_method": "hybrid" if len(scores) > 1 else "character_set"
+    }
+```
+
+---
+
+## PHẦN B: TRANSLATION LAYER
+
+### B.1 Vietnamese → English Translation Matrix
+
+```yaml
+vietnamese_to_english:
+  # Intent Verbs
+  "tạo": "create"
+  "xây dựng": "build"
+  "cải thiện": "improve"
+  "sửa lỗi": "fix bug"
+  "thiết kế": "design"
+  "phát triển": "develop"
+  "thêm": "add"
+  "xóa": "delete"
+  "sửa": "edit"
+  "thay đổi": "change"
+  "cập nhật": "update"
+  "nâng cấp": "upgrade"
+  "tối ưu": "optimize"
+  "debug": "debug"
+  
+  # Tech Terms
+  "trang web": "website"
+  "trang": "page"
+  "app": "app"
+  "ứng dụng": "application"
+  "hệ thống": "system"
+  "component": "component"
+  "thành phần": "component"
+  "chức năng": "feature"
+  "tính năng": "feature"
+  "api": "API"
+  "giao diện": "interface"
+  "database": "database"
+  "cơ sở dữ liệu": "database"
+  "backend": "backend"
+  "frontend": "frontend"
+  "code": "code"
+  "lập trình": "programming"
+  "mã nguồn": "source code"
+  "file": "file"
+  "folder": "folder"
+  "thư mục": "folder"
+  
+  # UI Terms
+  "nút": "button"
+  "nút bấm": "button"
+  "ô nhập": "input field"
+  "trường nhập": "input field"
+  "biểu mẫu": "form"
+  "form": "form"
+  "bảng": "table"
+  "menu": "menu"
+  "thanh điều hướng": "navigation bar"
+  "header": "header"
+  "footer": "footer"
+  "sidebar": "sidebar"
+  "popup": "popup"
+  "modal": "modal"
+  "toast": "toast notification"
+  "notification": "notification"
+  "thông báo": "notification"
+  
+  # Quality Terms
+  "đẹp": "beautiful"
+  "hiện đại": "modern"
+  "nhanh": "fast"
+  "chậm": "slow"
+  "bảo mật": "secure"
+  "an toàn": "safe"
+  "dễ sử dụng": "easy to use"
+  "thân thiện": "friendly"
+  "responsive": "responsive"
+  "tương thích": "compatible"
+  
+  # Project Types
+  "landing page": "landing page"
+  "trang đích": "landing page"
+  "portfolio": "portfolio"
+  "danh mục": "portfolio"
+  "blog": "blog"
+  "trang blog": "blog"
+  "dashboard": "dashboard"
+  "trang quản trị": "admin dashboard"
+  "cửa hàng": "store"
+  "shop": "shop"
+  "thương mại điện tử": "e-commerce"
+  
+  # Request Intensifiers
+  "càng đẹp càng tốt": "as beautiful as possible"
+  "tốt nhất": "best"
+  "hoàn hảo": "perfect"
+  "toàn bộ": "full"
+  "hoàn chỉnh": "complete"
+  "chi tiết": "detailed"
+  
+  # Question Words
+  "như thế nào": "how"
+  "làm sao": "how"
+  "cách nào": "which way"
+  "tại sao": "why"
+  "bao lâu": "how long"
+  "bao nhiêu": "how many"
+  "ở đâu": "where"
+  "khi nào": "when"
+  "là gì": "what is"
+  "có gì": "what"
+  
+  # Connectors
+  "với": "with"
+  "và": "and"
+  "hoặc": "or"
+  "để": "to"
+  "cho": "for"
+  "của": "of"
+  "là": "is"
+  "được": "is"
+  "này": "this"
+  "đó": "that"
+  "các": "these"
+  "những": "those"
+```
+
+### B.2 Translation Algorithm
+
+```python
+def translate_to_english(text: str, source_lang: str) -> str:
+    """
+    Translate request to English with semantic preservation
+    """
+    if source_lang == "vi":
+        return translate_vietnamese_to_english(text)
+    elif source_lang == "zh":
+        return translate_chinese_to_english(text)
+    elif source_lang == "ja":
+        return translate_japanese_to_english(text)
+    elif source_lang == "ko":
+        return translate_korean_to_english(text)
+    # ... other languages
+    
+def translate_vietnamese_to_english(text: str) -> str:
+    """Vietnamese to English with tech-term awareness"""
+    
+    # Step 1: Replace known tech terms
+    result = text
+    for vi_term, en_term in VI_TO_EN.items():
+        result = re.sub(
+            r'\b' + re.escape(vi_term) + r'\b',
+            en_term,
+            result,
+            flags=re.IGNORECASE
+        )
+    
+    # Step 2: Handle compound phrases
+    result = expand_compound_phrases(result)
+    
+    # Step 3: Normalize word order for English
+    result = normalize_word_order(result, "vi")
+    
+    # Step 4: Expand abbreviations
+    result = expand_abbreviations(result, "vi")
+    
+    # Step 5: Preserve code snippets (don't translate)
+    result = preserve_code_snippets(result)
+    
+    return result
+
+def expand_compound_phrases(text: str) -> str:
+    """Expand common Vietnamese compound phrases"""
+    compounds = {
+        "thiết kế web": "design website",
+        "xây dựng app": "build app",
+        "tạo landing page": "create landing page",
+        "cải thiện giao diện": "improve UI",
+        "sửa lỗi code": "fix code bug",
+        "phát triển tính năng": "develop feature",
+        "thêm chức năng": "add feature",
+        "tối ưu hiệu suất": "optimize performance",
+        "nâng cấp hệ thống": "upgrade system",
+    }
+    
+    for compound, expansion in compounds.items():
+        text = text.replace(compound, expansion)
+    
+    return text
+```
+
+### B.3 Example Translations
+
+| Vietnamese Input | English Output |
+|-----------------|---------------|
+| "Tạo một landing page cho startup AI của tôi" | "Create a landing page for my AI startup" |
+| "Cải thiện giao diện app thương mại điện tử" | "Improve UI of e-commerce app" |
+| "Xây dựng hệ thống quản lý kho hàng" | "Build warehouse management system" |
+| "Thêm tính năng thanh toán MoMo vào app" | "Add MoMo payment feature to app" |
+| "Sửa lỗi login trên trang admin" | "Fix login bug on admin page" |
+| "Thiết kế dashboard cho hệ thống CRM" | "Design CRM dashboard" |
+| "Tạo component button với nhiều variant" | "Create button component with multiple variants" |
+
+---
+
+## TỔNG QUAN SYSTEM FLOW
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    MULTI-LANGUAGE VIBE CODE FLOW                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  1. REQUEST RECEIVED (Any Language)                                        │
+│     ├── Detect source language                                             │
+│     ├── Extract raw request text                                           │
+│     └── Identify language signals (Vietnamese, Chinese, Japanese, etc.)     │
+│                                                                             │
+│  2. TRANSLATION LAYER                                                      │
+│     ├── Translate to English (semantic-preserving)                          │
+│     ├── Normalize terminology to English tech vocabulary                    │
+│     └── Preserve cultural context and nuances                               │
+│                                                                             │
+│  3. INTENT ANALYSIS (see [[rule_intent-detection]])                              │
+│     ├── Classify primary intent (build, fix, redesign, review)               │
+│     ├── Identify domain context (frontend, backend, security)              │
+│     └── Extract key entities and constraints                                │
+│                                                                             │
+│  4. RULE/SKILL AUTO-DISCOVERY (see [[rule_intent-detection]])                   │
+│     ├── Match against Rule Registry                                        │
+│     ├── Match against Skill Keyword Matrix                                 │
+│     ├── Calculate confidence scores                                        │
+│     └── Determine skill combination                                        │
+│                                                                             │
+│  5. VIBE CODE EXECUTION (see [[vibe-code-protocol]])                       │
+│     ├── Pre-review gates (from detected skills)                            │
+│     ├── Implementation (with detected rules)                               │
+│     └── Post-review gates (quality verification)                           │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## QUICK REFERENCE
+
+### Language Detection Quick Reference
+
+```
+Signs of Vietnamese:
+  - "tạo", "xây dựng", "cải thiện", "sửa lỗi", "thiết kế"
+  - "trang web", "app", "component", "hệ thống"
+  - No CJK characters
+
+Signs of Chinese:
+  - CJK characters (中文)
+  - "创建", "构建", "改进", "修复", "设计"
+  - "应用", "网站", "代码", "系统"
+
+Signs of Japanese:
+  - Hiragana/Katakana characters
+  - "作成", "構築", "開発", "設計"
+  - "アプリ", "ウェブサイト", "コード"
+
+Signs of Korean:
+  - Hangul characters (한글)
+  - "생성", "구축", "개발", "설계"
+  - "앱", "웹", "코드", "시스템"
+```
+
+### Translation Quick Reference
+
+```
+VI → EN Quick Map:
+  tạo/create | xây dựng/build | cải thiện/improve
+  sửa lỗi/fix bug | thiết kế/design | phát triển/develop
+  app/app | trang web/website | landing page/landing page
+  giao diện/UI | component/component | tính năng/feature
+  thanh toán/payment | bảo mật/security | database/database
+
+ZH → EN Quick Map:
+  创建/create | 构建/build | 改进/improve
+  修复/fix | 设计/design | 开发/develop
+  应用/app | 网站/website | 落地页/landing page
+  界面/UI | 组件/component | 功能/feature
+  支付/payment | 安全/security | 数据库/database
+```
+
+---
+
+## LIÊN KẾT
+
+- [[rule_skill-integration]] — Skill Auto-Discovery & Execution Protocol (base)
+- [[rule_skill-registry]] — Single source of truth cho skills
+- [[proto_context-router]] — Context routing rules
+- [[proto_memory-first]] — Memory context management

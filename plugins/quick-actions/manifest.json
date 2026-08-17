@@ -1,0 +1,136 @@
+{
+  "name": "cursor-framework-quick-actions",
+  "version": "1.0.0",
+  "description": "Quick actions for Cursor Framework operations",
+  "author": "Cursor Enterprise Framework",
+  "activationEvents": [
+    "onCommand:cursor-framework.warm",
+    "onCommand:cursor-framework.stats",
+    "onCommand:cursor-framework.clear-cache",
+    "onCommand:cursor-framework.scan",
+    "onCommand:cursor-framework.dashboard",
+    "onCommand:cursor-framework.dump-context"
+  ],
+  "main": "index.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "cursor-framework.warm",
+        "title": "Cursor Framework: Warm Cache",
+        "category": "Cursor Framework",
+        "description": "Warm up framework cache (scan + persist)"
+      },
+      {
+        "command": "cursor-framework.stats",
+        "title": "Cursor Framework: Show Stats",
+        "category": "Cursor Framework",
+        "description": "Show framework statistics"
+      },
+      {
+        "command": "cursor-framework.clear-cache",
+        "title": "Cursor Framework: Clear Cache",
+        "category": "Cursor Framework",
+        "description": "Clear framework cache"
+      },
+      {
+        "command": "cursor-framework.scan",
+        "title": "Cursor Framework: Scan Skills",
+        "category": "Cursor Framework",
+        "description": "Scan .cursor directory for skills and rules"
+      },
+      {
+        "command": "cursor-framework.dashboard",
+        "title": "Cursor Framework: Open Dashboard",
+        "category": "Cursor Framework",
+        "description": "Open framework dashboard in browser"
+      },
+      {
+        "command": "cursor-framework.dump-context",
+        "title": "Cursor Framework: Dump Context",
+        "category": "Cursor Framework",
+        "description": "Dump current session context to file"
+      },
+      {
+        "command": "cursor-framework.graph",
+        "title": "Cursor Framework: View Skill Graph",
+        "category": "Cursor Framework",
+        "description": "Open skill dependency graph visualization"
+      },
+      {
+        "command": "cursor-framework.index",
+        "title": "Cursor Framework: Rebuild Index",
+        "category": "Cursor Framework",
+        "description": "Rebuild skill index (INDEX.json + INDEX.md)"
+      },
+      {
+        "command": "cursor-framework.find-skills",
+        "title": "Cursor Framework: Find Skills",
+        "category": "Cursor Framework",
+        "description": "Find skills matching a query"
+      },
+      {
+        "command": "cursor-framework.code-graph",
+        "title": "Cursor Framework: Code Graph",
+        "category": "Cursor Framework",
+        "description": "Scan and view project code graph"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "cursor-framework.warm",
+          "when": "workspaceFolderExists"
+        },
+        {
+          "command": "cursor-framework.stats",
+          "when": "workspaceFolderExists"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "cursor-framework.dump-context",
+          "when": "editorTextFocus"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Cursor Framework",
+      "properties": {
+        "cursorFramework.rootPath": {
+          "type": "string",
+          "default": ".cursor",
+          "description": "Path to .cursor directory"
+        },
+        "cursorFramework.memoryPath": {
+          "type": "string",
+          "default": ".cache/memory.json",
+          "description": "Path to memory cache file"
+        },
+        "cursorFramework.dashboardPort": {
+          "type": "number",
+          "default": 8765,
+          "description": "Port for dashboard server"
+        },
+        "cursorFramework.autoWarm": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically warm cache on startup"
+        }
+      }
+    },
+    "keybindings": [
+      {
+        "command": "cursor-framework.stats",
+        "key": "ctrl+shift+f1",
+        "mac": "cmd+shift+f1",
+        "when": "workspaceFolderExists"
+      },
+      {
+        "command": "cursor-framework.warm",
+        "key": "ctrl+shift+f2",
+        "mac": "cmd+shift+f2",
+        "when": "workspaceFolderExists"
+      }
+    ]
+  }
+}

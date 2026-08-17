@@ -1,0 +1,13 @@
+{
+  "name": "cursor-autopilot-mcp",
+  "version": "1.0.0",
+  "description": "Automatic task analysis and workflow orchestration for Cursor Enterprise Framework.",
+  "author": { "name": "thaofvn-coca06" },
+  "homepage": "https://github.com/thaofvn-coca06/2026",
+  "keywords": ["cursor", "mcp", "autopilot", "workflow", "skills", "agents", "quality-gates"],
+  "entry": "cursor_autopilot_mcp.server:run",
+  "config": {
+    "workspace_root_env": "CURSOR_WORKSPACE_ROOT",
+    "framework_mcp_path": "tools/cursor-framework-mcp"
+  }
+}

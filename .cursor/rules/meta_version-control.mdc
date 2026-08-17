@@ -1,0 +1,834 @@
+---
+description: Version Control - bao gồm Git, GitHub, Git workflow
+created: 2026-06-23
+version: 1.1.0
+tags: [git, version-control, branching-strategy, commit-messages, code-review, workflow, merged]
+---
+
+# Version Control
+
+## Mục tiêu
+
+Version Control là nền tảng cho software development collaboration, tracking changes, và maintaining code history. Trong Cursor Enterprise Framework, Git là primary version control system với practices đảm bảo code quality, traceability, và efficient team collaboration. Mục tiêu của rule này là hướng dẫn developers trong việc use version control một cách hiệu quả và maintainable.
+
+Good version control practices enable parallel development, facilitate code review, support rollback capabilities, và maintain clear audit trail của mọi thay đổi.
+
+## Nguyên tắc
+
+**1. Atomic Commits**
+
+Một commit nên chứa một logical change. Small, focused commits. Easy to revert. Clear history.
+
+**2. Clear Commit Messages**
+
+Descriptive messages. Follow convention. Reference issues. Explain why, not what.
+
+**3. Branching Strategy**
+
+Use consistent strategy. Feature branches. Release branches. Hotfix branches.
+
+**4. Protected Main Branch**
+
+main/master không directly committed. All changes via PR. Required reviews. Passing tests.
+
+**5. Frequent Integration**
+
+Merge frequently. Small changes. Reduce conflicts. Continuous integration.
+
+**6. Code Review**
+
+All changes reviewed. Meaningful reviews. Timely reviews. Constructive feedback.
+
+**7. Tagging Releases**
+
+Semantic versioning. Annotated tags. Release notes. Traceability.
+
+**8. .gitignore**
+
+Ignore build artifacts. Ignore dependencies. Ignore IDE configs. Keep repo clean.
+
+**9. Submodules/Libraries**
+
+Manage dependencies carefully. Keep updated. Document usage. Consider monorepo.
+
+**10. Backup và Safety**
+
+Remote backups. Never force push to main. Recoverable history. Branch protection.
+
+## Checklist
+
+- [ ] Branching strategy defined
+- [ ] Commit convention documented
+- [ ] PR template created
+- [ ] Branch protection rules set
+- [ ] Code review process established
+- [ ] Release process defined
+- [ ] .gitignore configured
+- [ ] CI/CD integrated
+- [ ] Branch naming convention set
+- [ ] Team training completed
+
+## Anti Pattern
+
+**1. Large Commits**
+
+Everything in one commit. Hard to review. Hard to revert. Atomic commits.
+
+**2. Poor Messages**
+
+"Fixed stuff". "Updates". "WIP". Descriptive messages.
+
+**3. Long-Lived Branches**
+
+Branches diverge for weeks. Merge conflicts. Stale code. Frequent merges.
+
+**4. Force Push to Main**
+
+Rewriting shared history. Lost commits. Security risk. Never force push.
+
+**5. Committed Secrets**
+
+API keys in commits. Exposed credentials. Use environment variables.
+
+## Best Practice
+
+**1. Git Configuration**
+
+```bash
+# Global gitignore
+git config --global core.excludesFile '~/.gitignore'
+
+# Editor
+git config --global core.editor 'code --wait'
+
+# Aliases
+git config --global alias.st 'status -sb'
+git config --global alias.co 'checkout'
+git config --global alias.br 'branch'
+git config --global alias.ci 'commit'
+git config --global alias.lg "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+
+# Rebasing instead of merging
+git config --global pull.rebase true
+
+# Rebase when pulling
+git config --global rebase.autostash true
+
+# Stash pop choices
+git config --global rerere.autoUpdate true
+git config --global rerere.enabled true
+
+# Signing
+git config --global commit.gpgsign true
+git config --global tag.gpgsign true
+```
+
+**2. .gitignore**
+
+```gitignore
+# Dependencies
+node_modules/
+vendor/
+bower_components/
+
+# Build outputs
+dist/
+build/
+out/
+*.pyc
+__pycache__/
+*.o
+*.so
+*.class
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.env
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+*.lcov
+
+# OS
+.DS_Store
+Thumbs.db
+*.bak
+*~
+
+# Secrets
+*.pem
+*.key
+credentials.json
+service-account.json
+
+# Database
+*.sqlite
+*.db
+*.sqlite3
+
+# Cache
+.cache/
+.parcel-cache/
+.vuepress/dist/
+
+# Framework specific
+.next/
+.nuxt/
+.svelte-kit/
+```
+
+**3. Branching Strategy (GitFlow)**
+
+```bash
+# Branch naming
+# feature/TICKET-description
+# bugfix/TICKET-description
+# hotfix/TICKET-description
+# release/v1.2.3
+
+# Start feature
+git checkout develop
+git pull origin develop
+git checkout -b feature/ABC-123-user-authentication
+
+# Work on feature
+git add .
+git commit -m "feat(auth): add login endpoint"
+
+# Update from develop
+git fetch origin
+git rebase origin/develop
+
+# Finish feature
+git checkout develop
+git pull origin develop
+git merge --no-ff feature/ABC-123-user-authentication
+git branch -d feature/ABC-123-user-authentication
+git push origin develop
+
+# Create release
+git checkout -b release/v1.2.0 develop
+# ... prepare release ...
+git checkout main
+git merge --no-ff release/v1.2.0
+git tag -a v1.2.0 -m "Release v1.2.0"
+git push origin main --tags
+
+# Hotfix
+git checkout -b hotfix/ABC-456-fix-bug main
+# ... fix ...
+git checkout main
+git merge --no-ff hotfix/ABC-456-fix-bug
+git tag -a v1.2.1 -m "Hotfix v1.2.1"
+git push origin main --tags
+```
+
+**4. Commit Convention**
+
+```bash
+# Format
+# <type>(<scope>): <description>
+#
+# [optional body]
+#
+# [optional footer(s)]
+
+# Types
+# feat:     New feature
+# fix:      Bug fix
+# docs:     Documentation
+# style:    Formatting, missing semicolons, etc
+# refactor: Code refactoring
+# test:     Adding tests
+# chore:    Maintenance tasks
+# perf:     Performance improvements
+# ci:       CI/CD changes
+# build:    Build system changes
+# revert:   Revert commits
+
+# Examples
+git commit -m "feat(auth): add JWT token validation"
+git commit -m "fix(api): handle null pointer in user endpoint"
+git commit -m "docs(readme): update installation instructions"
+git commit -m "refactor(users): extract user validation to service"
+git commit -m "test(checkout): add integration tests for payment flow"
+git commit -m "perf(api): optimize database queries for user list"
+
+# With body
+git commit -m "feat(payments): add Stripe integration
+- Add Stripe SDK for payment processing
+- Implement webhook handling for payment events
+- Add retry logic for failed payments"
+
+# Breaking changes
+git commit -m "feat(api): change response format for /users
+BREAKING CHANGE: /users now returns array instead of object"
+```
+
+**5. Pull Request Template**
+
+```markdown
+# Pull Request
+
+## Description
+<!-- Describe what this PR does and why -->
+
+## Type of Change
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Breaking change
+- [ ] Documentation update
+
+## Related Issues
+<!-- Link to related issues: Fixes #123 -->
+
+## Testing
+<!-- Describe how this was tested -->
+
+- [ ] Unit tests added/updated
+- [ ] Integration tests added/updated
+- [ ] Manual testing performed
+
+## Checklist
+- [ ] Code follows the project's style guidelines
+- [ ] Self-review completed
+- [ ] Comments added for complex code
+- [ ] Documentation updated
+- [ ] No new warnings or errors
+- [ ] Dependent changes merged
+
+## Screenshots (if applicable)
+<!-- Add screenshots for UI changes -->
+
+## Additional Notes
+<!-- Any additional context -->
+```
+
+**6. Git Hooks**
+
+```bash
+# .husky/pre-commit
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+npx lint-staged
+```
+
+```json
+// package.json
+{
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-push": "npm test"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write",
+      "git add"
+    ],
+    "*.{json,md}": [
+      "prettier --write",
+      "git add"
+    ]
+  }
+}
+```
+
+```bash
+# commitlint.config.js
+module.exports = {
+  extends: ['@commitlint/config-conventional'],
+  rules: {
+    'type-enum': [
+      2,
+      'always',
+      [
+        'feat',
+        'fix',
+        'docs',
+        'style',
+        'refactor',
+        'perf',
+        'test',
+        'build',
+        'ci',
+        'chore',
+        'revert'
+      ]
+    ]
+  }
+};
+```
+
+**7. GitHub Actions Workflow**
+
+```yaml
+# .github/workflows/git.yml
+name: Git Actions
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  commit-lint:
+    name: Commit Message Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: wagoid/commitlint-github-action@v5
+
+  branch-check:
+    name: Branch Name Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check branch naming
+        run: |
+          if [[ ! "${{ github.head_ref }}" =~ ^(feature|bugfix|hotfix|release)/[A-Z]+-[0-9]+-.+$ ]]; then
+            echo "Branch name must follow: type/TICKET-description"
+            exit 1
+          fi
+
+  changes-protection:
+    name: Protect Main Branch
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Check if force pushed
+        run: |
+          if git log --oneline origin/main..HEAD | grep -q .; then
+            echo "Direct commits to main are not allowed"
+            exit 1
+          fi
+```
+
+**8. Release Process**
+
+```bash
+# Create release branch
+git checkout develop
+git pull
+git checkout -b release/v1.2.0
+
+# Update version
+echo "1.2.0" > VERSION
+git add VERSION
+git commit -m "chore: bump version to 1.2.0"
+
+# Test and fix
+# ... testing ...
+
+# Merge to main
+git checkout main
+git merge --no-ff release/v1.2.0 -m "Merge release v1.2.0"
+git tag -a v1.2.0 -m "Release v1.2.0"
+git push origin main --tags
+
+# Merge back to develop
+git checkout develop
+git merge --no-ff release/v1.2.0 -m "Merge release v1.2.0"
+git push origin develop
+
+# Clean up
+git branch -d release/v1.2.0
+```
+
+## Workflow
+
+**Phase 1: Branch Creation**
+
+Create branch from correct source. Follow naming convention. Update from base.
+
+**Phase 2: Development**
+
+Make atomic commits. Follow commit convention. Update documentation.
+
+**Phase 3: Code Review**
+
+Open PR. Request reviews. Address feedback. Get approvals.
+
+**Phase 4: Merge**
+
+Merge using squash or regular. Delete branch. Verify CI/CD.
+
+**Phase 5: Release**
+
+Create release branch. Test thoroughly. Tag release. Deploy.
+
+## Git Workflow
+
+Detailed Git workflow guidelines for Cursor Enterprise Framework.
+
+### 1. Branching Strategy (GitFlow)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    GitFlow Strategy                               │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Main Branch:                                                    │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  main ────────────────────────────────────────────────────│
+│  └─────────────────────────────────────────────────────────┘   │
+│                              │                                    │
+│  Release Branches:                                                │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  release/1.0 ──────────────────────────────────────────│  │
+│  └─────────────────────────────────────────────────────────┘   │
+│                              │                                    │
+│  Development:                                                   │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  develop ───────────────────────────────────────────────│  │
+│  └─────────────────────────────────────────────────────────┘   │
+│         │           │           │                               │
+│  Feature Branches:                                            │
+│  ┌──────▼──┐ ┌──────▼──┐ ┌──────▼──┐                         │
+│  │ feature │ │ feature │ │ feature │                          │
+│  │   /A   │ │   /B   │ │   /C   │                           │
+│  └─────────┘ └─────────┘ └─────────┘                            │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 2. Branch Naming Conventions
+
+```bash
+# Branch naming patterns
+# Pattern: <type>/<ticket-id>-<short-description>
+
+# Feature branches
+feature/PROJ-123-add-user-authentication
+feature/PROJ-456-implement-order-history
+feature/PROJ-789-fix-payment-bug
+
+# Bugfix branches
+bugfix/PROJ-101-fix-login-error
+bugfix/PROJ-102-correct-calculation-bug
+
+# Hotfix branches
+hotfix/PROJ-200-security-patch
+hotfix/PROJ-201-critical-bug-fix
+
+# Release branches
+release/v1.0.0
+release/v1.1.0
+
+# Changelog convention
+# feat: new feature
+# fix: bug fix
+# docs: documentation
+# style: formatting
+# refactor: code refactoring
+# test: adding tests
+# chore: maintenance
+```
+
+### 3. Merging Strategies
+
+```bash
+# Merge strategy for feature branches
+git checkout develop
+git pull origin develop
+git merge --no-ff feature/PROJ-123-user-auth
+
+# No fast-forward to preserve branch history
+# --no-ff creates a merge commit even for fast-forward
+
+# Rebase before merge (cleaner history)
+git checkout feature/PROJ-123-user-auth
+git fetch origin
+git rebase origin/develop
+
+# Resolve conflicts
+# Edit conflicting files
+git add .
+git rebase --continue
+
+# After rebase, force push
+git push --force-with-lease
+
+# Hotfix workflow
+git checkout main
+git pull
+git checkout -b hotfix/PROJ-200-security
+# Make changes
+git commit -m "fix(security): patch vulnerability"
+git checkout main
+git merge --no-ff hotfix/PROJ-200-security
+git tag v1.0.1
+git push origin main --tags
+git push origin hotfix/PROJ-200-security  # For merge to develop
+```
+
+### 4. GitOps Workflow
+
+Infrastructure as code approach.
+
+```bash
+# GitOps directory structure
+repository/
+├── apps/
+│   └── api/
+│       ├── src/
+│       └── Dockerfile
+├── infrastructure/
+│   ├── terraform/
+│   │   ├── modules/
+│   │   ├── environments/
+│   │   │   ├── dev/
+│   │   │   ├── staging/
+│   │   │   └── prod/
+│   │   └── main.tf
+│   └── k8s/
+│       ├── base/
+│       └── overlays/
+│           ├── dev/
+│           ├── staging/
+│           └── prod/
+└── .github/
+    └── workflows/
+```
+
+### 5. Complete Feature Workflow Example
+
+```bash
+# Start feature
+git checkout develop
+git pull origin develop
+git checkout -b feature/PROJ-123-user-authentication
+
+# Work on feature
+git add src/auth/
+git commit -m "feat(auth): add authentication module structure"
+
+git add src/auth/login/
+git commit -m "feat(auth): implement login endpoint"
+
+git add src/auth/register/
+git commit -m "feat(auth): implement registration endpoint"
+
+# Update with latest develop
+git fetch origin
+git rebase origin/develop
+
+# Push feature branch
+git push -u origin feature/PROJ-123-user-authentication
+
+# Create PR via GitHub/GitLab
+# Address review comments
+git add .
+git commit -m "fix(auth): address PR feedback"
+git push
+
+# After approval, squash and merge
+# Via GitHub UI or CLI
+```
+
+### 6. Hotfix Workflow Example
+
+```bash
+# Critical bug in production
+git checkout main
+git pull origin main
+git checkout -b hotfix/PROJ-200-critical-bug
+
+# Implement fix
+git add src/
+git commit -m "fix: resolve critical data race condition"
+
+# Test locally
+npm run test
+npm run test:integration
+
+# Push and create PR
+git push -u origin hotfix/PROJ-200-critical-bug
+
+# After review, merge to main
+git checkout main
+git pull origin main
+git merge --no-ff hotfix/PROJ-200-critical-bug
+
+# Tag the release
+git tag -a v1.0.1 -m "Hotfix: resolve critical bug PROJ-200"
+git push origin main --tags
+
+# Merge to develop
+git checkout develop
+git merge --no-ff hotfix/PROJ-200-critical-bug
+git push origin develop
+
+# Clean up
+git branch -d hotfix/PROJ-200-critical-bug
+```
+
+### 7. Release Workflow Example
+
+```bash
+# Prepare release
+git checkout develop
+git pull origin develop
+git checkout -b release/v1.1.0
+
+# Update version
+npm version minor --no-git-tag-version
+git add package.json
+git commit -m "chore: bump version to 1.1.0"
+
+# Run release tests
+npm run test
+npm run test:integration
+npm run test:e2e
+
+# If issues found
+git commit -m "fix(release): resolve test failures"
+git push
+
+# Merge to main
+git checkout main
+git pull origin main
+git merge --no-ff release/v1.1.0
+
+# Tag release
+git tag -a v1.1.0 -m "Release version 1.1.0"
+git push origin main --tags
+
+# Merge back to develop
+git checkout develop
+git merge --no-ff release/v1.1.0
+git push origin develop
+
+# Clean up
+git branch -d release/v1.1.0
+```
+
+### 8. Tagging Strategy
+
+```bash
+# Semantic versioning tags
+# v<major>.<minor>.<patch>
+
+# Create lightweight tag
+git tag v1.0.0
+
+# Create annotated tag (recommended)
+git tag -a v1.0.0 -m "Release version 1.0.0"
+
+# Create tag with signature
+git tag -s v1.0.0 -m "Release version 1.0.0"
+
+# Tag after commit
+git tag -a v1.0.0 <commit-sha>
+
+# Push tags
+git push origin v1.0.0
+git push origin --tags
+
+# List tags
+git tag -l
+git tag -l "v1.*"
+
+# Delete tags
+git tag -d v1.0.0           # Local
+git push origin :refs/tags/v1.0.0  # Remote
+```
+
+## Liên kết
+
+- [[git-flow]] - GitFlow strategy
+- [[ci-cd]] - CI/CD integration
+- [[code-review]] - Code review practices
+- [[deployment]] - Deployment process
+- [Git Documentation](https://git-scm.com/doc)
+- [Conventional Commits](https://www.conventionalcommits.org/)
+- [Git Flow](https://nvie.com/posts/a-successful-git-branching-model/)
+- [Trunk Based Development](https://trunkbaseddevelopment.com/)
+
+---
+
+## Worktree Workflow (from Superpowers)
+
+> **Source:** [obra/superpowers](https://github.com/obra/superpowers) `using-git-worktrees` + `finishing-a-development-branch` skills (248k stars) — "Creates isolated workspace on new branch, runs project setup, verifies clean test baseline."
+
+### When to Use a Worktree
+
+Use a worktree when:
+- Working on a feature that takes more than one session
+- Comparing two branches side-by-side without stashing
+- Running long-lived dev servers (different ports per worktree)
+- Reviewing a PR locally without disrupting the main checkout
+
+### Create a Worktree
+
+```bash
+# From main checkout, add a worktree for the new feature branch
+git worktree add ../proj-feature-auth feature/PROJ-123-user-auth
+
+# That gives you a sibling directory at ../proj-feature-auth
+# already on branch feature/PROJ-123-user-auth
+cd ../proj-feature-auth
+npm install   # or whatever setup the project has
+npm test      # verify clean baseline BEFORE writing code
+```
+
+A worktree shares the same `.git` database with the main checkout. There's no remote push until you decide to ship.
+
+### Daily Use
+
+```bash
+# Inside the worktree, work normally
+git add . && git commit -m "feat(auth): add login form"
+
+# Inspect a different branch from the main checkout, NOT from this worktree
+cd ../proj-main
+git fetch origin
+git checkout origin/feature/PROJ-456-other-stuff   # bonus worktree, auto-managed
+
+# Back to your work
+cd ../proj-feature-auth
+```
+
+### Finishing a Development Branch
+
+When tasks are complete and all tests pass, present options to the user:
+
+| Option | When to pick |
+|---|---|
+| **Merge** (no-ff) | Branch is small, single-purpose, ready to integrate |
+| **Open PR** | Need code review or CI checks before merge |
+| **Keep** (don't integrate yet) | Branch is WIP, dependencies not ready, want to return |
+| **Discard** | Branch was a dead end, throw away the worktree + branch |
+
+Cleanup script for the discard path:
+
+```bash
+# Inside main checkout, remove the worktree and the branch
+git worktree remove ../proj-feature-auth
+git branch -D feature/PROJ-123-user-auth
+```
+
+For Merge / PR / Keep, run project test suite one last time, then follow the existing §Release Workflow in this file.

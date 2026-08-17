@@ -1,0 +1,868 @@
+﻿---
+description: Intent Detection, Skill Auto-Discovery, and Clarification Flow - xác định intent, tự động phát hiện skills/rules, và clarification khi request ambiguous. Kết hợp với translation layer để xử lý multi-language requests.
+created: 2026-06-26
+version: 2.0.0
+tags: [intent-detection, skill-discovery, clarification, ambiguity, language-processing, auto-discovery, rules, skills]
+---
+
+# Intent Detection & Skill Auto-Discovery
+
+## Mục tiêu
+
+Phân tích request đã được translate để:
+1. **Xác định Intent** - build, fix, redesign, review
+2. **Auto-discover Skills** - tự động phát hiện skills/rules phù hợp
+3. **Clarification** - hỏi user khi request ambiguous
+
+---
+
+## PHẦN C: INTENT ANALYSIS
+
+### C.1 Primary Intent Classification
+
+```yaml
+intents:
+  build:
+    keywords: ["create", "build", "make", "add", "implement", "develop", "generate", "set up", "configure", "tạo", "xây dựng", "phát triển", "thêm", "implement"]
+    confidence_boost: 0.2
+    examples: ["create a landing page", "build an app", "make a component"]
+    
+  redesign:
+    keywords: ["improve", "upgrade", "redesign", "modernize", "enhance", "update", "refresh", "polish", "cải thiện", "nâng cấp", "tái thiết kế"]
+    confidence_boost: 0.2
+    examples: ["improve the UI", "upgrade the design", "redesign the homepage"]
+    
+  fix:
+    keywords: ["fix", "bug", "error", "issue", "problem", "repair", "debug", "patch", "sửa", "sửa lỗi", "debug", "khắc phục"]
+    confidence_boost: 0.2
+    examples: ["fix the login bug", "debug the API", "repair the form"]
+    
+  review:
+    keywords: ["review", "check", "audit", "inspect", "analyze", "assess", "evaluate", "rà soát", "kiểm tra", "đánh giá"]
+    confidence_boost: 0.2
+    examples: ["review the code", "check for security issues", "audit the implementation"]
+    
+  explain:
+    keywords: ["explain", "how", "what", "why", "understand", "clarify", "describe", "giải thích", "tại sao", "là gì"]
+    confidence_boost: 0.2
+    examples: ["explain how it works", "what is this component", "how to implement"]
+```
+
+### C.1.1 Antigravity-Style Goal Extraction
+
+**Trước khi xác định intent, suy luận đúng mục đích của user:**
+
+```yaml
+goal_extraction:
+  surface_implicit_goals:
+    # "Create landing page" → user may need:
+    landing_page_implicit:
+      - "Convert visitors to leads"
+      - "Communicate value proposition"
+      - "Build trust quickly"
+      - "Differentiate from competitors"
+      
+    # "Fix login bug" → user may need:
+    fix_bug_implicit:
+      - "Understand root cause (not symptom)"
+      - "Prevent future occurrences"
+      - "Test properly"
+      - "Minimal code change"
+      
+    # "Add payment" → user may need:
+    payment_implicit:
+      - "Understand payment flow"
+      - "Choose right provider"
+      - "Handle edge cases"
+      - "Be secure by default"
+```
+
+### C.1.2 Success Criteria Template
+
+```yaml
+success_criteria:
+  build:
+    - "Deliverables: [list exact files/components]"
+    - "Functionality: [what it should do]"
+    - "Quality: [no skeleton, complete code, tests pass]"
+    
+  fix:
+    - "Bug reproduced: [steps to reproduce]"
+    - "Root cause: [identified]"
+    - "Fix verified: [test proves it works]"
+    - "No regression: [existing tests pass]"
+    
+  redesign:
+    - "Before: [current state]"
+    - "After: [improved state]"
+    - "Preserved: [what must continue working]"
+    - "Design: [aesthetic direction]"
+```
+
+### C.1.3 Alternative Proposal Triggers
+
+**Đề xuất giải pháp thay thế khi:**
+
+1. User yêu cầu over-engineering
+2. Có giải pháp simpler/pre-built
+3. User chưa hiểu vấn đề đủ
+
+```
+═══════════════════════════════════════════════════════════════
+[ALTERNATIVE PROPOSAL]
+
+Your request suggests: "[what user asked]"
+Simpler alternative: "[what we recommend]"
+
+Trade-off analysis:
+├── Pros: [list]
+├── Cons: [list]
+├── Time saved: [estimate]
+
+Recommendation: [A/B]
+═══════════════════════════════════════════════════════════════
+```
+
+### C.2 Domain Classification
+
+```yaml
+domains:
+  frontend:
+    keywords: ["frontend", "UI", "UX", "interface", "landing", "page", "component", "button", "form", "layout", "responsive", "tailwind", "css", "react", "vue", "angular", "next", "nuxt"]
+    patterns: ["\.(tsx|jsx|vue|svelte)$", "\.(css|scss|tailwind)$"]
+    
+  backend:
+    keywords: ["backend", "API", "server", "database", "endpoint", "authentication", "authorization", "CRUD", "REST", "GraphQL"]
+    patterns: ["\.(py|java|go|ts|js)$"]
+    
+  security:
+    keywords: ["security", "auth", "login", "password", "JWT", "OAuth", "vulnerability", "XSS", "SQL injection", "encrypt", "HTTPS", "CORS", "CSRF"]
+    
+  payment:
+    keywords: ["payment", "checkout", "stripe", "paypal", "MoMo", "SePay", "PayOS", "VNPay", "ZaloPay", "VietQR", "invoice", "subscription"]
+    
+  mobile:
+    keywords: ["mobile", "app", "iOS", "Android", "react native", "flutter", "expo", "app store", "play store"]
+    
+  database:
+    keywords: ["database", "SQL", "PostgreSQL", "MySQL", "MongoDB", "migration", "schema", "query", "index", "ORM"]
+    
+  devops:
+    keywords: ["docker", "kubernetes", "CI/CD", "deployment", "AWS", "Azure", "GCP", "serverless", "lambda"]
+```
+
+### C.3 Intent Detection Algorithm
+
+```python
+def analyze_intent(english_request: str) -> dict:
+    """
+    Analyze translated request to determine intent and domain
+    Returns: {
+        "primary_intent": str,
+        "confidence": float,
+        "domains": list,
+        "entities": list,
+        "constraints": list
+    }
+    """
+    request_lower = english_request.lower()
+    
+    # Score each intent
+    intent_scores = {}
+    for intent_name, intent_data in INTENTS.items():
+        score = sum(1 for kw in intent_data["keywords"] if kw in request_lower)
+        intent_scores[intent_name] = score / len(intent_data["keywords"])
+    
+    # Get primary intent
+    primary_intent = max(intent_scores, key=intent_scores.get)
+    intent_confidence = intent_scores[primary_intent]
+    
+    # Detect domains
+    detected_domains = []
+    for domain_name, domain_data in DOMAINS.items():
+        score = sum(1 for kw in domain_data["keywords"] if kw in request_lower)
+        if score > 0:
+            detected_domains.append({
+                "domain": domain_name,
+                "score": score / len(domain_data["keywords"])
+            })
+    
+    # Extract entities (file names, component names, etc.)
+    entities = extract_entities(english_request)
+    
+    # Extract constraints (performance, security, etc.)
+    constraints = extract_constraints(english_request)
+    
+    return {
+        "primary_intent": primary_intent,
+        "intent_confidence": intent_confidence,
+        "intent_scores": intent_scores,
+        "domains": sorted(detected_domains, key=lambda x: x["score"], reverse=True),
+        "entities": entities,
+        "constraints": constraints
+    }
+```
+
+---
+
+## PHẦN D: RULE/SKILL AUTO-DISCOVERY
+
+> **Đầy đủ: [[rule_skill-registry]] §1-§6**
+> Tất cả skill definitions, triggers, confidence thresholds, và combinations được quản lý tập trung trong skill-registry.
+
+### D.1 Quick Reference
+
+| Skill | Role | Threshold | Mandatory |
+|-------|------|-----------|-----------|
+| frontend-taste | primary | 0.75 | No |
+| frontend-redesign | primary | 0.75 | No |
+| full-output | secondary | 0.80 | No |
+| frontend-review | mandatory | 0.50 | **Yes** |
+| security-review | primary | 0.85 | No |
+| vietnam-payment-review | primary | 0.90 | No |
+| karpathy-coding | mandatory_overlay | 1.0 | **Yes** |
+| ponytail | overlay | 0.85 | Optional |
+
+### D.2 Skill Trigger Rules
+
+| Rule | Trigger Conditions | Confidence | Priority |
+|------|-------------------|------------|----------|
+| `frontend-taste` | landing, portfolio, greenfield, new build | 0.90+ | HIGH |
+| `frontend-redesign` | improve, upgrade, existing site, redesign | 0.85+ | HIGH |
+| `full-output` | full implementation, complete, not skeleton | 0.90+ | HIGH |
+| `frontend-review` | any frontend task | 1.0 | MANDATORY |
+| `security-review` | security, auth, payment, vulnerability | 0.90+ | HIGH |
+| `vietnam-payment-review` | MoMo, SePay, PayOS, VNPay, ZaloPay, VietQR | 0.95+ | HIGH |
+| `karpathy-coding` | ALL coding tasks | 1.0 | MANDATORY |
+| `ponytail` | simple, minimal, less code, vibe code | 0.85+ | MEDIUM |
+| `visual-explainer` | diagram, architecture, flowchart | 0.90+ | MEDIUM |
+| `open-design` | design system, prototype, mockup | 0.85+ | MEDIUM |
+| `document-ocr` | OCR, text extraction, image to text | 0.95+ | MEDIUM |
+| `bazi` | 四柱, 算命, bazi, fortune | 0.95+ | LOW |
+| `aws` | AWS, EC2, S3, Lambda, DynamoDB | 0.90+ | HIGH |
+| `azure` | Azure, App Service, Cosmos DB | 0.90+ | HIGH |
+| `gcp` | GCP, Cloud Functions, BigQuery | 0.90+ | HIGH |
+| `docker` | docker, container, image | 0.90+ | HIGH |
+| `kubernetes` | k8s, kubernetes, pod, deployment | 0.90+ | HIGH |
+| `database` | PostgreSQL, MySQL, MongoDB, Redis | 0.85+ | MEDIUM |
+| `testing` | test, jest, playwright, unit test | 0.85+ | MEDIUM |
+
+### D.3 Skill Auto-Discovery Matrix
+
+```yaml
+skill_matrix:
+  # Frontend Skills
+  frontend-taste:
+    en_keywords: ["landing page", "portfolio", "homepage", "marketing site", "create", "build", "new"]
+    vi_keywords: ["trang đích", "danh mục", "trang chủ", "web marketing", "tạo", "xây dựng", "mới"]
+    zh_keywords: ["落地页", "作品集", "主页", "营销网站", "创建", "构建"]
+    confidence_threshold: 0.75
+    
+  frontend-redesign:
+    en_keywords: ["improve", "upgrade", "redesign", "modernize", "enhance", "existing", "current"]
+    vi_keywords: ["cải thiện", "nâng cấp", "thiết kế lại", "hiện đại hóa", "nâng cao", "hiện tại"]
+    zh_keywords: ["改进", "升级", "重新设计", "现代化", "增强", "现有"]
+    confidence_threshold: 0.75
+    
+  full-output:
+    en_keywords: ["full implementation", "complete", "not skeleton", "no TODO", "entire", "whole"]
+    vi_keywords: ["triển khai đầy đủ", "hoàn chỉnh", "toàn bộ", "không skeleton", "không TODO"]
+    zh_keywords: ["完整实现", "完整", "全部", "不省略"]
+    confidence_threshold: 0.80
+    
+  frontend-review:
+    en_keywords: ["review", "check", "quality", "audit", "inspect"]
+    vi_keywords: ["kiểm tra", "đánh giá", "chất lượng", "review", "quaudit"]
+    zh_keywords: ["审查", "检查", "质量", "审计"]
+    confidence_threshold: 0.70  # Mandatory for frontend tasks
+    
+  # Security Skills
+  security-review:
+    en_keywords: ["security", "vulnerability", "XSS", "SQL injection", "auth", "encrypt", "JWT", "OAuth"]
+    vi_keywords: ["bảo mật", "lỗ hổng", "auth", "mã hóa", "bảo vệ"]
+    zh_keywords: ["安全", "漏洞", "认证", "加密", "授权"]
+    confidence_threshold: 0.85
+    
+  vietnam-payment-review:
+    en_keywords: ["MoMo", "SePay", "PayOS", "VNPay", "ZaloPay", "VietQR"]
+    vi_keywords: ["MoMo", "SePay", "PayOS", "VNPay", "ZaloPay", "VietQR", "thanh toán", "ví điện tử"]
+    zh_keywords: ["MoMo", "SePay", "PayOS", "VNPay", "ZaloPay", "VietQR", "支付", "电子钱包"]
+    confidence_threshold: 0.90
+    
+  # Efficiency Skills
+  ponytail:
+    en_keywords: ["simple", "minimal", "less code", "yagni", "over-engineering"]
+    vi_keywords: ["đơn giản", "tối thiểu", "ít code", "không over-engineering"]
+    zh_keywords: ["简单", "最小", "少代码", "不要过度设计"]
+    confidence_threshold: 0.80
+    
+  karpathy-coding:
+    en_keywords: ["vibe code", "just do it", "don't overthink", "simple", "straightforward"]
+    vi_keywords: ["vibe code", "cứ làm đi", "đơn giản thôi", "không cần suy nghĩ nhiều"]
+    zh_keywords: ["vibe code", "直接做", "简单", "不要想太多"]
+    confidence_threshold: 0.75  # Runs with ALL tasks
+```
+
+### D.4 Auto-Discovery Algorithm
+
+```python
+def auto_discover_rules_and_skills(english_request: str, intent_analysis: dict) -> dict:
+    """
+    Automatically discover applicable rules and skills
+    """
+    request_lower = english_request.lower()
+    results = {
+        "skills": [],
+        "rules": [],
+        "gates": [],
+        "confidence": {}
+    }
+    
+    # Mandatory: karpathy-coding always runs
+    results["skills"].append({
+        "name": "karpathy-coding",
+        "type": "overlay",
+        "confidence": 1.0
+    })
+    
+    # Check each skill in matrix
+    for skill_name, skill_data in SKILL_MATRIX.items():
+        scores = []
+        
+        # Check English keywords
+        for kw in skill_data.get("en_keywords", []):
+            if kw in request_lower:
+                scores.append(1.0)
+                
+        # Check Vietnamese keywords (if original was Vietnamese)
+        for kw in skill_data.get("vi_keywords", []):
+            if kw in request_lower:
+                scores.append(1.0)
+                
+        # Check Chinese keywords
+        for kw in skill_data.get("zh_keywords", []):
+            if kw in request_lower:
+                scores.append(1.0)
+        
+        # Calculate confidence
+        if scores:
+            confidence = sum(scores) / max(len(skill_data.get("en_keywords", [1])), 1)
+            
+            if confidence >= skill_data["confidence_threshold"]:
+                results["skills"].append({
+                    "name": skill_name,
+                    "type": "primary" if skill_name not in ["karpathy-coding", "frontend-review"] else "mandatory",
+                    "confidence": confidence,
+                    "scores": scores
+                })
+                results["confidence"][skill_name] = confidence
+    
+    # Determine gates based on skills
+    for skill in results["skills"]:
+        gates = get_skill_gates(skill["name"])
+        results["gates"].extend(gates)
+    
+    # Remove duplicate gates
+    results["gates"] = list(set(results["gates"]))
+    
+    # Add domain-specific rules
+    for domain in intent_analysis["domains"]:
+        if domain["domain"] == "frontend":
+            results["rules"].append("frontend-architecture")
+        elif domain["domain"] == "security":
+            results["rules"].append("web-security")
+        elif domain["domain"] == "payment":
+            results["rules"].append("billing")
+        elif domain["domain"] == "database":
+            results["rules"].append("database")
+    
+    return results
+
+def get_skill_gates(skill_name: str) -> list:
+    """Get required gates for a skill"""
+    gate_map = {
+        "frontend-taste": ["taste-pre", "taste-post"],
+        "frontend-redesign": ["redesign-pre", "redesign-post"],
+        "full-output": ["fulloutput-pre", "fulloutput-post"],
+        "frontend-review": ["review-pre", "review-post"],
+        "security-review": ["security-pre", "security-post"],
+        "vietnam-payment-review": ["payment-pre", "payment-post"],
+        "karpathy-coding": ["karpathy-pre", "karpathy-post"],
+    }
+    return gate_map.get(skill_name, [])
+```
+
+### D.5 Multi-Language Keywords
+
+| Vietnamese | English | Skill |
+|-----------|---------|-------|
+| `trang đích`, `landing page` | landing page | frontend-taste |
+| `thiết kế lại`, `cải thiện` | redesign, improve | frontend-redesign |
+| `bảo mật`, `lỗ hổng` | security, vulnerability | security-review |
+| `thanh toán` | payment | vietnam-payment-review |
+| `đơn giản`, `ít code` | simple, minimal | ponytail |
+
+---
+
+## PHẦN G: CLARIFICATION FLOW (AMBIGUITY DETECTION)
+
+### G.1 Khi nào cần Clarification
+
+Request được coi là **ambiguous** khi:
+
+```yaml
+ambiguity_conditions:
+  # 1. Request quá ngắn
+  short_request:
+    max_words: 3
+    example: "Tạo app" → "Create app"
+    
+  # 2. Thiếu target rõ ràng
+  missing_target:
+    patterns: ["^create ", "^build ", "^add "]
+    without_target: true
+    example: "Create something" → missing target
+    
+  # 3. Thiếu action verb
+  missing_action:
+    required_keywords: ["create", "build", "fix", "add", "update", "delete", "remove"]
+    example: "The login page" → no action verb
+    
+  # 4. Intent confidence thấp
+  low_intent_confidence:
+    threshold: 0.5
+    example: intent_confidence < 0.5
+    
+  # 5. Multiple intents mạnh (conflict)
+  multi_intent_conflict:
+    score_gap: 0.15
+    example: build=0.45, fix=0.40 (gap < 0.15)
+    
+  # 6. Không có domain được detect
+  no_domain:
+    min_domains: 1
+    example: domain list empty
+    
+  # 7. Domain quan trọng nhưng thiếu context
+  critical_domain_without_context:
+    domains: ["security", "payment", "auth"]
+    missing_tech_stack: true
+```
+
+### G.2 Ambiguity Detection Algorithm
+
+```python
+def detect_ambiguity(
+    request: str,
+    intent_analysis: dict,
+    domain_detection: dict,
+    skill_discovery: dict
+) -> dict:
+    """
+    Detect if request is ambiguous and needs clarification
+    Returns: {
+        "is_ambiguous": bool,
+        "reasons": list,
+        "clarification_questions": list,
+        "confidence": float
+    }
+    """
+    request_lower = request.lower()
+    word_count = len(request.split())
+    reasons = []
+    questions = []
+    
+    # 1. Check request length
+    if word_count < 3:
+        reasons.append("request_too_short")
+        questions.append({
+            "type": "scope",
+            "question": "What specifically do you want to create/build/fix?",
+            "examples": [
+                "a landing page for my AI startup",
+                "a login component with email and password",
+                "a REST API for user management"
+            ]
+        })
+    
+    # 2. Check for missing target
+    has_target = bool(re.search(
+        r'\b(this|that|file|folder|app|page|component|'
+        r'button|form|api|database|system|feature)\w*',
+        request_lower
+    ))
+    if not has_target and word_count < 10:
+        reasons.append("missing_target")
+        questions.append({
+            "type": "target",
+            "question": "What is the target of this task?",
+            "examples": [
+                "a new React component",
+                "an existing API endpoint",
+                "the user dashboard"
+            ]
+        })
+    
+    # 3. Check intent confidence
+    intent_confidence = intent_analysis.get("intent_confidence", 0)
+    if intent_confidence < 0.5:
+        reasons.append("low_intent_confidence")
+        questions.append({
+            "type": "intent",
+            "question": "I noticed you want something done, but I'm not sure what action. "
+                       "Do you want to:",
+            "options": [
+                "CREATE something new",
+                "FIX an existing issue",
+                "IMPROVE/upgrade current implementation",
+                "REVIEW/audit current code"
+            ]
+        })
+    
+    # 4. Check multi-intent conflict
+    intent_scores = intent_analysis.get("intent_scores", {})
+    if len(intent_scores) >= 2:
+        sorted_scores = sorted(intent_scores.values(), reverse=True)
+        if len(sorted_scores) >= 2:
+            gap = sorted_scores[0] - sorted_scores[1]
+            if gap < 0.15 and sorted_scores[1] > 0.25:
+                reasons.append("multi_intent_conflict")
+                top_intents = sorted(intent_scores.items(), key=lambda x: x[1], reverse=True)[:2]
+                questions.append({
+                    "type": "priority",
+                    "question": f"I detected two possible intents: "
+                               f"'{top_intents[0][0]}' and '{top_intents[1][0]}'. "
+                               f"Which is your priority?",
+                    "options": [f"{i[0]} (priority)" for i in top_intents]
+                })
+    
+    # 5. Check domain detection
+    if not domain_detection.get("detected_domains"):
+        reasons.append("no_domain_detected")
+        questions.append({
+            "type": "domain",
+            "question": "What type of task is this?",
+            "options": [
+                "Frontend (UI/UX/Components)",
+                "Backend (API/Database/Server)",
+                "Full-stack (both frontend and backend)",
+                "DevOps (deployment/CI-CD)"
+            ]
+        })
+    
+    # 6. Check critical domains without tech context
+    critical_domains = ["security", "payment"]
+    detected_critical = [d for d in domain_detection.get("detected_domains", [])
+                        if d.get("domain") in critical_domains]
+    
+    if detected_critical:
+        tech_context = detect_tech_context(request)
+        if not tech_context:
+            reasons.append("critical_domain_no_tech_context")
+            questions.append({
+                "type": "tech_stack",
+                "question": f"For this {detected_critical[0]['domain']} task, "
+                           f"what technology are you using?",
+                "examples": [
+                    "React + Node.js",
+                    "Next.js + Prisma",
+                    "Vue + Laravel"
+                ]
+            })
+    
+    # 7. Special check for "vague" keywords
+    vague_keywords = ["something", "stuff", "things", "it", "this", "that"]
+    if any(kw in request_lower for kw in vague_keywords) and word_count < 8:
+        reasons.append("contains_vague_keywords")
+        questions.append({
+            "type": "specificity",
+            "question": "Can you be more specific about what you mean?",
+            "hint": "Instead of 'something', please name the actual component/file/feature."
+        })
+    
+    # Calculate overall ambiguity
+    is_ambiguous = len(reasons) > 0
+    ambiguity_confidence = min(1.0, len(reasons) * 0.25)
+    
+    return {
+        "is_ambiguous": is_ambiguous,
+        "reasons": reasons,
+        "clarification_questions": questions,
+        "ambiguity_confidence": ambiguity_confidence,
+        "severity": "high" if len(reasons) >= 2 else "medium" if len(reasons) == 1 else "low"
+    }
+```
+
+### G.3 Clarification Question Generation
+
+```python
+def generate_clarification_prompt(ambiguity_result: dict) -> str:
+    """
+    Generate user-friendly clarification prompt
+    """
+    if not ambiguity_result["is_ambiguous"]:
+        return None
+    
+    lines = []
+    lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    lines.append("📋 CLARIFICATION NEEDED")
+    lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    lines.append("")
+    lines.append("I need some additional information to proceed accurately:")
+    lines.append("")
+    
+    for i, question in enumerate(ambiguity_result["clarification_questions"], 1):
+        lines.append(f"{i}. **{question['type'].upper()}**: {question['question']}")
+        
+        if question.get("options"):
+            for opt in question["options"]:
+                lines.append(f"   - {opt}")
+        
+        if question.get("examples"):
+            lines.append("   Examples:")
+            for ex in question["examples"]:
+                lines.append(f"   • {ex}")
+        
+        if question.get("hint"):
+            lines.append(f"   💡 Hint: {question['hint']}")
+        
+        lines.append("")
+    
+    lines.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    lines.append("")
+    lines.append("Your clarification will help me:")
+    lines.append("  • Select the correct skills and rules")
+    lines.append("  • Choose the right approach")
+    lines.append("  • Execute the task correctly on first attempt")
+    
+    return "\n".join(lines)
+
+
+def process_clarification_response(
+    original_request: str,
+    user_response: str,
+    question_type: str
+) -> dict:
+    """
+    Process user's clarification response and merge with original request
+    """
+    # Update request with clarified information
+    clarified_request = {
+        "original": original_request,
+        "clarification": user_response,
+        "question_type": question_type,
+        "merged": f"{original_request} {user_response}"
+    }
+    
+    return clarified_request
+```
+
+### G.4 Clarification Flow Integration
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        CLARIFICATION FLOW                                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  1. REQUEST RECEIVED                                                        │
+│     ↓                                                                       │
+│  2. LANGUAGE DETECTION + TRANSLATION                                       │
+│     ↓                                                                       │
+│  3. INTENT ANALYSIS                                                         │
+│     ↓                                                                       │
+│  4. RULE/SKILL AUTO-DISCOVERY                                               │
+│     ↓                                                                       │
+│  5. ┌─────────────────────────────────────┐                                │
+│     │  AMBIGUITY DETECTION                 │                                │
+│     │  Check all ambiguity conditions     │                                │
+│     └─────────────┬───────────────────────┘                                │
+│                   │                                                         │
+│            ┌──────┴──────┐                                                  │
+│            │ Is ambiguous?│                                                  │
+│            └──────┬──────┘                                                  │
+│              YES  │    NO                                                   │
+│              ↓    ↓                                                         │
+│  ┌───────────────────┐    ┌──────────────────┐                            │
+│  │ GENERATE CLARIFY  │    │ CONTINUE TO      │                            │
+│  │ QUESTIONS         │    │ VALIDATION       │                            │
+│  │                   │    │ (Pre-Exec Gate)  │                            │
+│  └─────────┬─────────┘    └──────────────────┘                            │
+│            │                                                                │
+│            ↓                                                                │
+│  ┌───────────────────┐                                                     │
+│  │ ASK USER          │                                                     │
+│  │ (structured form) │                                                     │
+│  └─────────┬─────────┘                                                     │
+│            │                                                                │
+│            ↓                                                                │
+│  ┌───────────────────┐                                                     │
+│  │ PROCESS RESPONSE  │                                                     │
+│  │ Merge clarified   │                                                     │
+│  │ info into request │                                                     │
+│  └─────────┬─────────┘                                                     │
+│            │                                                                │
+│            ↓                                                                │
+│  ┌───────────────────┐                                                     │
+│  │ RE-ANALYZE       │                                                     │
+│  │ (Intent, Skills)  │                                                     │
+│  └─────────┬─────────┘                                                     │
+│            │                                                                │
+│            ↓                                                                │
+│  ┌───────────────────┐                                                     │
+│  │ CONTINUE TO       │                                                     │
+│  │ PRE-EXECUTION     │                                                     │
+│  │ VALIDATION        │                                                     │
+│  └───────────────────┘                                                     │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### G.5 Quick Clarification Templates
+
+```yaml
+clarification_templates:
+  # Short vague requests
+  too_short:
+    triggers: ["tạo app", "xây web", "fix bug", "làm gì đó", "cái gì đó"]
+    template: |
+      Your request is quite brief. To help you better:
+      
+      Please specify:
+      1. **What** - The target (component, page, feature)?
+      2. **Action** - Create, fix, improve, or add?
+      3. **Context** - Any specific requirements?
+      
+      Example: "Create a login page with email/password using React"
+
+  # Missing tech context
+  no_tech_stack:
+    triggers: ["bảo mật", "thanh toán", "auth", "login", "payment", "security"]
+    template: |
+      This task involves security/payment functionality.
+      
+      Please clarify:
+      1. **Framework** - React, Vue, Next.js, Nuxt, etc.?
+      2. **Backend** - Node.js, Python, .NET, etc.?
+      3. **Auth Method** - JWT, Session, OAuth, SSO?
+      4. **Payment Provider** - Stripe, MoMo, PayOS, etc.?
+
+  # Missing target
+  no_target:
+    triggers: ["tạo", "thêm", "sửa", "cải thiện"]
+    with_keywords: ["đẹp", "tốt", "mới", "nhanh", "tốt hơn"]
+    template: |
+      I understand you want to create/improve something.
+      
+      Please specify the **target**:
+      - File path: `src/components/Button.tsx`
+      - Component name: `UserProfile`
+      - Feature: `payment checkout flow`
+      - Page: `landing page for AI startup`
+```
+
+### G.6 Brainstorming Protocol (from Superpowers)
+
+> **Source:** [obra/superpowers](https://github.com/obra/superpowers) `brainstorming` skill (248k stars) — "Refines rough ideas through questions, explores alternatives, presents design in sections for validation."
+
+The brainstorming protocol activates BEFORE writing code, when intent is unclear or the design has multiple valid paths. It complements the clarification flow above (G.1-G.5) and the frontend-taste §0.C Ambiguous Brief Protocol.
+
+#### Core Principles
+
+1. **Ask before assuming** — surface trade-offs explicitly; surface assumptions explicitly; if the user says "build X", ask "what problem does X solve?" before designing X.
+2. **One question at a time** — don't bombard user with a 10-question form; peel one question, wait for answer, then next. Avoid premature decisions.
+3. **Explore alternatives** — for every "I want to do X", list 2-3 valid options with concrete trade-offs. Don't pick silently.
+4. **Present design in chunks** — once aligned, write a design doc in sections (problem, scope, options, decision, risks), get explicit approval per section before coding.
+5. **Persist via design doc** — write approved design to a doc file (e.g., `docs/specs/<feature>.md`) so the plan in `task-analyzer.mdc §3` has a stable reference.
+
+#### G.6.1 Antigravity-Style Brainstorming
+
+**Khi nào trigger brainstorming:**
+
+|| Signal | Trigger condition |
+|---|---|---|
+| Vague request | No concrete deliverable specified | → Ask 1 question |
+| Multiple options | 2+ valid approaches | → List trade-offs |
+| New feature scope | Ambiguous feature boundaries | → Clarify scope |
+| Open-ended "improve" | Could mean redesign/refactor/fix | → Define goal |
+| Over-engineering signal | Custom auth from scratch, etc. | → Suggest alternatives |
+
+**Enhanced Question Template:**
+
+```
+═══════════════════════════════════════════════════════════════
+[CLARIFICATION]
+
+Request: "[original request]"
+
+What I understand:
+• You want to: [summary]
+• Context: [tech stack if mentioned]
+• Goal: [what user expects]
+
+Before I proceed, one question:
+
+[1 QUESTION - most critical to understand]
+
+Your answer will help me:
+• Choose the right approach
+• Avoid over/under-engineering
+• Deliver exactly what you need
+═══════════════════════════════════════════════════════════════
+```
+
+#### G.6.2 Trade-off Documentation Template
+
+```
+═══════════════════════════════════════════════════════════════
+[TRADE-OFF ANALYSIS]
+
+Option A: [Name]
+├── Pros: [list]
+├── Cons: [list]
+├── Time: [estimate]
+└── Best for: [use case]
+
+Option B: [Name]
+├── Pros: [list]
+├── Cons: [list]
+├── Time: [estimate]
+└── Best for: [use case]
+
+My recommendation: [A/B] because [reasoning]
+
+For your request "[summary]", I suggest [option].
+Do you agree, or would you prefer [other option]?
+═══════════════════════════════════════════════════════════════
+```
+
+#### When to Trigger
+
+| Signal | Trigger condition |
+|---|---|
+| Vague brief | No concrete deliverable specified (already covered by G.1-G.3) |
+| Multiple options | 2+ valid approaches (performance vs simplicity, library A vs B) |
+| New feature scope | Ambiguous feature boundaries — what's in/out? |
+| Open-ended "improve" | Could mean redesign, refactor, fix, or add |
+
+#### Connection to Framework
+
+```
+Brainstorming (G.6)
+    ↓ (design doc with user approval)
+Intent Analysis (C) ─→ Skill Detection (skill-registry)
+    ↓
+Planning (task-analyzer §3 — atomic tasks 2-5min)
+    ↓
+Pre-Review Gate → Implementation → Post-Review Gate
+```
+
+> See: [[frontend-taste]] §0.B Design Read Declaration for landing page specific application.
+
+---
+
+## LIÊN KẾT
+
+- [[rule_skill-registry]] — Single source of truth cho skills
+- [[rule_skill-integration]] — Skill Auto-Discovery & Execution Protocol (base)
+- [[proto_context-router]] — Context routing rules
+- [[proto_memory-first]] — Memory context management
