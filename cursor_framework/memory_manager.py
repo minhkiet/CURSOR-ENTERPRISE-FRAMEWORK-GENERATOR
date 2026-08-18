@@ -333,7 +333,6 @@ class MemoryManager:
     def _matches_pattern(self, key: str, pattern: str) -> bool:
         """Check if key matches pattern."""
         if "*" in pattern:
-            import fnmatch
             return fnmatch.fnmatch(key, pattern)
         return pattern in key
 

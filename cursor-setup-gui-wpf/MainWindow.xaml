@@ -4,19 +4,25 @@
         xmlns:vm="clr-namespace:CursorSetupWpf.ViewModels"
         xmlns:views="clr-namespace:CursorSetupWpf.Views"
         Title="{Binding WindowTitle}"
-        Width="1200" Height="860"
-        MinWidth="960" MinHeight="720"
+        Width="1240" Height="880"
+        MinWidth="1000" MinHeight="740"
         WindowStartupLocation="CenterScreen"
         Icon="setup.ico"
-        Background="{StaticResource FormBackgroundBrush}">
+        Background="{StaticResource FormBackgroundBrush}"
+        Focusable="True">
 
     <Window.DataContext>
         <vm:MainViewModel/>
     </Window.DataContext>
 
+    <!-- Drop-shadow around the window for depth -->
+    <Window.Effect>
+        <DropShadowEffect BlurRadius="32" ShadowDepth="0" Direction="270" Color="#1E293B" Opacity="0.18"/>
+    </Window.Effect>
+
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="240"/>
+            <ColumnDefinition Width="260"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
@@ -30,27 +36,26 @@
                 </Grid.RowDefinitions>
 
                 <!-- Brand header -->
-                <Border Grid.Row="0" Padding="20,24,20,20">
+                <Border Grid.Row="0" Padding="20,22,20,20">
                     <StackPanel>
-                        <!-- Indigo accent bar + title -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                             <Border Width="4" CornerRadius="2"
-                                    Background="{StaticResource Indigo600Brush}"
+                                    Background="{StaticResource Indigo500Brush}"
+                                    Effect="{StaticResource IndigoGlow}"
                                     Margin="0,0,12,0"/>
                             <TextBlock Text="{Binding AppBrand}"
                                       FontFamily="{StaticResource UIFont}"
-                                      FontSize="17" FontWeight="SemiBold"
+                                      FontSize="16" FontWeight="SemiBold"
                                       Foreground="White"/>
                         </StackPanel>
                         <TextBlock Text="{Binding AppBrandSubtitle}"
                                    FontFamily="{StaticResource UIFont}"
-                                   FontSize="13"
+                                   FontSize="12"
                                    Foreground="{StaticResource Slate500Brush}"
                                    Margin="16,0,0,0"/>
                     </StackPanel>
                 </Border>
 
-                <!-- Divider -->
                 <Border Grid.Row="0" VerticalAlignment="Bottom"
                         BorderBrush="{StaticResource Slate800Brush}"
                         BorderThickness="0,0,0,1"/>
@@ -61,7 +66,8 @@
                          SelectedIndex="{Binding SelectedNavIndex, Mode=TwoWay}"
                          Background="Transparent"
                          BorderThickness="0"
-                         Margin="0,12,0,0">
+                         Margin="0,8,0,0"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <StackPanel/>
@@ -75,29 +81,32 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="ListBoxItem">
-                                        <Grid x:Name="root">
-                                            <!-- Active indicator bar (left edge) -->
-                                            <Border x:Name="activeBar" Width="3"
-                                                    Background="{StaticResource Indigo600Brush}"
-                                                    CornerRadius="0,3,3,0"
-                                                    HorizontalAlignment="Left"
-                                                    Margin="0,8" Opacity="0"/>
-
-                                            <!-- Content -->
-                                            <Border x:Name="bg" Padding="16,12"
-                                                    Background="Transparent"
-                                                    CornerRadius="8" Margin="0,2">
-                                                <StackPanel Orientation="Horizontal">
+                                        <Border x:Name="bg" Padding="16,12"
+                                                Background="Transparent"
+                                                CornerRadius="8" Margin="0,2">
+                                            <Grid>
+                                                <Border x:Name="activeBar" Width="3"
+                                                        Background="{StaticResource Indigo500Brush}"
+                                                        CornerRadius="0,3,3,0"
+                                                        HorizontalAlignment="Left"
+                                                        Margin="-16,8"
+                                                        Opacity="0"/>
+                                                <StackPanel Orientation="Horizontal"
+                                                            VerticalAlignment="Center">
                                                     <TextBlock Text="{Binding Icon}"
-                                                               FontFamily="Segoe MDL2 Assets"
-                                                               FontSize="18"
+                                                               FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                                               FontSize="16"
                                                                VerticalAlignment="Center"
                                                                Foreground="{StaticResource Slate400Brush}"
                                                                Margin="0,0,12,0"/>
-                                                    <ContentPresenter VerticalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding Title}"
+                                                               FontFamily="{StaticResource UIFont}"
+                                                               FontSize="13"
+                                                               VerticalAlignment="Center"
+                                                               Foreground="{StaticResource Slate300Brush}"/>
                                                 </StackPanel>
-                                            </Border>
-                                        </Grid>
+                                            </Grid>
+                                        </Border>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
                                                 <Setter TargetName="bg" Property="Background"
@@ -114,34 +123,44 @@
                             </Setter>
                         </Style>
                     </ListBox.ItemContainerStyle>
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Title}"
-                                       FontFamily="{StaticResource UIFont}"
-                                       FontSize="14"
-                                       Foreground="{StaticResource Slate300Brush}"/>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
                 </ListBox>
 
-                <!-- Language selector -->
+                <!-- Language selector + version chip -->
                 <Border Grid.Row="2" Padding="20,12,20,16">
                     <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding LanguageLabel}"
-                                   FontFamily="{StaticResource UIFont}"
-                                   FontSize="12"
-                                   Foreground="{StaticResource Slate400Brush}"
-                                   VerticalAlignment="Center"/>
-                        <ComboBox Grid.Column="1"
-                                  ItemsSource="{Binding Languages}"
-                                  SelectedItem="{Binding SelectedLanguage}"
-                                  DisplayMemberPath="DisplayName"
-                                  Style="{StaticResource ModernComboBoxStyle}"
-                                  MinWidth="130"/>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0" Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding LanguageLabel}"
+                                       FontFamily="{StaticResource UIFont}"
+                                       FontSize="11"
+                                       Foreground="{StaticResource Slate400Brush}"
+                                       VerticalAlignment="Center"/>
+                            <ComboBox Grid.Column="1"
+                                      ItemsSource="{Binding Languages}"
+                                      SelectedItem="{Binding SelectedLanguage}"
+                                      DisplayMemberPath="DisplayName"
+                                      Style="{StaticResource ModernComboBoxStyle}"
+                                      MinWidth="130"/>
+                        </Grid>
+                        <Border Grid.Row="1" Background="{StaticResource Slate800Brush}" CornerRadius="6" Padding="10,5">
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse Width="6" Height="6" Fill="{StaticResource Emerald500Brush}"
+                                         Effect="{StaticResource EmeraldGlow}"
+                                         Margin="0,0,8,0"/>
+                                <TextBlock Text="{Binding VersionChip}"
+                                           FontFamily="{StaticResource MonoFont}"
+                                           FontSize="11" FontWeight="SemiBold"
+                                           Foreground="{StaticResource Slate300Brush}"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
                     </Grid>
                 </Border>
             </Grid>
@@ -155,31 +174,23 @@
                 <RowDefinition Height="280"/>
             </Grid.RowDefinitions>
 
-            <!-- Page content (switched by SelectedNavIndex) -->
+            <!-- Page content -->
             <Grid Grid.Row="0" Background="{StaticResource ContentBackgroundBrush}">
-                <!-- Fade transition between pages -->
-                <Grid.Triggers>
-                    <EventTrigger RoutedEvent="Loaded">
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                                From="0" To="1" Duration="0:0:0.4"/>
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </EventTrigger>
-                </Grid.Triggers>
-
-                <!-- Page switcher -->
                 <Grid>
                     <views:InstallView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=0, FallbackValue=Visible}"/>
                     <views:ComponentsView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=1, FallbackValue=Collapsed}"/>
                     <views:AdvancedView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=2, FallbackValue=Collapsed}"/>
                     <views:HooksView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=3, FallbackValue=Collapsed}"/>
-                    <views:GuideView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=4, FallbackValue=Collapsed}"/>
+                    <views:McpServersView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=4, FallbackValue=Collapsed}"/>
+                    <views:UpdatesView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=5, FallbackValue=Collapsed}"/>
+                    <views:BackupView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=6, FallbackValue=Collapsed}"/>
+                    <views:SettingsView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=7, FallbackValue=Collapsed}"/>
+                    <views:GuideView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=8, FallbackValue=Collapsed}"/>
+                    <views:FrameworkView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=9, FallbackValue=Collapsed}"/>
                 </Grid>
             </Grid>
 
-            <!-- === BOTTOM PANEL === -->
+            <!-- === BOTTOM PANEL (Step progress) === -->
             <Border Grid.Row="1" Background="White"
                     BorderBrush="{StaticResource Slate200Brush}"
                     BorderThickness="0,1,0,0">
@@ -190,7 +201,6 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Summary row -->
                     <TextBlock Grid.Row="0"
                                Text="{Binding SummaryText}"
                                FontFamily="{StaticResource UIFont}"
@@ -199,8 +209,7 @@
                                Margin="0,10,0,0"
                                VerticalAlignment="Center"/>
 
-                    <!-- Step progress indicator — full row -->
-                    <Grid Grid.Row="1" Margin="0,10,0,0">
+                    <Grid Grid.Row="1" Margin="0,12,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
@@ -209,20 +218,21 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
                         <!-- Step 1 -->
                         <StackPanel Grid.Column="0" HorizontalAlignment="Center">
                             <Grid>
+                                <Ellipse x:Name="step1Ring" Width="30" Height="30"
+                                         Stroke="{Binding Step1Fill}" StrokeThickness="2"
+                                         Fill="Transparent"/>
                                 <Ellipse Width="26" Height="26" Fill="{Binding Step1Fill}"/>
                                 <TextBlock Text="{Binding Step1Text}"
                                            FontFamily="{StaticResource MonoFont}"
                                            FontSize="12" FontWeight="Bold"
                                            Foreground="White"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"/>
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Text="{Binding Step1Label}"
                                        FontSize="11"
@@ -230,21 +240,21 @@
                                        HorizontalAlignment="Center" Margin="0,4,0,0"/>
                         </StackPanel>
 
-                        <!-- Line 1-2 -->
                         <Border Grid.Column="1" Height="2" Width="50"
                                 Background="{Binding StepLine1Fill}"
                                 VerticalAlignment="Center" Margin="6,0"/>
 
-                        <!-- Step 2 -->
                         <StackPanel Grid.Column="2" HorizontalAlignment="Center">
                             <Grid>
+                                <Ellipse Width="30" Height="30"
+                                         Stroke="{Binding Step2Fill}" StrokeThickness="2"
+                                         Fill="Transparent"/>
                                 <Ellipse Width="26" Height="26" Fill="{Binding Step2Fill}"/>
                                 <TextBlock Text="{Binding Step2Text}"
                                            FontFamily="{StaticResource MonoFont}"
                                            FontSize="12" FontWeight="Bold"
                                            Foreground="White"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"/>
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Text="{Binding Step2Label}"
                                        FontSize="11"
@@ -252,21 +262,21 @@
                                        HorizontalAlignment="Center" Margin="0,4,0,0"/>
                         </StackPanel>
 
-                        <!-- Line 2-3 -->
                         <Border Grid.Column="3" Height="2" Width="50"
                                 Background="{Binding StepLine2Fill}"
                                 VerticalAlignment="Center" Margin="6,0"/>
 
-                        <!-- Step 3 -->
                         <StackPanel Grid.Column="4" HorizontalAlignment="Center">
                             <Grid>
+                                <Ellipse Width="30" Height="30"
+                                         Stroke="{Binding Step3Fill}" StrokeThickness="2"
+                                         Fill="Transparent"/>
                                 <Ellipse Width="26" Height="26" Fill="{Binding Step3Fill}"/>
                                 <TextBlock Text="{Binding Step3Text}"
                                            FontFamily="{StaticResource MonoFont}"
                                            FontSize="12" FontWeight="Bold"
                                            Foreground="White"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"/>
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Text="{Binding Step3Label}"
                                        FontSize="11"
@@ -274,21 +284,21 @@
                                        HorizontalAlignment="Center" Margin="0,4,0,0"/>
                         </StackPanel>
 
-                        <!-- Line 3-4 -->
                         <Border Grid.Column="5" Height="2" Width="50"
                                 Background="{Binding StepLine3Fill}"
                                 VerticalAlignment="Center" Margin="6,0"/>
 
-                        <!-- Step 4 -->
                         <StackPanel Grid.Column="6" HorizontalAlignment="Center">
                             <Grid>
+                                <Ellipse Width="30" Height="30"
+                                         Stroke="{Binding Step4Fill}" StrokeThickness="2"
+                                         Fill="Transparent"/>
                                 <Ellipse Width="26" Height="26" Fill="{Binding Step4Fill}"/>
                                 <TextBlock Text="{Binding Step4Text}"
                                            FontFamily="{StaticResource MonoFont}"
                                            FontSize="12" FontWeight="Bold"
                                            Foreground="White"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"/>
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Text="{Binding Step4Label}"
                                        FontSize="11"
@@ -296,10 +306,13 @@
                                        HorizontalAlignment="Center" Margin="0,4,0,0"/>
                         </StackPanel>
 
-                        <!-- Status indicator at right -->
-                        <StackPanel Grid.Column="8" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+                        <StackPanel Grid.Column="7" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
                             <Ellipse Width="8" Height="8" Margin="0,0,8,0"
-                                     Fill="{StaticResource Emerald600Brush}"/>
+                                     Fill="{StaticResource Emerald500Brush}">
+                                <Ellipse.Effect>
+                                    <BlurEffect Radius="2"/>
+                                </Ellipse.Effect>
+                            </Ellipse>
                             <TextBlock Text="{Binding StatusText}"
                                        FontFamily="{StaticResource UIFont}"
                                        FontSize="12"
@@ -308,10 +321,9 @@
                         </StackPanel>
                     </Grid>
 
-                    <!-- Thin separator -->
                     <Border Grid.Row="2" Height="1"
                             Background="{StaticResource Slate200Brush}"
-                            Margin="0,8,0,0"/>
+                            Margin="0,10,0,0"/>
                 </Grid>
             </Border>
 
@@ -323,7 +335,6 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Log output -->
                     <ScrollViewer Grid.Row="0"
                                   VerticalScrollBarVisibility="Auto"
                                   HorizontalScrollBarVisibility="Auto"
@@ -342,7 +353,6 @@
                         </ItemsControl>
                     </ScrollViewer>
 
-                    <!-- Button strip -->
                     <Border Grid.Row="1"
                             Background="{StaticResource Slate900Brush}"
                             Padding="24,12">
@@ -353,11 +363,10 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
-                            <!-- Install button centered -->
                             <Button Grid.Column="1"
                                     Style="{StaticResource PrimaryButtonStyle}"
                                     Command="{Binding InstallCommand}"
-                                    MinWidth="160">
+                                    MinWidth="180">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="&#xE8FB;"
@@ -374,5 +383,10 @@
                 </Grid>
             </Border>
         </Grid>
+
+        <!-- === TOAST LAYER (overlay on top of everything) === -->
+        <views:ToastView Grid.Column="0" Grid.ColumnSpan="2"
+                         HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                         IsHitTestVisible="False"/>
     </Grid>
 </Window>

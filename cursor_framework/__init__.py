@@ -17,13 +17,16 @@ Modules:
     workflow: Single entry point — scan + cache + build + persist
     watcher: Polls .cursor/ for changes, triggers callbacks
     dashboard: Stdlib HTTP server serving INDEX.json + stats + HTML
+    code_graph: Project code graph indexer with dependency detection
+    session_memory: Session memory tracker for file reads
+    cursor_integration: Cursor IDE integration layer
     utils: Common utilities
 
 Author: Cursor Enterprise Framework
 Version: 1.2.0
 """
 
-__version__ = "1.3.0"
+__version__ = "1.5.0"
 __author__ = "Cursor Enterprise Framework"
 
 # Lazy attribute access (PEP 562): importing `cursor_framework` does not
@@ -66,6 +69,19 @@ _LAZY_EXPORTS = {
     "OffloadResult": "cursor_framework.tdam_integration",
     "create_tdam_integration": "cursor_framework.tdam_integration",
     "create_tdam_integration_from_env": "cursor_framework.tdam_integration",
+    # Code Graph & Memory System
+    "CodeGraph": "cursor_framework.code_graph",
+    "CodeGraphResult": "cursor_framework.code_graph",
+    "Module": "cursor_framework.code_graph",
+    "Dependency": "cursor_framework.code_graph",
+    "SessionMemory": "cursor_framework.session_memory",
+    "FileRead": "cursor_framework.session_memory",
+    "CursorIntegration": "cursor_framework.cursor_integration",
+    # Additional exports
+    "Watcher": "cursor_framework.watcher",
+    # Code Graph RAG Integration (optional)
+    "CodeGraphRAG": "cursor_framework.integrations.code_graph_rag",
+    "is_code_graph_rag_available": "cursor_framework.integrations.code_graph_rag",
 }
 
 
@@ -116,4 +132,17 @@ __all__ = [
     "OffloadResult",
     "create_tdam_integration",
     "create_tdam_integration_from_env",
+    # Code Graph & Memory System
+    "CodeGraph",
+    "CodeGraphResult",
+    "Module",
+    "Dependency",
+    "SessionMemory",
+    "FileRead",
+    "CursorIntegration",
+    # Additional exports
+    "Watcher",
+    # Code Graph RAG Integration (optional)
+    "CodeGraphRAG",
+    "is_code_graph_rag_available",
 ]

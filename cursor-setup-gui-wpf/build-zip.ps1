@@ -1,14 +1,27 @@
 # ============================================================
-# Build cursor-setup.zip from latest .cursor contents
+# Build cursor-setup.zip from .cursor contents
 # ============================================================
+param(
+    [string]$Config = "Debug"
+)
+
 $ErrorActionPreference = "Stop"
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+# RepoRoot is parent of cursor-setup-gui-wpf
 $RepoRoot = Split-Path -Parent $ScriptDir
 $SourceDir = Join-Path $RepoRoot ".cursor"
-$BuildDir = Join-Path $ScriptDir "bin\Debug\net8.0-windows\win-x64"
+$BuildDir = Join-Path $ScriptDir "bin\$Config\net8.0-windows\win-x64"
 $OutputZip = Join-Path $BuildDir "cursor-setup.zip"
 $TempZip = Join-Path $env:TEMP "cursor-setup-build-$([System.Guid]::NewGuid().ToString('N')).zip"
+
+Write-Host ""
+Write-Host "Cursor Enterprise Framework Packager v4.4.0" -ForegroundColor Cyan
+Write-Host "===========================================" -ForegroundColor Cyan
+Write-Host "Config : $Config" -ForegroundColor Gray
+Write-Host "Source : $SourceDir"
+Write-Host "Output : $OutputZip"
+Write-Host ""
 
 if (-not (Test-Path $SourceDir)) {
     Write-Host "[ERROR] Source directory not found: $SourceDir" -ForegroundColor Red
@@ -17,23 +30,16 @@ if (-not (Test-Path $SourceDir)) {
 
 if (-not (Test-Path $BuildDir)) {
     Write-Host "[ERROR] Build directory not found: $BuildDir" -ForegroundColor Red
+    Write-Host "        Run build first: dotnet build" -ForegroundColor Yellow
     exit 1
 }
 
-Write-Host ""
-Write-Host "Cursor Enterprise Framework Packager v4.3.0" -ForegroundColor Cyan
-Write-Host "===========================================" -ForegroundColor Cyan
-Write-Host ""
-Write-Host "Source : $SourceDir"
-Write-Host "Output : $OutputZip"
-Write-Host ""
-
 # Stats
-Write-Host "[1/5] Gathering framework statistics..." -ForegroundColor Yellow
+Write-Host "[1/6] Gathering framework statistics..." -ForegroundColor Yellow
 $categories = @(
     "agents", "cache", "commands", "hooks", "knowledge",
     "memory", "prompts", "references", "rules", "scripts",
-    "skills", "templates", "workflows"
+    "skills", "templates", "workflows", "mcp"
 )
 $stats = [ordered]@{}
 foreach ($cat in $categories) {
@@ -56,7 +62,7 @@ foreach ($k in $stats.Keys) {
 
 # Integrity check
 Write-Host ""
-Write-Host "[2/5] Verifying framework integrity..." -ForegroundColor Yellow
+Write-Host "[2/6] Verifying framework integrity..." -ForegroundColor Yellow
 $requiredDirs = @("rules", "skills", "agents", "memory", "knowledge", "scripts")
 $issues = @()
 foreach ($dir in $requiredDirs) {
@@ -71,17 +77,24 @@ if ($issues.Count -gt 0) {
     Write-Host "  [OK] All required directories present" -ForegroundColor Green
 }
 
+# MCP tools check
+$mcpDir = Join-Path $SourceDir "mcp"
+if (Test-Path $mcpDir) {
+    $mcpFiles = @(Get-ChildItem -Path $mcpDir -Recurse -File -ErrorAction SilentlyContinue)
+    Write-Host "  [OK] MCP directory: $($mcpFiles.Count) files" -ForegroundColor Green
+} else {
+    Write-Host "  [INFO] MCP directory not found in .cursor (will be copied during build)" -ForegroundColor Gray
+}
+
 # Build ZIP
 Write-Host ""
-Write-Host "[3/5] Creating ZIP archive..." -ForegroundColor Yellow
+Write-Host "[3/6] Creating ZIP archive..." -ForegroundColor Yellow
 if (Test-Path $OutputZip) {
     Remove-Item $OutputZip -Force
     Write-Host "  Removed existing zip" -ForegroundColor Gray
 }
 if (Test-Path $TempZip) { Remove-Item $TempZip -Force }
 
-# Use Compress-Archive with the wildcard so the entries are at the root
-# (matching the format the installer expects)
 try {
     Compress-Archive -Path "$SourceDir\*" -DestinationPath $TempZip -CompressionLevel Optimal -Force
 }
@@ -98,7 +111,7 @@ Write-Host "  [OK] ZIP archive created: $zipSizeMB MB" -ForegroundColor Green
 
 # Verify structure
 Write-Host ""
-Write-Host "[4/5] Verifying ZIP structure..." -ForegroundColor Yellow
+Write-Host "[4/6] Verifying ZIP structure..." -ForegroundColor Yellow
 $verifyDir = Join-Path $env:TEMP "cursor-setup-verify-$([System.Guid]::NewGuid().ToString('N'))"
 if (Test-Path $verifyDir) { Remove-Item $verifyDir -Recurse -Force }
 New-Item -ItemType Directory -Path $verifyDir | Out-Null
@@ -112,7 +125,7 @@ Write-Host "  Directories: $dirs"
 Write-Host "  Files: $files"
 
 # Check expected categories
-$expectedDirs = @("agents", "commands", "hooks", "knowledge", "memory", "prompts", "references", "rules", "scripts", "skills", "templates", "workflows")
+$expectedDirs = @("agents", "commands", "hooks", "knowledge", "memory", "mcp", "prompts", "references", "rules", "scripts", "skills", "templates", "workflows")
 $missingDirs = @()
 foreach ($d in $expectedDirs) {
     if (-not (Test-Path (Join-Path $verifyDir $d))) {
@@ -130,10 +143,11 @@ Remove-Item $verifyDir -Recurse -Force
 
 # Write build info
 Write-Host ""
-Write-Host "[5/5] Writing build metadata..." -ForegroundColor Yellow
+Write-Host "[5/6] Writing build metadata..." -ForegroundColor Yellow
 $metaPath = Join-Path $BuildDir "cursor-setup-build.json"
 $meta = [ordered]@{
-    version     = "4.3.0"
+    version     = "4.4.0"
+    config      = $Config
     built_at    = (Get-Date).ToString("o")
     source      = $SourceDir
     output      = $OutputZip
@@ -144,6 +158,22 @@ $meta = [ordered]@{
 }
 $meta | ConvertTo-Json -Depth 5 | Out-File -FilePath $metaPath -Encoding UTF8
 Write-Host "  [OK] Metadata: $metaPath" -ForegroundColor Green
+
+# Verify MCP tools
+Write-Host ""
+Write-Host "[6/6] Verifying MCP tools..." -ForegroundColor Yellow
+$mcps = @("cursor-framework-mcp", "cursor-autopilot-mcp", "cursor-memory-mcp")
+$mcpFound = 0
+foreach ($mcp in $mcps) {
+    $mcpPath = Join-Path $verifyDir "mcp\$mcp"
+    if (Test-Path $mcpPath) {
+        $mcpFiles = @(Get-ChildItem -Path $mcpPath -Recurse -File -ErrorAction SilentlyContinue)
+        Write-Host "  [OK] $mcp`: $($mcpFiles.Count) files" -ForegroundColor Green
+        $mcpFound++
+    } else {
+        Write-Host "  [SKIP] $mcp not found in archive (will be added during build)" -ForegroundColor Gray
+    }
+}
 
 Write-Host ""
 Write-Host "===========================================" -ForegroundColor Cyan

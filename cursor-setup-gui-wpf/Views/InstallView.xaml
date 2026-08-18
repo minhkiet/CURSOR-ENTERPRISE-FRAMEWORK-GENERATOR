@@ -8,20 +8,20 @@
         <StackPanel MaxWidth="900">
 
             <!-- === Page Title === -->
-            <TextBlock Text="Cài đặt"
+            <TextBlock Text="{Binding InstallPageTitle}"
                        FontFamily="{StaticResource UIFont}" FontSize="24" FontWeight="Bold"
                        Foreground="{StaticResource Slate900Brush}" Margin="0,0,0,4"/>
-            <TextBlock Text="Chọn đường dẫn và tùy chọn cài đặt cho Cursor Enterprise Framework."
+            <TextBlock Text="{Binding InstallPageSubtitle}"
                        FontFamily="{StaticResource UIFont}" FontSize="14"
                        Foreground="{StaticResource Slate500Brush}" Margin="0,0,0,28"/>
 
             <!-- === Path Card === -->
             <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20">
                 <StackPanel>
-                    <TextBlock Text="Đường dẫn cài đặt"
+                    <TextBlock Text="{Binding InstallLocationLabel}"
                                FontFamily="{StaticResource UIFont}" FontSize="15" FontWeight="SemiBold"
                                Foreground="{StaticResource Slate900Brush}" Margin="0,0,0,4"/>
-                    <TextBlock Text="Chọn thư mục sẽ chứa các file cấu hình framework"
+                    <TextBlock Text="{Binding InstallLocationHint}"
                                FontFamily="{StaticResource UIFont}" FontSize="12"
                                Foreground="{StaticResource Slate500Brush}" Margin="0,0,0,16"/>
 
@@ -40,24 +40,24 @@
                                  Margin="0,0,12,0"/>
 
                         <Button Grid.Column="1"
-                                Content="Duyệt..."
+                                Content="{Binding InstallBrowseLabel}"
                                 Style="{StaticResource SecondaryButtonStyle}"
                                 Command="{Binding BrowseCommand}"
                                 Margin="0,0,8,0"/>
 
                         <Button Grid.Column="2"
-                                Content="+ Tạo thư mục"
+                                Content="{Binding InstallNewFolderLabel}"
                                 Style="{StaticResource GhostButtonStyle}"
                                 Command="{Binding NewFolderCommand}"/>
                     </Grid>
 
                     <!-- Toggle options -->
                     <StackPanel Margin="0,20,0,0">
-                        <CheckBox Content="Ghi đè file hiện có (--force)"
+                        <CheckBox Content="{Binding InstallForceLabel}"
                                   IsChecked="{Binding ForceOverwrite}"
                                   Style="{StaticResource ModernCheckBoxStyle}"
                                   Margin="0,0,0,8"/>
-                        <CheckBox Content="Bỏ qua kiểm tra Cursor đang chạy"
+                        <CheckBox Content="{Binding InstallSkipCursorLabel}"
                                   IsChecked="{Binding SkipCursorCheck}"
                                   Style="{StaticResource ModernCheckBoxStyle}"/>
                     </StackPanel>
@@ -68,16 +68,16 @@
             <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                        <TextBlock Text="Bước build sau cài đặt"
+                        <TextBlock Text="{Binding InstallBuildOptionsLabel}"
                                    FontFamily="{StaticResource UIFont}" FontSize="15" FontWeight="SemiBold"
                                    Foreground="{StaticResource Slate900Brush}"/>
                         <Border Style="{StaticResource ChipStyle}" Margin="12,0,0,0">
-                            <TextBlock Text="TUỲ CHỌN"
+                            <TextBlock Text="{Binding InstallOptionalLabel}"
                                        FontFamily="{StaticResource UIFont}" FontSize="10" FontWeight="Bold"
                                        Foreground="{StaticResource Indigo600Brush}"/>
                         </Border>
                     </StackPanel>
-                    <TextBlock Text="Chạy sau khi giải nén. Để trống nếu chỉ muốn cài đơn giản."
+                    <TextBlock Text="{Binding InstallBuildOptionsDesc}"
                                FontFamily="{StaticResource UIFont}" FontSize="12"
                                Foreground="{StaticResource Slate500Brush}" Margin="0,0,0,16"/>
 
@@ -94,34 +94,34 @@
                         </Grid.RowDefinitions>
 
                         <CheckBox Grid.Row="0" Grid.Column="0"
-                                  Content="Build Memory System"
+                                  Content="{Binding InstallBuildMemoryLabel}"
                                   IsChecked="{Binding BuildMemory}"
                                   Style="{StaticResource ModernCheckBoxStyle}" Margin="0,0,0,10"/>
 
                         <CheckBox Grid.Row="0" Grid.Column="1"
-                                  Content="Compile Knowledge"
+                                  Content="{Binding InstallCompileKnowledgeLabel}"
                                   IsChecked="{Binding CompileKnowledge}"
                                   Style="{StaticResource ModernCheckBoxStyle}" Margin="0,0,0,10"/>
 
                         <CheckBox Grid.Row="1" Grid.Column="0"
-                                  Content="Build Project Index"
+                                  Content="{Binding InstallBuildIndexLabel}"
                                   IsChecked="{Binding BuildIndex}"
                                   Style="{StaticResource ModernCheckBoxStyle}" Margin="0,0,0,10"/>
 
                         <CheckBox Grid.Row="1" Grid.Column="1"
-                                  Content="Build Embeddings"
+                                  Content="{Binding InstallBuildEmbeddingsLabel}"
                                   IsChecked="{Binding BuildEmbeddings}"
                                   Style="{StaticResource ModernCheckBoxStyle}" Margin="0,0,0,10"/>
 
                         <CheckBox Grid.Row="2" Grid.Column="0"
-                                  Content="Package Framework (.zip)"
+                                  Content="{Binding InstallPackageFrameworkLabel}"
                                   IsChecked="{Binding PackageFramework}"
                                   Style="{StaticResource ModernCheckBoxStyle}"/>
                     </Grid>
 
                     <!-- Note -->
                     <Border Background="#FFF7ED" CornerRadius="8" Padding="12,8" Margin="0,16,0,0">
-                        <TextBlock Text="Lưu ý: 'Package Framework' có thể mất vài phút (tạo cursor-setup.zip)."
+                        <TextBlock Text="{Binding InstallBuildExeNote}"
                                    FontFamily="{StaticResource UIFont}" FontSize="12"
                                    Foreground="#92400E"/>
                     </Border>
@@ -135,7 +135,7 @@
                                FontFamily="Segoe MDL2 Assets" FontSize="20"
                                Foreground="{StaticResource Indigo500Brush}"
                                VerticalAlignment="Top" Margin="0,2,16,0"/>
-                    <TextBlock Text="Mẹo: Chuyển sang tab 'Thành phần' và 'Nâng cao' để chọn rules, skills, agents và tài nguyên khác muốn cài đặt."
+                    <TextBlock Text="{Binding InstallTipLabel}"
                                FontFamily="{StaticResource UIFont}" FontSize="13"
                                Foreground="{StaticResource Indigo600Brush}"
                                TextWrapping="Wrap"/>

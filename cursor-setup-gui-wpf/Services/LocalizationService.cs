@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,6 +19,12 @@ namespace CursorSetupWpf.Services
         public static string Current { get; private set; } = DefaultCulture;
         public static event Action? CultureChanged;
 
+        // Preload default culture synchronously to avoid blocking UI on first T() call
+        static LocalizationService()
+        {
+            _cache[DefaultCulture] = Load(DefaultCulture);
+        }
+
         public static void SetCulture(string culture)
         {
             if (string.Equals(Current, culture, StringComparison.OrdinalIgnoreCase)) return;
@@ -27,9 +34,8 @@ namespace CursorSetupWpf.Services
 
         public static string T(string key, params object[] args)
         {
-            // Ensure cache is populated on first call
             if (!_cache.ContainsKey(Current))
-                _ = Load(Current);
+                _cache[Current] = Load(Current);
             string value = Lookup(Current, key) ?? Lookup("en", key) ?? key;
             if (args != null && args.Length > 0)
                 return string.Format(value, args);
@@ -40,7 +46,7 @@ namespace CursorSetupWpf.Services
         {
             if (!_cache.ContainsKey(culture))
                 _cache[culture] = Load(culture);
-            return _cache[culture].TryGetValue(key, out var v) ? v : null;
+            return _cache[culture].TryGetValue(key, out var v) ? v! : null;
         }
 
         static Dictionary<string, string> Load(string culture)

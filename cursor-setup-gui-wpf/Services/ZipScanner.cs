@@ -12,12 +12,13 @@ namespace CursorSetupWpf.Services
         public static readonly string[] CategoryOrder = new[]
         {
             "rules", "skills", "agents", "commands", "hooks", "knowledge",
-            "prompts", "references", "workflows", "templates", "memory", "scripts"
+            "prompts", "references", "workflows", "templates", "memory", "scripts",
+            "mcp"  // MCP tools: cursor-framework-mcp, cursor-autopilot-mcp, cursor-memory-mcp
         };
 
         public static readonly HashSet<string> CoreCategories = new(StringComparer.OrdinalIgnoreCase)
         {
-            "scripts", "memory"
+            "scripts", "memory", "mcp"
         };
 
         public static string EMBEDDED_ZIP_NAME = "cursor-setup.zip";
@@ -62,13 +63,13 @@ namespace CursorSetupWpf.Services
             string dir = exeDir;
             for (int i = 0; i < 3; i++)
             {
-                dir = Directory.GetParent(dir)?.FullName;
+                dir = Directory.GetParent(dir)?.FullName!;
                 if (string.IsNullOrEmpty(dir)) break;
                 candidates = candidates.Concat(new[] { Path.Combine(dir, EMBEDDED_ZIP_NAME) }).ToArray();
             }
             foreach (string c in candidates)
                 if (File.Exists(c)) return c;
-            return null;
+            return null!;
         }
 
         public static string ExtractDescription(string zipPath, string topCategory, string item)
@@ -132,7 +133,7 @@ namespace CursorSetupWpf.Services
                     && !string.IsNullOrEmpty(e.Name))
                     return e.FullName;
             }
-            return null;
+            return null!;
         }
 
         static string ExtractDescriptionFromText(string text)

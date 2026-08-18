@@ -25,6 +25,7 @@ file is portable across Python versions and inspectable by humans / tools.
 from __future__ import annotations
 
 import json
+import logging
 import os
 import tempfile
 from datetime import datetime
@@ -33,6 +34,8 @@ from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .memory_manager import MemoryManager, MemoryEntry, MemoryTier
+
+logger = logging.getLogger(__name__)
 
 
 def _serialize_entry(entry: "MemoryEntry") -> dict[str, Any]:
@@ -137,9 +140,13 @@ class MemoryStore:
                     default=str,
                 )
             os.replace(tmp_name, self.path)
-        except Exception:
+        except Exception as exc:
+            logger.error("Failed to write memory store to %s: %s", self.path, exc)
             if os.path.exists(tmp_name):
-                os.unlink(tmp_name)
+                try:
+                    os.unlink(tmp_name)
+                except OSError:
+                    pass
             raise
 
     # ponytail: 50MB cap. Anything larger almost certainly means a runaway

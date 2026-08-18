@@ -24,8 +24,27 @@
     <!-- Status -->
     <Color x:Key="Emerald600">#059669</Color>
     <Color x:Key="Emerald500">#10B981</Color>
+    <Color x:Key="Emerald400">#34D399</Color>
+    <Color x:Key="Emerald100">#D1FAE5</Color>
     <Color x:Key="Rose500">#F43F5E</Color>
+    <Color x:Key="Rose400">#FB7185</Color>
+    <Color x:Key="Rose100">#FFE4E6</Color>
     <Color x:Key="Amber500">#F59E0B</Color>
+    <Color x:Key="Amber400">#FBBF24</Color>
+    <Color x:Key="Amber100">#FEF3C7</Color>
+    <Color x:Key="Amber600">#D97706</Color>
+    <Color x:Key="Sky500">#0EA5E9</Color>
+    <Color x:Key="Sky400">#38BDF8</Color>
+    <Color x:Key="Purple600">#9333EA</Color>
+    <Color x:Key="Purple100">#F3E8FF</Color>
+    <Color x:Key="Cyan600">#0891B2</Color>
+    <Color x:Key="Cyan100">#CFFAFE</Color>
+    <Color x:Key="Teal600">#0D9488</Color>
+    <Color x:Key="Teal100">#CCFBF1</Color>
+    <Color x:Key="Blue600">#2563EB</Color>
+    <Color x:Key="Blue100">#DBEAFE</Color>
+    <Color x:Key="Red500">#EF4444</Color>
+    <Color x:Key="Red100">#FEE2E2</Color>
 
     <!-- Brushes -->
     <SolidColorBrush x:Key="Indigo600Brush" Color="{StaticResource Indigo600}"/>
@@ -48,8 +67,27 @@
 
     <SolidColorBrush x:Key="Emerald600Brush" Color="{StaticResource Emerald600}"/>
     <SolidColorBrush x:Key="Emerald500Brush" Color="{StaticResource Emerald500}"/>
+    <SolidColorBrush x:Key="Emerald400Brush" Color="{StaticResource Emerald400}"/>
+    <SolidColorBrush x:Key="Emerald100Brush" Color="{StaticResource Emerald100}"/>
     <SolidColorBrush x:Key="Rose500Brush" Color="{StaticResource Rose500}"/>
+    <SolidColorBrush x:Key="Rose400Brush" Color="{StaticResource Rose400}"/>
     <SolidColorBrush x:Key="Amber500Brush" Color="{StaticResource Amber500}"/>
+    <SolidColorBrush x:Key="Amber400Brush" Color="{StaticResource Amber400}"/>
+    <SolidColorBrush x:Key="Sky500Brush" Color="{StaticResource Sky500}"/>
+    <SolidColorBrush x:Key="Sky400Brush" Color="{StaticResource Sky400}"/>
+    <SolidColorBrush x:Key="Purple600Brush" Color="{StaticResource Purple600}"/>
+    <SolidColorBrush x:Key="Purple100Brush" Color="{StaticResource Purple100}"/>
+    <SolidColorBrush x:Key="Cyan600Brush" Color="{StaticResource Cyan600}"/>
+    <SolidColorBrush x:Key="Cyan100Brush" Color="{StaticResource Cyan100}"/>
+    <SolidColorBrush x:Key="Teal600Brush" Color="{StaticResource Teal600}"/>
+    <SolidColorBrush x:Key="Teal100Brush" Color="{StaticResource Teal100}"/>
+    <SolidColorBrush x:Key="Blue600Brush" Color="{StaticResource Blue600}"/>
+    <SolidColorBrush x:Key="Blue100Brush" Color="{StaticResource Blue100}"/>
+    <SolidColorBrush x:Key="Red500Brush" Color="{StaticResource Red500}"/>
+    <SolidColorBrush x:Key="Red100Brush" Color="{StaticResource Red100}"/>
+    <SolidColorBrush x:Key="Amber100Brush" Color="{StaticResource Amber100}"/>
+    <SolidColorBrush x:Key="Amber600Brush" Color="{StaticResource Amber600}"/>
+    <SolidColorBrush x:Key="Rose100Brush" Color="{StaticResource Rose100}"/>
 
     <!-- Gradient brushes -->
     <LinearGradientBrush x:Key="IndigoToEmeraldBrush" StartPoint="0,0" EndPoint="1,0">
@@ -65,6 +103,37 @@
         <GradientStop Color="{StaticResource Indigo600}" Offset="1"/>
     </LinearGradientBrush>
 
+    <!-- Diagonal hero gradient used for banners + auth screens -->
+    <LinearGradientBrush x:Key="HeroGradientBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#4F46E5" Offset="0"/>
+        <GradientStop Color="#7C3AED" Offset="0.55"/>
+        <GradientStop Color="#059669" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- Subtle radial for glassmorphism backgrounds -->
+    <RadialGradientBrush x:Key="IndigoRadialBrush" Center="0.5,0.5" RadiusX="0.8" RadiusY="0.8">
+        <GradientStop Color="#4F46E5" Offset="0"/>
+        <GradientStop Color="#4F46E500" Offset="1"/>
+    </RadialGradientBrush>
+
+    <!-- Toast accent gradients -->
+    <LinearGradientBrush x:Key="SuccessGradientBrush" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#059669" Offset="0"/>
+        <GradientStop Color="#10B981" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ErrorGradientBrush" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#DC2626" Offset="0"/>
+        <GradientStop Color="#F43F5E" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="InfoGradientBrush" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#0284C7" Offset="0"/>
+        <GradientStop Color="#38BDF8" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="WarningGradientBrush" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#D97706" Offset="0"/>
+        <GradientStop Color="#FBBF24" Offset="1"/>
+    </LinearGradientBrush>
+
     <!-- Form surface colors -->
     <SolidColorBrush x:Key="FormBackgroundBrush" Color="{StaticResource Slate50}"/>
     <SolidColorBrush x:Key="CardBackgroundBrush" Color="White"/>
@@ -75,6 +144,11 @@
     <SolidColorBrush x:Key="ProgressTrackBrush" Color="{StaticResource Slate200}"/>
     <SolidColorBrush x:Key="LogBackgroundBrush" Color="{StaticResource Slate900}"/>
     <SolidColorBrush x:Key="LogForegroundBrush" Color="{StaticResource Slate300}"/>
+
+    <!-- Glassmorphism brushes -->
+    <SolidColorBrush x:Key="GlassLightBrush" Color="#1AFFFFFF"/>
+    <SolidColorBrush x:Key="GlassBorderBrush" Color="#33FFFFFF"/>
+    <SolidColorBrush x:Key="GlassHighlightBrush" Color="#66FFFFFF"/>
 
     <!-- Typography -->
     <FontFamily x:Key="UIFont">Segoe UI</FontFamily>
@@ -91,11 +165,24 @@
     <CornerRadius x:Key="CardRadius">12</CornerRadius>
     <CornerRadius x:Key="ButtonRadius">8</CornerRadius>
     <CornerRadius x:Key="TagRadius">6</CornerRadius>
+    <CornerRadius x:Key="GlassRadius">16</CornerRadius>
 
     <!-- Drop shadow for cards -->
     <DropShadowEffect x:Key="CardShadow" BlurRadius="16" ShadowDepth="2"
                      Direction="270" Color="#1E293B" Opacity="0.08"/>
     <DropShadowEffect x:Key="ButtonShadow" BlurRadius="8" ShadowDepth="1"
                      Direction="270" Color="#4F46E5" Opacity="0.25"/>
+    <DropShadowEffect x:Key="SoftShadow" BlurRadius="20" ShadowDepth="0"
+                     Direction="270" Color="#1E293B" Opacity="0.10"/>
+    <DropShadowEffect x:Key="IntenseShadow" BlurRadius="32" ShadowDepth="4"
+                     Direction="270" Color="#1E293B" Opacity="0.18"/>
+    <DropShadowEffect x:Key="WindowShadow" BlurRadius="24" ShadowDepth="0"
+                     Direction="270" Color="#000000" Opacity="0.30"/>
+
+    <!-- Glow effects for nav indicator + active step -->
+    <DropShadowEffect x:Key="IndigoGlow" BlurRadius="12" ShadowDepth="0"
+                     Direction="270" Color="#6366F1" Opacity="0.55"/>
+    <DropShadowEffect x:Key="EmeraldGlow" BlurRadius="10" ShadowDepth="0"
+                     Direction="270" Color="#10B981" Opacity="0.55"/>
 
 </ResourceDictionary>

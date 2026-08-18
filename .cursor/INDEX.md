@@ -1,9 +1,7 @@
 # Cursor Enterprise Framework - Auto Index
 
-> Auto-generated: 2026-08-07T17:47:49 (updated bazi integration 2026-08-07)
+> Auto-generated: 2026-08-10T16:24:23
 > Root: `D:\PROJECTS\CURSORS\CURSOR ENTERPRISE FRAMEWORK GENERATOR\.cursor`
->
-> **Bazi integration (2026-08-07):** +1 skill (`.cursor/skills/bazi/`), +1 command (`.cursor/commands/bazi.md`), +1 vendored tool (`.cursor/../tools/bazi-plugin/`), updated 1 rule entry (`rule_skill-registry.mdc` §bazi).
 
 ## Totals
 
@@ -48,14 +46,14 @@
 | `web-performance-auditor.md` | `agents\web-performance-auditor.md` | Web Performance Engineer for Core Web Vitals, bundle analysis, and rendering performance. Use for any frontend perf audi |
 | `web-scraper.md` | `agents\web-scraper.md` | Extracts structured content from websites using Playwright. Targets SDK/API/UI/test/qc documentation, articles, tables,  |
 
-## Commands (29)
+## Commands (30)
 
 | Name | Path | Description |
 |------|------|-------------|
 | `command.md` | `commands\adr\command.md` | ADR - Tạo Architecture Decision Record |
 | `command.md` | `commands\audit\command.md` | Audit - Security, Performance, Architecture, Database audit |
+| `bazi.md` | `commands\bazi.md` | Bazi / 四柱 — tính tứ trụ deterministic bằng calculator vendored, đọc references theo câu hỏi, trả lời có trích dẫn và phả |
 | `command.md` | `commands\bazi\command.md` | Bazi - Tính Bát Tự (Four Pillars of Destiny) |
-| `bazi.md` | `commands\bazi.md` | **Bazi / 四柱** — tính tứ trụ deterministic bằng calculator vendored, đọc references theo câu hỏi, trả lời có trích dẫn và phản chứng (framework bridge cho guojiahh/bazi-analysis-skill) |
 | `command.md` | `commands\build\command.md` | Build Feature - Xây dựng feature mới từ requirement đến implementation |
 | `command.md` | `commands\clone\command.md` |  |
 | `command.md` | `commands\deploy\command.md` | Deploy - Deployment workflow từ build đến production |
@@ -595,7 +593,7 @@
 | `setup-mcp.ps1` | `scripts\weknora\setup-mcp.ps1` |  |
 | `setup-mcp.sh` | `scripts\weknora\setup-mcp.sh` |  |
 
-## Skills (92)
+## Skills (93)
 
 | Name | Path | Description |
 |------|------|-------------|
@@ -607,7 +605,7 @@
 | `aoti-debug` | `skills\aoti-debug` | >- |
 | `artifacts-builder` | `skills\artifacts-builder` | >- |
 | `aws-cognito-admin` | `skills\aws-cognito-admin` | >- |
-| `bazi` | `skills\bazi` | **Framework bridge** wrapping guojiahh/bazi-analysis-skill — deterministic Python calculator (lunar_python 1.4.8 vendored) + 9 references + 5 tests. Evidence-first tứ trụ / 大运 / 流年 analysis. Use `/bazi`. |
+| `bazi` | `skills\bazi` | > |
 | `canvas-design` | `skills\canvas-design` |  |
 | `code_full-output` | `skills\code_full-output` |  |
 | `code_karpathy` | `skills\code_karpathy` | Karpathy Coding - Think Before Code. Minimal overlay skill cho mọi task. 5 phút review trước/sau code. |

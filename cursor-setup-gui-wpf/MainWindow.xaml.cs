@@ -7,8 +7,8 @@ namespace CursorSetupWpf
     {
         public MainWindow()
         {
-            LocalizationService.CultureChanged += () => { };
             InitializeComponent();
+            LocalizationService.CultureChanged += () => { };
         }
     }
 }

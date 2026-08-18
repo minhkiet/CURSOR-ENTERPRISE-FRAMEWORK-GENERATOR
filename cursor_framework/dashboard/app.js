@@ -20,24 +20,48 @@
     currentTab = tab;
 
     var dashPanel = document.getElementById("panel-dashboard");
+    var contextPanel = document.getElementById("panel-context");
     var graphPanel = document.getElementById("panel-graph");
     var dashTab = document.getElementById("tab-dashboard");
+    var contextTab = document.getElementById("tab-context");
     var graphTab = document.getElementById("tab-graph");
 
     if (tab === "dashboard") {
       dashPanel.style.display = "";
+      if (contextPanel) contextPanel.style.display = "none";
       graphPanel.style.display = "none";
       dashTab.classList.add("is-active");
       dashTab.setAttribute("aria-selected", "true");
+      if (contextTab) {
+        contextTab.classList.remove("is-active");
+        contextTab.setAttribute("aria-selected", "false");
+      }
+      graphTab.classList.remove("is-active");
+      graphTab.setAttribute("aria-selected", "false");
+    } else if (tab === "context") {
+      dashPanel.style.display = "none";
+      if (contextPanel) contextPanel.style.display = "";
+      graphPanel.style.display = "none";
+      if (contextTab) {
+        contextTab.classList.add("is-active");
+        contextTab.setAttribute("aria-selected", "true");
+      }
+      dashTab.classList.remove("is-active");
+      dashTab.setAttribute("aria-selected", "false");
       graphTab.classList.remove("is-active");
       graphTab.setAttribute("aria-selected", "false");
     } else {
       dashPanel.style.display = "none";
+      if (contextPanel) contextPanel.style.display = "none";
       graphPanel.style.display = "";
       graphTab.classList.add("is-active");
       graphTab.setAttribute("aria-selected", "true");
       dashTab.classList.remove("is-active");
       dashTab.setAttribute("aria-selected", "false");
+      if (contextTab) {
+        contextTab.classList.remove("is-active");
+        contextTab.setAttribute("aria-selected", "false");
+      }
       if (!graphInitialized && typeof window._initGraph === "function") {
         graphInitialized = true;
         window._initGraph();
@@ -52,6 +76,7 @@
         e.preventDefault();
         var href = link.getAttribute("href");
         if (href === "#dashboard") switchTab("dashboard");
+        else if (href === "#context") switchTab("context");
         else if (href === "#graph") switchTab("graph");
       });
     });
@@ -59,6 +84,7 @@
     // Check hash on load.
     var hash = window.location.hash;
     if (hash === "#graph") switchTab("graph");
+    else if (hash === "#context") switchTab("context");
   }
 
   // -------- Network --------
@@ -158,6 +184,60 @@
           <div class="bento__value tnum">${fmt(c.value)}</div>
           <div class="bento__hint">${c.accent === "ok" ? "cache warming up" : c.accent === "warn" ? "cold lookups (good to warm)" : "estimated cost reduction"}</div>
         </div>`).join("");
+  }
+
+  // -------- Session Context panel --------
+  async function loadSessionContext() {
+    const data = await load("/api/session");
+    if (!data) return null;
+    return data;
+  }
+
+  function renderSessionContext(sessionData) {
+    if (!sessionData) {
+      return {
+        files: 0,
+        tokens: 0,
+        hitRate: 0,
+        lookups: 0,
+        recentFiles: []
+      };
+    }
+    return {
+      files: sessionData.files_read || 0,
+      tokens: sessionData.total_tokens || 0,
+      hitRate: sessionData.cache_hit_rate || 0,
+      lookups: (sessionData.cache_hits || 0) + (sessionData.cache_misses || 0),
+      recentFiles: sessionData.recent_files || []
+    };
+  }
+
+  function updateSessionContextUI(data) {
+    if (!data) return;
+
+    const el = document.getElementById("ctx-files");
+    if (el) el.textContent = fmt(data.files);
+
+    const tokEl = document.getElementById("ctx-tokens");
+    if (tokEl) tokEl.textContent = fmt(data.tokens);
+
+    const rateEl = document.getElementById("ctx-hit-rate");
+    if (rateEl) rateEl.textContent = data.hitRate + "%";
+
+    const lookupsEl = document.getElementById("ctx-lookups");
+    if (lookupsEl) lookupsEl.textContent = fmt(data.lookups);
+
+    const recentEl = document.getElementById("recentFilesList");
+    if (recentEl) {
+      if (data.recentFiles && data.recentFiles.length > 0) {
+        recentEl.innerHTML = data.recentFiles.map(function(f) {
+          return "<div style=\"padding:4px 0;border-bottom:1px solid var(--border-soft);\">" +
+                 "<span style=\"color:var(--fg-1);\">" + escapeHtml(f) + "</span></div>";
+        }).join("");
+      } else {
+        recentEl.innerHTML = "<span style=\"color:var(--fg-2);\">No files read yet</span>";
+      }
+    }
   }
 
   // -------- Workflow runtime cards --------
@@ -295,7 +375,11 @@
 
   // -------- Main refresh loop --------
   async function refresh() {
-    const [idx, stats] = await Promise.all([load("/api/index"), load("/api/stats")]);
+    const [idx, stats, session] = await Promise.all([
+      load("/api/index"),
+      load("/api/stats"),
+      load("/api/session")
+    ]);
 
     if (!idx && !stats) {
       setStatus("error", "offline");
@@ -311,6 +395,23 @@
     document.getElementById("workflow").innerHTML = renderWorkflow(stats);
     document.getElementById("cats").innerHTML = renderCategories(idx);
     renderHeroMeta(idx, stats);
+
+    // Update session context panel
+    const sessionData = renderSessionContext(session);
+    updateSessionContextUI(sessionData);
+
+    // Update code graph stats in context panel
+    const graphData = await load("/api/graph");
+    if (graphData) {
+      const modEl = document.getElementById("ctx-modules");
+      if (modEl) modEl.textContent = fmt(graphData.module_count || 0);
+      const depEl = document.getElementById("ctx-deps");
+      if (depEl) depEl.textContent = fmt(graphData.dependency_count || 0);
+      const langEl = document.getElementById("ctx-langs");
+      if (langEl) langEl.textContent = Object.keys(graphData.languages || {}).length;
+      const linesEl = document.getElementById("ctx-lines");
+      if (linesEl) linesEl.textContent = fmt(graphData.stats?.total_lines || 0);
+    }
   }
 
   // -------- Boot --------

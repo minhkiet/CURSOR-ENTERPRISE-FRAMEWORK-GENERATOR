@@ -8,7 +8,7 @@
 #   - all (default - sync all)
 
 param(
-    [ValidateSet("thaofvn-coca06/2026", "mikiarlo3/ai-copywriter", "virgiliojr94/book-to-skill", "AminBlg/SimpleEnglish", "Nutlope/hallmark", "all")]
+    [ValidateSet("thaofvn-coca06/2026", "mikiarlo3/ai-copywriter", "virgiliojr94/book-to-skill", "AminBlg/SimpleEnglish", "Nutlope/hallmark", "nextlevelbuilder/ui-ux-pro-max-skill", "all")]
     [string]$Repo = "all",
     [switch]$Force,
     [switch]$DryRun
@@ -60,6 +60,18 @@ $Repos = @{
             "ROADMAP.md" = Join-Path $TargetDir "skills\hallmark\ROADMAP.md"
         }
         DestDir = Join-Path $TargetDir "skills\hallmark"
+    }
+    "nextlevelbuilder/ui-ux-pro-max-skill" = @{
+        Branch = "main"
+        Files = @{
+            "skill.json" = Join-Path $TargetDir "skills\ui-ux-pro-max\skill.json"
+        }
+        # Copy data và scripts từ src/
+        CopyDirs = @(
+            @{ Remote = "src/ui-ux-pro-max/data"; Local = Join-Path $TargetDir "skills\ui-ux-pro-max\data" },
+            @{ Remote = "src/ui-ux-pro-max/scripts"; Local = Join-Path $TargetDir "skills\ui-ux-pro-max\scripts" }
+        )
+        DestDir = Join-Path $TargetDir "skills\ui-ux-pro-max"
     }
 }
 

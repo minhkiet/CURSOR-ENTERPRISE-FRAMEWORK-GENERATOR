@@ -913,6 +913,26 @@ export const SKILLS: FrameworkItem[] = [
       'Operations: capture · recall · compact · persona · scenarios',
       'Workflow integration via build-context command'
     ]
+  },
+  {
+    id: 'code-graph-analysis',
+    type: 'skill',
+    name: 'code-graph-analysis',
+    title: 'Code Graph Analysis',
+    subtitle: 'Knowledge graph queries using Memgraph + Qdrant',
+    description:
+      'Code graph analysis using vitali87/code-graph-rag. Provides natural language → Cypher queries, semantic code search, dependency tracing, and AST-based code understanding. Alternative to simple dependency graphs.',
+    category: 'Performance',
+    tags: ['knowledge-graph', 'cypher', 'memgraph', 'qdrant', 'code-analysis'],
+    role: 'secondary',
+    path: '.cursor/skills/code-graph-analysis/SKILL.md',
+    gates: ['graph-pre', 'graph-post'],
+    bullets: [
+      'Natural language query → Cypher query',
+      'Semantic code search with embeddings',
+      'Dependency tracing and call chains',
+      'AST-based code structure analysis'
+    ]
   }
 ]
 

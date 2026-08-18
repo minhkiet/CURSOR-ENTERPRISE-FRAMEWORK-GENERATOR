@@ -1,9 +1,9 @@
 {
   "root": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\.cursor",
-  "scanned_at": "2026-08-07T17:47:49",
+  "scanned_at": "2026-08-10T16:24:23",
   "totals": {
     "agents": 20,
-    "commands": 29,
+    "commands": 30,
     "hooks": 15,
     "knowledge": 329,
     "memory": 14,
@@ -11,10 +11,10 @@
     "references": 4,
     "rules": 43,
     "scripts": 41,
-    "skills": 92,
+    "skills": 93,
     "templates": 6,
     "workflows": 11,
-    "grand_total": 635
+    "grand_total": 637
   },
   "categories": {
     "agents": [
@@ -258,6 +258,16 @@
         "version": "1.0.0",
         "tags": [],
         "size_bytes": 1900
+      },
+      {
+        "name": "bazi.md",
+        "path": "commands\\bazi.md",
+        "category": "commands",
+        "kind": "file",
+        "description": "Bazi / 四柱 — tính tứ trụ deterministic bằng calculator vendored, đọc references theo câu hỏi, trả lời có trích dẫn và phản chứng",
+        "version": "1.0.0",
+        "tags": [],
+        "size_bytes": 9782
       },
       {
         "name": "command.md",
@@ -6097,7 +6107,7 @@
         "description": "",
         "version": "",
         "tags": [],
-        "size_bytes": 123935
+        "size_bytes": 125083
       },
       {
         "name": "rule_task-analyzer.mdc",
@@ -6675,6 +6685,16 @@
         "version": "",
         "tags": [],
         "size_bytes": 7794
+      },
+      {
+        "name": "bazi",
+        "path": "skills\\bazi",
+        "category": "skills",
+        "kind": "directory",
+        "description": ">",
+        "version": "",
+        "tags": [],
+        "size_bytes": 10947
       },
       {
         "name": "canvas-design",

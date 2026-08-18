@@ -62,6 +62,15 @@ const domains: Domain[] = [
     highlights: ['TDAM 4-layer memory (L0–L3)', 'Hybrid retrieval', 'Context window mgmt']
   },
   {
+    id: 'code-intelligence',
+    title: 'Code Intelligence',
+    description: 'Knowledge graphs, dependency analysis, semantic search, code structure understanding.',
+    ruleCount: 2,
+    skillCount: 2,
+    icon: 'graph',
+    highlights: ['Code graph RAG', 'Cypher queries', 'Semantic code search']
+  },
+  {
     id: 'security',
     title: 'Security',
     description: 'OWASP Top 10, secrets management, auth flows, payment security.',

@@ -3,15 +3,23 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS8632</NoWarn>
     <AssemblyName>cursor-setup-wpf</AssemblyName>
-    <Version>4.3.0</Version>
+    <Version>4.4.0</Version>
+    <FileVersion>4.4.0</FileVersion>
+    <AssemblyVersion>4.4.0</AssemblyVersion>
     <Company>Cursor Enterprise</Company>
     <Product>Cursor Enterprise Framework Setup</Product>
+    <Description>Setup tool for Cursor Enterprise Framework with MCP tools integration</Description>
+    <Copyright>Copyright 2026</Copyright>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <ApplicationIcon>setup.ico</ApplicationIcon>
     <Icon>setup.ico</Icon>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="setup.ico">
@@ -19,9 +27,33 @@
     </Content>
     <None Include="Resources\*.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>Resources\%(Filename)%(Extension)</TargetPath>
     </None>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Icons\*.xaml" />
+  </ItemGroup>
+  <!-- MCP Tools - auto-include from ../tools directory -->
+  <ItemGroup>
+    <Content Include="..\tools\cursor-framework-mcp\**\*" Condition="Exists('..\tools\cursor-framework-mcp')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>tools\cursor-framework-mcp\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\tools\cursor-autopilot-mcp\**\*" Condition="Exists('..\tools\cursor-autopilot-mcp')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>tools\cursor-autopilot-mcp\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\tools\cursor-memory-mcp\**\*" Condition="Exists('..\tools\cursor-memory-mcp')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>tools\cursor-memory-mcp\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\tools\mcp-config-template.json" Condition="Exists('..\tools\mcp-config-template.json')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>tools\mcp-config-template.json</Link>
+    </Content>
+    <Content Include="..\tools\MCP-INTEGRATION.md" Condition="Exists('..\tools\MCP-INTEGRATION.md')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>tools\MCP-INTEGRATION.md</Link>
+    </Content>
   </ItemGroup>
 </Project>

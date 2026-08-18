@@ -19,20 +19,20 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel>
-                    <TextBlock Text="Nâng cao"
+                    <TextBlock Text="{Binding AdvancedTitle}"
                                FontFamily="{StaticResource UIFont}" FontSize="24" FontWeight="Bold"
                                Foreground="{StaticResource Slate900Brush}" Margin="0,0,0,4"/>
-                    <TextBlock Text="Tài nguyên tuỳ chọn: prompts, references, workflows, templates, memory, scripts."
+                    <TextBlock Text="{Binding AdvancedSubtitle}"
                                FontFamily="{StaticResource UIFont}" FontSize="14"
                                Foreground="{StaticResource Slate500Brush}"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Button Content="Chọn tất cả"
+                    <Button Content="{Binding BtnSelectAll}"
                             Style="{StaticResource SecondaryButtonStyle}"
                             Command="{Binding DataContext.SelectAllAdvancedCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                             Margin="0,0,8,0"/>
-                    <Button Content="Bỏ chọn tất cả"
+                    <Button Content="{Binding BtnDeselectAll}"
                             Style="{StaticResource GhostButtonStyle}"
                             Command="{Binding DataContext.DeselectAllAdvancedCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
                 </StackPanel>

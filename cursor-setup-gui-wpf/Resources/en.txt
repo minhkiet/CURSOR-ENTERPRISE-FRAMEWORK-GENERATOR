@@ -15,6 +15,11 @@ tab.components=Components
 tab.advanced=Advanced
 tab.hooks=Hooks
 tab.guide=Guide
+tab.mcp=MCP Servers
+tab.updates=Updates
+tab.backup=Backup & Restore
+tab.settings=Settings
+tab.framework=Tools
 
 hooks.desc=Optional integration with the cursor_framework Python library. Hooks run as background subprocess and never block installation. Disable any hook to skip it.
 hooks.prescan_label=Pre-scan: validate ZIP before extraction
@@ -28,6 +33,51 @@ advanced_desc=Optional resources. Defaults: all selected.
 
 guide.welcome=Welcome to Cursor Enterprise Framework
 guide.intro=Enterprise AI Coding Framework with 39 rules, 17 skills, 36 knowledge bases, 4 agent personas and pre/post review gates system.
+guide.steps_title=Installation Steps
+
+# GuideView - Welcome Banner
+guide.welcome_banner=User Guide
+guide.welcome_banner_desc=Cursor Enterprise Framework Setup - Install in 5 easy steps.
+
+# GuideView - Step 1
+guide.step1_title=Select installation location
+guide.step1_desc=Press 'Browse...' to select a folder or 'Create folder' to create a new .cursor folder. Default location is ~/.cursor (Cursor configuration folder).
+guide.step1_tip=If you have previously installed the framework, the program will ask whether to overwrite existing files.
+
+# GuideView - Step 2
+guide.step2_title=Select components to install
+guide.step2_desc=Go to the Components tab to select:
+guide.step2_item1=rules: development rules and guidelines
+guide.step2_item2=skills: specialized skills for AI agents
+guide.step2_item3=agents: Prompts for Claude, GPT, Gemini
+guide.step2_item4=commands: Shortcut commands for Cursor IDE
+guide.step2_item5=hooks: Integration scripts for automation
+guide.step2_item6=knowledge: Knowledge bases and documentation
+
+# GuideView - Step 3
+guide.step3_title=Configure advanced options
+guide.step3_desc=The Advanced tab contains optional resources. The Hooks tab allows enabling/disabling Python framework (cursor_framework) integration - uncheck if not needed.
+
+# GuideView - Step 4
+guide.step4_title=Review your selections
+guide.step4_desc=Read carefully the selected options. Press 'Select all' / 'Deselect all' to quickly adjust. The status bar at the bottom shows the number of selected components.
+
+# GuideView - Step 5
+guide.step5_title=Press Install to begin installation
+guide.step5_desc=The installation process will display detailed logs. After completion, restart Cursor IDE to load the new components.
+
+# GuideView - About Section
+guide.about_title=About Cursor Enterprise Framework
+guide.about_intro=Cursor Enterprise Framework is an AI-augmented development toolkit for Cursor IDE. It includes:
+guide.architecture_title=Architecture & Design
+guide.architecture_desc=Clean Architecture, Hexagonal Architecture, CQRS, Event Sourcing, Domain-Driven Design
+guide.ai_agent_title=AI Agent Skills
+guide.ai_agent_desc=Karpathy coding discipline, Ponytail lazy senior, Vibe coding overlay, Frontend review
+guide.devtools_title=Development Tools
+guide.devtools_desc=Build Memory, Knowledge Compiler, Project Indexer, Embeddings Builder
+guide.deploy_ops_title=Deployment & Ops
+guide.deploy_ops_desc=Vercel, Cloudflare, Docker, Kubernetes, Serverless, CI/CD templates
+
 guide.step1=Step 1: Install
 guide.step1_desc=Choose install location and required components. Default: install all.
 guide.step2=Step 2: Components
@@ -114,6 +164,9 @@ msgbox.complete_title=Installation Complete
 msgbox.complete_msg=Cursor Enterprise Framework installed successfully!\n\nLocation: {0}\n\nPlease restart Cursor IDE.
 
 btn.cancel=Cancel
+btn.start=Start
+btn.open=Open
+btn.run=Run
 btn.install=Install
 btn.please_wait=Please wait...
 btn.yes=Yes
@@ -188,3 +241,154 @@ hooks.fail_safe_desc=Hook errors will not block installation
 footer.copyright=© 2026 Cursor Enterprise Framework
 footer.license=MIT License
 footer.version=Version {0}
+
+# MCP Servers tab
+mcp.title=MCP Servers
+mcp.subtitle=Manage Model Context Protocol servers bundled with the framework.
+mcp.sync_all=Sync All MCP Servers
+mcp.check_status=Re-check Status
+mcp.framework=Framework MCP
+mcp.framework_desc=Rules, skills, agents and command discovery.
+mcp.autopilot=Autopilot MCP
+mcp.autopilot_desc=Multi-step task automation over the framework catalog.
+mcp.memory=Memory MCP
+mcp.memory_desc=Persistent workspace memory and short-term recall cache.
+mcp.installed=Installed
+mcp.not_installed=Not installed
+mcp.tools_count={0} tools
+mcp.last_sync=Last sync: {0}
+mcp.last_sync_never=Never synced
+mcp.config_path=Config: {0}
+mcp.sync_success=Synced {0} MCP servers
+mcp.sync_failed=MCP sync failed: {0}
+mcp.opening_config=Opening config file...
+
+# Updates tab
+updates.title=Updates
+updates.subtitle=Check for new versions of the Cursor Enterprise Framework.
+updates.current_version=Installed version
+updates.latest_version=Latest version
+updates.check=Check for updates
+updates.download=Download update
+updates.last_checked=Last checked: {0}
+updates.last_checked_never=Never checked
+updates.up_to_date=You are running the latest version.
+updates.update_available=Update available
+updates.changelog=Changelog
+updates.check_failed=Update check failed: {0}
+updates.download_started=Download started
+
+# Backup & Restore tab
+backup.title=Backup & Restore
+backup.subtitle=Save snapshots of your framework configuration.
+backup.create=Create backup now
+backup.restore=Restore
+backup.delete=Delete
+backup.refresh=Refresh list
+backup.location=Backup folder
+backup.browse=Browse...
+backup.auto=Auto-backup before install
+backup.empty=No backups yet. Click 'Create backup now' to make one.
+backup.created=Backup created: {0}
+backup.restored=Backup restored successfully
+backup.delete_confirm_title=Delete backup?
+backup.delete_confirm_msg=Permanently delete this backup file?
+backup.restore_confirm_title=Restore backup?
+backup.restore_confirm_msg=This will replace your current framework files. Continue?
+
+# Settings tab
+settings.title=Settings
+settings.subtitle=Configure the installer behaviour.
+settings.theme=Theme
+settings.theme_indigo=Indigo (default)
+settings.theme_dark=Dark
+settings.theme_light=Light
+settings.theme_system=Follow system
+settings.autostart=Start with Windows
+settings.autostart_desc=Launch the installer on Windows login (admin required).
+settings.notify_complete=Notify on completion
+settings.notify_error=Notify on errors
+settings.log_path=Log file location
+settings.browse=Browse...
+settings.saved=Settings saved
+settings.path_required=Please choose a folder
+
+# Framework Tools tab
+framework.title=Framework Tools
+framework.subtitle=Launch cursor_framework components directly.
+framework.dashboard=Dashboard Server
+framework.dashboard_desc=Start Dashboard HTTP server on port 8765
+framework.graph_viz=Skills Graph
+framework.graph_viz_desc=D3 visualization on port 8766
+framework.api_server=API Server
+framework.api_server_desc=Cursor integration API server on port 8767
+framework.scan=Scan Workspace
+framework.scan_desc=Scan .cursor/ and display INDEX
+framework.build_index=Build Index
+framework.build_index_desc=Generate INDEX.json + INDEX.md
+framework.warm_cache=Warm Cache
+framework.warm_cache_desc=Force full index + memory persist
+framework.stats=Statistics
+framework.stats_desc=Display Workflow stats
+framework.skill_graph=Skill Graph
+framework.skill_graph_desc=Print skill dependency graph JSON
+framework.code_graph=Code Graph
+framework.code_graph_desc=Dump project code graph
+framework.session_stats=Session Stats
+framework.session_stats_desc=Show session memory statistics
+framework.clear_session=Clear Session
+framework.clear_session_desc=Clear session memory cache
+framework.running=Running...
+framework.started=Started: {0}
+framework.stopped=Stopped: {0}
+framework.failed=Failed (exit {0})
+framework.not_found=cursor_framework not found in install directory
+framework.open_browser=Open browser
+framework.cancel=Cancel command
+framework.running_note=Another command is running - please wait or press Cancel
+framework.dashboard_title=Dashboard Servers
+framework.build_title=Build & Index Tools
+framework.graph_title=Graph & Session Tools
+framework.about_title=About cursor_framework
+framework.about_desc=cursor_framework is a Python CLI bundled with Cursor Enterprise Framework, providing commands to manage skills, agents, memory and workflow. This framework is written in pure Python with no third-party dependencies.
+framework.about_commands=Commands:
+framework.about_command_list=serve, serve-graph, serve-api, scan, index, warm, stats, graph, dump-graph, session-stats, session-clear
+mcp.discovered_tools=Discovered Tools
+settings.appearance_label=Appearance
+settings.startup_label=Startup
+settings.notifications_label=Notifications
+settings.logging_label=Logging
+settings.save_label=Save settings
+backup.configuration_label=Configuration
+backup.snapshots_label=Snapshots
+
+# HooksView localization
+hooks.page_title=Hooks
+hooks.page_desc=Optional integration with the Python cursor_framework library. Hooks run in the background, do not block installation.
+hooks.prescan_title=Pre-scan: Check ZIP before extraction
+hooks.prescan_desc=Run `python -m cursor_framework.indexer --validate` to validate the archive before extract.
+hooks.prescan_script_label=Python arguments (passed to `python`):
+hooks.postinstall_title=Post-install: Generate INDEX.json for Dashboard
+hooks.postinstall_desc=Run `python -m cursor_framework.indexer` after installation to generate INDEX.json for Dashboard and Workflow modules.
+hooks.postinstall_script_label=Python arguments (passed to `python`):
+hooks.about_title=About Hooks
+hooks.about_desc=Uncheck the checkbox to skip a hook. Edit the script to change the default command. Both hooks are safe — if Python is not found or the script errors, the installer continues normally.
+
+# ComponentsView
+components.title=Components
+components.subtitle=Select rules, skills, agents, commands, and hooks to install.
+components.items=items
+
+# AdvancedView
+advanced.title=Advanced
+advanced.subtitle=Optional resources: prompts, references, workflows, templates, memory, scripts.
+
+# Common buttons
+btn.select_all=Select all
+btn.deselect_all=Deselect all
+
+# Install page
+install.page_title=Install
+install.page_subtitle=Select installation location and options for Cursor Enterprise Framework.
+install.optional=OPTIONAL
+install.skip_tip=Skip if only want a clean install.

@@ -5,7 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
+using System.Text.Json;
 using System.Threading.Tasks;
 using CursorSetupWpf.Models;
 
@@ -23,6 +23,29 @@ namespace CursorSetupWpf.Services
             "project-index-builder/build-index.ps1",
             "embedding-builder/build-embeddings.ps1",
             "packager.ps1",
+        };
+
+        // Known MCP servers. Each entry mirrors the catalog the framework ships with.
+        static readonly (string ServerKey, string DisplayName, string Description, string[] Tools)[] McpCatalog = new[]
+        {
+            (
+                "framework",
+                "Framework MCP",
+                "Cursor Enterprise Framework — rules, skills, agents and command discovery.",
+                new[] { "list_rules", "list_skills", "list_agents", "search_knowledge", "validate_setup" }
+            ),
+            (
+                "autopilot",
+                "Autopilot MCP",
+                "Multi-step task automation and orchestration over the framework catalog.",
+                new[] { "run_plan", "stream_progress", "abort_task", "list_workflows" }
+            ),
+            (
+                "memory",
+                "Memory MCP",
+                "Persistent workspace memory and short-term recall cache for Cursor sessions.",
+                new[] { "memory_get", "memory_set", "memory_search", "memory_clear", "memory_index" }
+            ),
         };
 
         public async Task RunInstallationAsync(SetupConfig config, List<CategorySelection> selections)
@@ -89,7 +112,7 @@ namespace CursorSetupWpf.Services
                     }
 
                     string filePath = Path.Combine(destDir, entry.FullName);
-                    string dir = Path.GetDirectoryName(filePath);
+                    string dir = Path.GetDirectoryName(filePath)!;
                     if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
 
                     bool extract = true;
@@ -156,6 +179,9 @@ namespace CursorSetupWpf.Services
             var refs = new[] { config.BuildMemory, config.CompileKnowledge, config.BuildIndex,
                                config.BuildEmbeddings, config.PackageFramework };
 
+            // Timeout per script (seconds) - embedding-builder and packager need more time
+            var timeouts = new[] { 120, 180, 120, 300, 180 };
+
             for (int i = 0; i < refs.Length; i++)
             {
                 if (!refs[i]) continue;
@@ -171,7 +197,7 @@ namespace CursorSetupWpf.Services
                 var sw = Stopwatch.StartNew();
                 int rc = await RunProcessAsync("powershell.exe",
                     $"-NoProfile -ExecutionPolicy Bypass -File \"{scriptPath}\"",
-                    workingDir);
+                    workingDir, timeouts[i]);
                 sw.Stop();
 
                 if (rc == 0)
@@ -207,7 +233,7 @@ namespace CursorSetupWpf.Services
                 .Any(name => Process.GetProcessesByName(name).Length > 0);
         }
 
-        async Task<int> RunProcessAsync(string fileName, string args, string workingDir, int timeoutSec = 30)
+        async Task<int> RunProcessAsync(string fileName, string args, string workingDir, int timeoutSec = 120)
         {
             var psi = new ProcessStartInfo(fileName, args)
             {
@@ -240,6 +266,208 @@ namespace CursorSetupWpf.Services
                 if (!string.IsNullOrWhiteSpace(line)) LogAppended?.Invoke("    " + line.Trim());
 
             return proc.ExitCode;
+        }
+
+        // ===================== MCP Server Sync =====================
+
+        /// <summary>
+        /// Path to Cursor's global MCP configuration file (per Cursor docs: ~/.cursor/mcp.json).
+        /// </summary>
+        public static string GetMcpConfigPath()
+        {
+            string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            return Path.Combine(home, ".cursor", "mcp.json");
+        }
+
+        /// <summary>
+        /// Returns true if any of the framework's MCP servers are already registered.
+        /// </summary>
+        public static bool CheckMcpInstalled()
+        {
+            try
+            {
+                string path = GetMcpConfigPath();
+                if (!File.Exists(path)) return false;
+                using var doc = JsonDocument.Parse(File.ReadAllText(path));
+                if (!doc.RootElement.TryGetProperty("mcpServers", out var servers))
+                    return false;
+                return McpCatalog.Any(entry =>
+                    servers.TryGetProperty(entry.ServerKey, out _));
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Build the canonical mcp.json content from the catalog. The exact command/args
+        /// are placeholders that match the framework's plugin runner; users can edit
+        /// afterwards without losing the keys.
+        /// </summary>
+        static Dictionary<string, object> BuildDefaultMcpConfig()
+        {
+            var servers = new Dictionary<string, object>();
+            foreach (var entry in McpCatalog)
+            {
+                servers[entry.ServerKey] = new
+                {
+                    command = "python",
+                    args = new[] { "-m", $"cursor_framework.mcp.{entry.ServerKey}" },
+                    env = new Dictionary<string, string>(),
+                    description = entry.Description,
+                    tools = entry.Tools
+                };
+            }
+            return new Dictionary<string, object>
+            {
+                ["mcpServers"] = servers,
+                ["version"] = "1.0",
+                ["syncedAt"] = DateTime.UtcNow.ToString("o"),
+            };
+        }
+
+        /// <summary>
+        /// Merge our default servers with an existing mcp.json so user customizations are preserved.
+        /// </summary>
+        static Dictionary<string, object> MergeMcpConfig(Dictionary<string, object> existing)
+        {
+            var defaults = BuildDefaultMcpConfig();
+            var existingServers = new Dictionary<string, object>();
+            if (existing.TryGetValue("mcpServers", out var raw)
+                && raw is JsonElement elem
+                && elem.ValueKind == JsonValueKind.Object)
+            {
+                foreach (var prop in elem.EnumerateObject())
+                    existingServers[prop.Name] = JsonSerializer.Deserialize<object>(prop.Value.GetRawText())!;
+            }
+            else if (raw is Dictionary<string, object> dict)
+            {
+                foreach (var kv in dict) existingServers[kv.Key] = kv.Value;
+            }
+
+            if (!defaults.TryGetValue("mcpServers", out var defaultServersObj)
+                || defaultServersObj is not Dictionary<string, object> defaultServers)
+                return existing;
+
+            foreach (var kv in defaultServers)
+                if (!existingServers.ContainsKey(kv.Key))
+                    existingServers[kv.Key] = kv.Value;
+
+            existing["mcpServers"] = existingServers;
+            existing["version"] = "1.0";
+            existing["syncedAt"] = DateTime.UtcNow.ToString("o");
+            return existing;
+        }
+
+        /// <summary>
+        /// Synchronize ~/.cursor/mcp.json with the framework's MCP catalog. Merges
+        /// with existing user configuration so any customizations are preserved.
+        /// </summary>
+        public async Task<(bool Success, string Message)> SyncMcpConfigAsync()
+        {
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    string path = GetMcpConfigPath();
+                    string dir = Path.GetDirectoryName(path)!;
+                    Directory.CreateDirectory(dir);
+
+                    Dictionary<string, object> existing = new();
+                    if (File.Exists(path))
+                    {
+                        try
+                        {
+                            string raw = File.ReadAllText(path);
+                            if (!string.IsNullOrWhiteSpace(raw))
+                            {
+                                using var doc = JsonDocument.Parse(raw);
+                                existing = JsonSerializer.Deserialize<Dictionary<string, object>>(doc.RootElement.GetRawText()) ?? new();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            LogAppended?.Invoke($"[MCP] existing mcp.json unreadable, recreating: {ex.Message}");
+                        }
+                    }
+
+                    var merged = MergeMcpConfig(existing);
+                    var opts = new JsonSerializerOptions { WriteIndented = true };
+                    File.WriteAllText(path, JsonSerializer.Serialize(merged, opts));
+                    LogAppended?.Invoke($"[MCP] synced {path}");
+                    return (true, $"Synced {McpCatalog.Length} MCP servers to {path}");
+                }
+                catch (Exception ex)
+                {
+                    LogAppended?.Invoke($"[MCP] sync failed: {ex.Message}");
+                    return (false, ex.Message);
+                }
+            });
+        }
+
+        /// <summary>
+        /// Return the full MCP server status snapshot for the UI.
+        /// </summary>
+        public List<McpServerStatus> GetMcpStatus()
+        {
+            var installedKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            DateTime? lastSync = null;
+            try
+            {
+                string path = GetMcpConfigPath();
+                if (File.Exists(path))
+                {
+                    lastSync = File.GetLastWriteTime(path);
+                    using var doc = JsonDocument.Parse(File.ReadAllText(path));
+                    if (doc.RootElement.TryGetProperty("mcpServers", out var servers)
+                        && servers.ValueKind == JsonValueKind.Object)
+                    {
+                        foreach (var prop in servers.EnumerateObject())
+                            installedKeys.Add(prop.Name);
+                    }
+                }
+            }
+            catch { /* ignore — just return empty */ }
+
+            var result = new List<McpServerStatus>();
+            foreach (var entry in McpCatalog)
+            {
+                bool installed = installedKeys.Contains(entry.ServerKey);
+                result.Add(new McpServerStatus
+                {
+                    Name = entry.ServerKey,
+                    ServerKey = entry.ServerKey,
+                    DisplayName = entry.DisplayName,
+                    Description = entry.Description,
+                    IsInstalled = installed,
+                    ToolCount = installed ? entry.Tools.Length : 0,
+                    LastSync = lastSync,
+                    ConfigPath = GetMcpConfigPath(),
+                });
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Enumerate all MCP tools that would be exposed after sync.
+        /// </summary>
+        public List<McpToolEntry> GetMcpTools()
+        {
+            var list = new List<McpToolEntry>();
+            foreach (var entry in McpCatalog)
+            {
+                foreach (var tool in entry.Tools)
+                {
+                    list.Add(new McpToolEntry
+                    {
+                        Name = tool,
+                        Server = entry.ServerKey,
+                        Description = $"{entry.DisplayName} → {tool}",
+                    });
+                }
+            }
+            return list;
         }
     }
 }

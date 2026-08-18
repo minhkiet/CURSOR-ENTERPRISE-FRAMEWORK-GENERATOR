@@ -122,9 +122,15 @@ class Dashboard:
         return out
 
     def _serve_static(self, rel_path: str) -> tuple[bytes, str] | None:
-        # ponytail: serve only files inside self.static_dir (no traversal).
-        target = (self.static_dir / rel_path).resolve()
-        if not str(target).startswith(str(self.static_dir)):
+        try:
+            target = (self.static_dir / rel_path).resolve()
+            # Verify resolved path is still under static_dir (prevent traversal)
+            static_resolved = self.static_dir.resolve()
+            try:
+                target.relative_to(static_resolved)
+            except ValueError:
+                return None
+        except (OSError, ValueError):
             return None
         if not target.is_file():
             return None
@@ -211,6 +217,25 @@ class Dashboard:
                         json.dumps(graph_data, ensure_ascii=False).encode("utf-8"),
                         "application/json",
                     )
+                    return
+
+                if path == "/api/session":
+                    # Return session memory stats
+                    try:
+                        from .session_memory import SessionMemory
+                        mem = SessionMemory()
+                        stats = mem.get_token_summary()
+                        self._send(
+                            200,
+                            json.dumps(stats, ensure_ascii=False).encode("utf-8"),
+                            "application/json",
+                        )
+                    except Exception as e:
+                        self._send(
+                            500,
+                            json.dumps({"error": str(e)}).encode("utf-8"),
+                            "application/json",
+                        )
                     return
 
                 # fallback: static asset (e.g. style.css)

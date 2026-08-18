@@ -13,6 +13,7 @@
             <helpers:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
             <helpers:InverseBoolConverter x:Key="InverseBool"/>
             <helpers:LogLevelToBrushConverter x:Key="LogLevelToBrush"/>
+            <helpers:BoolToBrushConverter x:Key="InstalledBrushConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

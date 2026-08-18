@@ -1,13 +1,21 @@
 # Cursor Enterprise Framework - Skill Index
 
-> **Phiên bản:** 3.1.0 | **Cập nhật:** 2026-08-07
-> **Total Skills:** 92+ | **Rules:** 43 | **Agents:** 18 | **Commands:** 29
+> **Phiên bản:** 3.6.0 | **Cập nhật:** 2026-08-18
+> **Total Skills:** 101+ | **Rules:** 43 | **Agents:** 18 | **Commands:** 37 | **Python Scripts:** 12+
 >
-> **Mới (2026-08-07):** Framework bridge `.cursor/skills/bazi/` wraps
-> [guojiahh/bazi-analysis-skill](https://github.com/guojiahh/bazi-analysis-skill) — deterministic
-> Python calculator (`tools/bazi-plugin/scripts/calculate_bazi.py`, vendored
-> `lunar_python 1.4.8`) + 9 references + 5 regression tests. Đồng hành với
-> prompt-time fallback `.cursor/skills/special_bazi/`. Slash command `/bazi`.
+> **Mới (2026-08-18):**
+> - **ui-ux-pro-max** từ [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) (117k stars):
+>   - 79 UI styles (Glassmorphism, Claymorphism, etc.)
+>   - 192 color palettes theo industry
+>   - 74 font pairings
+>   - Design System Generator với 192 reasoning rules
+>   - 22 tech stacks (React, Vue, SwiftUI, etc.)
+>
+> **Mới (2026-08-16):**
+> - **agent-skills integration** từ [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) (87k stars):
+>   - 8 commands mới: `/spec`, `/plan`, `/build`, `/build auto`, `/test`, `/review`, `/code-simplify`, `/ship`, `/webperf`
+>   - 5 skills mới: `spec-driven-development`, `planning-and-task-breakdown`, `incremental-implementation`, `test-driven-development`, `code-review-and-quality`, `code-simplification`, `debugging-and-error-recovery`
+>   - Session hooks cho agent awareness
 
 ---
 
@@ -15,15 +23,18 @@
 
 ```
 .cursor/
-├── skills/           # 92+ skills (tự động gọi theo context)
+├── skills/           # 93+ skills (tự động gọi theo context)
+├── agent-skills/    # 8 skills từ agent-skills
 ├── rules/            # 43 rules (luật theo domain)
 ├── agents/           # 18 agent personas (chuyên gia)
-├── commands/          # 29+ slash commands (workflows)
+├── agent-commands/  # 8 commands từ agent-skills
+├── commands/         # 29+ slash commands (workflows)
 ├── hooks/            # 15 hooks (CI/CD, git, dev)
-├── knowledge/         # 329 knowledge bases (theo ngôn ngữ/framework)
+├── agent-hooks/      # Session hooks cho agent awareness
+├── knowledge/        # 329 knowledge bases (theo ngôn ngữ/framework)
 ├── workflows/         # 11 workflows (standard processes)
-├── prompts/          # 31 prompts (task templates)
-├── memory/           # 14 memory files (context)
+├── prompts/           # 31 prompts (task templates)
+├── memory/            # 14 memory files (context)
 ├── references/       # 4 references (checklists)
 └── templates/        # 6 templates (ADR, bug, feature)
 ```
@@ -67,6 +78,21 @@
 | `api-patterns` | `rules/api-patterns.mdc` | REST, GraphQL, API Gateway |
 | `testing` | `rules/testing.mdc` | Unit, integration, E2E, TDD |
 
+### 1.5 Agent-Skills Development Lifecycle
+
+**From [agent-skills](https://github.com/addyosmani/agent-skills) (87k stars)**
+
+| Skill | Path | Description |
+|-------|------|-------------|
+| `spec-driven-development` | `agent-skills/spec-driven-development/` | Write specs before coding |
+| `planning-and-task-breakdown` | `agent-skills/planning-and-task-breakdown/` | Break work into ordered tasks |
+| `incremental-implementation` | `agent-skills/incremental-implementation/` | Build in thin vertical slices |
+| `test-driven-development` | `agent-skills/test-driven-development/` | RED-GREEN-REFACTOR cycle |
+| `code-review-and-quality` | `agent-skills/code-review-and-quality/` | Multi-axis code review |
+| `code-simplification` | `agent-skills/code-simplification/` | Simplify for clarity |
+| `debugging-and-error-recovery` | `agent-skills/debugging-and-error-recovery/` | Systematic root-cause debugging |
+| `security-and-hardening` | `agent-skills/security-and-hardening/` | Security vulnerabilities & hardening |
+
 ---
 
 ## NHÓM 2: UI & VISUAL DESIGN
@@ -80,6 +106,7 @@
 | `frontend-redesign` | `skills/frontend-redesign/` | Redesign existing UI |
 | `dashboard-ui` | `skills/dashboard-ui/` | Dashboard/Admin components (inputs, tables, forms, pickers) |
 | `ui-designer` | `agents/ui-designer.md` | Design systems, layouts, typography |
+| `ui-ux-pro-max` | `skills/ui-ux-pro-max/` | **117k stars** - 79 styles, 192 palettes, 74 fonts, 192 reasoning rules, 22 stacks |
 
 ### 2.2 Landing Page Components
 
@@ -199,6 +226,7 @@
 | `frontend-architect` | `agents/frontend-architect.md` | SSR/SSG, state management |
 | `vercel-react-best-practices` | `skills/vercel-react-best-practices/` | 40+ React perf rules |
 | `vercel-composition-patterns` | `skills/vercel-composition-patterns/` | Component composition |
+| `code-graph-analysis` | `skills/code-graph-analysis/` | Knowledge graph queries using Memgraph + Qdrant |
 
 ### 5.2 Performance Rules
 
@@ -295,14 +323,27 @@
 
 | Skill | Path | Description |
 |-------|------|-------------|
-| `web-cloner` | `agents/web-cloner.md` | Clone UI/visual, assets, behavior với Playwright |
+| `web-cloner` | `skills/web_cloner/` | **Prompt-first clone** — screenshot/URL → deterministic prompt. Full-site clone với site-crawler + route-discovery |
+| `web-clone-ui` | `agents/web-cloner.md` | Agent persona for website cloning |
 | `web-scraper` | `agents/web-scraper.md` | Extract structured content (docs, articles, tables) |
+| `site-crawler` | `skills/site-crawler/` | Crawl toàn bộ site, phát hiện tất cả URLs, sitemap |
+| `route-discovery` | `skills/route-discovery/` | Tìm routes cho SPA (React, Vue, Next.js) và SSR |
+| `full-site-clone` | `skills/full-site-clone/` | Workflow đầy đủ: discovery → URLs → clone → full site |
 
-### 8.2 Web Design
+### 8.2 Image Assets (Stock + AI)
+
+| Skill | Path | Description |
+|-------|------|-------------|
+| `image-finder` | `skills/image-finder/` | Stock images: Unsplash, Pexels, Pravatar, DiceBear |
+| `image-generator` | `skills/image-generator/` | AI generation: DALL-E 3, Flux, Stable Diffusion |
+| `image-workflow` | `skills/image-workflow/` | Combined: finder → generator → web-cloner |
+
+### 8.3 Web Design
 
 | Skill | Path | Description |
 |-------|------|-------------|
 | `open-design` | `skills/open-design/` | Open Design integration |
+| `landing-page-pro` | `skills/landing-page-pro/` | Build landing pages from requirements |
 
 ---
 
@@ -400,7 +441,7 @@
 | Agent | Description |
 |-------|-------------|
 | `ui-designer` | Design systems, typography |
-| `web-cloner` | Website cloning |
+| `web-cloner` | Website cloning (prompt-first) |
 | `web-scraper` | Content extraction |
 | `marketing-strategist` | Positioning, SEO, lifecycle |
 | `doc-writer` | API docs, READMEs, ADRs |
@@ -478,9 +519,10 @@ Extract frameworks  Simplify       Humanize copy
 
 ### Stack 6: Web Clone & Deploy
 ```
-web-cloner + web-scraper + frontend-taste + deploy-to-vercel
-     ↓           ↓              ↓                ↓
-   Clone UI    Extract     Rebuild taste      Ship it
+web-cloner + site-crawler + route-discovery + full-site-clone + image-workflow
+     ↓           ↓               ↓              ↓              ↓
+   Clone UI   Find URLs     Discover      Clone all     Asset workflow
+                           routes         pages
 ```
 
 ---
@@ -493,8 +535,13 @@ web-cloner + web-scraper + frontend-taste + deploy-to-vercel
 |----------|-----------------|
 | landing, portfolio, homepage, SaaS | `frontend-taste` |
 | redesign, improve UI | `frontend-redesign` |
-| clone, copy website | `web-cloner` |
+| clone, copy website | `web-cloner` + `full-site-clone` |
+| clone all pages, full site | `site-crawler` + `route-discovery` |
+| crawl site, find URLs | `site-crawler` |
+| discover routes, SPA routes | `route-discovery` |
 | scrape, extract, crawl | `web-scraper` |
+| tìm ảnh, find image, stock | `image-finder` |
+| tạo ảnh, generate image | `image-generator` |
 | security, vulnerability, OWASP | `security-review` |
 | performance, optimize, Core Web Vitals | `web-performance-auditor` |
 | book, document, PDF, convert | `book-to-skill` |
@@ -509,13 +556,14 @@ web-cloner + web-scraper + frontend-taste + deploy-to-vercel
 
 ### Bundle A: Web & Dashboard
 ```markdown
-1. frontend-taste (landing pages)
-2. hallmark (anti-slop design)
-3. dashboard-ui (dashboard/admin components)
-4. ai-copywriter (human copy)
-5. simple-english (clarity)
-6. karpathy-coding (code quality)
-7. ponytail (minimal code)
+1. ui-ux-pro-max (design system generator - 117k stars)
+2. frontend-taste (anti-slop frontend)
+3. hallmark (57 slop-test gates)
+4. dashboard-ui (components)
+5. ai-copywriter (human copy)
+6. simple-english (clarity)
+7. karpathy-coding (code quality)
+8. ponytail (minimal code)
 ```
 
 ### Bundle B: Full-Stack
@@ -565,13 +613,23 @@ web-cloner + web-scraper + frontend-taste + deploy-to-vercel
 5. Humanize copy với ai-copywriter
 ```
 
-### Clone website
+### Clone website (single page)
 ```
 1. /clone → web-cloner activates
-2. Playwright capture
-3. Extract structured content (web-scraper)
-4. Rebuild với frontend-taste
+2. image-workflow → analyze & source images
+3. image-finder → find stock alternatives
+4. image-generator → create custom images
 5. Deploy với deploy-to-vercel
+```
+
+### Clone full site (all pages)
+```
+1. site-crawler → crawl sitemap, discover all URLs
+2. route-discovery → find SPA/SSR routes
+3. full-site-clone → categorize pages, identify templates
+4. web-cloner → clone each page/template
+5. image-workflow → source all images
+6. Deploy với deploy-to-vercel
 ```
 
 ### Security review
@@ -592,6 +650,48 @@ web-cloner + web-scraper + frontend-taste + deploy-to-vercel
 
 ---
 
+## PYTHON SCRIPT SKILLS
+
+Các skills có thể gọi Python scripts để thực thi các tác vụ tự động:
+
+### Design & UI
+
+| Skill | Script | Mục đích |
+|-------|--------|-----------|
+| `ui-ux-pro-max` | `scripts/search.py` | Design System Generator, BM25 search, 192 reasoning rules |
+| `ui-ux-pro-max` | `scripts/design_system.py` | Generate complete design system cho project |
+
+### Data Engineering
+
+| Skill | Script | Mục đích |
+|-------|--------|-----------|
+| `senior-data-engineer` | `scripts/pipeline_orchestrator.py` | Generate Airflow DAG config |
+| `senior-data-engineer` | `scripts/data_quality_validator.py` | Validate data quality checks |
+| `senior-data-engineer` | `scripts/etl_performance_optimizer.py` | Optimize Spark/ETL performance |
+| `db_sql-server-table-reconciliation` | `scripts/reconcile.py` | Compare tables across SQL Server instances |
+
+### Media
+
+| Skill | Script | Mục đích |
+|-------|--------|-----------|
+| `youtube-downloader` | `scripts/download_video.py` | Download YouTube videos (yt-dlp) |
+
+### Framework Tools
+
+| Script | Mục đích |
+|--------|-----------|
+| `scripts/skill-installer.py` | Auto-install skill dependencies (pip/npm) |
+| `scripts/ocr_tool.py` | OCR text extraction (Tesseract) |
+
+### Bazi/命理
+
+| Path | Script | Mục đích |
+|------|--------|-----------|
+| `tools/bazi-plugin/scripts/` | `calculate_bazi.py` | 四柱八字排盘 (lunar_python 1.4.8) |
+| `tools/bazi-plugin/scripts/` | `bazi_status.py` | Preflight check trước phân tích |
+
+---
+
 ## SYNC COMMANDS
 
 ```powershell
@@ -607,4 +707,30 @@ web-cloner + web-scraper + frontend-taste + deploy-to-vercel
 # - virgiliojr94/book-to-skill (books to skills)
 # - AminBlg/SimpleEnglish   (plain language)
 # - Nutlope/hallmark       (anti-slop design)
+# - xiaopu-ai/web-clone-prompt (prompt-first clone)
+# - nextlevelbuilder/ui-ux-pro-max-skill (117k stars - UI/UX design)
+```
+
+---
+
+## DESIGN SYSTEM WORKFLOW
+
+### Stack 7: Design System (UI/UX Pro Max)
+```
+ui-ux-pro-max + frontend-taste + hallmark
+     ↓              ↓             ↓
+ Design System  Anti-slop    Anti-slop
+   Generator    frontend      design
+```
+
+### Generate Design System
+```bash
+# Basic design system
+python .cursor/skills/ui-ux-pro-max/scripts/search.py "beauty spa" --design-system -p "MyApp"
+
+# With design dials
+python .cursor/skills/ui-ux-pro-max/scripts/search.py "SaaS dashboard" --design-system --variance 8 --motion 9 --density 7
+
+# Persist to files
+python .cursor/skills/ui-ux-pro-max/scripts/search.py "fintech" --design-system --persist -p "MyBank"
 ```

@@ -15,6 +15,11 @@ tab.components=Thành phần
 tab.advanced=Nâng cao
 tab.hooks=Hooks
 tab.guide=Hướng dẫn
+tab.mcp=MCP Servers
+tab.updates=Cập nhật
+tab.backup=Sao lưu & Khôi phục
+tab.settings=Cài đặt
+tab.framework=Công cụ
 
 hooks.desc=Tích hợp tùy chọn với thư viện Python cursor_framework. Hook chạy dưới dạng tiến trình nền, không chặn quá trình cài đặt. Bỏ chọn checkbox để tắt hook.
 hooks.prescan_label=Pre-scan: kiểm tra ZIP trước khi giải nén
@@ -28,6 +33,51 @@ advanced_desc=Tài nguyên tùy chọn. Mặc định: chọn tất cả.
 
 guide.welcome=Chào mừng đến với Cursor Enterprise Framework
 guide.intro=Framework AI lập trình doanh nghiệp với 39 rules, 17 skills, 36 knowledge bases, 4 agent personas và hệ thống pre/post review gates. Hỗ trợ đầy đủ tiếng Việt.
+guide.steps_title=Các bước cài đặt
+
+# GuideView - Welcome Banner
+guide.welcome_banner=Hướng dẫn sử dụng
+guide.welcome_banner_desc=Cursor Enterprise Framework Setup - Cài đặt trong 5 bước đơn giản.
+
+# GuideView - Step 1
+guide.step1_title=Chọn đường dẫn cài đặt
+guide.step1_desc=Nhấn 'Duyệt...' để chọn thư mục hoặc 'Tạo thư mục' để tạo thư mục .cursor mới. Đường dẫn mặc định là ~/.cursor (thư mục cấu hình Cursor).
+guide.step1_tip=Nếu bạn đã cài framework trước đó, chương trình sẽ hỏi có ghi đè file hiện có hay không.
+
+# GuideView - Step 2
+guide.step2_title=Chọn thành phần muốn cài
+guide.step2_desc=Chuyển sang tab Thành phần để chọn:
+guide.step2_item1=rules: qui tắc và nguyên tắc phát triển
+guide.step2_item2=skills: kỹ năng chuyên biệt cho AI agent
+guide.step2_item3=agents: Prompt cho Claude, GPT, Gemini
+guide.step2_item4=commands: Lệnh tắt cho Cursor IDE
+guide.step2_item5=hooks: Integration scripts cho automation
+guide.step2_item6=knowledge: Cơ sở tri thức và tài liệu
+
+# GuideView - Step 3
+guide.step3_title=Cấu hình tùy chọn nâng cao
+guide.step3_desc=Tab Nâng cao chứa các tài nguyên tùy chọn. Tab Hooks cho phép bật/tắt tích hợp Python framework (cursor_framework) - bỏ chọn nếu không cần.
+
+# GuideView - Step 4
+guide.step4_title=Kiểm tra lại các tùy chọn
+guide.step4_desc=Đọc kỹ các tùy chọn đã chọn. Nhấn 'Chọn tất cả' / 'Bỏ chọn tất cả' để nhanh chóng điều chỉnh. Thanh trạng thái ở dưới cho biết số thành phần đã chọn.
+
+# GuideView - Step 5
+guide.step5_title=Nhấn Install để bắt đầu cài đặt
+guide.step5_desc=Quá trình cài đặt sẽ hiển thị log chi tiết. Sau khi hoàn tất, khởi động lại Cursor IDE để tải các thành phần mới.
+
+# GuideView - About Section
+guide.about_title=Về Cursor Enterprise Framework
+guide.about_intro=Cursor Enterprise Framework là bộ công cụ phát triển AI-augmented cho Cursor IDE. Bao gồm:
+guide.architecture_title=Kiến trúc & Thiết kế
+guide.architecture_desc=Clean Architecture, Hexagonal Architecture, CQRS, Event Sourcing, Domain-Driven Design
+guide.ai_agent_title=AI Agent Skills
+guide.ai_agent_desc=Karpathy coding discipline, Ponytail lazy senior, Vibe coding overlay, Frontend review
+guide.devtools_title=Development Tools
+guide.devtools_desc=Build Memory, Knowledge Compiler, Project Indexer, Embeddings Builder
+guide.deploy_ops_title=Deployment & Ops
+guide.deploy_ops_desc=Vercel, Cloudflare, Docker, Kubernetes, Serverless, CI/CD templates
+
 guide.step1=Bước 1: Cài đặt
 guide.step1_desc=Chọn vị trí cài đặt và các thành phần cần thiết. Mặc định: cài tất cả.
 guide.step2=Bước 2: Thành phần
@@ -114,6 +164,9 @@ msgbox.complete_title=Cài đặt hoàn tất
 msgbox.complete_msg=Đã cài đặt Cursor Enterprise Framework thành công!\n\nVị trí: {0}\n\nHãy khởi động lại Cursor IDE.
 
 btn.cancel=Hủy
+btn.start=Khởi động
+btn.open=Mở trình duyệt
+btn.run=Chạy
 btn.install=Cài đặt
 btn.please_wait=Vui lòng chờ...
 btn.yes=Có
@@ -188,3 +241,154 @@ hooks.fail_safe_desc=Hook lỗi sẽ không chặn cài đặt
 footer.copyright=© 2026 Cursor Enterprise Framework
 footer.license=MIT License
 footer.version=Phiên bản {0}
+
+# MCP Servers tab
+mcp.title=MCP Servers
+mcp.subtitle=Quản lý các MCP server đi kèm framework.
+mcp.sync_all=Đồng bộ tất cả
+mcp.check_status=Kiểm tra lại
+mcp.framework=Framework MCP
+mcp.framework_desc=Rules, skills, agents và command discovery.
+mcp.autopilot=Autopilot MCP
+mcp.autopilot_desc=Tự động hoá task nhiều bước trên catalog framework.
+mcp.memory=Memory MCP
+mcp.memory_desc=Bộ nhớ workspace và cache ngữ cảnh ngắn hạn.
+mcp.installed=Đã cài
+mcp.not_installed=Chưa cài
+mcp.tools_count={0} tools
+mcp.last_sync=Đồng bộ lần cuối: {0}
+mcp.last_sync_never=Chưa đồng bộ
+mcp.config_path=Cấu hình: {0}
+mcp.sync_success=Đã đồng bộ {0} MCP servers
+mcp.sync_failed=Đồng bộ MCP thất bại: {0}
+mcp.opening_config=Đang mở file cấu hình...
+
+# Updates tab
+updates.title=Cập nhật
+updates.subtitle=Kiểm tra phiên bản mới của Cursor Enterprise Framework.
+updates.current_version=Phiên bản đang cài
+updates.latest_version=Phiên bản mới nhất
+updates.check=Kiểm tra cập nhật
+updates.download=Tải bản cập nhật
+updates.last_checked=Lần kiểm tra cuối: {0}
+updates.last_checked_never=Chưa kiểm tra
+updates.up_to_date=Bạn đang dùng phiên bản mới nhất.
+updates.update_available=Có bản cập nhật
+updates.changelog=Nhật ký thay đổi
+updates.check_failed=Kiểm tra cập nhật thất bại: {0}
+updates.download_started=Đã bắt đầu tải
+
+# Backup & Restore tab
+backup.title=Sao lưu & Khôi phục
+backup.subtitle=Lưu snapshot cấu hình framework.
+backup.create=Tạo bản sao lưu
+backup.restore=Khôi phục
+backup.delete=Xoá
+backup.refresh=Làm mới
+backup.location=Thư mục sao lưu
+backup.browse=Duyệt...
+backup.auto=Tự động sao lưu trước khi cài
+backup.empty=Chưa có bản sao lưu. Nhấn 'Tạo bản sao lưu' để bắt đầu.
+backup.created=Đã tạo bản sao lưu: {0}
+backup.restored=Khôi phục thành công
+backup.delete_confirm_title=Xoá bản sao lưu?
+backup.delete_confirm_msg=Xoá vĩnh viễn file sao lưu này?
+backup.restore_confirm_title=Khôi phục bản sao lưu?
+backup.restore_confirm_msg=Thao tác này sẽ thay thế các file framework hiện tại. Tiếp tục?
+
+# Settings tab
+settings.title=Cài đặt
+settings.subtitle=Cấu hình hành vi của trình cài đặt.
+settings.theme=Giao diện
+settings.theme_indigo=Indigo (mặc định)
+settings.theme_dark=Tối
+settings.theme_light=Sáng
+settings.theme_system=Theo hệ thống
+settings.autostart=Khởi động cùng Windows
+settings.autostart_desc=Mở trình cài đặt khi đăng nhập Windows (cần quyền admin).
+settings.notify_complete=Thông báo khi hoàn tất
+settings.notify_error=Thông báo khi lỗi
+settings.log_path=Vị trí file log
+settings.browse=Duyệt...
+settings.saved=Đã lưu cài đặt
+settings.path_required=Vui lòng chọn thư mục
+
+# Framework Tools tab
+framework.title=Công cụ Framework
+framework.subtitle=Khởi chạy các thành phần cursor_framework trực tiếp.
+framework.dashboard=Dashboard Server
+framework.dashboard_desc=Khởi server Dashboard HTTP trên port 8765
+framework.graph_viz=Đồ thị Skills
+framework.graph_viz_desc=Visualization D3 trên port 8766
+framework.api_server=API Server
+framework.api_server_desc=Server tích hợp Cursor API trên port 8767
+framework.scan=Quét Workspace
+framework.scan_desc=Quét .cursor/ và hiển thị INDEX
+framework.build_index=Xây dựng Index
+framework.build_index_desc=Tạo INDEX.json + INDEX.md
+framework.warm_cache=Làm ấm Cache
+framework.warm_cache_desc=Force full index + memory persist
+framework.stats=Thống kê
+framework.stats_desc=Hiển thị Workflow stats
+framework.skill_graph=Skill Graph
+framework.skill_graph_desc=In skill dependency graph JSON
+framework.code_graph=Code Graph
+framework.code_graph_desc=Dump project code graph
+framework.session_stats=Session Stats
+framework.session_stats_desc=Show session memory statistics
+framework.clear_session=Xoá Session
+framework.clear_session_desc=Clear session memory cache
+framework.running=Đang chạy...
+framework.started=Đã khởi động: {0}
+framework.stopped=Đã dừng: {0}
+framework.failed=Thất bại (exit {0})
+framework.not_found=cursor_framework không tìm thấy trong thư mục cài đặt
+framework.open_browser=Mở trình duyệt
+framework.cancel=Hủy lệnh
+framework.running_note=Đang chạy command khác - vui lòng đợi hoặc nhấn Hủy
+framework.dashboard_title=Dashboard Servers
+framework.build_title=Công cụ Build & Index
+framework.graph_title=Công cụ Graph & Session
+framework.about_title=Về cursor_framework
+framework.about_desc=cursor_framework là Python CLI đi kèm Cursor Enterprise Framework, cung cấp các commands để quản lý skills, agents, memory và workflow. Framework này được viết bằng Python thuần, không phụ thuộc third-party libraries.
+framework.about_commands=Commands:
+framework.about_command_list=serve, serve-graph, serve-api, scan, index, warm, stats, graph, dump-graph, session-stats, session-clear
+mcp.discovered_tools=Công cụ đã phát hiện
+settings.appearance_label=Giao diện
+settings.startup_label=Khởi động
+settings.notifications_label=Thông báo
+settings.logging_label=Ghi log
+settings.save_label=Lưu cài đặt
+backup.configuration_label=Cấu hình
+backup.snapshots_label=Snapshots
+
+# HooksView localization
+hooks.page_title=Hooks
+hooks.page_desc=Tích hợp tùy chọn với thư viện Python cursor_framework. Hooks chạy ngầm, không chặn cài đặt.
+hooks.prescan_title=Pre-scan: Kiểm tra ZIP trước khi giải nén
+hooks.prescan_desc=Chạy `python -m cursor_framework.indexer --validate` để xác thực archive trước khi extract.
+hooks.prescan_script_label=Đối số Python (truyền cho `python`):
+hooks.postinstall_title=Post-install: Ghi INDEX.json cho Dashboard
+hooks.postinstall_desc=Chạy `python -m cursor_framework.indexer` sau khi cài đặt để tạo INDEX.json cho Dashboard và Workflow.
+hooks.postinstall_script_label=Đối số Python (truyền cho `python`):
+hooks.about_title=Về Hooks
+hooks.about_desc=Bỏ chọn checkbox để bỏ qua hook. Sửa script để thay đổi command mặc định. Cả hai hooks đều an toàn — nếu Python không tìm thấy hoặc script lỗi, trình cài đặt vẫn tiếp tục bình thường.
+
+# ComponentsView
+components.title=Thành phần
+components.subtitle=Chọn rules, skills, agents, commands, và hooks muốn cài đặt.
+components.items=mục
+
+# AdvancedView
+advanced.title=Nâng cao
+advanced.subtitle=Tài nguyên tuỳ chọn: prompts, references, workflows, templates, memory, scripts.
+
+# Common buttons
+btn.select_all=Chọn tất cả
+btn.deselect_all=Bỏ chọn tất cả
+
+# Install page
+install.page_title=Cài đặt
+install.page_subtitle=Chọn đường dẫn và tùy chọn cài đặt cho Cursor Enterprise Framework.
+install.optional=TÙY CHỌN
+install.skip_tip=Bỏ qua nếu chỉ muốn cài đơn giản.

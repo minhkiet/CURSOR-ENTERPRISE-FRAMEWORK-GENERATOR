@@ -5,7 +5,8 @@
 $ErrorActionPreference = "Stop"
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$RepoRoot = $ScriptDir
+# RepoRoot is parent of cursor-setup-gui-wpf
+$RepoRoot = Split-Path -Parent $ScriptDir
 $CursorDir = Join-Path $RepoRoot ".cursor"
 $McpTargetDir = Join-Path $CursorDir "mcp"
 $ToolsDir = Join-Path $RepoRoot "tools"
@@ -17,6 +18,12 @@ Write-Host ""
 Write-Host "Target : $McpTargetDir"
 Write-Host "Source : $ToolsDir"
 Write-Host ""
+
+# Create .cursor directory if not exists
+if (-not (Test-Path $CursorDir)) {
+    New-Item -ItemType Directory -Path $CursorDir -Force | Out-Null
+    Write-Host "[CREATE] $CursorDir" -ForegroundColor Green
+}
 
 # Create .cursor/mcp directory if not exists
 if (-not (Test-Path $McpTargetDir)) {
@@ -56,7 +63,7 @@ foreach ($mcp in $mcps) {
     $files = @(Get-ChildItem -Path $destDir -Recurse -File -ErrorAction SilentlyContinue)
     $totalFiles += $files.Count
     $totalCopied++
-    Write-Host "[COPY] $mcp` ($($files.Count) files)" -ForegroundColor Green
+    Write-Host "[COPY] $mcp ($($files.Count) files)" -ForegroundColor Green
 }
 
 # Copy MCP config template

@@ -27,47 +27,59 @@ Cursor Enterprise Framework tích hợp **Agent Personas** từ agent-skills - c
 
 ## Slash Commands (Development Lifecycle)
 
+### Core Commands (agent-commands)
+
+| Command | Description | Key Principle |
+|---------|-------------|---------------|
+| `/spec` | Define what to build | **Spec before code** |
+| `/plan` | Plan how to build it | **Small, atomic tasks** |
+| `/build` | Build incrementally | **One slice at a time** |
+| `/build auto` | Auto-generate plan + implement | Approve once, run autonomously |
+| `/test` | Prove it works | **Tests are proof** |
+| `/review` | Review before merge | **Improve code health** |
+| `/code-simplify` | Simplify the code | Clarity over cleverness |
+| `/ship` | Ship to production | **Fan-out to personas** |
+| `/webperf` | Web performance audit | Measure before optimize |
+
+### Extended Commands (mcp-hooks-commands)
+
+| Command | Description |
+|---------|-------------|
+| `/design` | Design system components |
+| `/clone` | Clone/copy patterns |
+| `/deploy` | Deployment workflows |
+| `/doc` | Documentation generation |
+| `/fix` | Bug fixing workflow |
+| `/frontend` | Frontend specific tasks |
+| `/generate` | Code generation |
+| `/memory` | Memory management |
+| `/ocr` | OCR processing |
+| `/payment` | Payment integration |
+| `/perf` | Performance optimization |
+| `/rag` | RAG/Vector search |
+| `/refactor` | Refactoring workflows |
+| `/report` | Generate reports |
+| `/scan` | Code scanning |
+| `/scrape` | Web scraping |
+| `/security` | Security review |
+| `/workflow` | Workflow automation |
+
+### Legacy Commands
+
+| Command | Description |
+|---------|-------------|
+| `/audit` | Audit codebase |
+| `/bazi` | Bazi/Tử Vi calculations |
+| `/numerology` | Numerology |
+| `/pentest` | Penetration testing |
+| `/tuvi` | Vietnamese astrology |
+
 ### Define Phase
 
 | Command | Description | Key Principle |
 |---------|-------------|---------------|
 | `/spec` | Define what to build | **Spec before code** |
 | `/interview` | Clarify requirements via one-question-at-a-time | Extract what user actually wants |
-
-### Plan Phase
-
-| Command | Description | Key Principle |
-|---------|-------------|---------------|
-| `/plan` | Plan how to build it (atomic 2-5min tasks, exact file paths, verification steps) | **Small, atomic tasks** |
-
-### Build Phase
-
-| Command | Description | Key Principle |
-|---------|-------------|---------------|
-| `/build` | Build incrementally | **One slice at a time** |
-| `/build auto` | Auto-generate plan + implement approved pass | Approve once, run autonomously |
-
-### Verify Phase
-
-| Command | Description | Key Principle |
-|---------|-------------|---------------|
-| `/test` | Prove it works | **Tests are proof** |
-| `/debug` | Debugging and error recovery (4-phase: reproduce, isolate, hypothesize, fix root cause) | Five-step triage |
-
-### Review Phase
-
-| Command | Description | Key Principle |
-|---------|-------------|---------------|
-| `/review` | Review before merge | **Improve code health** |
-| `/code-simplify` | Simplify the code | Clarity over cleverness |
-| `/perf` | Audit web performance | Measure before optimize |
-| `/security` | Security hardening | OWASP Top 10 prevention |
-
-### Ship Phase
-
-| Command | Description | Key Principle |
-|---------|-------------|---------------|
-| `/ship` | Ship to production | **Faster is safer** |
 
 ---
 
@@ -381,7 +393,7 @@ Before writing any code, stop at the first rung that holds:
 
 ## Skill Integration
 
-Agent Personas work with the existing skill system:
+Agent Personas work with the existing skill system. Skills are located in `.cursor/skills/` and `.cursor/agent-skills/`.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -400,13 +412,13 @@ Agent Personas work with the existing skill system:
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Available Skills
+### Native Skills (.cursor/skills/)
 
 | Skill | When to Use | Gates |
 |-------|-------------|-------|
 | `frontend-taste` | Landing pages, portfolios | taste-pre/post |
 | `frontend-redesign` | Improve existing UI | redesign-pre/post |
-| `frontend-review` | Quality checks, audits (includes Vercel compliance check in Part E) | review-pre/post |
+| `frontend-review` | Quality checks, audits | review-pre/post |
 | `full-output` | Complete implementations | fulloutput-pre/post |
 | `security-review` | Security vulnerabilities | security-pre/post |
 | `vietnam-payment-review` | MoMo, SePay, PayOS | payment-pre/post |
@@ -418,6 +430,21 @@ Agent Personas work with the existing skill system:
 | `stability` | Error handling, reliability | stability-pre/post |
 | `utility-helpers` | Reusable utilities, tools | utility-pre/post |
 | `data-quality` | Database, data validation | data-pre/post |
+
+### Agent Skills (.cursor/agent-skills/)
+
+**From [agent-skills](https://github.com/addyosmani/agent-skills) (87k stars):**
+
+| Skill | When to Use |
+|-------|-------------|
+| `spec-driven-development` | Start new project/feature with specification |
+| `planning-and-task-breakdown` | Break work into ordered tasks |
+| `incremental-implementation` | Build in thin vertical slices |
+| `test-driven-development` | TDD workflow with RED-GREEN-REFACTOR |
+| `code-review-and-quality` | Multi-axis code review |
+| `code-simplification` | Simplify code for clarity |
+| `debugging-and-error-recovery` | Systematic root-cause debugging |
+| `security-and-hardening` | Security vulnerabilities & hardening |
 
 ---
 

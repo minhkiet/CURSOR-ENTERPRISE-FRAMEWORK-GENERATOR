@@ -44,6 +44,23 @@ namespace CursorSetupWpf.Helpers
     }
 
     /// <summary>
+    /// Returns Emerald brush when true, Slate brush when false. Used for status badges.
+    /// </summary>
+    public class BoolToBrushConverter : IValueConverter
+    {
+        static readonly Brush TrueBrush = new SolidColorBrush(Color.FromRgb(16, 185, 129));  // Emerald-500
+        static readonly Brush FalseBrush = new SolidColorBrush(Color.FromRgb(100, 116, 139)); // Slate-500
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool b = value is bool x && x;
+            return b ? TrueBrush : FalseBrush;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            => DependencyProperty.UnsetValue;
+    }
+
+    /// <summary>
     /// Converts log line prefixes to WPF Brushes for colored log output.
     /// Dark slate-900 bg requires high-contrast, bright foregrounds.
     /// </summary>
@@ -65,6 +82,7 @@ namespace CursorSetupWpf.Helpers
             if (line.StartsWith("[SKIP-CAT]") || line.StartsWith("[SKIP]")) return WarnBrush;
             if (line.StartsWith("===")) return HeaderBrush;
             if (line.StartsWith("===>")) return HeaderBrush;
+            if (line.StartsWith("[MCP]") || line.StartsWith("[BACKUP]")) return HeaderBrush;
             return NormalBrush;
         }
 

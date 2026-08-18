@@ -168,6 +168,50 @@ def _build_parser() -> argparse.ArgumentParser:
         help="TencentDB Agent Memory CLI (Rich-powered). Run `python -m cursor_framework tdam --help`.",
     )
 
+    # dump-graph: Build and output project code graph
+    dump_graph = sub.add_parser(
+        "dump-graph",
+        help="Dump project code graph to stdout as JSON",
+        parents=[_common_flags()],
+    )
+    dump_graph.add_argument("--output", "-o", help="Output file path (default: stdout)")
+
+    # session-stats: Show session memory statistics
+    sub.add_parser(
+        "session-stats",
+        help="Show session memory statistics",
+        parents=[_common_flags()],
+    )
+
+    # session-clear: Clear session memory
+    session_clear = sub.add_parser(
+        "session-clear",
+        help="Clear session memory cache",
+        parents=[_common_flags()],
+    )
+    session_clear.add_argument(
+        "--force",
+        action="store_true",
+        help="Skip confirmation prompt",
+    )
+
+    # context: Generate context for a specific file
+    ctx = sub.add_parser(
+        "context",
+        help="Generate context for a file or directory",
+        parents=[_common_flags()],
+    )
+    ctx.add_argument("path", nargs="?", help="File or directory path")
+
+    # serve-api: Start Cursor integration API server
+    serve_api = sub.add_parser(
+        "serve-api",
+        help="Start Cursor integration API server",
+        parents=[_common_flags()],
+    )
+    serve_api.add_argument("--host", default="127.0.0.1", help="Bind host (default: 127.0.0.1)")
+    serve_api.add_argument("--port", type=int, default=8767, help="Bind port (default: 8767)")
+
     return parser
 
 
@@ -487,6 +531,89 @@ def _serve_graph(args: argparse.Namespace) -> int:
     return 0
 
 
+def _dump_graph(args: argparse.Namespace) -> int:
+    """Dump project code graph as JSON."""
+    from .code_graph import CodeGraph
+
+    graph = CodeGraph(root=args.root)
+    result = graph.scan()
+
+    output = json.dumps(result.to_dict(), indent=2, ensure_ascii=False)
+
+    if args.output:
+        Path(args.output).write_text(output, encoding="utf-8")
+        print(f"Code graph saved to {args.output}", file=sys.stderr)
+    else:
+        print(output)
+    return 0
+
+
+def _session_stats(args: argparse.Namespace) -> int:
+    """Show session memory statistics."""
+    from .session_memory import SessionMemory
+
+    mem = SessionMemory(cache_path=args.memory_path)
+    stats = mem.get_stats()
+    print(json.dumps(stats, indent=2, ensure_ascii=False))
+    return 0
+
+
+def _session_clear(args: argparse.Namespace) -> int:
+    """Clear session memory."""
+    from .session_memory import SessionMemory
+
+    if not args.force:
+        print("Use --force to confirm clearing session memory")
+        return 1
+
+    mem = SessionMemory(cache_path=args.memory_path)
+    result = mem.clear_session()
+    print(json.dumps(result, indent=2, ensure_ascii=False))
+    return 0
+
+
+def _context(args: argparse.Namespace) -> int:
+    """Generate context for a file or directory."""
+    from .cursor_integration import CursorIntegration
+
+    integration = CursorIntegration(
+        root=args.root,
+        cache_path=args.memory_path,
+    )
+
+    if args.path:
+        # Generate context for specific path
+        context = integration.build_context_prompt(
+            current_file=args.path,
+            max_tokens=args.max_tokens,
+        )
+        print(context)
+    else:
+        # Dump full context
+        ctx_path = integration.dump_context()
+        print(f"Context dumped to: {ctx_path}", file=sys.stderr)
+    return 0
+
+
+def _serve_api(args: argparse.Namespace) -> int:
+    """Start Cursor integration API server."""
+    from .cursor_integration import CursorIntegration
+
+    integration = CursorIntegration(
+        root=args.root,
+        cache_path=args.memory_path,
+    )
+
+    print(f"Cursor Integration API starting on http://{args.host}:{args.port}", file=sys.stderr)
+    print("Endpoints:", file=sys.stderr)
+    for endpoint, desc in integration.get_endpoints().items():
+        print(f"  {endpoint}: {desc}", file=sys.stderr)
+    print("Press Ctrl+C to stop", file=sys.stderr)
+
+    integration.serve(host=args.host, port=args.port)
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     # When invoked as `python -m cursor_framework tdam <subcmd> ...`,
     # the TDAM CLI parses its own subcommand via sys.argv.
@@ -509,6 +636,11 @@ def main(argv: list[str] | None = None) -> int:
         "index": _index,
         "clear-cache": _clear_cache,
         "graph": _graph,
+        "dump-graph": _dump_graph,
+        "session-stats": _session_stats,
+        "session-clear": _session_clear,
+        "context": _context,
+        "serve-api": _serve_api,
     }
 
     return dispatch[args.cmd](args)

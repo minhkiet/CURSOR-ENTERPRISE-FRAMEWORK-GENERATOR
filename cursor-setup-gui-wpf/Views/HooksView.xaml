@@ -1,17 +1,16 @@
 <UserControl x:Class="CursorSetupWpf.Views.HooksView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:vm="clr-namespace:CursorSetupWpf.ViewModels"
              Background="{StaticResource ContentBackgroundBrush}">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="32,28">
         <StackPanel MaxWidth="900">
 
             <!-- Page Title -->
-            <TextBlock Text="Hooks"
+            <TextBlock Text="{Binding HooksPageTitle}"
                        FontFamily="{StaticResource UIFont}" FontSize="24" FontWeight="Bold"
                        Foreground="{StaticResource Slate900Brush}" Margin="0,0,0,4"/>
-            <TextBlock Text="Tuỳ chọn tích hợp với thư viện Python cursor_framework. Hooks chạy ngầm, không chặn cài đặt."
+            <TextBlock Text="{Binding HooksPageDesc}"
                        FontFamily="{StaticResource UIFont}" FontSize="14"
                        Foreground="{StaticResource Slate500Brush}" Margin="0,0,0,28"/>
 
@@ -25,15 +24,15 @@
                         </Grid.ColumnDefinitions>
 
                         <CheckBox Grid.Column="0"
-                                  IsChecked="{Binding EnablePreScanHook}"
+                                  IsChecked="{Binding EnablePreScanHook, Mode=TwoWay}"
                                   Style="{StaticResource ModernCheckBoxStyle}"
                                   Margin="0,0,12,0"/>
 
                         <StackPanel Grid.Column="1">
-                            <TextBlock Text="Pre-scan: Kiểm tra ZIP trước khi giải nén"
+                            <TextBlock Text="{Binding HooksPrescanTitle}"
                                        FontFamily="{StaticResource UIFont}" FontSize="15" FontWeight="SemiBold"
                                        Foreground="{StaticResource Slate900Brush}"/>
-                            <TextBlock Text="Chạy `python -m cursor_framework.indexer --validate` để xác thực archive trước khi extract."
+                            <TextBlock Text="{Binding HooksPrescanDesc}"
                                        FontFamily="{StaticResource UIFont}" FontSize="12"
                                        Foreground="{StaticResource Slate500Brush}"
                                        TextWrapping="Wrap" Margin="0,4,0,0"/>
@@ -42,7 +41,7 @@
 
                     <!-- Script box -->
                     <StackPanel>
-                        <TextBlock Text="Python arguments (truyền cho `python`):"
+                        <TextBlock Text="{Binding HooksPrescanScriptLabel}"
                                    FontFamily="{StaticResource UIFont}" FontSize="12"
                                    Foreground="{StaticResource Slate500Brush}" Margin="32,0,0,6"/>
                         <TextBox Text="{Binding PreScanScript, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -64,15 +63,15 @@
                         </Grid.ColumnDefinitions>
 
                         <CheckBox Grid.Column="0"
-                                  IsChecked="{Binding EnablePostInstallHook}"
+                                  IsChecked="{Binding EnablePostInstallHook, Mode=TwoWay}"
                                   Style="{StaticResource ModernCheckBoxStyle}"
                                   Margin="0,0,12,0"/>
 
                         <StackPanel Grid.Column="1">
-                            <TextBlock Text="Post-install: Ghi INDEX.json cho Dashboard"
+                            <TextBlock Text="{Binding HooksPostinstallTitle}"
                                        FontFamily="{StaticResource UIFont}" FontSize="15" FontWeight="SemiBold"
                                        Foreground="{StaticResource Slate900Brush}"/>
-                            <TextBlock Text="Chạy `python -m cursor_framework.indexer` sau khi cài đặt để tạo INDEX.json cho module Dashboard và Workflow."
+                            <TextBlock Text="{Binding HooksPostinstallDesc}"
                                        FontFamily="{StaticResource UIFont}" FontSize="12"
                                        Foreground="{StaticResource Slate500Brush}"
                                        TextWrapping="Wrap" Margin="0,4,0,0"/>
@@ -80,7 +79,7 @@
                     </Grid>
 
                     <StackPanel>
-                        <TextBlock Text="Python arguments (truyền cho `python`):"
+                        <TextBlock Text="{Binding HooksPostinstallScriptLabel}"
                                    FontFamily="{StaticResource UIFont}" FontSize="12"
                                    Foreground="{StaticResource Slate500Brush}" Margin="32,0,0,6"/>
                         <TextBox Text="{Binding PostInstallScript, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -100,10 +99,10 @@
                                Foreground="{StaticResource Slate500Brush}"
                                VerticalAlignment="Top" Margin="0,0,16,0"/>
                     <StackPanel>
-                        <TextBlock Text="Về Hooks"
+                        <TextBlock Text="{Binding HooksAboutTitle}"
                                    FontFamily="{StaticResource UIFont}" FontSize="14" FontWeight="SemiBold"
                                    Foreground="{StaticResource Slate700Brush}" Margin="0,0,0,4"/>
-                        <TextBlock Text="Bỏ chọn checkbox để bỏ qua hook. Sửa script để thay đổi command mặc định. Cả hai hooks đều an toàn — nếu Python không tìm thấy hoặc script lỗi, trình cài đặt vẫn tiếp tục bình thường."
+                        <TextBlock Text="{Binding HooksAboutDesc}"
                                    FontFamily="{StaticResource UIFont}" FontSize="13"
                                    Foreground="{StaticResource Slate600Brush}"
                                    TextWrapping="Wrap"/>

@@ -25,6 +25,7 @@ Usage:
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional
@@ -35,6 +36,8 @@ from .token_optimizer import CompressionStrategy, TokenOptimizer
 
 if TYPE_CHECKING:
     from .tdam_integration import TDAMIntegration, MemoryLayer, MemoryItem
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -91,7 +94,12 @@ class ContextBuilder:
         Returns:
             ContextResult with compressed text + metadata
         """
-        detected = self.discovery.detect_skills(request)
+        try:
+            detected = self.discovery.detect_skills(request)
+        except Exception as e:
+            logger.warning("Skill detection failed for request: %s", e)
+            detected = []
+
         if not detected:
             return ContextResult(
                 text="", tokens=0, skill_count=0,
