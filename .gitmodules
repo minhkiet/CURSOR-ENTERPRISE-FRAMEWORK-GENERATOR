@@ -1,0 +1,3 @@
+[submodule "vendor/mcp-chrome"]
+	path = vendor/mcp-chrome
+	url = https://github.com/hangwin/mcp-chrome.git

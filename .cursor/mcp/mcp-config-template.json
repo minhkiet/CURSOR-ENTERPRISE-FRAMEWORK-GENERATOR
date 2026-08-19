@@ -59,6 +59,16 @@
     "created": "2026-08-09",
     "framework_version": "3.1.0",
     "total_tools": 26,
-    "description": "Cursor Enterprise Framework MCP stack - framework registry + autopilot + memory management"
+    "description": "Cursor Enterprise Framework MCP stack - framework registry + autopilot + memory management",
+    "vendored": {
+      "mcp-chrome": {
+        "source": "https://github.com/hangwin/mcp-chrome",
+        "path": "vendor/mcp-chrome",
+        "type": "git-submodule",
+        "runtime": "node + chrome-extension (separate from Python MCP servers above)",
+        "build": "cd vendor/mcp-chrome && pnpm install && pnpm build",
+        "note": "Chrome MCP is a browser-side MCP (Chrome extension + native host bridge). It is not started by this mcpServers block. Build per upstream README; install the chrome-extension locally; the native-server is the actual MCP stdio entry."
+      }
+    }
   }
 }

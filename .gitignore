@@ -70,6 +70,14 @@ demos/*/.turbo/
 demos/*/out/
 demos/*/dist/
 
+# --- Vendored third-party (submodules) ---
+vendor/*/node_modules/
+vendor/*/dist/
+vendor/*/.next/
+vendor/*/.turbo/
+vendor/*/out/
+vendor/*/build/
+
 # --- Installer / release artifacts ---
 cursor-setup.exe
 cursor-setup-py.exe
