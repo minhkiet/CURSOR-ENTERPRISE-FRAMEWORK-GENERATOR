@@ -1,0 +1,369 @@
+<UserControl x:Class="CursorSetupWpf.Views.FrameworkView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{StaticResource ContentBackgroundBrush}">
+    <UserControl.DataContext>
+        <Binding RelativeSource="{RelativeSource AncestorType=Window}" Path="DataContext"/>
+    </UserControl.DataContext>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="32,28">
+        <StackPanel MaxWidth="900">
+
+            <!-- === Header === -->
+            <TextBlock Text="{Binding FrameworkTitle}"
+                       FontFamily="{StaticResource UIFont}" FontSize="20" FontWeight="Bold"
+                       Foreground="{StaticResource Slate900Brush}" Margin="0,0,0,4"/>
+            <TextBlock Text="{Binding FrameworkSubtitle}"
+                       FontFamily="{StaticResource UIFont}" FontSize="13"
+                       Foreground="{StaticResource Slate500Brush}" Margin="0,0,0,24"/>
+
+            <!-- === Status Banner === -->
+            <Border x:Name="StatusBanner" CornerRadius="12" Padding="16,12" Margin="0,0,0,20"
+                    Visibility="{Binding IsFrameworkRunning, Converter={StaticResource BoolToVisibility}}">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#1D4ED8" Offset="0"/>
+                        <GradientStop Color="#7C3AED" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Ellipse Width="10" Height="10" Fill="#60A5FA" Margin="0,0,12,0" VerticalAlignment="Center">
+                        <Ellipse.Effect>
+                            <BlurEffect Radius="4"/>
+                        </Ellipse.Effect>
+                    </Ellipse>
+                    <TextBlock Grid.Column="1" Text="{Binding RunningCommandText}"
+                               FontFamily="{StaticResource MonoFont}" FontSize="12"
+                               Foreground="#BFDBFE" VerticalAlignment="Center"/>
+                    <Button Grid.Column="2" Content="{Binding BtnCancelLabel}"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Command="{Binding CancelFrameworkCommand}"
+                            Padding="16,6" FontSize="11"/>
+                </Grid>
+            </Border>
+
+            <!-- === Dashboard Section === -->
+            <TextBlock Text="{Binding FrameworkServersTitle}" FontFamily="{StaticResource UIFont}" FontSize="14" FontWeight="SemiBold"
+                       Foreground="{StaticResource Slate700Brush}" Margin="0,0,0,12"/>
+
+            <Grid Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Dashboard Server -->
+                <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,8,0">
+                    <StackPanel>
+                        <Border Width="40" Height="40" CornerRadius="10" Background="{StaticResource Indigo100Brush}"
+                                HorizontalAlignment="Left" Margin="0,0,0,12">
+                            <TextBlock Text="&#xE8A5;" FontFamily="Segoe MDL2 Assets" FontSize="18"
+                                       Foreground="{StaticResource Indigo600Brush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="{Binding FrameworkDashboardLabel}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{StaticResource Slate800Brush}" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding FrameworkDashboardDesc}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="11"
+                                   Foreground="{StaticResource Slate500Brush}" TextWrapping="Wrap" Margin="0,0,0,12"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="{Binding BtnStartLabel}" Style="{StaticResource PrimaryButtonStyle}"
+                                    Command="{Binding StartDashboardCommand}"
+                                    Padding="12,6" FontSize="11" Margin="0,0,6,0"/>
+                            <Button Content="{Binding BtnOpenLabel}" Style="{StaticResource SecondaryButtonStyle}"
+                                    Command="{Binding OpenBrowserCommand}"
+                                    CommandParameter="http://localhost:8765"
+                                    Padding="12,6" FontSize="11"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Graph Server -->
+                <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="4,0">
+                    <StackPanel>
+                        <Border Width="40" Height="40" CornerRadius="10" Background="{StaticResource Purple100Brush}"
+                                HorizontalAlignment="Left" Margin="0,0,0,12">
+                            <TextBlock Text="&#xE9D9;" FontFamily="Segoe MDL2 Assets" FontSize="18"
+                                       Foreground="{StaticResource Purple600Brush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="{Binding FrameworkGraphLabel}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{StaticResource Slate800Brush}" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding FrameworkGraphDesc}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="11"
+                                   Foreground="{StaticResource Slate500Brush}" TextWrapping="Wrap" Margin="0,0,0,12"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="{Binding BtnStartLabel}" Style="{StaticResource PrimaryButtonStyle}"
+                                    Command="{Binding StartGraphServerCommand}"
+                                    Padding="12,6" FontSize="11" Margin="0,0,6,0"/>
+                            <Button Content="{Binding BtnOpenLabel}" Style="{StaticResource SecondaryButtonStyle}"
+                                    Command="{Binding OpenBrowserCommand}"
+                                    CommandParameter="http://localhost:8766"
+                                    Padding="12,6" FontSize="11"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- API Server -->
+                <Border Grid.Column="2" Style="{StaticResource CardStyle}" Margin="8,0,0,0">
+                    <StackPanel>
+                        <Border Width="40" Height="40" CornerRadius="10" Background="{StaticResource Emerald100Brush}"
+                                HorizontalAlignment="Left" Margin="0,0,0,12">
+                            <TextBlock Text="&#xE968;" FontFamily="Segoe MDL2 Assets" FontSize="18"
+                                       Foreground="{StaticResource Emerald600Brush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="{Binding FrameworkApiLabel}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{StaticResource Slate800Brush}" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding FrameworkApiDesc}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="11"
+                                   Foreground="{StaticResource Slate500Brush}" TextWrapping="Wrap" Margin="0,0,0,12"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="{Binding BtnStartLabel}" Style="{StaticResource PrimaryButtonStyle}"
+                                    Command="{Binding StartApiServerCommand}"
+                                    Padding="12,6" FontSize="11" Margin="0,0,6,0"/>
+                            <Button Content="{Binding BtnOpenLabel}" Style="{StaticResource SecondaryButtonStyle}"
+                                    Command="{Binding OpenBrowserCommand}"
+                                    CommandParameter="http://localhost:8767"
+                                    Padding="12,6" FontSize="11"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- === Build & Index Tools === -->
+            <TextBlock Text="{Binding FrameworkBuildTitle}" FontFamily="{StaticResource UIFont}" FontSize="14" FontWeight="SemiBold"
+                       Foreground="{StaticResource Slate700Brush}" Margin="0,8,0,12"/>
+
+            <Grid Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Scan -->
+                <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,6,0">
+                    <StackPanel>
+                        <Border Width="36" Height="36" CornerRadius="8" Background="{StaticResource Slate100Brush}"
+                                HorizontalAlignment="Left" Margin="0,0,0,10">
+                            <TextBlock Text="&#xE8B7;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                                       Foreground="{StaticResource Slate600Brush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="{Binding FrameworkScanLabel}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{StaticResource Slate800Brush}" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding FrameworkScanDesc}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="10"
+                                   Foreground="{StaticResource Slate500Brush}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                        <Button Content="{Binding BtnRunLabel}" Style="{StaticResource SecondaryButtonStyle}"
+                                Command="{Binding RunFrameworkScanCommand}"
+                                Padding="10,5" FontSize="11"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Build Index -->
+                <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="6,0">
+                    <StackPanel>
+                        <Border Width="36" Height="36" CornerRadius="8" Background="{StaticResource Indigo100Brush}"
+                                HorizontalAlignment="Left" Margin="0,0,0,10">
+                            <TextBlock Text="&#xE8A1;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                                       Foreground="{StaticResource Indigo600Brush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="{Binding FrameworkIndexLabel}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{StaticResource Slate800Brush}" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding FrameworkIndexDesc}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="10"
+                                   Foreground="{StaticResource Slate500Brush}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                        <Button Content="{Binding BtnRunLabel}" Style="{StaticResource SecondaryButtonStyle}"
+                                Command="{Binding RunFrameworkIndexCommand}"
+                                Padding="10,5" FontSize="11"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Warm Cache -->
+                <Border Grid.Column="2" Style="{StaticResource CardStyle}" Margin="6,0">
+                    <StackPanel>
+                        <Border Width="36" Height="36" CornerRadius="8" Background="{StaticResource Amber100Brush}"
+                                HorizontalAlignment="Left" Margin="0,0,0,10">
+                            <TextBlock Text="&#xE898;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                                       Foreground="{StaticResource Amber600Brush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="{Binding FrameworkWarmLabel}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{StaticResource Slate800Brush}" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding FrameworkWarmDesc}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="10"
+                                   Foreground="{StaticResource Slate500Brush}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                        <Button Content="{Binding BtnRunLabel}" Style="{StaticResource SecondaryButtonStyle}"
+                                Command="{Binding RunFrameworkWarmCommand}"
+                                Padding="10,5" FontSize="11"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Stats -->
+                <Border Grid.Column="3" Style="{StaticResource CardStyle}" Margin="6,0,0,0">
+                    <StackPanel>
+                        <Border Width="36" Height="36" CornerRadius="8" Background="{StaticResource Cyan100Brush}"
+                                HorizontalAlignment="Left" Margin="0,0,0,10">
+                            <TextBlock Text="&#xE9F9;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                                       Foreground="{StaticResource Cyan600Brush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="{Binding FrameworkStatsLabel}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{StaticResource Slate800Brush}" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding FrameworkStatsDesc}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="10"
+                                   Foreground="{StaticResource Slate500Brush}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                        <Button Content="{Binding BtnRunLabel}" Style="{StaticResource SecondaryButtonStyle}"
+                                Command="{Binding RunFrameworkStatsCommand}"
+                                Padding="10,5" FontSize="11"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- === Graph & Session Tools === -->
+            <TextBlock Text="{Binding FrameworkGraphTitle}" FontFamily="{StaticResource UIFont}" FontSize="14" FontWeight="SemiBold"
+                       Foreground="{StaticResource Slate700Brush}" Margin="0,8,0,12"/>
+
+            <Grid Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Skill Graph -->
+                <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,6,0">
+                    <StackPanel>
+                        <Border Width="36" Height="36" CornerRadius="8" Background="{StaticResource Rose100Brush}"
+                                HorizontalAlignment="Left" Margin="0,0,0,10">
+                            <TextBlock Text="&#xE9D9;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                                       Foreground="{StaticResource Rose500Brush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="{Binding FrameworkSkillGraphLabel}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{StaticResource Slate800Brush}" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding FrameworkSkillGraphDesc}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="10"
+                                   Foreground="{StaticResource Slate500Brush}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                        <Button Content="{Binding BtnRunLabel}" Style="{StaticResource SecondaryButtonStyle}"
+                                Command="{Binding RunFrameworkGraphCommand}"
+                                Padding="10,5" FontSize="11"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Code Graph -->
+                <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="6,0">
+                    <StackPanel>
+                        <Border Width="36" Height="36" CornerRadius="8" Background="{StaticResource Teal100Brush}"
+                                HorizontalAlignment="Left" Margin="0,0,0,10">
+                            <TextBlock Text="&#xE8C8;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                                       Foreground="{StaticResource Teal600Brush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="{Binding FrameworkCodeGraphLabel}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{StaticResource Slate800Brush}" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding FrameworkCodeGraphDesc}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="10"
+                                   Foreground="{StaticResource Slate500Brush}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                        <Button Content="{Binding BtnRunLabel}" Style="{StaticResource SecondaryButtonStyle}"
+                                Command="{Binding RunFrameworkDumpGraphCommand}"
+                                Padding="10,5" FontSize="11"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Session Stats -->
+                <Border Grid.Column="2" Style="{StaticResource CardStyle}" Margin="6,0">
+                    <StackPanel>
+                        <Border Width="36" Height="36" CornerRadius="8" Background="{StaticResource Blue100Brush}"
+                                HorizontalAlignment="Left" Margin="0,0,0,10">
+                            <TextBlock Text="&#xE7BA;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                                       Foreground="{StaticResource Blue600Brush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="{Binding FrameworkSessionStatsLabel}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{StaticResource Slate800Brush}" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding FrameworkSessionStatsDesc}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="10"
+                                   Foreground="{StaticResource Slate500Brush}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                        <Button Content="{Binding BtnRunLabel}" Style="{StaticResource SecondaryButtonStyle}"
+                                Command="{Binding RunFrameworkSessionStatsCommand}"
+                                Padding="10,5" FontSize="11"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Clear Session -->
+                <Border Grid.Column="3" Style="{StaticResource CardStyle}" Margin="6,0,0,0">
+                    <StackPanel>
+                        <Border Width="36" Height="36" CornerRadius="8" Background="{StaticResource Red100Brush}"
+                                HorizontalAlignment="Left" Margin="0,0,0,10">
+                            <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                                       Foreground="{StaticResource Red500Brush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="{Binding FrameworkClearSessionLabel}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{StaticResource Slate800Brush}" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding FrameworkClearSessionDesc}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="10"
+                                   Foreground="{StaticResource Slate500Brush}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                        <Button Content="{Binding BtnRunLabel}" Style="{StaticResource SecondaryButtonStyle}"
+                                Command="{Binding RunFrameworkClearSessionCommand}"
+                                Padding="10,5" FontSize="11"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- === Framework Info === -->
+            <Border Style="{StaticResource CardStyle}" Background="{StaticResource Slate50Brush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Width="48" Height="48" CornerRadius="12" Background="{StaticResource Indigo100Brush}"
+                            Margin="0,0,16,0" VerticalAlignment="Top">
+                        <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="22"
+                                   Foreground="{StaticResource Indigo600Brush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="{Binding FrameworkAboutTitle}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{StaticResource Slate800Brush}" Margin="0,0,0,8"/>
+                        <TextBlock Text="{Binding FrameworkAboutDesc}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="12"
+                                   Foreground="{StaticResource Slate600Brush}" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                        <TextBlock FontFamily="{StaticResource MonoFont}" FontSize="11"
+                                   Foreground="{StaticResource Slate500Brush}">
+                            <Run Text="{Binding FrameworkAboutCommands, Mode=OneWay}"/>
+                            <LineBreak/>
+                            <Run Text="{Binding FrameworkAboutCommandList, Mode=OneWay}"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

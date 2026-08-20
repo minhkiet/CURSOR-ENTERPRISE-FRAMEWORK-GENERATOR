@@ -1,0 +1,87 @@
+<UserControl x:Class="CursorSetupWpf.Views.ToastView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:CursorSetupWpf.Models"
+             xmlns:services="clr-namespace:CursorSetupWpf.Services">
+
+    <ItemsControl ItemsSource="{Binding Source={x:Static services:ToastService.Instance}, Path=Toasts}"
+                  HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                  Margin="0,0,24,24">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <StackPanel/>
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+            <DataTemplate DataType="{x:Type models:ToastNotification}">
+                <Border Margin="0,0,0,10" CornerRadius="12" Padding="16,14"
+                        MinWidth="280" MaxWidth="380"
+                        Effect="{StaticResource SoftShadow}"
+                        BorderThickness="1">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Background" Value="White"/>
+                            <Setter Property="BorderBrush" Value="{StaticResource Slate200Brush}"/>
+                        </Style>
+                    </Border.Style>
+                    <Border.Triggers>
+                        <!-- No triggers here — colors are set per-level via code-behind -->
+                    </Border.Triggers>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Width="36" Height="36" CornerRadius="10"
+                                Margin="0,0,12,0">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="{StaticResource InfoGradientBrush}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Level}" Value="success">
+                                            <Setter Property="Background" Value="{StaticResource SuccessGradientBrush}"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Level}" Value="error">
+                                            <Setter Property="Background" Value="{StaticResource ErrorGradientBrush}"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Level}" Value="warning">
+                                            <Setter Property="Background" Value="{StaticResource WarningGradientBrush}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <TextBlock Text="{Binding Glyph}"
+                                       FontFamily="Segoe MDL2 Assets" FontSize="16"
+                                       Foreground="White"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Title}"
+                                       FontFamily="{StaticResource UIFont}" FontSize="13" FontWeight="SemiBold"
+                                       Foreground="{StaticResource Slate900Brush}"/>
+                            <TextBlock Text="{Binding Message}"
+                                       FontFamily="{StaticResource UIFont}" FontSize="12"
+                                       Foreground="{StaticResource Slate500Brush}"
+                                       TextWrapping="Wrap" Margin="0,2,0,0"/>
+                        </StackPanel>
+
+                        <Button Grid.Column="2"
+                                Style="{StaticResource IconButtonStyle}"
+                                Command="{Binding DataContext.DismissToastCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                CommandParameter="{Binding}"
+                                Margin="6,0,0,0"
+                                VerticalAlignment="Top"
+                                ToolTip="Dismiss">
+                            <TextBlock Text="&#xE711;"
+                                       FontFamily="Segoe MDL2 Assets" FontSize="11"
+                                       Foreground="{StaticResource Slate400Brush}"/>
+                        </Button>
+                    </Grid>
+                </Border>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+</UserControl>

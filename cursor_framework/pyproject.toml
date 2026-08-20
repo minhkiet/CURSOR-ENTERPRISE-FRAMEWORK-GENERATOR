@@ -1,0 +1,92 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cursor-framework"
+version = "1.5.0"
+description = "Cursor Enterprise Framework Generator - Knowledge indexing, skill discovery, and token optimization"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "Cursor Team", email = "cursor@example.com" }
+]
+keywords = ["cursor", "framework", "ai", "coding", "enterprise", "mcp", "skills"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "watchfiles>=0.21.0",
+    "httpx>=0.25.0",
+    "rich>=13.7.0",
+    "click>=8.1.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+server = [
+    "uvicorn>=0.24.0",
+    "fastapi>=0.104.0",
+]
+# code-graph-rag integration - requires Memgraph + Qdrant
+code-graph-rag = [
+    "pydantic-ai>=2.0.0",
+    "pydantic-settings>=2.12.0",
+    "pymgclient>=1.5.1",
+    "tree-sitter-python>=0.25.0",
+    "tree-sitter==0.25.2",
+    "rich>=14.2.0",
+    "click>=8.3.1",
+]
+# Full code-graph-rag with tree-sitter parsers for all languages
+code-graph-rag-full = [
+    "code-graph-rag[treesitter-full,semantic] @ git+https://github.com/vitali87/code-graph-rag.git",
+]
+
+[project.scripts]
+cursor-framework = "cursor_framework.__main__:main"
+cursor-warm = "cursor_framework.__main__:warm"
+cursor-dashboard = "cursor_framework.__main__:serve"
+
+[project.urls]
+Homepage = "https://github.com/cursor/enterprise-framework"
+Repository = "https://github.com/cursor/enterprise-framework"
+Documentation = "https://cursor.docs.example.com"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cursor_framework*"]
+
+[tool.setuptools.package-data]
+cursor_framework = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.black]
+line-length = 100
+target-version = ["py39", "py310", "py311", "py312"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["E501"]
