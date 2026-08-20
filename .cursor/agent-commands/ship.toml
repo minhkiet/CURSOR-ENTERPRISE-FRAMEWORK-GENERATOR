@@ -1,0 +1,45 @@
+description = "Run the pre-launch checklist via parallel fan-out to specialist personas, then synthesize a go/no-go decision"
+
+prompt = """
+Invoke the shipping-and-launch skill.
+
+`/ship` is a **fan-out orchestrator**. It runs three specialist personas in parallel against the current change, then merges their reports into a single go/no-go decision with a rollback plan.
+
+## Phase A — Parallel fan-out
+
+Dispatch three personas concurrently:
+
+1. **`code-reviewer`** — Run a five-axis review (correctness, readability, architecture, security, performance) on the staged changes.
+2. **`security-auditor`** — Run a vulnerability and threat-model pass. Check OWASP Top 10, secrets handling, auth/authz, dependency CVEs.
+3. **`test-engineer`** — Analyze test coverage for the change. Identify gaps in happy path, edge cases, error paths.
+
+## Phase B — Merge
+
+Synthesize all three reports:
+
+1. **Code Quality** — Aggregate Critical/Important findings
+2. **Security** — Promote Critical/High findings to launch blockers
+3. **Performance** — Pull from code-reviewer's performance axis
+4. **Infrastructure** — Env vars, migrations, monitoring, feature flags
+5. **Documentation** — README, ADRs, changelog
+
+## Phase C — Decision
+
+```markdown
+## Ship Decision: GO | NO-GO
+
+### Blockers
+- [Source + file:line]
+
+### Recommended fixes
+- [Source + file:line]
+
+### Acknowledged risks
+- [Risk + mitigation]
+
+### Rollback plan
+- Trigger: [conditions]
+- Procedure: [exact steps]
+- RTO: [target]
+```
+"""

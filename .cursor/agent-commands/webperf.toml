@@ -1,0 +1,33 @@
+description = "Run a web performance audit via the web-performance-auditor persona"
+
+prompt = """
+/webperf targets web applications specifically. Do not use for utility libraries, CLIs, or server-only code.
+
+## Determine the mode
+
+**Deep mode** — when available:
+- Lighthouse JSON report (`npx lighthouse --output json --output-path ./report.json`)
+- PageSpeed Insights JSON response
+- CrUX API response
+- DevTools performance trace
+- Live URL with chrome-devtools MCP configured
+
+**Quick mode** — default when none above are available.
+Scan source code for structural anti-patterns.
+
+## Run the audit
+
+Spawn the `web-performance-auditor` subagent with:
+- Files, components, or diff under review
+- Artifact paths (Lighthouse JSON, PSI JSON, trace) if available
+- Target URL or page name
+- Expected mode (Quick or Deep)
+
+## Output
+
+Return the full audit report:
+- Scorecard (populated from sourced values)
+- Ranked list of findings
+- Positive observations
+- Proactive recommendations
+"""
