@@ -1,0 +1,33 @@
+{
+  "project": ".cursor",
+  "root": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\.cursor",
+  "generated_at": "2026-08-20T23:00:49",
+  "session_id": "9f0790fb7dba",
+  "files_read": [],
+  "recent_files": [],
+  "token_summary": {
+    "total_tokens": 0,
+    "files_read": 0,
+    "unique_files": 0,
+    "avg_tokens_per_file": 0,
+    "cache_hits": 0,
+    "cache_misses": 0,
+    "cache_hit_rate": 0.0,
+    "token_limit": 100000,
+    "token_limit_exceeded": false,
+    "session_duration_seconds": 0.0
+  },
+  "cache_hit_rate": 0.0,
+  "code_graph_summary": {
+    "module_count": 0,
+    "dependency_count": 0,
+    "languages": {},
+    "scanned_at": "2026-08-20T23:00:49"
+  },
+  "skills_in_context": [],
+  "workflow_stats": {
+    "memory_hits": 0,
+    "memory_misses": 0,
+    "assets_indexed": 0
+  }
+}

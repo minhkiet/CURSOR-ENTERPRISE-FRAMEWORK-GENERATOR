@@ -95,12 +95,49 @@ if (Test-Path $OutputZip) {
 }
 if (Test-Path $TempZip) { Remove-Item $TempZip -Force }
 
+# Stage .cursor/ + cursor_framework/ into a temp dir so the zip contains
+# both the framework rules/skills/agents AND the Python package that the
+# WPF GUI's FrameworkRunner expects to find.
+$StagingDir = Join-Path $env:TEMP "cursor-setup-staging-$([System.Guid]::NewGuid().ToString('N'))"
+New-Item -ItemType Directory -Path $StagingDir -Force | Out-Null
+
 try {
-    Compress-Archive -Path "$SourceDir\*" -DestinationPath $TempZip -CompressionLevel Optimal -Force
+    # Copy framework rules/skills/agents/etc.
+    Copy-Item -Path "$SourceDir\*" -Destination $StagingDir -Recurse -Force
+
+    # Bundle Python package so `python -m cursor_framework` works after install.
+    $pkgSrc = Join-Path $RepoRoot "cursor_framework"
+    if (Test-Path $pkgSrc) {
+        $pkgDest = Join-Path $StagingDir "cursor_framework"
+        Copy-Item -Path $pkgSrc -Destination $pkgDest -Recurse -Force
+        # Strip dev artifacts that bloat the zip and serve no runtime purpose.
+        Get-ChildItem -Path $pkgDest -Force |
+            Where-Object { $_.Name -in @("__pycache__", "build", "review", "tests", ".cache", "cursor_framework.egg-info") } |
+            ForEach-Object { Remove-Item -Path $_.FullName -Recurse -Force -ErrorAction SilentlyContinue }
+        Get-ChildItem -Path $pkgDest -Recurse -Directory -Force -Filter "__pycache__" |
+            ForEach-Object { Remove-Item -Path $_.FullName -Recurse -Force -ErrorAction SilentlyContinue }
+        Write-Host "  [OK] Bundled cursor_framework Python package" -ForegroundColor Green
+    } else {
+        Write-Host "  [WARN] cursor_framework package not found at $pkgSrc" -ForegroundColor Yellow
+    }
+
+    # Also ship requirements.txt + pyproject.toml at zip root for editable installs.
+    foreach ($meta in @("requirements.txt", "pyproject.toml")) {
+        $metaSrc = Join-Path $RepoRoot $meta
+        if (Test-Path $metaSrc) {
+            Copy-Item -Path $metaSrc -Destination $StagingDir -Force
+        }
+    }
+
+    Compress-Archive -Path "$StagingDir\*" -DestinationPath $TempZip -CompressionLevel Optimal -Force
 }
 catch {
     Write-Host "[ERROR] Compress-Archive failed: $_" -ForegroundColor Red
+    Remove-Item -Path $StagingDir -Recurse -Force -ErrorAction SilentlyContinue
     exit 1
+}
+finally {
+    Remove-Item -Path $StagingDir -Recurse -Force -ErrorAction SilentlyContinue
 }
 
 Move-Item -Path $TempZip -Destination $OutputZip -Force
@@ -125,7 +162,7 @@ Write-Host "  Directories: $dirs"
 Write-Host "  Files: $files"
 
 # Check expected categories
-$expectedDirs = @("agents", "commands", "hooks", "knowledge", "memory", "mcp", "prompts", "references", "rules", "scripts", "skills", "templates", "workflows")
+$expectedDirs = @("agents", "commands", "hooks", "knowledge", "memory", "mcp", "prompts", "references", "rules", "scripts", "skills", "templates", "workflows", "cursor_framework")
 $missingDirs = @()
 foreach ($d in $expectedDirs) {
     if (-not (Test-Path (Join-Path $verifyDir $d))) {

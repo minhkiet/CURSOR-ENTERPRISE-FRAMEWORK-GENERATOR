@@ -9,8 +9,9 @@ REM   2. Create cursor-setup.zip from .cursor contents
 REM   3. Copy MCP tools to .cursor/mcp
 REM
 REM Usage:
-REM   buildappsetup.bat              (default: Debug)
-REM   buildappsetup.bat Release       (build Release)
+REM   buildappsetup.bat              (default: Release)
+REM   buildappsetup.bat Debug        (build Debug)
+REM   buildappsetup.bat Release      (build Release)
 REM   buildappsetup.bat /clean       (clean bin/obj before build)
 REM   buildappsetup.bat /help        (show this help)
 REM
@@ -150,7 +151,7 @@ REM ----- Step 3: Copy MCP tools -----
 echo [STEP 3] Copying MCP tools...
 
 if exist "%COPY_MCP_SCRIPT%" (
-    powershell -NoProfile -ExecutionPolicy Bypass -File "%COPY_MCP_SCRIPT%" >nul 2>&1
+    powershell -NoProfile -ExecutionPolicy Bypass -File "%COPY_MCP_SCRIPT%"
     if errorlevel 1 (
         echo   [WARN] MCP copy had issues, continuing...
     ) else (

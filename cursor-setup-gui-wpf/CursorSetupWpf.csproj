@@ -31,7 +31,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Icons\*.xaml" />
+    <Resource Include="Resources\Styles\*.xaml" />
+    <Resource Include="Resources\Themes\*.xaml" />
   </ItemGroup>
   <!-- MCP Tools - auto-include from ../tools directory -->
   <ItemGroup>

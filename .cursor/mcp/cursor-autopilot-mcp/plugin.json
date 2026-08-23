@@ -8,6 +8,6 @@
   "entry": "cursor_autopilot_mcp.server:run",
   "config": {
     "workspace_root_env": "CURSOR_WORKSPACE_ROOT",
-    "framework_mcp_path": ".cursor/mcp/cursor-framework-mcp"
+    "framework_mcp_path": "tools/cursor-framework-mcp"
   }
 }

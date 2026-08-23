@@ -65,7 +65,7 @@ const methods: InstallMethod[] = [
       {
         title: 'Chọn thư mục đích',
         detail: 'GUI mặc định đề xuất %USERPROFILE%\\.cursor (đúng chuẩn Cursor IDE). Bạn có thể đổi nếu muốn.',
-        code: 'C:\\Users\\<tên-bạn>\\.cursor',
+        code: '%USERPROFILE%\\.cursor',
         codeLabel: 'Đường dẫn mặc định'
       },
       {

@@ -344,12 +344,14 @@ def _clear_cache(args: argparse.Namespace) -> int:
 
     # Force path: actually delete, report per-file outcome.
     errors: list[str] = []
+    deleted: list[str] = []
     for p in existing:
         try:
             p.unlink()
+            deleted.append(str(p))
         except OSError as exc:
             errors.append(f"{p}: {exc}")
-    payload["deleted"] = [str(p) for p in existing if not errors or str(p) not in "\n".join(errors)]
+    payload["deleted"] = deleted
     payload["errors"] = errors
     payload["dry_run"] = False
     print(json.dumps(payload, indent=2, ensure_ascii=False))
@@ -548,13 +550,14 @@ def _dump_graph(args: argparse.Namespace) -> int:
     return 0
 
 
-def _session_stats(args: argparse.Namespace) -> int:
+def _session_stats(args):
     """Show session memory statistics."""
+    from dataclasses import asdict
     from .session_memory import SessionMemory
 
     mem = SessionMemory(cache_path=args.memory_path)
     stats = mem.get_stats()
-    print(json.dumps(stats, indent=2, ensure_ascii=False))
+    print(json.dumps(asdict(stats), indent=2, ensure_ascii=False))
     return 0
 
 

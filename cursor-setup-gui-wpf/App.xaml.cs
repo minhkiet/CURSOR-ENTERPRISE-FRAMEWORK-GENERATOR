@@ -7,7 +7,9 @@ namespace CursorSetupWpf
 {
     public partial class App : Application
     {
-        static readonly string LogPath = @"D:\temp\cursor-setup-debug.log";
+        static readonly string LogPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "CursorSetup", "cursor-setup-debug.log");
 
         static void Log(string msg)
         {

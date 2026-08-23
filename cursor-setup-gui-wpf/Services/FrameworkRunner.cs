@@ -96,10 +96,68 @@ namespace CursorSetupWpf.Services
         }
 
         /// <summary>
+        /// Walk up from a starting directory until we find cursor_framework.
+        /// </summary>
+        static string ScanUpwardsForFramework(string startDir)
+        {
+            try
+            {
+                var dir = Path.GetFullPath(startDir);
+                var root = Path.GetPathRoot(dir);
+                while (dir != null && !dir.Equals(root, StringComparison.OrdinalIgnoreCase))
+                {
+                    var candidate = Path.Combine(dir, "cursor_framework");
+                    if (Directory.Exists(candidate) &&
+                        (File.Exists(Path.Combine(candidate, "__init__.py")) ||
+                         File.Exists(Path.Combine(candidate, "__main__.py"))))
+                    {
+                        return candidate;
+                    }
+                    dir = Path.GetDirectoryName(dir);
+                }
+            }
+            catch { }
+            return "";
+        }
+
+        /// <summary>
+        /// Try to find cursor_framework relative to a known project structure.
+        /// Looks for patterns like: .../cursor_framework/ (same level as cursor-setup-gui-wpf)
+        /// </summary>
+        static string FindInProjectStructure(string baseDir)
+        {
+            try
+            {
+                // Common patterns: project root contains both cursor_framework and cursor-setup-gui-wpf
+                // e.g., D:\Projects\Cursor Framework\cursor_framework
+                var dirs = new[] {
+                    Path.Combine(baseDir, "..", "cursor_framework"),
+                    Path.Combine(baseDir, "..", "..", "cursor_framework"),
+                    Path.Combine(baseDir, "..", "..", "..", "cursor_framework"),
+                    Path.Combine(baseDir, "..", "Cursor Enterprise Framework Generator", "cursor_framework"),
+                    Path.Combine(baseDir, "..", "..", "Cursor Enterprise Framework Generator", "cursor_framework"),
+                };
+
+                foreach (var d in dirs)
+                {
+                    var full = Path.GetFullPath(d);
+                    if (Directory.Exists(full) &&
+                        (File.Exists(Path.Combine(full, "__init__.py")) ||
+                         File.Exists(Path.Combine(full, "__main__.py"))))
+                    {
+                        return full;
+                    }
+                }
+            }
+            catch { }
+            return "";
+        }
+
+        /// <summary>
         /// Find cursor_framework module path by scanning common locations.
         /// Order: installPath/cursor_framework → installPath/../cursor_framework →
         /// ~/.cursor/cursor_framework → AppContext.BaseDirectory/../cursor_framework
-        /// → AppContext.BaseDirectory/../../cursor_framework
+        /// → AppContext.BaseDirectory/../../cursor_framework → current directory
         /// </summary>
         static string FindFrameworkModulePath(string installPath)
         {
@@ -109,28 +167,53 @@ namespace CursorSetupWpf.Services
 
             var tryPaths = new List<string>
             {
+                // Relative to install path
                 Path.Combine(installPath, "cursor_framework"),
                 Path.Combine(installParent ?? "", "cursor_framework"),
+                // User profile default locations
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                     ".cursor", "cursor_framework"),
+                // Relative to AppContext.BaseDirectory (for development builds)
                 Path.Combine(AppContext.BaseDirectory, "cursor_framework"),
                 Path.Combine(AppContext.BaseDirectory, "..", "cursor_framework"),
                 Path.Combine(AppContext.BaseDirectory, "..", "..", "cursor_framework"),
                 Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "cursor_framework"),
                 Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "cursor_framework"),
+                Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "cursor_framework"),
+                Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "..", "cursor_framework"),
+                // Current directory and parent directories (for when running from project root)
+                Environment.CurrentDirectory,
+                Path.Combine(Environment.CurrentDirectory, "cursor_framework"),
+                Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..")),
+                Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..", "cursor_framework")),
+                Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..", "..")),
+                Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..", "..", "cursor_framework")),
             };
 
             foreach (var p in tryPaths)
             {
                 try
                 {
-                    if (Directory.Exists(p) &&
-                        (File.Exists(Path.Combine(p, "__init__.py")) ||
-                         File.Exists(Path.Combine(p, "__main__.py"))))
-                        return p;
+                    var fullPath = Path.GetFullPath(p);
+                    if (Directory.Exists(fullPath) &&
+                        (File.Exists(Path.Combine(fullPath, "__init__.py")) ||
+                         File.Exists(Path.Combine(fullPath, "__main__.py"))))
+                        return fullPath;
                 }
                 catch { }
             }
+
+            // Final fallback: walk up from AppContext.BaseDirectory
+            var found = ScanUpwardsForFramework(AppContext.BaseDirectory);
+            if (!string.IsNullOrEmpty(found)) return found;
+
+            // Walk up from current directory
+            found = ScanUpwardsForFramework(Environment.CurrentDirectory);
+            if (!string.IsNullOrEmpty(found)) return found;
+
+            // Try project structure patterns
+            found = FindInProjectStructure(AppContext.BaseDirectory);
+            if (!string.IsNullOrEmpty(found)) return found;
 
             return "";
         }

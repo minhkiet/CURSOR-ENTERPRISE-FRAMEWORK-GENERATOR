@@ -1,6 +1,6 @@
 # Cursor Enterprise Framework - MCP Integration Guide
 
-> **Version:** 1.1.0 | **Framework:** 3.1.0 | **Created:** 2026-08-09
+> **Version:** 1.0.0 | **Framework:** 3.1.0 | **Created:** 2026-08-09
 
 ## Tổng quan
 
@@ -288,58 +288,12 @@ optimize_framework(target_fill_ratio=0.7)
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0.0 | 2026-08-09 | Initial release: 3 MCP servers, 26 tools |
-| 1.1.0 | 2026-08-19 | Vendor hangwin/mcp-chrome as git submodule at `vendor/mcp-chrome/` (depth-1, pinned). Reference wired in `mcp-config-template.json` under `_meta.vendored`. |
-
----
-
-## Vendored MCP: mcp-chrome
-
-**Source:** [hangwin/mcp-chrome](https://github.com/hangwin/mcp-chrome)
-**Local path:** `vendor/mcp-chrome/` (git submodule, pinned to `f48e7175`)
-**Runtime:** Node.js + Chrome extension + native host bridge — **not** started by the Python `mcpServers` block above.
-
-### Layout (submodule, do not edit in-place)
-
-```
-vendor/mcp-chrome/
-├── app/
-│   ├── chrome-extension/   # Chrome extension source
-│   └── native-server/      # Native MCP stdio bridge
-├── packages/
-│   ├── shared/             # Shared TypeScript types
-│   └── wasm-simd/          # Optional WASM acceleration
-└── README.md               # Upstream docs
-```
-
-### Build & install (per upstream README)
-
-```bash
-cd vendor/mcp-chrome
-pnpm install
-pnpm build
-# Load app/chrome-extension/dist as unpacked extension in chrome://extensions
-# Configure native server per upstream docs (separate from Cursor's mcp.json)
-```
-
-### Why submodule, not mirror
-
-- Isolated under `vendor/` — no collision with `tools/`, `cursor-setup-gui-wpf/`, or any future JS work
-- Tracked by commit hash, not full history — pull updates explicitly: `git submodule update --remote vendor/mcp-chrome`
-- Build artifacts (`node_modules/`, `dist/`, `.turbo/`) excluded via `.gitignore` `vendor/*/...` patterns
-- License (MIT) preserved at `vendor/mcp-chrome/LICENSE` for attribution
-
-### Update
-
-```bash
-git submodule update --remote --merge vendor/mcp-chrome
-```
 
 ---
 
 ## References
 
 - Framework: [thaofvn-coca06/2026](https://github.com/thaofvn-coca06/2026)
-- Vendored: [hangwin/mcp-chrome](https://github.com/hangwin/mcp-chrome)
 - Skills: `.cursor/SKILL-INDEX.md`
 - Agents: `.cursor/AGENTS.md`
 - Rules: `.cursor/rules/`

@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "cursor-framework": {
+      "command": "python",
+      "args": ["-m", "cursor_framework_mcp.server"],
+      "cwd": "${workspaceFolder}/.cursor/mcp/cursor-framework-mcp",
+      "env": {
+        "CURSOR_WORKSPACE_ROOT": "${workspaceFolder}"
+      }
+    },
+    "cursor-autopilot": {
+      "command": "python",
+      "args": ["-m", "cursor_autopilot_mcp.server"],
+      "cwd": "${workspaceFolder}/.cursor/mcp/cursor-autopilot-mcp",
+      "env": {
+        "CURSOR_WORKSPACE_ROOT": "${workspaceFolder}"
+      }
+    },
+    "cursor-memory": {
+      "command": "python",
+      "args": ["-m", "cursor_memory_mcp.server"],
+      "cwd": "${workspaceFolder}/.cursor/mcp/cursor-memory-mcp",
+      "env": {
+        "CURSOR_WORKSPACE_ROOT": "${workspaceFolder}"
+      }
+    }
+  }
+}

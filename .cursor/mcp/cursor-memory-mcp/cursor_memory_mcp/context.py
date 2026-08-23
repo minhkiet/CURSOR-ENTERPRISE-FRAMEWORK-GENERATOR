@@ -25,7 +25,7 @@ class ContextManager:
 
     def stats(self, current_context: str = "") -> dict[str, Any]:
         framework = {
-            kind: {"items": cache.stats()["size"], "tokens": cache.stats()["total_tokens"]}
+            kind: {"items": cache.stats()["size"], "tokens": cache.stats()["tokens_tracked"]}
             for kind, cache in self.loader.caches().items()
         }
         memory = self.memory.stats()
