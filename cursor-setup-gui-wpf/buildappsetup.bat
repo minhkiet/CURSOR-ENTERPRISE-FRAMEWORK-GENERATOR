@@ -16,7 +16,7 @@ REM   buildappsetup.bat /clean       (clean bin/obj before build)
 REM   buildappsetup.bat /help        (show this help)
 REM
 REM Outputs (in bin\<Config>\net8.0-windows\win-x64\):
-REM   - cursor-setup-wpf.exe          (WPF installer app)
+REM   - ToolRunCursor.exe             (WPF installer app)
 REM   - cursor-setup.zip              (framework archive)
 REM   - Resources\vi.txt             (Vietnamese localization)
 REM   - Resources\en.txt             (English localization)
@@ -181,10 +181,10 @@ echo.
 set "MISSING=0"
 
 REM Check .exe
-if exist "%OUTPUT_DIR%\cursor-setup-wpf.exe" (
-    for %%A in ("%OUTPUT_DIR%\cursor-setup-wpf.exe") do echo   [OK] cursor-setup-wpf.exe
+if exist "%OUTPUT_DIR%\ToolRunCursor.exe" (
+    for %%A in ("%OUTPUT_DIR%\ToolRunCursor.exe") do echo   [OK] ToolRunCursor.exe
 ) else (
-    echo   [MISSING] cursor-setup-wpf.exe
+    echo   [MISSING] ToolRunCursor.exe
     set "MISSING=1"
 )
 
@@ -237,7 +237,7 @@ echo ===========================================================
 echo  Output : %OUTPUT_DIR%
 echo.
 echo  Artifacts:
-echo    - cursor-setup-wpf.exe
+echo    - ToolRunCursor.exe
 if exist "%OUTPUT_DIR%\cursor-setup.zip" (
     for %%A in ("%OUTPUT_DIR%\cursor-setup.zip") do (
         set "ZS=%%~zA"

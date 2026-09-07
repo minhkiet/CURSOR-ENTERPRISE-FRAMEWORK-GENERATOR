@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <NoWarn>$(NoWarn);CS8632</NoWarn>
-    <AssemblyName>cursor-setup-wpf</AssemblyName>
+    <AssemblyName>ToolRunCursor</AssemblyName>
     <Version>4.4.0</Version>
     <FileVersion>4.4.0</FileVersion>
     <AssemblyVersion>4.4.0</AssemblyVersion>
@@ -18,21 +18,16 @@
     <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <ApplicationIcon>setup.ico</ApplicationIcon>
-    <Icon>setup.ico</Icon>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="setup.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <None Include="Resources\*.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>Resources\%(Filename)%(Extension)</TargetPath>
     </None>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\Styles\*.xaml" />
     <Resource Include="Resources\Themes\*.xaml" />
+    <Resource Include="setup.ico" />
   </ItemGroup>
   <!-- MCP Tools - auto-include from ../tools directory -->
   <ItemGroup>

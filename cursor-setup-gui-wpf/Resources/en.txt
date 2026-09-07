@@ -20,6 +20,8 @@ tab.updates=Updates
 tab.backup=Backup & Restore
 tab.settings=Settings
 tab.framework=Tools
+tab.project_runner=Project Runner
+tab.script_generator=Script Generator
 
 hooks.desc=Optional integration with the cursor_framework Python library. Hooks run as background subprocess and never block installation. Disable any hook to skip it.
 hooks.prescan_label=Pre-scan: validate ZIP before extraction
@@ -89,6 +91,116 @@ guide.step4_desc=Configure pre-scan and post-install hooks for deeper integratio
 guide.step5=Step 5: Complete
 guide.step5_desc=Click "Install" to begin. The process will automatically extract, copy files and run post-install build steps.
 guide.tip=Tip: After installation, restart Cursor IDE to load the new components.
+
+# Expanded Guide Content (English)
+guide.expanded.title=Complete Installation Guide
+guide.expanded.subtitle=Detailed instructions for Cursor Enterprise Framework setup
+
+# Prerequisites
+guide.prereq.title=Prerequisites
+guide.prereq.subtitle=Before you begin
+guide.prereq.item1=Cursor IDE installed on your computer
+guide.prereq.item2=cursor-setup.zip file (download from GitHub releases)
+guide.prereq.item3=Windows 10/11 or Windows Server 2019+
+guide.prereq.item4=Administrator rights (for system-wide installation)
+guide.prereq.note=Note: You can also install to user folder without admin rights.
+
+# Installation Steps Detailed
+guide.install.step1.title=Step 1: Select Installation Location
+guide.install.step1.desc=Choose where Cursor Enterprise Framework files will be installed. Default location is your Cursor user folder.
+guide.install.step1.default_path=Default: %USERPROFILE%\.cursor
+guide.install.step1.create_new=Create new .cursor folder
+guide.install.step1.browse=Click Browse to select existing folder
+guide.install.step1.overwrite=If folder exists, select Overwrite to replace files
+
+guide.install.step2.title=Step 2: Choose Components
+guide.install.step2.desc=Select which framework components to install. All items are selected by default.
+guide.install.step2.component1=Rules (39 development guidelines and standards)
+guide.install.step2.component2=Skills (50+ specialized AI agent skills)
+guide.install.step2.component3=Agents (18 agent personas and prompts)
+guide.install.step2.component4=Commands (28 slash commands for Cursor IDE)
+guide.install.step2.component5=Hooks (Python integration scripts)
+guide.install.step2.component6=Knowledge (329 knowledge bases and references)
+guide.install.step2.tip=Tip: Uncheck components you don't need to reduce installation size.
+
+guide.install.step3.title=Step 3: Advanced Options (Optional)
+guide.install.step3.desc=Configure additional settings for experienced users.
+guide.install.step3.option1=References - Architecture patterns, coding standards
+guide.install.step3.option2=Workflows - Automated task workflows
+guide.install.step3.option3=Templates - Project templates and boilerplates
+guide.install.step3.option4=Memory - Workspace memory system
+guide.install.step3.option5=Scripts - Utility scripts and tools
+
+guide.install.step4.title=Step 4: Configure Hooks (Optional)
+guide.install.step4.desc=Hooks integrate with cursor_framework Python library for advanced automation.
+guide.install.step4.prescan=Pre-scan Hook: Validate ZIP archive before extraction
+guide.install.step4.postinstall=Post-install Hook: Generate INDEX.json for Dashboard
+guide.install.step4.disable=Disable hooks by unchecking - installation will continue normally
+
+guide.install.step5.title=Step 5: Install
+guide.install.step5.desc=Review your selections and click Install to begin.
+guide.install.step5.review=Review selected components in the status bar
+guide.install.step5.logs=Installation logs will display in real-time
+guide.install.step5.complete=Restart Cursor IDE after installation completes
+
+# Features Overview
+guide.features.title=Framework Features
+guide.features.subtitle=What you get with Cursor Enterprise Framework
+
+guide.features.rules.title=Development Rules (39 rules)
+guide.features.rules.desc=Comprehensive coding standards, architecture patterns, and best practices for enterprise development.
+
+guide.features.skills.title=AI Agent Skills (50+ skills)
+guide.features.skills.desc=Specialized skills for frontend, backend, security, testing, and deployment. Includes Karpathy coding discipline and Ponytail lazy senior principles.
+
+guide.features.agents.title=Agent Personas (18 personas)
+guide.features.agents.desc=Pre-configured prompts for Code Reviewer, Security Auditor, Test Engineer, Web Performance Auditor, and more.
+
+guide.features.commands.title=Slash Commands (28 commands)
+guide.features.commands.desc=Quick commands like /build, /test, /review, /deploy, /security for common development tasks.
+
+guide.features.knowledge.title=Knowledge Bases (329)
+guide.features.knowledge.desc=Extensive documentation, references, and guides for various technologies and frameworks.
+
+# Usage Guide
+guide.usage.title=How to Use
+guide.usage.subtitle=Getting started after installation
+
+guide.usage.restart.title=1. Restart Cursor IDE
+guide.usage.restart.desc=Close and reopen Cursor to load the new framework components.
+
+guide.usage.slash.title=2. Use Slash Commands
+guide.usage.slash.desc=Type / in Cursor to see available commands. Try /build, /test, /review, /spec, /plan
+
+guide.usage.skills.title=3. Access Skills
+guide.usage.skills.desc=Skills are automatically loaded. Use @ followed by skill name to activate specialized skills.
+
+guide.usage.agent.title=4. Agent Personas
+guide.usage.agent.desc=Request code review with /review, security audit with /security, or performance check with /webperf
+
+# Troubleshooting
+guide.trouble.title=Troubleshooting
+guide.trouble.subtitle=Common issues and solutions
+
+guide.trouble.issue1=Q: Components not loading after install?
+guide.trouble.solve1=Restart Cursor IDE. If still not working, check if .cursor folder exists in your home directory.
+
+guide.trouble.issue2=Q: Installation failed with permission error?
+guide.trouble.solve2=Run the installer as Administrator, or install to user folder instead.
+
+guide.trouble.issue3=Q: How to update the framework?
+guide.trouble.solve3=Download new cursor-setup.zip and run the installer again. Select Overwrite to update files.
+
+guide.trouble.issue4=Q: How to uninstall?
+guide.trouble.solve4=Delete the .cursor folder in your home directory. The framework is self-contained.
+
+# Keyboard Shortcuts
+guide.shortcuts.title=Keyboard Shortcuts
+guide.shortcuts.ctrl_s=Ctrl+Shift+B - Build command
+guide.shortcuts.ctrl_r=Ctrl+Shift+T - Test command
+guide.shortcuts.ctrl_shift_r=Ctrl+Shift+R - Review command
+guide.shortcuts.ctrl_shift_d=Ctrl+Shift+D - Deploy command
+guide.shortcuts.ctrl_shift_p=Ctrl+Shift+P - Project Indexer
 
 install.location=Installation Location
 install.location_hint=Select where Cursor Enterprise Framework will be installed
@@ -392,3 +504,32 @@ install.page_title=Install
 install.page_subtitle=Select installation location and options for Cursor Enterprise Framework.
 install.optional=OPTIONAL
 install.skip_tip=Skip if only want a clean install.
+
+# Project Runner tab
+project_runner.title=Project Runner
+project_runner.subtitle=Run framework tools on any project workspace.
+project_runner.select_project=Select Project Folder
+project_runner.browse=Browse...
+project_runner.detected_projects=Detected Projects
+project_runner.run_on_project=Run on Project
+project_runner.ask_placeholder=Type your request here...
+project_runner.no_project_selected=Please select a project folder first
+project_runner.current_path=Current project:
+project_runner.select_folder=Select Folder
+
+# Script Generator tab
+script_gen.title=Script Generator
+script_gen.subtitle=Generate .bat installer scripts for web apps, desktop apps, Vercel, databases, AI, and more — ready to run in any project.
+script_gen.filter_label=Category
+script_gen.project_label=Project:
+script_gen.output_label=Output:
+script_gen.use_ps=Use PowerShell
+script_gen.blocks_label=Script blocks
+script_gen.preview_label=Script preview
+script_gen.generate_selected=Generate Selected
+script_gen.generate_all=Generate All
+script_gen.generate_all_tip=Generate all checked scripts as .bat files
+script_gen.copy_preview=Copy
+script_gen.save_preview=Save File
+script_gen.open_output=Open Folder
+script_gen.project_selected=Project selected

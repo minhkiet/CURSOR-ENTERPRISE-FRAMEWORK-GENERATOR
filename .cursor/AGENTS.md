@@ -74,6 +74,16 @@ Cursor Enterprise Framework tích hợp **Agent Personas** từ agent-skills - c
 | `/pentest` | Penetration testing |
 | `/tuvi` | Vietnamese astrology |
 
+### API Integration Commands
+
+| Command | Description |
+|---------|-------------|
+| `/zalo` | Zalo API integration — messages, profile, OA management |
+| `/telegram` | Telegram Bot API — messages, media, groups |
+| `/facebook` | Facebook Graph API — Page posts, Messenger |
+| `/google` | Google APIs — Sheets, Gmail, Calendar, Maps |
+| `/shopee` | Shopee Open Platform — products, orders, logistics |
+
 ### Define Phase
 
 | Command | Description | Key Principle |

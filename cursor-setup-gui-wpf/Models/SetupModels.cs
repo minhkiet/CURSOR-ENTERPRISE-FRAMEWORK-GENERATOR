@@ -96,7 +96,7 @@ namespace CursorSetupWpf.Models
     }
 
     /// <summary>
-    /// Status of an MCP server (framework, autopilot, memory, ...).
+    /// Status of an MCP server (framework, autopilot, memory, browser, vercel, ...).
     /// Surfaces whether the server is installed and how many tools it provides.
     /// </summary>
     public class McpServerStatus : INotifyPropertyChanged
@@ -106,11 +106,42 @@ namespace CursorSetupWpf.Models
         private DateTime? _lastSync;
         private string _configPath = "";
         private string _status = "";
+        private string _command = "";
+        private string _args = "";
+        private string _cwd = "";
+        private string _url = "";
 
         public string Name { get; set; } = "";
         public string DisplayName { get; set; } = "";
         public string Description { get; set; } = "";
         public string ServerKey { get; set; } = ""; // The key used inside mcp.json
+
+        // New fields for enhanced server configuration
+        public string Command
+        {
+            get => _command;
+            set { _command = value; OnPropertyChanged(nameof(Command)); }
+        }
+        
+        public string Args
+        {
+            get => _args;
+            set { _args = value; OnPropertyChanged(nameof(Args)); }
+        }
+        
+        public string Cwd
+        {
+            get => _cwd;
+            set { _cwd = value; OnPropertyChanged(nameof(Cwd)); }
+        }
+        
+        public string Url
+        {
+            get => _url;
+            set { _url = value; OnPropertyChanged(nameof(Url)); }
+        }
+        
+        public bool IsUrlBased { get; set; } = false;
 
         public bool IsInstalled
         {
@@ -182,6 +213,69 @@ namespace CursorSetupWpf.Models
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged(string name) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    }
+
+    /// <summary>
+    /// Defines the default MCP servers for the framework.
+    /// </summary>
+    public static class DefaultMcpServers
+    {
+        public static readonly McpServerStatus[] Servers = new[]
+        {
+            new McpServerStatus
+            {
+                Name = "cursor-framework",
+                DisplayName = "Cursor Framework",
+                Description = "Rules, skills, agents registry with LRU caching",
+                ServerKey = "cursor-framework",
+                Command = "python",
+                Args = "-m cursor_framework_mcp.server",
+                Cwd = "${CURSOR_PROJECT}/tools/cursor-framework-mcp",
+                ToolCount = 9
+            },
+            new McpServerStatus
+            {
+                Name = "cursor-autopilot",
+                DisplayName = "Cursor Autopilot",
+                Description = "Auto-execution engine for workflows, gates, and suggestions",
+                ServerKey = "cursor-autopilot",
+                Command = "python",
+                Args = "-m cursor_autopilot_mcp.server",
+                Cwd = "${CURSOR_PROJECT}/tools/cursor-autopilot-mcp",
+                ToolCount = 8
+            },
+            new McpServerStatus
+            {
+                Name = "cursor-memory",
+                DisplayName = "Cursor Memory",
+                Description = "Persistent workspace memory and context management",
+                ServerKey = "cursor-memory",
+                Command = "python",
+                Args = "-m cursor_memory_mcp.server",
+                Cwd = "${CURSOR_PROJECT}/tools/cursor-memory-mcp",
+                ToolCount = 9
+            },
+            new McpServerStatus
+            {
+                Name = "vercel",
+                DisplayName = "Vercel",
+                Description = "Vercel deployment integration and monitoring",
+                ServerKey = "vercel",
+                IsUrlBased = true,
+                Url = "https://mcp.vercel.com",
+                ToolCount = 5
+            },
+            new McpServerStatus
+            {
+                Name = "browser",
+                DisplayName = "Browser MCP",
+                Description = "Browser automation via CDP — navigate, snapshot, click, type, screenshot",
+                ServerKey = "browser",
+                Command = "npx",
+                Args = "-y @browsermcp/mcp",
+                ToolCount = 15
+            }
+        };
     }
 
     /// <summary>

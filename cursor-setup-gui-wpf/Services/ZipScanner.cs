@@ -18,7 +18,8 @@ namespace CursorSetupWpf.Services
 
         public static readonly HashSet<string> CoreCategories = new(StringComparer.OrdinalIgnoreCase)
         {
-            "scripts", "memory", "mcp"
+            // Always extract — required for Cursor Settings (Rules / MCP) to light up after install.
+            "rules", "scripts", "memory", "mcp"
         };
 
         public static string EMBEDDED_ZIP_NAME = "cursor-setup.zip";

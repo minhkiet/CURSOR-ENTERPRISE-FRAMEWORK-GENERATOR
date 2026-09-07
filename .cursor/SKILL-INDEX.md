@@ -1,21 +1,15 @@
 # Cursor Enterprise Framework - Skill Index
 
-> **Phiên bản:** 3.6.0 | **Cập nhật:** 2026-08-18
-> **Total Skills:** 101+ | **Rules:** 43 | **Agents:** 18 | **Commands:** 37 | **Python Scripts:** 12+
+> **Phiên bản:** 4.0.0 | **Cập nhật:** 2026-09-04
+> **Total Skills:** 106+ | **Rules:** 39 | **Agents:** 18 | **Commands:** 42 | **MCP Servers:** 5
 >
-> **Mới (2026-08-18):**
-> - **ui-ux-pro-max** từ [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) (117k stars):
->   - 79 UI styles (Glassmorphism, Claymorphism, etc.)
->   - 192 color palettes theo industry
->   - 74 font pairings
->   - Design System Generator với 192 reasoning rules
->   - 22 tech stacks (React, Vue, SwiftUI, etc.)
->
-> **Mới (2026-08-16):**
-> - **agent-skills integration** từ [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) (87k stars):
->   - 8 commands mới: `/spec`, `/plan`, `/build`, `/build auto`, `/test`, `/review`, `/code-simplify`, `/ship`, `/webperf`
->   - 5 skills mới: `spec-driven-development`, `planning-and-task-breakdown`, `incremental-implementation`, `test-driven-development`, `code-review-and-quality`, `code-simplification`, `debugging-and-error-recovery`
->   - Session hooks cho agent awareness
+> **Mới (2026-09-04):**
+> - **API Integration Skills:** Zalo, Telegram, Facebook, Google, Shopee APIs
+> - **Browser MCP:** Browser automation via CDP (naviga
+
+...
+
+
 
 ---
 
@@ -25,7 +19,7 @@
 .cursor/
 ├── skills/           # 93+ skills (tự động gọi theo context)
 ├── agent-skills/    # 8 skills từ agent-skills
-├── rules/            # 43 rules (luật theo domain)
+├── rules/            # 39 rules (luật theo domain)
 ├── agents/           # 18 agent personas (chuyên gia)
 ├── agent-commands/  # 8 commands từ agent-skills
 ├── commands/         # 29+ slash commands (workflows)
@@ -36,7 +30,8 @@
 ├── prompts/           # 31 prompts (task templates)
 ├── memory/            # 14 memory files (context)
 ├── references/       # 4 references (checklists)
-└── templates/        # 6 templates (ADR, bug, feature)
+├── templates/        # 6 templates (ADR, bug, feature)
+└── mcp/             # 5 MCP servers configuration
 ```
 
 ---
@@ -448,9 +443,96 @@
 
 ---
 
-## NHÓM 10: KNOWLEDGE — TRADITIONAL SYSTEMS
+## MCP SERVERS
 
-### 10.1 Chinese Metaphysics (Bazi / Four Pillars)
+### Framework MCP Servers
+
+| Server | Tools | Description |
+|--------|-------|-------------|
+| `cursor-framework` | 9 | Rules, Skills, Agents Registry with LRU caching |
+| `cursor-autopilot` | 8 | Workflow automation, gates, suggestions |
+| `cursor-memory` | 9 | Token-aware hierarchical memory management |
+| `vercel` | 5 | Vercel deployment integration |
+| `browser` | 15 | Browser automation via CDP (navigate, snapshot, click, type, screenshot) |
+
+### MCP Configuration
+
+```json
+{
+  "mcpServers": {
+    "cursor-framework": {
+      "command": "python",
+      "args": ["-m", "cursor_framework_mcp.server"],
+      "cwd": "${CURSOR_PROJECT}/tools/cursor-framework-mcp"
+    },
+    "cursor-autopilot": {
+      "command": "python",
+      "args": ["-m", "cursor_autopilot_mcp.server"],
+      "cwd": "${CURSOR_PROJECT}/tools/cursor-autopilot-mcp"
+    },
+    "cursor-memory": {
+      "command": "python",
+      "args": ["-m", "cursor_memory_mcp.server"],
+      "cwd": "${CURSOR_PROJECT}/tools/cursor-memory-mcp"
+    },
+    "vercel": {
+      "url": "https://mcp.vercel.com"
+    },
+    "browser": {
+      "command": "npx",
+      "args": ["-y", "@browsermcp/mcp"]
+    }
+  }
+}
+```
+
+---
+
+## NHÓM 10: API INTEGRATIONS
+
+> **Platform APIs:** Vietnamese & International API integration skills for messaging, e-commerce, and cloud services.
+
+### 10.1 Vietnamese Platform APIs
+
+| Skill | Path | Description |
+|-------|------|-------------|
+| `zalo-integration` | `skills/source-command-zalo-command/` | Zalo OA API — messaging, profile, menu, followers. Mini App với ZaUI |
+| `shopee-integration` | `skills/source-command-shopee-command/` | Shopee Open Platform — products, orders, logistics, finance |
+
+### 10.2 International Messaging APIs
+
+| Skill | Path | Description |
+|-------|------|-------------|
+| `telegram-integration` | `skills/source-command-telegram-command/` | Telegram Bot API — messages, media, groups, inline queries, payments |
+| `facebook-integration` | `skills/source-command-facebook-command/` | Facebook Graph API — Page posts, Messenger, insights |
+
+### 10.3 Cloud & Productivity APIs
+
+| Skill | Path | Description |
+|-------|------|-------------|
+| `google-integration` | `skills/source-command-google-command/` | Google APIs — Sheets, Gmail, Calendar, Drive, Maps, Firebase |
+
+### 10.4 CLI Tools
+
+| Tool | Path | Description |
+|------|------|-------------|
+| `cursor_framework_cli` | `tools/cursor_framework_cli.py` | Standalone CLI tool for framework operations |
+
+### 10.5 API Integration Tools
+
+| Tool | Path | Description |
+|------|------|-------------|
+| `zalo_integration.py` | `tools/api_integrations/zalo_integration.py` | Zalo API Python client |
+| `telegram_integration.py` | `tools/api_integrations/telegram_integration.py` | Telegram Bot Python client |
+| `facebook_integration.py` | `tools/api_integrations/facebook_integration.py` | Facebook Graph API Python client |
+| `google_integration.py` | `tools/api_integrations/google_integration.py` | Google APIs Python client |
+| `shopee_integration.py` | `tools/api_integrations/shopee_integration.py` | Shopee Open Platform Python client |
+
+---
+
+## NHÓM 11: KNOWLEDGE — TRADITIONAL SYSTEMS
+
+### 11.1 Chinese Metaphysics (Bazi / Four Pillars)
 
 | Skill | Path | Description |
 |-------|------|-------------|

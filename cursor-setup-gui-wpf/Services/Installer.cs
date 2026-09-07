@@ -25,28 +25,84 @@ namespace CursorSetupWpf.Services
             "packager.ps1",
         };
 
-        // Known MCP servers. Each entry mirrors the catalog the framework ships with.
-        static readonly (string ServerKey, string DisplayName, string Description, string[] Tools)[] McpCatalog = new[]
+        // Real MCP packages live under {installPath}/mcp/<PackageDir> and expose
+        // python -m <Module>. Legacy keys from older installers are removed on sync.
+        // Version 4.0.0: Added Vercel and Browser MCP servers
+        static readonly (
+            string ServerKey,
+            string PackageDir,
+            string Module,
+            string DisplayName,
+            string Description,
+            string[] Tools
+        )[] McpCatalog =
         {
             (
-                "framework",
+                "cursor-framework",
+                "cursor-framework-mcp",
+                "cursor_framework_mcp.server",
                 "Framework MCP",
-                "Cursor Enterprise Framework — rules, skills, agents and command discovery.",
-                new[] { "list_rules", "list_skills", "list_agents", "search_knowledge", "validate_setup" }
+                "Cursor Enterprise Framework — rules, skills, agents registry.",
+                new[]
+                {
+                    "get_rule", "get_skill", "get_agent", "analyze_task",
+                    "load_skill_bundle", "get_essential_skills", "clear_cache",
+                    "get_framework_status", "optimize_framework"
+                }
             ),
             (
-                "autopilot",
+                "cursor-autopilot",
+                "cursor-autopilot-mcp",
+                "cursor_autopilot_mcp.server",
                 "Autopilot MCP",
-                "Multi-step task automation and orchestration over the framework catalog.",
-                new[] { "run_plan", "stream_progress", "abort_task", "list_workflows" }
+                "Auto-execution engine for workflows, gates, and suggestions.",
+                new[]
+                {
+                    "auto_execute", "execute_workflow", "run_gate_validation",
+                    "get_workflow_status", "abort_workflow", "list_workflows",
+                    "estimate_cost", "suggest_optimization"
+                }
             ),
             (
-                "memory",
+                "cursor-memory",
+                "cursor-memory-mcp",
+                "cursor_memory_mcp.server",
                 "Memory MCP",
-                "Persistent workspace memory and short-term recall cache for Cursor sessions.",
-                new[] { "memory_get", "memory_set", "memory_search", "memory_clear", "memory_index" }
+                "Persistent workspace memory and context management.",
+                new[]
+                {
+                    "store_memory", "recall_memory", "compact_context",
+                    "summarize_history", "get_context_stats", "prune_context",
+                    "export_memory", "import_memory", "sync_to_disk"
+                }
+            ),
+            // Version 4.0.0 - New MCP Servers
+            (
+                "vercel",
+                null,
+                null,
+                "Vercel AI SDK",
+                "Vercel AI SDK — deploy and manage AI projects with Vercel.",
+                new[]
+                {
+                    "vercel_deploy", "vercel_model_list", "vercel_model_deploy"
+                }
+            ),
+            (
+                "browser",
+                null,
+                null,
+                "Browser MCP",
+                "Browser automation — web scraping, screenshots, and testing.",
+                new[]
+                {
+                    "browser_navigate", "browser_snapshot", "browser_click",
+                    "browser_type", "browser_screenshot"
+                }
             ),
         };
+
+        static readonly string[] LegacyMcpKeys = { "framework", "autopilot", "memory" };
 
         public async Task RunInstallationAsync(SetupConfig config, List<CategorySelection> selections)
         {
@@ -60,12 +116,20 @@ namespace CursorSetupWpf.Services
             ProgressChanged?.Invoke(10, "Extracting framework files...");
             await ExtractZipAsync(zipPath, installPath, config.ForceOverwrite, selections);
 
-            ProgressChanged?.Invoke(85, "Running post-install scripts...");
+            ProgressChanged?.Invoke(80, "Registering MCP servers...");
+            var (mcpOk, mcpMsg) = await SyncMcpConfigAsync(installPath);
+            LogAppended?.Invoke(mcpOk ? $"[MCP] {mcpMsg}" : $"[MCP] WARN: {mcpMsg}");
+
+            ProgressChanged?.Invoke(88, "Registering Cursor hooks...");
+            var (hooksOk, hooksMsg) = await SyncHooksConfigAsync(installPath);
+            LogAppended?.Invoke(hooksOk ? $"[HOOKS] {hooksMsg}" : $"[HOOKS] WARN: {hooksMsg}");
+
+            ProgressChanged?.Invoke(92, "Running post-install scripts...");
             await RunPostInstallScriptsAsync(installPath, config);
 
             if (config.EnablePostInstallHook)
             {
-                ProgressChanged?.Invoke(95, "Generating INDEX.json...");
+                ProgressChanged?.Invoke(96, "Generating INDEX.json...");
                 await RunPostInstallHookAsync(installPath, config);
             }
 
@@ -118,16 +182,21 @@ namespace CursorSetupWpf.Services
                     bool extract = true;
                     if (File.Exists(filePath) && !force)
                     {
-                        LogAppended?.Invoke($"[SKIP] {entry.FullName}");
-                        extract = false;
-                        skipped++;
+                        // Overwrite empty/stub files left by older installs (e.g. 13-byte rules).
+                        long existingLen = new FileInfo(filePath).Length;
+                        if (existingLen > 64)
+                        {
+                            LogAppended?.Invoke($"[SKIP] {entry.FullName}");
+                            extract = false;
+                            skipped++;
+                        }
                     }
 
                     if (extract)
                     {
                         try
                         {
-                            entry.ExtractToFile(filePath, force);
+                            entry.ExtractToFile(filePath, overwrite: true);
                             LogAppended?.Invoke($"[COPY] {entry.FullName}");
                             copied++;
                         }
@@ -280,6 +349,15 @@ namespace CursorSetupWpf.Services
         }
 
         /// <summary>
+        /// Path to Cursor's global hooks configuration (per Cursor docs: ~/.cursor/hooks.json).
+        /// </summary>
+        public static string GetHooksConfigPath()
+        {
+            string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            return Path.Combine(home, ".cursor", "hooks.json");
+        }
+
+        /// <summary>
         /// Returns true if any of the framework's MCP servers are already registered.
         /// </summary>
         public static bool CheckMcpInstalled()
@@ -301,39 +379,73 @@ namespace CursorSetupWpf.Services
         }
 
         /// <summary>
-        /// Build the canonical mcp.json content from the catalog. The exact command/args
-        /// are placeholders that match the framework's plugin runner; users can edit
-        /// afterwards without losing the keys.
+        /// Build mcpServers entries pointing at packages under {installPath}/mcp/.
         /// </summary>
-        static Dictionary<string, object> BuildDefaultMcpConfig()
+        static Dictionary<string, object> BuildFrameworkMcpServers(string installPath)
         {
-            var servers = new Dictionary<string, object>();
+            string mcpRoot = Path.Combine(installPath, "mcp");
+            var servers = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+
             foreach (var entry in McpCatalog)
             {
-                servers[entry.ServerKey] = new
+                // Handle external MCP servers (vercel, browser) that don't have PackageDir/Module
+                if (string.IsNullOrEmpty(entry.PackageDir) || string.IsNullOrEmpty(entry.Module))
                 {
-                    command = "python",
-                    args = new[] { "-m", $"cursor_framework.mcp.{entry.ServerKey}" },
-                    env = new Dictionary<string, string>(),
-                    description = entry.Description,
-                    tools = entry.Tools
+                    // Vercel MCP - HTTP endpoint
+                    if (entry.ServerKey == "vercel")
+                    {
+                        servers[entry.ServerKey] = new Dictionary<string, object>
+                        {
+                            ["url"] = "https://mcp.vercel.com",
+                            ["description"] = entry.Description,
+                        };
+                    }
+                    // Browser MCP - npx based
+                    else if (entry.ServerKey == "browser")
+                    {
+                        servers[entry.ServerKey] = new Dictionary<string, object>
+                        {
+                            ["command"] = "npx",
+                            ["args"] = new[] { "-y", "@modelcontextprotocol/server-browser" },
+                            ["description"] = entry.Description,
+                        };
+                    }
+                    continue;
+                }
+
+                // Local MCP servers (python -m)
+                string cwd = Path.Combine(mcpRoot, entry.PackageDir);
+                if (!Directory.Exists(cwd))
+                {
+                    // Fall back to install root if package folder missing (still write entry).
+                    cwd = mcpRoot;
+                }
+
+                servers[entry.ServerKey] = new Dictionary<string, object>
+                {
+                    ["command"] = "python",
+                    ["args"] = new[] { "-m", entry.Module },
+                    ["cwd"] = cwd,
+                    ["env"] = new Dictionary<string, string>
+                    {
+                        ["CURSOR_WORKSPACE_ROOT"] = installPath,
+                    },
+                    ["description"] = entry.Description,
                 };
             }
-            return new Dictionary<string, object>
-            {
-                ["mcpServers"] = servers,
-                ["version"] = "1.0",
-                ["syncedAt"] = DateTime.UtcNow.ToString("o"),
-            };
+
+            return servers;
         }
 
         /// <summary>
-        /// Merge our default servers with an existing mcp.json so user customizations are preserved.
+        /// Merge framework servers into existing mcp.json. Always refreshes our keys
+        /// (so broken legacy module paths get fixed) while preserving user servers.
         /// </summary>
-        static Dictionary<string, object> MergeMcpConfig(Dictionary<string, object> existing)
+        static Dictionary<string, object> MergeMcpConfig(
+            Dictionary<string, object> existing,
+            string installPath)
         {
-            var defaults = BuildDefaultMcpConfig();
-            var existingServers = new Dictionary<string, object>();
+            var existingServers = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             if (existing.TryGetValue("mcpServers", out var raw)
                 && raw is JsonElement elem
                 && elem.ValueKind == JsonValueKind.Object)
@@ -346,13 +458,12 @@ namespace CursorSetupWpf.Services
                 foreach (var kv in dict) existingServers[kv.Key] = kv.Value;
             }
 
-            if (!defaults.TryGetValue("mcpServers", out var defaultServersObj)
-                || defaultServersObj is not Dictionary<string, object> defaultServers)
-                return existing;
+            foreach (var legacy in LegacyMcpKeys)
+                existingServers.Remove(legacy);
 
-            foreach (var kv in defaultServers)
-                if (!existingServers.ContainsKey(kv.Key))
-                    existingServers[kv.Key] = kv.Value;
+            var frameworkServers = BuildFrameworkMcpServers(installPath);
+            foreach (var kv in frameworkServers)
+                existingServers[kv.Key] = kv.Value;
 
             existing["mcpServers"] = existingServers;
             existing["version"] = "1.0";
@@ -361,15 +472,20 @@ namespace CursorSetupWpf.Services
         }
 
         /// <summary>
-        /// Synchronize ~/.cursor/mcp.json with the framework's MCP catalog. Merges
-        /// with existing user configuration so any customizations are preserved.
+        /// Synchronize ~/.cursor/mcp.json with packages under <paramref name="installPath"/>/mcp.
         /// </summary>
-        public async Task<(bool Success, string Message)> SyncMcpConfigAsync()
+        public async Task<(bool Success, string Message)> SyncMcpConfigAsync(string? installPath = null)
         {
             return await Task.Run(() =>
             {
                 try
                 {
+                    string resolvedInstall = string.IsNullOrWhiteSpace(installPath)
+                        ? Path.Combine(
+                            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                            ".cursor")
+                        : ResolveInstallPath(installPath);
+
                     string path = GetMcpConfigPath();
                     string dir = Path.GetDirectoryName(path)!;
                     Directory.CreateDirectory(dir);
@@ -383,7 +499,8 @@ namespace CursorSetupWpf.Services
                             if (!string.IsNullOrWhiteSpace(raw))
                             {
                                 using var doc = JsonDocument.Parse(raw);
-                                existing = JsonSerializer.Deserialize<Dictionary<string, object>>(doc.RootElement.GetRawText()) ?? new();
+                                existing = JsonSerializer.Deserialize<Dictionary<string, object>>(
+                                    doc.RootElement.GetRawText()) ?? new();
                             }
                         }
                         catch (Exception ex)
@@ -392,7 +509,7 @@ namespace CursorSetupWpf.Services
                         }
                     }
 
-                    var merged = MergeMcpConfig(existing);
+                    var merged = MergeMcpConfig(existing, resolvedInstall);
                     var opts = new JsonSerializerOptions { WriteIndented = true };
                     File.WriteAllText(path, JsonSerializer.Serialize(merged, opts));
                     LogAppended?.Invoke($"[MCP] synced {path}");
@@ -404,6 +521,116 @@ namespace CursorSetupWpf.Services
                     return (false, ex.Message);
                 }
             });
+        }
+
+        // ===================== Hooks Sync =====================
+
+        /// <summary>
+        /// Write/merge ~/.cursor/hooks.json so Cursor Settings → Hooks can see registered hooks.
+        /// Registers sessionStart from agent-hooks when the script is present.
+        /// </summary>
+        public async Task<(bool Success, string Message)> SyncHooksConfigAsync(string? installPath = null)
+        {
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    string resolvedInstall = string.IsNullOrWhiteSpace(installPath)
+                        ? Path.Combine(
+                            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                            ".cursor")
+                        : ResolveInstallPath(installPath);
+
+                    string hooksPath = GetHooksConfigPath();
+                    string cursorHome = Path.GetDirectoryName(hooksPath)!;
+                    Directory.CreateDirectory(cursorHome);
+
+                    // Prefer script inside the Cursor user home (where hooks.json lives).
+                    string sessionScriptRel = "agent-hooks/session-start.sh";
+                    string sessionScriptAbs = Path.Combine(cursorHome, sessionScriptRel.Replace('/', Path.DirectorySeparatorChar));
+
+                    // If install landed elsewhere, copy agent-hooks into ~/.cursor so relative paths work.
+                    if (!File.Exists(sessionScriptAbs))
+                    {
+                        string srcDir = Path.Combine(resolvedInstall, "agent-hooks");
+                        string destDir = Path.Combine(cursorHome, "agent-hooks");
+                        if (Directory.Exists(srcDir))
+                        {
+                            CopyDirectory(srcDir, destDir);
+                            sessionScriptAbs = Path.Combine(destDir, "session-start.sh");
+                        }
+                    }
+
+                    var hooksObj = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+                    if (File.Exists(hooksPath))
+                    {
+                        try
+                        {
+                            using var doc = JsonDocument.Parse(File.ReadAllText(hooksPath));
+                            if (doc.RootElement.TryGetProperty("hooks", out var existingHooks)
+                                && existingHooks.ValueKind == JsonValueKind.Object)
+                            {
+                                foreach (var prop in existingHooks.EnumerateObject())
+                                {
+                                    hooksObj[prop.Name] = JsonSerializer.Deserialize<object>(prop.Value.GetRawText())!;
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            LogAppended?.Invoke($"[HOOKS] existing hooks.json unreadable: {ex.Message}");
+                        }
+                    }
+
+                    if (File.Exists(sessionScriptAbs))
+                    {
+                        // Cursor user-hook commands are relative to ~/.cursor/
+                        hooksObj["sessionStart"] = new object[]
+                        {
+                            new Dictionary<string, object>
+                            {
+                                ["command"] = "./agent-hooks/session-start.sh"
+                            }
+                        };
+                    }
+                    else
+                    {
+                        LogAppended?.Invoke("[HOOKS] agent-hooks/session-start.sh not found — hooks map left as-is");
+                    }
+
+                    var payload = new Dictionary<string, object>
+                    {
+                        ["version"] = 1,
+                        ["hooks"] = hooksObj,
+                        ["syncedAt"] = DateTime.UtcNow.ToString("o"),
+                    };
+
+                    var opts = new JsonSerializerOptions { WriteIndented = true };
+                    File.WriteAllText(hooksPath, JsonSerializer.Serialize(payload, opts));
+                    int count = hooksObj.Count;
+                    LogAppended?.Invoke($"[HOOKS] synced {hooksPath} ({count} event(s))");
+                    return (true, $"Synced hooks.json ({count} event(s)) to {hooksPath}");
+                }
+                catch (Exception ex)
+                {
+                    LogAppended?.Invoke($"[HOOKS] sync failed: {ex.Message}");
+                    return (false, ex.Message);
+                }
+            });
+        }
+
+        static void CopyDirectory(string sourceDir, string destDir)
+        {
+            Directory.CreateDirectory(destDir);
+            foreach (string file in Directory.GetFiles(sourceDir))
+            {
+                string dest = Path.Combine(destDir, Path.GetFileName(file));
+                File.Copy(file, dest, overwrite: true);
+            }
+            foreach (string sub in Directory.GetDirectories(sourceDir))
+            {
+                CopyDirectory(sub, Path.Combine(destDir, Path.GetFileName(sub)));
+            }
         }
 
         /// <summary>
@@ -433,15 +660,15 @@ namespace CursorSetupWpf.Services
             var result = new List<McpServerStatus>();
             foreach (var entry in McpCatalog)
             {
-                bool installed = installedKeys.Contains(entry.ServerKey);
+                bool registered = installedKeys.Contains(entry.ServerKey);
                 result.Add(new McpServerStatus
                 {
                     Name = entry.ServerKey,
                     ServerKey = entry.ServerKey,
                     DisplayName = entry.DisplayName,
                     Description = entry.Description,
-                    IsInstalled = installed,
-                    ToolCount = installed ? entry.Tools.Length : 0,
+                    IsInstalled = registered,
+                    ToolCount = registered ? entry.Tools.Length : 0,
                     LastSync = lastSync,
                     ConfigPath = GetMcpConfigPath(),
                 });

@@ -21,6 +21,7 @@ namespace CursorSetupWpf.ViewModels
         readonly SettingsService _settings = new();
         readonly BackupService _backup = new();
         readonly FrameworkRunner _framework = new();
+        readonly ProjectRunner _projectRunner = new();
         readonly ToastService _toast = ToastService.Instance;
 
         // Navigation
@@ -186,6 +187,30 @@ namespace CursorSetupWpf.ViewModels
 
         // MCP labels
         public string McpDiscoveredToolsLabel => LocalizationService.T("mcp.discovered_tools");
+
+        // Project Runner labels
+        public string ProjectRunnerTitle => LocalizationService.T("project_runner.title");
+        public string ProjectRunnerSubtitle => LocalizationService.T("project_runner.subtitle");
+        public string ProjectRunnerSelectProjectLabel => LocalizationService.T("project_runner.select_project");
+        public string ProjectRunnerBrowseLabel => LocalizationService.T("project_runner.browse");
+        public string ProjectRunnerDetectedProjectsLabel => LocalizationService.T("project_runner.detected_projects");
+        public string ProjectRunnerRunOnProjectLabel => LocalizationService.T("project_runner.run_on_project");
+        public string ProjectRunnerAskPlaceholder => LocalizationService.T("project_runner.ask_placeholder");
+        public string ProjectRunnerCurrentPathLabel => LocalizationService.T("project_runner.current_path");
+
+        bool _isProjectRunnerRunning;
+        public bool IsProjectRunnerRunning { get => _isProjectRunnerRunning; set { if (Set(ref _isProjectRunnerRunning, value)) OnPropertyChanged(nameof(IsProjectRunnerRunning)); } }
+
+        string _projectRunnerOutput = "";
+        public string ProjectRunnerOutput { get => _projectRunnerOutput; set => Set(ref _projectRunnerOutput, value); }
+
+        string _selectedProjectPath = "";
+        public string SelectedProjectPath { get => _selectedProjectPath; set => Set(ref _selectedProjectPath, value); }
+
+        string _projectRunnerAskRequest = "";
+        public string ProjectRunnerAskRequest { get => _projectRunnerAskRequest; set => Set(ref _projectRunnerAskRequest, value); }
+
+        public ObservableCollection<string> DetectedProjects { get; } = new();
 
         bool _isFrameworkRunning;
         public bool IsFrameworkRunning { get => _isFrameworkRunning; set { if (Set(ref _isFrameworkRunning, value)) OnPropertyChanged(nameof(IsFrameworkRunning)); } }
@@ -418,6 +443,18 @@ namespace CursorSetupWpf.ViewModels
         public ICommand OpenBrowserCommand { get; }
         public ICommand CancelFrameworkCommand { get; }
 
+        // Project Runner commands
+        public ICommand BrowseProjectPathCommand { get; }
+        public ICommand RunProjectScanCommand { get; }
+        public ICommand RunProjectIndexCommand { get; }
+        public ICommand RunProjectWarmCommand { get; }
+        public ICommand RunProjectStatsCommand { get; }
+        public ICommand RunProjectGraphCommand { get; }
+        public ICommand RunProjectAskCommand { get; }
+        public ICommand CancelProjectRunnerCommand { get; }
+        public ICommand ClearProjectOutputCommand { get; }
+        public ICommand RefreshDetectedProjectsCommand { get; }
+
         public MainViewModel()
         {
             // Nav items
@@ -431,6 +468,8 @@ namespace CursorSetupWpf.ViewModels
             NavItems.Add(new NavItem { Icon = "\uE713", TitleKey = "tab.settings", Index = 7 });
             NavItems.Add(new NavItem { Icon = "\uE82D", TitleKey = "tab.guide", Index = 8 });
             NavItems.Add(new NavItem { Icon = "\uE8F9", TitleKey = "tab.framework", Index = 9 });
+            NavItems.Add(new NavItem { Icon = "\uE8A5", TitleKey = "tab.project_runner", Index = 10 });
+            NavItems.Add(new NavItem { Icon = "\uE8A5", TitleKey = "tab.script_generator", Index = 11 });
             
             _settings.Load();
             _installPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".cursor");
@@ -493,6 +532,18 @@ namespace CursorSetupWpf.ViewModels
             RunFrameworkClearSessionCommand = new AsyncRelayCommand(_ => RunFrameworkCommandAsync("session-clear"));
             CancelFrameworkCommand = new RelayCommand(CancelFramework);
 
+            // Project Runner commands
+            BrowseProjectPathCommand = new RelayCommand(BrowseProjectPath);
+            RunProjectScanCommand = new AsyncRelayCommand(_ => RunProjectCommandAsync("scan"));
+            RunProjectIndexCommand = new AsyncRelayCommand(_ => RunProjectCommandAsync("index"));
+            RunProjectWarmCommand = new AsyncRelayCommand(_ => RunProjectCommandAsync("warm"));
+            RunProjectStatsCommand = new AsyncRelayCommand(_ => RunProjectCommandAsync("stats"));
+            RunProjectGraphCommand = new AsyncRelayCommand(_ => RunProjectCommandAsync("graph"));
+            RunProjectAskCommand = new AsyncRelayCommand(_ => RunProjectAskAsync());
+            CancelProjectRunnerCommand = new RelayCommand(CancelProjectRunner);
+            ClearProjectOutputCommand = new RelayCommand(_ => ProjectRunnerOutput = "");
+            RefreshDetectedProjectsCommand = new RelayCommand(_ => RefreshDetectedProjects());
+
             // Wire FrameworkRunner events → log panel
             _framework.LogAppended += msg => Application.Current?.Dispatcher.Invoke(() =>
             {
@@ -506,6 +557,22 @@ namespace CursorSetupWpf.ViewModels
                 RunningCommandText = "";
                 LogLines.Add($"[FRAMEWORK] Process exited with code {code}");
                 TrimLogLines();
+            });
+
+            // Wire ProjectRunner events → output panel
+            _projectRunner.LogAppended += msg => Application.Current?.Dispatcher.Invoke(() =>
+            {
+                if (string.IsNullOrEmpty(msg)) return;
+                ProjectRunnerOutput += msg + "\n";
+            });
+            _projectRunner.OutputReceived += output => Application.Current?.Dispatcher.Invoke(() =>
+            {
+                ProjectRunnerOutput += output + "\n";
+            });
+            _projectRunner.ProcessExited += code => Application.Current?.Dispatcher.Invoke(() =>
+            {
+                IsProjectRunnerRunning = false;
+                ProjectRunnerOutput += $"\n[PROJECT] Exit code: {code}\n";
             });
 
             // Initialize data on startup
@@ -785,9 +852,12 @@ namespace CursorSetupWpf.ViewModels
         async Task SyncMcpAsync()
         {
             SetStatusKey("scanning");
-            var (success, message) = await _installer.SyncMcpConfigAsync();
+            var (success, message) = await _installer.SyncMcpConfigAsync(InstallPath);
             if (success)
             {
+                var (hooksOk, hooksMsg) = await _installer.SyncHooksConfigAsync(InstallPath);
+                LogLines.Add(hooksOk ? "[HOOKS] " + hooksMsg : "[HOOKS] WARN: " + hooksMsg);
+
                 _toast.Success(LocalizationService.T("mcp.title"),
                     LocalizationService.T("mcp.sync_success", McpCatalog.Count));
                 LogLines.Add("[MCP] " + message);
@@ -1155,6 +1225,16 @@ namespace CursorSetupWpf.ViewModels
 
             OnPropertyChanged(nameof(McpDiscoveredToolsLabel));
 
+            // Project Runner
+            OnPropertyChanged(nameof(ProjectRunnerTitle));
+            OnPropertyChanged(nameof(ProjectRunnerSubtitle));
+            OnPropertyChanged(nameof(ProjectRunnerSelectProjectLabel));
+            OnPropertyChanged(nameof(ProjectRunnerBrowseLabel));
+            OnPropertyChanged(nameof(ProjectRunnerDetectedProjectsLabel));
+            OnPropertyChanged(nameof(ProjectRunnerRunOnProjectLabel));
+            OnPropertyChanged(nameof(ProjectRunnerAskPlaceholder));
+            OnPropertyChanged(nameof(ProjectRunnerCurrentPathLabel));
+
             // Hooks page
             OnPropertyChanged(nameof(HooksPageTitle));
             OnPropertyChanged(nameof(HooksPageDesc));
@@ -1247,6 +1327,113 @@ namespace CursorSetupWpf.ViewModels
             _framework.WaitForExit(TimeSpan.FromSeconds(5));
             IsFrameworkRunning = false;
             RunningCommandText = "";
+        }
+
+        // ============ Project Runner ============
+        void BrowseProjectPath(object? _)
+        {
+            var dialog = new Microsoft.Win32.OpenFolderDialog
+            {
+                Title = LocalizationService.T("project_runner.select_project"),
+                InitialDirectory = Directory.Exists(SelectedProjectPath) ? SelectedProjectPath :
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                SelectedProjectPath = dialog.FolderName;
+                LogLines.Add("[PROJECT] Selected: " + SelectedProjectPath);
+            }
+        }
+
+        async Task RunProjectCommandAsync(string command)
+        {
+            if (IsProjectRunnerRunning)
+            {
+                _toast.Warning(ProjectRunnerTitle, LocalizationService.T("framework.running_note"));
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(SelectedProjectPath))
+            {
+                _toast.Warning(ProjectRunnerTitle, LocalizationService.T("project_runner.no_project_selected"));
+                return;
+            }
+
+            IsProjectRunnerRunning = true;
+            ProjectRunnerOutput = "";
+
+            try
+            {
+                await _projectRunner.RunCommandAsync(command, SelectedProjectPath);
+            }
+            catch (Exception ex)
+            {
+                _toast.Error(ProjectRunnerTitle, ex.Message);
+                LogLines.Add("[PROJECT ERROR] " + ex.Message);
+            }
+            finally
+            {
+                IsProjectRunnerRunning = false;
+            }
+        }
+
+        async Task RunProjectAskAsync()
+        {
+            if (IsProjectRunnerRunning)
+            {
+                _toast.Warning(ProjectRunnerTitle, LocalizationService.T("framework.running_note"));
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(SelectedProjectPath))
+            {
+                _toast.Warning(ProjectRunnerTitle, LocalizationService.T("project_runner.no_project_selected"));
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(ProjectRunnerAskRequest))
+            {
+                _toast.Warning(ProjectRunnerTitle, LocalizationService.T("project_runner.ask_placeholder"));
+                return;
+            }
+
+            IsProjectRunnerRunning = true;
+            ProjectRunnerOutput = "";
+
+            try
+            {
+                await _projectRunner.RunAskAsync(ProjectRunnerAskRequest, SelectedProjectPath);
+            }
+            catch (Exception ex)
+            {
+                _toast.Error(ProjectRunnerTitle, ex.Message);
+                LogLines.Add("[PROJECT ERROR] " + ex.Message);
+            }
+            finally
+            {
+                IsProjectRunnerRunning = false;
+            }
+        }
+
+        void CancelProjectRunner(object? _)
+        {
+            _projectRunner.Cancel();
+            _projectRunner.WaitForExit(TimeSpan.FromSeconds(5));
+            IsProjectRunnerRunning = false;
+        }
+
+        void RefreshDetectedProjects()
+        {
+            DetectedProjects.Clear();
+            var projects = ProjectRunner.DetectProjects(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+            foreach (var p in projects)
+                DetectedProjects.Add(p);
+
+            if (DetectedProjects.Count == 0)
+            {
+                // Add default paths
+                DetectedProjects.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".cursor"));
+            }
         }
 
         void ResetSteps()

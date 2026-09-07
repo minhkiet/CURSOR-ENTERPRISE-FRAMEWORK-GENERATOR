@@ -18,12 +18,11 @@ def _bootstrap_framework_import() -> None:
     configured = os.environ.get("CURSOR_WORKSPACE_ROOT")
     candidates = []
     if configured:
-        candidates.append(Path(configured).resolve() / ".cursor" / "mcp" / "cursor-framework-mcp")
+        candidates.append(Path(configured).resolve() / "tools" / "cursor-framework-mcp")
     candidates.extend(
         [
-            Path.cwd().resolve() / ".cursor" / "mcp" / "cursor-framework-mcp",
+            Path.cwd().resolve() / "tools" / "cursor-framework-mcp",
             Path(__file__).resolve().parents[2] / "cursor-framework-mcp",
-            Path(__file__).resolve().parents[2] / ".." / "cursor-framework-mcp",
         ]
     )
     for candidate in candidates:

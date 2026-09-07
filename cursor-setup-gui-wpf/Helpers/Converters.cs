@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
@@ -86,6 +87,32 @@ namespace CursorSetupWpf.Helpers
             return NormalBrush;
         }
 
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            => DependencyProperty.UnsetValue;
+    }
+
+    /// <summary>
+    /// Converts script template category string to a matching WPF brush.
+    /// web=Indigo, desktop=Cyan, deploy=Emerald, database=Amber, ai=Violet, utility=Slate.
+    /// </summary>
+    public class CategoryToColorBrushConverter : IValueConverter
+    {
+        static readonly Dictionary<string, Brush> CategoryBrushes = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["web"]      = new SolidColorBrush(Color.FromRgb( 79,  70, 229)),  // Indigo-600
+            ["desktop"]  = new SolidColorBrush(Color.FromRgb(  8, 145, 178)),  // Cyan-600
+            ["deploy"]   = new SolidColorBrush(Color.FromRgb(  5, 150, 105)),  // Emerald-600
+            ["database"] = new SolidColorBrush(Color.FromRgb(217, 119,   6)),  // Amber-600
+            ["ai"]       = new SolidColorBrush(Color.FromRgb(124,  58, 237)),  // Violet-600
+            ["utility"]  = new SolidColorBrush(Color.FromRgb( 71,  85, 105)),  // Slate-600
+        };
+        static readonly Brush DefaultBrush = new SolidColorBrush(Color.FromRgb(100, 116, 139)); // Slate-500
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string cat = value as string ?? "";
+            return CategoryBrushes.TryGetValue(cat, out var brush) ? brush : DefaultBrush;
+        }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
             => DependencyProperty.UnsetValue;
     }

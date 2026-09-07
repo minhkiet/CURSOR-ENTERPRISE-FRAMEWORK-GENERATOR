@@ -11,10 +11,10 @@ interface Stat {
 const stats: Stat[] = [
   { target: 720, label: 'Total files' },
   { target: 39, label: 'Rules' },
-  { target: 22, label: 'Skills' },
+  { target: 27, label: 'Skills' },
   { target: 329, label: 'Knowledge files' },
   { target: 18, label: 'Agents' },
-  { target: 4, label: 'TDAM layers', suffix: '' }
+  { target: 5, label: 'MCP Servers', suffix: '' }
 ]
 
 const displayValues = ref<number[]>(stats.map(() => 0))

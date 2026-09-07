@@ -360,6 +360,7 @@ const navItems = computed(() => [
   { id: 'install', label: 'Cài đặt' },
   { id: 'verify', label: 'Xác minh' },
   { id: 'troubleshoot', label: 'Xử lý lỗi' },
+  { id: 'mcp', label: 'MCP Memory' },
   { id: 'faq', label: 'FAQ' }
 ])
 
@@ -850,10 +851,179 @@ async function handleCopy(code: string, key: string) {
               </div>
             </article>
 
-            <!-- 7. FAQ -->
-            <article id="faq" class="ins-section">
+            <!-- 7. MCP MEMORY -->
+            <article id="mcp" class="ins-section">
               <header class="ins-section-head">
                 <div class="ins-section-num">07</div>
+                <div>
+                  <h2 class="ins-section-title">MCP Memory Tools</h2>
+                  <p class="ins-section-sub">
+                    Token-aware hierarchical memory giúp agent lưu trữ và truy xuất context hiệu quả.
+                  </p>
+                </div>
+              </header>
+
+              <div class="ins-callout">
+                <div class="ins-callout-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 8v4M12 16h.01" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="ins-callout-title">MCP Memory Tools là gì?</div>
+                  <p class="ins-callout-text">
+                    MCP Memory là server mở rộng giúp agent lưu trữ và truy xuất memory theo
+                    hierarchical tiers (short/medium/long-term). Nó sử dụng token budgeting để
+                    quản lý context window hiệu quả.
+                  </p>
+                </div>
+              </div>
+
+              <h3 class="ins-subsection-title">Memory Tiers</h3>
+              <div class="ins-prereq-grid">
+                <div class="ins-prereq">
+                  <div class="ins-prereq-check">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </div>
+                  <div class="ins-prereq-body">
+                    <div class="ins-prereq-title">Short-term</div>
+                    <p class="ins-prereq-desc">Task hiện tại, hoặc context của vài lần hội thoại gần nhất. Tự động clear khi task hoàn tất.</p>
+                  </div>
+                </div>
+                <div class="ins-prereq">
+                  <div class="ins-prereq-check">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </div>
+                  <div class="ins-prereq-body">
+                    <div class="ins-prereq-title">Medium-term</div>
+                    <p class="ins-prereq-desc">Kết luận và decisions của ngày hôm nay hoặc project hiện tại. Giữ qua nhiều sessions.</p>
+                  </div>
+                </div>
+                <div class="ins-prereq">
+                  <div class="ins-prereq-check">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </div>
+                  <div class="ins-prereq-body">
+                    <div class="ins-prereq-title">Long-term</div>
+                    <p class="ins-prereq-desc">Tri thức cross-project, patterns và conventions. Persist vĩnh viễn, được compress khi cần.</p>
+                  </div>
+                </div>
+              </div>
+
+              <h3 class="ins-subsection-title">Tools Reference</h3>
+              <div class="ins-steps">
+                <li class="ins-step">
+                  <div class="ins-step-num">01</div>
+                  <div class="ins-step-body">
+                    <h3 class="ins-step-title">store_memory</h3>
+                    <p class="ins-step-detail">Lưu một fact hoặc kết luận vào memory. Chỉ định tier phù hợp và tags để recall dễ dàng.</p>
+                    <div class="ins-code-wrap">
+                      <div class="ins-code-bar">
+                        <span class="ins-code-label">Tool Call</span>
+                      </div>
+                      <pre class="ins-code-block"><code>store_memory(
+  content: "User prefers dark mode",
+  tier: "medium",        # short | medium | long
+  kind: "preference",    # fact | decision | pattern | preference
+  tags: ["ui", "user"]
+)</code></pre>
+                    </div>
+                  </div>
+                </li>
+                <li class="ins-step">
+                  <div class="ins-step-num">02</div>
+                  <div class="ins-step-body">
+                    <h3 class="ins-step-title">recall_memory</h3>
+                    <p class="ins-step-detail">Tìm memories liên quan đến task hiện tại. Ranking dựa trên task relevance, recency, và access frequency.</p>
+                    <div class="ins-code-wrap">
+                      <div class="ins-code-bar">
+                        <span class="ins-code-label">Tool Call</span>
+                      </div>
+                      <pre class="ins-code-block"><code>recall_memory(
+  task: "Implement user authentication",
+  limit: 10,              # Số memories trả về
+  project: "my-project"   # Filter theo project (optional)
+)</code></pre>
+                    </div>
+                  </div>
+                </li>
+                <li class="ins-step">
+                  <div class="ins-step-num">03</div>
+                  <div class="ins-step-body">
+                    <h3 class="ins-step-title">get_context_stats</h3>
+                    <p class="ins-step-detail">Xem token usage breakdown: current context, framework cache, memory tiers, và history. Dùng để monitor trước khi context overflow.</p>
+                    <div class="ins-code-wrap">
+                      <div class="ins-code-bar">
+                        <span class="ins-code-label">Tool Call</span>
+                      </div>
+                      <pre class="ins-code-block"><code>get_context_stats(
+  current_context: "Nội dung context hiện tại..."
+)</code></pre>
+                    </div>
+                  </div>
+                </li>
+                <li class="ins-step">
+                  <div class="ins-step-num">04</div>
+                  <div class="ins-step-body">
+                    <h3 class="ins-step-title">compact_context</h3>
+                    <p class="ins-step-detail">Nén context deterministic về target token budget. Giữ focus areas quan trọng.</p>
+                    <div class="ins-code-wrap">
+                      <div class="ins-code-bar">
+                        <span class="ins-code-label">Tool Call</span>
+                      </div>
+                      <pre class="ins-code-block"><code>compact_context(
+  context_text: "Nội dung cần nén...",
+  target_tokens: 8000,
+  focus: "database schema"  # Ưu tiên giữ content liên quan
+)</code></pre>
+                    </div>
+                  </div>
+                </li>
+                <li class="ins-step">
+                  <div class="ins-step-num">05</div>
+                  <div class="ins-step-body">
+                    <h3 class="ins-step-title">prune_context</h3>
+                    <p class="ins-step-detail">Loại bỏ memories ít liên quan nhất cho đến khi đạt target token budget.</p>
+                    <div class="ins-code-wrap">
+                      <div class="ins-code-bar">
+                        <span class="ins-code-label">Tool Call</span>
+                      </div>
+                      <pre class="ins-code-block"><code>prune_context(
+  current_task: "Refactor authentication module",
+  target_tokens: 12000
+)</code></pre>
+                    </div>
+                  </div>
+                </li>
+                <li class="ins-step">
+                  <div class="ins-step-num">06</div>
+                  <div class="ins-step-body">
+                    <h3 class="ins-step-title">sync_to_disk</h3>
+                    <p class="ins-step-detail">Lưu tất cả memories xuống disk. Chạy định kỳ để tránh mất dữ liệu.</p>
+                    <div class="ins-code-wrap">
+                      <div class="ins-code-bar">
+                        <span class="ins-code-label">Tool Call</span>
+                      </div>
+                      <pre class="ins-code-block"><code>sync_to_disk(
+  compact_long_term: true  # Compress long-term memories trước khi save
+)</code></pre>
+                    </div>
+                  </div>
+                </li>
+              </div>
+            </article>
+
+            <!-- 8. FAQ -->
+            <article id="faq" class="ins-section">
+              <header class="ins-section-head">
+                <div class="ins-section-num">08</div>
                 <div>
                   <h2 class="ins-section-title">Câu hỏi thường gặp</h2>
                   <p class="ins-section-sub">
@@ -1009,12 +1179,19 @@ async function handleCopy(code: string, key: string) {
 .ins-sidebar {
   position: sticky;
   top: 80px;
+  background: var(--bg-base);
+  padding: 8px 0;
+  border-radius: var(--radius-lg);
 }
 
 .ins-sidebar-inner {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  background: var(--bg-surface);
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
 }
 
 .ins-sidebar-label {
@@ -1122,6 +1299,15 @@ async function handleCopy(code: string, key: string) {
 /* ─── SECTIONS ───────────────────────────────────────────────────────── */
 .ins-content {
   min-width: 0;
+}
+
+.ins-subsection-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 32px 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-hairline);
 }
 
 .ins-section {

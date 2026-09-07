@@ -20,6 +20,8 @@ tab.updates=Cập nhật
 tab.backup=Sao lưu & Khôi phục
 tab.settings=Cài đặt
 tab.framework=Công cụ
+tab.project_runner=Project Runner
+tab.script_generator=Tạo Script
 
 hooks.desc=Tích hợp tùy chọn với thư viện Python cursor_framework. Hook chạy dưới dạng tiến trình nền, không chặn quá trình cài đặt. Bỏ chọn checkbox để tắt hook.
 hooks.prescan_label=Pre-scan: kiểm tra ZIP trước khi giải nén
@@ -392,3 +394,143 @@ install.page_title=Cài đặt
 install.page_subtitle=Chọn đường dẫn và tùy chọn cài đặt cho Cursor Enterprise Framework.
 install.optional=TÙY CHỌN
 install.skip_tip=Bỏ qua nếu chỉ muốn cài đơn giản.
+
+# Project Runner tab
+project_runner.title=Project Runner
+project_runner.subtitle=Chạy framework tools trên workspace của project bất kỳ.
+project_runner.select_project=Chọn thư mục Project
+project_runner.browse=Duyệt...
+project_runner.detected_projects=Projects đã phát hiện
+project_runner.run_on_project=Chạy trên Project
+project_runner.ask_placeholder=Nhập yêu cầu của bạn ở đây...
+project_runner.no_project_selected=Vui lòng chọn thư mục project trước
+project_runner.current_path=Project hiện tại:
+project_runner.select_folder=Chọn thư mục
+
+# Script Generator tab
+script_gen.title=Tạo Script
+script_gen.subtitle=Tạo file .bat để cài đặt và chạy web app, desktop app, Vercel và các dịch vụ khác vào project của bạn.
+script_gen.filter_label=Danh mục
+script_gen.project_label=Project:
+script_gen.output_label=Output:
+script_gen.use_ps=Dùng PowerShell
+script_gen.blocks_label=Blocks trong script
+script_gen.preview_label=Xem trước script
+script_gen.generate_selected=Tạo script đã chọn
+script_gen.generate_all=Tạo tất cả
+script_gen.generate_all_tip=Tạo tất cả scripts đã chọn vào file .bat
+script_gen.copy_preview=Sao chép
+script_gen.save_preview=Lưu file
+script_gen.open_output=Mở thư mục
+script_gen.project_selected=Đã chọn project
+
+
+# Expanded Guide Content (Vietnamese)
+guide.expanded.title=Hướng dẫn cài đặt chi tiết
+guide.expanded.subtitle=Hướng dẫn đầy đủ cho Cursor Enterprise Framework
+
+# Prerequisites - Điều kiện tiên quyết
+guide.prereq.title=Điều kiện tiên quyết
+guide.prereq.subtitle=Trước khi bắt đầu
+guide.prereq.item1=Cursor IDE đã được cài đặt trên máy tính
+guide.prereq.item2=Tệp cursor-setup.zip (tải từ GitHub releases)
+guide.prereq.item3=Windows 10/11 hoặc Windows Server 2019+
+guide.prereq.item4=Quyền Administrator (cho cài đặt hệ thống)
+guide.prereq.note=Lưu ý: Có thể cài vào thư mục user mà không cần quyền admin.
+
+# Installation Steps Detailed - Các bước cài đặt chi tiết
+guide.install.step1.title=Bước 1: Chọn vị trí cài đặt
+guide.install.step1.desc=Chọn nơi lưu trữ các file của Cursor Enterprise Framework. Vị trí mặc định là thư mục Cursor user.
+guide.install.step1.default_path=Mặc định: %USERPROFILE%\.cursor
+guide.install.step1.create_new=Tạo thư mục .cursor mới
+guide.install.step1.browse=Nhấn Duyệt để chọn thư mục có sẵn
+guide.install.step1.overwrite=Nếu thư mục tồn tại, chọn Ghi đè để thay thế file
+
+guide.install.step2.title=Bước 2: Chọn thành phần
+guide.install.step2.desc=Chọn các thành phần framework muốn cài. Tất cả các mục được chọn theo mặc định.
+guide.install.step2.component1=Rules (39 quy tắc phát triển và tiêu chuẩn)
+guide.install.step2.component2=Skills (50+ kỹ năng chuyên biệt cho AI agent)
+guide.install.step2.component3=Agents (18 agent personas và prompts)
+guide.install.step2.component4=Commands (28 lệnh tắt cho Cursor IDE)
+guide.install.step2.component5=Hooks (Python integration scripts)
+guide.install.step2.component6=Knowledge (329 knowledge bases và references)
+guide.install.step2.tip=Mẹo: Bỏ chọn các thành phần không cần thiết để giảm kích thước cài đặt.
+
+guide.install.step3.title=Bước 3: Tùy chọn nâng cao (Tùy chọn)
+guide.install.step3.desc=Cấu hình các cài đặt bổ sung cho người dùng có kinh nghiệm.
+guide.install.step3.option1=References - Architecture patterns, coding standards
+guide.install.step3.option2=Workflows - Automated task workflows
+guide.install.step3.option3=Templates - Project templates và boilerplates
+guide.install.step3.option4=Memory - Workspace memory system
+guide.install.step3.option5=Scripts - Utility scripts và tools
+
+guide.install.step4.title=Bước 4: Cấu hình Hooks (Tùy chọn)
+guide.install.step4.desc=Hooks tích hợp với thư viện Python cursor_framework để tự động hóa nâng cao.
+guide.install.step4.prescan=Pre-scan Hook: Kiểm tra ZIP archive trước khi giải nén
+guide.install.step4.postinstall=Post-install Hook: Tạo INDEX.json cho Dashboard
+guide.install.step4.disable=Tắt hooks bằng cách bỏ chọn - cài đặt sẽ tiếp tục bình thường
+
+guide.install.step5.title=Bước 5: Cài đặt
+guide.install.step5.desc=Xem lại các lựa chọn và nhấn Cài đặt để bắt đầu.
+guide.install.step5.review=Xem lại các thành phần đã chọn trong thanh trạng thái
+guide.install.step5.logs=Nhật ký cài đặt sẽ hiển thị theo thời gian thực
+guide.install.step5.complete=Khởi động lại Cursor IDE sau khi cài đặt hoàn tất
+
+# Features Overview - Tổng quan tính năng
+guide.features.title=Tính năng của Framework
+guide.features.subtitle=Những gì bạn nhận được với Cursor Enterprise Framework
+
+guide.features.rules.title=Development Rules (39 rules)
+guide.features.rules.desc=Bộ tiêu chuẩn lập trình toàn diện, architecture patterns và best practices cho phát triển doanh nghiệp.
+
+guide.features.skills.title=AI Agent Skills (50+ skills)
+guide.features.skills.desc=Kỹ năng chuyên biệt cho frontend, backend, security, testing và deployment. Bao gồm Karpathy coding discipline và Ponytail lazy senior principles.
+
+guide.features.agents.title=Agent Personas (18 personas)
+guide.features.agents.desc=Pre-configured prompts cho Code Reviewer, Security Auditor, Test Engineer, Web Performance Auditor và hơn thế nữa.
+
+guide.features.commands.title=Slash Commands (28 commands)
+guide.features.commands.desc=Lệnh nhanh như /build, /test, /review, /deploy, /security cho các tác vụ phát triển thông dụng.
+
+guide.features.knowledge.title=Knowledge Bases (329)
+guide.features.knowledge.desc=Tài liệu mở rộng, references và hướng dẫn cho các công nghệ và frameworks khác nhau.
+
+# Usage Guide - Hướng dẫn sử dụng
+guide.usage.title=Cách sử dụng
+guide.usage.subtitle=Bắt đầu sau khi cài đặt
+
+guide.usage.restart.title=1. Khởi động lại Cursor IDE
+guide.usage.restart.desc=Đóng và mở lại Cursor để tải các thành phần framework mới.
+
+guide.usage.slash.title=2. Sử dụng Slash Commands
+guide.usage.slash.desc=Gõ / trong Cursor để xem các lệnh có sẵn. Thử /build, /test, /review, /spec, /plan
+
+guide.usage.skills.title=3. Truy cập Skills
+guide.usage.skills.desc=Skills được tự động tải. Sử dụng @ kèm tên skill để kích hoạt kỹ năng chuyên biệt.
+
+guide.usage.agent.title=4. Agent Personas
+guide.usage.agent.desc=Yêu cầu code review với /review, security audit với /security, hoặc performance check với /webperf
+
+# Troubleshooting - Xử lý sự cố
+guide.trouble.title=Xử lý sự cố
+guide.trouble.subtitle=Các vấn đề thường gặp và giải pháp
+
+guide.trouble.issue1=Hỏi: Thành phần không tải sau khi cài đặt?
+guide.trouble.solve1=Khởi động lại Cursor IDE. Nếu vẫn không hoạt động, kiểm tra thư mục .cursor có trong thư mục home không.
+
+guide.trouble.issue2=Hỏi: Cài đặt thất bại với lỗi quyền?
+guide.trouble.solve2=Chạy trình cài đặt với quyền Administrator, hoặc cài vào thư mục user.
+
+guide.trouble.issue3=Hỏi: Cách cập nhật framework?
+guide.trouble.solve3=Tải cursor-setup.zip mới và chạy trình cài đặt lại. Chọn Ghi đè để cập nhật file.
+
+guide.trouble.issue4=Hỏi: Cách gỡ cài đặt?
+guide.trouble.solve4=Xóa thư mục .cursor trong thư mục home của bạn. Framework là self-contained.
+
+# Keyboard Shortcuts - Phím tắt
+guide.shortcuts.title=Phím tắt
+guide.shortcuts.ctrl_s=Ctrl+Shift+B - Lệnh Build
+guide.shortcuts.ctrl_r=Ctrl+Shift+T - Lệnh Test
+guide.shortcuts.ctrl_shift_r=Ctrl+Shift+R - Lệnh Review
+guide.shortcuts.ctrl_shift_d=Ctrl+Shift+D - Lệnh Deploy
+guide.shortcuts.ctrl_shift_p=Ctrl+Shift+P - Project Indexer
