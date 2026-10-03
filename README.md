@@ -21,16 +21,17 @@ Instead of starting every session from zero, the framework:
 
 ## What's in the box
 
-| Component | Files | Where |
+| Components | Files | Where |
 |---|--:|---|
-| Rules (`.mdc`) | 43 | `.cursor/rules/` |
-| Skills | 50 | `.cursor/skills/` |
-| Knowledge domains | 8 (incl. **Marketing** with 47 concept-refs) | `.cursor/knowledge/` |
-| Python library (`cursor_framework`) | 14 modules + 6 utils | `cursor_framework/` |
-| Vue.js dashboard | Vue 3 + Vite + Tailwind | `cursor_framework_web/` |
-| Demo projects | 5 (CRM, fitness, food-delivery, realestate, travel) | `demos/` |
-| Windows GUI installer (built) | `cursor-setup.exe` (~162 MB), `cursor-setup.zip` (~22 MB) | `dist/` |
-| PowerShell / CMD installers | 5 scripts | root |
+| **Rules** (`.mdc`) | 43 | `.cursor/rules/` |
+| **Skills** | 50 | `.cursor/skills/` |
+| **ECC Integration** | 68 agents, 292 skills, 94 commands | [ECC v2.2.2](https://github.com/affaan-m/ECC) |
+| **Knowledge domains** | 8 (incl. **Marketing** with 47 concept-refs) | `.cursor/knowledge/` |
+| **Python library** (`cursor_framework`) | 14 modules + 6 utils | `cursor_framework/` |
+| **Vue.js dashboard** | Vue 3 + Vite + Tailwind | `cursor_framework_web/` |
+| **Demo projects** | 5 (CRM, fitness, food-delivery, realestate, travel) | `demos/` |
+| **Windows GUI installer** (built) | `cursor-setup.exe` (~162 MB), `cursor-setup.zip` (~22 MB) | `dist/` |
+| **PowerShell / CMD installers** | 5 scripts | root |
 
 The framework ships **605+ files** inside `cursor-setup.zip` (the actual `.cursor/` payload). Repo source counts higher because of demos and build artifacts.
 
@@ -46,6 +47,7 @@ The framework ships **605+ files** inside `cursor-setup.zip` (the actual `.curso
 | AI / ML | `.cursor/knowledge/ai/` | 2 | Internal + WeKnora docs |
 | Chatbot | `.cursor/knowledge/chatbot/` | 2 | ChatbotX reference |
 | **Marketing** | `.cursor/knowledge/marketing/` | **7 + 47 concept-refs** | **[coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) ⭐39k (sync 2026-07-15)** |
+| **ECC (v2.2.2)** | `.cursor/` | **68 agents, 292 skills, 94 commands** | **[affaan-m/ECC](https://github.com/affaan-m/ECC)** |
 
 ## Architecture
 
@@ -89,6 +91,67 @@ cursor-setup-gui/               # C# WinForms GUI installer
 demos/                          # Reference projects
 ├── crm/  fitness/  food-delivery/  realestate/  travel/
 ```
+
+## ECC (Enhanced Code Copilot) Integration
+
+The framework now integrates **ECC v2.2.2** from [github.com/affaan-m/ECC](https://github.com/affaan-m/ECC), providing:
+
+### What's Included
+
+| Feature | Count | Description |
+|---------|-------|-------------|
+| **Agents** | 68 | Planning, review, security, architecture specialists |
+| **Skills** | 292 | TDD, research, security, docs, frontend, data, ML, ops |
+| **Commands** | 94 | Slash command shims for all workflows |
+| **Hooks** | Runtime | Session summaries, continuous learning, context controls |
+| **AgentShield** | Built-in | Security scanning for prompts, hooks, MCP config |
+
+### Supported Harnesses
+
+| Harness | Install Profile | Hooks | Native Plugin |
+|---------|----------------|-------|---------------|
+| Claude Code | minimal/core/full | ✅ | ✅ ecc@ecc |
+| Codex | minimal/core | ✅ | ✅ Native |
+| Cursor | minimal | ❌ | ❌ |
+| Gemini CLI | minimal | ❌ | ❌ |
+| Zed | minimal | ❌ | ❌ |
+| Kimi Code | minimal | ❌ | ❌ |
+| GitHub Copilot | minimal | ❌ | ❌ |
+| + 7 others | minimal | ❌ | ❌ |
+
+### Quick Install
+
+```bash
+# Claude Code / Codex (recommended)
+npx ecc-universal@2.2.2 install --profile core --target claude
+
+# Guided multi-harness setup
+npx ecc-universal@2.2.2 install --guided
+
+# Cursor (project-local)
+./install.sh --profile minimal --target cursor
+```
+
+### Python Integration
+
+```python
+from cursor_framework import (
+    ECCIntegration,
+    HarnessType,
+    InstallProfile
+)
+
+ecc = ECCIntegration()
+status = ecc.get_status()
+
+# Install for Claude Code
+result = ecc.install_harness(
+    HarnessType.CLAUDE_CODE,
+    InstallProfile.CORE
+)
+```
+
+---
 
 ## Installation
 

@@ -1,29 +1,36 @@
 @echo off
 REM ============================================================
 REM buildappsetup.bat
-REM Cursor Enterprise Framework - Build Script
+REM Cursor Enterprise Framework - Build Script v4.4.0
 REM ============================================================
 REM Purpose:
-REM   1. Build the cursor-setup-gui-wpf project (Debug/Release)
-REM   2. Create cursor-setup.zip from .cursor contents
-REM   3. Copy MCP tools to .cursor/mcp
+REM   1. Check prerequisites (dotnet, scripts, MCP tools)
+REM   2. Clean bin/obj (optional via /clean)
+REM   3. Publish the cursor-setup-gui-wpf project (self-contained, single-file)
+REM   4. Copy MCP tools to .cursor/mcp
+REM   5. Create cursor-setup.zip from .cursor contents
+REM   6. Verify all outputs exist
 REM
 REM Usage:
-REM   buildappsetup.bat              (default: Release)
+REM   buildappsetup.bat              (default: Release, self-contained)
 REM   buildappsetup.bat Debug        (build Debug)
 REM   buildappsetup.bat Release      (build Release)
 REM   buildappsetup.bat /clean       (clean bin/obj before build)
 REM   buildappsetup.bat /help        (show this help)
 REM
-REM Outputs (in bin\<Config>\net8.0-windows\win-x64\):
-REM   - ToolRunCursor.exe             (WPF installer app)
+REM Outputs (in bin\<Config>\net8.0-windows\win-x64\publish\):
+REM   - ToolRunCursor.exe             (self-contained single-file WPF installer)
 REM   - cursor-setup.zip              (framework archive)
 REM   - Resources\vi.txt             (Vietnamese localization)
 REM   - Resources\en.txt             (English localization)
+REM   - cursor-setup-build.json      (build metadata)
 REM
 REM Requirements:
 REM   - .NET 8 SDK installed
 REM   - PowerShell available
+REM   - tools/cursor-framework-mcp directory
+REM   - tools/cursor-autopilot-mcp directory
+REM   - tools/cursor-memory-mcp directory
 REM ============================================================
 
 setlocal EnableDelayedExpansion
@@ -35,7 +42,9 @@ set "PROJECT_DIR=%SCRIPT_DIR%"
 set "BUILD_CONFIG=Release"
 set "BUILD_RID=win-x64"
 set "TFM=net8.0-windows"
-set "OUTPUT_DIR=%PROJECT_DIR%\bin\%BUILD_CONFIG%\%TFM%\%BUILD_RID%"
+set "REPO_ROOT=%PROJECT_DIR%\.."
+set "TOOLS_DIR=%REPO_ROOT%\tools"
+set "OUTPUT_DIR=%PROJECT_DIR%\bin\%BUILD_CONFIG%\%TFM%\%BUILD_RID%\publish"
 set "ZIP_SCRIPT=%PROJECT_DIR%\build-zip.ps1"
 set "COPY_MCP_SCRIPT=%PROJECT_DIR%\Copy-McpTools.ps1"
 
@@ -56,17 +65,19 @@ goto :parse_args
 :end_parse
 
 REM Update OUTPUT_DIR after config is parsed
-set "OUTPUT_DIR=%PROJECT_DIR%\bin\%BUILD_CONFIG%\%TFM%\%BUILD_RID%"
+set "OUTPUT_DIR=%PROJECT_DIR%\bin\%BUILD_CONFIG%\%TFM%\%BUILD_RID%\publish"
 
 REM ----- Header -----
 echo.
 echo ===========================================================
-echo  Cursor Enterprise Framework - Build Script
+echo  Cursor Enterprise Framework - Build Script v4.4.0
 echo ===========================================================
 echo  Project   : %PROJECT_DIR%
 echo  Config    : %BUILD_CONFIG%
-echo  Output    : %OUTPUT_DIR%
-echo  Clean     : %DO_CLEAN%
+echo  Output     : %OUTPUT_DIR%
+echo  Repo Root  : %REPO_ROOT%
+echo  Tools Dir  : %TOOLS_DIR%
+echo  Clean      : %DO_CLEAN%
 echo ===========================================================
 echo.
 
@@ -97,6 +108,21 @@ if not exist "%PROJECT_DIR%\CursorSetupWpf.csproj" (
 )
 echo   [OK] Project file found.
 
+REM Check required MCP tools directories
+set "MCP_MISSING=0"
+set "MCP_LIST=cursor-framework-mcp cursor-autopilot-mcp cursor-memory-mcp"
+for %%M in (!MCP_LIST!) do (
+    if not exist "%TOOLS_DIR%\%%M" (
+        echo [WARN] %%M not found in tools\
+        set "MCP_MISSING=1"
+    ) else (
+        for %%F in ("%TOOLS_DIR%\%%M") do echo   [OK] tools\%%~nxF\ exists
+    )
+)
+if "!MCP_MISSING!"=="1" (
+    echo [WARN] Some MCP tools are missing. Build may not include all tools.
+)
+
 REM Check scripts
 if not exist "%ZIP_SCRIPT%" (
     echo [ERROR] build-zip.ps1 not found.
@@ -119,24 +145,25 @@ if "%DO_CLEAN%"=="1" (
     echo.
 )
 
-REM ----- Step 2: Build WPF project -----
-echo [STEP 2] Building WPF project...
+REM ----- Step 2: Publish WPF project (self-contained, single-file) -----
+echo [STEP 2] Publishing WPF project (self-contained single-file)...
 echo.
 
 pushd "%PROJECT_DIR%" >nul
 
-REM Build with restore first
-dotnet restore "%PROJECT_DIR%\CursorSetupWpf.csproj" -v q
-if errorlevel 1 (
-    echo [ERROR] dotnet restore failed!
-    popd >nul
-    exit /b 1
-)
-
-dotnet build "%PROJECT_DIR%\CursorSetupWpf.csproj" -c %BUILD_CONFIG% --nologo -v q
+REM Publish with self-contained + single-file so the .exe runs standalone
+REM without requiring .NET runtime to be installed on the target machine.
+dotnet publish "%PROJECT_DIR%\CursorSetupWpf.csproj" ^
+    -c %BUILD_CONFIG% ^
+    -r %BUILD_RID% ^
+    --self-contained true ^
+    -p:PublishSingleFile=true ^
+    -p:IncludeNativeLibrariesForSelfExtract=true ^
+    -p:EnableCompressionInSingleFile=true ^
+    --nologo -v q
 if errorlevel 1 (
     echo.
-    echo [ERROR] dotnet build failed!
+    echo [ERROR] dotnet publish failed!
     popd >nul
     exit /b 1
 )
@@ -144,18 +171,18 @@ if errorlevel 1 (
 popd >nul
 
 echo.
-echo   [OK] Build succeeded.
+echo   [OK] Publish succeeded (self-contained, single-file).
 echo.
 
 REM ----- Step 3: Copy MCP tools -----
-echo [STEP 3] Copying MCP tools...
+echo [STEP 3] Copying MCP tools to .cursor\mcp...
 
 if exist "%COPY_MCP_SCRIPT%" (
     powershell -NoProfile -ExecutionPolicy Bypass -File "%COPY_MCP_SCRIPT%"
     if errorlevel 1 (
         echo   [WARN] MCP copy had issues, continuing...
     ) else (
-        echo   [OK] MCP tools copied.
+        echo   [OK] MCP tools copied to .cursor\mcp.
     )
 ) else (
     echo   [SKIP] Copy-McpTools.ps1 not found.
@@ -172,6 +199,7 @@ if errorlevel 1 (
     echo [ERROR] ZIP creation failed!
     exit /b 1
 )
+echo.
 
 REM ----- Step 5: Verify outputs -----
 echo.
@@ -180,15 +208,19 @@ echo.
 
 set "MISSING=0"
 
-REM Check .exe
+REM Check .exe in publish folder
 if exist "%OUTPUT_DIR%\ToolRunCursor.exe" (
-    for %%A in ("%OUTPUT_DIR%\ToolRunCursor.exe") do echo   [OK] ToolRunCursor.exe
+    for %%A in ("%OUTPUT_DIR%\ToolRunCursor.exe") do (
+        set "ZS=%%~zA"
+        set /a "ZM=ZS / 1048576"
+        echo   [OK] ToolRunCursor.exe ^(!ZM! MB^)
+    )
 ) else (
-    echo   [MISSING] ToolRunCursor.exe
+    echo   [MISSING] ToolRunCursor.exe  ^(expected in %OUTPUT_DIR%\^)
     set "MISSING=1"
 )
 
-REM Check .zip
+REM Check .zip in publish folder
 if exist "%OUTPUT_DIR%\cursor-setup.zip" (
     for %%A in ("%OUTPUT_DIR%\cursor-setup.zip") do (
         set "ZS=%%~zA"
@@ -196,7 +228,7 @@ if exist "%OUTPUT_DIR%\cursor-setup.zip" (
         echo   [OK] cursor-setup.zip ^(!ZM! MB^)
     )
 ) else (
-    echo   [MISSING] cursor-setup.zip
+    echo   [MISSING] cursor-setup.zip  ^(expected in %OUTPUT_DIR%\^)
     set "MISSING=1"
 )
 
@@ -215,8 +247,16 @@ if exist "%OUTPUT_DIR%\Resources\en.txt" (
     set "MISSING=1"
 )
 
+REM Check build metadata
+if exist "%OUTPUT_DIR%\cursor-setup-build.json" (
+    echo   [OK] cursor-setup-build.json
+) else (
+    echo   [MISSING] cursor-setup-build.json
+    set "MISSING=1"
+)
+
 REM Check .cursor\mcp
-if exist "%PROJECT_DIR%\.cursor\mcp" (
+if exist "%REPO_ROOT%\.cursor\mcp" (
     echo   [OK] .cursor\mcp directory exists
 ) else (
     echo   [WARN] .cursor\mcp not found
@@ -237,7 +277,13 @@ echo ===========================================================
 echo  Output : %OUTPUT_DIR%
 echo.
 echo  Artifacts:
-echo    - ToolRunCursor.exe
+if exist "%OUTPUT_DIR%\ToolRunCursor.exe" (
+    for %%A in ("%OUTPUT_DIR%\ToolRunCursor.exe") do (
+        set "ZS=%%~zA"
+        set /a "ZM=ZS / 1048576"
+        echo    - ToolRunCursor.exe ^(!ZM! MB^) self-contained
+    )
+)
 if exist "%OUTPUT_DIR%\cursor-setup.zip" (
     for %%A in ("%OUTPUT_DIR%\cursor-setup.zip") do (
         set "ZS=%%~zA"
@@ -247,6 +293,7 @@ if exist "%OUTPUT_DIR%\cursor-setup.zip" (
 )
 echo    - Resources\vi.txt
 echo    - Resources\en.txt
+echo    - cursor-setup-build.json
 echo ===========================================================
 echo.
 
@@ -256,9 +303,11 @@ exit /b 0
 :show_help
 echo.
 echo Usage:
-echo   buildappsetup.bat              Build Debug
-echo   buildappsetup.bat Release      Build Release
+echo   buildappsetup.bat              Build Release (self-contained)
+echo   buildappsetup.bat Debug       Build Debug   (self-contained)
+echo   buildappsetup.bat Release     Build Release (self-contained)
 echo   buildappsetup.bat /clean      Clean before build
 echo   buildappsetup.bat /help       Show this help
 echo.
+echo Outputs go to: bin\^\<Config^\>\net8.0-windows\win-x64\publish\
 exit /b 0

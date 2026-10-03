@@ -8,20 +8,39 @@ import sys
 from pathlib import Path
 from typing import Any
 
+pkg_dir = Path(__file__).resolve().parent
+parent_dir = pkg_dir.parent
+if str(parent_dir) not in sys.path:
+    sys.path.insert(0, str(parent_dir))
+if str(pkg_dir) not in sys.path:
+    sys.path.insert(0, str(pkg_dir))
+if not __package__:
+    __package__ = pkg_dir.name
+
 try:
     from mcp.server.fastmcp import FastMCP
-except ImportError as exc:  # pragma: no cover
-    raise SystemExit("FastMCP is not installed. Install requirements.txt") from exc
+except Exception:
+    try:
+        from fastmcp import FastMCP
+    except Exception:
+        try:
+            from .mcp_runtime import UniversalMcpServer as FastMCP
+        except Exception:
+            from mcp_runtime import UniversalMcpServer as FastMCP
 
 
 def _bootstrap_framework_import() -> None:
-    configured = os.environ.get("CURSOR_WORKSPACE_ROOT")
     candidates = []
-    if configured:
-        candidates.append(Path(configured).resolve() / "tools" / "cursor-framework-mcp")
+    for env_key in ("ANTIGRAVITY_WORKSPACE_ROOT", "CURSOR_WORKSPACE_ROOT", "CLAUDE_PROJECT_DIR", "CODEX_WORKSPACE_ROOT", "WORKSPACE_ROOT"):
+        configured = os.environ.get(env_key)
+        if configured:
+            candidates.append(Path(configured).resolve() / "tools" / "cursor-framework-mcp")
+            candidates.append(Path(configured).resolve() / ".cursor" / "mcp" / "cursor-framework-mcp")
+
     candidates.extend(
         [
             Path.cwd().resolve() / "tools" / "cursor-framework-mcp",
+            Path.cwd().resolve() / ".cursor" / "mcp" / "cursor-framework-mcp",
             Path(__file__).resolve().parents[2] / "cursor-framework-mcp",
         ]
     )
@@ -47,9 +66,10 @@ def _json(value: Any) -> str:
 
 
 def _root() -> str:
-    configured = os.environ.get("CURSOR_WORKSPACE_ROOT")
-    if configured and Path(configured).is_dir():
-        return str(Path(configured).resolve())
+    for env_key in ("ANTIGRAVITY_WORKSPACE_ROOT", "CURSOR_WORKSPACE_ROOT", "CLAUDE_PROJECT_DIR", "CODEX_WORKSPACE_ROOT", "WORKSPACE_ROOT"):
+        configured = os.environ.get(env_key)
+        if configured and Path(configured).is_dir():
+            return str(Path(configured).resolve())
     return find_workspace_root(os.getcwd())
 
 

@@ -1935,3 +1935,572 @@ export function categoriesForType(type: FrameworkItemType): string[] {
   CATALOG.filter((i) => i.type === type).forEach((i) => set.add(i.category))
   return Array.from(set)
 }
+
+// ────────────────────────────────────────────────────────────────────────────
+// CROSS-AGENT COMPATIBILITY — supported vibe coding agents
+// ────────────────────────────────────────────────────────────────────────────
+
+export type AgentId = 'cursor' | 'codex' | 'claude-code' | 'grok' | 'antigravity' | 'windsurf' | 'cline' | 'roo'
+
+export interface AgentInfo {
+  id: AgentId
+  name: string
+  displayName: string
+  gatePrefix: string
+  skillsPath: string
+  rulesPath: string
+  agentsPath: string
+  supportsMcp: boolean
+  supportsRules: boolean
+  envVars: string[]
+  description: string
+  limitations: string[]
+  installUrl?: string
+}
+
+export const AGENTS_INFO: AgentInfo[] = [
+  {
+    id: 'cursor',
+    name: 'cursor',
+    displayName: 'Cursor IDE',
+    gatePrefix: 'K',
+    skillsPath: '.cursor/skills',
+    rulesPath: '.cursor/rules',
+    agentsPath: '.cursor/agents',
+    supportsMcp: true,
+    supportsRules: true,
+    envVars: ['CURSOR_IDE', 'CURSOR_PROJECT'],
+    description: 'Full-featured local IDE with MCP integration, rule files, and comprehensive skill system.',
+    limitations: [],
+    installUrl: 'https://cursor.com',
+  },
+  {
+    id: 'antigravity',
+    name: 'antigravity',
+    displayName: 'Google Antigravity',
+    gatePrefix: 'AG',
+    skillsPath: '.agents/skills',
+    rulesPath: '.gemini/rules',
+    agentsPath: '.agents/agents',
+    supportsMcp: true,
+    supportsRules: true,
+    envVars: ['ANTIGRAVITY_APP_DATA', 'GEMINI_CLI', 'ANTIGRAVITY_WORKSPACE_ROOT'],
+    description: 'Google Antigravity autonomous agentic coding assistant with deep reasoning and native MCP support.',
+    limitations: [],
+    installUrl: 'https://deepmind.google',
+  },
+  {
+    id: 'codex',
+    name: 'codex',
+    displayName: 'Codex (cursor.com)',
+    gatePrefix: 'CX',
+    skillsPath: '.cursor/skills',
+    rulesPath: '.cursor/rules',
+    agentsPath: '.cursor/agents',
+    supportsMcp: true,
+    supportsRules: true,
+    envVars: ['CODEX_ENABLED', 'ORIGIN_HOST'],
+    description: 'Cloud-based agent at origin.cursor.com. Repository-aware with MCP tools integration.',
+    limitations: ['MCP tools may differ from local', 'Cloud-only context'],
+    installUrl: 'https://origin.cursor.com',
+  },
+  {
+    id: 'claude-code',
+    name: 'claude-code',
+    displayName: 'Claude Code (@cursor/codex)',
+    gatePrefix: 'C',
+    skillsPath: '.claude/skills',
+    rulesPath: '.claude/rules',
+    agentsPath: '.claude/agents',
+    supportsMcp: true,
+    supportsRules: true,
+    envVars: ['CLAUDE_IDE', 'CLAUDE_API_KEY', 'CLAUDE_PROJECT_DIR'],
+    description: 'Anthropic Claude-powered coding agent with long context and reasoning capabilities.',
+    limitations: ['Different skill path (.claude/skills)', 'Tool naming conventions differ'],
+    installUrl: 'https://claude.com/code',
+  },
+  {
+    id: 'windsurf',
+    name: 'windsurf',
+    displayName: 'Codeium Windsurf',
+    gatePrefix: 'W',
+    skillsPath: '.windsurf/skills',
+    rulesPath: '.codeium/windsurf/rules',
+    agentsPath: '.windsurf/agents',
+    supportsMcp: true,
+    supportsRules: true,
+    envVars: ['WINDSURF_WORKSPACE_ROOT', 'CODEIUM_IDE'],
+    description: 'Codeium Windsurf AI IDE with Cascade flow and native MCP integration.',
+    limitations: [],
+    installUrl: 'https://codeium.com/windsurf',
+  },
+  {
+    id: 'cline',
+    name: 'cline',
+    displayName: 'Cline (VS Code Extension)',
+    gatePrefix: 'CL',
+    skillsPath: '.cline/skills',
+    rulesPath: '.cline/rules',
+    agentsPath: '.cline/agents',
+    supportsMcp: true,
+    supportsRules: true,
+    envVars: ['CLINE_EXTENSION', 'CLINE_WORKSPACE_ROOT'],
+    description: 'Autonomous coding agent extension for VS Code with integrated terminal and MCP servers.',
+    limitations: [],
+    installUrl: 'https://github.com/cline/cline',
+  },
+  {
+    id: 'roo',
+    name: 'roo',
+    displayName: 'Roo Code (VS Code Extension)',
+    gatePrefix: 'R',
+    skillsPath: '.roo/skills',
+    rulesPath: '.roo/rules',
+    agentsPath: '.roo/agents',
+    supportsMcp: true,
+    supportsRules: true,
+    envVars: ['ROO_CODE_EXTENSION', 'ROO_WORKSPACE_ROOT'],
+    description: 'Community-driven autonomous agent extension for VS Code supporting multiple custom modes and MCP.',
+    limitations: [],
+    installUrl: 'https://github.com/RooVetGit/Roo-Code',
+  },
+  {
+    id: 'grok',
+    name: 'grok',
+    displayName: 'Grok (x.com/grok)',
+    gatePrefix: 'G',
+    skillsPath: '.grok/skills',
+    rulesPath: '.grok/rules',
+    agentsPath: '.grok/agents',
+    supportsMcp: false,
+    supportsRules: true,
+    envVars: ['GROK_API_KEY'],
+    description: 'x.com/grok agent with real-time information access and coding assistance.',
+    limitations: ['Limited MCP support', 'May have different code style preferences'],
+    installUrl: 'https://x.com/grok',
+  },
+]
+
+export interface UniversalGate {
+  id: string
+  name: string
+  description: string
+  phase: 'pre' | 'post'
+  section: string
+}
+
+export const UNIVERSAL_GATES: UniversalGate[] = [
+  { id: 'U.1', name: 'Think Before Code', description: 'State assumptions, ask if unclear', phase: 'pre', section: 'Think' },
+  { id: 'U.2', name: 'Simplicity Check', description: 'Check for over-engineering', phase: 'pre', section: 'Simple' },
+  { id: 'U.3', name: 'Surgical Scope', description: 'Define what to touch / what not to touch', phase: 'pre', section: 'Scope' },
+  { id: 'U.4', name: 'Goal Definition', description: 'Define verifiable success criteria', phase: 'pre', section: 'Goals' },
+  { id: 'U.5', name: 'Implementation Verification', description: 'Every line traces to request', phase: 'post', section: 'Verify' },
+  { id: 'U.6', name: 'Simplicity Re-Check', description: 'Can 200 lines be 50?', phase: 'post', section: 'Simple' },
+  { id: 'U.7', name: 'Goal Achievement', description: 'Success criteria verified', phase: 'post', section: 'Done' },
+  { id: '§X', name: 'Verify Before Deliver', description: 'Re-read code, verify each criterion', phase: 'post', section: 'Verify' },
+  { id: '§Y', name: 'Receive Feedback', description: 'Read feedback, verify claims, push back if wrong', phase: 'post', section: 'Feedback' },
+]
+
+export interface AgentFeatureComparison {
+  agent: AgentId
+  universalGates: boolean
+  agentGates: boolean
+  mcpTools: boolean
+  ruleFiles: boolean
+  skillAutoDiscovery: boolean
+  crossAgentSync: boolean
+  customGatePrefix: boolean
+}
+
+export const AGENT_FEATURE_COMPARISON: AgentFeatureComparison[] = [
+  { agent: 'cursor', universalGates: true, agentGates: true, mcpTools: true, ruleFiles: true, skillAutoDiscovery: true, crossAgentSync: true, customGatePrefix: true },
+  { agent: 'antigravity', universalGates: true, agentGates: true, mcpTools: true, ruleFiles: true, skillAutoDiscovery: true, crossAgentSync: true, customGatePrefix: true },
+  { agent: 'codex', universalGates: true, agentGates: true, mcpTools: true, ruleFiles: true, skillAutoDiscovery: true, crossAgentSync: true, customGatePrefix: true },
+  { agent: 'claude-code', universalGates: true, agentGates: true, mcpTools: true, ruleFiles: true, skillAutoDiscovery: true, crossAgentSync: true, customGatePrefix: true },
+  { agent: 'windsurf', universalGates: true, agentGates: true, mcpTools: true, ruleFiles: true, skillAutoDiscovery: true, crossAgentSync: true, customGatePrefix: true },
+  { agent: 'cline', universalGates: true, agentGates: true, mcpTools: true, ruleFiles: true, skillAutoDiscovery: true, crossAgentSync: true, customGatePrefix: true },
+  { agent: 'roo', universalGates: true, agentGates: true, mcpTools: true, ruleFiles: true, skillAutoDiscovery: true, crossAgentSync: true, customGatePrefix: true },
+  { agent: 'grok', universalGates: true, agentGates: true, mcpTools: false, ruleFiles: true, skillAutoDiscovery: true, crossAgentSync: true, customGatePrefix: true },
+]
+
+export interface UniversalSkill {
+  name: string
+  description: string
+  category: string
+  compatibleAgents: AgentId[]
+}
+
+const ALL_AGENTS: AgentId[] = ['cursor', 'antigravity', 'codex', 'claude-code', 'windsurf', 'cline', 'roo', 'grok']
+
+export const UNIVERSAL_SKILLS: UniversalSkill[] = [
+  { name: 'karpathy-coding', description: 'Universal coding discipline overlay', category: 'Coding Discipline', compatibleAgents: ALL_AGENTS },
+  { name: 'frontend-taste', description: 'Anti-slop frontend for landing pages', category: 'Frontend', compatibleAgents: ALL_AGENTS },
+  { name: 'frontend-review', description: 'Quality gate for all frontend tasks', category: 'Frontend', compatibleAgents: ALL_AGENTS },
+  { name: 'full-output', description: 'Complete implementation without truncation', category: 'Coding Discipline', compatibleAgents: ALL_AGENTS },
+  { name: 'security-review', description: 'OWASP security review', category: 'Security', compatibleAgents: ALL_AGENTS },
+  { name: 'test-analysis', description: 'Comprehensive test analysis', category: 'Quality', compatibleAgents: ALL_AGENTS },
+  { name: 'perf-optimization', description: 'Performance optimization', category: 'Performance', compatibleAgents: ALL_AGENTS },
+  { name: 'stability', description: 'Error handling and resilience', category: 'Operations', compatibleAgents: ALL_AGENTS },
+  { name: 'data-quality', description: 'Database and data validation', category: 'Data', compatibleAgents: ALL_AGENTS },
+]
+
+export function getAgentInfo(id: AgentId): AgentInfo | undefined {
+  return AGENTS_INFO.find(a => a.id === id)
+}
+
+export function getCompatibleAgents(skillName: string): AgentId[] {
+  const skill = UNIVERSAL_SKILLS.find(s => s.name === skillName)
+  return skill?.compatibleAgents ?? ['cursor']
+}
+
+export function getMcpConfigSnippet(agent: AgentId, workspaceRoot: string = '/path/to/project'): string {
+  const isClaude = agent === 'claude-code'
+  const config = {
+    mcpServers: {
+      framework: {
+        command: 'python',
+        args: isClaude ? ['-m', 'cursor_framework_mcp'] : ['-m', 'cursor_framework_mcp.server'],
+        env: {
+          WORKSPACE_ROOT: workspaceRoot,
+          CURSOR_WORKSPACE_ROOT: workspaceRoot,
+        },
+      },
+      autopilot: {
+        command: 'python',
+        args: isClaude ? ['-m', 'cursor_autopilot_mcp'] : ['-m', 'cursor_autopilot_mcp.server'],
+        env: {
+          WORKSPACE_ROOT: workspaceRoot,
+        },
+      },
+      memory: {
+        command: 'python',
+        args: isClaude ? ['-m', 'cursor_memory_mcp'] : ['-m', 'cursor_memory_mcp.server'],
+        env: {
+          WORKSPACE_ROOT: workspaceRoot,
+        },
+      },
+    },
+  }
+  return JSON.stringify(config, null, 2)
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// ECC (Enhanced Code Copilot) Integration
+// Source: https://github.com/affaan-m/ECC
+// Version: 2.2.2
+// ────────────────────────────────────────────────────────────────────────────
+
+export type HarnessType =
+  | 'claude'
+  | 'codex'
+  | 'cursor'
+  | 'antigravity'
+  | 'gemini'
+  | 'zed'
+  | 'opencode'
+  | 'qwen'
+  | 'hermes'
+  | 'openclaw'
+  | 'kimi'
+  | 'codebuddy'
+  | 'joycode'
+  | 'copilot'
+
+export type InstallProfile = 'minimal' | 'core' | 'full'
+
+export type InstallStatus = 'not_installed' | 'partial' | 'installed' | 'outdated'
+
+export interface HarnessInfo {
+  type: HarnessType
+  name: string
+  installPath: string
+  supportedProfiles: InstallProfile[]
+  requiresNode: boolean
+  requiresGit: boolean
+  hasHooks: boolean
+  hasNativePlugin: boolean
+  description: string
+}
+
+export interface ECCStatus {
+  installed: boolean
+  version: string | null
+  repositoryPath: string | null
+  npmAvailable: boolean
+  gitAvailable: boolean
+  harnesses: HarnessInstallStatus[]
+}
+
+export interface HarnessInstallStatus {
+  harness: HarnessType
+  status: InstallStatus
+  version: string | null
+  profile: InstallProfile | null
+  installedCount: number
+}
+
+export interface ECCComponent {
+  name: string
+  type: 'skill' | 'agent' | 'rule' | 'command' | 'hook'
+  path: string
+  description: string
+  tags: string[]
+}
+
+// ECC version info
+export const ECC_INFO = {
+  version: '2.2.2',
+  repo: 'https://github.com/affaan-m/ECC',
+  npmPackage: 'ecc-universal',
+  stats: {
+    agents: 68,
+    skills: 292,
+    commands: 94,
+  },
+}
+
+// Supported harnesses
+export const HARNESSES: HarnessInfo[] = [
+  {
+    type: 'claude',
+    name: 'Claude Code',
+    installPath: '~/.claude',
+    supportedProfiles: ['minimal', 'core', 'full'],
+    requiresNode: true,
+    requiresGit: true,
+    hasHooks: true,
+    hasNativePlugin: true,
+    description: 'Native ecc@ecc plugin with full hooks support',
+  },
+  {
+    type: 'codex',
+    name: 'Codex',
+    installPath: '~/.codex',
+    supportedProfiles: ['minimal', 'core'],
+    requiresNode: true,
+    requiresGit: true,
+    hasHooks: true,
+    hasNativePlugin: true,
+    description: 'Native plugin or legacy sync to ~/.codex',
+  },
+  {
+    type: 'cursor',
+    name: 'Cursor',
+    installPath: '.cursor',
+    supportedProfiles: ['minimal'],
+    requiresNode: false,
+    requiresGit: true,
+    hasHooks: false,
+    hasNativePlugin: false,
+    description: 'Project-local Cursor adapter',
+  },
+  {
+    type: 'antigravity',
+    name: 'Antigravity',
+    installPath: '.antigravity',
+    supportedProfiles: ['minimal'],
+    requiresNode: false,
+    requiresGit: true,
+    hasHooks: false,
+    hasNativePlugin: false,
+    description: 'Project-local Antigravity adapter',
+  },
+  {
+    type: 'gemini',
+    name: 'Gemini CLI',
+    installPath: '.gemini',
+    supportedProfiles: ['minimal'],
+    requiresNode: false,
+    requiresGit: true,
+    hasHooks: false,
+    hasNativePlugin: false,
+    description: 'Project-local Gemini CLI config',
+  },
+  {
+    type: 'zed',
+    name: 'Zed',
+    installPath: '.zed',
+    supportedProfiles: ['minimal'],
+    requiresNode: false,
+    requiresGit: true,
+    hasHooks: false,
+    hasNativePlugin: false,
+    description: 'Project-local Zed adapter',
+  },
+  {
+    type: 'opencode',
+    name: 'OpenCode',
+    installPath: '.opencode',
+    supportedProfiles: ['minimal', 'core', 'full'],
+    requiresNode: true,
+    requiresGit: true,
+    hasHooks: true,
+    hasNativePlugin: false,
+    description: 'npm build required before install',
+  },
+  {
+    type: 'qwen',
+    name: 'Qwen CLI',
+    installPath: '.qwen',
+    supportedProfiles: ['minimal'],
+    requiresNode: false,
+    requiresGit: true,
+    hasHooks: false,
+    hasNativePlugin: false,
+    description: 'Project-local Qwen CLI adapter',
+  },
+  {
+    type: 'hermes',
+    name: 'Hermes',
+    installPath: '.hermes',
+    supportedProfiles: ['minimal'],
+    requiresNode: false,
+    requiresGit: true,
+    hasHooks: false,
+    hasNativePlugin: false,
+    description: 'Project-local Hermes adapter',
+  },
+  {
+    type: 'openclaw',
+    name: 'OpenClaw',
+    installPath: '~/.openclaw',
+    supportedProfiles: ['minimal'],
+    requiresNode: false,
+    requiresGit: true,
+    hasHooks: false,
+    hasNativePlugin: false,
+    description: 'Managed home-directory install',
+  },
+  {
+    type: 'kimi',
+    name: 'Kimi Code',
+    installPath: '.kimi-code',
+    supportedProfiles: ['minimal'],
+    requiresNode: true,
+    requiresGit: true,
+    hasHooks: false,
+    hasNativePlugin: false,
+    description: 'Project-local Kimi Code install',
+  },
+  {
+    type: 'codebuddy',
+    name: 'CodeBuddy',
+    installPath: '.codebuddy',
+    supportedProfiles: ['minimal'],
+    requiresNode: false,
+    requiresGit: true,
+    hasHooks: false,
+    hasNativePlugin: false,
+    description: 'Project-local CodeBuddy adapter',
+  },
+  {
+    type: 'joycode',
+    name: 'JoyCode',
+    installPath: '.joycode',
+    supportedProfiles: ['minimal'],
+    requiresNode: false,
+    requiresGit: true,
+    hasHooks: false,
+    hasNativePlugin: false,
+    description: 'Project-local JoyCode adapter',
+  },
+  {
+    type: 'copilot',
+    name: 'GitHub Copilot',
+    installPath: '.github',
+    supportedProfiles: ['minimal'],
+    requiresNode: false,
+    requiresGit: false,
+    hasHooks: false,
+    hasNativePlugin: false,
+    description: 'Copilot instruction file in .github/',
+  },
+]
+
+// Installation profile descriptions
+export const INSTALL_PROFILES: Record<InstallProfile, { name: string; description: string; includes: string[] }> = {
+  minimal: {
+    name: 'Minimal',
+    description: 'Rules, agents, core skills - no hooks runtime',
+    includes: ['agents', 'rules'],
+  },
+  core: {
+    name: 'Core',
+    description: 'Full skills + commands with optional hooks',
+    includes: ['agents', 'rules', 'skills', 'commands', 'memory'],
+  },
+  full: {
+    name: 'Full',
+    description: 'Everything including hooks and advanced features',
+    includes: ['agents', 'rules', 'skills', 'commands', 'hooks', 'memory', 'advanced'],
+  },
+}
+
+// ECC skill categories (from 292 skills)
+export const ECC_SKILL_CATEGORIES = [
+  { id: 'planner', name: 'Planning', count: 24, skills: ['planner', 'architect', 'strategy'] },
+  { id: 'reviewer', name: 'Review & Audit', count: 32, skills: ['code-reviewer', 'security-reviewer', 'go-reviewer', 'python-reviewer'] },
+  { id: 'security', name: 'Security', count: 28, skills: ['agentshield', 'pen-test', 'owasp-audit'] },
+  { id: 'tdd', name: 'TDD & Testing', count: 36, skills: ['tdd-workflow', 'e2e-testing', 'test-coverage'] },
+  { id: 'frontend', name: 'Frontend', count: 42, skills: ['frontend-taste', 'react-patterns', 'vue-best-practices'] },
+  { id: 'backend', name: 'Backend', count: 38, skills: ['api-design', 'database-patterns', 'microservices'] },
+  { id: 'devops', name: 'DevOps & CI/CD', count: 30, skills: ['docker-best-practices', 'kubernetes-patterns', 'ci-cd-templates'] },
+  { id: 'data', name: 'Data Engineering', count: 26, skills: ['sql-optimization', 'data-pipeline', 'analytics'] },
+  { id: 'ml', name: 'ML & AI', count: 22, skills: ['ml-pipeline', 'model-deployment', 'prompt-engineering'] },
+  { id: 'docs', name: 'Documentation', count: 14, skills: ['readme-template', 'api-docs', 'changelog-generator'] },
+]
+
+// ECC commands (94 total)
+export const ECC_COMMANDS = [
+  { name: '/ecc:plan', description: 'Plan a feature or task' },
+  { name: '/ecc:implement', description: 'Implement with TDD workflow' },
+  { name: '/ecc:review', description: 'Code review' },
+  { name: '/ecc:security-scan', description: 'Security audit' },
+  { name: '/ecc:refactor-clean', description: 'Clean code smells' },
+  { name: '/ecc:build-fix', description: 'Fix build errors' },
+  { name: '/ecc:context-budget', description: 'Check context usage' },
+  { name: '/ecc:save-session', description: 'Save session summary' },
+  { name: '/ecc:resume-session', description: 'Resume previous session' },
+  { name: '/ecc:configure-ecc', description: 'Reconfigure ECC settings' },
+]
+
+// Helper functions
+export function getHarnessInfo(type: HarnessType): HarnessInfo | undefined {
+  return HARNESSES.find(h => h.type === type)
+}
+
+export function getProfileInfo(profile: InstallProfile) {
+  return INSTALL_PROFILES[profile]
+}
+
+export function isProfileSupported(harness: HarnessType, profile: InstallProfile): boolean {
+  const info = getHarnessInfo(harness)
+  return info?.supportedProfiles.includes(profile) ?? false
+}
+
+export function requiresNode(harness: HarnessType): boolean {
+  return getHarnessInfo(harness)?.requiresNode ?? false
+}
+
+export function requiresGit(harness: HarnessType): boolean {
+  return getHarnessInfo(harness)?.requiresGit ?? false
+}
+
+export function supportsHooks(harness: HarnessType): boolean {
+  return getHarnessInfo(harness)?.hasHooks ?? false
+}
+
+export function hasNativePlugin(harness: HarnessType): boolean {
+  return getHarnessInfo(harness)?.hasNativePlugin ?? false
+}
+
+export function formatInstallCommand(harness: HarnessType, profile: InstallProfile): string {
+  const profileFlag = `--profile ${profile}`
+  const targetFlag = `--target ${harness}`
+
+  if (harness === 'claude' || harness === 'codex') {
+    return `npx ecc-universal@${ECC_INFO.version} install ${profileFlag} ${targetFlag}`
+  }
+
+  return `./install.sh ${profileFlag} ${targetFlag}`
+}

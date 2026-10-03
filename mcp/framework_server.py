@@ -20,17 +20,29 @@ import sys
 from pathlib import Path
 from typing import Any, Optional
 
-# Use fastmcp if available, fallback to minimal implementation
-try:
-    from fastmcp import FastMCP
-    HAS_FASTMCP = True
-except ImportError:
-    HAS_FASTMCP = False
-    print("fastmcp not installed. Run: pip install fastmcp", file=sys.stderr)
+# Add paths to sys.path so cursor_framework and local modules are always importable
+_repo_root = Path(__file__).resolve().parent.parent
+if str(_repo_root) not in sys.path:
+    sys.path.insert(0, str(_repo_root))
 
-# Initialize FastMCP server
-if HAS_FASTMCP:
-    mcp = FastMCP("cursor-framework")
+_mcp_dir = Path(__file__).resolve().parent
+if str(_mcp_dir) not in sys.path:
+    sys.path.insert(0, str(_mcp_dir))
+
+# Use fastmcp if available, fallback to universal stdio implementation
+try:
+    from mcp.server.fastmcp import FastMCP
+except Exception:
+    try:
+        from fastmcp import FastMCP
+    except Exception:
+        try:
+            from mcp_runtime import UniversalMcpServer as FastMCP
+        except ImportError:
+            from cursor_framework.mcp_runtime import UniversalMcpServer as FastMCP
+
+mcp = FastMCP("cursor-framework")
+HAS_FASTMCP = True
 
 # ============================================================================
 # Framework Core Imports (lazy-loaded)
@@ -443,12 +455,7 @@ def main():
     parser.add_argument("--port", type=int, default=8765, help="Port for stdio mode")
     
     args = parser.parse_args()
-    
-    if HAS_FASTMCP:
-        mcp.run(transport="stdio")
-    else:
-        print("ERROR: fastmcp required. Install with: pip install fastmcp", file=sys.stderr)
-        sys.exit(1)
+    mcp.run(transport="stdio")
 
 if __name__ == "__main__":
     main()

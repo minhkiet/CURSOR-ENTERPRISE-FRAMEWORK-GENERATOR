@@ -51,14 +51,14 @@ Vietnam Payment Review là skill chuyên biệt để review các payment integr
 
 ## Provider Overview
 
-| Provider | Loại | API Style | Sandbox | Kênh |
-|----------|------|-----------|---------|------|
-| MoMo | E-Wallet, QR | REST JSON | Có | QR Code, App Deep Link |
-| SePay | Banking | REST JSON | Có | Banking Transfer (webhook) |
-| PayOS | Payment Gateway | REST JSON | Có | QR Code, ATM/Card |
-| ZaloPay | E-Wallet, Gateway | REST JSON | Có | QR, App, Card |
-| VNPay | Payment Gateway | REST POST Form | Có | QR, ATM, Card, E-Wallet |
-| VietQR | QR Payment | REST JSON | Có | QR Code (NAPAS) |
+| Provider | Loại | API Style | Sandbox | Kênh | Đặc điểm |
+|----------|------|-----------|---------|------|-----------|
+| MoMo | E-Wallet, QR | REST JSON | Có | QR Code, App Deep Link | IPN webhook, HMAC-SHA256 |
+| SePay | Banking | REST JSON | Có | Banking Transfer (webhook) | VietQR-based, webhook push, atomic UPDATE idempotency |
+| PayOS | Payment Gateway | REST JSON | Có | QR Code, ATM/Card | Checksum, webhook |
+| ZaloPay | E-Wallet, Gateway | REST JSON | Có | QR, App, Card | MAC validation |
+| VNPay | Payment Gateway | REST POST Form | Có | QR, ATM, Card, E-Wallet | SHA256 hash, IPN |
+| VietQR | QR Payment | REST JSON | Có | QR Code (NAPAS) | VietQR/NAPAS standard |
 
 ## Review Checklist
 
@@ -90,16 +90,129 @@ Vietnam Payment Review là skill chuyên biệt để review các payment integr
 
 ### SePay
 
-- [ ] API key stored in env, not in code
-- [ ] Webhook secret validated on incoming transfers
-- [ ] Duplicate transfer detection (same `transferId` processed once)
-- [ ] Amount matching: verify transferred amount >= expected amount
-- [ ] Account number validation before processing
-- [ ] Bank code mapping handled correctly
-- [ ] Sandbox testing with SePay test bank accounts
-- [ ] Transfer descriptor/description parsing for auto-matching
-- [ ] Handle both `transfer_in` and `transfer_out` events
-- [ ] Sandbox endpoint: `https://api.sepay.vn`
+#### Core Configuration
+- [ ] API key stored in env (`SEPAY_API_KEY`), never in code
+- [ ] Webhook endpoint registered at my.sepay.vn
+- [ ] Payment code structure configured at **Công ty → Cấu hình chung → Cấu trúc mã thanh toán**
+
+#### QR Code Generation
+- [ ] QR URL follows format: `https://vietqr.app/img?acc=...&bank=...&amount=...&des=...`
+- [ ] `acc` = Số tài khoản thụ hưởng ( beneficiary account number)
+- [ ] `bank` = Mã ngân hàng (bank code, e.g., `Vietcombank`)
+- [ ] `amount` = Số tiền VND (integer, no decimals)
+- [ ] `des` = Nội dung chuyển khoản (payment code/descriptor)
+- [ ] All params URL-encoded properly
+
+#### Webhook Security
+- [ ] API Key authentication via `Authorization: Apikey <SEPAY_API_KEY>` header
+- [ ] Use `hash_equals()` (constant-time comparison) to prevent timing attacks
+- [ ] HMAC-SHA256 signature recommended for production (see [SePay Auth](https://developer.sepay.vn/vi/sepay-webhooks/xac-thuc#hmac-sha256))
+
+#### Idempotent Webhook Processing
+- [ ] `transaction_id` stored as UNIQUE key in `webhook_logs` table
+- [ ] Use `INSERT IGNORE` or `ON DUPLICATE KEY` to prevent duplicate processing
+- [ ] `UNIQUE(transaction_id)` at DB layer + `INSERT IGNORE` in handler = race-safe
+
+#### Payment Code Security
+- [ ] Payment codes use cryptographically random values: `bin2hex(random_bytes(6))` or `crypto.randomBytes(6).toString('hex')`
+- [ ] **NEVER** use auto-increment IDs or plain timestamps as payment codes
+- [ ] Unpredictable codes prevent fake webhook injection or order claiming
+
+#### Amount Verification (Atomic UPDATE)
+- [ ] Use single atomic UPDATE with amount check in WHERE clause:
+```sql
+UPDATE orders 
+SET status = 'paid', paid_at = NOW() 
+WHERE code = ? AND status = 'pending' AND amount <= ?
+```
+- [ ] This prevents race conditions without explicit transactions
+- [ ] First webhook changes `pending → paid`; subsequent retries hit `status = 'pending'` = false, so nothing happens
+
+#### Backend Endpoints Pattern
+- [ ] `POST /api/orders` - Tạo đơn, trả mã + QR URL
+- [ ] `GET /api/orders/:code/status` - Frontend poll trạng thái (3s interval)
+- [ ] `POST /webhook/sepay` - Nhận webhook từ SePay
+
+#### Database Schema
+```sql
+CREATE TABLE orders (
+  id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+  code        VARCHAR(64)  NOT NULL UNIQUE,           -- payment descriptor
+  amount      BIGINT       NOT NULL,                   -- VND integer, no decimals
+  status      ENUM('pending','paid','expired') DEFAULT 'pending',
+  paid_at     DATETIME     NULL,
+  created_at  DATETIME     DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_status_created (status, created_at)
+);
+
+CREATE TABLE webhook_logs (
+  id             BIGINT AUTO_INCREMENT PRIMARY KEY,
+  transaction_id VARCHAR(128) NOT NULL UNIQUE,         -- SePay transaction ID
+  body           JSON         NOT NULL,                -- full webhook payload
+  processed_at   DATETIME     DEFAULT CURRENT_TIMESTAMP
+);
+```
+- `amount BIGINT`: VND has no decimals. `INT` max 2.1B, B2B invoices easily overflow.
+- `code UNIQUE`: prevents duplicate payment codes at DB level.
+- `transaction_id UNIQUE`: idempotency lock for webhooks.
+- `body JSON`: query with `JSON_EXTRACT` for debugging.
+- `idx_status_created`: find pending orders older than X minutes for expiry jobs.
+
+#### Frontend Payment Page
+- [ ] Display QR code via `https://vietqr.app/img?...` URL
+- [ ] Poll `/api/orders/:code/status` every 3 seconds
+- [ ] 15-minute countdown before marking as expired
+- [ ] Status states: `waiting`, `paid`, `expired`
+- [ ] Consider SSE/WebSocket for multi-order backends (server push vs client poll)
+
+#### Webhook Response
+- [ ] Return `{"success": true}` immediately (before heavy processing)
+- [ ] Push heavy work (email, inventory, third-party APIs) to queue (Redis, SQS)
+- [ ] Webhook timeout: 30 seconds
+
+#### Transfer Matching
+- [ ] Webhook payload fields: `id` (transaction_id), `code` (payment descriptor), `transferAmount`, `transferType` ('in')
+- [ ] Check `transferType === 'in'` before processing
+- [ ] Match by `code` field in webhook payload
+
+#### Production Checklist
+- [ ] HMAC-SHA256 enabled (API Key only = insufficient against payload tampering)
+- [ ] Payment codes are cryptographically random
+- [ ] Amount validation in SQL WHERE clause (not in application code)
+- [ ] Return 200 before heavy processing
+- [ ] Webhook HTTPS-only
+- [ ] Reconciliation endpoint tested (see [Đối soát giao dịch](https://developer.sepay.vn/vi/sepay-webhooks/doi-soat-giao-dich))
+
+#### Example Webhook Handler (PHP)
+```php
+// POST /webhook/sepay
+$auth = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+if (!hash_equals('Apikey ' . getenv('SEPAY_API_KEY'), $auth)) {
+    http_response_code(401);
+    exit;
+}
+
+$body = json_decode(file_get_contents('php://input'), true);
+
+// Idempotency: skip if already processed
+$log = $pdo->prepare('INSERT IGNORE INTO webhook_logs (transaction_id, body) VALUES (?, ?)');
+$log->execute([$body['id'], $body]);
+if ($log->rowCount() === 0) {
+    echo json_encode(['success' => true]); // already handled
+    exit;
+}
+
+// Atomic UPDATE with amount check
+if ($body['transferType'] === 'in' && !empty($body['code'])) {
+    $pdo->prepare(
+        'UPDATE orders SET status = "paid", paid_at = NOW()
+         WHERE code = ? AND status = "pending" AND amount <= ?'
+    )->execute([$body['code'], $body['transferAmount']]);
+    // TODO: enqueue email / inventory update
+}
+
+echo json_encode(['success' => true]);
+```
 
 ### PayOS
 
@@ -202,7 +315,43 @@ async handleWebhook(req: Request) {
 }
 ```
 
-### Hardcoded Credentials
+### SePay: Predictable Payment Codes
+
+```php
+// ❌ BAD: Auto-increment or timestamp as payment code
+$code = 'DH' . $orderId;  // Predictable! Attackers can guess
+$code = 'DH' . time();      // Predictable! Can scan future codes
+
+// ✅ GOOD: Cryptographically random payment code
+$code = 'DH' . bin2hex(random_bytes(6));  // 12 hex chars, unpredictable
+```
+
+```typescript
+// ❌ BAD: Predictable code in Node.js
+const code = `DH${Date.now()}`;  // Can be predicted!
+
+// ✅ GOOD: Random payment code
+import crypto from 'crypto';
+const code = 'DH' + crypto.randomBytes(6).toString('hex');
+```
+
+### SePay: SELECT-then-UPDATE Race Condition
+
+```php
+// ❌ BAD: SELECT then UPDATE — race condition with duplicate webhooks
+$order = $pdo->query("SELECT * FROM orders WHERE code = '$code'")->fetch();
+if ($order['status'] === 'paid') exit;  // Gap: another webhook could also pass this check
+$pdo->exec("UPDATE orders SET status = 'paid' WHERE code = '$code'");
+```
+
+```php
+// ✅ GOOD: Single atomic UPDATE with amount check in WHERE
+$pdo->prepare(
+    'UPDATE orders SET status = "paid", paid_at = NOW()
+     WHERE code = ? AND status = "pending" AND amount <= ?'
+)->execute([$code, $transferAmount]);
+// Second webhook: status != 'pending' → no rows affected → safe idempotency
+```
 
 ```typescript
 // ❌ BAD: Credentials in code
@@ -307,7 +456,7 @@ class PaymentService {
 
 ### Vietnam-Specific Review
 - [ ] MoMo: partnerCode, accessKey, secretKey not in code; QR format correct
-- [ ] SePay: auto-reconciliation by amount+content implemented
+- [ ] **SePay**: cryptographically random payment codes; atomic UPDATE with `amount <= ?` in WHERE; `INSERT IGNORE` for idempotent webhooks; HMAC-SHA256 enabled in production
 - [ ] PayOS: checksum validation with checksumKey implemented
 - [ ] ZaloPay: appTransId uniqueness guaranteed
 - [ ] VNPay: return URL and IPN URL configured correctly

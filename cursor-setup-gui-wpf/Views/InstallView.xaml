@@ -7,23 +7,26 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="32,28">
         <StackPanel MaxWidth="900">
 
-            <!-- === Page Title === -->
+            <!-- === Page Title ===
+                 Font: 24px, weight 600 (per evondevKit) -->
             <TextBlock Text="{Binding InstallPageTitle}"
-                       FontFamily="{StaticResource UIFont}" FontSize="24" FontWeight="Bold"
+                       FontFamily="{StaticResource UIFont}" FontSize="24" FontWeight="SemiBold"
                        Foreground="{StaticResource Slate900Brush}" Margin="0,0,0,4"/>
             <TextBlock Text="{Binding InstallPageSubtitle}"
                        FontFamily="{StaticResource UIFont}" FontSize="14"
-                       Foreground="{StaticResource Slate500Brush}" Margin="0,0,0,28"/>
+                       Foreground="{StaticResource Neutral500Brush}" Margin="0,0,0,28"/>
 
-            <!-- === Path Card === -->
+            <!-- === Path Card ===
+                 evondevKit Card: white bg, subtle border, NO shadow, 16px radius -->
             <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20">
                 <StackPanel>
+                    <!-- Section Title: 18px, weight 600 -->
                     <TextBlock Text="{Binding InstallLocationLabel}"
-                               FontFamily="{StaticResource UIFont}" FontSize="15" FontWeight="SemiBold"
+                               FontFamily="{StaticResource UIFont}" FontSize="18" FontWeight="SemiBold"
                                Foreground="{StaticResource Slate900Brush}" Margin="0,0,0,4"/>
                     <TextBlock Text="{Binding InstallLocationHint}"
                                FontFamily="{StaticResource UIFont}" FontSize="12"
-                               Foreground="{StaticResource Slate500Brush}" Margin="0,0,0,16"/>
+                               Foreground="{StaticResource Neutral500Brush}" Margin="0,0,0,16"/>
 
                     <!-- Path display + buttons -->
                     <Grid>
@@ -64,12 +67,14 @@
                 </StackPanel>
             </Border>
 
-            <!-- === Build Options Card === -->
+            <!-- === Build Options Card ===
+                 Section Title: 18px, weight 600 -->
             <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                        <!-- Section Title -->
                         <TextBlock Text="{Binding InstallBuildOptionsLabel}"
-                                   FontFamily="{StaticResource UIFont}" FontSize="15" FontWeight="SemiBold"
+                                   FontFamily="{StaticResource UIFont}" FontSize="18" FontWeight="SemiBold"
                                    Foreground="{StaticResource Slate900Brush}"/>
                         <Border Style="{StaticResource ChipStyle}" Margin="12,0,0,0">
                             <TextBlock Text="{Binding InstallOptionalLabel}"
@@ -79,7 +84,7 @@
                     </StackPanel>
                     <TextBlock Text="{Binding InstallBuildOptionsDesc}"
                                FontFamily="{StaticResource UIFont}" FontSize="12"
-                               Foreground="{StaticResource Slate500Brush}" Margin="0,0,0,16"/>
+                               Foreground="{StaticResource Neutral500Brush}" Margin="0,0,0,16"/>
 
                     <!-- Two-column grid of checkboxes -->
                     <Grid>
@@ -119,11 +124,11 @@
                                   Style="{StaticResource ModernCheckBoxStyle}"/>
                     </Grid>
 
-                    <!-- Note -->
-                    <Border Background="#FFF7ED" CornerRadius="8" Padding="12,8" Margin="0,16,0,0">
+                    <!-- Note with warm background -->
+                    <Border Background="{StaticResource Warning100Brush}" CornerRadius="8" Padding="12,8" Margin="0,16,0,0">
                         <TextBlock Text="{Binding InstallBuildExeNote}"
                                    FontFamily="{StaticResource UIFont}" FontSize="12"
-                                   Foreground="#92400E"/>
+                                   Foreground="{StaticResource Warning600Brush}"/>
                     </Border>
                 </StackPanel>
             </Border>

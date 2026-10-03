@@ -10,12 +10,13 @@
         <StackPanel MaxWidth="900">
 
             <!-- === Header === -->
+            <!-- Page Title: 24px, weight 600 -->
             <TextBlock Text="{Binding FrameworkTitle}"
-                       FontFamily="{StaticResource UIFont}" FontSize="20" FontWeight="Bold"
+                       FontFamily="{StaticResource UIFont}" FontSize="24" FontWeight="SemiBold"
                        Foreground="{StaticResource Slate900Brush}" Margin="0,0,0,4"/>
             <TextBlock Text="{Binding FrameworkSubtitle}"
-                       FontFamily="{StaticResource UIFont}" FontSize="13"
-                       Foreground="{StaticResource Slate500Brush}" Margin="0,0,0,24"/>
+                       FontFamily="{StaticResource UIFont}" FontSize="14"
+                       Foreground="{StaticResource Neutral500Brush}" Margin="0,0,0,24"/>
 
             <!-- === Status Banner === -->
             <Border x:Name="StatusBanner" CornerRadius="12" Padding="16,12" Margin="0,0,0,20"

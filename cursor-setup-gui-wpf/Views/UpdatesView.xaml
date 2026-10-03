@@ -18,12 +18,13 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel>
+                    <!-- Page Title: 24px, weight 600 -->
                     <TextBlock Text="{Binding UpdatesTitle}"
-                               FontFamily="{StaticResource UIFont}" FontSize="24" FontWeight="Bold"
+                               FontFamily="{StaticResource UIFont}" FontSize="24" FontWeight="SemiBold"
                                Foreground="{StaticResource Slate900Brush}" Margin="0,0,0,4"/>
                     <TextBlock Text="{Binding UpdatesSubtitle}"
                                FontFamily="{StaticResource UIFont}" FontSize="14"
-                               Foreground="{StaticResource Slate500Brush}"/>
+                               Foreground="{StaticResource Neutral500Brush}"/>
                 </StackPanel>
 
                 <Button Grid.Column="1" Style="{StaticResource PrimaryButtonStyle}"

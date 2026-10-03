@@ -144,13 +144,69 @@
         <GradientStop Color="#FBBF24" Offset="1"/>
     </LinearGradientBrush>
 
+    <!-- === evondevKit Color Palette === -->
+    <!-- Page Background: Light gray, NOT pure white -->
+    <Color x:Key="PageBackground">#f4f4f6</Color>
+    <Color x:Key="PageBackgroundDark">#e8e8ea</Color>
+    
+    <!-- Card Surface: Pure white with subtle border -->
+    <Color x:Key="CardBorder">#eff0f0</Color>
+    <Color x:Key="CardBackgroundEvon">#FFFFFF</Color>
+    
+    <!-- Input Border -->
+    <Color x:Key="InputBorder">#e4e4e7</Color>
+    <Color x:Key="InputBorderFocus">#4F46E5</Color>
+    
+    <!-- === Status Colors === -->
+    <!-- Emerald Green: Success, completed, active -->
+    <Color x:Key="Success600">#059669</Color>
+    <Color x:Key="Success500">#10B981</Color>
+    <Color x:Key="Success100">#D1FAE5</Color>
+    
+    <!-- Amber: Warning, attention needed -->
+    <Color x:Key="Warning600">#D97706</Color>
+    <Color x:Key="Warning500">#F59E0B</Color>
+    <Color x:Key="Warning100">#FEF3C7</Color>
+    
+    <!-- Rose: Dangerous action (Delete, Logout) - NOT red -->
+    <Color x:Key="Danger600">#E11D48</Color>
+    <Color x:Key="Danger500">#F43F5E</Color>
+    <Color x:Key="Danger100">#FFE4E6</Color>
+    
+    <!-- Gray: Wait, draft, pending -->
+    <Color x:Key="Neutral600">#4B5563</Color>
+    <Color x:Key="Neutral500">#6B7280</Color>
+    <Color x:Key="Neutral100">#F3F4F6</Color>
+
+    <!-- evondevKit Brushes -->
+    <SolidColorBrush x:Key="PageBackgroundBrush" Color="{StaticResource PageBackground}"/>
+    <SolidColorBrush x:Key="PageBackgroundDarkBrush" Color="{StaticResource PageBackgroundDark}"/>
+    <SolidColorBrush x:Key="CardBorderBrush" Color="{StaticResource CardBorder}"/>
+    <SolidColorBrush x:Key="CardBackgroundEvonBrush" Color="{StaticResource CardBackgroundEvon}"/>
+    <SolidColorBrush x:Key="InputBorderBrush" Color="{StaticResource InputBorder}"/>
+    <SolidColorBrush x:Key="InputBorderFocusBrush" Color="{StaticResource InputBorderFocus}"/>
+    
+    <!-- Status Brushes -->
+    <SolidColorBrush x:Key="Success600Brush" Color="{StaticResource Success600}"/>
+    <SolidColorBrush x:Key="Success500Brush" Color="{StaticResource Success500}"/>
+    <SolidColorBrush x:Key="Success100Brush" Color="{StaticResource Success100}"/>
+    <SolidColorBrush x:Key="Warning600Brush" Color="{StaticResource Warning600}"/>
+    <SolidColorBrush x:Key="Warning500Brush" Color="{StaticResource Warning500}"/>
+    <SolidColorBrush x:Key="Warning100Brush" Color="{StaticResource Warning100}"/>
+    <SolidColorBrush x:Key="Danger600Brush" Color="{StaticResource Danger600}"/>
+    <SolidColorBrush x:Key="Danger500Brush" Color="{StaticResource Danger500}"/>
+    <SolidColorBrush x:Key="Danger100Brush" Color="{StaticResource Danger100}"/>
+    <SolidColorBrush x:Key="Neutral600Brush" Color="{StaticResource Neutral600}"/>
+    <SolidColorBrush x:Key="Neutral500Brush" Color="{StaticResource Neutral500}"/>
+    <SolidColorBrush x:Key="Neutral100Brush" Color="{StaticResource Neutral100}"/>
+
     <!-- Form surface colors -->
-    <SolidColorBrush x:Key="FormBackgroundBrush" Color="{StaticResource Slate50}"/>
-    <SolidColorBrush x:Key="CardBackgroundBrush" Color="White"/>
+    <SolidColorBrush x:Key="FormBackgroundBrush" Color="{StaticResource PageBackground}"/>
+    <SolidColorBrush x:Key="CardBackgroundBrush" Color="{StaticResource CardBackgroundEvon}"/>
     <SolidColorBrush x:Key="NavBackgroundBrush" Color="{StaticResource Slate900}"/>
     <SolidColorBrush x:Key="NavHoverBrush" Color="{StaticResource Slate800}"/>
     <SolidColorBrush x:Key="NavActiveBrush" Color="{StaticResource Indigo600}"/>
-    <SolidColorBrush x:Key="ContentBackgroundBrush" Color="{StaticResource Slate50}"/>
+    <SolidColorBrush x:Key="ContentBackgroundBrush" Color="{StaticResource PageBackground}"/>
     <SolidColorBrush x:Key="ProgressTrackBrush" Color="{StaticResource Slate200}"/>
     <SolidColorBrush x:Key="LogBackgroundBrush" Color="{StaticResource Slate900}"/>
     <SolidColorBrush x:Key="LogForegroundBrush" Color="{StaticResource Slate300}"/>
@@ -160,26 +216,43 @@
     <SolidColorBrush x:Key="GlassBorderBrush" Color="#33FFFFFF"/>
     <SolidColorBrush x:Key="GlassHighlightBrush" Color="#66FFFFFF"/>
 
-    <!-- Typography -->
+    <!-- Typography (evondevKit) -->
     <FontFamily x:Key="UIFont">Segoe UI</FontFamily>
     <FontFamily x:Key="MonoFont">Cascadia Mono, Consolas, Courier New</FontFamily>
 
+    <!-- evondevKit Typography Scale -->
+    <sys:Double x:Key="FontSizePageTitle" xmlns:sys="clr-namespace:System;assembly=mscorlib">24</sys:Double>
+    <sys:Double x:Key="FontSizeSectionTitle" xmlns:sys="clr-namespace:System;assembly=mscorlib">18</sys:Double>
+    <sys:Double x:Key="FontSizeBody" xmlns:sys="clr-namespace:System;assembly=mscorlib">14</sys:Double>
+    <sys:Double x:Key="FontSizeSmall" xmlns:sys="clr-namespace:System;assembly=mscorlib">12</sys:Double>
+    
+    <!-- Legacy typography sizes (for backward compatibility) -->
     <sys:Double x:Key="FontSizeS" xmlns:sys="clr-namespace:System;assembly=mscorlib">11</sys:Double>
     <sys:Double x:Key="FontSizeM" xmlns:sys="clr-namespace:System;assembly=mscorlib">13</sys:Double>
     <sys:Double x:Key="FontSizeL" xmlns:sys="clr-namespace:System;assembly=mscorlib">15</sys:Double>
     <sys:Double x:Key="FontSizeXL" xmlns:sys="clr-namespace:System;assembly=mscorlib">18</sys:Double>
     <sys:Double x:Key="FontSizeTitle" xmlns:sys="clr-namespace:System;assembly=mscorlib">20</sys:Double>
 
-    <!-- Spacing -->
+    <!-- evondevKit Spacing -->
     <Thickness x:Key="CardPadding">20</Thickness>
-    <CornerRadius x:Key="CardRadius">12</CornerRadius>
+    <Thickness x:Key="FormGroupSpacing">24</Thickness>
+    <Thickness x:Key="FormFieldSpacing">16</Thickness>
+    <Thickness x:Key="FormLineSpacing">4</Thickness>
+    
+    <!-- evondevKit Border Radius -->
+    <CornerRadius x:Key="CardRadius">16</CornerRadius>
+    <CornerRadius x:Key="CardRadiusSm">12</CornerRadius>
     <CornerRadius x:Key="ButtonRadius">8</CornerRadius>
     <CornerRadius x:Key="TagRadius">6</CornerRadius>
     <CornerRadius x:Key="GlassRadius">16</CornerRadius>
+    <CornerRadius x:Key="InputRadius">8</CornerRadius>
 
-    <!-- Drop shadow for cards -->
+    <!-- Drop shadow for cards - REMOVED per evondevKit (flat design, NO shadows) -->
+    <!-- 
     <DropShadowEffect x:Key="CardShadow" BlurRadius="16" ShadowDepth="2"
                      Direction="270" Color="#1E293B" Opacity="0.08"/>
+    -->
+    
     <DropShadowEffect x:Key="ButtonShadow" BlurRadius="8" ShadowDepth="1"
                      Direction="270" Color="#4F46E5" Opacity="0.25"/>
     <DropShadowEffect x:Key="SoftShadow" BlurRadius="20" ShadowDepth="0"

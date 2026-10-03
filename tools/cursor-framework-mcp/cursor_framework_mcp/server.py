@@ -22,27 +22,58 @@ import sys
 from pathlib import Path
 from typing import Any
 
+pkg_dir = Path(__file__).resolve().parent
+parent_dir = pkg_dir.parent
+if str(parent_dir) not in sys.path:
+    sys.path.insert(0, str(parent_dir))
+if str(pkg_dir) not in sys.path:
+    sys.path.insert(0, str(pkg_dir))
+if not __package__:
+    __package__ = pkg_dir.name
+
 try:
     from mcp.server.fastmcp import FastMCP
-except ImportError as exc:  # pragma: no cover - import guard
-    raise SystemExit(
-        "FastMCP is not installed. Install with: pip install -r requirements.txt"
-    ) from exc
+except Exception:
+    try:
+        from fastmcp import FastMCP
+    except Exception:
+        try:
+            from .mcp_runtime import UniversalMcpServer as FastMCP
+        except Exception:
+            from mcp_runtime import UniversalMcpServer as FastMCP
 
-from .analyzer import AnalysisResult, Suggestion, TaskAnalyzer
-from .loader import Loader, make_default_loader
-from .optimizer import Optimizer
-from .registry import (
-    AGENT_DOMAINS,
-    ESSENTIAL_SKILLS,
-    SKILL_BUNDLES,
-    SKILL_DOMAINS,
-    build_registry,
-    find_workspace_root,
-)
+try:
+    from .analyzer import AnalysisResult, Suggestion, TaskAnalyzer
+    from .loader import Loader, make_default_loader
+    from .optimizer import Optimizer
+    from .registry import (
+        AGENT_DOMAINS,
+        ESSENTIAL_SKILLS,
+        SKILL_BUNDLES,
+        SKILL_DOMAINS,
+        build_registry,
+        find_workspace_root,
+    )
+except Exception:
+    from analyzer import AnalysisResult, Suggestion, TaskAnalyzer
+    from loader import Loader, make_default_loader
+    from optimizer import Optimizer
+    from registry import (
+        AGENT_DOMAINS,
+        ESSENTIAL_SKILLS,
+        SKILL_BUNDLES,
+        SKILL_DOMAINS,
+        build_registry,
+        find_workspace_root,
+    )
 
 log = logging.getLogger("cursor_framework_mcp")
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(levelname)s: %(message)s")
+# Ensure logging goes to stderr so stdio JSON-RPC isn't corrupted
+if not log.handlers:
+    sh = logging.StreamHandler(sys.stderr)
+    sh.setFormatter(logging.Formatter("%(asctime)s [%(name)s] %(levelname)s: %(message)s"))
+    log.addHandler(sh)
+    log.setLevel(logging.INFO)
 
 DEFAULT_CACHE_CFG: dict[str, Any] = {
     "max_rules": 20,
@@ -53,10 +84,19 @@ DEFAULT_CACHE_CFG: dict[str, Any] = {
 
 
 def _resolve_workspace_root() -> str:
-    """Prefer CURSOR_WORKSPACE_ROOT env var, then walk up looking for `.cursor`."""
-    env = os.environ.get("CURSOR_WORKSPACE_ROOT")
-    if env and Path(env).is_dir():
-        return str(Path(env).resolve())
+    """Prefer ANTIGRAVITY/CURSOR/CLAUDE env vars, then walk up looking for workspace markers."""
+    for env_key in (
+        "ANTIGRAVITY_WORKSPACE_ROOT",
+        "CURSOR_WORKSPACE_ROOT",
+        "CLAUDE_PROJECT_DIR",
+        "CODEX_WORKSPACE_ROOT",
+        "WINDSURF_WORKSPACE_ROOT",
+        "WORKSPACE_ROOT",
+        "CURSOR_PROJECT",
+    ):
+        env = os.environ.get(env_key)
+        if env and Path(env).is_dir():
+            return str(Path(env).resolve())
     cwd = os.getcwd()
     found = find_workspace_root(cwd)
     return found

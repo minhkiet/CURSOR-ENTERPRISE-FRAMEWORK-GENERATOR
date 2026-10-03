@@ -534,3 +534,161 @@ guide.shortcuts.ctrl_r=Ctrl+Shift+T - Lệnh Test
 guide.shortcuts.ctrl_shift_r=Ctrl+Shift+R - Lệnh Review
 guide.shortcuts.ctrl_shift_d=Ctrl+Shift+D - Lệnh Deploy
 guide.shortcuts.ctrl_shift_p=Ctrl+Shift+P - Project Indexer
+
+# ECC (Enhanced Code Copilot) tab
+ecc.title=Tích hợp ECC
+ecc.subtitle=Enhanced Code Copilot v2.2.2 - 68 agents, 292 kỹ năng, 94 lệnh
+ecc.status=Trạng thái
+ecc.installed=Đã cài
+ecc.not_installed=Chưa cài
+ecc.clone=Tải Repository
+ecc.refresh=Làm mới
+ecc.hooks=Bật Hooks
+ecc.harnesses=Hệ thống được hỗ trợ
+ecc.features=Tính năng chính
+ecc.install_failed=Cài đặt thất bại
+ecc.install_success=Cài đặt thành công
+ecc.repo_cloned=Repository được tải thành công
+ecc.repo_exists=Repository đã tồn tại
+ecc.git_required=Yêu cầu Git cho thao tác này
+ecc.node_required=Yêu cầu Node.js cho cài đặt npm
+ecc.agents=Agents
+ecc.skills=Skills
+ecc.commands=Commands
+ecc.active_vibe_coder=Vibe Coder đang dùng:
+ecc.gate=Gate
+ecc.installing=Đang cài
+ecc.error=Lỗi
+ecc.cloning_repo=Đang tải repository
+ecc.clone_failed=Tải thất bại
+ecc.install_script_not_found=Không tìm thấy script cài đặt
+ecc.repo_not_found=Không tìm thấy Repository. Hãy tải về trước.
+ecc.hooks_memory=Hooks & Bộ nhớ
+ecc.hooks_memory_desc=Tóm tắt phiên, học liên tục, instincts, và điều khiển ngữ cảnh
+ecc.agent_shield=AgentShield
+ecc.agent_shield_desc=Quét prompts, hooks, cấu hình MCP, quyền, secrets, và các file agent
+ecc.workflow=Workflow Engine
+ecc.workflow_desc=lên kế hoạch → triển khai → review → xác minh → ghi nhớ → cải thiện
+ecc.install_commands=Lệnh cài đặt
+ecc.claude_code=Claude Code:
+ecc.codex=Codex:
+ecc.cursor=Cursor:
+ecc.guided_setup=Cài đặt hướng dẫn:
+ecc.harness_claude_desc=Plugin ecc@ecc gốc với đầy đủ hooks
+ecc.harness_codex_desc=Plugin gốc hoặc legacy sync
+ecc.harness_cursor_desc=Adapter local của project
+ecc.harness_gemini_desc=Cấu hình local của project
+ecc.harness_zed_desc=Adapter local của project
+ecc.harness_kimi_desc=Cài đặt local của project
+ecc.harness_copilot_desc=copilot-instructions.md
+ecc.harness_antigravity_desc=Adapter local của project
+tab.ecc=ECC
+
+# Vibe Coder selector
+vibe_coder.label=Vibe Coder
+vibe_coder.tooltip=Chọn trợ lý AI coding của bạn
+
+# Vibe Tools
+vibe_tool.cursor=Cursor IDE
+vibe_tool.cursor_desc=Cursor IDE với tính năng coding AI
+vibe_tool.antigravity=Antigravity
+vibe_tool.antigravity_desc=Công cụ vibe coding thế hệ mới
+vibe_tool.codex=OpenAI Codex
+vibe_tool.codex_desc=OpenAI Codex CLI
+vibe_tool.claude_code=Claude Code
+vibe_tool.claude_code_desc=Anthropic Claude Code
+vibe_tool.grok=Grok CLI
+vibe_tool.grok_desc=xAI Grok CLI
+vibe_tool.gemini=Gemini CLI
+vibe_tool.gemini_desc=Google Gemini CLI
+vibe_tool.zed=Zed AI
+vibe_tool.zed_desc=Zed AI Editor
+vibe_tool.kimi=Kimi Code
+vibe_tool.kimi_desc=Kimi Code AI
+vibe_tool.copilot=GitHub Copilot
+vibe_tool.copilot_desc=GitHub Copilot CLI
+vibe_tool.windsurf=WindSurf
+vibe_tool.windsurf_desc=Codeium WindSurf IDE
+vibe_tool.continue=Continue.dev
+vibe_tool.continue_desc=Trợ lý coding AI nguồn mở
+vibe_tool.cline=Cline
+vibe_tool.cline_desc=Tác nhân coding tự động cho VSCode
+vibe_tool.roo=Roo Code
+vibe_tool.roo_desc=Trợ lý coding linh hoạt cho VSCode
+vibe_tool.aider=Aider
+vibe_tool.aider_desc=Công cụ CLI cho pair programming với AI
+
+# evondev-ui-ux Skill
+evondev.title=UI/UX Design
+evondev.subtitle=Kỹ năng thiết kế UI/UX chuyên nghiệp dựa trên evondevKit
+evondev.description=Dashboard, forms, tables, modals, settings với design system và tokens
+evondev.components=UI Components
+evondev.components_desc=26 UI components sẵn sàng production
+evondev.layouts=Layouts
+evondev.layouts_desc=5 mẫu layout (app, form, overlay, pricing, kanban)
+evondev.tokens=Design Tokens
+evondev.tokens_desc=CSS tokens cho màu sắc, typography, spacing
+evondev.rules=Design Rules
+evondev.rules_desc=7 danh mục quy tắc thiết kế
+evondev.process=Design Process
+evondev.process_desc=Quy trình wireframe-first với 2-3 tùy chọn
+evondev.brief=Brief
+evondev.wireframe=Wireframe
+evondev.build=Build
+evondev.designer_mode=Designer Mode
+evondev.designer_mode_desc=Tạo UI như designer với wireframes trước
+evondev.flat_style=Flat Style
+evondev.glassmorphism=Glassmorphism
+evondev.gradient=Gradient
+evondev.dark_mode=Dark Mode
+evondev.light_mode=Light Mode
+
+# Vibe Framework Directories
+vibe_framework.title=Vibe Code Framework
+vibe_framework.subtitle=Thư mục chuẩn cho AI coding đa nền tảng
+vibe_framework.install=Cài cho tất cả Vibe Coders
+vibe_framework.install_desc=Cài framework cho tất cả công cụ AI coding được hỗ trợ
+vibe_framework.directories=Framework Directories
+vibe_framework.skills_dir=Skills Directory
+vibe_framework.rules_dir=Rules Directory
+vibe_framework.agents_dir=Agents Directory
+vibe_framework.commands_dir=Commands Directory
+vibe_framework.prompts_dir=Prompts Directory
+vibe_framework.workflows_dir=Workflows Directory
+vibe_framework.templates_dir=Templates Directory
+vibe_framework.config_dir=Config Directory
+vibe_framework.primary=Primary Frameworks
+vibe_framework.secondary=Secondary Frameworks
+vibe_framework.vscode=VSCode Extensions
+
+# Agent Management & Installation
+agent.title=Quản lý Agent
+agent.installed=Đã cài đặt
+agent.not_installed=Chưa cài đặt
+agent.install_success=Cài đặt thành công cho {0}
+agent.install_failed=Cài đặt agent thất bại: {0}
+agent.all_agents_success=Đã cài đặt thành công cho tất cả các agent!
+agent.all_agents_partial=Cài đặt hoàn tất một phần: {0}
+install.all_agents=Cài đặt cho tất cả Vibe Coders
+install.single_agent=Cài đặt cho agent được chọn
+vibe_coder.select=Chọn công cụ Vibe Coder của bạn
+
+# Project Runner
+project_runner.running=Đang thực thi lệnh framework...
+project_runner.ask_title=Hỏi Framework
+project_runner.ask_subtitle=Thực thi yêu cầu bằng ngôn ngữ tự nhiên qua pipeline workflow
+project_runner.run_ask=Gửi yêu cầu
+project_runner.output=Kết quả xuất (Output)
+project_runner.clear=Xóa
+
+# Common Units & Labels
+common.items_unit=mục
+script_gen.scripts_unit=scripts
+script_gen.commands_unit=lệnh
+script_gen.cat_all=Tất cả
+script_gen.cat_web=Web
+script_gen.cat_desktop=Desktop
+script_gen.cat_deploy=Triển khai
+script_gen.cat_database=Cơ sở dữ liệu
+script_gen.cat_ai=AI / LLM
+script_gen.cat_utility=Tiện ích

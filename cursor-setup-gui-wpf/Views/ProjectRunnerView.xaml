@@ -10,12 +10,13 @@
         <StackPanel MaxWidth="1000">
 
             <!-- === Header === -->
+            <!-- Page Title: 24px, weight 600 -->
             <TextBlock Text="{Binding ProjectRunnerTitle}"
-                       FontFamily="{StaticResource UIFont}" FontSize="20" FontWeight="Bold"
+                       FontFamily="{StaticResource UIFont}" FontSize="24" FontWeight="SemiBold"
                        Foreground="{StaticResource Slate900Brush}" Margin="0,0,0,4"/>
             <TextBlock Text="{Binding ProjectRunnerSubtitle}"
-                       FontFamily="{StaticResource UIFont}" FontSize="13"
-                       Foreground="{StaticResource Slate500Brush}" Margin="0,0,0,24"/>
+                       FontFamily="{StaticResource UIFont}" FontSize="14"
+                       Foreground="{StaticResource Neutral500Brush}" Margin="0,0,0,24"/>
 
             <!-- === Status Banner === -->
             <Border x:Name="StatusBanner" CornerRadius="12" Padding="16,12" Margin="0,0,0,20"
@@ -37,10 +38,10 @@
                             <BlurEffect Radius="4"/>
                         </Ellipse.Effect>
                     </Ellipse>
-                    <TextBlock Grid.Column="1" Text="Running framework command..."
+                    <TextBlock Grid.Column="1" Text="{Binding ProjectRunnerRunningLabel}"
                                FontFamily="{StaticResource MonoFont}" FontSize="12"
                                Foreground="#D1FAE5" VerticalAlignment="Center"/>
-                    <Button Grid.Column="2" Content="Cancel"
+                    <Button Grid.Column="2" Content="{Binding BtnCancelLabel}"
                             Style="{StaticResource SecondaryButtonStyle}"
                             Command="{Binding CancelProjectRunnerCommand}"
                             Padding="16,6" FontSize="11"/>
@@ -103,11 +104,11 @@
                                        Foreground="{StaticResource Slate600Brush}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
-                        <TextBlock Text="Scan" FontFamily="{StaticResource UIFont}" FontSize="13" FontWeight="SemiBold"
+                        <TextBlock Text="{Binding FrameworkScanLabel}" FontFamily="{StaticResource UIFont}" FontSize="13" FontWeight="SemiBold"
                                    Foreground="{StaticResource Slate800Brush}" Margin="0,0,0,4"/>
-                        <TextBlock Text="Scan .cursor/ folder" FontFamily="{StaticResource UIFont}" FontSize="10"
+                        <TextBlock Text="{Binding FrameworkScanDesc}" FontFamily="{StaticResource UIFont}" FontSize="10"
                                    Foreground="{StaticResource Slate500Brush}" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                        <Button Content="Run" Style="{StaticResource SecondaryButtonStyle}"
+                        <Button Content="{Binding BtnRunLabel}" Style="{StaticResource SecondaryButtonStyle}"
                                 Command="{Binding RunProjectScanCommand}"
                                 Padding="10,5" FontSize="11"/>
                     </StackPanel>
@@ -122,11 +123,11 @@
                                        Foreground="{StaticResource Indigo600Brush}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
-                        <TextBlock Text="Build Index" FontFamily="{StaticResource UIFont}" FontSize="13" FontWeight="SemiBold"
+                        <TextBlock Text="{Binding FrameworkIndexLabel}" FontFamily="{StaticResource UIFont}" FontSize="13" FontWeight="SemiBold"
                                    Foreground="{StaticResource Slate800Brush}" Margin="0,0,0,4"/>
-                        <TextBlock Text="Generate INDEX.json" FontFamily="{StaticResource UIFont}" FontSize="10"
+                        <TextBlock Text="{Binding FrameworkIndexDesc}" FontFamily="{StaticResource UIFont}" FontSize="10"
                                    Foreground="{StaticResource Slate500Brush}" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                        <Button Content="Run" Style="{StaticResource SecondaryButtonStyle}"
+                        <Button Content="{Binding BtnRunLabel}" Style="{StaticResource SecondaryButtonStyle}"
                                 Command="{Binding RunProjectIndexCommand}"
                                 Padding="10,5" FontSize="11"/>
                     </StackPanel>
@@ -141,11 +142,11 @@
                                        Foreground="{StaticResource Amber600Brush}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
-                        <TextBlock Text="Warm Cache" FontFamily="{StaticResource UIFont}" FontSize="13" FontWeight="SemiBold"
+                        <TextBlock Text="{Binding FrameworkWarmLabel}" FontFamily="{StaticResource UIFont}" FontSize="13" FontWeight="SemiBold"
                                    Foreground="{StaticResource Slate800Brush}" Margin="0,0,0,4"/>
-                        <TextBlock Text="Preload &amp; persist" FontFamily="{StaticResource UIFont}" FontSize="10"
+                        <TextBlock Text="{Binding FrameworkWarmDesc}" FontFamily="{StaticResource UIFont}" FontSize="10"
                                    Foreground="{StaticResource Slate500Brush}" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                        <Button Content="Run" Style="{StaticResource SecondaryButtonStyle}"
+                        <Button Content="{Binding BtnRunLabel}" Style="{StaticResource SecondaryButtonStyle}"
                                 Command="{Binding RunProjectWarmCommand}"
                                 Padding="10,5" FontSize="11"/>
                     </StackPanel>
@@ -160,11 +161,11 @@
                                        Foreground="{StaticResource Cyan600Brush}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
-                        <TextBlock Text="Stats" FontFamily="{StaticResource UIFont}" FontSize="13" FontWeight="SemiBold"
+                        <TextBlock Text="{Binding FrameworkStatsLabel}" FontFamily="{StaticResource UIFont}" FontSize="13" FontWeight="SemiBold"
                                    Foreground="{StaticResource Slate800Brush}" Margin="0,0,0,4"/>
-                        <TextBlock Text="View statistics" FontFamily="{StaticResource UIFont}" FontSize="10"
+                        <TextBlock Text="{Binding FrameworkStatsDesc}" FontFamily="{StaticResource UIFont}" FontSize="10"
                                    Foreground="{StaticResource Slate500Brush}" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                        <Button Content="Run" Style="{StaticResource SecondaryButtonStyle}"
+                        <Button Content="{Binding BtnRunLabel}" Style="{StaticResource SecondaryButtonStyle}"
                                 Command="{Binding RunProjectStatsCommand}"
                                 Padding="10,5" FontSize="11"/>
                     </StackPanel>
@@ -174,10 +175,10 @@
             <!-- === Ask Section === -->
             <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16">
                 <StackPanel>
-                    <TextBlock Text="Ask the Framework"
+                    <TextBlock Text="{Binding ProjectRunnerAskTitle}"
                                FontFamily="{StaticResource UIFont}" FontSize="14" FontWeight="SemiBold"
                                Foreground="{StaticResource Slate800Brush}" Margin="0,0,0,4"/>
-                    <TextBlock Text="Run a natural language request through the workflow pipeline"
+                    <TextBlock Text="{Binding ProjectRunnerAskSubtitle}"
                                FontFamily="{StaticResource UIFont}" FontSize="12"
                                Foreground="{StaticResource Slate500Brush}" Margin="0,0,0,12"/>
 
@@ -195,7 +196,7 @@
                                             <Setter.Value>
                                                 <VisualBrush Stretch="None" AlignmentX="Left" AlignmentY="Top">
                                                     <VisualBrush.Visual>
-                                                        <TextBlock Text="Type your request here..." 
+                                                        <TextBlock Text="{Binding ProjectRunnerAskPlaceholder}" 
                                                                    Foreground="{StaticResource Slate400Brush}"
                                                                    FontStyle="Italic" Margin="12,10,0,0"/>
                                                     </VisualBrush.Visual>
@@ -208,7 +209,7 @@
                         </TextBox.Style>
                     </TextBox>
 
-                    <Button Content="Run Ask" Style="{StaticResource PrimaryButtonStyle}"
+                    <Button Content="{Binding ProjectRunnerRunAskLabel}" Style="{StaticResource PrimaryButtonStyle}"
                              Command="{Binding RunProjectAskCommand}"
                              HorizontalAlignment="Left" Padding="24,10"/>
                 </StackPanel>
@@ -223,9 +224,9 @@
                     </Grid.RowDefinitions>
 
                     <Grid Grid.Row="0" Margin="0,0,0,8">
-                        <TextBlock Text="Output" FontFamily="{StaticResource UIFont}" FontSize="13" FontWeight="SemiBold"
+                        <TextBlock Text="{Binding ProjectRunnerOutputLabel}" FontFamily="{StaticResource UIFont}" FontSize="13" FontWeight="SemiBold"
                                    Foreground="{StaticResource Slate300Brush}"/>
-                        <Button Content="Clear" Style="{StaticResource SecondaryButtonStyle}"
+                        <Button Content="{Binding ProjectRunnerClearLabel}" Style="{StaticResource SecondaryButtonStyle}"
                                 Command="{Binding ClearProjectOutputCommand}"
                                 HorizontalAlignment="Right" Padding="12,4" FontSize="10"/>
                     </Grid>

@@ -26,7 +26,8 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- === LEFT NAVIGATION SIDEBAR === -->
+        <!-- === LEFT NAVIGATION SIDEBAR ===
+             Dark sidebar with accent indicator -->
         <Border Grid.Column="0" Background="{StaticResource NavBackgroundBrush}">
             <Grid>
                 <Grid.RowDefinitions>
@@ -35,30 +36,66 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Brand header -->
-                <Border Grid.Row="0" Padding="20,22,20,20">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                            <Border Width="4" CornerRadius="2"
-                                    Background="{StaticResource Indigo500Brush}"
-                                    Effect="{StaticResource IndigoGlow}"
-                                    Margin="0,0,12,0"/>
-                            <TextBlock Text="{Binding AppBrand}"
-                                      FontFamily="{StaticResource UIFont}"
-                                      FontSize="16" FontWeight="SemiBold"
-                                      Foreground="White"/>
+                <!-- Sidebar Top Section (Brand + Vibe Coder) -->
+                <StackPanel Grid.Row="0">
+                    <Border Padding="20,18,20,10">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <Border Width="4" CornerRadius="2"
+                                        Background="{StaticResource Indigo500Brush}"
+                                        Effect="{StaticResource IndigoGlow}"
+                                        Margin="0,0,12,0"/>
+                                <TextBlock Text="{Binding AppBrand}"
+                                           FontFamily="{StaticResource UIFont}"
+                                           FontSize="16" FontWeight="SemiBold"
+                                           Foreground="White"/>
+                            </StackPanel>
+                            <TextBlock Text="{Binding AppBrandSubtitle}"
+                                       FontFamily="{StaticResource UIFont}"
+                                       FontSize="11"
+                                       Foreground="{StaticResource Slate500Brush}"
+                                       Margin="16,0,0,0"/>
                         </StackPanel>
-                        <TextBlock Text="{Binding AppBrandSubtitle}"
-                                   FontFamily="{StaticResource UIFont}"
-                                   FontSize="12"
-                                   Foreground="{StaticResource Slate500Brush}"
-                                   Margin="16,0,0,0"/>
-                    </StackPanel>
-                </Border>
+                    </Border>
 
-                <Border Grid.Row="0" VerticalAlignment="Bottom"
-                        BorderBrush="{StaticResource Slate800Brush}"
-                        BorderThickness="0,0,0,1"/>
+                    <!-- Vibe Coder Selector -->
+                    <Border Padding="16,4,16,12">
+                        <Border Background="{StaticResource Slate800Brush}" CornerRadius="8" Padding="12,8">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0"
+                                           Text="&#xE945;"
+                                           FontFamily="Segoe MDL2 Assets"
+                                           FontSize="14"
+                                           Foreground="{StaticResource Indigo400Brush}"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,10,0"/>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="{Binding VibeCoderTitle}"
+                                               FontFamily="{StaticResource UIFont}"
+                                               FontSize="10"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource Slate400Brush}"
+                                               Margin="0,0,0,4"/>
+                                    <ComboBox ItemsSource="{Binding AvailableAgents}"
+                                              SelectedItem="{Binding SelectedAgent}"
+                                              DisplayMemberPath="DisplayName"
+                                              Style="{StaticResource ModernComboBoxStyle}"
+                                              FontSize="11"
+                                              Padding="8,5"
+                                              MinWidth="160"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Border>
+
+                    <!-- Divider -->
+                    <Border BorderBrush="{StaticResource Slate800Brush}"
+                            BorderThickness="0,0,0,1"/>
+                </StackPanel>
 
                 <!-- Navigation items -->
                 <ListBox Grid.Row="1"
@@ -187,6 +224,9 @@
                     <views:SettingsView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=7, FallbackValue=Collapsed}"/>
                     <views:GuideView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=8, FallbackValue=Collapsed}"/>
                     <views:FrameworkView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=9, FallbackValue=Collapsed}"/>
+                    <views:ProjectRunnerView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=10, FallbackValue=Collapsed}"/>
+                    <views:ScriptGeneratorView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=11, FallbackValue=Collapsed}"/>
+                    <views:ECCView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=12, FallbackValue=Collapsed}"/>
                 </Grid>
             </Grid>
 

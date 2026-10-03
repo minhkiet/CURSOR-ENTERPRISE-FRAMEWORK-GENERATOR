@@ -33,6 +33,9 @@ namespace CursorSetupWpf.ViewModels
         }
 
         public ThreadSafeObservableCollection<NavItem> NavItems { get; } = new();
+        
+        // ECC ViewModel - shared with ECCView for bilingual support
+        public ECCViewModel ECCViewModel { get; } = new();
         public ThreadSafeObservableCollection<SetupCategory> ComponentCategories { get; } = new();
         public ThreadSafeObservableCollection<SetupCategory> AdvancedCategories { get; } = new();
         public ThreadSafeObservableCollection<McpServerStatus> McpServers { get; } = new();
@@ -51,6 +54,9 @@ namespace CursorSetupWpf.ViewModels
         public string WindowTitle => LocalizationService.T("app.title");
         public string AppBrand => LocalizationService.T("app.title_short");
         public string AppBrandSubtitle => LocalizationService.T("app.subtitle");
+
+        // Vibe Coder selector
+        public string VibeCoderTitle => LocalizationService.T("vibe_coder.label");
 
         // MCP labels
         public string McpTitle => LocalizationService.T("mcp.title");
@@ -218,6 +224,17 @@ namespace CursorSetupWpf.ViewModels
         string _runningCommandText = "";
         public string RunningCommandText { get => _runningCommandText; set => Set(ref _runningCommandText, value); }
 
+        public string ProjectRunnerRunningLabel => LocalizationService.T("project_runner.running");
+        public string ProjectRunnerAskTitle => LocalizationService.T("project_runner.ask_title");
+        public string ProjectRunnerAskSubtitle => LocalizationService.T("project_runner.ask_subtitle");
+        public string ProjectRunnerRunAskLabel => LocalizationService.T("project_runner.run_ask");
+        public string ProjectRunnerOutputLabel => LocalizationService.T("project_runner.output");
+        public string ProjectRunnerClearLabel => LocalizationService.T("project_runner.clear");
+        public string ItemsUnitLabel => LocalizationService.T("common.items_unit");
+        public string AgentTitle => LocalizationService.T("agent.title");
+        public string AgentInstalledLabel => LocalizationService.T("agent.installed");
+        public string AgentNotInstalledLabel => LocalizationService.T("agent.not_installed");
+
         // Localization
         ObservableCollection<LanguageItem> _languages = new();
         public ObservableCollection<LanguageItem> Languages => _languages;
@@ -230,6 +247,8 @@ namespace CursorSetupWpf.ViewModels
                 if (Set(ref _selectedLanguage, value) && value != null)
                 {
                     LocalizationService.SetCulture(value.Code);
+                    _settings.Current.Language = value.Code;
+                    _settings.Save();
                     RefreshStrings();
                 }
             }
@@ -346,7 +365,7 @@ namespace CursorSetupWpf.ViewModels
         public int InstalledCount => McpServers.Count(s => s.IsInstalled);
         public int TotalCount => McpServers.Count;
         public string McpConfigPathLabel =>
-            LocalizationService.T("mcp.config_path", Installer.GetMcpConfigPath());
+            LocalizationService.T("mcp.config_path", Installer.GetMcpConfigPath(SelectedAgent?.Agent ?? TargetAgent.Cursor));
 
         // ============ Updates-specific computed properties ============
         public string CurrentVersion { get; } = "v4.3.0";
@@ -405,6 +424,62 @@ namespace CursorSetupWpf.ViewModels
             set { _settings.Current.LogFileLocation = value; OnPropertyChanged(nameof(LogFileLocation)); }
         }
 
+        // ============ Cross-Agent Selection ============
+        public ObservableCollection<AgentSelectionItem> AvailableAgents { get; } = new();
+        AgentSelectionItem _selectedAgent;
+        public AgentSelectionItem SelectedAgent
+        {
+            get => _selectedAgent;
+            set
+            {
+                if (Set(ref _selectedAgent, value) && value != null)
+                {
+                    OnPropertyChanged(nameof(SelectedAgentName));
+                    OnPropertyChanged(nameof(SelectedAgentPrefix));
+                    OnPropertyChanged(nameof(SelectedAgentPath));
+                    OnPropertyChanged(nameof(IsClaudeCodeSelected));
+                    OnPropertyChanged(nameof(IsGrokSelected));
+                    OnPropertyChanged(nameof(IsCodexSelected));
+                    OnPropertyChanged(nameof(IsCursorSelected));
+                    OnPropertyChanged(nameof(IsAntigravitySelected));
+                    OnPropertyChanged(nameof(IsWindsurfSelected));
+                    OnPropertyChanged(nameof(IsClineSelected));
+                    OnPropertyChanged(nameof(IsRooSelected));
+                    OnPropertyChanged(nameof(McpConfigPathLabel));
+                    CheckMcpStatus();
+                }
+            }
+        }
+        public string SelectedAgentName => SelectedAgent?.DisplayName ?? "Cursor IDE";
+        public string SelectedAgentPrefix => SelectedAgent?.GatePrefix ?? "K";
+        public string SelectedAgentPath => SelectedAgent?.SkillsPath ?? ".cursor/skills";
+        public bool IsCursorSelected => SelectedAgent?.Agent == CursorSetupWpf.Services.TargetAgent.Cursor;
+        public bool IsCodexSelected => SelectedAgent?.Agent == CursorSetupWpf.Services.TargetAgent.Codex;
+        public bool IsClaudeCodeSelected => SelectedAgent?.Agent == CursorSetupWpf.Services.TargetAgent.ClaudeCode;
+        public bool IsGrokSelected => SelectedAgent?.Agent == CursorSetupWpf.Services.TargetAgent.Grok;
+        public bool IsAntigravitySelected => SelectedAgent?.Agent == CursorSetupWpf.Services.TargetAgent.Antigravity;
+        public bool IsWindsurfSelected => SelectedAgent?.Agent == CursorSetupWpf.Services.TargetAgent.Windsurf;
+        public bool IsClineSelected => SelectedAgent?.Agent == CursorSetupWpf.Services.TargetAgent.Cline;
+        public bool IsRooSelected => SelectedAgent?.Agent == CursorSetupWpf.Services.TargetAgent.Roo;
+
+        bool _installForAllAgents;
+        public bool InstallForAllAgents
+        {
+            get => _installForAllAgents;
+            set { if (Set(ref _installForAllAgents, value)) OnPropertyChanged(nameof(InstallForAllAgentsLabel)); }
+        }
+        public string InstallForAllAgentsLabel => InstallForAllAgents
+            ? LocalizationService.T("install.all_agents")
+            : LocalizationService.T("install.single_agent");
+
+        public ObservableCollection<AgentStatusItem> AgentStatuses { get; } = new();
+
+        // Cross-agent commands
+        public ICommand RefreshAgentStatusCommand { get; }
+        public ICommand InstallForSelectedAgentCommand { get; }
+        public ICommand InstallForAllAgentsCommand { get; }
+        public ICommand OpenAgentDocsCommand { get; }
+
         // ============ Commands ============
         public ICommand BrowseCommand { get; }
         public ICommand NewFolderCommand { get; }
@@ -457,6 +532,9 @@ namespace CursorSetupWpf.ViewModels
 
         public MainViewModel()
         {
+            // Subscribe to culture changes for automatic UI refresh
+            LocalizationService.CultureChanged += RefreshStrings;
+            
             // Nav items
             NavItems.Add(new NavItem { Icon = "\uE8B7", TitleKey = "tab.install", Index = 0 });
             NavItems.Add(new NavItem { Icon = "\uE8F1", TitleKey = "tab.components", Index = 1 });
@@ -470,15 +548,18 @@ namespace CursorSetupWpf.ViewModels
             NavItems.Add(new NavItem { Icon = "\uE8F9", TitleKey = "tab.framework", Index = 9 });
             NavItems.Add(new NavItem { Icon = "\uE8A5", TitleKey = "tab.project_runner", Index = 10 });
             NavItems.Add(new NavItem { Icon = "\uE8A5", TitleKey = "tab.script_generator", Index = 11 });
+            NavItems.Add(new NavItem { Icon = "\uE74D", TitleKey = "tab.ecc", Index = 12 });
             
             _settings.Load();
             _installPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".cursor");
             _backupLocation = _settings.DefaultBackupPath;
             
-            // Languages
+            // Languages (Default: Tiếng Việt)
             _languages.Add(new LanguageItem { Code = "vi", DisplayName = "Tiếng Việt" });
             _languages.Add(new LanguageItem { Code = "en", DisplayName = "English" });
-            _selectedLanguage = _languages.First();
+            string preferredLang = string.IsNullOrWhiteSpace(_settings.Current.Language) ? "vi" : _settings.Current.Language;
+            _selectedLanguage = _languages.FirstOrDefault(l => l.Code.Equals(preferredLang, StringComparison.OrdinalIgnoreCase)) ?? _languages.First();
+            LocalizationService.SetCulture(_selectedLanguage.Code);
             
             // Initialize Commands
             BrowseCommand = new RelayCommand(Browse);
@@ -540,9 +621,19 @@ namespace CursorSetupWpf.ViewModels
             RunProjectStatsCommand = new AsyncRelayCommand(_ => RunProjectCommandAsync("stats"));
             RunProjectGraphCommand = new AsyncRelayCommand(_ => RunProjectCommandAsync("graph"));
             RunProjectAskCommand = new AsyncRelayCommand(_ => RunProjectAskAsync());
-            CancelProjectRunnerCommand = new RelayCommand(CancelProjectRunner);
+            CancelProjectRunnerCommand = new RelayCommand((Action)CancelProjectRunner);
             ClearProjectOutputCommand = new RelayCommand(_ => ProjectRunnerOutput = "");
-            RefreshDetectedProjectsCommand = new RelayCommand(_ => RefreshDetectedProjects());
+            Action refreshAction = () => { RefreshDetectedProjects(); };
+            RefreshDetectedProjectsCommand = new RelayCommand(refreshAction);
+
+            // Cross-agent commands
+            RefreshAgentStatusCommand = new RelayCommand(_ => RefreshAgentStatus());
+            InstallForSelectedAgentCommand = new AsyncRelayCommand(_ => InstallForSelectedAgentAsync());
+            InstallForAllAgentsCommand = new AsyncRelayCommand(_ => InstallForAllAgentsAsync());
+            OpenAgentDocsCommand = new RelayCommand(OpenAgentDocs);
+
+            // Initialize agents
+            InitializeAgents();
 
             // Wire FrameworkRunner events → log panel
             _framework.LogAppended += msg => Application.Current?.Dispatcher.Invoke(() =>
@@ -852,10 +943,11 @@ namespace CursorSetupWpf.ViewModels
         async Task SyncMcpAsync()
         {
             SetStatusKey("scanning");
-            var (success, message) = await _installer.SyncMcpConfigAsync(InstallPath);
+            var agent = SelectedAgent?.Agent ?? CursorSetupWpf.Services.TargetAgent.Cursor;
+            var (success, message) = await _installer.SyncMcpConfigAsync(InstallPath, agent);
             if (success)
             {
-                var (hooksOk, hooksMsg) = await _installer.SyncHooksConfigAsync(InstallPath);
+                var (hooksOk, hooksMsg) = await _installer.SyncHooksConfigAsync(InstallPath, agent);
                 LogLines.Add(hooksOk ? "[HOOKS] " + hooksMsg : "[HOOKS] WARN: " + hooksMsg);
 
                 _toast.Success(LocalizationService.T("mcp.title"),
@@ -878,7 +970,8 @@ namespace CursorSetupWpf.ViewModels
 
         void CheckMcpStatus()
         {
-            var statuses = _installer.GetMcpStatus();
+            var agent = SelectedAgent?.Agent ?? CursorSetupWpf.Services.TargetAgent.Cursor;
+            var statuses = _installer.GetMcpStatus(agent);
             var tools = _installer.GetMcpTools();
             Application.Current?.Dispatcher.Invoke(() =>
             {
@@ -895,7 +988,8 @@ namespace CursorSetupWpf.ViewModels
 
         void OpenMcpConfig(object? arg)
         {
-            string path = arg as string ?? Installer.GetMcpConfigPath();
+            var agent = SelectedAgent?.Agent ?? CursorSetupWpf.Services.TargetAgent.Cursor;
+            string path = arg as string ?? Installer.GetMcpConfigPath(agent);
             try
             {
                 if (File.Exists(path))
@@ -1141,6 +1235,7 @@ namespace CursorSetupWpf.ViewModels
             OnPropertyChanged(nameof(WindowTitle));
             OnPropertyChanged(nameof(AppBrand));
             OnPropertyChanged(nameof(AppBrandSubtitle));
+            OnPropertyChanged(nameof(VibeCoderTitle));
             OnPropertyChanged(nameof(CanInstall));
             OnPropertyChanged(nameof(StatusText));
             OnPropertyChanged(nameof(SummaryText));
@@ -1282,6 +1377,21 @@ namespace CursorSetupWpf.ViewModels
 
             OnPropertyChanged(nameof(BackupConfigurationLabel));
             OnPropertyChanged(nameof(BackupSnapshotsLabel));
+
+            OnPropertyChanged(nameof(ProjectRunnerRunningLabel));
+            OnPropertyChanged(nameof(ProjectRunnerAskTitle));
+            OnPropertyChanged(nameof(ProjectRunnerAskSubtitle));
+            OnPropertyChanged(nameof(ProjectRunnerRunAskLabel));
+            OnPropertyChanged(nameof(ProjectRunnerOutputLabel));
+            OnPropertyChanged(nameof(ProjectRunnerClearLabel));
+            OnPropertyChanged(nameof(ItemsUnitLabel));
+            OnPropertyChanged(nameof(AgentTitle));
+            OnPropertyChanged(nameof(AgentInstalledLabel));
+            OnPropertyChanged(nameof(AgentNotInstalledLabel));
+            OnPropertyChanged(nameof(InstallForAllAgentsLabel));
+
+            // Refresh all bound UI elements
+            OnPropertyChanged(string.Empty);
         }
 
         void DismissToast(object? arg)
@@ -1422,7 +1532,119 @@ namespace CursorSetupWpf.ViewModels
             IsProjectRunnerRunning = false;
         }
 
+        // ─── Cross-Agent Methods ─────────────────────────────────────────
+
+        void InitializeAgents()
+        {
+            AvailableAgents.Clear();
+            foreach (var config in Installer.GetAgentCatalog())
+            {
+                AvailableAgents.Add(new AgentSelectionItem
+                {
+                    Agent = config.Agent,
+                    DisplayName = config.Name,
+                    GatePrefix = config.GatePrefix,
+                    SkillsPath = config.SkillsPath,
+                    InstallUrl = config.InstallUrl,
+                    SupportsMcp = config.SupportsMcp,
+                });
+            }
+
+            // Select detected agent or default to Cursor
+            var detected = Installer.DetectCurrentAgent();
+            var selected = AvailableAgents.FirstOrDefault(a => a.Agent == detected)
+                ?? AvailableAgents.First();
+            _selectedAgent = selected;
+        }
+
+        void RefreshAgentStatus()
+        {
+            var statuses = _installer.GetAgentInstallationStatus(InstallPath);
+            Application.Current?.Dispatcher.Invoke(() =>
+            {
+                AgentStatuses.Clear();
+                foreach (var (agent, installed, path) in statuses)
+                {
+                    var config = Installer.GetAgentConfig(agent);
+                    AgentStatuses.Add(new AgentStatusItem
+                    {
+                        Agent = agent,
+                        DisplayName = config?.Name ?? agent.ToString(),
+                        IsInstalled = installed,
+                        InstallPath = path,
+                    });
+                }
+            });
+        }
+
         void RefreshDetectedProjects()
+        {
+            DetectedProjects.Clear();
+            var projects = ProjectRunner.DetectProjects(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+            foreach (var p in projects)
+                DetectedProjects.Add(p);
+            if (DetectedProjects.Count == 0)
+                DetectedProjects.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".cursor"));
+        }
+
+        async Task InstallForSelectedAgentAsync()
+        {
+            if (SelectedAgent == null) return;
+            var (success, message) = await _installer.InstallForAgentAsync(
+                SelectedAgent.Agent, InstallPath, BuildConfig(), BuildSelections());
+            if (success)
+            {
+                _toast.Success(LocalizationService.T("agent.title"),
+                    LocalizationService.T("agent.install_success", SelectedAgent.DisplayName));
+            }
+            else
+            {
+                _toast.Error(LocalizationService.T("agent.title"),
+                    LocalizationService.T("agent.install_failed", message));
+            }
+            RefreshAgentStatus();
+        }
+
+        async Task InstallForAllAgentsAsync()
+        {
+            var (success, message) = await _installer.InstallForAllAgentsAsync(
+                InstallPath, BuildConfig(), BuildSelections());
+            if (success)
+            {
+                _toast.Success(LocalizationService.T("agent.title"),
+                    LocalizationService.T("agent.all_agents_success"));
+            }
+            else
+            {
+                _toast.Warning(LocalizationService.T("agent.title"),
+                    LocalizationService.T("agent.all_agents_partial", message));
+            }
+            RefreshAgentStatus();
+        }
+
+        void OpenAgentDocs(object? param)
+        {
+            if (param is string url && !string.IsNullOrWhiteSpace(url))
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
+                }
+                catch { }
+            }
+            else if (SelectedAgent != null && !string.IsNullOrWhiteSpace(SelectedAgent.InstallUrl))
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo { FileName = SelectedAgent.InstallUrl, UseShellExecute = true });
+                }
+                catch { }
+            }
+        }
+
+        // ─── Project Runner Methods ──────────────────────────────────
+
+        void CancelProjectRunner()
         {
             DetectedProjects.Clear();
             var projects = ProjectRunner.DetectProjects(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
@@ -1510,5 +1732,32 @@ namespace CursorSetupWpf.ViewModels
     static class McpCatalog
     {
         public static int Count { get; } = 3;
+    }
+
+    // ─── Cross-Agent Helper Classes ────────────────────────────────────
+
+    /// <summary>
+    /// Represents an agent that can be selected for installation.
+    /// </summary>
+    public class AgentSelectionItem
+    {
+        public CursorSetupWpf.Services.TargetAgent Agent { get; init; }
+        public string DisplayName { get; init; } = "";
+        public string GatePrefix { get; init; } = "U";
+        public string SkillsPath { get; init; } = "";
+        public string InstallUrl { get; init; } = "";
+        public bool SupportsMcp { get; init; }
+    }
+
+    /// <summary>
+    /// Represents the installation status of an agent.
+    /// </summary>
+    public class AgentStatusItem
+    {
+        public CursorSetupWpf.Services.TargetAgent Agent { get; init; }
+        public string DisplayName { get; init; } = "";
+        public bool IsInstalled { get; init; }
+        public string InstallPath { get; init; } = "";
+        public string StatusLabel => IsInstalled ? LocalizationService.T("agent.installed") : LocalizationService.T("agent.not_installed");
     }
 }

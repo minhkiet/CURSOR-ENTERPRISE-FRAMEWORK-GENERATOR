@@ -11,6 +11,111 @@ using CursorSetupWpf.Models;
 
 namespace CursorSetupWpf.Services
 {
+    /// <summary>
+    /// Supported vibe coding agents for cross-agent installation.
+    /// </summary>
+    public enum TargetAgent
+    {
+        Cursor,      // Cursor IDE - primary target
+        Codex,       // Codex (cursor.com / origin.cursor.com)
+        ClaudeCode,  // Claude Code (@cursor/codex)
+        Grok,        // Grok (x.com/grok)
+        Windsurf,    // WindSurf IDE
+        Continue,    // Continue.dev
+        Cline,      // Cline VSCode extension
+        Roo,        // Roo Code
+        Aider,      // Aider CLI
+        GeminiCLI,   // Google Gemini CLI
+        KimiCode,   // Kimi Code AI
+        Zed,        // Zed AI Editor
+        Copilot,    // GitHub Copilot
+        Antigravity, // Antigravity
+    }
+
+    /// <summary>
+    /// Standard AI/Vibe Code framework directories.
+    /// Maps to all popular vibe coding tools.
+    /// </summary>
+    public static class FrameworkDirectories
+    {
+        // Primary framework roots (can contain skills, rules, agents, etc.)
+        public static readonly Dictionary<string, string[]> PrimaryRoots = new()
+        {
+            { ".cursor", new[] { "skills", "rules", "agents", "commands", "hooks", "knowledge", "references", "workflows", "prompts", "templates", "memory", "scripts" } },
+            { ".claude", new[] { "skills", "rules", "agents", "commands", "prompts" } },
+            { ".codex", new[] { "skills", "prompts", "agents" } },
+            { ".grok", new[] { "skills", "rules", "agents" } },
+            { ".gemini", new[] { "skills", "commands" } },
+            { ".windsurf", new[] { "rules", "workflows" } },
+            { ".continue", new[] { "rules", "prompts" } },
+            { ".aider", Array.Empty<string>() }, // Uses .aider.conf.yml
+            { ".roo", new[] { "rules", "modes", "commands" } },
+            { ".cline", new[] { "rules", "skills" } },
+            { ".kiro", new[] { "steering", "specs" } },
+            { ".qwen", new[] { "commands", "skills" } },
+            { ".opencode", new[] { "agents", "commands", "skills" } },
+            { ".factory", new[] { "droids", "skills" } },
+            { ".vibe", new[] { "skills", "rules", "agents", "commands", "prompts", "workflows", "templates", "config" } },
+            { ".agents", new[] { "skills", "rules", "workflows" } },
+            { ".github", new[] { "copilot", "prompts", "instructions", "agents" } },
+            { ".vscode", new[] { "settings.json", "tasks.json", "extensions.json" } },
+        };
+
+        // Skills directories per agent
+        public static readonly Dictionary<string, string> SkillsDirs = new()
+        {
+            { "Cursor", ".cursor/skills" },
+            { "Codex", ".cursor/skills" },
+            { "ClaudeCode", ".claude/skills" },
+            { "Grok", ".grok/skills" },
+            { "GeminiCLI", ".gemini/skills" },
+            { "Windsurf", ".windsurf/rules" },
+            { "Continue", ".continue/rules" },
+            { "Cline", ".cline/skills" },
+            { "Roo", ".roo/rules" },
+            { "Aider", ".aider" },
+            { "KimiCode", ".vibe/skills" },
+            { "Zed", ".zed" },
+            { "Copilot", ".github/copilot" },
+            { "Antigravity", ".gemini/skills" },
+        };
+
+        // Rules directories per agent
+        public static readonly Dictionary<string, string> RulesDirs = new()
+        {
+            { "Cursor", ".cursor/rules" },
+            { "Codex", ".cursor/rules" },
+            { "ClaudeCode", ".claude/rules" },
+            { "Grok", ".grok/rules" },
+            { "GeminiCLI", ".gemini/rules" },
+            { "Windsurf", ".windsurf/rules" },
+            { "Continue", ".continue/rules" },
+            { "Cline", ".cline/rules" },
+            { "Roo", ".roo/rules" },
+            { "KimiCode", ".vibe/rules" },
+            { "Antigravity", ".gemini/rules" },
+        };
+    }
+
+    /// <summary>
+    /// Agent-specific installation configuration.
+    /// </summary>
+    public class AgentInstallConfig
+    {
+        public TargetAgent Agent { get; init; }
+        public string Name { get; init; } = "";
+        public string SkillsPath { get; init; } = "";
+        public string RulesPath { get; init; } = "";
+        public string AgentsPath { get; init; } = "";
+        public string GatePrefix { get; init; } = "U";
+        public string[] EnvVars { get; init; } = Array.Empty<string>();
+        public string InstallUrl { get; init; } = "";
+        public bool SupportsMcp { get; init; }
+        public bool SupportsRules { get; init; } = true;
+        public string Description { get; init; } = "";
+        public string Icon { get; init; } = "\uE8B7"; // Default icon
+    }
+
     public class Installer
     {
         public event Action<int, string> ProgressChanged = null!;  // 0-100, status message
@@ -28,6 +133,7 @@ namespace CursorSetupWpf.Services
         // Real MCP packages live under {installPath}/mcp/<PackageDir> and expose
         // python -m <Module>. Legacy keys from older installers are removed on sync.
         // Version 4.0.0: Added Vercel and Browser MCP servers
+        // Version 5.0.0: Added evondev-ui-ux skill
         static readonly (
             string ServerKey,
             string PackageDir,
@@ -104,7 +210,230 @@ namespace CursorSetupWpf.Services
 
         static readonly string[] LegacyMcpKeys = { "framework", "autopilot", "memory" };
 
-        public async Task RunInstallationAsync(SetupConfig config, List<CategorySelection> selections)
+    // ─── Cross-Agent Installation Catalog ────────────────────────────────────
+    // Version 5.0.0: Added cross-agent installation support with all vibe coding tools
+
+        static readonly AgentInstallConfig[] AgentCatalog =
+        {
+            // Primary IDEs
+            new AgentInstallConfig
+            {
+                Agent = TargetAgent.Cursor,
+                Name = "Cursor IDE",
+                SkillsPath = ".cursor/skills",
+                RulesPath = ".cursor/rules",
+                AgentsPath = ".cursor/agents",
+                GatePrefix = "K",
+                EnvVars = new[] { "CURSOR_IDE", "CURSOR_PROJECT" },
+                InstallUrl = "https://cursor.com",
+                SupportsMcp = true,
+                SupportsRules = true,
+                Description = "AI-first code editor with integrated agent skills",
+                Icon = "\uE8B7",
+            },
+            new AgentInstallConfig
+            {
+                Agent = TargetAgent.Codex,
+                Name = "Codex (cursor.com)",
+                SkillsPath = ".cursor/skills",
+                RulesPath = ".cursor/rules",
+                AgentsPath = ".cursor/agents",
+                GatePrefix = "CX",
+                EnvVars = new[] { "CODEX_ENABLED", "ORIGIN_HOST" },
+                InstallUrl = "https://origin.cursor.com",
+                SupportsMcp = true,
+                SupportsRules = true,
+                Description = "Cloud-powered coding agent from Cursor",
+                Icon = "\uE8B7",
+            },
+            new AgentInstallConfig
+            {
+                Agent = TargetAgent.ClaudeCode,
+                Name = "Claude Code (@cursor/codex)",
+                SkillsPath = ".claude/skills",
+                RulesPath = ".claude/rules",
+                AgentsPath = ".claude/agents",
+                GatePrefix = "C",
+                EnvVars = new[] { "CLAUDE_IDE", "CLAUDE_API_KEY" },
+                InstallUrl = "https://claude.com/code",
+                SupportsMcp = true,
+                SupportsRules = true,
+                Description = "Anthropic's CLI for coding with Claude",
+                Icon = "\uE8B7",
+            },
+            new AgentInstallConfig
+            {
+                Agent = TargetAgent.Grok,
+                Name = "Grok (x.com/grok)",
+                SkillsPath = ".grok/skills",
+                RulesPath = ".grok/rules",
+                AgentsPath = ".grok/agents",
+                GatePrefix = "G",
+                EnvVars = new[] { "GROK_API_KEY" },
+                InstallUrl = "https://x.com/grok",
+                SupportsMcp = false,
+                SupportsRules = true,
+                Description = "xAI's Grok CLI for coding assistance",
+                Icon = "\uE8B7",
+            },
+            // VSCode Extensions
+            new AgentInstallConfig
+            {
+                Agent = TargetAgent.Cline,
+                Name = "Cline",
+                SkillsPath = ".cline/skills",
+                RulesPath = ".cline/rules",
+                AgentsPath = ".cline/agents",
+                GatePrefix = "CL",
+                EnvVars = new[] { "ANTHROPIC_API_KEY" },
+                InstallUrl = "https://marketplace.visualstudio.com/items?itemName=cline.clyde",
+                SupportsMcp = true,
+                SupportsRules = true,
+                Description = "Autonomous coding agent for VSCode",
+                Icon = "\uE8B7",
+            },
+            new AgentInstallConfig
+            {
+                Agent = TargetAgent.Continue,
+                Name = "Continue.dev",
+                SkillsPath = ".continue/rules",
+                RulesPath = ".continue/rules",
+                AgentsPath = ".continue/agents",
+                GatePrefix = "CO",
+                EnvVars = new[] { "OPENAI_API_KEY" },
+                InstallUrl = "https://marketplace.visualstudio.com/items?itemName=Continue.continue",
+                SupportsMcp = true,
+                SupportsRules = true,
+                Description = "Open-source AI coding assistant for VSCode/JetBrains",
+                Icon = "\uE8B7",
+            },
+            // CLI Tools
+            new AgentInstallConfig
+            {
+                Agent = TargetAgent.GeminiCLI,
+                Name = "Google Gemini CLI",
+                SkillsPath = ".gemini/skills",
+                RulesPath = ".gemini/rules",
+                AgentsPath = ".gemini/agents",
+                GatePrefix = "GM",
+                EnvVars = new[] { "GEMINI_API_KEY" },
+                InstallUrl = "https://ai.google.dev/gemini-api",
+                SupportsMcp = true,
+                SupportsRules = true,
+                Description = "Google's Gemini CLI for terminal-based coding",
+                Icon = "\uE8B7",
+            },
+            new AgentInstallConfig
+            {
+                Agent = TargetAgent.KimiCode,
+                Name = "Kimi Code AI",
+                SkillsPath = ".vibe/skills",
+                RulesPath = ".vibe/rules",
+                AgentsPath = ".vibe/agents",
+                GatePrefix = "KC",
+                EnvVars = new[] { "KIMI_API_KEY" },
+                InstallUrl = "https://kimi.moonshot.cn",
+                SupportsMcp = true,
+                SupportsRules = true,
+                Description = "Moonshot AI's coding assistant",
+                Icon = "\uE8B7",
+            },
+            new AgentInstallConfig
+            {
+                Agent = TargetAgent.Aider,
+                Name = "Aider",
+                SkillsPath = ".aider",
+                RulesPath = ".aider",
+                AgentsPath = ".aider",
+                GatePrefix = "A",
+                EnvVars = new[] { "AIDER_MODEL" },
+                InstallUrl = "https://aider.chat",
+                SupportsMcp = false,
+                SupportsRules = true,
+                Description = "CLI tool for pair programming with AI",
+                Icon = "\uE8B7",
+            },
+            // Editors with AI
+            new AgentInstallConfig
+            {
+                Agent = TargetAgent.Zed,
+                Name = "Zed AI",
+                SkillsPath = ".zed",
+                RulesPath = ".zed",
+                AgentsPath = ".zed/agents",
+                GatePrefix = "Z",
+                EnvVars = new[] { "ZEDAI_API_KEY" },
+                InstallUrl = "https://zed.dev",
+                SupportsMcp = false,
+                SupportsRules = true,
+                Description = "High-performance editor with AI integration",
+                Icon = "\uE8B7",
+            },
+            new AgentInstallConfig
+            {
+                Agent = TargetAgent.Windsurf,
+                Name = "WindSurf",
+                SkillsPath = ".windsurf/rules",
+                RulesPath = ".windsurf/rules",
+                AgentsPath = ".windsurf/workflows",
+                GatePrefix = "W",
+                EnvVars = new[] { "WINDSURF_API_KEY" },
+                InstallUrl = "https://codeium.com/windsurf",
+                SupportsMcp = true,
+                SupportsRules = true,
+                Description = "Codeium's AI-powered IDE",
+                Icon = "\uE8B7",
+            },
+            new AgentInstallConfig
+            {
+                Agent = TargetAgent.Copilot,
+                Name = "GitHub Copilot",
+                SkillsPath = ".github/copilot",
+                RulesPath = ".github/copilot",
+                AgentsPath = ".github/copilot",
+                GatePrefix = "CP",
+                EnvVars = new[] { "GITHUB_TOKEN" },
+                InstallUrl = "https://github.com/features/copilot",
+                SupportsMcp = false,
+                SupportsRules = true,
+                Description = "GitHub's AI pair programmer",
+                Icon = "\uE8B7",
+            },
+            // Roo Code
+            new AgentInstallConfig
+            {
+                Agent = TargetAgent.Roo,
+                Name = "Roo Code",
+                SkillsPath = ".roo/rules",
+                RulesPath = ".roo/rules",
+                AgentsPath = ".roo/modes",
+                GatePrefix = "R",
+                EnvVars = new[] { "OPENAI_API_KEY" },
+                InstallUrl = "https://marketplace.visualstudio.com/items?itemName=rooveterinaryinc.roo-cline",
+                SupportsMcp = true,
+                SupportsRules = true,
+                Description = "Flexible AI coding assistant for VSCode",
+                Icon = "\uE8B7",
+            },
+            // Antigravity
+            new AgentInstallConfig
+            {
+                Agent = TargetAgent.Antigravity,
+                Name = "Antigravity",
+                SkillsPath = ".gemini/skills",
+                RulesPath = ".gemini/rules",
+                AgentsPath = ".gemini/agents",
+                GatePrefix = "AG",
+                EnvVars = new[] { "GEMINI_API_KEY" },
+                InstallUrl = "https://github.com",
+                SupportsMcp = true,
+                SupportsRules = true,
+                Description = "Next-gen vibe coding tool",
+                Icon = "\uE8B7",
+            },
+        };
+
+    public async Task RunInstallationAsync(SetupConfig config, List<CategorySelection> selections)
         {
             string zipPath = ZipScanner.FindZipPath();
             if (zipPath == null)
@@ -340,31 +669,54 @@ namespace CursorSetupWpf.Services
         // ===================== MCP Server Sync =====================
 
         /// <summary>
-        /// Path to Cursor's global MCP configuration file (per Cursor docs: ~/.cursor/mcp.json).
+        /// Path to global MCP configuration file per target agent.
         /// </summary>
-        public static string GetMcpConfigPath()
+        public static string GetMcpConfigPath(TargetAgent agent = TargetAgent.Cursor)
         {
             string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            return Path.Combine(home, ".cursor", "mcp.json");
+            string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            if (string.IsNullOrEmpty(appData))
+                appData = Path.Combine(home, ".config");
+
+            return agent switch
+            {
+                TargetAgent.Cursor => Path.Combine(home, ".cursor", "mcp.json"),
+                TargetAgent.Codex => Path.Combine(home, ".codex", "mcp.json"),
+                TargetAgent.ClaudeCode => Path.Combine(home, ".claude", "mcp.json"),
+                TargetAgent.Antigravity => Path.Combine(home, ".gemini", "antigravity", "mcp.json"),
+                TargetAgent.Windsurf => Path.Combine(home, ".codeium", "windsurf", "mcp_config.json"),
+                TargetAgent.Cline => Path.Combine(appData, "Code", "User", "globalStorage", "saoudrizwan.claude-dev", "settings", "cline_mcp_settings.json"),
+                TargetAgent.Roo => Path.Combine(appData, "Code", "User", "globalStorage", "rooveterinaryinc.roo-cline", "settings", "cline_mcp_settings.json"),
+                _ => Path.Combine(home, ".cursor", "mcp.json"),
+            };
         }
 
+        public static string GetMcpConfigPath() => GetMcpConfigPath(TargetAgent.Cursor);
+
         /// <summary>
-        /// Path to Cursor's global hooks configuration (per Cursor docs: ~/.cursor/hooks.json).
+        /// Path to global hooks configuration per target agent.
         /// </summary>
-        public static string GetHooksConfigPath()
+        public static string GetHooksConfigPath(TargetAgent agent = TargetAgent.Cursor)
         {
             string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            return Path.Combine(home, ".cursor", "hooks.json");
+            return agent switch
+            {
+                TargetAgent.ClaudeCode => Path.Combine(home, ".claude", "hooks.json"),
+                TargetAgent.Antigravity => Path.Combine(home, ".gemini", "antigravity", "hooks.json"),
+                _ => Path.Combine(home, ".cursor", "hooks.json"),
+            };
         }
+
+        public static string GetHooksConfigPath() => GetHooksConfigPath(TargetAgent.Cursor);
 
         /// <summary>
         /// Returns true if any of the framework's MCP servers are already registered.
         /// </summary>
-        public static bool CheckMcpInstalled()
+        public static bool CheckMcpInstalled(TargetAgent agent = TargetAgent.Cursor)
         {
             try
             {
-                string path = GetMcpConfigPath();
+                string path = GetMcpConfigPath(agent);
                 if (!File.Exists(path)) return false;
                 using var doc = JsonDocument.Parse(File.ReadAllText(path));
                 if (!doc.RootElement.TryGetProperty("mcpServers", out var servers))
@@ -377,6 +729,8 @@ namespace CursorSetupWpf.Services
                 return false;
             }
         }
+
+        public static bool CheckMcpInstalled() => CheckMcpInstalled(TargetAgent.Cursor);
 
         /// <summary>
         /// Build mcpServers entries pointing at packages under {installPath}/mcp/.
@@ -473,8 +827,11 @@ namespace CursorSetupWpf.Services
 
         /// <summary>
         /// Synchronize ~/.cursor/mcp.json with packages under <paramref name="installPath"/>/mcp.
+        /// <summary>
+        /// Synchronize MCP configuration with packages under <paramref name="installPath"/>/mcp
+        /// for the specified target agent.
         /// </summary>
-        public async Task<(bool Success, string Message)> SyncMcpConfigAsync(string? installPath = null)
+        public async Task<(bool Success, string Message)> SyncMcpConfigAsync(string? installPath = null, TargetAgent agent = TargetAgent.Cursor)
         {
             return await Task.Run(() =>
             {
@@ -486,9 +843,9 @@ namespace CursorSetupWpf.Services
                             ".cursor")
                         : ResolveInstallPath(installPath);
 
-                    string path = GetMcpConfigPath();
+                    string path = GetMcpConfigPath(agent);
                     string dir = Path.GetDirectoryName(path)!;
-                    Directory.CreateDirectory(dir);
+                    if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
 
                     Dictionary<string, object> existing = new();
                     if (File.Exists(path))
@@ -511,8 +868,22 @@ namespace CursorSetupWpf.Services
 
                     var merged = MergeMcpConfig(existing, resolvedInstall);
                     var opts = new JsonSerializerOptions { WriteIndented = true };
-                    File.WriteAllText(path, JsonSerializer.Serialize(merged, opts));
-                    LogAppended?.Invoke($"[MCP] synced {path}");
+                    string jsonOutput = JsonSerializer.Serialize(merged, opts);
+                    File.WriteAllText(path, jsonOutput);
+                    LogAppended?.Invoke($"[MCP] synced global agent config: {path}");
+
+                    // Also write local workspace copy
+                    try
+                    {
+                        string localMcp = Path.Combine(resolvedInstall, "mcp.json");
+                        File.WriteAllText(localMcp, jsonOutput);
+                        LogAppended?.Invoke($"[MCP] synced workspace config: {localMcp}");
+                    }
+                    catch (Exception ex)
+                    {
+                        LogAppended?.Invoke($"[MCP] local mcp copy notice: {ex.Message}");
+                    }
+
                     return (true, $"Synced {McpCatalog.Length} MCP servers to {path}");
                 }
                 catch (Exception ex)
@@ -526,10 +897,10 @@ namespace CursorSetupWpf.Services
         // ===================== Hooks Sync =====================
 
         /// <summary>
-        /// Write/merge ~/.cursor/hooks.json so Cursor Settings → Hooks can see registered hooks.
+        /// Write/merge hooks.json for the specified target agent.
         /// Registers sessionStart from agent-hooks when the script is present.
         /// </summary>
-        public async Task<(bool Success, string Message)> SyncHooksConfigAsync(string? installPath = null)
+        public async Task<(bool Success, string Message)> SyncHooksConfigAsync(string? installPath = null, TargetAgent agent = TargetAgent.Cursor)
         {
             return await Task.Run(() =>
             {
@@ -541,7 +912,7 @@ namespace CursorSetupWpf.Services
                             ".cursor")
                         : ResolveInstallPath(installPath);
 
-                    string hooksPath = GetHooksConfigPath();
+                    string hooksPath = GetHooksConfigPath(agent);
                     string cursorHome = Path.GetDirectoryName(hooksPath)!;
                     Directory.CreateDirectory(cursorHome);
 
@@ -619,6 +990,195 @@ namespace CursorSetupWpf.Services
             });
         }
 
+        // ─── Cross-Agent Installation Methods ────────────────────────────────
+
+        /// <summary>
+        /// Get all supported agent configurations.
+        /// </summary>
+        public static IReadOnlyList<AgentInstallConfig> GetAgentCatalog() => AgentCatalog;
+
+        /// <summary>
+        /// Get agent configuration by type.
+        /// </summary>
+        public static AgentInstallConfig? GetAgentConfig(TargetAgent agent)
+        {
+            foreach (var config in AgentCatalog)
+                if (config.Agent == agent) return config;
+            return null;
+        }
+
+        /// <summary>
+        /// Detect which agent is currently running.
+        /// </summary>
+        public static TargetAgent DetectCurrentAgent()
+        {
+            if (Environment.GetEnvironmentVariable("CURSOR_IDE") != null ||
+                Environment.GetEnvironmentVariable("CURSOR_PROJECT") != null)
+                return TargetAgent.Cursor;
+            if (Environment.GetEnvironmentVariable("CODEX_ENABLED") != null ||
+                Environment.GetEnvironmentVariable("ORIGIN_HOST") != null)
+                return TargetAgent.Codex;
+            if (Environment.GetEnvironmentVariable("CLAUDE_IDE") != null ||
+                Environment.GetEnvironmentVariable("CLAUDE_API_KEY") != null)
+                return TargetAgent.ClaudeCode;
+            if (Environment.GetEnvironmentVariable("GROK_API_KEY") != null)
+                return TargetAgent.Grok;
+            return TargetAgent.Cursor; // default to Cursor
+        }
+
+        /// <summary>
+        /// Get the base path for a specific agent's framework installation.
+        /// </summary>
+        public static string GetAgentInstallPath(TargetAgent agent, string basePath)
+        {
+            var config = GetAgentConfig(agent);
+            if (config == null) return basePath;
+
+            string agentPath = config.SkillsPath.Split('/')[0]; // e.g. ".cursor", ".claude", ".grok"
+            return Path.Combine(basePath, agentPath);
+        }
+
+        /// <summary>
+        /// Install framework for a specific agent.
+        /// </summary>
+        public async Task<(bool Success, string Message)> InstallForAgentAsync(
+            TargetAgent agent,
+            string installBasePath,
+            SetupConfig config,
+            List<CategorySelection> selections)
+        {
+            try
+            {
+                var agentConfig = GetAgentConfig(agent);
+                if (agentConfig == null)
+                    return (false, $"Unknown agent: {agent}");
+
+                string zipPath = ZipScanner.FindZipPath();
+                if (zipPath == null)
+                    return (false, "Framework archive not found");
+
+                // Determine install path based on agent
+                string installPath;
+                if (agent == TargetAgent.Cursor || agent == TargetAgent.Codex)
+                {
+                    // Cursor and Codex share the same path
+                    installPath = ResolveInstallPath(installBasePath);
+                }
+                else
+                {
+                    // Claude Code and Grok have separate paths
+                    installPath = Path.Combine(installBasePath, agentConfig.SkillsPath.Split('/')[0]);
+                    if (!Directory.Exists(installPath))
+                        Directory.CreateDirectory(installPath);
+                }
+
+                LogAppended?.Invoke($"[AGENT] Installing for {agentConfig.Name}...");
+                LogAppended?.Invoke($"[AGENT] Gate prefix: {agentConfig.GatePrefix}");
+                LogAppended?.Invoke($"[AGENT] Skills path: {agentConfig.SkillsPath}");
+                LogAppended?.Invoke($"[AGENT] Install path: {installPath}");
+
+                // Extract framework files
+                ProgressChanged?.Invoke(10, $"Extracting files for {agentConfig.Name}...");
+                await ExtractZipAsync(zipPath, installPath, config.ForceOverwrite, selections);
+
+                // Sync MCP for agents that support it
+                if (agentConfig.SupportsMcp)
+                {
+                    ProgressChanged?.Invoke(80, "Syncing MCP servers...");
+                    var (mcpOk, mcpMsg) = await SyncMcpConfigAsync(installPath, agentConfig.Agent);
+                    LogAppended?.Invoke(mcpOk ? $"[MCP] {mcpMsg}" : $"[MCP] WARN: {mcpMsg}");
+                }
+
+                // Sync hooks
+                ProgressChanged?.Invoke(88, "Syncing hooks...");
+                var (hooksOk, hooksMsg) = await SyncHooksConfigAsync(installPath, agentConfig.Agent);
+                LogAppended?.Invoke(hooksOk ? $"[HOOKS] {hooksMsg}" : $"[HOOKS] WARN: {hooksMsg}");
+
+                // Write agent manifest
+                var manifestPath = Path.Combine(installPath, "agent-manifest.json");
+                var manifest = new Dictionary<string, object>
+                {
+                    ["agent"] = agentConfig.Agent.ToString().ToLowerInvariant(),
+                    ["name"] = agentConfig.Name,
+                    ["gate_prefix"] = agentConfig.GatePrefix,
+                    ["skills_path"] = agentConfig.SkillsPath,
+                    ["rules_path"] = agentConfig.RulesPath,
+                    ["agents_path"] = agentConfig.AgentsPath,
+                    ["supports_mcp"] = agentConfig.SupportsMcp,
+                    ["supports_rules"] = agentConfig.SupportsRules,
+                    ["installed_at"] = DateTime.UtcNow.ToString("o"),
+                };
+                await File.WriteAllTextAsync(manifestPath,
+                    JsonSerializer.Serialize(manifest, new JsonSerializerOptions { WriteIndented = true }));
+                LogAppended?.Invoke($"[AGENT] Manifest written: {manifestPath}");
+
+                ProgressChanged?.Invoke(100, $"Installation for {agentConfig.Name} complete!");
+                return (true, $"Installed for {agentConfig.Name} at {installPath}");
+            }
+            catch (Exception ex)
+            {
+                LogAppended?.Invoke($"[AGENT] Installation failed: {ex.Message}");
+                return (false, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Install framework for all supported agents.
+        /// </summary>
+        public async Task<(bool Success, string Message)> InstallForAllAgentsAsync(
+            string installBasePath,
+            SetupConfig config,
+            List<CategorySelection> selections)
+        {
+            var results = new List<(TargetAgent Agent, bool Success, string Message)>();
+
+            foreach (var agentConfig in AgentCatalog)
+            {
+                LogAppended?.Invoke($"=== Installing for {agentConfig.Name} ===");
+                var (success, message) = await InstallForAgentAsync(
+                    agentConfig.Agent, installBasePath, config, selections);
+                results.Add((agentConfig.Agent, success, message));
+                LogAppended?.Invoke($"    Result: {(success ? "OK" : "FAILED")} - {message}");
+            }
+
+            int successCount = results.Count(r => r.Success);
+            int totalCount = results.Count;
+            bool allSuccess = successCount == totalCount;
+
+            string summary = $"Cross-agent installation: {successCount}/{totalCount} agents installed successfully";
+            LogAppended?.Invoke($"[AGENT] {summary}");
+
+            return (allSuccess, summary);
+        }
+
+        /// <summary>
+        /// Get installation status for all agents.
+        /// </summary>
+        public List<(TargetAgent Agent, bool IsInstalled, string Path)> GetAgentInstallationStatus(string basePath)
+        {
+            var status = new List<(TargetAgent, bool, string)>();
+
+            foreach (var config in AgentCatalog)
+            {
+                string agentPath;
+                if (config.Agent == TargetAgent.Cursor || config.Agent == TargetAgent.Codex)
+                {
+                    agentPath = ResolveInstallPath(basePath);
+                }
+                else
+                {
+                    agentPath = Path.Combine(basePath, config.SkillsPath.Split('/')[0]);
+                }
+
+                string manifestPath = Path.Combine(agentPath, "agent-manifest.json");
+                bool installed = File.Exists(manifestPath);
+
+                status.Add((config.Agent, installed, agentPath));
+            }
+
+            return status;
+        }
+
         static void CopyDirectory(string sourceDir, string destDir)
         {
             Directory.CreateDirectory(destDir);
@@ -636,13 +1196,13 @@ namespace CursorSetupWpf.Services
         /// <summary>
         /// Return the full MCP server status snapshot for the UI.
         /// </summary>
-        public List<McpServerStatus> GetMcpStatus()
+        public List<McpServerStatus> GetMcpStatus(TargetAgent agent = TargetAgent.Cursor)
         {
             var installedKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             DateTime? lastSync = null;
+            string path = GetMcpConfigPath(agent);
             try
             {
-                string path = GetMcpConfigPath();
                 if (File.Exists(path))
                 {
                     lastSync = File.GetLastWriteTime(path);
@@ -670,7 +1230,7 @@ namespace CursorSetupWpf.Services
                     IsInstalled = registered,
                     ToolCount = registered ? entry.Tools.Length : 0,
                     LastSync = lastSync,
-                    ConfigPath = GetMcpConfigPath(),
+                    ConfigPath = path,
                 });
             }
             return result;

@@ -10,6 +10,13 @@ Features:
     - Gate execution (pre-review and post-review)
     - Skill combination rules
     - Skill metadata management
+    - Cross-agent skill compatibility detection
+
+Supports multiple vibe coding agents:
+    - Cursor IDE
+    - Codex (cursor.com)
+    - Claude Code (@cursor/codex)
+    - Grok (x.com/grok)
 
 Usage:
     >>> from cursor_framework import SkillDiscovery
@@ -17,6 +24,12 @@ Usage:
     >>> skills = discovery.detect_skills("Create a landing page for SaaS")
     >>> print(skills)
     [Skill.FRONTEND_TASTE, Skill.FULL_OUTPUT, Skill.FRONTEND_REVIEW]
+    
+    >>> # Cross-agent skill detection
+    >>> from cursor_framework.skill_discovery import CrossAgentSkillDiscovery
+    >>> cross_discovery = CrossAgentSkillDiscovery()
+    >>> skills = cross_discovery.detect_compatible_skills("Build a security audit")
+    >>> print(f"Compatible with {len(skills)} agents")
 """
 
 from collections import deque
@@ -1118,3 +1131,335 @@ class SkillDiscovery:
 def create_discovery(base_path: Optional[str] = None) -> SkillDiscovery:
     """Factory function to create a configured SkillDiscovery."""
     return SkillDiscovery(base_path=base_path)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Cross-Agent Skill Discovery
+# ─────────────────────────────────────────────────────────────────────────────
+
+@dataclass
+class CrossAgentSkill:
+    """A skill compatible with multiple agents."""
+    skill: str
+    confidence: float
+    compatible_agents: list[str]
+    primary_agent: str
+    gates: list[str]
+
+
+class CrossAgentSkillDiscovery:
+    """
+    Skill discovery for cross-agent compatibility.
+
+    Detects skills that work across multiple vibe coding agents
+    and provides agent-specific routing.
+
+    Integrates with ECC (Enhanced Code Copilot) for extended skill coverage.
+    ECC provides 68 agents, 292 skills, and 94 commands across multiple harnesses.
+    """
+
+    # Universal skill triggers that work across all agents
+    UNIVERSAL_SKILLS = [
+        "karpathy-coding",
+        "frontend-taste",
+        "frontend-review",
+        "full-output",
+        "security-review",
+        "test-analysis",
+        "perf-optimization",
+        "stability",
+        "data-quality",
+    ]
+
+    # Agent-specific skill mappings
+    AGENT_SKILL_MAPPINGS = {
+        "cursor": [
+            "ponytail",
+            "frontend-redesign",
+            "vietnam-payment-review",
+            "vietnam-address",
+            "bazi",
+            "document-ocr",
+            "weknora-kb",
+            "weknora-agent",
+            "video-generation",
+            "pixelrag",
+            "visual-explainer",
+            "open-design",
+            "skill-installer",
+        ],
+        "codex": [
+            "ponytail",
+            "frontend-redesign",
+            "vietnam-payment-review",
+        ],
+        "claude-code": [
+            "claude-specific",
+        ],
+        "grok": [
+            "grok-specific",
+        ],
+    }
+
+    # ECC skill categories (from ECC 2.2.2 - 292 skills)
+    ECC_SKILL_CATEGORIES = {
+        "planner": ["planner", "plan", "strategy", "roadmap"],
+        "reviewer": ["reviewer", "review", "audit", "code-review"],
+        "security": ["security", "vulnerability", "audit", "owasp"],
+        "tdd": ["tdd", "test-driven", "test-first", "unit-test"],
+        "frontend": ["frontend", "ui", "css", "react", "vue", "angular"],
+        "backend": ["backend", "api", "server", "database"],
+        "devops": ["devops", "deploy", "ci-cd", "docker", "kubernetes"],
+        "data": ["data", "sql", "nosql", "analytics"],
+        "ml": ["machine-learning", "ml", "ai", "model"],
+        "docs": ["docs", "documentation", "readme", "api-doc"],
+    }
+
+    def __init__(self, base_path: Optional[str] = None):
+        """
+        Initialize cross-agent skill discovery.
+
+        Args:
+            base_path: Base path for skill files
+        """
+        import os as _os
+        self.base_path = base_path or _os.getcwd()
+        self.base_discovery = SkillDiscovery(base_path)
+        self._ecc_components: Optional[dict] = None
+
+    def detect_compatible_skills(self, request: str) -> list[CrossAgentSkill]:
+        """
+        Detect skills compatible with all agents.
+
+        Args:
+            request: The user request
+
+        Returns:
+            List of CrossAgentSkill with agent compatibility info
+        """
+        detected_skills = self.base_discovery.detect_skills(request)
+        results = []
+
+        for skill in detected_skills:
+            # Check universal compatibility
+            if skill.skill in self.UNIVERSAL_SKILLS:
+                compatible = ["cursor", "codex", "claude-code", "grok", "universal"]
+            else:
+                compatible = [skill.skill]  # Agent-specific
+
+            results.append(CrossAgentSkill(
+                skill=skill.skill,
+                confidence=skill.confidence,
+                compatible_agents=compatible,
+                primary_agent="cursor",
+                gates=self._get_universal_gates(),
+            ))
+
+        return results
+
+    def _get_universal_gates(self) -> list[str]:
+        """Get universal gate list."""
+        return ["U.1", "U.2", "U.3", "U.4", "U.5", "U.6", "U.7", "§X", "§Y"]
+
+    def get_universal_skills(self) -> list[str]:
+        """Get list of skills that work across all agents."""
+        return self.UNIVERSAL_SKILLS.copy()
+
+    def get_agent_skills(self, agent: str) -> list[str]:
+        """
+        Get skills specific to an agent.
+
+        Args:
+            agent: Agent identifier
+
+        Returns:
+            List of agent-specific skill names
+        """
+        return self.AGENT_SKILL_MAPPINGS.get(agent, []).copy()
+
+    def get_skill_compatibility(self, skill_name: str) -> dict[str, bool]:
+        """
+        Get compatibility matrix for a skill.
+
+        Args:
+            skill_name: Name of the skill
+
+        Returns:
+            Dictionary mapping agent names to compatibility bool
+        """
+        is_universal = skill_name in self.UNIVERSAL_SKILLS
+
+        compatibility = {}
+        for agent in ["cursor", "codex", "claude-code", "grok"]:
+            if is_universal:
+                compatibility[agent] = True
+            else:
+                compatibility[agent] = skill_name in self.AGENT_SKILL_MAPPINGS.get(agent, [])
+
+        return compatibility
+
+    def recommend_skill_order(self, skills: list[str]) -> list[str]:
+        """
+        Reorder skills for optimal cross-agent compatibility.
+
+        Args:
+            skills: List of skill names
+
+        Returns:
+            Reordered list with universal skills first
+        """
+        universal = [s for s in skills if s in self.UNIVERSAL_SKILLS]
+        agent_specific = [s for s in skills if s not in self.UNIVERSAL_SKILLS]
+        return universal + agent_specific
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # ECC Integration Methods
+    # ─────────────────────────────────────────────────────────────────────────
+
+    def load_ecc_components(self, ecc_path: Optional[str] = None) -> dict:
+        """
+        Load ECC components for skill discovery.
+
+        Args:
+            ecc_path: Path to ECC repository (auto-detected if not provided)
+
+        Returns:
+            dict with ECC components by type
+        """
+        if self._ecc_components is not None:
+            return self._ecc_components
+
+        try:
+            from cursor_framework.ecc_integration import ECCIntegration
+            ecc = ECCIntegration()
+            components = ecc.discover_components(ecc_path)
+            self._ecc_components = components
+            return components
+        except ImportError:
+            # ECC module not available
+            self._ecc_components = {}
+            return {}
+        except Exception:
+            self._ecc_components = {}
+            return {}
+
+    def detect_ecc_skills(self, request: str) -> list[CrossAgentSkill]:
+        """
+        Detect ECC-specific skills from a request.
+
+        Args:
+            request: The user request
+
+        Returns:
+            List of CrossAgentSkill with ECC skill matches
+        """
+        request_lower = request.lower()
+        components = self.load_ecc_components()
+
+        results = []
+        for category, keywords in self.ECC_SKILL_CATEGORIES.items():
+            # Check if any category keyword matches
+            matches = any(kw.lower() in request_lower for kw in keywords)
+            if matches:
+                # Find components in this category
+                ecc_skills = components.get("skills", [])
+                category_skills = [
+                    s for s in ecc_skills
+                    if any(kw.lower() in s.name.lower() or kw.lower() in s.description.lower()
+                           for kw in keywords)
+                ]
+
+                for skill in category_skills[:5]:  # Limit to 5 per category
+                    results.append(CrossAgentSkill(
+                        skill=f"ecc:{skill.name}",
+                        confidence=0.7,
+                        compatible_agents=["claude-code", "cursor", "codex", "universal"],
+                        primary_agent="claude-code",
+                        gates=self._get_ecc_gates(category),
+                    ))
+
+        return results
+
+    def _get_ecc_gates(self, category: str) -> list[str]:
+        """Get gate list for ECC skill category."""
+        gate_map = {
+            "planner": ["ecc-pre-plan", "ecc-post-plan"],
+            "reviewer": ["ecc-pre-review", "ecc-post-review"],
+            "security": ["ecc-pre-security", "ecc-post-security"],
+            "tdd": ["ecc-pre-tdd", "ecc-post-tdd"],
+            "frontend": ["ecc-pre-frontend", "ecc-post-frontend"],
+            "backend": ["ecc-pre-backend", "ecc-post-backend"],
+            "devops": ["ecc-pre-devops", "ecc-post-devops"],
+            "data": ["ecc-pre-data", "ecc-post-data"],
+            "ml": ["ecc-pre-ml", "ecc-post-ml"],
+            "docs": ["ecc-pre-docs", "ecc-post-docs"],
+        }
+        return gate_map.get(category, ["ecc-pre", "ecc-post"])
+
+    def get_ecc_compatible_skills(self, request: str) -> list[CrossAgentSkill]:
+        """
+        Get all skills including ECC-specific ones.
+
+        Args:
+            request: The user request
+
+        Returns:
+            Combined list of native + ECC skills
+        """
+        native_skills = self.detect_compatible_skills(request)
+        ecc_skills = self.detect_ecc_skills(request)
+
+        # Combine and deduplicate
+        all_skills = {}
+        for skill in native_skills + ecc_skills:
+            if skill.skill not in all_skills or skill.confidence > all_skills[skill.skill].confidence:
+                all_skills[skill.skill] = skill
+
+        return list(all_skills.values())
+
+    def get_ecc_skill_summary(self) -> dict:
+        """
+        Get summary of available ECC skills by category.
+
+        Returns:
+            dict mapping category to skill count
+        """
+        components = self.load_ecc_components()
+        summary = {}
+
+        for category in self.ECC_SKILL_CATEGORIES:
+            keywords = self.ECC_SKILL_CATEGORIES[category]
+            ecc_skills = components.get("skills", [])
+            count = sum(
+                1 for s in ecc_skills
+                if any(kw.lower() in s.name.lower() or kw.lower() in s.description.lower()
+                       for kw in keywords)
+            )
+            summary[category] = count
+
+        return summary
+
+    def get_harness_skills(self, harness: str) -> list[str]:
+        """
+        Get skills available for a specific harness.
+
+        Args:
+            harness: Harness identifier (claude, codex, cursor, etc.)
+
+        Returns:
+            List of skill names available for the harness
+        """
+        base_skills = self.AGENT_SKILL_MAPPINGS.get(harness, [])
+
+        # Add ECC skills that work with this harness
+        ecc_skills = []
+        if harness in ["claude-code", "cursor", "codex"]:
+            components = self.load_ecc_components()
+            ecc_skills = [s.name for s in components.get("skills", [])[:20]]
+
+        return self.UNIVERSAL_SKILLS + base_skills + ecc_skills
+
+
+def create_cross_agent_discovery(base_path: Optional[str] = None) -> CrossAgentSkillDiscovery:
+    """Factory function to create a configured CrossAgentSkillDiscovery."""
+    return CrossAgentSkillDiscovery(base_path=base_path)

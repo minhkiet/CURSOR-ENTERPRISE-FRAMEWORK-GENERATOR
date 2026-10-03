@@ -76,6 +76,107 @@ This library is designed to work with the Cursor Enterprise Framework rules and 
 - **Skills** for frontend, security, testing, and more
 - **Pre-review and post-review gates** for quality assurance
 
+## Cross-Agent Compatibility
+
+The framework supports multiple vibe coding agents with unified skill and rule management.
+
+### Supported Agents
+
+| Agent | Identifier | Gate Prefix | Skills Path | Rules Path |
+|-------|-----------|-------------|-------------|------------|
+| Cursor IDE | `cursor` | `K` | `.cursor/skills` | `.cursor/rules` |
+| Codex | `codex` | `CX` | `.cursor/skills` | `.cursor/rules` |
+| Claude Code | `claude-code` | `C` | `.claude/skills` | `.claude/rules` |
+| Grok | `grok` | `G` | `.grok/skills` | `.grok/rules` |
+| Universal | `universal` | `U` | (all paths) | (all paths) |
+
+### Installation per Agent
+
+#### Cursor IDE / Codex
+```bash
+# Primary installation target
+python -m cursor_framework install --agent cursor
+```
+
+#### Claude Code (@cursor/codex)
+```bash
+# Install to Claude Code skills directory
+python -m cursor_framework install --agent claude-code
+```
+
+#### Grok (x.com/grok)
+```bash
+# Install to Grok skills directory
+python -m cursor_framework install --agent grok
+```
+
+### Universal Gates (U.1-U.7)
+
+All agents support universal gates that work identically:
+
+**Pre-Code Gates:**
+- `U.1` Think: State assumptions, ask if unclear
+- `U.2` Simple: Check for over-engineering
+- `U.3` Scope: Define surgical boundaries
+- `U.4` Goals: Define verifiable success criteria
+
+**Post-Code Gates:**
+- `U.5` Verify: Check each line traces to request
+- `U.6` Simple: Can 200 lines be 50?
+- `U.7` Done: Goals met?
+
+### Agent-Specific Gates
+
+| Agent | Pre-Gates | Post-Gates |
+|-------|-----------|------------|
+| Cursor | K.1-K.4 | K.5-K.7 |
+| Codex | CX.1-CX.4 | CX.5-CX.7 |
+| Claude Code | C.1-C.4 | C.5-C.7 |
+| Grok | G.1-G.4 | G.5-G.7 |
+
+### Skill Compatibility
+
+Universal skills work on all agents without modification:
+- `karpathy-coding` - Universal coding discipline
+- `frontend-taste` - Anti-slop frontend
+- `frontend-review` - Quality gate
+- `full-output` - Complete implementation
+- `security-review` - OWASP security
+- `test-analysis` - Testing strategy
+- `perf-optimization` - Performance
+- `stability` - Error handling
+- `data-quality` - Database/schema
+
+### Agent Detection
+
+The framework auto-detects which agent is running:
+
+```python
+from cursor_framework.skills.skill_registry import create_cross_agent_registry
+
+registry = create_cross_agent_registry()
+agent = registry.detect_agent()
+print(f"Detected: {agent.value}")  # cursor, codex, claude-code, grok, unknown
+```
+
+### Cross-Agent Sync
+
+Sync skills across all agents:
+```python
+from cursor_framework.skills.skill_registry import create_cross_agent_registry
+
+registry = create_cross_agent_registry()
+manifest = registry.export_all_manifests(".cursor/skills/manifests/")
+```
+
+### Known Limitations
+
+| Agent | Limitation | Workaround |
+|-------|-----------|------------|
+| Claude Code | Different skill path | Use `.claude/skills` |
+| Grok | Limited MCP support | Use universal gates |
+| Codex | Cloud-only context | Export context to file |
+
 ## License
 
 MIT

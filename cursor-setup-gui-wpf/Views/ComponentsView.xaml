@@ -19,12 +19,13 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel>
+                    <!-- Page Title: 24px, weight 600 -->
                     <TextBlock Text="{Binding ComponentsTitle}"
-                               FontFamily="{StaticResource UIFont}" FontSize="24" FontWeight="Bold"
+                               FontFamily="{StaticResource UIFont}" FontSize="24" FontWeight="SemiBold"
                                Foreground="{StaticResource Slate900Brush}" Margin="0,0,0,4"/>
                     <TextBlock Text="{Binding ComponentsSubtitle}"
                                FontFamily="{StaticResource UIFont}" FontSize="14"
-                               Foreground="{StaticResource Slate500Brush}"/>
+                               Foreground="{StaticResource Neutral500Brush}"/>
                 </StackPanel>
 
                 <!-- Quick actions -->
@@ -67,13 +68,15 @@
                                                        VerticalAlignment="Center"/>
                                         </Border>
                                         <StackPanel VerticalAlignment="Center">
+                                            <!-- Section Title: 18px, weight 600 -->
                                             <TextBlock Text="{Binding Name}"
-                                                       FontFamily="{StaticResource UIFont}" FontSize="15" FontWeight="SemiBold"
+                                                       FontFamily="{StaticResource UIFont}" FontSize="18" FontWeight="SemiBold"
                                                        Foreground="{StaticResource Slate900Brush}"/>
                                             <TextBlock FontFamily="{StaticResource UIFont}" FontSize="12"
-                                                       Foreground="{StaticResource Slate500Brush}">
+                                                       Foreground="{StaticResource Neutral500Brush}">
                                                 <Run Text="{Binding TotalCount, Mode=OneWay}"/>
-                                                <Run Text=" items"/>
+                                                <Run Text=" "/>
+                                                <Run Text="{Binding DataContext.ItemsUnitLabel, RelativeSource={RelativeSource AncestorType=Window}, Mode=OneWay}"/>
                                             </TextBlock>
                                         </StackPanel>
                                     </StackPanel>

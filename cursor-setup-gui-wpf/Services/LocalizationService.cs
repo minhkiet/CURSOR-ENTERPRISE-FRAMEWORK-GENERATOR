@@ -55,6 +55,13 @@ namespace CursorSetupWpf.Services
             try
             {
                 string path = Path.Combine(AppContext.BaseDirectory, "Resources", culture + ".txt");
+                if (!File.Exists(path))
+                {
+                    string alt1 = Path.Combine(Directory.GetCurrentDirectory(), "Resources", culture + ".txt");
+                    string alt2 = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Resources", culture + ".txt");
+                    if (File.Exists(alt1)) path = alt1;
+                    else if (File.Exists(alt2)) path = alt2;
+                }
                 if (!File.Exists(path)) return dict;
                 foreach (string raw in File.ReadAllLines(path, System.Text.Encoding.UTF8))
                 {

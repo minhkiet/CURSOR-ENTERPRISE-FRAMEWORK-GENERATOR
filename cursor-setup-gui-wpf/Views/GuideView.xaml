@@ -11,7 +11,8 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="32,28">
         <StackPanel MaxWidth="900">
 
-            <!-- === Welcome Banner === -->
+            <!-- === Welcome Banner ===
+                 Gradient banner for hero section -->
             <Border CornerRadius="16" Padding="28,24" Margin="0,0,0,28">
                 <Border.Background>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
@@ -28,7 +29,7 @@
 
                     <StackPanel>
                         <TextBlock Text="{Binding WelcomeTitle}"
-                                   FontFamily="{StaticResource UIFont}" FontSize="22" FontWeight="Bold"
+                                   FontFamily="{StaticResource UIFont}" FontSize="24" FontWeight="SemiBold"
                                    Foreground="White" Margin="0,0,0,8"/>
                         <TextBlock Text="{Binding WelcomeSubtitle}"
                                    FontFamily="{StaticResource UIFont}" FontSize="14"
@@ -45,9 +46,10 @@
                 </Grid>
             </Border>
 
-            <!-- === Step-by-step Guide === -->
+            <!-- === Step-by-step Guide ===
+                 Section Title: 18px, weight 600 -->
             <TextBlock Text="{Binding StepsTitle}"
-                       FontFamily="{StaticResource UIFont}" FontSize="18" FontWeight="Bold"
+                       FontFamily="{StaticResource UIFont}" FontSize="18" FontWeight="SemiBold"
                        Foreground="{StaticResource Slate900Brush}" Margin="0,0,0,20"/>
 
             <!-- Step 1 -->
@@ -63,14 +65,16 @@
                     <Rectangle Width="2" Height="60" Fill="{StaticResource Slate200Brush}"
                                HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,-20"/>
                 </Grid>
+                <!-- Step Title: 15px -> 18px weight 600 -->
                 <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="12,0,0,0">
                     <StackPanel>
+                        <!-- Section Title: 18px, weight 600 -->
                         <TextBlock Text="{Binding Step1Title}"
-                                   FontFamily="{StaticResource UIFont}" FontSize="15" FontWeight="SemiBold"
+                                   FontFamily="{StaticResource UIFont}" FontSize="18" FontWeight="SemiBold"
                                    Foreground="{StaticResource Slate900Brush}" Margin="0,0,0,6"/>
                         <TextBlock Text="{Binding Step1Description}"
-                                   FontFamily="{StaticResource UIFont}" FontSize="13"
-                                   Foreground="{StaticResource Slate600Brush}" TextWrapping="Wrap"/>
+                                   FontFamily="{StaticResource UIFont}" FontSize="14"
+                                   Foreground="{StaticResource Neutral600Brush}" TextWrapping="Wrap"/>
                         <Border Background="{StaticResource Indigo50Brush}" CornerRadius="8"
                                 Padding="12,8" Margin="0,10,0,0">
                             <StackPanel Orientation="Horizontal">
@@ -194,21 +198,23 @@
                 </Border>
             </Grid>
 
-            <!-- === About Framework === -->
-            <Border Style="{StaticResource CardStyle}" Background="{StaticResource Slate100Brush}">
+            <!-- === About Framework ===
+                 evondevKit Card with light background -->
+            <Border Style="{StaticResource CardStyle}" Background="{StaticResource Neutral100Brush}">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
                         <TextBlock Text="{Binding InfoIcon}"
                                    FontFamily="Segoe MDL2 Assets" FontSize="20"
-                                   Foreground="{StaticResource Slate500Brush}" VerticalAlignment="Center"
+                                   Foreground="{StaticResource Neutral500Brush}" VerticalAlignment="Center"
                                    Margin="0,0,12,0"/>
+                        <!-- Section Title: 18px, weight 600 -->
                         <TextBlock Text="{Binding AboutTitle}"
-                                   FontFamily="{StaticResource UIFont}" FontSize="16" FontWeight="SemiBold"
+                                   FontFamily="{StaticResource UIFont}" FontSize="18" FontWeight="SemiBold"
                                    Foreground="{StaticResource Slate800Brush}"/>
                     </StackPanel>
                     <TextBlock Text="{Binding AboutIntro}"
-                               FontFamily="{StaticResource UIFont}" FontSize="13"
-                               Foreground="{StaticResource Slate600Brush}" TextWrapping="Wrap"/>
+                               FontFamily="{StaticResource UIFont}" FontSize="14"
+                               Foreground="{StaticResource Neutral600Brush}" TextWrapping="Wrap"/>
                     <Grid Margin="0,12,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>

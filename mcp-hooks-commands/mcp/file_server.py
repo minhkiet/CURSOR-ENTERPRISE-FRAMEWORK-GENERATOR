@@ -5,7 +5,7 @@ MCP server wrapping cursor_framework file utilities for Cursor IDE.
 Provides tools for file operations, search, and path handling.
 
 Usage:
-    python mcp/file_server.py
+    python file_server.py
 """
 
 from __future__ import annotations
@@ -16,14 +16,28 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-try:
-    from fastmcp import FastMCP
-    HAS_FASTMCP = True
-except ImportError:
-    HAS_FASTMCP = False
+# Add paths to sys.path so cursor_framework and local modules are always importable
+_repo_root = Path(__file__).resolve().parent.parent
+if str(_repo_root) not in sys.path:
+    sys.path.insert(0, str(_repo_root))
 
-if HAS_FASTMCP:
-    mcp = FastMCP("file-ops")
+_mcp_dir = Path(__file__).resolve().parent
+if str(_mcp_dir) not in sys.path:
+    sys.path.insert(0, str(_mcp_dir))
+
+try:
+    from mcp.server.fastmcp import FastMCP
+except Exception:
+    try:
+        from fastmcp import FastMCP
+    except Exception:
+        try:
+            from mcp_runtime import UniversalMcpServer as FastMCP
+        except ImportError:
+            from cursor_framework.mcp_runtime import UniversalMcpServer as FastMCP
+
+mcp = FastMCP("file-ops")
+HAS_FASTMCP = True
 
 # Import utilities from cursor_framework
 from cursor_framework.utils.file_utils import (
@@ -49,7 +63,15 @@ if HAS_FASTMCP:
 
     @mcp.tool()
     def ensure_directory(path: str) -> dict:
-        """Ensure a directory exists, create if not."""
+        """
+        Ensure a directory exists, create if not.
+        
+        Args:
+            path: Directory path to create
+        
+        Returns:
+            Status and path created
+        """
         try:
             p = ensure_dir(path)
             return {"success": True, "path": str(p)}
@@ -58,31 +80,77 @@ if HAS_FASTMCP:
 
     @mcp.tool()
     def find_files(directory: str, pattern: str = "*", recursive: bool = True) -> list[str]:
-        """Find files matching a glob pattern."""
+        """
+        Find files matching a glob pattern.
+        
+        Args:
+            directory: Directory to search
+            pattern: Glob pattern (e.g., "*.py", "**/*.ts")
+            recursive: Search subdirectories
+        
+        Returns:
+            List of matching file paths
+        """
         paths = find_files(directory, pattern, recursive)
         return [str(p) for p in paths]
 
     @mcp.tool()
     def copy_file(src: str, dst: str, overwrite: bool = False) -> dict:
-        """Copy a file from source to destination."""
+        """
+        Copy a file from source to destination.
+        
+        Args:
+            src: Source file path
+            dst: Destination file path
+            overwrite: Overwrite if destination exists
+        
+        Returns:
+            Success status
+        """
         success = copy_file(src, dst, overwrite)
         return {"success": success, "src": src, "dst": dst}
 
     @mcp.tool()
     def move_file(src: str, dst: str, overwrite: bool = False) -> dict:
-        """Move a file from source to destination."""
+        """
+        Move a file from source to destination.
+        
+        Args:
+            src: Source file path
+            dst: Destination file path
+            overwrite: Overwrite if destination exists
+        
+        Returns:
+            Success status
+        """
         success = move_file(src, dst, overwrite)
         return {"success": success, "src": src, "dst": dst}
 
     @mcp.tool()
     def delete_file(path: str) -> dict:
-        """Delete a file."""
+        """
+        Delete a file.
+        
+        Args:
+            path: File path to delete
+        
+        Returns:
+            Success status
+        """
         success = delete_file(path)
         return {"success": success, "path": path}
 
     @mcp.tool()
     def get_file_info(path: str) -> dict:
-        """Get file metadata (size, extension)."""
+        """
+        Get file metadata (size, extension).
+        
+        Args:
+            path: File path
+        
+        Returns:
+            File metadata
+        """
         p = Path(path)
         if not p.exists():
             return {"exists": False, "path": path}
@@ -98,34 +166,89 @@ if HAS_FASTMCP:
         }
 
     @mcp.tool()
-    def list_dir(path: str, files_only: bool = False, dirs_only: bool = False) -> list[str]:
-        """List directory contents."""
+    def list_dir(
+        path: str,
+        files_only: bool = False,
+        dirs_only: bool = False
+    ) -> list[str]:
+        """
+        List directory contents.
+        
+        Args:
+            path: Directory path
+            files_only: Only return files
+            dirs_only: Only return directories
+        
+        Returns:
+            List of items in directory
+        """
         items = list_directory(path, files_only, dirs_only)
         return [str(p) for p in items]
 
     @mcp.tool()
     def read_file(path: str, encoding: str = "utf-8") -> dict:
-        """Safely read file contents."""
+        """
+        Safely read file contents.
+        
+        Args:
+            path: File path
+            encoding: File encoding
+        
+        Returns:
+            File contents or error
+        """
         content = read_file_safe(path, encoding)
         if content is None:
             return {"success": False, "error": "Could not read file"}
         return {"success": True, "content": content, "path": path}
 
     @mcp.tool()
-    def write_file(path: str, content: str, encoding: str = "utf-8") -> dict:
-        """Safely write file contents."""
+    def write_file(
+        path: str,
+        content: str,
+        encoding: str = "utf-8"
+    ) -> dict:
+        """
+        Safely write file contents.
+        
+        Args:
+            path: File path
+            content: Content to write
+            encoding: File encoding
+        
+        Returns:
+            Success status
+        """
         success = write_file_safe(path, content, encoding)
         return {"success": success, "path": path}
 
     @mcp.tool()
     def change_ext(path: str, new_ext: str) -> str:
-        """Change file extension."""
+        """
+        Change file extension.
+        
+        Args:
+            path: File path
+            new_ext: New extension (with or without dot)
+        
+        Returns:
+            New file path with changed extension
+        """
         new_path = change_extension(path, new_ext)
         return str(new_path)
 
     @mcp.tool()
     def get_relative(from_path: str, to_path: str) -> str:
-        """Get relative path from one path to another."""
+        """
+        Get relative path from one path to another.
+        
+        Args:
+            from_path: Base path
+            to_path: Target path
+        
+        Returns:
+            Relative path
+        """
         return get_relative_path(from_path, to_path)
 
     # ============================================================================
@@ -134,7 +257,15 @@ if HAS_FASTMCP:
 
     @mcp.tool()
     def batch_copy(items: list[dict]) -> list[dict]:
-        """Batch copy multiple files."""
+        """
+        Batch copy multiple files.
+        
+        Args:
+            items: List of {"src": str, "dst": str, "overwrite": bool}
+        
+        Returns:
+            Results for each copy operation
+        """
         results = []
         for item in items:
             src = item.get("src", "")
@@ -146,7 +277,15 @@ if HAS_FASTMCP:
 
     @mcp.tool()
     def batch_delete(paths: list[str]) -> list[dict]:
-        """Batch delete multiple files."""
+        """
+        Batch delete multiple files.
+        
+        Args:
+            paths: List of file paths to delete
+        
+        Returns:
+            Results for each delete operation
+        """
         results = []
         for path in paths:
             success = delete_file(path)
@@ -154,8 +293,24 @@ if HAS_FASTMCP:
         return results
 
     @mcp.tool()
-    def search_in_files(directory: str, pattern: str, search_text: str, recursive: bool = True) -> list[dict]:
-        """Search for text within files matching a pattern."""
+    def search_in_files(
+        directory: str,
+        pattern: str,
+        search_text: str,
+        recursive: bool = True
+    ) -> list[dict]:
+        """
+        Search for text within files matching a pattern.
+        
+        Args:
+            directory: Directory to search
+            pattern: File glob pattern
+            search_text: Text to search for
+            recursive: Search subdirectories
+        
+        Returns:
+            List of matches with file path and line number
+        """
         import re
         matches = []
         files = find_files(directory, pattern, recursive)
@@ -177,7 +332,16 @@ if HAS_FASTMCP:
 
     @mcp.tool()
     def find_duplicates(directory: str, pattern: str = "*") -> list[list[str]]:
-        """Find duplicate files by content hash."""
+        """
+        Find duplicate files by content hash.
+        
+        Args:
+            directory: Directory to search
+            pattern: File glob pattern
+        
+        Returns:
+            Lists of duplicate file paths
+        """
         import hashlib
         from collections import defaultdict
         
@@ -194,11 +358,22 @@ if HAS_FASTMCP:
             except Exception:
                 continue
         
+        # Return only groups with duplicates
         return [paths for paths in hash_map.values() if len(paths) > 1]
 
     @mcp.tool()
     def count_lines(directory: str, pattern: str = "*") -> dict:
-        """Count lines of code in matching files."""
+        """
+        Count lines of code in matching files.
+        
+        Args:
+            directory: Directory to search
+            pattern: File glob pattern
+        
+        Returns:
+            Total lines, file counts by extension
+        """
+        import re
         files = find_files(directory, pattern, recursive=True)
         
         total_lines = 0
@@ -225,7 +400,16 @@ if HAS_FASTMCP:
 
     @mcp.tool()
     def tree(directory: str, max_depth: int = 3) -> dict:
-        """Generate directory tree structure."""
+        """
+        Generate directory tree structure.
+        
+        Args:
+            directory: Root directory
+            max_depth: Maximum depth to traverse
+        
+        Returns:
+            Tree structure as nested dict
+        """
         def build_tree(path: Path, depth: int) -> dict:
             if depth > max_depth:
                 return {"type": "truncated"}
@@ -244,15 +428,14 @@ if HAS_FASTMCP:
         
         return build_tree(Path(directory), 0)
 
+# ============================================================================
+# CLI Entry Point
+# ============================================================================
+
 def main():
     parser = argparse.ArgumentParser(description="File Operations MCP Server")
     args = parser.parse_args()
-    
-    if HAS_FASTMCP:
-        mcp.run(transport="stdio")
-    else:
-        print("ERROR: fastmcp required. Install with: pip install fastmcp", file=sys.stderr)
-        sys.exit(1)
+    mcp.run(transport="stdio")
 
 if __name__ == "__main__":
     main()

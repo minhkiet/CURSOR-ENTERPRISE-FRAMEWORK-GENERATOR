@@ -1,11 +1,13 @@
 # Cursor Enterprise Framework - Skill Index
 
-> **Phiên bản:** 4.0.0 | **Cập nhật:** 2026-09-04
-> **Total Skills:** 106+ | **Rules:** 39 | **Agents:** 18 | **Commands:** 42 | **MCP Servers:** 5
+> **Phiên bản:** 4.1.0 | **Cập nhật:** 2026-10-01
+> **Total Skills:** 115+ | **Rules:** 43 | **Agents:** 22 | **Commands:** 43 | **MCP Servers:** 5
 >
-> **Mới (2026-09-04):**
-> - **API Integration Skills:** Zalo, Telegram, Facebook, Google, Shopee APIs
-> - **Browser MCP:** Browser automation via CDP (naviga
+> **Mới (2026-10-01):**
+> - **evondev-ui-ux:** UI/UX skill cho app (dashboard, danh sách, bảng, form, modal). Từ evondevKit
+> - **CMS Landing Enterprise v4:** Full SaaS CRM/CMS/Landing/Wallet/Affiliate system
+> - **CMS Agents:** Solution Architect, Frontend Engineer, Backend Engineer, UX Designer
+> - **CMS Rules:** Architecture, Stack, RBAC, Responsive patterns
 
 ...
 
@@ -19,8 +21,8 @@
 .cursor/
 ├── skills/           # 93+ skills (tự động gọi theo context)
 ├── agent-skills/    # 8 skills từ agent-skills
-├── rules/            # 39 rules (luật theo domain)
-├── agents/           # 18 agent personas (chuyên gia)
+├── rules/            # 43 rules (luật theo domain)
+├── agents/           # 22 agent personas (chuyên gia)
 ├── agent-commands/  # 8 commands từ agent-skills
 ├── commands/         # 29+ slash commands (workflows)
 ├── hooks/            # 15 hooks (CI/CD, git, dev)
@@ -32,6 +34,25 @@
 ├── references/       # 4 references (checklists)
 ├── templates/        # 6 templates (ADR, bug, feature)
 └── mcp/             # 5 MCP servers configuration
+```
+
+## CMS Landing Enterprise v4
+
+```
+.agents/
+├── skills/
+│   └── cms-landing-enterprise/     # Master skill
+└── agents/
+    ├── cms-solution-architect.md   # Solution architect
+    ├── cms-frontend-engineer.md   # Vue 3 specialist
+    ├── cms-backend-engineer.md    # ASP.NET Core specialist
+    └── cms-ux-designer.md        # UX designer
+
+.cursor/rules/
+├── rule_cms-architecture.mdc      # Clean Architecture
+├── rule_cms-stack.mdc            # Tech stack conventions
+├── rule_cms-rbac.mdc             # RBAC patterns
+└── rule_cms-responsive.mdc        # Mobile-first responsive
 ```
 
 ---
@@ -102,6 +123,83 @@
 | `dashboard-ui` | `skills/dashboard-ui/` | Dashboard/Admin components (inputs, tables, forms, pickers) |
 | `ui-designer` | `agents/ui-designer.md` | Design systems, layouts, typography |
 | `ui-ux-pro-max` | `skills/ui-ux-pro-max/` | **117k stars** - 79 styles, 192 palettes, 74 fonts, 192 reasoning rules, 22 stacks |
+| `evondev-ui-ux` | `skills/evondev-ui-ux/` | **evondevKit** - UI/UX cho app (dashboard, danh sách, bảng, form, modal). Default design mode với wireframe. Gọi `/evon:ui-ux` |
+
+### 2.2 App UI Components (evondevKit)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    evondevKit UI COMPONENTS (46 files)                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ LAYOUTS (5):                                                              │
+│ • app.md              - Dashboard, danh sách, bảng, cài đặt, hồ sơ       │
+│ • app-kanban.html     - Kanban board với drag-drop                       │
+│ • form.md             - Đăng nhập, đăng ký, form nhiều trường           │
+│ • overlay.md          - Modal, panel trượt, dropdown, command palette     │
+│ • pricing.md          - Bảng giá, trang chọn gói                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ COMPONENTS (26):                                                         │
+│ • accordion.md        - FAQ, mục mở/đóng tại chỗ                         │
+│ • avatar.md           - Avatar người dùng, nhóm avatar chồng nhau        │
+│ • banner.md           - Thanh thông báo (info, warning, error)            │
+│ • breadcrumb.md       - Đường dẫn trên header                            │
+│ • button.md           - Nút (primary, secondary, ghost, destructive)       │
+│ • card.md             - Card (flat, elevated, glass)                      │
+│ • charts.md           - Biểu đồ (bar, line, pie, area)                   │
+│ • chat.md             - Khung chat AI, tin nhắn hai phía                  │
+│ • choice-controls.md  - Checkbox, radio, switch, select, date/time picker │
+│ • comment-thread.md   - Khu bình luận, trả lời lồng nhau                │
+│ • description-list.md - Nhãn và giá trị của trang chi tiết               │
+│ • empty-state.md     - Trạng thái rỗng, đang tải, lỗi tải              │
+│ • file-upload.md     - Kéo thả tệp, danh sách tệp đang tải lên         │
+│ • inline-edit.md      - Tên sửa tại chỗ ở đầu trang                     │
+│ • input.md            - Ô nhập (text, search, password, textarea)         │
+│ • list-row.md         - Dòng trong danh sách                              │
+│ • otp-input.md       - Ô nhập mã OTP                                    │
+│ • quantity-input.md  - Ô nhập số lượng có nút − +                      │
+│ • range-slider.md     - Thanh trượt chọn khoảng số, khoảng giá          │
+│ • small-controls.md   - Chip lọc, tab, phân trang                        │
+│ • sortable-header.md  - Tiêu đề cột bảng bấm để sắp xếp                │
+│ • tag-input.md        - Ô nhập nhiều tag (email, nhãn)                  │
+│ • timeline.md         - Dòng thời gian, lịch sử hoạt động               │
+│ • tree.md             - Cây thư mục, cây lồng nhau mở đóng được         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ DESIGN RULES (7):                                                        │
+│ • principles.md       - 12 nguyên tắc thiết kế cốt lõi                  │
+│ • rules-color.md      - Màu, viền, bóng, dark mode, token               │
+│ • rules-form.md       - Khối, lưới, bo góc, khoảng thở, icon           │
+│ • rules-state.md      - Nút, hover, focus, danh sách, modal              │
+│ • rules-type.md      - Chữ, font, xuống dòng, copy, ngôn ngữ          │
+│ • responsive.md       - Luật màn hẹp, ngưỡng 375px                     │
+│ • tailwind-v4-traps.md - Bẫy Tailwind v4 khi có CSS cũ                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ DESIGN TOKENS (5):                                                       │
+│ • tokens.css         - CSS variables (màu, spacing, typography)           │
+│ • styles.md          - Flat, glass, gradient, nổi, dark mode              │
+│ • budgets.md         - Ngân sách, nhịp, thang cỡ chữ                   │
+│ • brand-tokens.md    - Cách đổi thương hiệu, màu nhấn, font           │
+│ • locked-rules.md     - Luật chủ dự án đã chốt                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ WORKFLOWS (4):                                                          │
+│ • design-process.md  - Nhánh U: brief → wireframe → dựng               │
+│ • review.md          - Nhánh V: soi UI đang có, bảng trước/sau        │
+│ • refactor.md        - Nhánh L: refactor giữ nguyên hình                │
+│ • system.md         - Design system: D9, token + 7 nguyên tố          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ SCRIPTS (2):                                                            │
+│ • probe.mjs         - Probe UI đang chạy (375px → 1920px)              │
+│ • lint-skill.mjs    - Lint skill files                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Skill Trigger Keywords:**
+- `dựng màn`, `build a page`, `design this screen` → design mode (wireframe)
+- `dựng luôn`, `just build it` → skip wireframe
+- `xem giúp`, `review UI`, `nhìn rối` → review mode
+- `giữ brand` → keep brand mode
+- `design system`, `UI kit` → system mode
+- `refactor`, `chuyển sang Tailwind` → refactor mode
+- `evon`, `ui-ux` → auto-activate
 
 ### 2.2 Landing Page Components
 
@@ -367,6 +465,70 @@
 
 ---
 
+## NHÓM 10: CMS LANDING ENTERPRISE
+
+### 10.1 Master Skill
+
+| Skill | Path | Description |
+|-------|------|-------------|
+| `cms-landing-enterprise` | `agents/skills/cms-landing-enterprise/` | **CMS Landing Enterprise v4** - Full SaaS CRM/CMS/Landing/Wallet/Affiliate system |
+
+### 10.2 CMS Agents
+
+| Agent | Path | Description |
+|-------|------|-------------|
+| `cms-solution-architect` | `agents/cms-solution-architect.md` | Solution architect - entity design, API contracts |
+| `cms-frontend-engineer` | `agents/cms-frontend-engineer.md` | Vue 3 specialist - responsive, mobile-first |
+| `cms-backend-engineer` | `agents/cms-backend-engineer.md` | ASP.NET Core specialist - Dapper, UnitOfWork |
+| `cms-ux-designer` | `agents/cms-ux-designer.md` | UX designer - workspace layouts, components |
+
+### 10.3 CMS Rules
+
+| Rule | Path | Description |
+|------|------|-------------|
+| `cms-architecture` | `rules/rule_cms-architecture.mdc` | Clean Architecture, repository pattern, module structure |
+| `cms-stack` | `rules/rule_cms-stack.mdc` | Tech stack conventions - Vue 3, ASP.NET Core 9, Dapper |
+| `cms-rbac` | `rules/rule_cms-rbac.mdc` | RBAC patterns - roles, permissions, authorization |
+| `cms-responsive` | `rules/rule_cms-responsive.mdc` | Mobile-first responsive - breakpoints, bottom nav, FAB |
+
+### 10.4 CMS Module Overview
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    CMS LANDING ENTERPRISE v4                             │
+├─────────────────────────────────────────────────────────────────────────┤
+│  Dashboard    │ CRM       │ Landing    │ CMS        │ Wallet           │
+│  Lead/Customer│ Page/Menu │ Affiliate   │ Orders     │ Commission       │
+├─────────────────────────────────────────────────────────────────────────┤
+│  Products     │ Invoice   │ Task       │ Calendar   │ Chat             │
+│  Service/Ebook│ Payment   │ Kanban/List │ Events     │ SignalR          │
+├─────────────────────────────────────────────────────────────────────────┤
+│  Blog         │ Media     │ Reports     │ Users      │ Settings          │
+│  Content      │ WEBP/Crop  │ Analytics   │ RBAC       │ All Configurable  │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### 10.5 Tech Stack Summary
+
+| Layer | Technology |
+|-------|------------|
+| **Frontend** | Vue 3 + TypeScript + Vite + TailwindCSS + Pinia + VueUse |
+| **Backend** | ASP.NET Core 9 + Dapper + UnitOfWork + JWT + SignalR |
+| **Database** | SQLite (dev) / PostgreSQL / MySQL |
+| **Auth** | ASP.NET Core Identity + JWT (15min) + Refresh Token |
+| **Real-time** | SignalR |
+| **Deploy** | Docker + Nginx / IIS / Vercel |
+
+### 10.6 CMS Triggers
+
+- cms landing, saas crm, landing builder, menu builder
+- wallet system, affiliate system, commission engine
+- lead workspace, customer workspace, product workspace
+- drag drop dashboard, bottom navigation, floating action button
+- responsive layout, mobile first, workspace layout
+- pipeline view, kanban board, calendar view, real-time chat
+- sepay payment, stripe payment, signalr realtime
+
 ## SLASH COMMANDS
 
 ### Development Lifecycle
@@ -617,6 +779,7 @@ web-cloner + site-crawler + route-discovery + full-site-clone + image-workflow
 |----------|-----------------|
 | landing, portfolio, homepage, SaaS | `frontend-taste` |
 | redesign, improve UI | `frontend-redesign` |
+| dựng màn, app UI, dashboard, evon, ui-ux | `evondev-ui-ux` |
 | clone, copy website | `web-cloner` + `full-site-clone` |
 | clone all pages, full site | `site-crawler` + `route-discovery` |
 | crawl site, find URLs | `site-crawler` |
@@ -638,14 +801,15 @@ web-cloner + site-crawler + route-discovery + full-site-clone + image-workflow
 
 ### Bundle A: Web & Dashboard
 ```markdown
-1. ui-ux-pro-max (design system generator - 117k stars)
-2. frontend-taste (anti-slop frontend)
-3. hallmark (57 slop-test gates)
-4. dashboard-ui (components)
-5. ai-copywriter (human copy)
-6. simple-english (clarity)
-7. karpathy-coding (code quality)
-8. ponytail (minimal code)
+1. evondev-ui-ux (app UI - dashboard, danh sách, bảng, form)
+2. ui-ux-pro-max (design system generator - 117k stars)
+3. frontend-taste (anti-slop frontend)
+4. hallmark (57 slop-test gates)
+5. dashboard-ui (components)
+6. ai-copywriter (human copy)
+7. simple-english (clarity)
+8. karpathy-coding (code quality)
+9. ponytail (minimal code)
 ```
 
 ### Bundle B: Full-Stack
@@ -790,6 +954,7 @@ Các skills có thể gọi Python scripts để thực thi các tác vụ tự 
 # - AminBlg/SimpleEnglish   (plain language)
 # - Nutlope/hallmark       (anti-slop design)
 # - xiaopu-ai/web-clone-prompt (prompt-first clone)
+# - evondev/evondevKit     (app UI/UX - dashboard, forms, components)
 # - nextlevelbuilder/ui-ux-pro-max-skill (117k stars - UI/UX design)
 ```
 

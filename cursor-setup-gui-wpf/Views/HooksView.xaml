@@ -6,13 +6,13 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="32,28">
         <StackPanel MaxWidth="900">
 
-            <!-- Page Title -->
+            <!-- Page Title: 24px, weight 600 -->
             <TextBlock Text="{Binding HooksPageTitle}"
-                       FontFamily="{StaticResource UIFont}" FontSize="24" FontWeight="Bold"
+                       FontFamily="{StaticResource UIFont}" FontSize="24" FontWeight="SemiBold"
                        Foreground="{StaticResource Slate900Brush}" Margin="0,0,0,4"/>
             <TextBlock Text="{Binding HooksPageDesc}"
                        FontFamily="{StaticResource UIFont}" FontSize="14"
-                       Foreground="{StaticResource Slate500Brush}" Margin="0,0,0,28"/>
+                       Foreground="{StaticResource Neutral500Brush}" Margin="0,0,0,28"/>
 
             <!-- Pre-scan Hook -->
             <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20">

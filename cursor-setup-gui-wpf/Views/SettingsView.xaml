@@ -12,12 +12,13 @@
         <!-- Header -->
         <Border Grid.Row="0" Padding="32,28,32,16">
             <StackPanel>
+                <!-- Page Title: 24px, weight 600 -->
                 <TextBlock Text="{Binding SettingsTitle}"
-                           FontFamily="{StaticResource UIFont}" FontSize="24" FontWeight="Bold"
+                           FontFamily="{StaticResource UIFont}" FontSize="24" FontWeight="SemiBold"
                            Foreground="{StaticResource Slate900Brush}" Margin="0,0,0,4"/>
                 <TextBlock Text="{Binding SettingsSubtitle}"
                            FontFamily="{StaticResource UIFont}" FontSize="14"
-                           Foreground="{StaticResource Slate500Brush}"/>
+                           Foreground="{StaticResource Neutral500Brush}"/>
             </StackPanel>
         </Border>
 
@@ -32,14 +33,15 @@
                                        FontFamily="Segoe MDL2 Assets" FontSize="18"
                                        Foreground="{StaticResource Indigo500Brush}"
                                        VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <!-- Section Title: 18px, weight 600 -->
                             <TextBlock Text="{Binding SettingsAppearanceLabel}"
-                                       FontFamily="{StaticResource UIFont}" FontSize="15" FontWeight="SemiBold"
+                                       FontFamily="{StaticResource UIFont}" FontSize="18" FontWeight="SemiBold"
                                        Foreground="{StaticResource Slate900Brush}"/>
                         </StackPanel>
 
                         <TextBlock Text="{Binding SettingsThemeLabel}"
                                    FontFamily="{StaticResource UIFont}" FontSize="12"
-                                   Foreground="{StaticResource Slate500Brush}" Margin="0,0,0,8"/>
+                                   Foreground="{StaticResource Neutral500Brush}" Margin="0,0,0,8"/>
 
                         <ComboBox ItemsSource="{Binding AvailableThemes}"
                                   SelectedItem="{Binding SelectedTheme, Mode=TwoWay}"
@@ -52,13 +54,14 @@
                 <!-- Startup -->
                 <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20">
                     <StackPanel>
+                        <!-- Section Title: 18px, weight 600 -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
                             <TextBlock Text="&#xE7E8;"
                                        FontFamily="Segoe MDL2 Assets" FontSize="18"
                                        Foreground="{StaticResource Indigo500Brush}"
                                        VerticalAlignment="Center" Margin="0,0,10,0"/>
                             <TextBlock Text="{Binding SettingsStartupLabel}"
-                                       FontFamily="{StaticResource UIFont}" FontSize="15" FontWeight="SemiBold"
+                                       FontFamily="{StaticResource UIFont}" FontSize="18" FontWeight="SemiBold"
                                        Foreground="{StaticResource Slate900Brush}"/>
                         </StackPanel>
 
@@ -67,7 +70,7 @@
                                   Style="{StaticResource ModernCheckBoxStyle}"/>
                         <TextBlock Text="{Binding SettingsAutostartDescLabel}"
                                    FontFamily="{StaticResource UIFont}" FontSize="12"
-                                   Foreground="{StaticResource Slate500Brush}"
+                                   Foreground="{StaticResource Neutral500Brush}"
                                    Margin="30,4,0,0" TextWrapping="Wrap" MaxWidth="600"
                                    HorizontalAlignment="Left"/>
                     </StackPanel>
@@ -76,13 +79,14 @@
                 <!-- Notifications -->
                 <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20">
                     <StackPanel>
+                        <!-- Section Title: 18px, weight 600 -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
                             <TextBlock Text="&#xE91F;"
                                        FontFamily="Segoe MDL2 Assets" FontSize="18"
                                        Foreground="{StaticResource Indigo500Brush}"
                                        VerticalAlignment="Center" Margin="0,0,10,0"/>
                             <TextBlock Text="{Binding SettingsNotificationsLabel}"
-                                       FontFamily="{StaticResource UIFont}" FontSize="15" FontWeight="SemiBold"
+                                       FontFamily="{StaticResource UIFont}" FontSize="18" FontWeight="SemiBold"
                                        Foreground="{StaticResource Slate900Brush}"/>
                         </StackPanel>
 
@@ -98,19 +102,20 @@
                 <!-- Logs -->
                 <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20">
                     <StackPanel>
+                        <!-- Section Title: 18px, weight 600 -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
                             <TextBlock Text="&#xE756;"
                                        FontFamily="Segoe MDL2 Assets" FontSize="18"
                                        Foreground="{StaticResource Indigo500Brush}"
                                        VerticalAlignment="Center" Margin="0,0,10,0"/>
                             <TextBlock Text="{Binding SettingsLoggingLabel}"
-                                       FontFamily="{StaticResource UIFont}" FontSize="15" FontWeight="SemiBold"
+                                       FontFamily="{StaticResource UIFont}" FontSize="18" FontWeight="SemiBold"
                                        Foreground="{StaticResource Slate900Brush}"/>
                         </StackPanel>
 
                         <TextBlock Text="{Binding SettingsLogPathLabel}"
                                    FontFamily="{StaticResource UIFont}" FontSize="12"
-                                   Foreground="{StaticResource Slate500Brush}" Margin="0,0,0,6"/>
+                                   Foreground="{StaticResource Neutral500Brush}" Margin="0,0,0,6"/>
 
                         <Grid>
                             <Grid.ColumnDefinitions>

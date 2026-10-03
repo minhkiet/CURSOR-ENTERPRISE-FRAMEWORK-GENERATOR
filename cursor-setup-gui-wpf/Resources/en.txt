@@ -533,3 +533,161 @@ script_gen.copy_preview=Copy
 script_gen.save_preview=Save File
 script_gen.open_output=Open Folder
 script_gen.project_selected=Project selected
+
+# ECC (Enhanced Code Copilot) tab
+ecc.title=ECC Integration
+ecc.subtitle=Enhanced Code Copilot v2.2.2 - 68 agents, 292 skills, 94 commands
+ecc.status=Status
+ecc.installed=Installed
+ecc.not_installed=Not installed
+ecc.clone=Clone Repository
+ecc.refresh=Refresh Status
+ecc.hooks=Enable Hooks
+ecc.harnesses=Supported Harnesses
+ecc.features=Key Features
+ecc.install_failed=Install failed
+ecc.install_success=Installation successful
+ecc.repo_cloned=Repository cloned successfully
+ecc.repo_exists=Repository already exists
+ecc.git_required=Git is required for this operation
+ecc.node_required=Node.js is required for npm-based installation
+ecc.agents=Agents
+ecc.skills=Skills
+ecc.commands=Commands
+ecc.active_vibe_coder=Active Vibe Coder:
+ecc.gate=Gate
+ecc.installing=Installing
+ecc.error=Error
+ecc.cloning_repo=Cloning repository
+ecc.clone_failed=Clone failed
+ecc.install_script_not_found=Install script not found
+ecc.repo_not_found=Repository not found. Clone first.
+ecc.hooks_memory=Hooks & Memory
+ecc.hooks_memory_desc=Session summaries, continuous learning, instincts, and context controls
+ecc.agent_shield=AgentShield
+ecc.agent_shield_desc=Scanning for prompts, hooks, MCP config, permissions, secrets, and agent files
+ecc.workflow=Workflow Engine
+ecc.workflow_desc=plan → implement → review → verify → remember → improve
+ecc.install_commands=Installation Commands
+ecc.claude_code=Claude Code:
+ecc.codex=Codex:
+ecc.cursor=Cursor:
+ecc.guided_setup=Guided Setup:
+ecc.harness_claude_desc=Native ecc@ecc plugin with full hooks
+ecc.harness_codex_desc=Native plugin or legacy sync
+ecc.harness_cursor_desc=Project-local adapter
+ecc.harness_gemini_desc=Project-local config
+ecc.harness_zed_desc=Project-local adapter
+ecc.harness_kimi_desc=Project-local install
+ecc.harness_copilot_desc=copilot-instructions.md
+ecc.harness_antigravity_desc=Project-local adapter
+tab.ecc=ECC
+
+# Vibe Coder selector
+vibe_coder.label=Vibe Coder
+vibe_coder.tooltip=Select your AI coding assistant
+
+# Vibe Tools
+vibe_tool.cursor=Cursor IDE
+vibe_tool.cursor_desc=Cursor IDE with AI-powered coding
+vibe_tool.antigravity=Antigravity
+vibe_tool.antigravity_desc=Next-gen vibe coding tool
+vibe_tool.codex=OpenAI Codex
+vibe_tool.codex_desc=OpenAI Codex CLI
+vibe_tool.claude_code=Claude Code
+vibe_tool.claude_code_desc=Anthropic Claude Code
+vibe_tool.grok=Grok CLI
+vibe_tool.grok_desc=xAI Grok CLI
+vibe_tool.gemini=Gemini CLI
+vibe_tool.gemini_desc=Google Gemini CLI
+vibe_tool.zed=Zed AI
+vibe_tool.zed_desc=Zed AI Editor
+vibe_tool.kimi=Kimi Code
+vibe_tool.kimi_desc=Kimi Code AI
+vibe_tool.copilot=GitHub Copilot
+vibe_tool.copilot_desc=GitHub Copilot CLI
+vibe_tool.windsurf=WindSurf
+vibe_tool.windsurf_desc=Codeium WindSurf IDE
+vibe_tool.continue=Continue.dev
+vibe_tool.continue_desc=Open-source AI coding assistant
+vibe_tool.cline=Cline
+vibe_tool.cline_desc=Autonomous coding agent for VSCode
+vibe_tool.roo=Roo Code
+vibe_tool.roo_desc=Flexible AI coding assistant for VSCode
+vibe_tool.aider=Aider
+vibe_tool.aider_desc=CLI tool for pair programming with AI
+
+# evondev-ui-ux Skill
+evondev.title=UI/UX Design
+evondev.subtitle=Professional UI/UX design skill based on evondevKit
+evondev.description=Dashboard, forms, tables, modals, settings with design system and tokens
+evondev.components=UI Components
+evondev.components_desc=26 production-ready UI components
+evondev.layouts=Layouts
+evondev.layouts_desc=5 layout templates (app, form, overlay, pricing, kanban)
+evondev.tokens=Design Tokens
+evondev.tokens_desc=CSS tokens for colors, typography, spacing
+evondev.rules=Design Rules
+evondev.rules_desc=7 design rule categories
+evondev.process=Design Process
+evondev.process_desc=Wireframe-first workflow with 2-3 options
+evondev.brief=Brief
+evondev.wireframe=Wireframe
+evondev.build=Build
+evondev.designer_mode=Designer Mode
+evondev.designer_mode_desc=Create UI as a designer with wireframes first
+evondev.flat_style=Flat Style
+evondev.glassmorphism=Glassmorphism
+evondev.gradient=Gradient
+evondev.dark_mode=Dark Mode
+evondev.light_mode=Light Mode
+
+# Vibe Framework Directories
+vibe_framework.title=Vibe Code Framework
+vibe_framework.subtitle=Standard directories for cross-platform AI coding
+vibe_framework.install=Install for All Vibe Coders
+vibe_framework.install_desc=Install framework to all supported AI coding tools
+vibe_framework.directories=Framework Directories
+vibe_framework.skills_dir=Skills Directory
+vibe_framework.rules_dir=Rules Directory
+vibe_framework.agents_dir=Agents Directory
+vibe_framework.commands_dir=Commands Directory
+vibe_framework.prompts_dir=Prompts Directory
+vibe_framework.workflows_dir=Workflows Directory
+vibe_framework.templates_dir=Templates Directory
+vibe_framework.config_dir=Config Directory
+vibe_framework.primary=Primary Frameworks
+vibe_framework.secondary=Secondary Frameworks
+vibe_framework.vscode=VSCode Extensions
+
+# Agent Management & Installation
+agent.title=Agent Manager
+agent.installed=Installed
+agent.not_installed=Not Installed
+agent.install_success=Successfully installed for {0}
+agent.install_failed=Agent installation failed: {0}
+agent.all_agents_success=Successfully installed for all agents!
+agent.all_agents_partial=Installation partially completed: {0}
+install.all_agents=Install for all Vibe Coders
+install.single_agent=Install for selected agent
+vibe_coder.select=Select your Vibe Coder tool
+
+# Project Runner
+project_runner.running=Running framework command...
+project_runner.ask_title=Ask the Framework
+project_runner.ask_subtitle=Run a natural language request through the workflow pipeline
+project_runner.run_ask=Run Ask
+project_runner.output=Output
+project_runner.clear=Clear
+
+# Common Units & Labels
+common.items_unit=items
+script_gen.scripts_unit=scripts
+script_gen.commands_unit=command(s)
+script_gen.cat_all=All
+script_gen.cat_web=Web
+script_gen.cat_desktop=Desktop
+script_gen.cat_deploy=Deploy
+script_gen.cat_database=Database
+script_gen.cat_ai=AI / LLM
+script_gen.cat_utility=Utility

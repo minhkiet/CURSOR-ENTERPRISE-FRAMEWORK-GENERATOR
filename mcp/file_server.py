@@ -16,14 +16,28 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-try:
-    from fastmcp import FastMCP
-    HAS_FASTMCP = True
-except ImportError:
-    HAS_FASTMCP = False
+# Add paths to sys.path so cursor_framework and local modules are always importable
+_repo_root = Path(__file__).resolve().parent.parent
+if str(_repo_root) not in sys.path:
+    sys.path.insert(0, str(_repo_root))
 
-if HAS_FASTMCP:
-    mcp = FastMCP("file-ops")
+_mcp_dir = Path(__file__).resolve().parent
+if str(_mcp_dir) not in sys.path:
+    sys.path.insert(0, str(_mcp_dir))
+
+try:
+    from mcp.server.fastmcp import FastMCP
+except Exception:
+    try:
+        from fastmcp import FastMCP
+    except Exception:
+        try:
+            from mcp_runtime import UniversalMcpServer as FastMCP
+        except ImportError:
+            from cursor_framework.mcp_runtime import UniversalMcpServer as FastMCP
+
+mcp = FastMCP("file-ops")
+HAS_FASTMCP = True
 
 # Import utilities from cursor_framework
 from cursor_framework.utils.file_utils import (
@@ -421,12 +435,7 @@ if HAS_FASTMCP:
 def main():
     parser = argparse.ArgumentParser(description="File Operations MCP Server")
     args = parser.parse_args()
-    
-    if HAS_FASTMCP:
-        mcp.run(transport="stdio")
-    else:
-        print("ERROR: fastmcp required. Install with: pip install fastmcp", file=sys.stderr)
-        sys.exit(1)
+    mcp.run(transport="stdio")
 
 if __name__ == "__main__":
     main()

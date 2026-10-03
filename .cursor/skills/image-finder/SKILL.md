@@ -5,7 +5,103 @@ description: Tìm ảnh stock miễn phí và tạo ảnh/video bằng AI (Googl
 
 # Image Finder Skill
 
-Tìm và tải ảnh stock miễn phí cho website clone và web design.
+Tìm và tải ảnh stock miễn phí cho website clone và web design. Hỗ trợ multi-provider với automatic fallback.
+
+## Quick Start - API Usage
+
+```python
+from cursor_framework.skills.image_search import ImageSearchSkill
+
+# Initialize (uses API keys from env or parameters)
+skill = ImageSearchSkill(
+    pexels_key="YOUR_PEXELS_KEY",      # Optional - free tier available
+    unsplash_key="YOUR_UNSPLASH_KEY",   # Optional
+    pixabay_key="YOUR_PIXABAY_KEY"      # Optional
+)
+
+# Search with automatic provider fallback
+result = await skill.search(
+    query="modern dashboard dark theme",
+    limit=20,
+    orientation="landscape",
+    colors=["#0C0C0C", "#1A1A2E"]
+)
+
+# Access results
+for img in result.images:
+    print(f"{img.url} ({img.width}x{img.height}) - {img.source}")
+```
+
+## Search Response Format
+
+```json
+{
+  "query": "modern dashboard",
+  "images": [
+    {
+      "url": "https://...",
+      "thumbnailUrl": "https://...",
+      "width": 1920,
+      "height": 1080,
+      "source": "Unsplash",
+      "sourceUrl": "https://unsplash.com/...",
+      "author": "John Doe",
+      "authorUrl": "https://unsplash.com/@johndoe",
+      "license": "free",
+      "provider": "unsplash",
+      "score": 0.95
+    }
+  ],
+  "metadata": {
+    "totalProviders": 3,
+    "successfulProviders": 2,
+    "failedProviders": ["pixabay: Rate limit exceeded"],
+    "totalImagesFound": 20,
+    "deduplicatedCount": 2,
+    "responseTimeMs": 245.32,
+    "cacheHit": false
+  }
+}
+```
+
+## Image Presentation Effects
+
+```python
+from cursor_framework.skills.image_presentation import (
+    ImagePresentationSkill,
+    RevealEffect,
+    RevealAnimation,
+    LightboxEffect,
+    BeforeAfterComparison
+)
+
+skill = ImagePresentationSkill()
+
+# Generate reveal animation CSS
+css = skill.generate_reveal_css(RevealAnimation.FADE_IN)
+js = skill.generate_reveal_js(RevealAnimation.FADE_IN)
+
+# Generate lightbox
+lightbox_html = skill.generate_lightbox_html()
+lightbox_css = skill.generate_lightbox_css()
+lightbox_js = skill.generate_lightbox_js()
+
+# Before/After comparison
+comparison = skill.generate_comparison(
+    before_src="/img/before.jpg",
+    after_src="/img/after.jpg",
+    before_label="Before",
+    after_label="After"
+)
+```
+
+## Khi nào dùng
+
+- Tìm ảnh thay thế cho website clone
+- Cần ảnh stock cho landing page
+- Tìm ảnh theo chủ đề cụ thể
+- Tìm ảnh có độ phân giải cao
+- Cần image effects (lightbox, masonry, parallax)
 
 ## Khi nào dùng
 

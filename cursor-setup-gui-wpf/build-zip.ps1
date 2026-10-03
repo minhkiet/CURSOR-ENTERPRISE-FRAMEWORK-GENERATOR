@@ -11,7 +11,7 @@ $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 # RepoRoot is parent of cursor-setup-gui-wpf
 $RepoRoot = Split-Path -Parent $ScriptDir
 $SourceDir = Join-Path $RepoRoot ".cursor"
-$BuildDir = Join-Path $ScriptDir "bin\$Config\net8.0-windows\win-x64"
+$BuildDir = Join-Path $ScriptDir "bin\$Config\net8.0-windows\win-x64\publish"
 $OutputZip = Join-Path $BuildDir "cursor-setup.zip"
 $TempZip = Join-Path $env:TEMP "cursor-setup-build-$([System.Guid]::NewGuid().ToString('N')).zip"
 
@@ -182,8 +182,19 @@ Remove-Item $verifyDir -Recurse -Force
 Write-Host ""
 Write-Host "[5/6] Writing build metadata..." -ForegroundColor Yellow
 $metaPath = Join-Path $BuildDir "cursor-setup-build.json"
+
+# Try to read version from .csproj dynamically, fall back to hardcoded
+$csprojPath = Join-Path $ScriptDir "CursorSetupWpf.csproj"
+$version = "4.4.0"
+if (Test-Path $csprojPath) {
+    $csprojContent = Get-Content $csprojPath -Raw
+    if ($csprojContent -match '<Version>(.*?)</Version>') {
+        $version = $matches[1]
+    }
+}
+
 $meta = [ordered]@{
-    version     = "4.4.0"
+    version     = $version
     config      = $Config
     built_at    = (Get-Date).ToString("o")
     source      = $SourceDir
@@ -194,7 +205,7 @@ $meta = [ordered]@{
     categories  = $stats
 }
 $meta | ConvertTo-Json -Depth 5 | Out-File -FilePath $metaPath -Encoding UTF8
-Write-Host "  [OK] Metadata: $metaPath" -ForegroundColor Green
+Write-Host "  [OK] Metadata: $metaPath (version $version)" -ForegroundColor Green
 
 # Verify MCP tools
 Write-Host ""

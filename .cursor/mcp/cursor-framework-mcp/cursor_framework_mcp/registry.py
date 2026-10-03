@@ -222,64 +222,108 @@ _ALIAS_TARGET_RE = re.compile(r"use:\s*\n*\s*`?([^`\n]+/SKILL\.md)`?", re.IGNORE
 
 
 def build_registry(workspace_root: str) -> Registry:
-    """Scan `.cursor/rules`, `.cursor/skills`, `.cursor/agents` and index items."""
+    """Scan rules, skills, and agents across multi-platform directories (.cursor, .agents, .gemini, .claude, .codex, root)."""
     root = Path(workspace_root).resolve()
-    rules_dir = root / ".cursor" / "rules"
-    skills_dir = root / ".cursor" / "skills"
-    agents_dir = root / ".cursor" / "agents"
-
     reg = Registry(workspace_root=str(root))
 
-    if rules_dir.is_dir():
-        for path in sorted(rules_dir.rglob("*.mdc")):
-            item = _index_rule(path, root)
-            reg.rules[item.id] = item
-            reg.by_path[item.path] = item
+    # Multi-platform rule directories
+    rule_dirs = [
+        root / ".cursor" / "rules",
+        root / ".agents" / "rules",
+        root / ".gemini" / "rules",
+        root / ".claude" / "rules",
+        root / "rules",
+    ]
+    seen_rule_paths = set()
+    for rdir in rule_dirs:
+        if rdir.is_dir():
+            for ext in ("*.mdc", "*.md"):
+                for path in sorted(rdir.rglob(ext)):
+                    if path in seen_rule_paths:
+                        continue
+                    seen_rule_paths.add(path)
+                    item = _index_rule(path, root)
+                    if item.id not in reg.rules:
+                        reg.rules[item.id] = item
+                    reg.by_path[item.path] = item
 
-    if skills_dir.is_dir():
-        # Two-pass index: index canonical files normally; for alias files
-        # (.cursor/skills/<folder>/SKILL.md where folder is just a redirect),
-        # also register the friendly alias folder name so users can request
-        # either id. The loader follows the redirect transparently.
-        alias_folders: dict[str, str] = {}  # alias folder name -> redirect target path
-        for path in skills_dir.rglob("SKILL.md"):
-            try:
-                head = path.read_text(encoding="utf-8", errors="ignore")
-            except OSError:
-                continue
-            first_line = head.splitlines()[0] if head else ""
-            if first_line.lstrip("\ufeff").lower().startswith("# alias:"):
-                m = _ALIAS_TARGET_RE.search(head)
-                if m:
-                    alias_folders[path.parent.name] = m.group(1).strip()
-        for path in sorted(skills_dir.rglob("SKILL.md")):
-            item = _index_skill(path, root)
-            reg.skills[item.id] = item
-            reg.by_path[item.path] = item
-            # If this folder is an alias, also register it under its raw folder
-            # name (e.g. "karpathy-coding") so users can ask for either id.
-            if path.parent.name in alias_folders:
-                friendly = path.parent.name
-                if friendly != item.id and friendly not in reg.skills:
-                    friendly_item = RegistryItem(
-                        id=friendly,
-                        kind="skill",
-                        path=item.path,
-                        abs_path=item.abs_path,
-                        domains=item.domains,
-                        triggers=item.triggers,
-                        role=item.role,
-                        exists=True,
-                    )
-                    reg.skills[friendly] = friendly_item
-                    reg.by_path[friendly_item.path + "#" + friendly] = friendly_item
+    # Multi-platform skill directories
+    skill_dirs = [
+        root / ".cursor" / "skills",
+        root / ".cursor" / "agent-skills",
+        root / ".agents" / "skills",
+        root / ".gemini" / "skills",
+        root / ".claude" / "skills",
+        root / "skills",
+    ]
+    seen_skill_paths = set()
+    alias_folders: dict[str, str] = {}
 
-    if agents_dir.is_dir():
-        # Agents may be either one big AGENTS.md or per-agent files
-        md_files = sorted(agents_dir.rglob("*.md"))
-        for path in md_files:
-            for item in _index_agents(path, root):
-                reg.agents[item.id] = item
+    for sdir in skill_dirs:
+        if sdir.is_dir():
+            for path in sdir.rglob("SKILL.md"):
+                try:
+                    head = path.read_text(encoding="utf-8", errors="ignore")
+                except OSError:
+                    continue
+                first_line = head.splitlines()[0] if head else ""
+                if first_line.lstrip("\ufeff").lower().startswith("# alias:"):
+                    m = _ALIAS_TARGET_RE.search(head)
+                    if m:
+                        alias_folders[path.parent.name] = m.group(1).strip()
+
+            for path in sorted(sdir.rglob("SKILL.md")):
+                if path in seen_skill_paths:
+                    continue
+                seen_skill_paths.add(path)
+                item = _index_skill(path, root)
+                if item.id not in reg.skills:
+                    reg.skills[item.id] = item
+                reg.by_path[item.path] = item
+                if path.parent.name in alias_folders:
+                    friendly = path.parent.name
+                    if friendly != item.id and friendly not in reg.skills:
+                        friendly_item = RegistryItem(
+                            id=friendly,
+                            kind="skill",
+                            path=item.path,
+                            abs_path=item.abs_path,
+                            domains=item.domains,
+                            triggers=item.triggers,
+                            role=item.role,
+                            exists=True,
+                        )
+                        reg.skills[friendly] = friendly_item
+                        reg.by_path[friendly_item.path + "#" + friendly] = friendly_item
+
+    # Multi-platform agent directories & root files
+    agent_dirs = [
+        root / ".cursor" / "agents",
+        root / ".agents" / "agents",
+        root / ".codex" / "agents",
+        root / ".claude" / "agents",
+        root / ".gemini" / "agents",
+        root / "agents",
+    ]
+    seen_agent_paths = set()
+    for adir in agent_dirs:
+        if adir.is_dir():
+            for path in sorted(adir.rglob("*.md")):
+                if path in seen_agent_paths:
+                    continue
+                seen_agent_paths.add(path)
+                for item in _index_agents(path, root):
+                    if item.id not in reg.agents:
+                        reg.agents[item.id] = item
+                    reg.by_path[item.path] = item
+
+    # Also scan root and .cursor AGENTS.md
+    for agents_file in [root / "AGENTS.md", root / ".cursor" / "AGENTS.md"]:
+        if agents_file.is_file() and agents_file not in seen_agent_paths:
+            seen_agent_paths.add(agents_file)
+            for item in _index_agents(agents_file, root):
+                if item.id not in reg.agents:
+                    reg.agents[item.id] = item
                 reg.by_path[item.path] = item
 
     return reg
@@ -490,12 +534,37 @@ def _parse_agent_body(name: str, body: str) -> tuple[list[str], list[str], str]:
     return domains, triggers, role
 
 
-# ---------------------------------------------------------------------- helpers
-
 def find_workspace_root(start: str | os.PathLike[str] = ".") -> str:
-    """Walk up from `start` looking for `.cursor/rules`."""
+    """Walk up from `start` looking for workspace markers across multi-platform tools (.cursor, .agents, .gemini, .claude, .codex, .windsurf, AGENTS.md, pyproject.toml, .git)."""
+    # 1. Check environment variables
+    for env_key in (
+        "ANTIGRAVITY_WORKSPACE_ROOT",
+        "CURSOR_WORKSPACE_ROOT",
+        "CLAUDE_PROJECT_DIR",
+        "CODEX_WORKSPACE_ROOT",
+        "WINDSURF_WORKSPACE_ROOT",
+        "WORKSPACE_ROOT",
+        "CURSOR_PROJECT",
+    ):
+        val = os.environ.get(env_key)
+        if val and Path(val).is_dir():
+            return str(Path(val).resolve())
+
+    # 2. Walk up checking for workspace markers
     p = Path(start).resolve()
     for parent in [p, *p.parents]:
-        if (parent / ".cursor" / "rules").is_dir():
+        markers = [
+            parent / ".cursor",
+            parent / ".agents",
+            parent / ".gemini",
+            parent / ".claude",
+            parent / ".codex",
+            parent / ".windsurf",
+            parent / "AGENTS.md",
+            parent / "pyproject.toml",
+            parent / ".git",
+        ]
+        if any(m.exists() for m in markers):
             return str(parent)
+
     return str(p)

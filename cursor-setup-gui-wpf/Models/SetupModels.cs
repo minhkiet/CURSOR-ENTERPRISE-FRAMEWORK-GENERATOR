@@ -294,6 +294,7 @@ namespace CursorSetupWpf.Models
     public class AppSettings
     {
         public string Theme { get; set; } = "Indigo"; // Indigo, Light, Dark, System
+        public string Language { get; set; } = "vi"; // vi, en (Default: Vietnamese)
         public bool AutoStartWithWindows { get; set; }
         public bool NotifyOnComplete { get; set; } = true;
         public bool NotifyOnError { get; set; } = true;

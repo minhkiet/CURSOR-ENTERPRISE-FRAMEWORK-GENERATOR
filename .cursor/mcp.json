@@ -1,28 +1,73 @@
 {
   "mcpServers": {
     "cursor-framework": {
-      "command": "python",
-      "args": ["-m", "cursor_framework_mcp.server"],
-      "cwd": "${workspaceFolder}/.cursor/mcp/cursor-framework-mcp",
+      "command": "C:\\Python312\\python.exe",
+      "args": [
+        "-m",
+        "cursor_framework_mcp.server"
+      ],
+      "cwd": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\tools\\cursor-framework-mcp",
       "env": {
-        "CURSOR_WORKSPACE_ROOT": "${workspaceFolder}"
-      }
+        "CURSOR_WORKSPACE_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "ANTIGRAVITY_WORKSPACE_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "CLAUDE_PROJECT_DIR": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "CODEX_WORKSPACE_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "WINDSURF_WORKSPACE_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "WORKSPACE_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "CURSOR_FRAMEWORK_CACHE_MAX_RULES": "20",
+        "CURSOR_FRAMEWORK_CACHE_MAX_SKILLS": "30",
+        "CURSOR_FRAMEWORK_CACHE_MAX_AGENTS": "10",
+        "CURSOR_FRAMEWORK_CACHE_TTL_MINUTES": "30"
+      },
+      "description": "Cursor Enterprise Framework - Rules, Skills, Agents registry"
     },
     "cursor-autopilot": {
-      "command": "python",
-      "args": ["-m", "cursor_autopilot_mcp.server"],
-      "cwd": "${workspaceFolder}/.cursor/mcp/cursor-autopilot-mcp",
+      "command": "C:\\Python312\\python.exe",
+      "args": [
+        "-m",
+        "cursor_autopilot_mcp.server"
+      ],
+      "cwd": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\tools\\cursor-autopilot-mcp",
       "env": {
-        "CURSOR_WORKSPACE_ROOT": "${workspaceFolder}"
-      }
+        "CURSOR_WORKSPACE_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "ANTIGRAVITY_WORKSPACE_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "CLAUDE_PROJECT_DIR": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "CODEX_WORKSPACE_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "WINDSURF_WORKSPACE_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "WORKSPACE_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "CURSOR_FRAMEWORK_CACHE_MAX_RULES": "20",
+        "CURSOR_FRAMEWORK_CACHE_MAX_SKILLS": "30",
+        "CURSOR_FRAMEWORK_CACHE_MAX_AGENTS": "10",
+        "CURSOR_FRAMEWORK_CACHE_TTL_MINUTES": "30",
+        "CURSOR_FRAMEWORK_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\tools\\cursor-framework-mcp"
+      },
+      "description": "Auto-execution engine for workflows, gates, and suggestions"
     },
     "cursor-memory": {
-      "command": "python",
-      "args": ["-m", "cursor_memory_mcp.server"],
-      "cwd": "${workspaceFolder}/.cursor/mcp/cursor-memory-mcp",
+      "command": "C:\\Python312\\python.exe",
+      "args": [
+        "-m",
+        "cursor_memory_mcp.server"
+      ],
+      "cwd": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\tools\\cursor-memory-mcp",
       "env": {
-        "CURSOR_WORKSPACE_ROOT": "${workspaceFolder}"
-      }
+        "CURSOR_WORKSPACE_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "ANTIGRAVITY_WORKSPACE_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "CLAUDE_PROJECT_DIR": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "CODEX_WORKSPACE_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "WINDSURF_WORKSPACE_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "WORKSPACE_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "CURSOR_FRAMEWORK_CACHE_MAX_RULES": "20",
+        "CURSOR_FRAMEWORK_CACHE_MAX_SKILLS": "30",
+        "CURSOR_FRAMEWORK_CACHE_MAX_AGENTS": "10",
+        "CURSOR_FRAMEWORK_CACHE_TTL_MINUTES": "30",
+        "CURSOR_MEMORY_CACHE_DIR": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\.cache\\cursor-memory-mcp",
+        "CURSOR_CONTEXT_TOKEN_BUDGET": "100000",
+        "CURSOR_MEMORY_AUTO_PRUNE": "true"
+      },
+      "description": "Persistent workspace memory and context management"
     }
-  }
+  },
+  "version": "1.0",
+  "syncedAt": "2026-10-03T18:45:18.063354"
 }
