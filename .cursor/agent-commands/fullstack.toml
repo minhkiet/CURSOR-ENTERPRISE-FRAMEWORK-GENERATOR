@@ -1,0 +1,11 @@
+name = "fullstack"
+description = "Fullstack Web Development skill - ASP.NET Core Web API + React TypeScript TSX"
+command = "/fullstack"
+category = "development"
+triggers = ["fullstack", "fullstack web", "asp.net core react", "dotnet react", "react typescript dotnet", "build fullstack", "web api react", "/fullstack"]
+skill_path = ".cursor/skills/fullstack-web-development/SKILL.md"
+
+[config]
+auto_activate = true
+priority = 9
+language = ["vi", "en"]

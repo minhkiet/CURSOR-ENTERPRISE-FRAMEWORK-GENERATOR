@@ -1,7 +1,21 @@
 # Cursor Enterprise Framework - Skill Index
 
-> **Phiên bản:** 4.1.0 | **Cập nhật:** 2026-10-01
-> **Total Skills:** 115+ | **Rules:** 43 | **Agents:** 22 | **Commands:** 43 | **MCP Servers:** 5
+> **Phiên bản:** 4.4.0 | **Cập nhật:** 2026-10-09
+> **Total Skills:** 117+ | **Rules:** 45 | **Agents:** 23 | **Commands:** 45 | **MCP Servers:** 5
+
+**Mới (2026-10-09):**
+- **Vibe Code Framework (NEW):** Cross-platform AI coding framework với 3 lớp phân chia (Rules, Skills, Agents/Workflows). Single source of truth, nhiều tool adapters.
+>
+> **Mới (2026-10-05):**
+> - **fullstack-web-development (NEW):** ASP.NET Core Web API + React TSX + Database + REST + JWT Auth. Enforces end-to-end data flow (UI -> API Service -> Controller -> Service -> DB -> Response -> State -> UI), 30 strict engineering rules, 17-point verification checklist, and preservation mandate.
+> - **rule_fullstack-development (NEW):** Fullstack development protocol
+> - **/fullstack command (NEW):** Slash command cho fullstack feature, fix, api, audit, verify
+> - **fullstack-engineer agent (NEW):** Senior fullstack engineer persona
+>
+> **Mới (2026-10-03):**
+> - **vbs-scan-security (NEW):** [vbsec](https://github.com/tanviet12/vbsec) — 21 rule cross-language vulnerability scanner với L1-L4 data flow analysis, optional `--sca` (OSV.dev live CVE lookup) và `--auto-fix` (agentic patch + verify). Reasoning-based, không pattern-match thuần. 5 language overlays: Go/PHP/TS-JS/Python/.NET. Test results: 54/55 known bugs caught, 0 false alarms.
+> - **security_vbsec rule (NEW):** Integration rule cho vbsec skill
+> - **/vbs-scan-security command (NEW):** Slash command tương ứng
 >
 > **Mới (2026-10-01):**
 > - **evondev-ui-ux:** UI/UX skill cho app (dashboard, danh sách, bảng, form, modal). Từ evondevKit
@@ -68,6 +82,7 @@
 | `ponytail` | `skills/ponytail/` | Lazy Senior Dev - YAGNI, minimal code |
 | `full-output` | `skills/full-output/` | No skeletons, complete implementation |
 | `vibe-coding` | `skills/vibe-coding/` | Vibe coding protocol với pre/post gates |
+| `fullstack-web-development` | `skills/fullstack-web-development/` | **NEW (2026-10-05):** ASP.NET Core Web API + React TSX + DB + REST + JWT Auth (30 principles, end-to-end data flow, 17-point verification) |
 
 ### 1.2 Code Review & Quality
 
@@ -77,6 +92,7 @@
 | `backend-reviewer` | `agents/backend-reviewer.md` | NestJS, Laravel, ASP.NET Core review |
 | `frontend-review` | `skills/frontend-review/` | Quality gate cho frontend work |
 | `database-reviewer` | `agents/database-reviewer.md` | Schema, query, indexing review |
+| `fullstack-engineer` | `agents/fullstack-engineer.md` | **NEW (2026-10-05):** Senior Fullstack Engineer (.NET + React/TSX) |
 
 ### 1.3 Code Refactoring & Debugging
 
@@ -90,6 +106,7 @@
 | Rule | Path | Description |
 |------|------|-------------|
 | `coding-standards` | `rules/coding-standards.mdc` | Unified coding standards |
+| `rule_fullstack-development` | `rules/rule_fullstack-development.mdc` | **NEW (2026-10-05):** Fullstack development protocol (ASP.NET Core + React + TSX, 30 principles) |
 | `architecture-patterns` | `rules/architecture-patterns.mdc` | Clean Architecture, Hexagonal, CQRS |
 | `api-patterns` | `rules/api-patterns.mdc` | REST, GraphQL, API Gateway |
 | `testing` | `rules/testing.mdc` | Unit, integration, E2E, TDD |
@@ -345,6 +362,7 @@
 |-------|------|-------------|
 | `security-review` | `skills/security-review/` | OWASP Top 10, ASI Top 10, supply chain |
 | `sec_security-review` | `skills/sec_security-review/` | Active framework security review (OWASP, payment, AD) |
+| `vbs-scan-security` | `skills/vbs-scan-security/` | **NEW (2026-10-03):** [vbsec](https://github.com/tanviet12/vbsec) — 21 rule cross-language vulnerability scanner, L1-L4 data flow analysis, optional `--sca` (OSV.dev live CVE) + `--auto-fix` (agentic patch loop). Reasoning-based, không pattern-match thuần. 5 language overlays: Go/PHP/TS-JS/Python/.NET. Slash command `/vbs-scan-security`. |
 | `vietnam-payment-review` | `skills/vietnam-payment-review/` | MoMo, SePay, PayOS, ZaloPay |
 | `hackingtool` | `skills/sec_hackingtool/` | **Pentest/OSINT bridge** — 183 tools (nmap, nuclei, sherlock, subfinder, maigret, sqlmap, impacket, …) via `tools/hackingtool-plugin/`. Use `/pentest` slash command. Active scan cần authorization. |
 
@@ -353,6 +371,7 @@
 | Rule | Path | Description |
 |------|------|-------------|
 | `security` | `rules/security.mdc` | Security, web-security, secrets |
+| `security_vbsec` | `rules/security_vbsec.mdc` | **NEW (2026-10-03):** vbsec scanner integration rule (21 canonical rules, L1-L4 data flow, OSV.dev, auto-fix) |
 | `auth` | `rules/auth.mdc` | Authentication & authorization |
 
 ### 6.3 Security References
@@ -548,7 +567,9 @@
 |---------|------|-------------|
 | `/clone` | `commands/clone/` | Clone website |
 | `/frontend` | `commands/frontend/` | Frontend tasks |
-| `/security` | `commands/security/` | Security review |
+| `/security` | `commands/security/` | Security review (manual, 5 layers) |
+| `/vbs-scan-security` | `commands/vbs-scan-security/` | **NEW:** Auto scan 21 rules với L1-L4 data flow, optional `--sca` (OSV.dev) + `--auto-fix` |
+| `/fullstack` | `commands/fullstack/` | **NEW (2026-10-05):** Fullstack development (feature, fix, api, audit, verify) |
 | `/perf` | `commands/perf/` | Performance audit |
 | `/doc` | `commands/doc/` | Generate docs |
 | `/generate` | `commands/generate/` | Generate code |
@@ -568,6 +589,7 @@
 | `backend-reviewer` | NestJS, Laravel, ASP.NET Core |
 | `database-reviewer` | Schema, query, indexing |
 | `refactor-specialist` | Behavior-preserving refactor |
+| `fullstack-engineer` | Senior Fullstack Engineer (.NET + React/TSX) |
 
 ### Architecture
 
@@ -981,3 +1003,92 @@ python .cursor/skills/ui-ux-pro-max/scripts/search.py "SaaS dashboard" --design-
 # Persist to files
 python .cursor/skills/ui-ux-pro-max/scripts/search.py "fintech" --design-system --persist -p "MyBank"
 ```
+
+---
+
+## NHÓM 12: VIBE CODE FRAMEWORK
+
+### Cross-Platform AI Coding Framework
+
+> **Mới (2026-10-09):** Vibe Code Framework chuẩn hóa cách tổ chức Rules, Skills, Agents và Workflows cho các Vibe Coding tool.
+
+### Cấu trúc Framework
+
+```
+vibe-code-framework/
+├── 01-core-rules/              # Nguyên tắc chung
+│   ├── 01-principles.md        # YAGNI, KISS, DRY, SOLID
+│   ├── 02-security.md         # OWASP, secrets
+│   ├── 03-code-quality.md     # Clean code, testing
+│   ├── 04-architecture.md     # Clean Architecture
+│   └── 05-git-workflow.md     # Git conventions
+│
+├── 03-skills/                  # Skills dùng chung
+│   ├── create-feature/          # Tạo feature
+│   ├── create-api/             # Tạo API
+│   ├── create-ui/              # Thiết kế UI
+│   ├── database-migration/      # DB migration
+│   ├── code-review/           # Review code
+│   └── debug-error/           # Debug lỗi
+│
+├── 04-agents/                  # Agent personas
+│   ├── architect.md            # Solution Architect
+│   └── reviewer.md            # Code Reviewer
+│
+├── 05-workflows/               # Multi-step workflows
+│   ├── new-feature.md         # Tạo feature
+│   └── bug-fix.md            # Fix bug
+│
+├── 07-adapters/                # Tool adapters
+│   ├── cursor/                # Cursor (.mdc)
+│   ├── claude-code/           # Claude Code (.md)
+│   └── codex/                 # Codex (AGENTS.md)
+│
+└── 08-scripts/                 # Utilities
+    └── sync-adapters.ps1      # Sync script
+```
+
+### Ba lớp phân chia
+
+| Lớp | Mô tả | Ví dụ |
+|-----|-------|--------|
+| **Rules** | Quy tắc luôn phải tuân thủ | Kiến trúc, coding style, bảo mật, cấu trúc dự án |
+| **Skills** | Quy trình chuyên biệt cho từng task | Tạo API, thiết kế UI, review code, tạo database migration |
+| **Agents/Workflows** | Vai trò và quy trình phối hợp nhiều bước | Solution Architect, Fullstack Engineer, multi-step workflows |
+
+### Tool Adapters
+
+| Tool | Rules / Instructions | Skills |
+|------|---------------------|--------|
+| **Cursor** | `.cursor/rules/*.mdc` | `.cursor/skills/*/SKILL.md` |
+| **Claude Code** | `CLAUDE.md`, `.claude/rules/` | `.claude/skills/` |
+| **OpenAI Codex** | `AGENTS.md` | `.agents/skills/` |
+| **GitHub Copilot** | `.github/copilot-instructions.md` | Tùy phiên bản |
+| **VS Code Agent** | `AGENTS.md`, `.github/copilot-instructions.md` | Theo Agent Skills |
+| **Windsurf** | `.windsurf/rules/` | Theo cấu hình |
+
+### Nguyên tắc cốt lõi
+
+1. **Single Source of Truth** — Chỉ viết một bản nội dung, sync sang các tool
+2. **Không nhân bản nội dung** — Rules trong `01-core-rules/`, Skills trong `03-skills/`
+3. **Adapter chỉ chuyển đổi định dạng** — Không chứa nội dung gốc
+
+### Sync Commands
+
+```powershell
+# Sync all adapters
+.\vibe-code-framework\08-scripts\sync-adapters.ps1 -Tool All
+
+# Sync cho Cursor
+.\vibe-code-framework\08-scripts\sync-adapters.ps1 -Tool Cursor
+
+# Sync cho Claude Code
+.\vibe-code-framework\08-scripts\sync-adapters.ps1 -Tool ClaudeCode
+```
+
+### Liên kết
+
+- [Vibe Code Framework README](../vibe-code-framework/README.md)
+- [Cursor Rules Adapter](../vibe-code-framework/07-adapters/cursor/README.md)
+- [AGENTS.md (Codex)](../vibe-code-framework/AGENTS.md)
+- [CLAUDE.md (Claude Code)](../vibe-code-framework/CLAUDE.md)

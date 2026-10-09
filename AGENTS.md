@@ -1,4 +1,4 @@
-﻿# Codex Enterprise Framework - Root Rules
+# Codex Enterprise Framework - Root Rules
 
 > Based on [agent-skills](https://github.com/addyosmani/agent-skills) (67k stars)
 > **Skill Index:** Xem `.cursor/SKILL-INDEX.md` để biết tổng hợp tất cả skills, agents, commands
@@ -32,6 +32,7 @@ DEFINE          PLAN           BUILD          VERIFY         SHIP
 - **karpathy-coding**: [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) (186k stars) - Think before coding, simplicity, surgical changes
 - **ponytail**: Lazy Senior - minimal code, YAGNI
 - **full-output**: No skeletons, complete implementation
+- **fullstack-web-development**: ASP.NET Core Web API + React TSX + Database + REST + JWT Auth (30 strict engineering rules, 17-point verification)
 
 ### UI & Design
 - **landing-page-pro**: Landing pages, SaaS, E-commerce (Hero, Pricing, Auth, Cart)
@@ -84,6 +85,7 @@ Specialized reviewers for targeted tasks:
 
 | Persona | Trigger | Expertise |
 |---------|---------|-----------|
+| Fullstack Engineer | /fullstack | End-to-end ASP.NET Core + React/TSX |
 | Code Reviewer | /review | Five-axis code review |
 | Test Engineer | /test | Test strategy, coverage |
 | Security Auditor | /security | OWASP, vulnerabilities |

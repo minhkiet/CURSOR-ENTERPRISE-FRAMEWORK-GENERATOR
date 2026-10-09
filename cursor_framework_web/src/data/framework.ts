@@ -31,6 +31,24 @@ export interface FrameworkItem {
 
 export const RULES: FrameworkItem[] = [
   {
+    id: 'rule_fullstack-development',
+    type: 'rule',
+    name: 'rule_fullstack-development',
+    title: 'Fullstack Web Development Protocol',
+    subtitle: 'ASP.NET Core Web API + React TSX end-to-end rules',
+    description:
+      'Core protocol governing fullstack web development with ASP.NET Core and React. Enforces strict layer boundaries, DTO mapping, authoritative validation, JWT authentication, and 17-point verification gate.',
+    category: 'Development',
+    tags: ['fullstack', 'aspnetcore', 'react', 'typescript', 'rest-api', 'clean-architecture'],
+    path: '.cursor/rules/rule_fullstack-development.mdc',
+    bullets: [
+      'Strict 9-stage data flow from React UI down to Database and back',
+      'Controllers handle HTTP only — zero raw database entities exposed',
+      'Authoritative backend validation; frontend validation for UX only',
+      'Mandatory pre-completion verification checklist'
+    ]
+  },
+  {
     id: 'karpathy-guidelines',
     type: 'rule',
     name: 'karpathy-guidelines',
@@ -526,6 +544,27 @@ export const RULES: FrameworkItem[] = [
 
 export const SKILLS: FrameworkItem[] = [
   {
+    id: 'fullstack-web-development',
+    type: 'skill',
+    name: 'fullstack-web-development',
+    title: 'Fullstack Web Development',
+    subtitle: 'ASP.NET Core Web API + React TSX end-to-end',
+    description:
+      'Build, modify, and debug fullstack web apps using ASP.NET Core Web API, React + TypeScript + TSX, database, REST, and JWT auth. Enforces end-to-end data flow, 30 strict engineering rules, 17-point verification, and preservation mandate.',
+    category: 'Development',
+    tags: ['fullstack', 'aspnetcore', 'react', 'typescript', 'rest-api', 'jwt', 'database'],
+    role: 'primary',
+    trigger: '/fullstack',
+    path: '.cursor/skills/fullstack-web-development/SKILL.md',
+    gates: ['fullstack-pre', 'fullstack-post'],
+    bullets: [
+      'End-to-End data flow (React UI ➔ API ➔ Controller ➔ Service ➔ DB ➔ State ➔ UI)',
+      'Backend owns business logic, authoritative validation, and security',
+      '30 core rules: controller HTTP-only, DTOs required, zero exposed entities',
+      '17-point pre-delivery verification checklist'
+    ]
+  },
+  {
     id: 'karpathy-coding',
     type: 'skill',
     name: 'karpathy-coding',
@@ -941,6 +980,26 @@ export const SKILLS: FrameworkItem[] = [
 // ────────────────────────────────────────────────────────────────────────────
 
 export const AGENTS: FrameworkItem[] = [
+  {
+    id: 'fullstack-engineer',
+    type: 'agent',
+    name: 'fullstack-engineer',
+    title: 'Fullstack Engineer',
+    subtitle: 'Senior Fullstack Engineer (.NET + React/TSX)',
+    description:
+      'Oversees complete end-to-end implementation across ASP.NET Core Web API and React + TypeScript. Enforces contract synchronization, authoritative server validation, surgical patches, and 17-point verification.',
+    category: 'Architecture',
+    tags: ['fullstack', 'aspnetcore', 'react', 'typescript', 'end-to-end'],
+    role: 'primary',
+    trigger: '/fullstack',
+    path: '.cursor/agents/fullstack-engineer.md',
+    bullets: [
+      'Delivers complete end-to-end features (never leaves broken or partial flows)',
+      'Synchronizes TypeScript types 1:1 with C# backend DTOs',
+      'Preserves existing functionality and applies surgical, minimal safe diffs',
+      'Validates all 17 pre-completion criteria before finishing'
+    ]
+  },
   {
     id: 'code-reviewer',
     type: 'agent',

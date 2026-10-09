@@ -1,0 +1,154 @@
+---
+description: Kiến trúc hệ thống (Clean Architecture, Dependency Injection)
+trigger: architecture, clean architecture, layers, dependency injection
+version: 1.0.0
+category: architecture
+---
+
+# Kiến trúc hệ thống
+
+> **Version:** 1.0.0 | **Category:** Architecture
+
+---
+
+## 1. Clean Architecture
+
+### Layer Structure
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Clean Architecture                        │
+├─────────────────────────────────────────────────────────────┤
+│   ┌─────────────────────────────────────────────────────┐ │
+│   │                   Presentation                         │ │
+│   │   (Controllers, API Routes, UI Components)           │ │
+│   └─────────────────────────────────────────────────────┘ │
+│                           ↓ ↑                                │
+│   ┌─────────────────────────────────────────────────────┐ │
+│   │                   Application                         │ │
+│   │   (Use Cases, DTOs, Application Services)            │ │
+│   └─────────────────────────────────────────────────────┘ │
+│                           ↓ ↑                                │
+│   ┌─────────────────────────────────────────────────────┐ │
+│   │                      Domain                          │ │
+│   │   (Entities, Value Objects, Domain Services)         │ │
+│   └─────────────────────────────────────────────────────┘ │
+│                           ↓ ↑                                │
+│   ┌─────────────────────────────────────────────────────┐ │
+│   │                  Infrastructure                      │ │
+│   │   (Database, External APIs, File System)             │ │
+│   └─────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Dependency Rule
+
+```
+Outer layers có thể phụ thuộc vào inner layers
+Inner layers KHÔNG BAO GIỜ phụ thuộc vào outer layers
+
+Presentation → Application → Domain ← Infrastructure
+
+Infrastructure phải implement interfaces từ Domain
+```
+
+---
+
+## 2. Dependency Injection
+
+### Constructor Injection
+
+```typescript
+// ❌ Hardcoded dependency
+class UserService {
+  private repository = new UserRepository();
+}
+
+// ✅ Constructor injection
+class UserService {
+  constructor(
+    private userRepository: IUserRepository
+  ) {}
+}
+```
+
+---
+
+## 3. Repository Pattern
+
+```typescript
+interface IUserRepository {
+  findById(id: string): Promise<User | null>;
+  findByEmail(email: string): Promise<User | null>;
+  create(user: User): Promise<User>;
+  update(id: string, data: Partial<User>): Promise<User>;
+  delete(id: string): Promise<void>;
+}
+```
+
+---
+
+## 4. Service Layer
+
+### Application Services
+
+```typescript
+class CreateUserUseCase {
+  constructor(
+    private userRepository: IUserRepository,
+    private emailService: IEmailService
+  ) {}
+  
+  async execute(dto: CreateUserDTO): Promise<Result<User>> {
+    // 1. Validate
+    // 2. Check duplicates
+    // 3. Create
+    // 4. Persist
+    // 5. Side effects
+  }
+}
+```
+
+---
+
+## 5. API Design
+
+### RESTful Conventions
+
+```
+Resource (plural noun)
+├── GET    /users           → List users
+├── GET    /users/:id       → Get user
+├── POST   /users           → Create user
+├── PUT    /users/:id       → Update user
+├── PATCH  /users/:id       → Partial update
+├── DELETE /users/:id       → Delete user
+```
+
+---
+
+## 6. Configuration Management
+
+```typescript
+const config = {
+  database: {
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT || '5432'),
+  },
+  api: {
+    port: parseInt(process.env.PORT || '3000'),
+    env: process.env.NODE_ENV,
+  },
+  auth: {
+    jwtSecret: process.env.JWT_SECRET,
+    jwtExpiry: process.env.JWT_EXPIRY || '15m',
+  },
+};
+```
+
+---
+
+## Nguồn tham khảo
+
+- [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+- [Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture/)

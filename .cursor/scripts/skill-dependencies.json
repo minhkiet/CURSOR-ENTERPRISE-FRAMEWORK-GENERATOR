@@ -16,6 +16,30 @@
     "supportedLanguages": ["vi", "zh", "ja", "ko", "en"]
   },
   "skills": {
+    "fullstack-web-development": {
+      "name": "Fullstack Web Development",
+      "description": "ASP.NET Core Web API + React TypeScript TSX fullstack development with 30 core rules and end-to-end flow.",
+      "version": "1.0.0",
+      "keywords": {
+        "en": ["fullstack", "fullstack web", "asp.net core react", "dotnet react", "react typescript dotnet", "build fullstack", "web api react", "/fullstack"],
+        "vi": ["phát triển fullstack", "lập trình web fullstack", "dotnet react", "aspnet react"]
+      },
+      "gates": {
+        "pre": ["fullstack-pre"],
+        "post": ["fullstack-post"]
+      },
+      "dependencies": {
+        "npm": {
+          "required": false,
+          "packages": [
+            { "name": "axios", "description": "Promise based HTTP client" },
+            { "name": "react-router-dom", "description": "Declarative routing" }
+          ]
+        }
+      },
+      "autoApply": true,
+      "priority": "HIGH"
+    },
     "frontend-taste": {
       "name": "Frontend Taste",
       "description": "Premium frontend design skill for landing pages and portfolios. Anti-slop frontend. Not for dashboards or data tables.",

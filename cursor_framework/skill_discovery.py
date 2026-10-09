@@ -108,6 +108,19 @@ class SkillRegistry:
         """Initialize default skills from framework."""
         default_skills = [
             SkillMetadata(
+                name="fullstack-web-development",
+                version="1.0.0",
+                description="ASP.NET Core Web API + React TSX fullstack development with 30 core rules and end-to-end flow",
+                tags=["fullstack", "aspnetcore", "react", "typescript", "rest-api", "jwt"],
+                path=".cursor/skills/fullstack-web-development/SKILL.md",
+                pre_review_sections=["01"],
+                post_review_sections=["23"],
+                trigger_keywords=[
+                    "fullstack", "fullstack web", "asp.net core react", "dotnet react",
+                    "react typescript dotnet", "build fullstack", "web api react", "/fullstack"
+                ],
+            ),
+            SkillMetadata(
                 name="frontend-taste",
                 version="1.0.0",
                 description="Anti-slop frontend for landing pages and portfolios",

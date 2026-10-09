@@ -1,0 +1,111 @@
+---
+description: Nguyên tắc nền tảng (YAGNI, DRY, KISS, SOLID)
+trigger: principles, yagni, dry, kiss, solid, clean code
+version: 1.0.0
+category: core
+---
+
+# Nguyên tắc nền tảng
+
+> **Version:** 1.0.0 | **Category:** Core Principles
+
+---
+
+## Tổng quan
+
+Các nguyên tắc nền tảng hướng dẫn cách tư duy và ra quyết định trong quá trình phát triển. Áp dụng chúng trước khi viết bất kỳ dòng code nào.
+
+---
+
+## 1. YAGNI — You Aren't Gonna Need It
+
+**Nguyên tắc:** Không viết code cho tính năng không cần thiết.
+
+### YAGNI Ladder
+
+```
+┌────────────────────────────────────────────────────────────┐
+│ YAGNI Ladder — Dừng ở bậc thang đầu tiên có thể giữ     │
+├────────────────────────────────────────────────────────────┤
+│                                                            │
+│  1. Có cần xây không?          → không: skip (YAGNI)     │
+│  2. Đã có trong codebase?       → reuse, đừng viết lại   │
+│  3. Stdlib có không?             → dùng nó                │
+│  4. Native platform feature?     → dùng nó                │
+│  5. Đã cài dependency?          → dùng nó                │
+│  6. Một dòng?                   → một dòng               │
+│  7. Chỉ khi đó: tối thiểu nhất                                          │
+│                                                            │
+└────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 2. KISS — Keep It Simple, Stupid
+
+**Nguyên tắc:** Giải pháp đơn giản nhất thường là giải pháp tốt nhất.
+
+### Quy tắc
+
+1. **Ưu tiên đơn giản** — Nếu giải pháp phức tạp, tìm cách đơn giản hơn
+2. **Một trách nhiệm** — Mỗi function/class chỉ làm một việc
+3. **Tránh premature optimization** — Chạy được trước, tối ưu sau
+
+---
+
+## 3. DRY — Don't Repeat Yourself
+
+**Nguyên tắc:** Mỗi kiến thức phải có một biểu diễn duy nhất trong hệ thống.
+
+### DRY Checklist
+
+```
+□ Logic lặp lại → Extract thành function/module
+□ Validation lặp lại → Extract thành validator
+□ Type lặp lại → Extract thành shared type
+□ Constant lặp lại → Extract thành constants file
+□ Test lặp lại → Extract thành shared test utility
+```
+
+---
+
+## 4. SOLID Principles
+
+### S — Single Responsibility Principle
+> Mỗi class chỉ có một lý do để thay đổi.
+
+### O — Open/Closed Principle
+> Mở rộng bằng kế thừa, đóng với sửa đổi.
+
+### L — Liskov Substitution Principle
+> Objects của subclass có thể thay thế objects của parent class.
+
+### I — Interface Segregation Principle
+> Nhiều interfaces nhỏ, chuyên biệt tốt hơn một interface lớn.
+
+### D — Dependency Inversion Principle
+> Phụ thuộc vào abstractions, không phải concretions.
+
+---
+
+## 5. Pre-Implementation Checklist
+
+Trước khi viết code, hãy tự hỏi:
+
+```
+□ Tôi đã hiểu rõ requirement chưa?
+□ Tôi đã thực sự cần tính năng này không? (YAGNI)
+□ Có cách nào đơn giản hơn không? (KISS)
+□ Tôi đang duplicate code/logic không? (DRY)
+□ Đây có phải là đúng abstraction không? (SOLID)
+□ Tôi đã test được trong đầu chưa?
+```
+
+---
+
+## Nguồn tham khảo
+
+- [YAGNI - Martin Fowler](https://martinfowler.com/bliki/Yagni.html)
+- [KISS Principle](https://people.apache.org/~fhanik/kiss.html)
+- [DRY Principle](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself)
+- [SOLID Principles](https://en.wikipedia.org/wiki/SOLID)

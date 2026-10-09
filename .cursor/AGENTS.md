@@ -1,4 +1,4 @@
-﻿# Cursor Enterprise Framework - Agent Personas & Lifecycle Protocol
+# Cursor Enterprise Framework - Agent Personas & Lifecycle Protocol
 
 > Based on [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) (67k stars) and [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) (186k stars)
 
@@ -51,6 +51,7 @@ Cursor Enterprise Framework tích hợp **Agent Personas** từ agent-skills - c
 | `/doc` | Documentation generation |
 | `/fix` | Bug fixing workflow |
 | `/frontend` | Frontend specific tasks |
+| `/fullstack` | Fullstack web app development (ASP.NET Core + React/TSX) |
 | `/generate` | Code generation |
 | `/memory` | Memory management |
 | `/ocr` | OCR processing |
@@ -581,6 +582,7 @@ Delivery
 | Performance audit | Web Performance Auditor | - |
 | Landing page | frontend-taste skill | karpathy-coding |
 | Security + payment | Security Auditor | vietnam-payment-review |
+| Fullstack web app | Fullstack Engineer | karpathy-coding |
 
 ### Slash Commands Quick Guide
 

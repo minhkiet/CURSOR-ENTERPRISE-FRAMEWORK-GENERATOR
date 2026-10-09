@@ -1,4 +1,4 @@
-﻿---
+---
 description: Single Source of Truth cho tất cả skill definitions, triggers, confidence thresholds, và gate mappings. Được sử dụng bởi skill-integration, task-analyzer, và multi-language-vibe-code. Bao gồm Ponytail Lazy Senior Dev principles. Integrated với agent-skills (addyosmani/agent-skills) và ChatbotX development patterns. Tích hợp Karpathy Guidelines từ andrej-karpathy-skills và Hallmark anti-slop design skill từ Nutlope/hallmark (9.3k stars).
 created: 2026-06-26
 version: 2.0.0
@@ -134,6 +134,29 @@ Mỗi skill được định nghĩa với các properties:
 **Post-Gates:** §5.A-5.C (3 sections)
 
 **Purpose:** Chống truncation, placeholder, skeleton. Đảm bảo output đầy đủ.
+
+---
+
+#### fullstack-web-development
+
+| Property | Value |
+|----------|-------|
+| **ID** | `fullstack-web-development` |
+| **Path** | `.cursor/skills/fullstack-web-development/SKILL.md` |
+| **Role** | `primary` |
+| **Domains** | `fullstack`, `backend`, `frontend`, `api`, `database` |
+| **Confidence Base** | `0.85` |
+| **Threshold** | `0.75` (auto-select) |
+
+**Triggers:**
+- "fullstack", "fullstack web", "asp.net core react", "dotnet react"
+- "react typescript dotnet", "build fullstack", "web api react"
+- "/fullstack", "fullstack feature", "fullstack bug fix"
+
+**Pre-Gates:** §01 (Project Analysis - 10 inspection steps)  
+**Post-Gates:** §23 (17-point Verification Checklist)
+
+**Purpose:** Xây dựng, sửa đổi, debug fullstack web app (ASP.NET Core Web API + React TypeScript TSX) với 30 quy tắc cốt lõi, bảo đảm dòng dữ liệu xuyên suốt (React UI ➔ API Service ➔ Controller ➔ Service ➔ Database ➔ Response ➔ State ➔ UI) và bảo toàn mã nguồn cũ.
 
 ---
 
@@ -1005,6 +1028,10 @@ Mỗi skill được định nghĩa với các properties:
 | `code-simplify` | code-simplification | 0.90 | Chesterton's Fence |
 | `ship`, `/ship` | shipping-and-launch | 0.95 | Pre-launch checklist |
 | `interview` | interview-me | 0.90 | One-question-at-a-time |
+| **FULLSTACK DEVELOPMENT** ||||
+| `fullstack`, `/fullstack` | fullstack-web-development | 0.95 | ASP.NET Core + React + TSX end-to-end |
+| `asp.net core react`, `dotnet react` | fullstack-web-development | 0.95 | Fullstack .NET backend + React UI |
+| `react typescript dotnet` | fullstack-web-development | 0.95 | Fullstack API + state + components |
 | **VISUAL** ||||
 | `diagram` | visual-explainer | 0.95 | Architecture/system diagrams |
 | `architecture overview` | visual-explainer | 0.95 | System architecture |

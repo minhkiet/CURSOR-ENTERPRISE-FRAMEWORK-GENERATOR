@@ -49,160 +49,193 @@ namespace CursorSetupWpf.ViewModels
         public string Str(string key) => LocalizationService.T(key);
         public string VersionChip => "v4.3";
 
-        public string InstallButtonText => LocalizationService.T("btn.install");
-        public string LanguageLabel => LocalizationService.T("combobox.lang");
-        public string WindowTitle => LocalizationService.T("app.title");
-        public string AppBrand => LocalizationService.T("app.title_short");
-        public string AppBrandSubtitle => LocalizationService.T("app.subtitle");
+        // Backing fields for localized strings (required for OnPropertyChanged to work in WPF)
+        // Initialize all at once to reduce code duplication
+        string _installPageTitle = "", _installPageSubtitle = "", _installButtonText = "";
+        string _languageLabel = "", _windowTitle = "", _appBrand = "", _appBrandSubtitle = "";
+        string _vibeCoderTitle = "", _mcpTitle = "", _mcpSubtitle = "", _mcpSyncAllLabel = "", _mcpCheckStatusLabel = "";
+        string _mcpInstalledLabel = "", _mcpNotInstalledLabel = "", _mcpOpenConfigLabel = "", _mcpLastSyncLabel = "";
+        string _hooksPageTitle = "", _hooksPageDesc = "", _hooksPrescanTitle = "", _hooksPrescanDesc = "";
+        string _hooksPrescanScriptLabel = "", _hooksPostinstallTitle = "", _hooksPostinstallDesc = "";
+        string _hooksPostinstallScriptLabel = "", _hooksAboutTitle = "", _hooksAboutDesc = "";
+        string _componentsTitle = "", _componentsSubtitle = "", _advancedTitle = "", _advancedSubtitle = "";
+        string _btnSelectAll = "", _btnDeselectAll = "";
+        string _installLocationLabel = "", _installLocationHint = "", _installBrowseLabel = "", _installNewFolderLabel = "";
+        string _installForceLabel = "", _installSkipCursorLabel = "", _installBuildOptionsLabel = "";
+        string _installOptionalLabel = "", _installBuildOptionsDesc = "", _installBuildMemoryLabel = "";
+        string _installCompileKnowledgeLabel = "", _installBuildIndexLabel = "", _installBuildEmbeddingsLabel = "";
+        string _installPackageFrameworkLabel = "", _installBuildExeNote = "", _installTipLabel = "";
+        string _updatesTitle = "", _updatesSubtitle = "", _updatesCheckLabel = "", _updatesDownloadLabel = "";
+        string _updatesChangelogLabel = "", _updatesCurrentVersionLabel = "", _updatesLatestVersionLabel = "";
+        string _backupTitle = "", _backupSubtitle = "", _backupCreateLabel = "", _backupRestoreLabel = "";
+        string _backupDeleteLabel = "", _backupRefreshLabel = "", _backupLocationLabel = "", _backupBrowseLabel = "";
+        string _backupAutoLabel = "", _backupEmptyLabel = "", _backupConfigurationLabel = "", _backupSnapshotsLabel = "";
+        string _settingsTitle = "", _settingsSubtitle = "", _settingsThemeLabel = "";
+        string _settingsAutostartLabel = "", _settingsAutostartDescLabel = "";
+        string _settingsNotifyCompleteLabel = "", _settingsNotifyErrorLabel = "";
+        string _settingsLogPathLabel = "", _settingsBrowseLabel = "";
+        string _settingsAppearanceLabel = "", _settingsStartupLabel = "", _settingsNotificationsLabel = "";
+        string _settingsLoggingLabel = "", _settingsSaveLabel = "";
+        string _frameworkTitle = "", _frameworkSubtitle = "", _btnStartLabel = "", _btnOpenLabel = "";
+        string _btnRunLabel = "", _btnCancelLabel = "";
+        string _frameworkDashboardLabel = "", _frameworkDashboardDesc = "";
+        string _frameworkGraphLabel = "", _frameworkGraphDesc = "", _frameworkApiLabel = "", _frameworkApiDesc = "";
+        string _frameworkScanLabel = "", _frameworkScanDesc = "", _frameworkIndexLabel = "", _frameworkIndexDesc = "";
+        string _frameworkWarmLabel = "", _frameworkWarmDesc = "", _frameworkStatsLabel = "", _frameworkStatsDesc = "";
+        string _frameworkSkillGraphLabel = "", _frameworkSkillGraphDesc = "";
+        string _frameworkCodeGraphLabel = "", _frameworkCodeGraphDesc = "";
+        string _frameworkSessionStatsLabel = "", _frameworkSessionStatsDesc = "";
+        string _frameworkClearSessionLabel = "", _frameworkClearSessionDesc = "";
+        string _frameworkRunningText = "", _frameworkServersTitle = "", _frameworkBuildTitle = "";
+        string _frameworkGraphTitle = "", _frameworkAboutTitle = "", _frameworkAboutDesc = "";
+        string _frameworkAboutCommands = "", _frameworkAboutCommandList = "";
+        string _mcpDiscoveredToolsLabel = "";
+        string _projectRunnerTitle = "", _projectRunnerSubtitle = "", _projectRunnerSelectProjectLabel = "";
+        string _projectRunnerBrowseLabel = "", _projectRunnerDetectedProjectsLabel = "", _projectRunnerRunOnProjectLabel = "";
+        string _projectRunnerAskPlaceholder = "", _projectRunnerCurrentPathLabel = "";
+        string _projectRunnerRunningLabel = "", _projectRunnerAskTitle = "", _projectRunnerAskSubtitle = "";
+        string _projectRunnerRunAskLabel = "", _projectRunnerOutputLabel = "", _projectRunnerClearLabel = "";
+        string _itemsUnitLabel = "", _agentTitle = "", _agentInstalledLabel = "", _agentNotInstalledLabel = "";
+        string _installForAllAgentsLabel = "";
 
-        // Vibe Coder selector
-        public string VibeCoderTitle => LocalizationService.T("vibe_coder.label");
-
-        // MCP labels
-        public string McpTitle => LocalizationService.T("mcp.title");
-        public string McpSubtitle => LocalizationService.T("mcp.subtitle");
-        public string McpSyncAllLabel => LocalizationService.T("mcp.sync_all");
-        public string McpCheckStatusLabel => LocalizationService.T("mcp.check_status");
-        public string McpInstalledLabel => LocalizationService.T("mcp.installed");
-        public string McpNotInstalledLabel => LocalizationService.T("mcp.not_installed");
-        public string McpOpenConfigLabel => LocalizationService.T("mcp.opening_config");
-        public string McpLastSyncLabel =>
-            LocalizationService.T("mcp.last_sync",
-                McpServers.FirstOrDefault()?.LastSyncText ?? LocalizationService.T("mcp.last_sync_never"));
-
-        // Hooks page labels
-        public string HooksPageTitle => LocalizationService.T("hooks.page_title");
-        public string HooksPageDesc => LocalizationService.T("hooks.page_desc");
-        public string HooksPrescanTitle => LocalizationService.T("hooks.prescan_title");
-        public string HooksPrescanDesc => LocalizationService.T("hooks.prescan_desc");
-        public string HooksPrescanScriptLabel => LocalizationService.T("hooks.prescan_script_label");
-        public string HooksPostinstallTitle => LocalizationService.T("hooks.postinstall_title");
-        public string HooksPostinstallDesc => LocalizationService.T("hooks.postinstall_desc");
-        public string HooksPostinstallScriptLabel => LocalizationService.T("hooks.postinstall_script_label");
-        public string HooksAboutTitle => LocalizationService.T("hooks.about_title");
-        public string HooksAboutDesc => LocalizationService.T("hooks.about_desc");
-
-        // Components page labels
-        public string ComponentsTitle => LocalizationService.T("components.title");
-        public string ComponentsSubtitle => LocalizationService.T("components.subtitle");
-
-        // Advanced page labels
-        public string AdvancedTitle => LocalizationService.T("advanced.title");
-        public string AdvancedSubtitle => LocalizationService.T("advanced.subtitle");
-
-        // Common button labels
-        public string BtnSelectAll => LocalizationService.T("btn.select_all");
-        public string BtnDeselectAll => LocalizationService.T("btn.deselect_all");
-
-        // Install page labels
-        public string InstallPageTitle => LocalizationService.T("install.page_title");
-        public string InstallPageSubtitle => LocalizationService.T("install.page_subtitle");
-        public string InstallLocationLabel => LocalizationService.T("install.location");
-        public string InstallLocationHint => LocalizationService.T("install.location_hint");
-        public string InstallBrowseLabel => LocalizationService.T("install.browse");
-        public string InstallNewFolderLabel => LocalizationService.T("install.new_folder");
-        public string InstallForceLabel => LocalizationService.T("install.force");
-        public string InstallSkipCursorLabel => LocalizationService.T("install.skip_cursor");
-        public string InstallBuildOptionsLabel => LocalizationService.T("install.build_options");
-        public string InstallOptionalLabel => LocalizationService.T("install.optional");
-        public string InstallBuildOptionsDesc => LocalizationService.T("install.build_options_desc");
-        public string InstallBuildMemoryLabel => LocalizationService.T("install.build_memory");
-        public string InstallCompileKnowledgeLabel => LocalizationService.T("install.compile_knowledge");
-        public string InstallBuildIndexLabel => LocalizationService.T("install.build_index");
-        public string InstallBuildEmbeddingsLabel => LocalizationService.T("install.build_embeddings");
-        public string InstallPackageFrameworkLabel => LocalizationService.T("install.package_framework");
-        public string InstallBuildExeNote => LocalizationService.T("install.build_exe_note");
-        public string InstallTipLabel => LocalizationService.T("install.tip");
-
-        // Updates labels
-        public string UpdatesTitle => LocalizationService.T("updates.title");
-        public string UpdatesSubtitle => LocalizationService.T("updates.subtitle");
-        public string UpdatesCheckLabel => LocalizationService.T("updates.check");
-        public string UpdatesDownloadLabel => LocalizationService.T("updates.download");
-        public string UpdatesChangelogLabel => LocalizationService.T("updates.changelog");
-        public string UpdatesCurrentVersionLabel => LocalizationService.T("updates.current_version");
-        public string UpdatesLatestVersionLabel => LocalizationService.T("updates.latest_version");
-
-        // Backup labels
-        public string BackupTitle => LocalizationService.T("backup.title");
-        public string BackupSubtitle => LocalizationService.T("backup.subtitle");
-        public string BackupCreateLabel => LocalizationService.T("backup.create");
-        public string BackupRestoreLabel => LocalizationService.T("backup.restore");
-        public string BackupDeleteLabel => LocalizationService.T("backup.delete");
-        public string BackupRefreshLabel => LocalizationService.T("backup.refresh");
-        public string BackupLocationLabel => LocalizationService.T("backup.location");
-        public string BackupBrowseLabel => LocalizationService.T("backup.browse");
-        public string BackupAutoLabel => LocalizationService.T("backup.auto");
-        public string BackupEmptyLabel => LocalizationService.T("backup.empty");
-        public string BackupConfigurationLabel => LocalizationService.T("backup.configuration_label");
-        public string BackupSnapshotsLabel => LocalizationService.T("backup.snapshots_label");
-
-        // Settings labels
-        public string SettingsTitle => LocalizationService.T("settings.title");
-        public string SettingsSubtitle => LocalizationService.T("settings.subtitle");
-        public string SettingsThemeLabel => LocalizationService.T("settings.theme");
-        public string SettingsAutostartLabel => LocalizationService.T("settings.autostart");
-        public string SettingsAutostartDescLabel => LocalizationService.T("settings.autostart_desc");
-        public string SettingsNotifyCompleteLabel => LocalizationService.T("settings.notify_complete");
-        public string SettingsNotifyErrorLabel => LocalizationService.T("settings.notify_error");
-        public string SettingsLogPathLabel => LocalizationService.T("settings.log_path");
-        public string SettingsBrowseLabel => LocalizationService.T("settings.browse");
-        public string SettingsAppearanceLabel => LocalizationService.T("settings.appearance_label");
-        public string SettingsStartupLabel => LocalizationService.T("settings.startup_label");
-        public string SettingsNotificationsLabel => LocalizationService.T("settings.notifications_label");
-        public string SettingsLoggingLabel => LocalizationService.T("settings.logging_label");
-        public string SettingsSaveLabel => LocalizationService.T("settings.save_label");
-
-        // Framework labels
-        public string FrameworkTitle => LocalizationService.T("framework.title");
-        public string FrameworkSubtitle => LocalizationService.T("framework.subtitle");
-        public string BtnStartLabel => LocalizationService.T("btn.start");
-        public string BtnOpenLabel => LocalizationService.T("btn.open");
-        public string BtnRunLabel => LocalizationService.T("btn.run");
-        public string BtnCancelLabel => LocalizationService.T("btn.cancel");
-        public string FrameworkDashboardLabel => LocalizationService.T("framework.dashboard");
-        public string FrameworkDashboardDesc => LocalizationService.T("framework.dashboard_desc");
-        public string FrameworkGraphLabel => LocalizationService.T("framework.graph_viz");
-        public string FrameworkGraphDesc => LocalizationService.T("framework.graph_viz_desc");
-        public string FrameworkApiLabel => LocalizationService.T("framework.api_server");
-        public string FrameworkApiDesc => LocalizationService.T("framework.api_server_desc");
-        public string FrameworkScanLabel => LocalizationService.T("framework.scan");
-        public string FrameworkScanDesc => LocalizationService.T("framework.scan_desc");
-        public string FrameworkIndexLabel => LocalizationService.T("framework.build_index");
-        public string FrameworkIndexDesc => LocalizationService.T("framework.build_index_desc");
-        public string FrameworkWarmLabel => LocalizationService.T("framework.warm_cache");
-        public string FrameworkWarmDesc => LocalizationService.T("framework.warm_cache_desc");
-        public string FrameworkStatsLabel => LocalizationService.T("framework.stats");
-        public string FrameworkStatsDesc => LocalizationService.T("framework.stats_desc");
-        public string FrameworkSkillGraphLabel => LocalizationService.T("framework.skill_graph");
-        public string FrameworkSkillGraphDesc => LocalizationService.T("framework.skill_graph_desc");
-        public string FrameworkCodeGraphLabel => LocalizationService.T("framework.code_graph");
-        public string FrameworkCodeGraphDesc => LocalizationService.T("framework.code_graph_desc");
-        public string FrameworkSessionStatsLabel => LocalizationService.T("framework.session_stats");
-        public string FrameworkSessionStatsDesc => LocalizationService.T("framework.session_stats_desc");
-        public string FrameworkClearSessionLabel => LocalizationService.T("framework.clear_session");
-        public string FrameworkClearSessionDesc => LocalizationService.T("framework.clear_session_desc");
-        public string FrameworkRunningText => LocalizationService.T("framework.running");
-        public string FrameworkServersTitle => LocalizationService.T("framework.dashboard_title");
-        public string FrameworkBuildTitle => LocalizationService.T("framework.build_title");
-        public string FrameworkGraphTitle => LocalizationService.T("framework.graph_title");
-        public string FrameworkAboutTitle => LocalizationService.T("framework.about_title");
-        public string FrameworkAboutDesc => LocalizationService.T("framework.about_desc");
-        public string FrameworkAboutCommands => LocalizationService.T("framework.about_commands");
-        public string FrameworkAboutCommandList => LocalizationService.T("framework.about_command_list");
-
-        // MCP labels
-        public string McpDiscoveredToolsLabel => LocalizationService.T("mcp.discovered_tools");
-
-        // Project Runner labels
-        public string ProjectRunnerTitle => LocalizationService.T("project_runner.title");
-        public string ProjectRunnerSubtitle => LocalizationService.T("project_runner.subtitle");
-        public string ProjectRunnerSelectProjectLabel => LocalizationService.T("project_runner.select_project");
-        public string ProjectRunnerBrowseLabel => LocalizationService.T("project_runner.browse");
-        public string ProjectRunnerDetectedProjectsLabel => LocalizationService.T("project_runner.detected_projects");
-        public string ProjectRunnerRunOnProjectLabel => LocalizationService.T("project_runner.run_on_project");
-        public string ProjectRunnerAskPlaceholder => LocalizationService.T("project_runner.ask_placeholder");
-        public string ProjectRunnerCurrentPathLabel => LocalizationService.T("project_runner.current_path");
+        // Properties with backing fields (will be initialized in constructor)
+        public string InstallButtonText { get => _installButtonText; set => Set(ref _installButtonText, value); }
+        public string LanguageLabel { get => _languageLabel; set => Set(ref _languageLabel, value); }
+        public string WindowTitle { get => _windowTitle; set => Set(ref _windowTitle, value); }
+        public string AppBrand { get => _appBrand; set => Set(ref _appBrand, value); }
+        public string AppBrandSubtitle { get => _appBrandSubtitle; set => Set(ref _appBrandSubtitle, value); }
+        public string VibeCoderTitle { get => _vibeCoderTitle; set => Set(ref _vibeCoderTitle, value); }
+        public string McpTitle { get => _mcpTitle; set => Set(ref _mcpTitle, value); }
+        public string McpSubtitle { get => _mcpSubtitle; set => Set(ref _mcpSubtitle, value); }
+        public string McpSyncAllLabel { get => _mcpSyncAllLabel; set => Set(ref _mcpSyncAllLabel, value); }
+        public string McpCheckStatusLabel { get => _mcpCheckStatusLabel; set => Set(ref _mcpCheckStatusLabel, value); }
+        public string McpInstalledLabel { get => _mcpInstalledLabel; set => Set(ref _mcpInstalledLabel, value); }
+        public string McpNotInstalledLabel { get => _mcpNotInstalledLabel; set => Set(ref _mcpNotInstalledLabel, value); }
+        public string McpOpenConfigLabel { get => _mcpOpenConfigLabel; set => Set(ref _mcpOpenConfigLabel, value); }
+        public string McpLastSyncLabel { get => _mcpLastSyncLabel; set => Set(ref _mcpLastSyncLabel, value); }
+        public string HooksPageTitle { get => _hooksPageTitle; set => Set(ref _hooksPageTitle, value); }
+        public string HooksPageDesc { get => _hooksPageDesc; set => Set(ref _hooksPageDesc, value); }
+        public string HooksPrescanTitle { get => _hooksPrescanTitle; set => Set(ref _hooksPrescanTitle, value); }
+        public string HooksPrescanDesc { get => _hooksPrescanDesc; set => Set(ref _hooksPrescanDesc, value); }
+        public string HooksPrescanScriptLabel { get => _hooksPrescanScriptLabel; set => Set(ref _hooksPrescanScriptLabel, value); }
+        public string HooksPostinstallTitle { get => _hooksPostinstallTitle; set => Set(ref _hooksPostinstallTitle, value); }
+        public string HooksPostinstallDesc { get => _hooksPostinstallDesc; set => Set(ref _hooksPostinstallDesc, value); }
+        public string HooksPostinstallScriptLabel { get => _hooksPostinstallScriptLabel; set => Set(ref _hooksPostinstallScriptLabel, value); }
+        public string HooksAboutTitle { get => _hooksAboutTitle; set => Set(ref _hooksAboutTitle, value); }
+        public string HooksAboutDesc { get => _hooksAboutDesc; set => Set(ref _hooksAboutDesc, value); }
+        public string ComponentsTitle { get => _componentsTitle; set => Set(ref _componentsTitle, value); }
+        public string ComponentsSubtitle { get => _componentsSubtitle; set => Set(ref _componentsSubtitle, value); }
+        public string AdvancedTitle { get => _advancedTitle; set => Set(ref _advancedTitle, value); }
+        public string AdvancedSubtitle { get => _advancedSubtitle; set => Set(ref _advancedSubtitle, value); }
+        public string BtnSelectAll { get => _btnSelectAll; set => Set(ref _btnSelectAll, value); }
+        public string BtnDeselectAll { get => _btnDeselectAll; set => Set(ref _btnDeselectAll, value); }
+        public string InstallPageTitle { get => _installPageTitle; set => Set(ref _installPageTitle, value); }
+        public string InstallPageSubtitle { get => _installPageSubtitle; set => Set(ref _installPageSubtitle, value); }
+        public string InstallLocationLabel { get => _installLocationLabel; set => Set(ref _installLocationLabel, value); }
+        public string InstallLocationHint { get => _installLocationHint; set => Set(ref _installLocationHint, value); }
+        public string InstallBrowseLabel { get => _installBrowseLabel; set => Set(ref _installBrowseLabel, value); }
+        public string InstallNewFolderLabel { get => _installNewFolderLabel; set => Set(ref _installNewFolderLabel, value); }
+        public string InstallForceLabel { get => _installForceLabel; set => Set(ref _installForceLabel, value); }
+        public string InstallSkipCursorLabel { get => _installSkipCursorLabel; set => Set(ref _installSkipCursorLabel, value); }
+        public string InstallBuildOptionsLabel { get => _installBuildOptionsLabel; set => Set(ref _installBuildOptionsLabel, value); }
+        public string InstallOptionalLabel { get => _installOptionalLabel; set => Set(ref _installOptionalLabel, value); }
+        public string InstallBuildOptionsDesc { get => _installBuildOptionsDesc; set => Set(ref _installBuildOptionsDesc, value); }
+        public string InstallBuildMemoryLabel { get => _installBuildMemoryLabel; set => Set(ref _installBuildMemoryLabel, value); }
+        public string InstallCompileKnowledgeLabel { get => _installCompileKnowledgeLabel; set => Set(ref _installCompileKnowledgeLabel, value); }
+        public string InstallBuildIndexLabel { get => _installBuildIndexLabel; set => Set(ref _installBuildIndexLabel, value); }
+        public string InstallBuildEmbeddingsLabel { get => _installBuildEmbeddingsLabel; set => Set(ref _installBuildEmbeddingsLabel, value); }
+        public string InstallPackageFrameworkLabel { get => _installPackageFrameworkLabel; set => Set(ref _installPackageFrameworkLabel, value); }
+        public string InstallBuildExeNote { get => _installBuildExeNote; set => Set(ref _installBuildExeNote, value); }
+        public string InstallTipLabel { get => _installTipLabel; set => Set(ref _installTipLabel, value); }
+        public string UpdatesTitle { get => _updatesTitle; set => Set(ref _updatesTitle, value); }
+        public string UpdatesSubtitle { get => _updatesSubtitle; set => Set(ref _updatesSubtitle, value); }
+        public string UpdatesCheckLabel { get => _updatesCheckLabel; set => Set(ref _updatesCheckLabel, value); }
+        public string UpdatesDownloadLabel { get => _updatesDownloadLabel; set => Set(ref _updatesDownloadLabel, value); }
+        public string UpdatesChangelogLabel { get => _updatesChangelogLabel; set => Set(ref _updatesChangelogLabel, value); }
+        public string UpdatesCurrentVersionLabel { get => _updatesCurrentVersionLabel; set => Set(ref _updatesCurrentVersionLabel, value); }
+        public string UpdatesLatestVersionLabel { get => _updatesLatestVersionLabel; set => Set(ref _updatesLatestVersionLabel, value); }
+        public string BackupTitle { get => _backupTitle; set => Set(ref _backupTitle, value); }
+        public string BackupSubtitle { get => _backupSubtitle; set => Set(ref _backupSubtitle, value); }
+        public string BackupCreateLabel { get => _backupCreateLabel; set => Set(ref _backupCreateLabel, value); }
+        public string BackupRestoreLabel { get => _backupRestoreLabel; set => Set(ref _backupRestoreLabel, value); }
+        public string BackupDeleteLabel { get => _backupDeleteLabel; set => Set(ref _backupDeleteLabel, value); }
+        public string BackupRefreshLabel { get => _backupRefreshLabel; set => Set(ref _backupRefreshLabel, value); }
+        public string BackupLocationLabel { get => _backupLocationLabel; set => Set(ref _backupLocationLabel, value); }
+        public string BackupBrowseLabel { get => _backupBrowseLabel; set => Set(ref _backupBrowseLabel, value); }
+        public string BackupAutoLabel { get => _backupAutoLabel; set => Set(ref _backupAutoLabel, value); }
+        public string BackupEmptyLabel { get => _backupEmptyLabel; set => Set(ref _backupEmptyLabel, value); }
+        public string BackupConfigurationLabel { get => _backupConfigurationLabel; set => Set(ref _backupConfigurationLabel, value); }
+        public string BackupSnapshotsLabel { get => _backupSnapshotsLabel; set => Set(ref _backupSnapshotsLabel, value); }
+        public string SettingsTitle { get => _settingsTitle; set => Set(ref _settingsTitle, value); }
+        public string SettingsSubtitle { get => _settingsSubtitle; set => Set(ref _settingsSubtitle, value); }
+        public string SettingsThemeLabel { get => _settingsThemeLabel; set => Set(ref _settingsThemeLabel, value); }
+        public string SettingsAutostartLabel { get => _settingsAutostartLabel; set => Set(ref _settingsAutostartLabel, value); }
+        public string SettingsAutostartDescLabel { get => _settingsAutostartDescLabel; set => Set(ref _settingsAutostartDescLabel, value); }
+        public string SettingsNotifyCompleteLabel { get => _settingsNotifyCompleteLabel; set => Set(ref _settingsNotifyCompleteLabel, value); }
+        public string SettingsNotifyErrorLabel { get => _settingsNotifyErrorLabel; set => Set(ref _settingsNotifyErrorLabel, value); }
+        public string SettingsLogPathLabel { get => _settingsLogPathLabel; set => Set(ref _settingsLogPathLabel, value); }
+        public string SettingsBrowseLabel { get => _settingsBrowseLabel; set => Set(ref _settingsBrowseLabel, value); }
+        public string SettingsAppearanceLabel { get => _settingsAppearanceLabel; set => Set(ref _settingsAppearanceLabel, value); }
+        public string SettingsStartupLabel { get => _settingsStartupLabel; set => Set(ref _settingsStartupLabel, value); }
+        public string SettingsNotificationsLabel { get => _settingsNotificationsLabel; set => Set(ref _settingsNotificationsLabel, value); }
+        public string SettingsLoggingLabel { get => _settingsLoggingLabel; set => Set(ref _settingsLoggingLabel, value); }
+        public string SettingsSaveLabel { get => _settingsSaveLabel; set => Set(ref _settingsSaveLabel, value); }
+        public string FrameworkTitle { get => _frameworkTitle; set => Set(ref _frameworkTitle, value); }
+        public string FrameworkSubtitle { get => _frameworkSubtitle; set => Set(ref _frameworkSubtitle, value); }
+        public string BtnStartLabel { get => _btnStartLabel; set => Set(ref _btnStartLabel, value); }
+        public string BtnOpenLabel { get => _btnOpenLabel; set => Set(ref _btnOpenLabel, value); }
+        public string BtnRunLabel { get => _btnRunLabel; set => Set(ref _btnRunLabel, value); }
+        public string BtnCancelLabel { get => _btnCancelLabel; set => Set(ref _btnCancelLabel, value); }
+        public string FrameworkDashboardLabel { get => _frameworkDashboardLabel; set => Set(ref _frameworkDashboardLabel, value); }
+        public string FrameworkDashboardDesc { get => _frameworkDashboardDesc; set => Set(ref _frameworkDashboardDesc, value); }
+        public string FrameworkGraphLabel { get => _frameworkGraphLabel; set => Set(ref _frameworkGraphLabel, value); }
+        public string FrameworkGraphDesc { get => _frameworkGraphDesc; set => Set(ref _frameworkGraphDesc, value); }
+        public string FrameworkApiLabel { get => _frameworkApiLabel; set => Set(ref _frameworkApiLabel, value); }
+        public string FrameworkApiDesc { get => _frameworkApiDesc; set => Set(ref _frameworkApiDesc, value); }
+        public string FrameworkScanLabel { get => _frameworkScanLabel; set => Set(ref _frameworkScanLabel, value); }
+        public string FrameworkScanDesc { get => _frameworkScanDesc; set => Set(ref _frameworkScanDesc, value); }
+        public string FrameworkIndexLabel { get => _frameworkIndexLabel; set => Set(ref _frameworkIndexLabel, value); }
+        public string FrameworkIndexDesc { get => _frameworkIndexDesc; set => Set(ref _frameworkIndexDesc, value); }
+        public string FrameworkWarmLabel { get => _frameworkWarmLabel; set => Set(ref _frameworkWarmLabel, value); }
+        public string FrameworkWarmDesc { get => _frameworkWarmDesc; set => Set(ref _frameworkWarmDesc, value); }
+        public string FrameworkStatsLabel { get => _frameworkStatsLabel; set => Set(ref _frameworkStatsLabel, value); }
+        public string FrameworkStatsDesc { get => _frameworkStatsDesc; set => Set(ref _frameworkStatsDesc, value); }
+        public string FrameworkSkillGraphLabel { get => _frameworkSkillGraphLabel; set => Set(ref _frameworkSkillGraphLabel, value); }
+        public string FrameworkSkillGraphDesc { get => _frameworkSkillGraphDesc; set => Set(ref _frameworkSkillGraphDesc, value); }
+        public string FrameworkCodeGraphLabel { get => _frameworkCodeGraphLabel; set => Set(ref _frameworkCodeGraphLabel, value); }
+        public string FrameworkCodeGraphDesc { get => _frameworkCodeGraphDesc; set => Set(ref _frameworkCodeGraphDesc, value); }
+        public string FrameworkSessionStatsLabel { get => _frameworkSessionStatsLabel; set => Set(ref _frameworkSessionStatsLabel, value); }
+        public string FrameworkSessionStatsDesc { get => _frameworkSessionStatsDesc; set => Set(ref _frameworkSessionStatsDesc, value); }
+        public string FrameworkClearSessionLabel { get => _frameworkClearSessionLabel; set => Set(ref _frameworkClearSessionLabel, value); }
+        public string FrameworkClearSessionDesc { get => _frameworkClearSessionDesc; set => Set(ref _frameworkClearSessionDesc, value); }
+        public string FrameworkRunningText { get => _frameworkRunningText; set => Set(ref _frameworkRunningText, value); }
+        public string FrameworkServersTitle { get => _frameworkServersTitle; set => Set(ref _frameworkServersTitle, value); }
+        public string FrameworkBuildTitle { get => _frameworkBuildTitle; set => Set(ref _frameworkBuildTitle, value); }
+        public string FrameworkGraphTitle { get => _frameworkGraphTitle; set => Set(ref _frameworkGraphTitle, value); }
+        public string FrameworkAboutTitle { get => _frameworkAboutTitle; set => Set(ref _frameworkAboutTitle, value); }
+        public string FrameworkAboutDesc { get => _frameworkAboutDesc; set => Set(ref _frameworkAboutDesc, value); }
+        public string FrameworkAboutCommands { get => _frameworkAboutCommands; set => Set(ref _frameworkAboutCommands, value); }
+        public string FrameworkAboutCommandList { get => _frameworkAboutCommandList; set => Set(ref _frameworkAboutCommandList, value); }
+        public string McpDiscoveredToolsLabel { get => _mcpDiscoveredToolsLabel; set => Set(ref _mcpDiscoveredToolsLabel, value); }
+        public string ProjectRunnerTitle { get => _projectRunnerTitle; set => Set(ref _projectRunnerTitle, value); }
+        public string ProjectRunnerSubtitle { get => _projectRunnerSubtitle; set => Set(ref _projectRunnerSubtitle, value); }
+        public string ProjectRunnerSelectProjectLabel { get => _projectRunnerSelectProjectLabel; set => Set(ref _projectRunnerSelectProjectLabel, value); }
+        public string ProjectRunnerBrowseLabel { get => _projectRunnerBrowseLabel; set => Set(ref _projectRunnerBrowseLabel, value); }
+        public string ProjectRunnerDetectedProjectsLabel { get => _projectRunnerDetectedProjectsLabel; set => Set(ref _projectRunnerDetectedProjectsLabel, value); }
+        public string ProjectRunnerRunOnProjectLabel { get => _projectRunnerRunOnProjectLabel; set => Set(ref _projectRunnerRunOnProjectLabel, value); }
+        public string ProjectRunnerAskPlaceholder { get => _projectRunnerAskPlaceholder; set => Set(ref _projectRunnerAskPlaceholder, value); }
+        public string ProjectRunnerCurrentPathLabel { get => _projectRunnerCurrentPathLabel; set => Set(ref _projectRunnerCurrentPathLabel, value); }
+        public string ProjectRunnerRunningLabel { get => _projectRunnerRunningLabel; set => Set(ref _projectRunnerRunningLabel, value); }
+        public string ProjectRunnerAskTitle { get => _projectRunnerAskTitle; set => Set(ref _projectRunnerAskTitle, value); }
+        public string ProjectRunnerAskSubtitle { get => _projectRunnerAskSubtitle; set => Set(ref _projectRunnerAskSubtitle, value); }
+        public string ProjectRunnerRunAskLabel { get => _projectRunnerRunAskLabel; set => Set(ref _projectRunnerRunAskLabel, value); }
+        public string ProjectRunnerOutputLabel { get => _projectRunnerOutputLabel; set => Set(ref _projectRunnerOutputLabel, value); }
+        public string ProjectRunnerClearLabel { get => _projectRunnerClearLabel; set => Set(ref _projectRunnerClearLabel, value); }
+        public string ItemsUnitLabel { get => _itemsUnitLabel; set => Set(ref _itemsUnitLabel, value); }
+        public string AgentTitle { get => _agentTitle; set => Set(ref _agentTitle, value); }
+        public string AgentInstalledLabel { get => _agentInstalledLabel; set => Set(ref _agentInstalledLabel, value); }
+        public string AgentNotInstalledLabel { get => _agentNotInstalledLabel; set => Set(ref _agentNotInstalledLabel, value); }
+        public string InstallForAllAgentsLabel { get => _installForAllAgentsLabel; set => Set(ref _installForAllAgentsLabel, value); }
 
         bool _isProjectRunnerRunning;
         public bool IsProjectRunnerRunning { get => _isProjectRunnerRunning; set { if (Set(ref _isProjectRunnerRunning, value)) OnPropertyChanged(nameof(IsProjectRunnerRunning)); } }
@@ -223,17 +256,6 @@ namespace CursorSetupWpf.ViewModels
 
         string _runningCommandText = "";
         public string RunningCommandText { get => _runningCommandText; set => Set(ref _runningCommandText, value); }
-
-        public string ProjectRunnerRunningLabel => LocalizationService.T("project_runner.running");
-        public string ProjectRunnerAskTitle => LocalizationService.T("project_runner.ask_title");
-        public string ProjectRunnerAskSubtitle => LocalizationService.T("project_runner.ask_subtitle");
-        public string ProjectRunnerRunAskLabel => LocalizationService.T("project_runner.run_ask");
-        public string ProjectRunnerOutputLabel => LocalizationService.T("project_runner.output");
-        public string ProjectRunnerClearLabel => LocalizationService.T("project_runner.clear");
-        public string ItemsUnitLabel => LocalizationService.T("common.items_unit");
-        public string AgentTitle => LocalizationService.T("agent.title");
-        public string AgentInstalledLabel => LocalizationService.T("agent.installed");
-        public string AgentNotInstalledLabel => LocalizationService.T("agent.not_installed");
 
         // Localization
         ObservableCollection<LanguageItem> _languages = new();
@@ -424,7 +446,177 @@ namespace CursorSetupWpf.ViewModels
             set { _settings.Current.LogFileLocation = value; OnPropertyChanged(nameof(LogFileLocation)); }
         }
 
-        // ============ Cross-Agent Selection ============
+        // ============ Localization Helpers ============
+        
+        /// <summary>
+        /// Initialize all localized string properties from current culture.
+        /// Call this in constructor and in RefreshStrings to update all UI labels.
+        /// </summary>
+        void InitLocalizedStrings()
+        {
+            WindowTitle = LocalizationService.T("app.title");
+            AppBrand = LocalizationService.T("app.title_short");
+            AppBrandSubtitle = LocalizationService.T("app.subtitle");
+            InstallButtonText = LocalizationService.T("btn.install");
+            LanguageLabel = LocalizationService.T("combobox.lang");
+            VibeCoderTitle = LocalizationService.T("vibe_coder.label");
+            
+            // MCP labels
+            McpTitle = LocalizationService.T("mcp.title");
+            McpSubtitle = LocalizationService.T("mcp.subtitle");
+            McpSyncAllLabel = LocalizationService.T("mcp.sync_all");
+            McpCheckStatusLabel = LocalizationService.T("mcp.check_status");
+            McpInstalledLabel = LocalizationService.T("mcp.installed");
+            McpNotInstalledLabel = LocalizationService.T("mcp.not_installed");
+            McpOpenConfigLabel = LocalizationService.T("mcp.opening_config");
+            McpLastSyncLabel = LocalizationService.T("mcp.last_sync",
+                McpServers.FirstOrDefault()?.LastSyncText ?? LocalizationService.T("mcp.last_sync_never"));
+            McpDiscoveredToolsLabel = LocalizationService.T("mcp.discovered_tools");
+            
+            // Hooks page
+            HooksPageTitle = LocalizationService.T("hooks.page_title");
+            HooksPageDesc = LocalizationService.T("hooks.page_desc");
+            HooksPrescanTitle = LocalizationService.T("hooks.prescan_title");
+            HooksPrescanDesc = LocalizationService.T("hooks.prescan_desc");
+            HooksPrescanScriptLabel = LocalizationService.T("hooks.prescan_script_label");
+            HooksPostinstallTitle = LocalizationService.T("hooks.postinstall_title");
+            HooksPostinstallDesc = LocalizationService.T("hooks.postinstall_desc");
+            HooksPostinstallScriptLabel = LocalizationService.T("hooks.postinstall_script_label");
+            HooksAboutTitle = LocalizationService.T("hooks.about_title");
+            HooksAboutDesc = LocalizationService.T("hooks.about_desc");
+            
+            // Components
+            ComponentsTitle = LocalizationService.T("components.title");
+            ComponentsSubtitle = LocalizationService.T("components.subtitle");
+            
+            // Advanced
+            AdvancedTitle = LocalizationService.T("advanced.title");
+            AdvancedSubtitle = LocalizationService.T("advanced.subtitle");
+            
+            // Common buttons
+            BtnSelectAll = LocalizationService.T("btn.select_all");
+            BtnDeselectAll = LocalizationService.T("btn.deselect_all");
+            
+            // Install page
+            InstallPageTitle = LocalizationService.T("install.page_title");
+            InstallPageSubtitle = LocalizationService.T("install.page_subtitle");
+            InstallLocationLabel = LocalizationService.T("install.location");
+            InstallLocationHint = LocalizationService.T("install.location_hint");
+            InstallBrowseLabel = LocalizationService.T("install.browse");
+            InstallNewFolderLabel = LocalizationService.T("install.new_folder");
+            InstallForceLabel = LocalizationService.T("install.force");
+            InstallSkipCursorLabel = LocalizationService.T("install.skip_cursor");
+            InstallBuildOptionsLabel = LocalizationService.T("install.build_options");
+            InstallOptionalLabel = LocalizationService.T("install.optional");
+            InstallBuildOptionsDesc = LocalizationService.T("install.build_options_desc");
+            InstallBuildMemoryLabel = LocalizationService.T("install.build_memory");
+            InstallCompileKnowledgeLabel = LocalizationService.T("install.compile_knowledge");
+            InstallBuildIndexLabel = LocalizationService.T("install.build_index");
+            InstallBuildEmbeddingsLabel = LocalizationService.T("install.build_embeddings");
+            InstallPackageFrameworkLabel = LocalizationService.T("install.package_framework");
+            InstallBuildExeNote = LocalizationService.T("install.build_exe_note");
+            InstallTipLabel = LocalizationService.T("install.tip");
+            
+            // Updates
+            UpdatesTitle = LocalizationService.T("updates.title");
+            UpdatesSubtitle = LocalizationService.T("updates.subtitle");
+            UpdatesCheckLabel = LocalizationService.T("updates.check");
+            UpdatesDownloadLabel = LocalizationService.T("updates.download");
+            UpdatesChangelogLabel = LocalizationService.T("updates.changelog");
+            UpdatesCurrentVersionLabel = LocalizationService.T("updates.current_version");
+            UpdatesLatestVersionLabel = LocalizationService.T("updates.latest_version");
+            
+            // Backup
+            BackupTitle = LocalizationService.T("backup.title");
+            BackupSubtitle = LocalizationService.T("backup.subtitle");
+            BackupCreateLabel = LocalizationService.T("backup.create");
+            BackupRestoreLabel = LocalizationService.T("backup.restore");
+            BackupDeleteLabel = LocalizationService.T("backup.delete");
+            BackupRefreshLabel = LocalizationService.T("backup.refresh");
+            BackupLocationLabel = LocalizationService.T("backup.location");
+            BackupBrowseLabel = LocalizationService.T("backup.browse");
+            BackupAutoLabel = LocalizationService.T("backup.auto");
+            BackupEmptyLabel = LocalizationService.T("backup.empty");
+            BackupConfigurationLabel = LocalizationService.T("backup.configuration_label");
+            BackupSnapshotsLabel = LocalizationService.T("backup.snapshots_label");
+            
+            // Settings
+            SettingsTitle = LocalizationService.T("settings.title");
+            SettingsSubtitle = LocalizationService.T("settings.subtitle");
+            SettingsThemeLabel = LocalizationService.T("settings.theme");
+            SettingsAutostartLabel = LocalizationService.T("settings.autostart");
+            SettingsAutostartDescLabel = LocalizationService.T("settings.autostart_desc");
+            SettingsNotifyCompleteLabel = LocalizationService.T("settings.notify_complete");
+            SettingsNotifyErrorLabel = LocalizationService.T("settings.notify_error");
+            SettingsLogPathLabel = LocalizationService.T("settings.log_path");
+            SettingsBrowseLabel = LocalizationService.T("settings.browse");
+            SettingsAppearanceLabel = LocalizationService.T("settings.appearance_label");
+            SettingsStartupLabel = LocalizationService.T("settings.startup_label");
+            SettingsNotificationsLabel = LocalizationService.T("settings.notifications_label");
+            SettingsLoggingLabel = LocalizationService.T("settings.logging_label");
+            SettingsSaveLabel = LocalizationService.T("settings.save_label");
+            
+            // Framework
+            FrameworkTitle = LocalizationService.T("framework.title");
+            FrameworkSubtitle = LocalizationService.T("framework.subtitle");
+            BtnStartLabel = LocalizationService.T("btn.start");
+            BtnOpenLabel = LocalizationService.T("btn.open");
+            BtnRunLabel = LocalizationService.T("btn.run");
+            BtnCancelLabel = LocalizationService.T("btn.cancel");
+            FrameworkDashboardLabel = LocalizationService.T("framework.dashboard");
+            FrameworkDashboardDesc = LocalizationService.T("framework.dashboard_desc");
+            FrameworkGraphLabel = LocalizationService.T("framework.graph_viz");
+            FrameworkGraphDesc = LocalizationService.T("framework.graph_viz_desc");
+            FrameworkApiLabel = LocalizationService.T("framework.api_server");
+            FrameworkApiDesc = LocalizationService.T("framework.api_server_desc");
+            FrameworkScanLabel = LocalizationService.T("framework.scan");
+            FrameworkScanDesc = LocalizationService.T("framework.scan_desc");
+            FrameworkIndexLabel = LocalizationService.T("framework.build_index");
+            FrameworkIndexDesc = LocalizationService.T("framework.build_index_desc");
+            FrameworkWarmLabel = LocalizationService.T("framework.warm_cache");
+            FrameworkWarmDesc = LocalizationService.T("framework.warm_cache_desc");
+            FrameworkStatsLabel = LocalizationService.T("framework.stats");
+            FrameworkStatsDesc = LocalizationService.T("framework.stats_desc");
+            FrameworkSkillGraphLabel = LocalizationService.T("framework.skill_graph");
+            FrameworkSkillGraphDesc = LocalizationService.T("framework.skill_graph_desc");
+            FrameworkCodeGraphLabel = LocalizationService.T("framework.code_graph");
+            FrameworkCodeGraphDesc = LocalizationService.T("framework.code_graph_desc");
+            FrameworkSessionStatsLabel = LocalizationService.T("framework.session_stats");
+            FrameworkSessionStatsDesc = LocalizationService.T("framework.session_stats_desc");
+            FrameworkClearSessionLabel = LocalizationService.T("framework.clear_session");
+            FrameworkClearSessionDesc = LocalizationService.T("framework.clear_session_desc");
+            FrameworkRunningText = LocalizationService.T("framework.running");
+            FrameworkServersTitle = LocalizationService.T("framework.dashboard_title");
+            FrameworkBuildTitle = LocalizationService.T("framework.build_title");
+            FrameworkGraphTitle = LocalizationService.T("framework.graph_title");
+            FrameworkAboutTitle = LocalizationService.T("framework.about_title");
+            FrameworkAboutDesc = LocalizationService.T("framework.about_desc");
+            FrameworkAboutCommands = LocalizationService.T("framework.about_commands");
+            FrameworkAboutCommandList = LocalizationService.T("framework.about_command_list");
+            
+            // Project Runner
+            ProjectRunnerTitle = LocalizationService.T("project_runner.title");
+            ProjectRunnerSubtitle = LocalizationService.T("project_runner.subtitle");
+            ProjectRunnerSelectProjectLabel = LocalizationService.T("project_runner.select_project");
+            ProjectRunnerBrowseLabel = LocalizationService.T("project_runner.browse");
+            ProjectRunnerDetectedProjectsLabel = LocalizationService.T("project_runner.detected_projects");
+            ProjectRunnerRunOnProjectLabel = LocalizationService.T("project_runner.run_on_project");
+            ProjectRunnerAskPlaceholder = LocalizationService.T("project_runner.ask_placeholder");
+            ProjectRunnerCurrentPathLabel = LocalizationService.T("project_runner.current_path");
+            ProjectRunnerRunningLabel = LocalizationService.T("project_runner.running");
+            ProjectRunnerAskTitle = LocalizationService.T("project_runner.ask_title");
+            ProjectRunnerAskSubtitle = LocalizationService.T("project_runner.ask_subtitle");
+            ProjectRunnerRunAskLabel = LocalizationService.T("project_runner.run_ask");
+            ProjectRunnerOutputLabel = LocalizationService.T("project_runner.output");
+            ProjectRunnerClearLabel = LocalizationService.T("project_runner.clear");
+            
+            // Common
+            ItemsUnitLabel = LocalizationService.T("common.items_unit");
+            AgentTitle = LocalizationService.T("agent.title");
+            AgentInstalledLabel = LocalizationService.T("agent.installed");
+            AgentNotInstalledLabel = LocalizationService.T("agent.not_installed");
+            InstallForAllAgentsLabel = LocalizationService.T("install.all_agents");
+        }
         public ObservableCollection<AgentSelectionItem> AvailableAgents { get; } = new();
         AgentSelectionItem _selectedAgent;
         public AgentSelectionItem SelectedAgent
@@ -466,11 +658,15 @@ namespace CursorSetupWpf.ViewModels
         public bool InstallForAllAgents
         {
             get => _installForAllAgents;
-            set { if (Set(ref _installForAllAgents, value)) OnPropertyChanged(nameof(InstallForAllAgentsLabel)); }
+            set {
+                if (Set(ref _installForAllAgents, value)) {
+                    // Update the label when boolean changes
+                    InstallForAllAgentsLabel = value 
+                        ? LocalizationService.T("install.all_agents")
+                        : LocalizationService.T("install.single_agent");
+                }
+            }
         }
-        public string InstallForAllAgentsLabel => InstallForAllAgents
-            ? LocalizationService.T("install.all_agents")
-            : LocalizationService.T("install.single_agent");
 
         public ObservableCollection<AgentStatusItem> AgentStatuses { get; } = new();
 
@@ -558,6 +754,11 @@ namespace CursorSetupWpf.ViewModels
             _languages.Add(new LanguageItem { Code = "vi", DisplayName = "Tiếng Việt" });
             _languages.Add(new LanguageItem { Code = "en", DisplayName = "English" });
             string preferredLang = string.IsNullOrWhiteSpace(_settings.Current.Language) ? "vi" : _settings.Current.Language;
+            
+            // Initialize all localized strings BEFORE setting culture (prevents empty UI)
+            InitLocalizedStrings();
+            
+            // Set language AFTER initial strings are loaded
             _selectedLanguage = _languages.FirstOrDefault(l => l.Code.Equals(preferredLang, StringComparison.OrdinalIgnoreCase)) ?? _languages.First();
             LocalizationService.SetCulture(_selectedLanguage.Code);
             
@@ -1222,174 +1423,24 @@ namespace CursorSetupWpf.ViewModels
 
         void RefreshStrings()
         {
+            // Re-initialize all localized strings from current culture
+            InitLocalizedStrings();
+            
+            // Notify UI for dynamic properties
             OnPropertyChanged(nameof(VersionChip));
             OnPropertyChanged(nameof(SelectedNavIndex));
             foreach (var nav in NavItems)
                 nav.RefreshTitle();
-            OnPropertyChanged(nameof(Step1Label));
-            OnPropertyChanged(nameof(Step2Label));
-            OnPropertyChanged(nameof(Step3Label));
-            OnPropertyChanged(nameof(Step4Label));
-            OnPropertyChanged(nameof(InstallButtonText));
-            OnPropertyChanged(nameof(LanguageLabel));
-            OnPropertyChanged(nameof(WindowTitle));
-            OnPropertyChanged(nameof(AppBrand));
-            OnPropertyChanged(nameof(AppBrandSubtitle));
-            OnPropertyChanged(nameof(VibeCoderTitle));
             OnPropertyChanged(nameof(CanInstall));
             OnPropertyChanged(nameof(StatusText));
             OnPropertyChanged(nameof(SummaryText));
-
-            // MCP / Updates / Backup / Settings labels
-            OnPropertyChanged(nameof(McpTitle));
-            OnPropertyChanged(nameof(McpSubtitle));
-            OnPropertyChanged(nameof(McpSyncAllLabel));
-            OnPropertyChanged(nameof(McpCheckStatusLabel));
-            OnPropertyChanged(nameof(McpInstalledLabel));
-            OnPropertyChanged(nameof(McpNotInstalledLabel));
-            OnPropertyChanged(nameof(McpOpenConfigLabel));
             OnPropertyChanged(nameof(McpConfigPathLabel));
-            OnPropertyChanged(nameof(McpLastSyncLabel));
-
-            OnPropertyChanged(nameof(UpdatesTitle));
-            OnPropertyChanged(nameof(UpdatesSubtitle));
-            OnPropertyChanged(nameof(UpdatesCheckLabel));
-            OnPropertyChanged(nameof(UpdatesDownloadLabel));
-            OnPropertyChanged(nameof(UpdatesChangelogLabel));
-            OnPropertyChanged(nameof(UpdatesCurrentVersionLabel));
-            OnPropertyChanged(nameof(UpdatesLatestVersionLabel));
             OnPropertyChanged(nameof(LastCheckedLabel));
             OnPropertyChanged(nameof(UpdateStatusText));
-
-            OnPropertyChanged(nameof(BackupTitle));
-            OnPropertyChanged(nameof(BackupSubtitle));
-            OnPropertyChanged(nameof(BackupCreateLabel));
-            OnPropertyChanged(nameof(BackupRestoreLabel));
-            OnPropertyChanged(nameof(BackupDeleteLabel));
-            OnPropertyChanged(nameof(BackupRefreshLabel));
-            OnPropertyChanged(nameof(BackupLocationLabel));
-            OnPropertyChanged(nameof(BackupBrowseLabel));
-            OnPropertyChanged(nameof(BackupAutoLabel));
-            OnPropertyChanged(nameof(BackupEmptyLabel));
-
-            OnPropertyChanged(nameof(SettingsTitle));
-            OnPropertyChanged(nameof(SettingsSubtitle));
-            OnPropertyChanged(nameof(SettingsThemeLabel));
-            OnPropertyChanged(nameof(SettingsAutostartLabel));
-            OnPropertyChanged(nameof(SettingsAutostartDescLabel));
-            OnPropertyChanged(nameof(SettingsNotifyCompleteLabel));
-            OnPropertyChanged(nameof(SettingsNotifyErrorLabel));
-            OnPropertyChanged(nameof(SettingsLogPathLabel));
-            OnPropertyChanged(nameof(SettingsBrowseLabel));
-
-            OnPropertyChanged(nameof(FrameworkTitle));
-            OnPropertyChanged(nameof(FrameworkSubtitle));
-            OnPropertyChanged(nameof(BtnStartLabel));
-            OnPropertyChanged(nameof(BtnOpenLabel));
-            OnPropertyChanged(nameof(BtnRunLabel));
-            OnPropertyChanged(nameof(BtnCancelLabel));
-            OnPropertyChanged(nameof(FrameworkDashboardLabel));
-            OnPropertyChanged(nameof(FrameworkDashboardDesc));
-            OnPropertyChanged(nameof(FrameworkGraphLabel));
-            OnPropertyChanged(nameof(FrameworkGraphDesc));
-            OnPropertyChanged(nameof(FrameworkApiLabel));
-            OnPropertyChanged(nameof(FrameworkApiDesc));
-            OnPropertyChanged(nameof(FrameworkScanLabel));
-            OnPropertyChanged(nameof(FrameworkScanDesc));
-            OnPropertyChanged(nameof(FrameworkIndexLabel));
-            OnPropertyChanged(nameof(FrameworkIndexDesc));
-            OnPropertyChanged(nameof(FrameworkWarmLabel));
-            OnPropertyChanged(nameof(FrameworkWarmDesc));
-            OnPropertyChanged(nameof(FrameworkStatsLabel));
-            OnPropertyChanged(nameof(FrameworkStatsDesc));
-            OnPropertyChanged(nameof(FrameworkSkillGraphLabel));
-            OnPropertyChanged(nameof(FrameworkSkillGraphDesc));
-            OnPropertyChanged(nameof(FrameworkCodeGraphLabel));
-            OnPropertyChanged(nameof(FrameworkCodeGraphDesc));
-            OnPropertyChanged(nameof(FrameworkSessionStatsLabel));
-            OnPropertyChanged(nameof(FrameworkSessionStatsDesc));
-            OnPropertyChanged(nameof(FrameworkClearSessionLabel));
-            OnPropertyChanged(nameof(FrameworkClearSessionDesc));
-            OnPropertyChanged(nameof(FrameworkServersTitle));
-            OnPropertyChanged(nameof(FrameworkBuildTitle));
-            OnPropertyChanged(nameof(FrameworkGraphTitle));
-            OnPropertyChanged(nameof(FrameworkAboutTitle));
-            OnPropertyChanged(nameof(FrameworkAboutDesc));
-            OnPropertyChanged(nameof(FrameworkAboutCommands));
-            OnPropertyChanged(nameof(FrameworkAboutCommandList));
-
-            OnPropertyChanged(nameof(McpDiscoveredToolsLabel));
-
-            // Project Runner
-            OnPropertyChanged(nameof(ProjectRunnerTitle));
-            OnPropertyChanged(nameof(ProjectRunnerSubtitle));
-            OnPropertyChanged(nameof(ProjectRunnerSelectProjectLabel));
-            OnPropertyChanged(nameof(ProjectRunnerBrowseLabel));
-            OnPropertyChanged(nameof(ProjectRunnerDetectedProjectsLabel));
-            OnPropertyChanged(nameof(ProjectRunnerRunOnProjectLabel));
-            OnPropertyChanged(nameof(ProjectRunnerAskPlaceholder));
-            OnPropertyChanged(nameof(ProjectRunnerCurrentPathLabel));
-
-            // Hooks page
-            OnPropertyChanged(nameof(HooksPageTitle));
-            OnPropertyChanged(nameof(HooksPageDesc));
-            OnPropertyChanged(nameof(HooksPrescanTitle));
-            OnPropertyChanged(nameof(HooksPrescanDesc));
-            OnPropertyChanged(nameof(HooksPrescanScriptLabel));
-            OnPropertyChanged(nameof(HooksPostinstallTitle));
-            OnPropertyChanged(nameof(HooksPostinstallDesc));
-            OnPropertyChanged(nameof(HooksPostinstallScriptLabel));
-            OnPropertyChanged(nameof(HooksAboutTitle));
-            OnPropertyChanged(nameof(HooksAboutDesc));
-
-            OnPropertyChanged(nameof(ComponentsTitle));
-            OnPropertyChanged(nameof(ComponentsSubtitle));
-            OnPropertyChanged(nameof(AdvancedTitle));
-            OnPropertyChanged(nameof(AdvancedSubtitle));
-            OnPropertyChanged(nameof(BtnSelectAll));
-            OnPropertyChanged(nameof(BtnDeselectAll));
-
-            // Install page
-            OnPropertyChanged(nameof(InstallPageTitle));
-            OnPropertyChanged(nameof(InstallPageSubtitle));
-            OnPropertyChanged(nameof(InstallLocationLabel));
-            OnPropertyChanged(nameof(InstallLocationHint));
-            OnPropertyChanged(nameof(InstallBrowseLabel));
-            OnPropertyChanged(nameof(InstallNewFolderLabel));
-            OnPropertyChanged(nameof(InstallForceLabel));
-            OnPropertyChanged(nameof(InstallSkipCursorLabel));
-            OnPropertyChanged(nameof(InstallBuildOptionsLabel));
-            OnPropertyChanged(nameof(InstallOptionalLabel));
-            OnPropertyChanged(nameof(InstallBuildOptionsDesc));
-            OnPropertyChanged(nameof(InstallBuildMemoryLabel));
-            OnPropertyChanged(nameof(InstallCompileKnowledgeLabel));
-            OnPropertyChanged(nameof(InstallBuildIndexLabel));
-            OnPropertyChanged(nameof(InstallBuildEmbeddingsLabel));
-            OnPropertyChanged(nameof(InstallPackageFrameworkLabel));
-            OnPropertyChanged(nameof(InstallBuildExeNote));
-            OnPropertyChanged(nameof(InstallTipLabel));
-
-            OnPropertyChanged(nameof(SettingsAppearanceLabel));
-            OnPropertyChanged(nameof(SettingsStartupLabel));
-            OnPropertyChanged(nameof(SettingsNotificationsLabel));
-            OnPropertyChanged(nameof(SettingsLoggingLabel));
-            OnPropertyChanged(nameof(SettingsSaveLabel));
-
-            OnPropertyChanged(nameof(BackupConfigurationLabel));
-            OnPropertyChanged(nameof(BackupSnapshotsLabel));
-
-            OnPropertyChanged(nameof(ProjectRunnerRunningLabel));
-            OnPropertyChanged(nameof(ProjectRunnerAskTitle));
-            OnPropertyChanged(nameof(ProjectRunnerAskSubtitle));
-            OnPropertyChanged(nameof(ProjectRunnerRunAskLabel));
-            OnPropertyChanged(nameof(ProjectRunnerOutputLabel));
-            OnPropertyChanged(nameof(ProjectRunnerClearLabel));
-            OnPropertyChanged(nameof(ItemsUnitLabel));
-            OnPropertyChanged(nameof(AgentTitle));
-            OnPropertyChanged(nameof(AgentInstalledLabel));
-            OnPropertyChanged(nameof(AgentNotInstalledLabel));
+            OnPropertyChanged(nameof(HasNoBackups));
             OnPropertyChanged(nameof(InstallForAllAgentsLabel));
-
+            OnPropertyChanged(nameof(McpLastSyncLabel));
+            
             // Refresh all bound UI elements
             OnPropertyChanged(string.Empty);
         }
