@@ -42,7 +42,7 @@ namespace CursorSetupWpf.Services
             return value;
         }
 
-        static string Lookup(string culture, string key)
+        static string? Lookup(string culture, string key)
         {
             if (!_cache.ContainsKey(culture))
                 _cache[culture] = Load(culture);

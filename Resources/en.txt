@@ -1,6 +1,10 @@
 app.title=Cursor Enterprise Framework - Setup
 app.title_short=Cursor Enterprise Framework
-app.subtitle=v4.3.0 - Enterprise AI Coding Framework
+app.subtitle=v4.4.0 - Enterprise AI Coding Framework
+safety.title=Safe package boundary
+safety.body=Staging writes only to the package. Your .cursor tree is never modified by packaging.
+safety.badge=BLOCKED · governance approval required
+log.title=Operational log
 loading_components=Loading components...
 scan_archive_not_found=Framework archive not found next to the installer.
 place_zip_hint=Place cursor-setup.zip next to cursor-setup.exe.

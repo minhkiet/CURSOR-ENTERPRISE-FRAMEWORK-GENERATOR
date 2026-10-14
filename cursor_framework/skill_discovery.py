@@ -1178,6 +1178,7 @@ class CrossAgentSkillDiscovery:
         "frontend-review",
         "full-output",
         "security-review",
+        "reverse-engineer-anything",
         "test-analysis",
         "perf-optimization",
         "stability",
@@ -1200,11 +1201,13 @@ class CrossAgentSkillDiscovery:
             "visual-explainer",
             "open-design",
             "skill-installer",
+            "reverse-engineer-anything",
         ],
         "codex": [
             "ponytail",
             "frontend-redesign",
             "vietnam-payment-review",
+            "reverse-engineer-anything",
         ],
         "claude-code": [
             "claude-specific",
@@ -1218,7 +1221,7 @@ class CrossAgentSkillDiscovery:
     ECC_SKILL_CATEGORIES = {
         "planner": ["planner", "plan", "strategy", "roadmap"],
         "reviewer": ["reviewer", "review", "audit", "code-review"],
-        "security": ["security", "vulnerability", "audit", "owasp"],
+        "security": ["security", "vulnerability", "audit", "owasp", "reverse-engineering", "reverse", "rea", "decompile"],
         "tdd": ["tdd", "test-driven", "test-first", "unit-test"],
         "frontend": ["frontend", "ui", "css", "react", "vue", "angular"],
         "backend": ["backend", "api", "server", "database"],

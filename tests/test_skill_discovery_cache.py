@@ -35,7 +35,10 @@ def test_second_load_hits_cache(sandbox_cursor: Path):
 
 def test_cache_invalidates_on_mtime_change(sandbox_cursor: Path):
     sd = SkillDiscovery(base_path=str(sandbox_cursor.parent))
-    skill_path = sandbox_cursor / "skills" / "frontend-taste" / "SKILL.md"
+    # The registry maps the public skill id to its canonical on-disk path.
+    # `frontend-taste` is a compatibility alias; the canonical file is
+    # `ui_frontend-taste/SKILL.md`.
+    skill_path = sandbox_cursor / "skills" / "ui_frontend-taste" / "SKILL.md"
     if not skill_path.exists():
         import pytest
         pytest.skip("skill file missing")

@@ -11,16 +11,9 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="32,28">
         <StackPanel MaxWidth="900">
 
-            <!-- === Welcome Banner ===
-                 Gradient banner for hero section -->
-            <Border CornerRadius="16" Padding="28,24" Margin="0,0,0,28">
-                <Border.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#4F46E5" Offset="0"/>
-                        <GradientStop Color="#7C3AED" Offset="0.5"/>
-                        <GradientStop Color="#059669" Offset="1"/>
-                    </LinearGradientBrush>
-                </Border.Background>
+            <!-- Flat welcome banner: one brand color, clear hierarchy. -->
+            <Border Background="{StaticResource Indigo700Brush}" BorderBrush="{StaticResource Indigo800Brush}"
+                    BorderThickness="1" CornerRadius="12" Padding="28,24" Margin="0,0,0,18">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -44,6 +37,45 @@
                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                 </Grid>
+            </Border>
+
+            <!-- The guide now starts the real workflow. -->
+            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,22"
+                    Background="{StaticResource CardBackgroundBrush}">
+                <StackPanel>
+                    <TextBlock Text="{Binding PurposeTitle}" FontFamily="{StaticResource UIFont}" FontSize="18"
+                               FontWeight="SemiBold" Foreground="{StaticResource Slate900Brush}"/>
+                    <TextBlock Text="{Binding PurposeDescription}" FontFamily="{StaticResource UIFont}" FontSize="13"
+                               Foreground="{StaticResource Slate600Brush}" TextWrapping="Wrap" Margin="0,6,0,12"/>
+                    <Border Background="{StaticResource Warning100Brush}" BorderBrush="{StaticResource Warning500Brush}"
+                            BorderThickness="1" CornerRadius="8" Padding="12,9" Margin="0,0,0,14">
+                        <TextBlock Text="{Binding SafetyNote}" FontFamily="{StaticResource UIFont}" FontSize="12"
+                                   Foreground="{StaticResource Warning600Brush}" TextWrapping="Wrap"/>
+                    </Border>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="{Binding InstallActionLabel}" Style="{StaticResource PrimaryButtonStyle}"
+                                    Command="{Binding DataContext.OpenInstallPageCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    Margin="0,0,8,0"/>
+                            <Button Content="{Binding AgentsActionLabel}" Style="{StaticResource SecondaryButtonStyle}"
+                                    Command="{Binding DataContext.OpenAgentsPageCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    Margin="0,0,8,0"/>
+                            <Button Content="{Binding UtilitiesActionLabel}" Style="{StaticResource GhostButtonStyle}"
+                                    Command="{Binding DataContext.OpenUtilitiesPageCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal">
+                            <Button Content="{Binding PreflightActionLabel}" Style="{StaticResource GhostButtonStyle}"
+                                    Command="{Binding DataContext.RunGuidePreflightCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                            <TextBlock Text="{Binding DataContext.GuidePreflightStatus, RelativeSource={RelativeSource AncestorType=Window}}"
+                                       FontFamily="{StaticResource UIFont}" FontSize="11" Foreground="{StaticResource Slate500Brush}"
+                                       VerticalAlignment="Center" Margin="12,0,0,0" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
             </Border>
 
             <!-- === Step-by-step Guide ===

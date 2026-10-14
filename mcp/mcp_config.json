@@ -19,6 +19,14 @@
         "PYTHONPATH": "${workspaceFolder}"
       },
       "description": "File operations - Search, copy, move, delete, tree view"
+    },
+    "rea": {
+      "command": "node",
+      "args": [
+        "${workspaceFolder}/tools/rea/scripts/rea.mjs",
+        "mcp"
+      ],
+      "description": "REA - Reverse Engineer Anything: native binaries, Electron/JS, APK, WASM, runtime via MCP"
     }
   }
 }

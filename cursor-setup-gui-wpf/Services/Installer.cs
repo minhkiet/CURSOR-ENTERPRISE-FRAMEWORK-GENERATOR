@@ -136,8 +136,8 @@ namespace CursorSetupWpf.Services
         // Version 5.0.0: Added evondev-ui-ux skill
         static readonly (
             string ServerKey,
-            string PackageDir,
-            string Module,
+            string? PackageDir,
+            string? Module,
             string DisplayName,
             string Description,
             string[] Tools
@@ -204,6 +204,19 @@ namespace CursorSetupWpf.Services
                 {
                     "browser_navigate", "browser_snapshot", "browser_click",
                     "browser_type", "browser_screenshot"
+                }
+            ),
+            // Version 4.5.0 - REA (Reverse Engineer Anything) MCP Server
+            (
+                "rea",
+                null,
+                null,
+                "Reverse Engineer Anything (REA)",
+                "Universal reverse engineering CLI & MCP server for native, .NET, JS, APK, EVM, WASM.",
+                new[]
+                {
+                    "rea_investigate", "rea_decompile", "rea_inspect_binary",
+                    "rea_trace", "rea_surface"
                 }
             ),
         };
@@ -761,6 +774,29 @@ namespace CursorSetupWpf.Services
                         {
                             ["command"] = "npx",
                             ["args"] = new[] { "-y", "@modelcontextprotocol/server-browser" },
+                            ["description"] = entry.Description,
+                        };
+                    }
+                    // REA MCP - node based
+                    else if (entry.ServerKey == "rea")
+                    {
+                        string reaScript = Path.Combine(installPath, "tools", "rea", "scripts", "rea.mjs");
+                        string reaCwd = Path.Combine(installPath, "tools", "rea");
+                        if (!File.Exists(reaScript))
+                        {
+                            string parentDir = Path.GetDirectoryName(installPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)) ?? "";
+                            string candidateScript = Path.Combine(parentDir, "tools", "rea", "scripts", "rea.mjs");
+                            if (File.Exists(candidateScript))
+                            {
+                                reaScript = candidateScript;
+                                reaCwd = Path.Combine(parentDir, "tools", "rea");
+                            }
+                        }
+                        servers[entry.ServerKey] = new Dictionary<string, object>
+                        {
+                            ["command"] = "node",
+                            ["args"] = new[] { reaScript, "mcp" },
+                            ["cwd"] = reaCwd,
                             ["description"] = entry.Description,
                         };
                     }

@@ -66,8 +66,17 @@
         "CURSOR_MEMORY_AUTO_PRUNE": "true"
       },
       "description": "Persistent workspace memory and context management"
+    },
+    "rea": {
+      "command": "node",
+      "args": [
+        "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\tools\\rea\\scripts\\rea.mjs",
+        "mcp"
+      ],
+      "cwd": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\tools\\rea",
+      "description": "REA - Reverse Engineer Anything: native binaries, Electron/JS, APK, WASM via MCP"
     }
   },
   "version": "1.0",
-  "syncedAt": "2026-10-03T18:45:18.063354"
+  "syncedAt": "2026-10-13T00:27:06.618332"
 }

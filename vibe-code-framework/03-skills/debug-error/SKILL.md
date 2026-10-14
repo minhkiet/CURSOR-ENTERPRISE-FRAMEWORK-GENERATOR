@@ -34,7 +34,7 @@ Debug và fix lỗi systematic:
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Debug Process
+## Process Steps
 
 ### Phase 1: Reproduce
 
@@ -133,6 +133,12 @@ Debug và fix lỗi systematic:
 │                                                            │
 └────────────────────────────────────────────────────────────┘
 ```
+
+## Post-Check Gates
+
+- Confirm the root cause is addressed rather than masked.
+- Run the regression test and the relevant existing test suite.
+- Record any environment limitation or unresolved issue as `BLOCKED`.
 
 ## Common Bug Patterns
 

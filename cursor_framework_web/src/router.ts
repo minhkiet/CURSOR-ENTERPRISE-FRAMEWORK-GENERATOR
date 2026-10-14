@@ -5,6 +5,7 @@ import TemplatePreview from './views/TemplatePreview.vue'
 import LearnView from './views/LearnView.vue'
 import PromptsView from './views/PromptsView.vue'
 import InstallGuideView from './views/InstallGuideView.vue'
+import CmsDashboardView from './views/CmsDashboardView.vue'
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -23,6 +24,19 @@ const router = createRouter({
       path: '/templates/:id',
       name: 'template-preview',
       component: TemplatePreview
+    },
+    {
+      path: '/cms',
+      name: 'cms-dashboard',
+      component: CmsDashboardView
+    },
+    {
+      path: '/dashboard',
+      redirect: '/cms'
+    },
+    {
+      path: '/login',
+      redirect: '/cms'
     },
     {
       path: '/learn',

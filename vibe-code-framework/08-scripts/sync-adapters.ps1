@@ -22,14 +22,14 @@
 
 .PARAMETER TargetPath
     Path to the target project
-    Default: Parent of SourcePath
+    Required: an explicit consumer project directory outside the Resource Hub
 
 .EXAMPLE
-    .\sync-adapters.ps1 -Tool Cursor
+    .\sync-adapters.ps1 -Tool Cursor -SourcePath "C:\Framework\vibe-code-framework" -TargetPath "C:\Projects\MyApp"
     Sync all content to Cursor format
 
 .EXAMPLE
-    .\sync-adapters.ps1 -Tool All
+    .\sync-adapters.ps1 -Tool All -SourcePath "C:\Framework\vibe-code-framework" -TargetPath "C:\Projects\MyApp"
     Sync to all supported tools
 #>
 
@@ -43,11 +43,21 @@ param(
     [string]$Category = 'all',
     
     [Parameter(Mandatory=$false)]
-    [string]$SourcePath = $PSScriptRoot,
+    [string]$SourcePath = (Split-Path $PSScriptRoot -Parent),
     
     [Parameter(Mandatory=$false)]
-    [string]$TargetPath = (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent)
+    [string]$TargetPath = '',
+
+    [Parameter(Mandatory=$false)]
+    [string]$ManifestPath = '',
+
+    [Parameter(Mandatory=$false)]
+    [switch]$AllowOverwrite
 )
+
+if ([string]::IsNullOrWhiteSpace($ManifestPath)) {
+    $ManifestPath = Join-Path $SourcePath '00-governance\resource-manifest.json'
+}
 
 # Colors for output
 function Write-Success($message) {
@@ -64,6 +74,66 @@ function Write-Warning($message) {
 
 function Write-Error($message) {
     Write-Host "❌ $message" -ForegroundColor Red
+}
+
+function Test-ExecutionInput {
+    if ([string]::IsNullOrWhiteSpace($TargetPath)) {
+        Write-Error "TargetPath is required; provide an explicit consumer project directory"
+        return $false
+    }
+
+    if (-not (Test-Path -LiteralPath $SourcePath -PathType Container)) {
+        Write-Error "SourcePath must be an existing Resource Hub directory: $SourcePath"
+        return $false
+    }
+
+    if (-not (Test-Path -LiteralPath $ManifestPath -PathType Leaf)) {
+        Write-Error "ManifestPath must point to the canonical Resource Hub manifest: $ManifestPath"
+        return $false
+    }
+
+    if (-not (Test-Path -LiteralPath $TargetPath -PathType Container)) {
+        Write-Error "TargetPath must be an existing consumer project directory: $TargetPath"
+        return $false
+    }
+
+    $sourceFullPath = [IO.Path]::GetFullPath((Resolve-Path -LiteralPath $SourcePath).Path)
+    $targetFullPath = [IO.Path]::GetFullPath((Resolve-Path -LiteralPath $TargetPath).Path)
+    $sourcePrefix = $sourceFullPath.TrimEnd('\', '/') + '\'
+    $targetPrefix = $targetFullPath.TrimEnd('\', '/') + '\'
+    if ($sourceFullPath.Equals($targetFullPath, [StringComparison]::OrdinalIgnoreCase) -or
+        $targetFullPath.StartsWith($sourcePrefix, [StringComparison]::OrdinalIgnoreCase) -or
+        $sourceFullPath.StartsWith($targetPrefix, [StringComparison]::OrdinalIgnoreCase)) {
+        Write-Error "TargetPath must be an external consumer directory, not the Resource Hub or a parent/child of it"
+        return $false
+    }
+
+    try {
+        $manifest = Get-Content -LiteralPath $ManifestPath -Raw | ConvertFrom-Json
+    } catch {
+        Write-Error "ManifestPath is not valid JSON: $ManifestPath"
+        return $false
+    }
+
+    foreach ($requiredPath in $manifest.executionInputContract.sourcePath.mustContain) {
+        if (-not (Test-Path -LiteralPath (Join-Path $SourcePath $requiredPath))) {
+            Write-Error "SourcePath is missing required canonical path: $requiredPath"
+            return $false
+        }
+    }
+
+    return $true
+}
+
+function Test-TargetFileWrite {
+    param([string]$TargetFile)
+
+    if ((Test-Path -LiteralPath $TargetFile -PathType Leaf) -and -not $AllowOverwrite) {
+        Write-Warning "Target exists; skipped (pass -AllowOverwrite to replace): $TargetFile"
+        return $false
+    }
+
+    return $true
 }
 
 # Tool configurations
@@ -174,8 +244,9 @@ function Sync-Rules {
         New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
     }
     
-    Get-ChildItem -Path $sourceDir -Filter "*.md" -File -Exclude "README.md" | ForEach-Object {
+    Get-ChildItem -LiteralPath $sourceDir -File | Where-Object { $_.Extension -eq '.md' -and $_.Name -ne 'README.md' } | ForEach-Object {
         $targetFile = Join-Path $targetDir ($_.BaseName + $Config.Extension)
+        if (-not (Test-TargetFileWrite -TargetFile $targetFile)) { return }
         $content = Get-Content $_.FullName -Raw
         
         # Add frontmatter for Cursor
@@ -214,7 +285,7 @@ function Sync-Skills {
         return
     }
     
-    Get-ChildItem -Path $sourceDir -Directory -Exclude "README.md", "SKILL-FORMAT.md" | ForEach-Object {
+    Get-ChildItem -LiteralPath $sourceDir -Directory | Where-Object { $_.Name -notin @('README.md', 'SKILL-FORMAT.md') } | ForEach-Object {
         $targetSkillDir = Join-Path $targetDir $_.Name
         $skillFile = Join-Path $_.FullName "SKILL.md"
         
@@ -223,6 +294,8 @@ function Sync-Skills {
         }
         
         if (Test-Path $skillFile) {
+            $targetFile = Join-Path $targetSkillDir 'SKILL.md'
+            if (-not (Test-TargetFileWrite -TargetFile $targetFile)) { return }
             Copy-Item -Path $skillFile -Destination $targetSkillDir -Force
             Write-Success "Synced: $($_.Name)/SKILL.md"
         }
@@ -251,8 +324,9 @@ function Sync-Agents {
         New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
     }
     
-    Get-ChildItem -Path $sourceDir -Filter "*.md" -File -Exclude "README.md" | ForEach-Object {
+    Get-ChildItem -LiteralPath $sourceDir -File | Where-Object { $_.Extension -eq '.md' -and $_.Name -ne 'README.md' } | ForEach-Object {
         $targetFile = Join-Path $targetDir $_.Name
+        if (-not (Test-TargetFileWrite -TargetFile $targetFile)) { return }
         Copy-Item -Path $_.FullName -Destination $targetFile -Force
         Write-Success "Synced: $($_.Name)"
     }
@@ -279,8 +353,9 @@ function Sync-Files {
             New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
         }
         
+        if (-not (Test-TargetFileWrite -TargetFile $targetFile)) { continue }
         Copy-Item -Path $sourceFile -Destination $targetFile -Force
-        Write-Success "Synced: $file.Source → $file.Target"
+        Write-Success ("Synced: {0} → {1}" -f $file.Source, $file.Target)
     }
 }
 
@@ -327,7 +402,13 @@ Write-Info "Source: $SourcePath"
 Write-Info "Target: $TargetPath"
 Write-Info "Tool: $Tool"
 Write-Info "Category: $Category"
+Write-Info "Manifest: $ManifestPath"
+Write-Info "AllowOverwrite: $AllowOverwrite"
 Write-Host ""
+
+if (-not (Test-ExecutionInput)) {
+    exit 1
+}
 
 if ($Tool -eq "All") {
     foreach ($toolName in $ToolConfigs.Keys) {

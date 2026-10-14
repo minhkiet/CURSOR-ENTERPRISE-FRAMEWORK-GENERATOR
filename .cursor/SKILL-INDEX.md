@@ -1,8 +1,13 @@
 # Cursor Enterprise Framework - Skill Index
 
-> **Phiên bản:** 4.4.0 | **Cập nhật:** 2026-10-09
-> **Total Skills:** 117+ | **Rules:** 45 | **Agents:** 23 | **Commands:** 45 | **MCP Servers:** 5
+> **Phiên bản:** 4.5.0 | **Cập nhật:** 2026-10-13
+> **Total Skills:** 120+ | **Rules:** 45 | **Agents:** 23 | **Commands:** 47 | **MCP Servers:** 6
 
+> **Mới (2026-10-13):**
+> - **REA (Reverse Engineer Anything) (NEW):** [morluto/rea](https://github.com/morluto/rea) (v6.4.0) — One CLI & MCP server for reverse engineering native binaries (PE/ELF/Mach-O qua Ghidra/Hopper/IDA), managed .NET, Electron/JS ASAR, Android APKs (JADX), WASM, EVM bytecode, Go binaries, and runtime process observation (pwntools, Frida, LLDB, CDP).
+> - **reverse-engineer-anything skill:** Evidence preservation, artifact inspection, and cleanroom reconstruction.
+> - **/rea & /reverse commands:** Reverse engineering workflows and automated CLI/MCP routing.
+>
 **Mới (2026-10-09):**
 - **Vibe Code Framework (NEW):** Cross-platform AI coding framework với 3 lớp phân chia (Rules, Skills, Agents/Workflows). Single source of truth, nhiều tool adapters.
 >
@@ -365,6 +370,7 @@
 | `vbs-scan-security` | `skills/vbs-scan-security/` | **NEW (2026-10-03):** [vbsec](https://github.com/tanviet12/vbsec) — 21 rule cross-language vulnerability scanner, L1-L4 data flow analysis, optional `--sca` (OSV.dev live CVE) + `--auto-fix` (agentic patch loop). Reasoning-based, không pattern-match thuần. 5 language overlays: Go/PHP/TS-JS/Python/.NET. Slash command `/vbs-scan-security`. |
 | `vietnam-payment-review` | `skills/vietnam-payment-review/` | MoMo, SePay, PayOS, ZaloPay |
 | `hackingtool` | `skills/sec_hackingtool/` | **Pentest/OSINT bridge** — 183 tools (nmap, nuclei, sherlock, subfinder, maigret, sqlmap, impacket, …) via `tools/hackingtool-plugin/`. Use `/pentest` slash command. Active scan cần authorization. |
+| `reverse-engineer-anything` | `skills/sec_reverse-engineer-anything/` | **NEW (2026-10-13):** [morluto/rea](https://github.com/morluto/rea) (v6.4.0) — Reverse engineer anything with unified CLI & MCP server. Native binaries (Hopper/Ghidra/IDA), .NET, Electron/JS ASAR, Android APK (JADX), WASM, EVM bytecode, Go binaries, runtime observation with evidence preservation. Slash commands: `/rea`, `/reverse`. |
 
 ### 6.2 Security Rules
 
@@ -569,6 +575,8 @@
 | `/frontend` | `commands/frontend/` | Frontend tasks |
 | `/security` | `commands/security/` | Security review (manual, 5 layers) |
 | `/vbs-scan-security` | `commands/vbs-scan-security/` | **NEW:** Auto scan 21 rules với L1-L4 data flow, optional `--sca` (OSV.dev) + `--auto-fix` |
+| `/rea` | `commands/rea.md` | **NEW (2026-10-13):** Reverse engineer binaries, Electron/JS, APK, WASM via REA MCP & CLI |
+| `/reverse` | `commands/reverse.md` | **NEW (2026-10-13):** Reverse engineering command alias pointing to `/rea` |
 | `/fullstack` | `commands/fullstack/` | **NEW (2026-10-05):** Fullstack development (feature, fix, api, audit, verify) |
 | `/perf` | `commands/perf/` | Performance audit |
 | `/doc` | `commands/doc/` | Generate docs |

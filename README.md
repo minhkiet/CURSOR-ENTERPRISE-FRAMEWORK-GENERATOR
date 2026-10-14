@@ -1,651 +1,379 @@
 # Cursor Enterprise Framework Generator
 
-> A cross-IDE framework for AI coding agents — built around **Memory First**, **Retrieval First**, **Token Optimization**, and **Knowledge Reuse**.
+> A universal framework for AI coding agents & Vibe Coding tools — built around **Memory First**, **Retrieval First**, **Token Optimization**, **Knowledge Reuse**, and **Anti-AI-Slop Aesthetics**.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Latest Release](https://img.shields.io/badge/release-v1.3.0-blue)](https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/releases)
+[![Vibe Code](https://img.shields.io/badge/Vibe_Code-Universal_Support-10b981)](vibe-code-framework/)
+[![Templates](https://img.shields.io/badge/Templates-22_Production_Ready-f59e0b)](cursor_framework_web/public/templates/)
+[![Themes](https://img.shields.io/badge/Themes-6_Aesthetics-6366f1)](#themes--uiux-system)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
 
 ---
 
 ## What is it?
 
-**Cursor Enterprise Framework (CEF)** is a drop-in `.cursor/` configuration that turns any AI coding agent — Cursor, Claude Code, Windsurf, Cline, Roo Code, Vibe Code — into a context-aware, token-efficient, memory-backed senior developer.
+**Cursor Enterprise Framework (CEF)** is a production-grade configuration and tooling suite that turns any AI coding agent — **Cursor**, **Windsurf**, **Claude Code**, **GitHub Copilot**, **Roo Code**, **Cline**, **Google Antigravity**, **Trae**, **Devin / OpenHands**, **Aider**, or **Bolt.new / v0** — into a context-aware, token-efficient, memory-backed senior full-stack engineer.
 
-Instead of starting every session from zero, the framework:
+Instead of starting every coding session from zero and falling into generic "AI slop", the framework:
 
-1. **Routes requests** to the right domain knowledge via a `ContextRouter`.
-2. **Stores decisions and bug history** in a SQLite-backed memory layer.
-3. **Reuses prompts and skills** from a curated skill library.
-4. **Compresses and caches** token-heavy context automatically.
+1. **Routes requests** to the right domain knowledge via a fast `ContextRouter`.
+2. **Stores architectural decisions and bug history** in a SQLite-backed memory layer (`~/.cursor/memory/decisions.sqlite`).
+3. **Reuses 50+ curated skills and 43 strict rules** (`.mdc`), enforcing surgical code edits and YAGNI discipline.
+4. **Integrates ECC Universal v2.2.2** (68 agents, 292 skills, 94 commands) and **REA v6.4.0** (Reverse Engineer Anything).
+5. **Provides 22 production-grade landing & SaaS templates** with zero dependencies, rich interactive logic, and human-crafted aesthetics.
+6. **Supports 6 distinctive design themes** with an instant theme switcher and a secure CMS Dashboard (`admin` / `admin@123`).
 
-## What's in the box
+---
 
-| Components | Files | Where |
+## What's in the Box
+
+| Components | Count / Details | Location |
 |---|--:|---|
-| **Rules** (`.mdc`) | 43 | `.cursor/rules/` |
-| **Skills** | 50 | `.cursor/skills/` |
+| **Rules** (`.mdc`) | 43 rule files | `.cursor/rules/` |
+| **Skills** | 50 specialized skills | `.cursor/skills/` & `.agents/skills/` |
+| **Templates** | 22 production-ready web apps | `cursor_framework_web/public/templates/` |
+| **Vibe Code Tools** | 10+ popular IDEs & CLIs supported | `vibe-code-framework/07-adapters/` |
+| **Themes** | 6 custom visual themes | `cursor_framework_web/src/styles/main.css` |
+| **Agent Personas** | 18 specialized roles | `.cursor/AGENTS.md` |
 | **ECC Integration** | 68 agents, 292 skills, 94 commands | [ECC v2.2.2](https://github.com/affaan-m/ECC) |
-| **Knowledge domains** | 8 (incl. **Marketing** with 47 concept-refs) | `.cursor/knowledge/` |
-| **Python library** (`cursor_framework`) | 14 modules + 6 utils | `cursor_framework/` |
-| **Vue.js dashboard** | Vue 3 + Vite + Tailwind | `cursor_framework_web/` |
-| **Demo projects** | 5 (CRM, fitness, food-delivery, realestate, travel) | `demos/` |
-| **Windows GUI installer** (built) | `cursor-setup.exe` (~162 MB), `cursor-setup.zip` (~22 MB) | `dist/` |
-| **PowerShell / CMD installers** | 5 scripts | root |
+| **REA Integration** | Universal reverse engineering & decompilation | [morluto/rea v6.4.0](https://github.com/morluto/rea) |
+| **VBS Security Scanner** | 21 cross-language vulnerability rules + SCA | `.cursor/skills/sec_reverse-engineer-anything/` |
+| **Python Library** | 14 modules + 6 utility suites | `cursor_framework/` |
+| **Web Dashboard & CMS** | Vue 3 + Vite 6 + TypeScript + CMS Auth Gate | `cursor_framework_web/` |
+| **Windows GUI Installer** | `cursor-setup.exe` (~162 MB), `cursor-setup.zip` (~22 MB) | `dist/` |
 
-The framework ships **605+ files** inside `cursor-setup.zip` (the actual `.cursor/` payload). Repo source counts higher because of demos and build artifacts.
+---
 
-### Knowledge Domains
+## Multi-Tool Vibe Code Support Matrix
 
-| Domain | Subfolder | Files | Source |
+Framework cung cấp giải pháp **One Source — Universal Adapters**. Chỉ cần duy trì một bộ quy tắc và kỹ năng duy nhất, bạn có thể đồng bộ sang tất cả các công cụ Vibe Coding phổ biến nhất hiện nay:
+
+| Vibe Code Tool | Configuration Path | Sync Script / Adapter | Agent Modes & Hotkeys |
 |---|---|---|---|
-| Frontend | `.cursor/knowledge/frontend/` | 5 | Internal best practices + Vercel reference |
-| Backend | `.cursor/knowledge/backend/` | 4 | Internal + framework references |
-| Database | `.cursor/knowledge/database/` | 3 | Internal + reference docs |
-| Cloud / DevOps | `.cursor/knowledge/cloud/` | 3 | Internal + reference docs |
-| Security | `.cursor/knowledge/security/` | 3 | OWASP + internal |
-| AI / ML | `.cursor/knowledge/ai/` | 2 | Internal + WeKnora docs |
-| Chatbot | `.cursor/knowledge/chatbot/` | 2 | ChatbotX reference |
-| **Marketing** | `.cursor/knowledge/marketing/` | **7 + 47 concept-refs** | **[coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) ⭐39k (sync 2026-07-15)** |
-| **ECC (v2.2.2)** | `.cursor/` | **68 agents, 292 skills, 94 commands** | **[affaan-m/ECC](https://github.com/affaan-m/ECC)** |
+| **Cursor IDE** | `%USERPROFILE%\.cursor\` or `~/.cursor/` | Native drop-in (`setup.bat`) | Composer (`Ctrl+I`), Chat (`Ctrl+L`), Agent Mode |
+| **Windsurf (Codeium)** | `.windsurfrules`, `.windsurf/rules/` | `sync-adapters.ps1 -Tool Windsurf` | Cascade Flow (`Ctrl+L`), Supercomplete |
+| **Claude Code** | `CLAUDE.md`, `.claude/skills/`, `.claude/rules/` | `npx ecc-universal@2.2.2 install --target claude` | Terminal pair programmer, headless CI/CD, hooks |
+| **GitHub Copilot** | `.github/copilot-instructions.md`, `.github/prompts/` | `sync-adapters.ps1 -Tool Copilot` | Copilot Edits (`Ctrl+Shift+I`), Workspace agent |
+| **Roo Code & Cline** | `.roomodes`, `.clinerules`, `.roomodes.json` | Native mode files in `07-adapters/` | Custom autonomous roles (Architect, Reviewer, Coder) |
+| **Google Antigravity** | `~/.gemini/antigravity/` & `.agents/skills/` | `sync-adapters.ps1 -Tool Antigravity` | AGY CLI, Agentic workflows, sidecars, tool loops |
+| **Trae (ByteDance)** | `.trae/rules/`, `AGENTS.md` | `sync-adapters.ps1 -Tool Cursor` | Claude 3.5 Sonnet / GPT-4o builder mode |
+| **Devin / OpenHands** | `AGENTS.md`, `.openhands/instructions.md` | Copy `AGENTS.md` to workspace root | Autonomous issue solver, automated PR creator |
+| **Aider** | `.aider.conf.yml`, `.cursor/rules/*.mdc` | `aider --read .cursor/rules/coding-standards.mdc` | Terminal Git pair programming, auto git-commits |
+| **Bolt.new / v0.dev** | Export templates from `public/templates/` | Copy component spec & zero-skeleton HTML/JS | Instant web sandbox scaffolding |
 
-## Architecture
+### Quick Sync All Adapters
 
+```powershell
+# Windows PowerShell (sync toàn bộ adapters cho Cursor, Windsurf, Claude Code, Copilot, Codex, Antigravity)
+.\vibe-code-framework\08-scripts\sync-adapters.ps1
+
+# Đồng bộ riêng cho một công cụ cụ thể
+.\vibe-code-framework\08-scripts\sync-adapters.ps1 -Tool Windsurf
+.\vibe-code-framework\08-scripts\sync-adapters.ps1 -Tool Copilot
 ```
-.cursor/                        # Framework config (installed to ~/.cursor/)
-├── rules/                      # 43 .mdc rule files (incl. skill-registry §9 marketingskills)
-├── skills/                     # 50 specialized skill folders
-├── memory/                     # SQLite memory layer
-├── knowledge/                  # Domain knowledge base (8 domains, incl. marketing)
-├── prompts/                    # Prompt templates
-├── workflows/                  # Standard workflows
-├── templates/                  # Project templates
-├── commands/                   # Slash commands
-├── hooks/                      # Lifecycle hooks
-└── agents/                     # Agent personas
-
-cursor_framework/               # Python library
-├── context_router.py           # Intent → skill routing
-├── memory_manager.py           # Memory tier manager
-├── memory_store.py             # SQLite-backed store with size cap
-├── token_optimizer.py          # Token compression
-├── skill_discovery.py          # Auto skill detection + cache
-├── rules_parser.py             # .mdc parser
-├── skills_parser.py            # Skill def parser
-├── workflow.py                 # Workflow engine
-├── indexer.py                  # Builds .cursor/INDEX.json
-├── integration.py              # Cross-module glue
-├── context_builder.py          # Builds full context for LLM
-├── watcher.py                  # Auto-reload on file changes
-├── dashboard.py                # Streamlit dashboard
-└── utils/                      # text / file / code / http / security
-
-cursor_framework_web/           # Vue 3 dashboard
-├── src/{views,components,composables}/
-└── package.json (vue, vite, vue-router, motion, jszip)
-
-cursor-setup-gui/               # C# WinForms GUI installer
-├── SetupForm.cs                # 1600 LOC, per-category picker
-└── Lang.cs / LangItem.cs       # i18n (en/vi)
-
-demos/                          # Reference projects
-├── crm/  fitness/  food-delivery/  realestate/  travel/
-```
-
-## ECC (Enhanced Code Copilot) Integration
-
-The framework now integrates **ECC v2.2.2** from [github.com/affaan-m/ECC](https://github.com/affaan-m/ECC), providing:
-
-### What's Included
-
-| Feature | Count | Description |
-|---------|-------|-------------|
-| **Agents** | 68 | Planning, review, security, architecture specialists |
-| **Skills** | 292 | TDD, research, security, docs, frontend, data, ML, ops |
-| **Commands** | 94 | Slash command shims for all workflows |
-| **Hooks** | Runtime | Session summaries, continuous learning, context controls |
-| **AgentShield** | Built-in | Security scanning for prompts, hooks, MCP config |
-
-### Supported Harnesses
-
-| Harness | Install Profile | Hooks | Native Plugin |
-|---------|----------------|-------|---------------|
-| Claude Code | minimal/core/full | ✅ | ✅ ecc@ecc |
-| Codex | minimal/core | ✅ | ✅ Native |
-| Cursor | minimal | ❌ | ❌ |
-| Gemini CLI | minimal | ❌ | ❌ |
-| Zed | minimal | ❌ | ❌ |
-| Kimi Code | minimal | ❌ | ❌ |
-| GitHub Copilot | minimal | ❌ | ❌ |
-| + 7 others | minimal | ❌ | ❌ |
-
-### Quick Install
 
 ```bash
-# Claude Code / Codex (recommended)
-npx ecc-universal@2.2.2 install --profile core --target claude
-
-# Guided multi-harness setup
-npx ecc-universal@2.2.2 install --guided
-
-# Cursor (project-local)
-./install.sh --profile minimal --target cursor
-```
-
-### Python Integration
-
-```python
-from cursor_framework import (
-    ECCIntegration,
-    HarnessType,
-    InstallProfile
-)
-
-ecc = ECCIntegration()
-status = ecc.get_status()
-
-# Install for Claude Code
-result = ecc.install_harness(
-    HarnessType.CLAUDE_CODE,
-    InstallProfile.CORE
-)
+# macOS / Linux (Bash)
+./vibe-code-framework/08-scripts/sync-adapters.sh --tool all
 ```
 
 ---
 
-## Installation
+## Installation Guide (Hướng Dẫn Cài Đặt)
 
-Three ways to install — pick whichever fits your environment.
+Bạn có thể lựa chọn 1 trong các phương thức cài đặt thuận tiện dưới đây:
 
-### Option 1: Windows GUI (recommended for first-time users)
+### Cách 1: Windows GUI Installer (Khuyến nghị cho người mới)
 
-1. Download both files from the [latest release](https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/releases):
-   - `cursor-setup.exe` (self-contained, no .NET required)
-   - `cursor-setup.zip` (framework payload, ~22 MB)
-2. Place them in the same folder.
-3. Double-click `cursor-setup.exe`.
-4. Pick the destination folder in the GUI dialog (defaults to `%USERPROFILE%\.cursor`).
-5. Click **Install**. Restart Cursor IDE.
+1. Tải 2 file từ [Latest Release](https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/releases):
+   - `cursor-setup.exe` (Self-contained, không yêu cầu cài .NET runtime)
+   - `cursor-setup.zip` (Bộ payload framework ~22 MB)
+2. Đặt cả 2 file vào cùng một thư mục.
+3. Chạy `cursor-setup.exe`, chọn đường dẫn đích (mặc định `%USERPROFILE%\.cursor`).
+4. Bấm **Install** và đợi 15 giây. Khởi động lại Cursor IDE / Windsurf.
 
-The GUI shows progress, an extraction log, and a file-count sanity check.
+### Cách 2: PowerShell One-Liner (Windows Tự Động 100%)
 
-### Option 2: One-liner from PowerShell
+Mở PowerShell và dán lệnh sau để tự động tải và cài đặt bản mới nhất:
 
 ```powershell
 irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1 | iex
 ```
 
-Download the ZIP from GitHub, extract, and run `setup.bat` automatically. Updates:
-
+Để cập nhật phiên bản mới sau này:
 ```powershell
 & {irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1} -Update
 ```
 
-### Option 3: Clone + setup
+### Cách 3: macOS / Linux Universal Script
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.sh | bash
+```
+
+### Cách 4: Cài đặt cho Claude Code / Codex qua NPX (ECC Universal)
+
+```bash
+# Cài đặt profile core cho Claude Code
+npx ecc-universal@2.2.2 install --profile core --target claude
+
+# Hoặc cài đặt qua trình hướng dẫn tương tác đa công cụ
+npx ecc-universal@2.2.2 install --guided
+```
+
+### Cách 5: Clone & Cài Đặt Thủ Công từ Source
 
 ```powershell
 git clone https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR.git
 cd "CURSOR ENTERPRISE FRAMEWORK GENERATOR"
-.\setup.bat                    # install to %USERPROFILE%\.cursor
-.\setup.bat --force            # overwrite existing install
-.\setup.bat --gui-picker       # show folder-picker dialog
-.\setup.bat --install-dir "D:\custom\.cursor"
+
+# Chạy script cài đặt
+.\setup.bat                    # Cài đặt vào %USERPROFILE%\.cursor
+.\setup.bat --force            # Ghi đè cài đặt cũ
+.\setup.bat --gui-picker       # Bật hộp thoại chọn thư mục
 ```
 
-Equivalent CLI installers at the repo root: `install-github.bat`, `install-github.ps1`, `quick-install.ps1`.
-
-## Usage
-
-### In Cursor / Claude Code / Windsurf
-
-Once installed, just open any project. The framework auto-loads:
-
-- **Skills** via `cursor_framework.skill_discovery` — detected from your request, loaded on demand.
-- **Memory** at `~/.cursor/memory/decisions.sqlite` — previous ADRs and bug fixes are checked first.
-- **Rules** in `.cursor/rules/*.mdc` — applied automatically to every request.
-
-Example: ask *"Optimize this Entity Framework query"* and the framework will load `aspnet-core` + `sql-server` skills, skip `bazi`/`pdf`, and surface any related decisions from memory.
-
-### As a Python library
+### Cách 6: Cài đặt Thư Viện Python `cursor_framework`
 
 ```bash
-git clone https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR.git
 cd "CURSOR ENTERPRISE FRAMEWORK GENERATOR"
-pip install -e ".[all]"        # editable install from this repo
+pip install -e ".[all]"
 ```
 
-> **Note:** A different package named `cursor-framework` already exists on PyPI.
-> **Do not run `pip install cursor-framework`** — it is a different, older library
-> (v1.0.0, pydantic-only). Always install from source as shown above.
+*(Lưu ý: Không dùng `pip install cursor-framework` trên PyPI vì đó là package cũ của bên thứ 3. Luôn cài đặt từ mã nguồn repo này).*
 
-The `cursor_framework` Python package gives you full programmatic control over every subsystem: routing, memory, token budgeting, skill discovery, indexing, and the auto-watch pipeline. There are two usage modes — the **single-entry `Workflow`** class for end-to-end requests, and **standalone modules** for fine-grained control.
+---
 
-#### 1 — Workflow (recommended entry point)
+## Usage Guide (Hướng Dẫn Sử Dụng)
 
-`Workflow` orchestrates the full 4-phase pipeline (`scan → detect → build → persist`) behind a single `ask()` call. Memory survives across Python sessions automatically.
+### 1. Vibe Coding Lifecycle (agent-skills)
 
-```python
-from cursor_framework import Workflow
-
-wf = Workflow(
-    root=".cursor",            # path to .cursor/ directory
-    memory_path=".cache/memory.json",  # persisted memory file
-    max_tokens=4000,          # token budget for skill context
-    max_skills=5,             # cap on skills loaded per request
-    auto_watch=False,         # re-index on file change (see §4)
-)
-
-# First call: scans .cursor/, detects skills, builds context
-result = wf.ask("Create a landing page for our SaaS product")
-
-print(result.from_cache)      # False on first run, True on repeats
-print(result.context.tokens)  # actual token count used
-print(result.context.skills_used)   # e.g. ["frontend-taste", "full-output"]
-print(result.context.truncated)     # True if compression was needed
-print(result.memory_hits, result.memory_misses)
-print(result.asset_count)     # grand total assets indexed
-print(f"{result.latency_ms:.1f}ms")
-
-# Rapid follow-up for same request → cache hit, <1ms
-same = wf.ask("Create a landing page for our SaaS product")
-print(same.from_cache)        # True
-
-# Dashboard stats from all subsystems
-stats = wf.stats()
-print(stats)
-# {'restored_entries': 3, 'memory_entries': 12, 'memory_hits': 7,
-#  'tokens_saved': 2400, 'assets_indexed': 387, 'cache_files': 5,
-#  'watcher_scans': 0, 'watcher_changes': 0}
-
-# Force warm-up without making a request
-wf.warm()   # builds index, persists state, returns stats
-
-# Wire to Dashboard for live HTTP monitoring (see §5)
-from cursor_framework import Dashboard
-dash = Dashboard(root=".cursor", workflow=wf)
-# dash.serve(port=8765)   # blocking — run in a thread for non-blocking
-```
-
-#### 2 — Standalone modules
-
-Each module works independently if you need only one piece.
-
-**ContextRouter** — classify intent and route to the right skill:
-
-```python
-from cursor_framework import ContextRouter, IntentType, Domain, Skill
-
-router = ContextRouter()
-route = router.route("Optimize this PostgreSQL query with indexing")
-
-print(route.skill)           # Skill.DATABASE_OPTIMIZATION
-print(route.confidence)      # 0.87
-print(route.intent)          # IntentType.REFACTORING
-print(route.domain)          # Domain.DATABASE
-print(route.reasoning)       # "Intent: refactoring (0.73), Domain: database (0.85)..."
-
-# Multi-skill routing (e.g. landing page needs taste + full-output + review)
-routes = router.route_multi_skill("Build a greenfield landing page with Tailwind")
-for r in routes:
-    print(r.skill)
-# Skill.FRONTEND_TASTE, Skill.FULL_OUTPUT, Skill.FRONTEND_REVIEW
-```
-
-**SkillDiscovery** — auto-detect and load skills with gate execution:
-
-```python
-from cursor_framework import SkillDiscovery, GateType
-
-sd = SkillDiscovery(base_path=".")   # base path for .cursor/skills/
-
-# Detect skills for a request
-skills = sd.detect_skills("Add security review for momo payment integration")
-for s in skills:
-    print(s.skill, f"conf={s.confidence:.2f}")
-# vietnam-payment-review conf=0.89
-# security-review conf=0.71
-
-# Load skill file content (mtime-cached)
-content = sd.load_skill_file("frontend-taste")
-print(len(content), "chars loaded")
-
-# Execute pre-review gates
-results = sd.execute_gates(skills, context={}, gate_type=GateType.PRE_REVIEW)
-for r in results:
-    print(r.skill, "passed:", r.passed, "items:", r.items_checked)
-
-# Discovery statistics
-print(sd.get_discovery_stats())
-# {'total_discoveries': 4, 'unique_skills': 3, 'avg_confidence': 0.74,
-#  'gate_summary': {'total_gates': 8, 'pre_review': {'total': 4, 'passed': 4}}}
-
-# Clear skill file cache (useful after updating skill files)
-cleared = sd.clear_skill_cache()
-print(f"Cleared {cleared} cached skill files")
-```
-
-**MemoryManager** — tiered in-memory store (hot/warm/cold) with TTL and priority:
-
-```python
-from cursor_framework import MemoryManager, MemoryTier
-
-mm = MemoryManager()
-
-# Store in HOT tier (1h TTL, 100-entry cap)
-mm.store("auth_choice", {"method": "JWT", "reason": "stateless API"},
-         tier=MemoryTier.HOT, priority=8)
-
-# Store in WARM tier (24h TTL, 500-entry cap)
-mm.store("project_tech", {"stack": "Next.js + Prisma"},
-         tier=MemoryTier.WARM, priority=5)
-
-# Retrieve (searches HOT → WARM → COLD automatically)
-print(mm.retrieve("auth_choice"))   # {'method': 'JWT', 'reason': 'stateless API'}
-
-# Retrieve from specific tier
-print(mm.retrieve("project_tech", tier=MemoryTier.WARM))
-
-# Query by pattern
-results = mm.query_by_pattern("auth_*")
-print(list(results.keys()))
-
-# Cross-reference linking
-mm.link_entries("auth_choice", "project_tech")
-print(mm.get_related("auth_choice"))
-
-# Invalidate (mark stale without deleting)
-mm.invalidate("auth_choice")
-
-# Delete
-mm.delete("auth_choice")
-
-# Stats
-stats = mm.get_stats()
-print(stats.hit_rate, stats.miss_rate, stats.total_entries)
-
-# Optimize (cleanup expired + evict low-priority)
-mm.optimize()
-```
-
-**MemoryStore** — JSON persistence for MemoryManager across sessions:
-
-```python
-from cursor_framework import MemoryManager, MemoryTier, MemoryStore
-import json
-
-mm = MemoryManager()
-mm.store("user:42", {"name": "Alice"}, tier=MemoryTier.WARM)
-
-store = MemoryStore(".cache/memory.json")
-count = store.save(mm)          # atomic write; returns entry count
-print(f"Saved {count} entries")
-
-# Later, in a new Python process:
-mm2 = MemoryManager()
-restored = store.load_into(mm2)  # silent on corrupt/missing files
-print(f"Restored {restored} entries, hits={mm2._hits}")
-print(mm2.retrieve("user:42"))   # {'name': 'Alice'}
-```
-
-**TokenOptimizer** — budget management and context compression:
-
-```python
-from cursor_framework import TokenOptimizer, TokenBudget, CompressionStrategy
-
-opt = TokenOptimizer(max_tokens=100_000, compression_threshold=0.7)
-
-# Estimate tokens (conservative: 0.25 chars/token)
-print(opt.estimate_tokens("Hello world, this is a test."))  # ~12
-
-# Manual compression
-long_text = open(".cursor/rules/frontend-frameworks.mdc").read()
-compressed = opt.compress(long_text, target_tokens=2000,
-                           strategy=CompressionStrategy.SEMANTIC_WITH_SUMMARY)
-print(opt.estimate_tokens(compressed))   # ≈ 2000
-
-# Budget management
-budget = TokenBudget(max_tokens=100_000, system_reserve=5000, response_reserve=3000)
-print(budget.available_for_context)      # 92_000
-budget.allocate("skill_context", 5000)
-print(budget.current_usage)             # 5000
-print(budget.get_usage_breakdown())
-
-# Compression statistics
-print(opt.get_compression_stats())
-# {'total_compressions': 2, 'total_original_tokens': 8400,
-#  'tokens_saved': 3400, 'avg_compression_ratio': 0.60}
-```
-
-**Indexer** — scan `.cursor/` into machine + human-readable indexes:
-
-```python
-from cursor_framework import Indexer
-
-idx = Indexer(root=".cursor")
-idx.scan()
-
-print(idx.stats)
-# {'rules': 42, 'skills': 50, 'agents': 1, 'commands': 0,
-#  'hooks': 0, 'knowledge': 0, 'memory': 0, 'prompts': 0,
-#  'references': 0, 'scripts': 0, 'templates': 0, 'workflows': 0,
-#  'grand_total': 93}
-
-# Write outputs
-json_path = idx.write_json()         # .cursor/INDEX.json
-md_path   = idx.write_markdown()     # .cursor/INDEX.md
-print(f"Written: {json_path}, {md_path}")
-
-# Inspect individual entries
-for entry in idx.result.categories["skills"]:
-    if "frontend" in entry.name:
-        print(entry.name, entry.version, entry.description[:60])
-```
-
-**ContextBuilder** — detect skills, load them, compress to token budget:
-
-```python
-from cursor_framework import ContextBuilder
-
-cb = ContextBuilder(root=".cursor", max_tokens=4000)
-
-result = cb.build("Redesign the landing page with modern Tailwind")
-print(result.tokens, result.skill_count, result.truncated)
-# e.g. 3840 3 False
-print(result.skills_used)   # skills actually loaded
-print(result.skipped)       # skills beyond max_skills cap
-
-print(cb.stats())
-# {'compression_runs': 0, 'available_tokens': 3600, 'budget_ratio': 0.90}
-```
-
-**Dashboard** — stdlib HTTP server with live stats:
-
-```python
-from cursor_framework import Dashboard
-import threading
-
-# Basic (no auth, localhost only)
-dash = Dashboard(root=".cursor")
-t = threading.Thread(target=dash.serve, kwargs={"port": 8765}, daemon=True)
-t.start()
-
-# With auth token (all API calls require ?token=xxx or X-Auth-Token header)
-dash = Dashboard(root=".cursor", auth_token="secret123")
-t = threading.Thread(target=dash.serve, kwargs={"port": 8765}, daemon=True)
-t.start()
-
-# Wire to Workflow for live runtime stats
-from cursor_framework import Workflow
-wf = Workflow(root=".cursor", memory_path=".cache/memory.json")
-dash = Dashboard(root=".cursor", workflow=wf)
-# dash.serve(port=8765)
-
-# Endpoints:
-#   GET /             → HTML dashboard
-#   GET /api/index    → INDEX.json (asset counts)
-#   GET /api/stats    → live stats (memory hits, watcher scans, etc.)
-#   GET /api/memory   → memory entry counts
-```
-
-#### 3 — CLI tools
-
-Every module exposes a CLI entry point:
-
-```bash
-# Index .cursor/ → INDEX.json + INDEX.md
-python -m cursor_framework.indexer .cursor
-
-# Run all tests (in-repo)
-pytest
-
-# Build the GUI installer
-cd cursor-setup-gui
-dotnet publish -c Release -r win-x64 --self-contained \
-  -p:PublishSingleFile=true -o ../dist
-```
-
-#### 4 — Auto-watch mode
-
-Enable `auto_watch=True` on `Workflow` to re-index `.cursor/` whenever a file changes. The index is lazily invalidated — the next `ask()` call rebuilds it on the main thread (not in the watcher thread, avoiding concurrency issues).
-
-```python
-wf = Workflow(root=".cursor", auto_watch=True, watch_interval=5.0)
-
-# Simulate a file change
-import pathlib
-pathlib.Path(".cursor/skills/new-skill/SKILL.md").touch()
-
-# Next ask() triggers a fresh scan
-result = wf.ask("Use the new skill")
-print(wf.stats()["watcher_changes"])   # 1
-
-# Stop watching when done
-wf.stop_watching()
-```
-
-#### 5 — Putting it together: a complete agent loop
-
-```python
-from cursor_framework import Workflow, MemoryManager, MemoryTier
-
-# One workflow per project — reuse across the session
-wf = Workflow(root=".cursor", max_tokens=6000, max_skills=5)
-
-requests = [
-    "Create a SaaS landing page with Tailwind and a dark theme",
-    "Add Stripe billing with monthly/annual plans",
-    "Write unit tests for the auth module",
-    "Deploy to Railway with a PostgreSQL database",
-]
-
-for req in requests:
-    result = wf.ask(req)
-    print(f"\n{'='*60}")
-    print(f"Request : {req}")
-    print(f"Skills  : {result.context.skills_used}")
-    print(f"Skipped : {result.context.skipped}")
-    print(f"Tokens  : {result.context.tokens} (truncated={result.context.truncated})")
-    print(f"Cache   : from_cache={result.from_cache}, "
-          f"hits={result.memory_hits}, misses={result.memory_misses}")
-    print(f"Assets  : {result.asset_count} indexed")
-
-print("\nFinal stats:", wf.stats())
-```
-
-Output (example):
+Framework vận hành theo chu trình 5 bước nghiêm ngặt:
 
 ```
-Request : Create a SaaS landing page with Tailwind and a dark theme
-Skills  : ['frontend-taste', 'full-output', 'frontend-review']
-Tokens  : 5840 (truncated=False)
-Cache   : from_cache=False, hits=0, misses=3
-Assets  : 387 indexed
-
-Request : Add Stripe billing with monthly/annual plans
-Skills  : ['vietnam-payment-review', 'security-review']
-Tokens  : 3921 (truncated=False)
-Cache   : from_cache=False, hits=0, misses=2
-Assets  : 387 indexed
-
-Request : Write unit tests for the auth module
-Skills  : ['full-output']
-Tokens  : 1240 (truncated=False)
-Cache   : from_cache=False, hits=0, misses=1
-Assets  : 387 indexed
-
-Request : Deploy to Railway with a PostgreSQL database
-Skills  : ['deployment', 'database']
-Tokens  : 2890 (truncated=False)
-Cache   : from_cache=False, hits=0, misses=2
-Assets  : 387 indexed
-
-Final stats: {'restored_entries': 0, 'memory_entries': 24, 'memory_hits': 0,
-              'memory_misses': 8, 'tokens_saved': 0, 'assets_indexed': 387,
-              'cache_files': 6, 'watcher_scans': 0, 'watcher_changes': 0}
+DEFINE          PLAN           BUILD          VERIFY         SHIP
+┌──────┐      ┌──────┐      ┌──────┐      ┌──────┐      ┌──────┐
+│ Idea │ ───▶ │ Spec │ ───▶ │ Code │ ───▶ │ Test │ ───▶ │  Go  │
+│Refine│      │  PRD │      │ Impl │      │Debug │      │ Live │
+└──────┘      └──────┘      └──────┘      └──────┘      └──────┘
+  /spec          /plan          /build        /test         /ship
 ```
 
-Modules: `context_router`, `memory_manager`, `memory_store`, `token_optimizer`, `skill_discovery`, `rules_parser`, `skills_parser`, `context_builder`, `workflow`, `indexer`, `integration`, `watcher`, `dashboard`, `review.frontend_reviewer`. Utilities in `cursor_framework/utils/`: `text_utils`, `file_utils`, `code_utils`, `http_utils`, `security_utils`.
+### 2. Danh Sách Slash Commands Thông Dụng Trong IDE
 
-### Vue dashboard (development)
+Khi mở Composer (`Ctrl+I`) hoặc Chat (`Ctrl+L`) trong Cursor / Windsurf / Claude Code, bạn chỉ cần gõ `/` để kích hoạt:
 
-```bash
-cd cursor_framework_web
-npm install
-npm run dev                     # http://localhost:5173
-npm run build                   # production bundle to dist/
-```
-
-Views: Home, Learn, Prompts, Template Preview, Templates Gallery.
-
-## Tech stack supported
-
-- **Frontend**: Next.js 15 · React 19 · Vue 3 · Nuxt 4 · TypeScript · TailwindCSS · Shadcn/UI · Vuetify · Ant Design
-- **Backend**: Laravel 12 · ASP.NET Core 9 · NestJS · NodeJS
-- **Database**: PostgreSQL · MySQL · SQL Server · SQLite · Redis
-- **BaaS**: Supabase (Auth, DB, Storage, Edge Functions, PGVector)
-- **AI**: OpenAI · Gemini · Claude · Ollama · OpenRouter
-- **RAG**: PGVector · ChromaDB · Qdrant · Weaviate
-- **Workflow**: n8n · Temporal · Trigger.dev · Prefect
-- **Cloud / Deploy**: Cloudflare · AWS · Azure · GCP · Docker · Kubernetes · Coolify · Vercel · Railway
-
-## Demos
-
-| Demo | Stack | Use as reference for |
+| Slash Command | Persona / Action | Công Dụng Chi Tiết |
 |---|---|---|
-| `demos/crm/` | Next.js + Prisma | Multi-tenant SaaS, RLS, billing |
-| `demos/fitness/` | Next.js | Consumer app with dashboards |
-| `demos/food-delivery/` | docs-only | Marketplace patterns (reference docs) |
-| `demos/realestate/` | docs-only | Listing + search (reference docs) |
-| `demos/travel/` | docs-only | Booking flows (reference docs) |
+| `/spec` | Product Architect | Biến ý tưởng 1 dòng thành bản PRD đầy đủ, có tiêu chí nghiệm thu |
+| `/plan` | Task Decomposer | Chia nhỏ bài toán thành các subtask độc lập, có checklist kiểm định |
+| `/build` | Senior Developer | Sinh mã nguồn hoàn chỉnh, áp dụng `frontend-taste` và `full-output` |
+| `/test` | Test Engineer | Viết unit test, integration test, kiểm tra biên độ lỗi và race condition |
+| `/review` | Code Reviewer | Đánh giá 5 trục: Tính đúng đắn, Thiết kế, Bảo mật, Hiệu năng, Tiếp cận |
+| `/security` | Security Auditor | Kiểm tra lỗ hổng OWASP, rò rỉ secret, CORS, CSRF |
+| `/vbs-scan` | VBS Security Scanner | Quét 21 rule bảo mật chuyên sâu với AST taint analysis & SCA CVE |
+| `/rea` | Reverse Engineer | Dịch ngược tệp nhị phân PE/ELF/.NET/APK/WASM thành code sạch |
+| `/fullstack` | Fullstack Engineer | Xây dựng API ASP.NET Core / NestJS + React / Vue 3 đồng bộ contract |
+| `/cms` | CMS Navigator | Quản trị, xem trước và chỉnh sửa 22 template trên CMS Dashboard |
 
-## Development
+---
+
+## 22 Production-Ready Templates Catalog
+
+Toàn bộ **22 templates** nằm tại thư mục [`cursor_framework_web/public/templates/`](file:///d:/PROJECTS/CURSORS/CURSOR%20ENTERPRISE%20FRAMEWORK%20GENERATOR/cursor_framework_web/public/templates/). Tất cả đều là **zero-dependency static code** (HTML5 + CSS3 + Vanilla JS), mở lên là chạy ngay trong trình duyệt hoặc iframe, không phụ thuộc server nặng nề:
+
+| STT | Slug / Thư mục | Tên Mẫu Template | Ngành Nghề | Tính Năng Nổi Bật Thực Tế | Phong Cách Giao Diện |
+|---|---|---|---|---|---|
+| **1** | `auto-showroom` | **AutoPrime Motors** | Showroom Ô Tô Đa Hãng | • Lọc kho xe đa hãng (Porsche, Mercedes, BMW, Audi, Lexus, VinFast)<br>• **Công cụ tính giá lăn bánh** tự động áp thuế trước bạ địa phương (10-12%)<br>• **Bảng dự toán trả góp ngân hàng** (20%-80%, lãi suất giảm dần)<br>• Form đặt lịch lái thử tận nhà & cam kết kiểm định 176 hạng mục | Dark Slate Luxury Automotive (`#090d16` & Royal Amber Gold) |
+| **2** | `viet-restaurant` | **Vị Xưa Quán** | Ẩm Thực Truyền Thống Việt | • Câu chuyện 38 năm gìn giữ hạt ngọc làng quê trên niêu đất Bát Tràng<br>• Menu 8 món biểu tượng 3 miền (Bắc - Trung - Nam)<br>• **Hệ thống E-Voucher 1 chạm sao chép** (`GIAM15`, `SUMVAY25`)<br>• Hướng dẫn 4 chi nhánh & Form đặt bàn online (phòng VIP, tiệc gia đình) | Heritage Warm Wood & Terracotta (`#180e0a` & Gold) |
+| **3** | `insurance` | **Aegis Bảo An** | Bảo Hiểm Toàn Diện 4.0 | • Bộ công cụ **tính phí bảo hiểm tức thì trong 30s**<br>• Quy trình bồi thường trực tuyến e-Claim giải ngân trong 24h<br>• Bản đồ liên kết bảo lãnh viện phí **680+ bệnh viện** toàn quốc<br>• Hướng dẫn 4 bước mua bảo hiểm & đánh giá khách hàng | High-Trust Royal Navy Blue (`#041224` & Radiant Cyan) |
+| **4** | `crm` | **SaaS CRM Platform** | CRM Doanh Nghiệp | Quản lý khách hàng tiềm năng, đường ống bán hàng Kanban, phân quyền vai trò | Dark Zinc & Emerald Minimalist |
+| **5** | `sale` | **Flash Sale & Black Friday** | Thương Mại Điện Tử | Đồng hồ đếm ngược Flash Deal, thông báo đơn mua theo thời gian thực | High-Energy Crimson & Amber |
+| **6** | `bazi` | **Tứ Trụ Mệnh Lý** | Phong Thủy & Bát Tự Á Đông | Bảng tra Can Chi, tính thập thần, luận giải cung mệnh học thuật | Á Đông Huyền Bí & Chu Sa |
+| **7** | `numerology` | **Thần Số Học Pythagore** | Khám Phá Bản Thân | Tính con số chủ đạo, 4 đỉnh cao cuộc đời, biểu đồ ngày sinh | Neo Tokyo Cosmic Obsidian & Violet |
+| **8** | `realestate` | **Bất Động Sản Nghỉ Dưỡng** | Bất Động Sản Cao Cấp | Bộ lọc phân khúc biệt thự biển, dự toán vay mua nhà, bản đồ tiện ích 360° | Warm Ivory & Emerald Gold |
+| **9** | `food-delivery` | **Giao Đồ Ăn Nhanh** | Giao Hàng & F&B | Theo dõi đơn hàng theo thời gian thực, combo bữa trưa văn phòng, mã freeship | Fresh Tangerine & Warm Charcoal |
+| **10** | `travel` | **Tour Trải Nghiệm & Du Lịch** | Du Lịch & Lữ Hành | Lịch trình tour theo ngày, chọn ngày khởi hành, đánh giá hướng dẫn viên | Tropical Azure & Sea Green |
+| **11** | `beauty-spa` | **Viện Thẩm Mỹ & Spa** | Sức Khỏe & Làm Đẹp | Bảng giá dịch vụ chăm sóc da chuyên sâu, đặt lịch hẹn chuyên gia trị liệu | Rose Champagne & Soft Nude |
+| **12** | `fitness` | **Phòng Gym & Huấn Luyện Viên** | Thể Thao & Fitness | Tính chỉ số BMI/TDEE, lịch tập luyện theo tuần, đăng ký gói tập PT 1-kèm-1 | High-Contrast Acid Lime & Charcoal |
+| **13** | `edu-tutor` | **Gia Sư & Luyện Thi** | Giáo Dục Trực Tuyến | Tìm gia sư theo môn học, thi thử trực tuyến, lộ trình đỗ đại học điểm cao | Trustworthy Indigo & Golden Badge |
+| **14** | `agritech` | **Nông Nghiệp Công Nghệ Cao** | Nông Nghiệp & IoT | Giám sát độ ẩm đất cảm biến IoT, truy xuất nguồn gốc nông sản Blockchain | Eco Leaf Green & Slate |
+| **15** | `farm` | **Nông Trại Hữu Cơ** | Nông Nghiệp Sinh Thái | Gói rau sạch định kỳ hàng tuần, quy trình canh tác thuận tự nhiên | Earthy Olive & Terracotta |
+| **16** | `orchard` | **Vườn Cây Ăn Quả Sinh Thái** | Trang Trại Sinh Thái | Đặt vé trải nghiệm thu hoạch trái cây tại vườn, đặc sản sấy dẻo OCOP | Sunny Citrus Orange & Mint |
+| **17** | `church` | **Giáo Xứ & Mục Vụ** | Cộng Đoàn Tôn Giáo | Giờ lễ các ngày trong tuần, tin mục vụ giáo xứ, đóng góp thiện nguyện | Sacred Gold & Deep Stone Grey |
+| **18** | `preschool` | **Mầm Non Song Ngữ** | Mầm Non & Giáo Dục Sớm | Thực đơn dinh dưỡng mỗi ngày, camera trực tuyến lớp học, phương pháp Montessori | Playful Pastel Sky & Sunny Yellow |
+| **19** | `aitech` | **AI SaaS Platform** | Công Nghệ & Trí Tuệ Nhân Tạo | Bảng so sánh token LLM, playground thử nghiệm prompt, sandbox API | Deep Space Obsidian & Cyan Pulse |
+| **20** | `computech` | **Thiết Bị Công Nghệ** | Phần Cứng & Laptop | Bộ lọc cấu hình gaming PC, build case máy tính tự động kiểm tra tương thích | Stealth Gunmetal & Cyberpunk Amber |
+| **21** | `blog` | **Tạp Chí Công Nghệ** | Blog & Truyền Thông | Ước tính thời gian đọc, thanh tiến trình đọc bài, chế độ ban đêm tối ưu mắt | Editorial Typography & Clean Grey |
+| **22** | `portfolio` | **Hồ Sơ Năng Lực Sáng Tạo** | Portfolio Cá Nhân | Thư viện dự án dạng lưới bẻ trục, timeline kinh nghiệm, biểu mẫu liên hệ | Monochromatic Minimalist & High Contrast |
+
+---
+
+## Sample Prompts (Mẫu Prompts Vibe Coding Chuẩn Mực)
+
+Để AI sinh code chuẩn xác, không bịa đặt và không để lại skeleton placeholder, hãy sử dụng **Công Thức Prompt 5 Thành Phần (Golden Formula)**:
+
+$$\text{Prompt} = \text{Vai Trò (Role)} + \text{Bối Cảnh & Mục Tiêu (Context)} + \text{Ràng Buộc Nghiêm Ngặt (Constraints)} + \text{Kiểm Định (Dual Gates)} + \text{Đầu Ra Hoàn Chỉnh (Full Output)}$$
+
+### Mẫu 1: Xây Dựng Showroom Ô Tô Đa Hãng
+```markdown
+Bạn là Kiến trúc sư giải pháp frontend cao cấp theo chuẩn /evondev-ui-ux và /ui_landing-page-pro.
+Hãy xây dựng sàn giao dịch ô tô cao cấp AutoPrime Motors:
+1. Nền tảng xe đa hãng (Porsche, Mercedes-Benz, BMW, Audi, Lexus, VinFast, Volvo).
+2. Tích hợp bộ công cụ tính giá lăn bánh tức thì: Tự động cộng thuế trước bạ địa phương (Hà Nội 12%, TP.HCM 10%, tỉnh khác 10%), phí biển số và bảo hiểm bắt buộc.
+3. Bảng dự toán trả góp ngân hàng: Người dùng kéo chọn tỉ lệ trả trước (20%-80%) và số năm vay (1-8 năm), tự động tính số tiền gốc + lãi trả hàng tháng.
+4. Cam kết kiểm định 176 hạng mục, đặt lịch lái thử tại nhà (Home Test Drive), hệ thống 5 showroom.
+5. Phong cách Dark Slate Luxury Automotive (#090d16 viền vàng kim #f59e0b). Zero placeholder, mã HTML5/CSS/JS thuần độc lập.
+```
+
+### Mẫu 2: Xây Dựng Nhà Hàng Ẩm Thực Truyền Thống Việt
+```markdown
+Đóng vai trò UX Designer & Content Creator theo chuẩn /frontend-taste.
+Thiết kế trang web nhà hàng ẩm thực di sản Vị Xưa Quán:
+1. Thể hiện câu chuyện 38 năm gìn giữ cơm niêu đất nung Bát Tràng và triết lý ngũ hành ẩm thực 3 miền.
+2. Thực đơn 8 món ăn biểu tượng chia theo tabs (Món Bắc, Món Trung, Món Nam, Tráng Miệng & Trà Sen).
+3. Trải nghiệm dịch vụ 5 sao: Phòng VIP tiếp khách riêng tư, hòa tấu nhạc dân tộc, bãi đỗ xe ô tô.
+4. Hệ thống voucher e-coupon (GIAM15, SUMVAY25) bấm 1 chạm sao chép ngay vào clipboard.
+5. Form đặt bàn trực tuyến chọn chi nhánh và ghi chú dị ứng/yêu cầu đặc biệt.
+6. Phong cách Gỗ mun gụ ấm áp (#180e0a) kết hợp đỏ đất nung và vàng rơm hoàng cung. Font Playfair Display thanh tao.
+```
+
+### Mẫu 3: Quét Lỗ Hổng Bảo Mật & Tự Động Vá (vbsec)
+```markdown
+Thực hiện quét bảo mật toàn diện dự án theo kỹ năng /vbs-scan-security:
+1. Phân tích luồng dữ liệu L1-L4 từ các nguồn untrusted inputs (req.body, query, params) tới các sinks nhạy cảm (SQL query, command execution, SSRF).
+2. Kiểm tra các thư viện bên thứ 3 phát hiện CVE tồn đọng qua OSV.dev database (--sca).
+3. Xuất file báo cáo chuẩn SARIF và sinh các bản vá lỗi (git diff) tối thiểu, không gây breaking changes logic ứng dụng.
+```
+
+### Mẫu 4: Dịch Ngược Nhị Phân & Tái Tạo Mã Nguồn Sạch (REA)
+```markdown
+Sử dụng công cụ /reverse-engineer-anything để kiểm tra file nhị phân target:
+1. Trích xuất symbol table, import/export APIs và control flow graph.
+2. Tách biệt hoàn toàn phần logic kinh doanh (Cleanroom Spec), vẽ sơ đồ tuần tự Sequence Diagram.
+3. Viết lại module tương đương bằng TypeScript/C# hoàn toàn sạch (cleanroom replacement), có bộ test case xác nhận độ tương thích 1:1.
+```
+
+---
+
+## Essential Commands Reference (Bảng Tổng Hợp Lệnh Cần Thiết)
+
+### 1. Lệnh Phát Triển & Web Dashboard
 
 ```bash
-# Clone
-git clone https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR.git
+# Di chuyển vào thư mục web dashboard
+cd cursor_framework_web
 
-# Install Python deps
+# Cài đặt thư viện Node
+npm install
+
+# Khởi chạy server phát triển (Vite 6)
+npm run dev                     # Mở http://localhost:5173
+
+# Sinh lại toàn bộ 22 thumbnail preview PNGs
+node scripts/generate-previews.js
+
+# Kiểm tra TypeScript & Đóng gói sản phẩm sản xuất
+npm run build                   # Tự động chạy prebuild sinh PNGs + vue-tsc + vite build
+
+# Chạy thử bản production
+npm run preview
+```
+
+### 2. Lệnh Đồng Bộ Adapters & Vibe Code
+
+```powershell
+# Đồng bộ tất cả adapters (.cursor, .claude, .windsurf, .agents, .github)
+.\vibe-code-framework\08-scripts\sync-adapters.ps1
+
+# Đồng bộ riêng từng tool
+.\vibe-code-framework\08-scripts\sync-adapters.ps1 -Tool Cursor
+.\vibe-code-framework\08-scripts\sync-adapters.ps1 -Tool Windsurf
+.\vibe-code-framework\08-scripts\sync-adapters.ps1 -Tool Copilot
+.\vibe-code-framework\08-scripts\sync-adapters.ps1 -Tool Antigravity
+
+# Kiểm tra tính toàn vẹn của framework
+.\vibe-code-framework\08-scripts\validate.ps1
+```
+
+### 3. Lệnh Thư Viện Python & Trí Nhớ SQLite
+
+```bash
+# Cài đặt thư viện ở chế độ editable
 pip install -e ".[all]"
 
-# Run tests (136+ tests across 2 suites)
-pytest                                  # all tests with coverage
+# Khởi chạy Dashboard HTTP local
+python -c "from cursor_framework import Dashboard, Workflow; dash = Dashboard(root='.cursor', workflow=Workflow(root='.cursor')); dash.serve(port=8765)"
 
-# Build the GUI installer
-cd cursor-setup-gui
-dotnet publish -c Release -r win-x64 --self-contained \
-  -p:PublishSingleFile=true -o ../dist
+# Tạo lại chỉ mục INDEX.json và INDEX.md
+python -m cursor_framework.indexer .cursor
+
+# Chạy toàn bộ test suites (136+ unit tests)
+pytest
 ```
 
-Branch protection on `main` is active (PR + 1 approval required, status checks enforced). Releases are tagged (`v1.3.0` current); see `dist/RELEASE-NOTES-*.md` for each version.
+### 4. Lệnh Reverse Engineering (REA)
 
-## License
+```powershell
+# Kiểm tra phiên bản REA CLI
+node tools/rea/scripts/rea.mjs --version
 
-MIT — see [LICENSE on GitHub](https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/blob/main/LICENSE). *(No LICENSE file is committed in this repo at the moment — declared in `pyproject.toml` and the `setup.bat` installer banner.)*
+# Khởi chạy REA MCP Server (stdio)
+node tools/rea/scripts/rea.mjs mcp
 
-## Versioning
+# Chạy sanity test REA
+.\tools\rea\setup-rea.ps1
+```
 
-- **Repo tags** (`v1.x.y`): mark repo-level milestones.
-- **Framework version** (`4.x.y`, in `setup.bat`): tracks the installed `.cursor/` payload content.
-- **Library version** (`pyproject.toml`): the `cursor_framework` Python package.
+### 5. Lệnh Build Trình Cài Đặt Windows GUI
 
-Current: repo `v1.3.0` · framework `4.2.0` · library `1.0.0`.
+```powershell
+cd cursor-setup-gui-wpf
+dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o ../dist
+```
+
+---
+
+## Themes & UI/UX System
+
+Để đảm bảo giao diện **"Không thuần AI, nhìn wow"**, toàn bộ hệ thống áp dụng triết lý thiết kế từ:
+- **`frontend-taste` & `hallmark`**: 57 cổng kiểm định slop-test (loại bỏ gradient tím/hồng vô nghĩa, tránh layout 3 card cân xứng sáo rỗng, không dùng ảnh stock AI chung chung).
+- **`evondev-ui-ux`**: Chuẩn khoảng cách 8px scale, nhịp thở typography tương phản cao, chuyển động vi mô tự nhiên `cubic-bezier(0.16, 1, 0.3, 1)`.
+
+### 6 Theme Giao Diện Tích Hợp Sẵn
+
+Người dùng có thể chuyển đổi giao diện tức thì qua nút chọn Theme trên thanh điều hướng (`NavBar.vue`):
+
+1. **Emerald Engine** (`theme-emerald` - Mặc định): Dark Zinc tối tân kết hợp sắc xanh ngọc Acid Emerald, phong cách Linear/Vercel.
+2. **Indigo Linear** (`theme-indigo`): Tím đêm điện tử kết hợp ánh sáng Neon Indigo huyền ảo.
+3. **Cyber Amber** (`theme-cyberpunk`): Sắc đen Obsidian bóng bẩy điểm xuyết hổ phách hoàng kim và cyan công nghệ cao.
+4. **Slate Luxury** (`theme-slate`): Titanium xám nhám cao cấp kết hợp ánh vàng Champagne, chuẩn thiết kế xe hơi & tài chính xa xỉ.
+5. **Warm Heritage** (`theme-heritage`): Gỗ mun gụ ấm áp, đất nung đỏ và vàng rơm di sản Á Đông.
+6. **Clean Editorial** (`theme-light`): Nền giấy trắng tuyết thanh lịch, độ tương phản cao, tối ưu cho môi trường ánh sáng ban ngày.
+
+---
+
+## CMS Dashboard & Quản Trị Hệ Thống
+
+Hệ thống tích hợp trang quản trị CMS Dashboard chuyên nghiệp tại đường dẫn `/#/cms`:
+- **Cổng xác thực an toàn cố định**:
+  - **Tài khoản:** `admin`
+  - **Mật khẩu:** `admin@123`
+- **Các tính năng quản trị chính**:
+  - Theo dõi KPI tổng quan (22 gói templates, 137 trang landing pages, 148K+ tương tác, Lighthouse 99.2/100).
+  - Tìm kiếm & lọc đa chiều theo ngành nghề, trạng thái hiển thị (Active/Draft) và đánh dấu nổi bật (Featured).
+  - Chuyển đổi linh hoạt giữa giao diện **Lưới (Grid)** và **Bảng dữ liệu (Table)**.
+  - Xem trước tức thì (Quick View Modal) và mở toàn màn hình (Full Preview).
+  - Form thêm mới / chỉnh sửa metadata, tính năng, tags và xuất file ZIP triển khai.
+
+---
+
+## License & Conventions
+
+- **License:** MIT License — Xem chi tiết tại [LICENSE](LICENSE).
+- **Versioning:**
+  - Repo Releases: `v1.3.0`
+  - Framework Payload: `4.2.0`
+  - ECC Universal: `2.2.2`
+  - REA Engine: `6.4.0`

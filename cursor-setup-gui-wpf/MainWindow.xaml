@@ -4,8 +4,8 @@
         xmlns:vm="clr-namespace:CursorSetupWpf.ViewModels"
         xmlns:views="clr-namespace:CursorSetupWpf.Views"
         Title="{Binding WindowTitle}"
-        Width="1240" Height="880"
-        MinWidth="1000" MinHeight="740"
+        Width="1360" Height="900"
+        MinWidth="1080" MinHeight="760"
         WindowStartupLocation="CenterScreen"
         Icon="setup.ico"
         Background="{StaticResource FormBackgroundBrush}"
@@ -14,11 +14,6 @@
     <Window.DataContext>
         <vm:MainViewModel/>
     </Window.DataContext>
-
-    <!-- Drop-shadow around the window for depth -->
-    <Window.Effect>
-        <DropShadowEffect BlurRadius="32" ShadowDepth="0" Direction="270" Color="#1E293B" Opacity="0.18"/>
-    </Window.Effect>
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -206,32 +201,76 @@
         <!-- === MAIN CONTENT AREA === -->
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
+                <RowDefinition Height="72"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="280"/>
+                <RowDefinition Height="240"/>
             </Grid.RowDefinitions>
 
+            <!-- Operational header: make the safe packaging boundary visible
+                 before a user starts an install. -->
+            <Border Grid.Row="0"
+                    Background="{StaticResource CardBackgroundBrush}"
+                    BorderBrush="{StaticResource CardBorderBrush}"
+                    BorderThickness="0,0,0,1"
+                    Padding="28,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{Binding SafetyTitle}"
+                                   FontFamily="{StaticResource UIFont}"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource Slate900Brush}"/>
+                        <TextBlock Text="{Binding SafetyBody}"
+                                   FontFamily="{StaticResource UIFont}"
+                                   FontSize="11"
+                                   Foreground="{StaticResource Slate500Brush}"
+                                   Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <Border Grid.Column="1"
+                            Background="{StaticResource Warning100Brush}"
+                            BorderBrush="{StaticResource Warning500Brush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="12,7"
+                            VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="8" Height="8"
+                                     Fill="{StaticResource Warning600Brush}"
+                                     Margin="0,0,8,0"
+                                     VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding SafetyBadge}"
+                                       FontFamily="{StaticResource UIFont}"
+                                       FontSize="11"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource Warning600Brush}"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+
             <!-- Page content -->
-            <Grid Grid.Row="0" Background="{StaticResource ContentBackgroundBrush}">
+            <Grid Grid.Row="1" Background="{StaticResource ContentBackgroundBrush}">
                 <Grid>
                     <views:InstallView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=0, FallbackValue=Visible}"/>
-                    <views:ComponentsView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=1, FallbackValue=Collapsed}"/>
-                    <views:AdvancedView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=2, FallbackValue=Collapsed}"/>
-                    <views:HooksView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=3, FallbackValue=Collapsed}"/>
-                    <views:McpServersView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=4, FallbackValue=Collapsed}"/>
-                    <views:UpdatesView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=5, FallbackValue=Collapsed}"/>
+                    <views:VibeCodersView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=1, FallbackValue=Collapsed}"/>
+                    <views:ComponentsView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=2, FallbackValue=Collapsed}"/>
+                    <views:AdvancedView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=3, FallbackValue=Collapsed}"/>
+                    <views:HooksView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=4, FallbackValue=Collapsed}"/>
+                    <views:UtilitiesView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=5, FallbackValue=Collapsed}"/>
                     <views:BackupView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=6, FallbackValue=Collapsed}"/>
-                    <views:SettingsView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=7, FallbackValue=Collapsed}"/>
-                    <views:GuideView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=8, FallbackValue=Collapsed}"/>
-                    <views:FrameworkView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=9, FallbackValue=Collapsed}"/>
-                    <views:ProjectRunnerView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=10, FallbackValue=Collapsed}"/>
-                    <views:ScriptGeneratorView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=11, FallbackValue=Collapsed}"/>
-                    <views:ECCView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=12, FallbackValue=Collapsed}"/>
+                    <views:UpdatesView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=7, FallbackValue=Collapsed}"/>
+                    <views:SettingsView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=8, FallbackValue=Collapsed}"/>
+                    <views:GuideView Visibility="{Binding SelectedNavIndex, Converter={StaticResource IndexToVisibility}, ConverterParameter=9, FallbackValue=Collapsed}"/>
                 </Grid>
             </Grid>
 
             <!-- === BOTTOM PANEL (Step progress) === -->
-            <Border Grid.Row="1" Background="White"
+            <Border Grid.Row="2" Background="{StaticResource CardBackgroundBrush}"
                     BorderBrush="{StaticResource Slate200Brush}"
                     BorderThickness="0,1,0,0">
                 <Grid Margin="24,0">
@@ -368,14 +407,37 @@
             </Border>
 
             <!-- === LOG + BUTTONS === -->
-            <Border Grid.Row="2" Background="{StaticResource LogBackgroundBrush}">
+            <Border Grid.Row="3" Background="{StaticResource LogBackgroundBrush}">
                 <Grid>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <ScrollViewer Grid.Row="0"
+                    <Border Grid.Row="0" Background="{StaticResource Slate800Brush}"
+                            BorderBrush="{StaticResource Slate700Brush}"
+                            BorderThickness="0,0,0,1"
+                            Padding="24,9">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding OperationalLogLabel}"
+                                       FontFamily="{StaticResource UIFont}"
+                                       FontSize="11"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource Slate300Brush}"/>
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding StatusText}"
+                                       FontFamily="{StaticResource MonoFont}"
+                                       FontSize="10"
+                                       Foreground="{StaticResource Slate400Brush}"/>
+                        </Grid>
+                    </Border>
+
+                    <ScrollViewer Grid.Row="1"
                                   VerticalScrollBarVisibility="Auto"
                                   HorizontalScrollBarVisibility="Auto"
                                   Padding="24,12">
@@ -393,7 +455,7 @@
                         </ItemsControl>
                     </ScrollViewer>
 
-                    <Border Grid.Row="1"
+                    <Border Grid.Row="2"
                             Background="{StaticResource Slate900Brush}"
                             Padding="24,12">
                         <Grid>
@@ -406,7 +468,8 @@
                             <Button Grid.Column="1"
                                     Style="{StaticResource PrimaryButtonStyle}"
                                     Command="{Binding InstallCommand}"
-                                    MinWidth="180">
+                                    MinWidth="180"
+                                    Visibility="{Binding IsInstallPage, Converter={StaticResource BoolToVisibility}}">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="&#xE8FB;"
@@ -418,6 +481,15 @@
                                     </StackPanel>
                                 </Button.Content>
                             </Button>
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding InstallSurfaceHint}"
+                                       Visibility="{Binding IsInstallPage, Converter={StaticResource BoolToVisibility}, ConverterParameter=Invert}"
+                                       FontFamily="{StaticResource UIFont}"
+                                       FontSize="12"
+                                       Foreground="{StaticResource Slate400Brush}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       TextWrapping="Wrap"/>
                         </Grid>
                     </Border>
                 </Grid>

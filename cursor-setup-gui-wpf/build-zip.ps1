@@ -1,5 +1,5 @@
 # ============================================================
-# Build cursor-setup.zip from .cursor contents
+# Build cursor-setup.zip from .cursor contents and staged MCP tools
 # ============================================================
 param(
     [string]$Config = "Debug"
@@ -16,7 +16,7 @@ $OutputZip = Join-Path $BuildDir "cursor-setup.zip"
 $TempZip = Join-Path $env:TEMP "cursor-setup-build-$([System.Guid]::NewGuid().ToString('N')).zip"
 
 Write-Host ""
-Write-Host "Cursor Enterprise Framework Packager v4.4.0" -ForegroundColor Cyan
+Write-Host "Cursor Enterprise Framework Packager v4.5.0" -ForegroundColor Cyan
 Write-Host "===========================================" -ForegroundColor Cyan
 Write-Host "Config : $Config" -ForegroundColor Gray
 Write-Host "Source : $SourceDir"
@@ -102,8 +102,49 @@ $StagingDir = Join-Path $env:TEMP "cursor-setup-staging-$([System.Guid]::NewGuid
 New-Item -ItemType Directory -Path $StagingDir -Force | Out-Null
 
 try {
-    # Copy framework rules/skills/agents/etc.
+    # Copy framework rules/skills/agents/etc. from the existing consumer
+    # boundary. This is read-only; no host .cursor path is modified.
     Copy-Item -Path "$SourceDir\*" -Destination $StagingDir -Recurse -Force
+
+    # Remove generated Python caches from the staged copy only. The source
+    # .cursor tree remains untouched and the archive stays portable.
+    Get-ChildItem -Path $StagingDir -Recurse -Directory -Force -Filter "__pycache__" |
+        Sort-Object FullName -Descending |
+        ForEach-Object { Remove-Item -LiteralPath $_.FullName -Recurse -Force -ErrorAction SilentlyContinue }
+    Get-ChildItem -Path $StagingDir -Recurse -File -Force |
+        Where-Object { $_.Extension -in @(".pyc", ".pyo") } |
+        ForEach-Object { Remove-Item -LiteralPath $_.FullName -Force -ErrorAction SilentlyContinue }
+
+    # Stage MCP tools directly into the archive. Do not copy them into the
+    # repository's .cursor/mcp first: that would overwrite user state merely
+    # to produce a package.
+    $stagedMcp = Join-Path $StagingDir "mcp"
+    if (Test-Path $stagedMcp) { Remove-Item $stagedMcp -Recurse -Force }
+    New-Item -ItemType Directory -Path $stagedMcp -Force | Out-Null
+    $mcpSources = @("cursor-framework-mcp", "cursor-autopilot-mcp", "cursor-memory-mcp")
+    foreach ($mcp in $mcpSources) {
+        $mcpSource = Join-Path $RepoRoot "tools\$mcp"
+        if (-not (Test-Path $mcpSource -PathType Container)) {
+            Write-Host "  [WARN] MCP source not found: $mcpSource" -ForegroundColor Yellow
+            continue
+        }
+        Copy-Item -Path $mcpSource -Destination (Join-Path $stagedMcp $mcp) -Recurse -Force
+        Write-Host "  [OK] Staged MCP: $mcp" -ForegroundColor Green
+    }
+    # Do not ship interpreter caches in a distributable archive. They are
+    # machine-specific, can be stale, and needlessly inflate the package.
+    Get-ChildItem -Path $stagedMcp -Recurse -Directory -Force -Filter "__pycache__" |
+        Sort-Object FullName -Descending |
+        ForEach-Object { Remove-Item -LiteralPath $_.FullName -Recurse -Force -ErrorAction SilentlyContinue }
+    Get-ChildItem -Path $stagedMcp -Recurse -File -Force |
+        Where-Object { $_.Extension -in @(".pyc", ".pyo") } |
+        ForEach-Object { Remove-Item -LiteralPath $_.FullName -Force -ErrorAction SilentlyContinue }
+    foreach ($meta in @("mcp-config-template.json", "MCP-INTEGRATION.md")) {
+        $metaSource = Join-Path $RepoRoot "tools\$meta"
+        if (Test-Path $metaSource -PathType Leaf) {
+            Copy-Item -LiteralPath $metaSource -Destination $stagedMcp -Force
+        }
+    }
 
     # Bundle Python package so `python -m cursor_framework` works after install.
     $pkgSrc = Join-Path $RepoRoot "cursor_framework"
@@ -175,9 +216,6 @@ if ($missingDirs.Count -gt 0) {
     Write-Host "  [OK] All expected directories present" -ForegroundColor Green
 }
 
-# Cleanup
-Remove-Item $verifyDir -Recurse -Force
-
 # Write build info
 Write-Host ""
 Write-Host "[5/6] Writing build metadata..." -ForegroundColor Yellow
@@ -185,7 +223,7 @@ $metaPath = Join-Path $BuildDir "cursor-setup-build.json"
 
 # Try to read version from .csproj dynamically, fall back to hardcoded
 $csprojPath = Join-Path $ScriptDir "CursorSetupWpf.csproj"
-$version = "4.4.0"
+$version = "4.5.0"
 if (Test-Path $csprojPath) {
     $csprojContent = Get-Content $csprojPath -Raw
     if ($csprojContent -match '<Version>(.*?)</Version>') {
@@ -222,6 +260,9 @@ foreach ($mcp in $mcps) {
         Write-Host "  [SKIP] $mcp not found in archive (will be added during build)" -ForegroundColor Gray
     }
 }
+
+# Cleanup only the temporary verification directory after every check has run.
+Remove-Item $verifyDir -Recurse -Force
 
 Write-Host ""
 Write-Host "===========================================" -ForegroundColor Cyan

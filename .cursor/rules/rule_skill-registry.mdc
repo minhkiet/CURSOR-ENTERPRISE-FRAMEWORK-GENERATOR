@@ -232,6 +232,31 @@ Mỗi skill được định nghĩa với các properties:
 
 ---
 
+#### reverse-engineer-anything
+
+| Property | Value |
+|----------|-------|
+| **ID** | `reverse-engineer-anything` |
+| **Path** | `.cursor/skills/sec_reverse-engineer-anything/SKILL.md` |
+| **Role** | `primary` |
+| **Domains** | `security`, `reverse-engineering`, `binary-analysis` |
+| **Confidence Base** | `0.85` |
+| **Threshold** | `0.85` (auto-select) |
+| **Source** | [morluto/rea](https://github.com/morluto/rea) (v6.4.0) |
+
+**Triggers:**
+- reverse engineering, reverse-engineer, decompile, disasm, disassemble
+- binary analysis, ghidra, hopper, ida, asar, electron inspection
+- apk analysis, jadx, wasm analysis, evm bytecode, go binary
+- dịch ngược mã máy, phân tích nhị phân, bóc tách asar/apk
+
+**Pre-Gates:** U.1-U.4  
+**Post-Gates:** U.5-U.7, §X
+
+**Purpose:** Reverse engineering toàn diện cho native binaries (PE/ELF/Mach-O qua Ghidra/Hopper/IDA), managed .NET assemblies, Electron/JS ASAR, Android APK (JADX), WASM, EVM bytecode, Go binaries, và runtime observation (pwntools, Frida, LLDB, CDP) với cơ chế bảo tồn bằng chứng (evidence preservation) và cleanroom re-implementation.
+
+---
+
 #### hallmark
 
 | Property | Value |

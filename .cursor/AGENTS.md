@@ -63,6 +63,8 @@ Cursor Enterprise Framework tích hợp **Agent Personas** từ agent-skills - c
 | `/scan` | Code scanning |
 | `/scrape` | Web scraping |
 | `/security` | Security review |
+| `/rea` | REA reverse engineering (native, .NET, Electron/JS, APK, WASM) |
+| `/reverse` | Alias for `/rea` |
 | `/workflow` | Workflow automation |
 
 ### Legacy Commands

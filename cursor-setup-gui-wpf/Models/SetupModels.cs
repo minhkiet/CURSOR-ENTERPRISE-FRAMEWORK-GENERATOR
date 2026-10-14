@@ -55,7 +55,7 @@ namespace CursorSetupWpf.Models
     {
         private bool _isSelected = true;
         private string _description = "";
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public int Index { get; set; }
         public string Name { get; set; } = "";

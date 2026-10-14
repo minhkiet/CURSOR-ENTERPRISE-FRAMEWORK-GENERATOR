@@ -51,6 +51,10 @@ DEFINE          PLAN           BUILD          VERIFY         SHIP
 ### Quality & Review
 - **frontend-review**: Quality gate cho all frontend work
 
+### Security & Reverse Engineering
+- **vbs-scan-security**: [vbsec](https://github.com/tanviet12/vbsec) - 21 rule cross-language vulnerability scanner
+- **reverse-engineer-anything**: [morluto/rea](https://github.com/morluto/rea) - One CLI & MCP server for reverse engineering (native, .NET, Electron/JS, APK, WASM, EVM, Go)
+
 ## Skill Index
 Xem `.cursor/SKILL-INDEX.md` cho tổng hợp đầy đủ theo nhóm:
 - Nhóm 1: Code & Development

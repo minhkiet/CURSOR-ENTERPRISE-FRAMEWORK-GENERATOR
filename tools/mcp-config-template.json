@@ -37,12 +37,18 @@
         "CURSOR_MEMORY_AUTO_PRUNE": "true"
       },
       "description": "Memory and context management for Cursor - stores, recalls, compresses, and syncs memory"
+    },
+    "rea": {
+      "command": "node",
+      "args": ["D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\tools\\rea\\scripts\\rea.mjs", "mcp"],
+      "cwd": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\tools\\rea",
+      "description": "REA - Reverse Engineer Anything: native binaries, Electron/JS, APK, WASM, runtime via MCP"
     }
   },
   "_meta": {
     "version": "1.0.0",
     "framework_version": "3.1.0",
-    "total_tools": 26,
-    "description": "Cursor Enterprise Framework MCP stack - framework registry + autopilot + memory management"
+    "total_tools": 27,
+    "description": "Cursor Enterprise Framework MCP stack - framework registry + autopilot + memory management + REA"
   }
 }

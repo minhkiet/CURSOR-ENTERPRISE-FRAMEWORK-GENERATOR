@@ -1,15 +1,14 @@
 @echo off
 REM ============================================================
 REM buildappsetup.bat
-REM Cursor Enterprise Framework - Build Script v4.4.0
+REM Cursor Enterprise Framework - Build Script v4.5.0
 REM ============================================================
 REM Purpose:
 REM   1. Check prerequisites (dotnet, scripts, MCP tools)
 REM   2. Clean bin/obj (optional via /clean)
 REM   3. Publish the cursor-setup-gui-wpf project (self-contained, single-file)
-REM   4. Copy MCP tools to .cursor/mcp
-REM   5. Create cursor-setup.zip from .cursor contents
-REM   6. Verify all outputs exist
+REM   4. Create cursor-setup.zip from .cursor contents and staged MCP tools
+REM   5. Verify all outputs exist
 REM
 REM Usage:
 REM   buildappsetup.bat              (default: Release, self-contained)
@@ -70,7 +69,7 @@ set "OUTPUT_DIR=%PROJECT_DIR%\bin\%BUILD_CONFIG%\%TFM%\%BUILD_RID%\publish"
 REM ----- Header -----
 echo.
 echo ===========================================================
-echo  Cursor Enterprise Framework - Build Script v4.4.0
+echo  Cursor Enterprise Framework - Build Script v4.5.0
 echo ===========================================================
 echo  Project   : %PROJECT_DIR%
 echo  Config    : %BUILD_CONFIG%
@@ -174,23 +173,9 @@ echo.
 echo   [OK] Publish succeeded (self-contained, single-file).
 echo.
 
-REM ----- Step 3: Copy MCP tools -----
-echo [STEP 3] Copying MCP tools to .cursor\mcp...
-
-if exist "%COPY_MCP_SCRIPT%" (
-    powershell -NoProfile -ExecutionPolicy Bypass -File "%COPY_MCP_SCRIPT%"
-    if errorlevel 1 (
-        echo   [WARN] MCP copy had issues, continuing...
-    ) else (
-        echo   [OK] MCP tools copied to .cursor\mcp.
-    )
-) else (
-    echo   [SKIP] Copy-McpTools.ps1 not found.
-)
-echo.
-
-REM ----- Step 4: Create ZIP -----
-echo [STEP 4] Creating cursor-setup.zip...
+REM ----- Step 3: Create ZIP -----
+REM build-zip.ps1 stages MCP tools directly and never modifies host .cursor.
+echo [STEP 3] Creating cursor-setup.zip...
 echo.
 
 powershell -NoProfile -ExecutionPolicy Bypass -File "%ZIP_SCRIPT%" -Config %BUILD_CONFIG%
@@ -201,9 +186,9 @@ if errorlevel 1 (
 )
 echo.
 
-REM ----- Step 5: Verify outputs -----
+REM ----- Step 4: Verify outputs -----
 echo.
-echo [STEP 5] Verifying outputs...
+echo [STEP 4] Verifying outputs...
 echo.
 
 set "MISSING=0"

@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getTemplateById, templates } from '../data/templates'
 import DownloadModal from '../components/DownloadModal.vue'
+import TemplatePreviewSvg from '../components/TemplatePreviewSvg.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -83,6 +84,13 @@ function refreshFrame() {
           </div>
 
           <div class="preview-actions">
+            <button class="action-btn" @click="router.push('/cms')" title="Mở trang quản trị CMS">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14">
+                <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+                <rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/>
+              </svg>
+              <span>CMS</span>
+            </button>
             <button class="action-btn" @click="viewSource">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
               <span>Source</span>
@@ -207,12 +215,7 @@ function refreshFrame() {
             @click="previewTemplate(t.id)"
           >
             <div class="related-thumb">
-              <iframe
-                :src="`/templates/${t.slug}/`"
-                :title="t.name"
-                class="related-thumb-iframe"
-                loading="lazy"
-              ></iframe>
+              <TemplatePreviewSvg :slug="t.slug" />
             </div>
             <div class="related-body">
               <span class="related-cat">{{ t.industry }}</span>
@@ -712,19 +715,14 @@ function refreshFrame() {
 
 .related-thumb {
   aspect-ratio: 16 / 10;
-  background: var(--bg-canvas);
+  background: #09090b;
   overflow: hidden;
   position: relative;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
-.related-thumb-iframe {
-  width: 200%;
-  height: 200%;
-  transform: scale(0.5);
-  transform-origin: top left;
-  border: 0;
-  pointer-events: none;
-  background: #fff;
+.related-card:hover .thumbnail-inner {
+  transform: scale(1.03) translateY(-2px);
 }
 
 .related-body {

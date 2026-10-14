@@ -223,7 +223,7 @@ chmod +x 08-scripts/install.sh
 
 1. ✅ Hoàn thiện `01-core-rules` (principles, security, code-quality, architecture, git)
 2. ✅ Chuẩn hóa quy ước `SKILL.md`
-3. ✅ Xây bộ skills dùng chung (create-feature, create-api, create-ui, database-migration, code-review, debug-error, security-scan, fullstack-web)
+3. ✅ Xây bộ skills dùng chung (10 skills)
 4. ✅ Viết adapter cho Cursor và Codex trước
 5. ✅ Bổ sung Claude Code, Antigravity, Windsurf và Copilot
 6. ✅ Tạo script cài đặt, đồng bộ và test adapter
@@ -234,14 +234,14 @@ chmod +x 08-scripts/install.sh
 vibe-code-framework/
 ├── README.md, AGENTS.md, CLAUDE.md, GEMINI.md     ✅
 ├── 01-core-rules/ (5 files)                        ✅
-├── 03-skills/ (7 skills)                          ✅
+├── 03-skills/ (10 skills)                       ✅
 ├── 04-agents/ (5 agents)                          ✅
-├── 05-workflows/ (4 workflows)                     ✅
+├── 05-workflows/ (5 workflows)                     ✅
 ├── 06-templates/ (3 templates)                     ✅
 ├── 07-adapters/ (6 tool adapters)                ✅
-└── 08-scripts/ (2 sync scripts)                   ✅
+└── 08-scripts/ (4 scripts)                      ✅
 
-Total: ~60 files
+Total: ~70 files
 ```
 
 ---

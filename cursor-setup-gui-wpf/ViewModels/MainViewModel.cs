@@ -22,6 +22,7 @@ namespace CursorSetupWpf.ViewModels
         readonly BackupService _backup = new();
         readonly FrameworkRunner _framework = new();
         readonly ProjectRunner _projectRunner = new();
+        readonly GitHubSkillService _githubSkills = new();
         readonly ToastService _toast = ToastService.Instance;
 
         // Navigation
@@ -29,8 +30,19 @@ namespace CursorSetupWpf.ViewModels
         public int SelectedNavIndex
         {
             get => _selectedNavIndex;
-            set => Set(ref _selectedNavIndex, value);
+            set
+            {
+                if (Set(ref _selectedNavIndex, value))
+                {
+                    OnPropertyChanged(nameof(IsInstallPage));
+                    OnPropertyChanged(nameof(InstallSurfaceHint));
+                }
+            }
         }
+        public bool IsInstallPage => SelectedNavIndex == 0;
+        public string InstallSurfaceHint => IsInstallPage
+            ? LocalizationService.T("install.surface_active")
+            : LocalizationService.T("install.surface_inactive");
 
         public ThreadSafeObservableCollection<NavItem> NavItems { get; } = new();
         
@@ -47,12 +59,13 @@ namespace CursorSetupWpf.ViewModels
 
         // Strings (bound directly, updated when culture changes)
         public string Str(string key) => LocalizationService.T(key);
-        public string VersionChip => "v4.3";
+        public string VersionChip => "v4.5.0";
 
         // Backing fields for localized strings (required for OnPropertyChanged to work in WPF)
         // Initialize all at once to reduce code duplication
         string _installPageTitle = "", _installPageSubtitle = "", _installButtonText = "";
         string _languageLabel = "", _windowTitle = "", _appBrand = "", _appBrandSubtitle = "";
+        string _safetyTitle = "", _safetyBody = "", _safetyBadge = "", _operationalLogLabel = "";
         string _vibeCoderTitle = "", _mcpTitle = "", _mcpSubtitle = "", _mcpSyncAllLabel = "", _mcpCheckStatusLabel = "";
         string _mcpInstalledLabel = "", _mcpNotInstalledLabel = "", _mcpOpenConfigLabel = "", _mcpLastSyncLabel = "";
         string _hooksPageTitle = "", _hooksPageDesc = "", _hooksPrescanTitle = "", _hooksPrescanDesc = "";
@@ -97,6 +110,13 @@ namespace CursorSetupWpf.ViewModels
         string _projectRunnerRunAskLabel = "", _projectRunnerOutputLabel = "", _projectRunnerClearLabel = "";
         string _itemsUnitLabel = "", _agentTitle = "", _agentInstalledLabel = "", _agentNotInstalledLabel = "";
         string _installForAllAgentsLabel = "";
+        string _agentHubTitle = "", _agentHubSubtitle = "", _agentSelectAllLabel = "", _agentDeselectAllLabel = "";
+        string _agentInstallSelectedLabel = "", _agentSyncSelectedLabel = "", _agentOpenFolderLabel = "", _agentDocsLabel = "";
+        string _utilitiesTitle = "", _utilitiesSubtitle = "", _skillImportTitle = "", _skillImportSubtitle = "";
+        string _skillValidateLabel = "", _skillImportLabel = "", _skillWorkspaceLabel = "", _skillTargetLabel = "";
+        string _skillRuntimeLabel = "", _skillBlockedLabel = "", _governanceToolsTitle = "", _openGovernanceLabel = "";
+        string _skillRepoLabel = "", _skillPathLabel = "", _skillNameLabel = "", _skillBrowseLabel = "", _skillOpenLabel = "";
+        string _governanceScanLabel = "", _runtimeRefreshLabel = "", _agentSelectionHint = "";
 
         // Properties with backing fields (will be initialized in constructor)
         public string InstallButtonText { get => _installButtonText; set => Set(ref _installButtonText, value); }
@@ -104,6 +124,10 @@ namespace CursorSetupWpf.ViewModels
         public string WindowTitle { get => _windowTitle; set => Set(ref _windowTitle, value); }
         public string AppBrand { get => _appBrand; set => Set(ref _appBrand, value); }
         public string AppBrandSubtitle { get => _appBrandSubtitle; set => Set(ref _appBrandSubtitle, value); }
+        public string SafetyTitle { get => _safetyTitle; set => Set(ref _safetyTitle, value); }
+        public string SafetyBody { get => _safetyBody; set => Set(ref _safetyBody, value); }
+        public string SafetyBadge { get => _safetyBadge; set => Set(ref _safetyBadge, value); }
+        public string OperationalLogLabel { get => _operationalLogLabel; set => Set(ref _operationalLogLabel, value); }
         public string VibeCoderTitle { get => _vibeCoderTitle; set => Set(ref _vibeCoderTitle, value); }
         public string McpTitle { get => _mcpTitle; set => Set(ref _mcpTitle, value); }
         public string McpSubtitle { get => _mcpSubtitle; set => Set(ref _mcpSubtitle, value); }
@@ -236,6 +260,34 @@ namespace CursorSetupWpf.ViewModels
         public string AgentInstalledLabel { get => _agentInstalledLabel; set => Set(ref _agentInstalledLabel, value); }
         public string AgentNotInstalledLabel { get => _agentNotInstalledLabel; set => Set(ref _agentNotInstalledLabel, value); }
         public string InstallForAllAgentsLabel { get => _installForAllAgentsLabel; set => Set(ref _installForAllAgentsLabel, value); }
+        public string AgentHubTitle { get => _agentHubTitle; set => Set(ref _agentHubTitle, value); }
+        public string AgentHubSubtitle { get => _agentHubSubtitle; set => Set(ref _agentHubSubtitle, value); }
+        public string AgentSelectAllLabel { get => _agentSelectAllLabel; set => Set(ref _agentSelectAllLabel, value); }
+        public string AgentDeselectAllLabel { get => _agentDeselectAllLabel; set => Set(ref _agentDeselectAllLabel, value); }
+        public string AgentInstallSelectedLabel { get => _agentInstallSelectedLabel; set => Set(ref _agentInstallSelectedLabel, value); }
+        public string AgentSyncSelectedLabel { get => _agentSyncSelectedLabel; set => Set(ref _agentSyncSelectedLabel, value); }
+        public string AgentOpenFolderLabel { get => _agentOpenFolderLabel; set => Set(ref _agentOpenFolderLabel, value); }
+        public string AgentDocsLabel { get => _agentDocsLabel; set => Set(ref _agentDocsLabel, value); }
+        public string UtilitiesTitle { get => _utilitiesTitle; set => Set(ref _utilitiesTitle, value); }
+        public string UtilitiesSubtitle { get => _utilitiesSubtitle; set => Set(ref _utilitiesSubtitle, value); }
+        public string SkillImportTitle { get => _skillImportTitle; set => Set(ref _skillImportTitle, value); }
+        public string SkillImportSubtitle { get => _skillImportSubtitle; set => Set(ref _skillImportSubtitle, value); }
+        public string SkillValidateLabel { get => _skillValidateLabel; set => Set(ref _skillValidateLabel, value); }
+        public string SkillImportLabel { get => _skillImportLabel; set => Set(ref _skillImportLabel, value); }
+        public string SkillWorkspaceLabel { get => _skillWorkspaceLabel; set => Set(ref _skillWorkspaceLabel, value); }
+        public string SkillTargetLabel { get => _skillTargetLabel; set => Set(ref _skillTargetLabel, value); }
+        public string SkillRuntimeLabel { get => _skillRuntimeLabel; set => Set(ref _skillRuntimeLabel, value); }
+        public string SkillBlockedLabel { get => _skillBlockedLabel; set => Set(ref _skillBlockedLabel, value); }
+        public string GovernanceToolsTitle { get => _governanceToolsTitle; set => Set(ref _governanceToolsTitle, value); }
+        public string OpenGovernanceLabel { get => _openGovernanceLabel; set => Set(ref _openGovernanceLabel, value); }
+        public string SkillRepoLabel { get => _skillRepoLabel; set => Set(ref _skillRepoLabel, value); }
+        public string SkillPathLabel { get => _skillPathLabel; set => Set(ref _skillPathLabel, value); }
+        public string SkillNameLabel { get => _skillNameLabel; set => Set(ref _skillNameLabel, value); }
+        public string SkillBrowseLabel { get => _skillBrowseLabel; set => Set(ref _skillBrowseLabel, value); }
+        public string SkillOpenLabel { get => _skillOpenLabel; set => Set(ref _skillOpenLabel, value); }
+        public string GovernanceScanLabel { get => _governanceScanLabel; set => Set(ref _governanceScanLabel, value); }
+        public string RuntimeRefreshLabel { get => _runtimeRefreshLabel; set => Set(ref _runtimeRefreshLabel, value); }
+        public string AgentSelectionHint { get => _agentSelectionHint; set => Set(ref _agentSelectionHint, value); }
 
         bool _isProjectRunnerRunning;
         public bool IsProjectRunnerRunning { get => _isProjectRunnerRunning; set { if (Set(ref _isProjectRunnerRunning, value)) OnPropertyChanged(nameof(IsProjectRunnerRunning)); } }
@@ -390,8 +442,8 @@ namespace CursorSetupWpf.ViewModels
             LocalizationService.T("mcp.config_path", Installer.GetMcpConfigPath(SelectedAgent?.Agent ?? TargetAgent.Cursor));
 
         // ============ Updates-specific computed properties ============
-        public string CurrentVersion { get; } = "v4.3.0";
-        string _latestVersion = "v4.3.0";
+        public string CurrentVersion { get; } = "v4.5.0";
+        string _latestVersion = "v4.5.0";
         public string LatestVersion { get => _latestVersion; set => Set(ref _latestVersion, value); }
         bool _hasUpdate;
         public bool HasUpdate { get => _hasUpdate; set => Set(ref _hasUpdate, value); }
@@ -421,8 +473,8 @@ namespace CursorSetupWpf.ViewModels
         public bool HasNoBackups => Backups.Count == 0;
 
         // ============ Settings-specific properties ============
-        ThemeItem _selectedTheme;
-        public ThemeItem SelectedTheme { get => _selectedTheme; set => Set(ref _selectedTheme, value); }
+        ThemeItem? _selectedTheme;
+        public ThemeItem? SelectedTheme { get => _selectedTheme; set => Set(ref _selectedTheme, value); }
         public bool AutoStartWithWindows
         {
             get => _settings.Current.AutoStartWithWindows;
@@ -457,6 +509,10 @@ namespace CursorSetupWpf.ViewModels
             WindowTitle = LocalizationService.T("app.title");
             AppBrand = LocalizationService.T("app.title_short");
             AppBrandSubtitle = LocalizationService.T("app.subtitle");
+            SafetyTitle = LocalizationService.T("safety.title");
+            SafetyBody = LocalizationService.T("safety.body");
+            SafetyBadge = LocalizationService.T("safety.badge");
+            OperationalLogLabel = LocalizationService.T("log.title");
             InstallButtonText = LocalizationService.T("btn.install");
             LanguageLabel = LocalizationService.T("combobox.lang");
             VibeCoderTitle = LocalizationService.T("vibe_coder.label");
@@ -616,10 +672,39 @@ namespace CursorSetupWpf.ViewModels
             AgentInstalledLabel = LocalizationService.T("agent.installed");
             AgentNotInstalledLabel = LocalizationService.T("agent.not_installed");
             InstallForAllAgentsLabel = LocalizationService.T("install.all_agents");
+            AgentHubTitle = LocalizationService.T("agent.hub_title");
+            AgentHubSubtitle = LocalizationService.T("agent.hub_subtitle");
+            AgentSelectAllLabel = LocalizationService.T("agent.select_all");
+            AgentDeselectAllLabel = LocalizationService.T("agent.deselect_all");
+            AgentInstallSelectedLabel = LocalizationService.T("agent.install_selected");
+            AgentSyncSelectedLabel = LocalizationService.T("agent.sync_selected");
+            AgentOpenFolderLabel = LocalizationService.T("agent.open_folder");
+            AgentDocsLabel = LocalizationService.T("agent.docs");
+
+            UtilitiesTitle = LocalizationService.T("utilities.title");
+            UtilitiesSubtitle = LocalizationService.T("utilities.subtitle");
+            SkillImportTitle = LocalizationService.T("skill_import.title");
+            SkillImportSubtitle = LocalizationService.T("skill_import.subtitle");
+            SkillValidateLabel = LocalizationService.T("skill_import.validate");
+            SkillImportLabel = LocalizationService.T("skill_import.import");
+            SkillWorkspaceLabel = LocalizationService.T("skill_import.workspace");
+            SkillTargetLabel = LocalizationService.T("skill_import.target");
+            SkillRuntimeLabel = LocalizationService.T("skill_import.runtime");
+            SkillBlockedLabel = LocalizationService.T("skill_import.blocked");
+            GovernanceToolsTitle = LocalizationService.T("governance.tools_title");
+            OpenGovernanceLabel = LocalizationService.T("governance.open_records");
+            SkillRepoLabel = LocalizationService.T("skill_import.repository");
+            SkillPathLabel = LocalizationService.T("skill_import.path");
+            SkillNameLabel = LocalizationService.T("skill_import.name");
+            SkillBrowseLabel = LocalizationService.T("skill_import.browse");
+            SkillOpenLabel = LocalizationService.T("skill_import.open");
+            GovernanceScanLabel = LocalizationService.T("governance.scan");
+            RuntimeRefreshLabel = LocalizationService.T("skill_import.refresh_runtime");
+            AgentSelectionHint = LocalizationService.T("agent.selection_hint");
         }
         public ObservableCollection<AgentSelectionItem> AvailableAgents { get; } = new();
-        AgentSelectionItem _selectedAgent;
-        public AgentSelectionItem SelectedAgent
+        AgentSelectionItem? _selectedAgent;
+        public AgentSelectionItem? SelectedAgent
         {
             get => _selectedAgent;
             set
@@ -669,12 +754,46 @@ namespace CursorSetupWpf.ViewModels
         }
 
         public ObservableCollection<AgentStatusItem> AgentStatuses { get; } = new();
+        public int SelectedAgentCount => AvailableAgents.Count(a => a.IsSelected);
+        public int InstalledAgentCount => AvailableAgents.Count(a => a.IsInstalled);
+        public string AgentFleetSummary => $"{InstalledAgentCount}/{AvailableAgents.Count} installed · {SelectedAgentCount} selected";
+
+        // Additive GitHub skill importer state. Import is enabled only after a
+        // successful dry-run for the exact same inputs.
+        string _githubWorkspaceRoot = "";
+        public string GithubWorkspaceRoot { get => _githubWorkspaceRoot; set { if (Set(ref _githubWorkspaceRoot, value)) { OnPropertyChanged(nameof(GithubTargetPath)); InvalidateGithubDryRun(); } } }
+        public string GithubTargetPath => _githubSkills.GetTargetPath(GithubWorkspaceRoot);
+        string _githubRepository = "";
+        public string GithubRepository { get => _githubRepository; set { if (Set(ref _githubRepository, value)) InvalidateGithubDryRun(); } }
+        string _githubSkillPath = "";
+        public string GithubSkillPath { get => _githubSkillPath; set { if (Set(ref _githubSkillPath, value)) InvalidateGithubDryRun(); } }
+        string _githubReference = "main";
+        public string GithubReference { get => _githubReference; set { if (Set(ref _githubReference, value)) InvalidateGithubDryRun(); } }
+        string _githubSkillName = "";
+        public string GithubSkillName { get => _githubSkillName; set { if (Set(ref _githubSkillName, value)) InvalidateGithubDryRun(); } }
+        string _githubRuntimeStatus = "BLOCKED";
+        public string GithubRuntimeStatus { get => _githubRuntimeStatus; set => Set(ref _githubRuntimeStatus, value); }
+        string _githubImportStatus = "BLOCKED";
+        public string GithubImportStatus { get => _githubImportStatus; set => Set(ref _githubImportStatus, value); }
+        string _githubImportSummary = "";
+        public string GithubImportSummary { get => _githubImportSummary; set => Set(ref _githubImportSummary, value); }
+        string _githubImportOutput = "";
+        public string GithubImportOutput { get => _githubImportOutput; set => Set(ref _githubImportOutput, value); }
+        bool _isGithubBusy;
+        public bool IsGithubBusy { get => _isGithubBusy; set { if (Set(ref _isGithubBusy, value)) OnPropertyChanged(nameof(CanImportGithubSkill)); } }
+        string _lastGithubDryRunKey = "";
+        public bool CanImportGithubSkill => !IsGithubBusy && GithubImportStatus == "DRY_RUN_PASS" && _lastGithubDryRunKey == GithubInputKey();
 
         // Cross-agent commands
         public ICommand RefreshAgentStatusCommand { get; }
         public ICommand InstallForSelectedAgentCommand { get; }
         public ICommand InstallForAllAgentsCommand { get; }
         public ICommand OpenAgentDocsCommand { get; }
+        public ICommand SelectAllAgentsCommand { get; }
+        public ICommand DeselectAllAgentsCommand { get; }
+        public ICommand InstallSelectedAgentsCommand { get; }
+        public ICommand SyncSelectedMcpCommand { get; }
+        public ICommand OpenAgentFolderCommand { get; }
 
         // ============ Commands ============
         public ICommand BrowseCommand { get; }
@@ -698,6 +817,20 @@ namespace CursorSetupWpf.ViewModels
         public ICommand SaveSettingsCommand { get; }
         public ICommand BrowseLogLocationCommand { get; }
         public ICommand DismissToastCommand { get; }
+        public ICommand ValidateGithubSkillCommand { get; }
+        public ICommand ImportGithubSkillCommand { get; }
+        public ICommand RefreshPythonRuntimeCommand { get; }
+        public ICommand OpenWorkspaceRootCommand { get; }
+        public ICommand BrowseWorkspaceRootCommand { get; }
+        public ICommand OpenGovernanceCommand { get; }
+        public ICommand RunGovernanceScanCommand { get; }
+        public ICommand OpenInstallPageCommand { get; }
+        public ICommand OpenAgentsPageCommand { get; }
+        public ICommand OpenUtilitiesPageCommand { get; }
+        public ICommand RunGuidePreflightCommand { get; }
+
+        string _guidePreflightStatus = "";
+        public string GuidePreflightStatus { get => _guidePreflightStatus; set => Set(ref _guidePreflightStatus, value); }
 
         // Framework commands
         public ICommand StartDashboardCommand { get; }
@@ -733,22 +866,23 @@ namespace CursorSetupWpf.ViewModels
             
             // Nav items
             NavItems.Add(new NavItem { Icon = "\uE8B7", TitleKey = "tab.install", Index = 0 });
-            NavItems.Add(new NavItem { Icon = "\uE8F1", TitleKey = "tab.components", Index = 1 });
-            NavItems.Add(new NavItem { Icon = "\uE713", TitleKey = "tab.advanced", Index = 2 });
-            NavItems.Add(new NavItem { Icon = "\uE768", TitleKey = "tab.hooks", Index = 3 });
-            NavItems.Add(new NavItem { Icon = "\uE912", TitleKey = "tab.mcp", Index = 4 });
-            NavItems.Add(new NavItem { Icon = "\uE777", TitleKey = "tab.updates", Index = 5 });
+            // Keep the primary shell focused on setup, distribution and recovery.
+            // Framework servers, project runner, script generator, ECC and the
+            // standalone MCP page are intentionally not primary setup steps.
+            NavItems.Add(new NavItem { Icon = "\uE8F1", TitleKey = "tab.agents", Index = 1 });
+            NavItems.Add(new NavItem { Icon = "\uE8F1", TitleKey = "tab.components", Index = 2 });
+            NavItems.Add(new NavItem { Icon = "\uE713", TitleKey = "tab.advanced", Index = 3 });
+            NavItems.Add(new NavItem { Icon = "\uE768", TitleKey = "tab.hooks", Index = 4 });
+            NavItems.Add(new NavItem { Icon = "\uE713", TitleKey = "tab.utilities", Index = 5 });
             NavItems.Add(new NavItem { Icon = "\uE895", TitleKey = "tab.backup", Index = 6 });
-            NavItems.Add(new NavItem { Icon = "\uE713", TitleKey = "tab.settings", Index = 7 });
-            NavItems.Add(new NavItem { Icon = "\uE82D", TitleKey = "tab.guide", Index = 8 });
-            NavItems.Add(new NavItem { Icon = "\uE8F9", TitleKey = "tab.framework", Index = 9 });
-            NavItems.Add(new NavItem { Icon = "\uE8A5", TitleKey = "tab.project_runner", Index = 10 });
-            NavItems.Add(new NavItem { Icon = "\uE8A5", TitleKey = "tab.script_generator", Index = 11 });
-            NavItems.Add(new NavItem { Icon = "\uE74D", TitleKey = "tab.ecc", Index = 12 });
+            NavItems.Add(new NavItem { Icon = "\uE777", TitleKey = "tab.updates", Index = 7 });
+            NavItems.Add(new NavItem { Icon = "\uE713", TitleKey = "tab.settings", Index = 8 });
+            NavItems.Add(new NavItem { Icon = "\uE82D", TitleKey = "tab.guide", Index = 9 });
             
             _settings.Load();
             _installPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".cursor");
             _backupLocation = _settings.DefaultBackupPath;
+            _githubWorkspaceRoot = _githubSkills.FindWorkspaceRoot();
             
             // Languages (Default: Tiếng Việt)
             _languages.Add(new LanguageItem { Code = "vi", DisplayName = "Tiếng Việt" });
@@ -832,9 +966,29 @@ namespace CursorSetupWpf.ViewModels
             InstallForSelectedAgentCommand = new AsyncRelayCommand(_ => InstallForSelectedAgentAsync());
             InstallForAllAgentsCommand = new AsyncRelayCommand(_ => InstallForAllAgentsAsync());
             OpenAgentDocsCommand = new RelayCommand(OpenAgentDocs);
+            SelectAllAgentsCommand = new RelayCommand(_ => SetAllAgentsSelected(true));
+            DeselectAllAgentsCommand = new RelayCommand(_ => SetAllAgentsSelected(false));
+            InstallSelectedAgentsCommand = new AsyncRelayCommand(_ => InstallSelectedAgentsAsync());
+            SyncSelectedMcpCommand = new AsyncRelayCommand(_ => SyncSelectedMcpAsync());
+            OpenAgentFolderCommand = new RelayCommand(OpenAgentFolder);
+
+            // Additive GitHub skill importer and governance utilities
+            ValidateGithubSkillCommand = new AsyncRelayCommand(_ => RunGithubImportAsync(dryRun: true));
+            ImportGithubSkillCommand = new AsyncRelayCommand(_ => RunGithubImportAsync(dryRun: false));
+            RefreshPythonRuntimeCommand = new AsyncRelayCommand(_ => ProbeGithubRuntimeAsync());
+            OpenWorkspaceRootCommand = new RelayCommand(_ => OpenDirectory(GithubWorkspaceRoot));
+            BrowseWorkspaceRootCommand = new RelayCommand(BrowseWorkspaceRoot);
+            OpenGovernanceCommand = new RelayCommand(_ => OpenDirectory(Path.Combine(GithubWorkspaceRoot, "vibe-code-framework", "00-governance", "records")));
+            RunGovernanceScanCommand = new AsyncRelayCommand(_ => RunFrameworkCommandAsync("scan"));
+            OpenInstallPageCommand = new RelayCommand(_ => NavigateTo(0));
+            OpenAgentsPageCommand = new RelayCommand(_ => NavigateTo(1));
+            OpenUtilitiesPageCommand = new RelayCommand(_ => NavigateTo(5));
+            RunGuidePreflightCommand = new AsyncRelayCommand(_ => RunGuidePreflightAsync());
 
             // Initialize agents
             InitializeAgents();
+            RefreshAgentStatus();
+            _ = ProbeGithubRuntimeAsync();
 
             // Wire FrameworkRunner events → log panel
             _framework.LogAppended += msg => Application.Current?.Dispatcher.Invoke(() =>
@@ -870,7 +1024,7 @@ namespace CursorSetupWpf.ViewModels
             // Initialize data on startup
             ResetSteps();
             SeedChangelog();
-            LoadCategoriesAsync();
+            _ = LoadCategoriesAsync();
             RefreshBackups();
             LoadThemes();
         }
@@ -1064,36 +1218,75 @@ namespace CursorSetupWpf.ViewModels
                     cat.SelectAll(false);
         }
 
-        async void LoadCategoriesAsync()
+        async Task LoadCategoriesAsync()
         {
-            string zipPath = ZipScanner.FindZipPath();
-            if (zipPath == null)
+            try
             {
-                LogLines.Add("ERROR: " + LocalizationService.T("scan_archive_not_found"));
-                LogLines.Add(LocalizationService.T("place_zip_hint"));
-                return;
+                string zipPath = ZipScanner.FindZipPath();
+                if (zipPath == null)
+                {
+                    LogLines.Add("ERROR: " + LocalizationService.T("scan_archive_not_found"));
+                    LogLines.Add(LocalizationService.T("place_zip_hint"));
+                    return;
+                }
+
+                SetStatusKey("scanning");
+                LogLines.Add("Scanning: " + zipPath);
+
+                var items = await Task.Run(() => ZipScanner.ScanCategories(zipPath));
+
+                // Extract descriptions in background, then update UI
+                await Task.Run(() =>
+                {
+                    var compCats = new[] { "rules", "skills", "agents", "commands", "hooks", "knowledge" };
+                    foreach (var catName in compCats)
+                        PrepareCategory(catName, items, ComponentCategories);
+
+                    var advCats = new[] { "prompts", "references", "workflows", "templates", "memory", "scripts" };
+                    foreach (var catName in advCats)
+                        PrepareCategory(catName, items, AdvancedCategories);
+                });
+
+                UpdateSummary();
+                SetStatusKey("ready_to_install");
+                LogLines.Add(LocalizationService.T("scanned_log", items.Count));
             }
-
-            SetStatusKey("scanning");
-            LogLines.Add("Scanning: " + zipPath);
-
-            var items = await Task.Run(() => ZipScanner.ScanCategories(zipPath));
-
-            // Extract descriptions in background, then update UI
-            await Task.Run(() =>
+            catch (Exception ex)
             {
-                var compCats = new[] { "rules", "skills", "agents", "commands", "hooks", "knowledge" };
-                foreach (var catName in compCats)
-                    PrepareCategory(catName, items, ComponentCategories);
+                SetStatusKey("scan_failed");
+                LogLines.Add($"[SCAN] ERROR: {ex.Message}");
+            }
+        }
 
-                var advCats = new[] { "prompts", "references", "workflows", "templates", "memory", "scripts" };
-                foreach (var catName in advCats)
-                    PrepareCategory(catName, items, AdvancedCategories);
-            });
+        void NavigateTo(int index)
+        {
+            SelectedNavIndex = index;
+            LogLines.Add($"[NAV] Opened setup step {index + 1}");
+        }
 
-            UpdateSummary();
-            SetStatusKey("ready_to_install");
-            LogLines.Add(LocalizationService.T("scanned_log", items.Count));
+        async Task RunGuidePreflightAsync()
+        {
+            GuidePreflightStatus = LocalizationService.T("guide.preflight.running");
+            try
+            {
+                var zipPath = ZipScanner.FindZipPath();
+                if (string.IsNullOrWhiteSpace(zipPath) || !File.Exists(zipPath))
+                {
+                    GuidePreflightStatus = LocalizationService.T("guide.preflight.blocked");
+                    LogLines.Add("[GUIDE] BLOCKED: framework archive not found.");
+                    return;
+                }
+
+                var items = await Task.Run(() => ZipScanner.ScanCategories(zipPath));
+                var total = items.Values.Sum(group => group.Count);
+                GuidePreflightStatus = LocalizationService.T("guide.preflight.ready", total);
+                LogLines.Add($"[GUIDE] Preflight PASS: archive ready, {total} category item(s) discovered.");
+            }
+            catch (Exception ex)
+            {
+                GuidePreflightStatus = LocalizationService.T("guide.preflight.error");
+                LogLines.Add($"[GUIDE] Preflight ERROR: {ex.Message}");
+            }
         }
 
         void PrepareCategory(string catName, Dictionary<string, List<string>> items, ObservableCollection<SetupCategory> target)
@@ -1288,6 +1481,18 @@ namespace CursorSetupWpf.ViewModels
             ChangelogEntries.Clear();
             ChangelogEntries.Add(new ChangelogEntry
             {
+                Version = "v4.5.0",
+                Date = new DateTime(2026, 10, 13),
+                Description = "Integrated REA (Reverse Engineer Anything v6.4.0) CLI & MCP, sec_reverse-engineer-anything skill, /rea & /reverse commands."
+            });
+            ChangelogEntries.Add(new ChangelogEntry
+            {
+                Version = "v4.4.0",
+                Date = new DateTime(2026, 10, 10),
+                Description = "Multi-agent Vibe Coder Hub, safe additive skill import, governance records, and operational diagnostics."
+            });
+            ChangelogEntries.Add(new ChangelogEntry
+            {
                 Version = "v4.3.0",
                 Date = new DateTime(2026, 7, 22),
                 Description = "MCP server sync, glassmorphic UI, toast notifications and tabbed navigation."
@@ -1429,6 +1634,7 @@ namespace CursorSetupWpf.ViewModels
             // Notify UI for dynamic properties
             OnPropertyChanged(nameof(VersionChip));
             OnPropertyChanged(nameof(SelectedNavIndex));
+            OnPropertyChanged(nameof(InstallSurfaceHint));
             foreach (var nav in NavItems)
                 nav.RefreshTitle();
             OnPropertyChanged(nameof(CanInstall));
@@ -1606,6 +1812,8 @@ namespace CursorSetupWpf.ViewModels
             var selected = AvailableAgents.FirstOrDefault(a => a.Agent == detected)
                 ?? AvailableAgents.First();
             _selectedAgent = selected;
+            foreach (var agent in AvailableAgents)
+                agent.IsSelected = agent.Agent == detected;
         }
 
         void RefreshAgentStatus()
@@ -1624,7 +1832,16 @@ namespace CursorSetupWpf.ViewModels
                         IsInstalled = installed,
                         InstallPath = path,
                     });
+                    var selection = AvailableAgents.FirstOrDefault(a => a.Agent == agent);
+                    if (selection != null)
+                    {
+                        selection.IsInstalled = installed;
+                        selection.InstallPath = path;
+                    }
                 }
+                OnPropertyChanged(nameof(InstalledAgentCount));
+                OnPropertyChanged(nameof(SelectedAgentCount));
+                OnPropertyChanged(nameof(AgentFleetSummary));
             });
         }
 
@@ -1690,6 +1907,172 @@ namespace CursorSetupWpf.ViewModels
                     Process.Start(new ProcessStartInfo { FileName = SelectedAgent.InstallUrl, UseShellExecute = true });
                 }
                 catch { }
+            }
+        }
+
+        void SetAllAgentsSelected(bool selected)
+        {
+            foreach (var agent in AvailableAgents) agent.IsSelected = selected;
+            OnPropertyChanged(nameof(SelectedAgentCount));
+            OnPropertyChanged(nameof(AgentFleetSummary));
+        }
+
+        async Task InstallSelectedAgentsAsync()
+        {
+            var selected = AvailableAgents.Where(a => a.IsSelected).ToList();
+            if (selected.Count == 0)
+            {
+                _toast.Warning(AgentTitle, "Select at least one Vibe Coder before installing.");
+                return;
+            }
+
+            var failures = new List<string>();
+            foreach (var agent in selected)
+            {
+                var result = await _installer.InstallForAgentAsync(
+                    agent.Agent, InstallPath, BuildConfig(), BuildSelections());
+                if (!result.Success) failures.Add($"{agent.DisplayName}: {result.Message}");
+            }
+
+            RefreshAgentStatus();
+            if (failures.Count == 0)
+                _toast.Success(AgentTitle, $"Installed for {selected.Count} selected Vibe Coder(s).");
+            else
+                _toast.Warning(AgentTitle, $"Completed with {failures.Count} failure(s): {string.Join(" | ", failures)}");
+        }
+
+        async Task SyncSelectedMcpAsync()
+        {
+            var selected = AvailableAgents.Where(a => a.IsSelected && a.SupportsMcp).ToList();
+            if (selected.Count == 0)
+            {
+                _toast.Warning(McpTitle, "No selected agent has MCP support.");
+                return;
+            }
+
+            var failures = new List<string>();
+            foreach (var agent in selected)
+            {
+                var result = await _installer.SyncMcpConfigAsync(InstallPath, agent.Agent);
+                LogLines.Add($"[MCP] {agent.DisplayName}: {result.Message}");
+                if (!result.Success) failures.Add(agent.DisplayName);
+            }
+            CheckMcpStatus();
+            if (failures.Count == 0)
+                _toast.Success(McpTitle, $"MCP synchronized for {selected.Count} selected agent(s).");
+            else
+                _toast.Warning(McpTitle, $"MCP sync blocked/failed for: {string.Join(", ", failures)}");
+        }
+
+        void OpenAgentFolder(object? param)
+        {
+            if (param is AgentSelectionItem agent)
+            {
+                OpenDirectory(agent.InstallPath);
+                return;
+            }
+            OpenDirectory(InstallPath);
+        }
+
+        void OpenDirectory(string? path)
+        {
+            if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
+            {
+                _toast.Warning(UtilitiesTitle, $"Directory is not available: {path}");
+                return;
+            }
+            try
+            {
+                Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                _toast.Error(UtilitiesTitle, ex.Message);
+            }
+        }
+
+        void BrowseWorkspaceRoot(object? _)
+        {
+            var dialog = new Microsoft.Win32.OpenFolderDialog
+            {
+                Title = SkillWorkspaceLabel,
+                InitialDirectory = Directory.Exists(GithubWorkspaceRoot)
+                    ? GithubWorkspaceRoot
+                    : Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                GithubWorkspaceRoot = dialog.FolderName;
+                _ = ProbeGithubRuntimeAsync();
+            }
+        }
+
+        string GithubInputKey() => string.Join("\u001f", GithubWorkspaceRoot, GithubRepository,
+            GithubSkillPath, GithubReference, GithubSkillName);
+
+        void InvalidateGithubDryRun()
+        {
+            _lastGithubDryRunKey = "";
+            GithubImportStatus = "BLOCKED";
+            GithubImportSummary = SkillBlockedLabel;
+            OnPropertyChanged(nameof(CanImportGithubSkill));
+        }
+
+        async Task ProbeGithubRuntimeAsync()
+        {
+            var runtime = await _githubSkills.ProbePythonAsync(GithubWorkspaceRoot);
+            GithubRuntimeStatus = runtime.IsAvailable ? $"{runtime.Command} · {runtime.Version}" : "BLOCKED";
+            GithubImportSummary = runtime.IsAvailable ? runtime.Detail : runtime.Detail;
+            LogLines.Add(runtime.IsAvailable
+                ? $"[PYTHON] Verified {runtime.Command} ({runtime.Version})"
+                : "[PYTHON] BLOCKED: no usable interpreter; Windows Store shim is insufficient.");
+        }
+
+        async Task RunGithubImportAsync(bool dryRun)
+        {
+            if (!dryRun && !CanImportGithubSkill)
+            {
+                _toast.Warning(SkillImportTitle, "Validate with a successful dry-run before importing.");
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(GithubRepository))
+            {
+                GithubImportStatus = "BLOCKED";
+                GithubImportSummary = "GitHub repository is required.";
+                return;
+            }
+
+            IsGithubBusy = true;
+            GithubImportOutput = "";
+            try
+            {
+                var result = await _githubSkills.RunImportAsync(
+                    GithubWorkspaceRoot, GithubRepository, GithubSkillPath,
+                    GithubReference, GithubSkillName, dryRun);
+                GithubRuntimeStatus = string.IsNullOrWhiteSpace(result.Runtime) ? "BLOCKED" : result.Runtime;
+                GithubImportStatus = result.Status;
+                GithubImportSummary = result.Summary;
+                GithubImportOutput = result.Output;
+                LogLines.Add($"[SKILL] {result.Status}: {result.Summary}");
+                if (dryRun && result.Status == "DRY_RUN_PASS")
+                {
+                    _lastGithubDryRunKey = GithubInputKey();
+                    _toast.Success(SkillImportTitle, "Dry-run passed. Import is now enabled; no files were written.");
+                }
+                else if (!dryRun && result.Status == "IMPORTED")
+                {
+                    _lastGithubDryRunKey = "";
+                    _toast.Success(SkillImportTitle, "Skill imported additively; existing skills were not overwritten.");
+                }
+                else if (result.Status == "BLOCKED")
+                {
+                    _toast.Warning(SkillImportTitle, result.Summary);
+                }
+            }
+            finally
+            {
+                IsGithubBusy = false;
+                OnPropertyChanged(nameof(CanImportGithubSkill));
             }
         }
 
@@ -1790,7 +2173,7 @@ namespace CursorSetupWpf.ViewModels
     /// <summary>
     /// Represents an agent that can be selected for installation.
     /// </summary>
-    public class AgentSelectionItem
+    public class AgentSelectionItem : ViewModelBase
     {
         public CursorSetupWpf.Services.TargetAgent Agent { get; init; }
         public string DisplayName { get; init; } = "";
@@ -1798,6 +2181,17 @@ namespace CursorSetupWpf.ViewModels
         public string SkillsPath { get; init; } = "";
         public string InstallUrl { get; init; } = "";
         public bool SupportsMcp { get; init; }
+        bool _isSelected;
+        public bool IsSelected { get => _isSelected; set => Set(ref _isSelected, value); }
+        bool _isInstalled;
+        public bool IsInstalled { get => _isInstalled; set { if (Set(ref _isInstalled, value)) { OnPropertyChanged(nameof(StatusLabel)); OnPropertyChanged(nameof(StatusBrush)); } } }
+        string _installPath = "";
+        public string InstallPath { get => _installPath; set => Set(ref _installPath, value); }
+        public string StatusLabel => IsInstalled ? LocalizationService.T("agent.installed") : LocalizationService.T("agent.not_installed");
+        public Brush StatusBrush => IsInstalled ? new SolidColorBrush(Color.FromRgb(5, 150, 105)) : new SolidColorBrush(Color.FromRgb(100, 116, 139));
+        public string SupportSummary => SupportsMcp
+            ? LocalizationService.T("agent.mcp_supported")
+            : LocalizationService.T("agent.mcp_unavailable");
     }
 
     /// <summary>

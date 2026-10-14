@@ -503,28 +503,28 @@ export const templates: Template[] = [
     id: 'computech',
     slug: 'computech',
     name: 'TechHub',
-    category: 'Cong Nghe May Tinh',
-    tagline: 'Laptop, PC gaming, linh kien chinh hang',
+    category: 'Công Nghệ Máy Tính',
+    tagline: 'Laptop, PC Gaming, linh kiện chính hãng',
     description:
-      'Landing page cho cua hang may tinh. Laptop gaming, PC build, linh kien, phu kien. Phu hop cua hang laptop, gaming gear, linh kien may tinh.',
+      'Landing page cho cửa hàng công nghệ & máy tính. Laptop gaming, PC custom, linh kiện chính hãng, bảo hành 24 tháng, hỗ trợ trả góp 0% và giao hàng tốc hành.',
     industry: 'COMPUTER',
     accent: '#dc2626',
     accentSecondary: '#f59e0b',
     bgGradient: 'linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #991b1b 100%)',
     icon: 'laptop',
     features: [
-      'Laptop gaming & van phong',
-      'PC build theo yeu cau',
-      'Linh kien chinh hang',
-      'Trai nghiem thuc te',
-      'Bao hanh & tra gop'
+      'Bento grid laptop gaming & văn phòng',
+      'Cấu hình PC build theo yêu cầu realtime',
+      'Linh kiện phân phối chính hãng 100%',
+      'Bảo hành 24 tháng tận nơi',
+      'Trả góp 0% qua thẻ tín dụng'
     ],
     highlights: [
-      { label: 'San pham', value: '2,000+' },
-      { label: 'Thuong hieu', value: '50+' },
-      { label: 'Tra gop', value: '0%' }
+      { label: 'Sản phẩm', value: '2,000+' },
+      { label: 'Thương hiệu', value: '50+' },
+      { label: 'Trả góp', value: '0%' }
     ],
-    tags: ['Laptop', 'Gaming PC', 'Linh kien', 'Cong nghe'],
+    tags: ['Laptop', 'Gaming PC', 'Linh kiện', 'Công nghệ'],
     fileSize: '264 KB',
     pages: 6,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS']
@@ -533,28 +533,28 @@ export const templates: Template[] = [
     id: 'preschool',
     slug: 'preschool',
     name: 'Little Stars',
-    category: 'Giao Duc Mam Non',
-    tagline: 'Nuoi day tre trong tinh yeu',
+    category: 'Giáo Dục Mầm Non',
+    tagline: 'Nuôi dạy trẻ trong tình yêu thương & sáng tạo',
     description:
-      'Landing page cho truong mam non. Chuong trinh hoc theo doi tuong, co so vat chat hien dai, giao vien nhiet tinh. Phu hop truong mam non, nha tre, mam non chuyen biet.',
+      'Landing page cho trường mầm non chuẩn quốc tế. Phương pháp STEAM tiên tiến, cơ sở vật chất hiện đại, dinh dưỡng hữu cơ và báo cáo học tập số cho phụ huynh.',
     industry: 'EDUCATION',
     accent: '#f97316',
     accentSecondary: '#84cc16',
     bgGradient: 'linear-gradient(135deg, #7c2d12 0%, #9a3412 50%, #f97316 100%)',
     icon: 'baby',
     features: [
-      'Chuong trinh hoc theo nhom tuoi',
-      'Co so vat chat hien dai',
-      'Giao vien chuyen nghiep',
-      'Bao cao hap nhan hang ngay',
-      'An toan & giam sat 24/7'
+      'Chương trình học STEAM theo lứa tuổi',
+      'Cơ sở vật chất chuẩn quốc tế',
+      'Đội ngũ giáo viên bản ngữ & chuyên môn cao',
+      'Báo cáo sinh hoạt & dinh dưỡng hàng ngày',
+      'Camera an ninh giám sát 24/7'
     ],
     highlights: [
-      { label: 'Tre em', value: '300+' },
-      { label: 'Giao vien', value: '25' },
-      { label: 'Nam kinh nghiem', value: '15' }
+      { label: 'Học sinh', value: '300+' },
+      { label: 'Giáo viên', value: '25' },
+      { label: 'Năm kinh nghiệm', value: '15' }
     ],
-    tags: ['Mam non', 'Giao duc tre', 'Nuoi day', 'Phat trien'],
+    tags: ['Mầm non', 'STEAM', 'Giáo dục sớm', 'Trẻ em'],
     fileSize: '229 KB',
     pages: 5,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS']
@@ -562,32 +562,122 @@ export const templates: Template[] = [
   {
     id: 'church',
     slug: 'church',
-    name: 'Holy Light Parish',
-    category: 'Giao Xu Cong Giao',
-    tagline: 'Noi anh sang Chua soi vao long',
+    name: 'Thánh Quang Parish',
+    category: 'Giáo Xứ & Tôn Giáo',
+    tagline: 'Nơi ánh sáng Chúa soi rọi tâm hồn',
     description:
-      'Landing page cho giao xu Cong giao. Lich than le, thong tin bi tich, hoat dong giao xu. Phu hop giao xu, giao phan, cong dong tin nguoi.',
+      'Landing page trang nghiêm, thanh thoát cho giáo xứ Công giáo. Tra cứu lịch Thánh lễ trực tuyến, hướng dẫn bí tích, tin tức cộng đoàn và suy niệm Lời Chúa mỗi ngày.',
     industry: 'CHURCH',
     accent: '#b91c1c',
     accentSecondary: '#fcd34d',
     bgGradient: 'linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #b91c1c 100%)',
     icon: 'cross',
     features: [
-      'Lich than le chi tiet',
-      'Thong tin bi tich',
-      'Hoat dong giao xu',
-      'Doi ngu linh muc',
-      'Lien he & ban do'
+      'Lịch Thánh lễ trong tuần & Chúa Nhật chi tiết',
+      'Thủ tục chuẩn bị các Bí tích (Rửa tội, Hôn phối...)',
+      'Tin tức hoạt động & hội đoàn giáo xứ',
+      'Suy niệm Lời Chúa hàng ngày',
+      'Thư viện hình ảnh & bản đồ chỉ đường'
     ],
     highlights: [
-      { label: 'Giao dan', value: '3,000+' },
-      { label: 'Nam thanh lap', value: '1995' },
-      { label: 'Linh muc', value: '2' }
+      { label: 'Giáo dân', value: '3,000+' },
+      { label: 'Năm thành lập', value: '1995' },
+      { label: 'Linh mục', value: '2' }
     ],
-    tags: ['Cong giao', 'Giao xu', 'Than le', 'Giao dan'],
+    tags: ['Công giáo', 'Giáo xứ', 'Thánh lễ', 'Tôn giáo'],
     fileSize: '198 KB',
     pages: 4,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS']
+  },
+  {
+    id: 'insurance',
+    slug: 'insurance',
+    name: 'Aegis Bảo An',
+    category: 'Bảo Hiểm Toàn Diện',
+    tagline: 'An tâm tương lai, vững bước hiện tại',
+    description:
+      'Landing page doanh nghiệp bảo hiểm chuẩn quốc tế. Đầy đủ các dòng sản phẩm: Sức khỏe CarePlus, Nhân thọ An Thịnh, Xe cơ giới AutoCare, Du lịch quốc tế GlobeSecure & Tài sản doanh nghiệp BizShield. Tích hợp công cụ tính phí trực tuyến, tra cứu 680+ bệnh viện bảo lãnh, đánh giá khách hàng & bồi thường e-Claim 24h.',
+    industry: 'INSURANCE',
+    accent: '#0284c7',
+    accentSecondary: '#f59e0b',
+    bgGradient: 'linear-gradient(135deg, #07192f 0%, #0c3366 50%, #0369a1 100%)',
+    icon: 'shield-check',
+    features: [
+      'Công cụ ước tính phí bảo hiểm động theo độ tuổi & hạn mức',
+      'Mạng lưới 680+ bệnh viện bảo lãnh viện phí trực tiếp',
+      'Quy trình nộp hồ sơ e-Claim bồi thường trực tuyến 24h',
+      'Bảng so sánh 3 gói quyền lợi chi tiết (Cơ bản/Vàng/Kim cương)',
+      'Hệ thống thu thập yêu cầu tư vấn 1-1 chuyên sâu'
+    ],
+    highlights: [
+      { label: 'Khách hàng tin chọn', value: '4.8M+' },
+      { label: 'Chi trả bồi thường', value: '1.850 Tỷ' },
+      { label: 'Bệnh viện liên kết', value: '680+' }
+    ],
+    tags: ['Bảo Hiểm', 'Sức Khỏe', 'Nhân Thọ', 'Ô Tô', 'E-Claim', 'Tài Chính'],
+    fileSize: '312 KB',
+    pages: 6,
+    techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Phosphor Icons']
+  },
+  {
+    id: 'auto-showroom',
+    slug: 'auto-showroom',
+    name: 'AutoPrime Motors',
+    category: 'Showroom Ô Tô Đa Thương Hiệu',
+    tagline: 'Sở hữu xe mơ ước — Trải nghiệm mua sắm 5 sao',
+    description:
+      'Siêu thị ô tô phân phối đa thương hiệu chính hãng & xe lướt chuẩn 176 hạng mục: Toyota, Mercedes-Benz, BMW, Porsche, Ford, Hyundai, VinFast. Tích hợp công cụ tính chi phí lăn bánh & trả góp ngân hàng lãi suất 6.8%, lái thử tại nhà, thu cũ đổi mới Trade-in và giao xe 24h tận nơi.',
+    industry: 'AUTOMOTIVE',
+    accent: '#f59e0b',
+    accentSecondary: '#38bdf8',
+    bgGradient: 'linear-gradient(135deg, #090d16 0%, #0f172a 50%, #1e293b 100%)',
+    icon: 'car-profile',
+    features: [
+      'Bộ lọc tìm xe thông minh theo hãng, kiểu dáng, tầm giá và nhiên liệu',
+      'Công cụ dự toán chi phí lăn bánh & bảng tính trả góp ngân hàng 85%',
+      'Quy trình lái thử xe tận nhà (Home Test-Drive) miễn phí',
+      'Hệ thống thu cũ đổi mới (Trade-In) định giá minh bạch trong 15 phút',
+      'Chính sách bảo hành vàng 3 năm & cứu hộ khẩn cấp 24/7 toàn quốc'
+    ],
+    highlights: [
+      { label: 'Xe đã giao', value: '5,800+' },
+      { label: 'Hạng mục kiểm định', value: '176' },
+      { label: 'Showroom toàn quốc', value: '5' }
+    ],
+    tags: ['Ô tô', 'Showroom', 'Xe lướt', 'Xe điện', 'Trả góp', 'Lái thử'],
+    fileSize: '340 KB',
+    pages: 6,
+    techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Phosphor Icons']
+  },
+  {
+    id: 'viet-restaurant',
+    slug: 'viet-restaurant',
+    name: 'Vị Xưa Quán',
+    category: 'Nhà Hàng Ẩm Thực Truyền Thống Việt',
+    tagline: 'Vị xưa tinh hoa — Trọn vẹn phong vị mâm cơm gia đình Việt',
+    description:
+      'Chuỗi nhà hàng ẩm thực di sản 3 miền Bắc - Trung - Nam đạt chứng nhận Michelin Selected. Chuyên cơm niêu cháy giòn 2 mặt, cá bống kho tộ, bún chả nướng than hoa, phở bát đá và bánh xèo miền Tây. Tích hợp hệ thống đặt bàn giữ chỗ đẹp, phòng VIP máy lạnh, E-Voucher giảm 15%-25% và chỉ dẫn đường tới 4 chi nhánh toàn quốc.',
+    industry: 'RESTAURANT',
+    accent: '#d97706',
+    accentSecondary: '#16a34a',
+    bgGradient: 'linear-gradient(135deg, #120b07 0%, #281910 50%, #451a03 100%)',
+    icon: 'bowl-food',
+    features: [
+      'Thực đơn di sản 120+ món ăn truyền thống 3 miền Bắc - Trung - Nam',
+      'Hệ thống đặt bàn trực tuyến chọn chi nhánh, phòng VIP & số lượng khách',
+      'Bộ sưu tập E-Voucher giảm 15% - 25% kèm form nhận mã SMS/Zalo tức thì',
+      'Không gian văn hóa nhà cổ Bắc Bộ, mộc mạc thư thái & âm nhạc truyền thống',
+      'Bãi đỗ xe ô tô miễn phí có bảo vệ trông giữ tại tất cả 4 chi nhánh'
+    ],
+    highlights: [
+      { label: 'Năm gia truyền', value: '38+' },
+      { label: 'Món ăn di sản', value: '120+' },
+      { label: 'Thực khách đánh giá', value: '4.9 ★' }
+    ],
+    tags: ['Nhà Hàng', 'Cơm Niêu', 'Ẩm Thực Việt', 'Michelin Selected', 'Voucher', 'Đặt Bàn'],
+    fileSize: '325 KB',
+    pages: 5,
+    techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Phosphor Icons']
   }
 ]
 

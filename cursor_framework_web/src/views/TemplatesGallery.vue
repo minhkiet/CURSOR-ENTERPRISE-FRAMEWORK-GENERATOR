@@ -38,13 +38,27 @@ function viewTemplate(t: Template) {
         <div class="gallery-hero-content">
           <div class="section-label">Template Library</div>
           <h1 class="gallery-title">
-            Six templates. Production ready.<br />
-            <span class="gallery-title-accent">Clone and ship.</span>
+            {{ templates.length }} Production-Ready Templates.<br />
+            <span class="gallery-title-accent">Clone, customize & ship.</span>
           </h1>
           <p class="gallery-subtitle">
-            Each template is a static HTML/CSS/JS bundle. Tailored for specific industries,
-            tested on real conversion data, and built with the same framework primitives.
+            Mỗi template là một gói HTML/CSS/JS độc lập, tối ưu tỷ lệ chuyển đổi, tải siêu tốc
+            và tương thích hoàn hảo với Next.js, Vue 3 hoặc thuần static web.
           </p>
+
+          <div class="gallery-hero-actions" style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+            <router-link to="/cms" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16">
+                <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+                <rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/>
+              </svg>
+              <span>Quản Lý CMS Templates</span>
+            </router-link>
+            <a href="#templates-grid" class="btn btn-ghost" style="display: inline-flex; align-items: center; gap: 8px;">
+              <span>Khám phá bộ sưu tập</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><path d="M19 9l-7 7-7-7"/></svg>
+            </a>
+          </div>
 
           <div class="gallery-stats">
             <div class="gallery-stat">
@@ -95,7 +109,7 @@ function viewTemplate(t: Template) {
       </div>
     </section>
 
-    <section class="gallery-grid-section">
+    <section class="gallery-grid-section" id="templates-grid">
       <div class="container">
         <div class="gallery-grid">
           <article
@@ -350,39 +364,64 @@ function viewTemplate(t: Template) {
 .template-card-preview {
   position: relative;
   aspect-ratio: 16 / 10;
-  background: var(--bg-canvas);
+  background: #09090b;
   overflow: hidden;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.template-card:hover .thumbnail-inner {
+  transform: scale(1.03) translateY(-2px);
 }
 
 .template-card-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(9, 9, 11, 0.7);
+  background: linear-gradient(
+    to top,
+    rgba(9, 9, 11, 0.88) 0%,
+    rgba(9, 9, 11, 0.35) 50%,
+    rgba(9, 9, 11, 0.15) 100%
+  );
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity var(--t-base);
-  backdrop-filter: blur(8px);
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(2px);
+  pointer-events: none;
 }
 
 .template-card:hover .template-card-overlay {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .overlay-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 20px;
-  background: var(--text-primary);
-  color: var(--bg-canvas);
+  padding: 11px 22px;
+  background: #ffffff;
+  color: #09090b;
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-pill);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 700;
   cursor: pointer;
   font-family: inherit;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.2);
+  transform: translateY(6px);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.15s, box-shadow 0.2s;
+}
+
+.template-card:hover .overlay-btn {
+  transform: translateY(0);
+}
+
+.overlay-btn:hover {
+  background: var(--accent-bright, #38bdf8);
+  color: #000000;
+  box-shadow: 0 12px 28px -4px rgba(56, 189, 248, 0.5);
 }
 
 .overlay-btn svg {

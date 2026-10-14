@@ -20,10 +20,10 @@ const mouseY = ref(50)
 const prefersReducedMotion = ref(false)
 
 const metrics: Metric[] = [
-  { value: '39', label: 'MDC rules' },
-  { value: '22', label: 'Skills' },
-  { value: '329', label: 'Knowledge files' },
-  { value: '18', label: 'Specialist agents' }
+  { value: '22', label: 'Mẫu Templates' },
+  { value: '43', label: 'Rules (.mdc)' },
+  { value: '50', label: 'Skills' },
+  { value: '10+', label: 'Vibe Code Tools' }
 ]
 
 const capabilities: Capability[] = [
@@ -136,9 +136,8 @@ const titleWords2 = ['for', 'AI', 'coding', 'agents.']
           </h1>
 
           <p class="hero-sub" :class="{ visible: isVisible }">
-            41 rules, 18 skills, 272 knowledge files, 8 specialist personas.
-            One drop-in <code class="hero-code">.cursor/</code> directory that pushes
-            your coding agent from prototype to production.
+            43 rules, 50 skills, 22 templates thực tế, 18 specialist agents và 6 theme.
+            Tương thích tất cả các tool vibe code phổ biến: Cursor, Windsurf, Claude Code, Copilot, Roo, Cline, Antigravity.
           </p>
 
           <div class="hero-cta" :class="{ visible: isVisible }">

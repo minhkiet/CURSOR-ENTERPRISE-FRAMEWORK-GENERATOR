@@ -33,7 +33,7 @@ Review code theo quality gates:
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Review Process
+## Process Steps
 
 ### 1. Analyze Change
 

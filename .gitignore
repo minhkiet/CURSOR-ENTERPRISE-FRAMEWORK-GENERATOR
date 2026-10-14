@@ -41,6 +41,8 @@
 .cursor/scripts/weknora/
 
 # --- Python build / package artifacts ---
+.venv/
+venv/
 build/
 dist/
 cursor_framework/__pycache__/
@@ -54,7 +56,6 @@ cursor_framework/utils/__pycache__/
 cursor_framework_web/dist/
 cursor_framework_web/node_modules/
 cursor_framework_web/scripts/
-cursor_framework_web/public/templates/
 cursor_framework_web/*.tsbuildinfo
 *.tsbuildinfo
 

@@ -1,4 +1,4 @@
-﻿---
+---
 description: Intent Detection, Skill Auto-Discovery, and Clarification Flow - xác định intent, tự động phát hiện skills/rules, và clarification khi request ambiguous. Kết hợp với translation layer để xử lý multi-language requests.
 created: 2026-06-26
 version: 2.0.0
@@ -232,6 +232,7 @@ def analyze_intent(english_request: str) -> dict:
 | `full-output` | full implementation, complete, not skeleton | 0.90+ | HIGH |
 | `frontend-review` | any frontend task | 1.0 | MANDATORY |
 | `security-review` | security, auth, payment, vulnerability | 0.90+ | HIGH |
+| `reverse-engineer-anything` | reverse engineering, decompile, disasm, binary analysis, ghidra, hopper, ida, asar, apk | 0.90+ | HIGH |
 | `vietnam-payment-review` | MoMo, SePay, PayOS, VNPay, ZaloPay, VietQR | 0.95+ | HIGH |
 | `karpathy-coding` | ALL coding tasks | 1.0 | MANDATORY |
 | `ponytail` | simple, minimal, less code, vibe code | 0.85+ | MEDIUM |
@@ -281,6 +282,12 @@ skill_matrix:
     en_keywords: ["security", "vulnerability", "XSS", "SQL injection", "auth", "encrypt", "JWT", "OAuth"]
     vi_keywords: ["bảo mật", "lỗ hổng", "auth", "mã hóa", "bảo vệ"]
     zh_keywords: ["安全", "漏洞", "认证", "加密", "授权"]
+    confidence_threshold: 0.85
+    
+  reverse-engineer-anything:
+    en_keywords: ["reverse engineering", "reverse-engineer", "decompile", "disasm", "binary analysis", "ghidra", "hopper", "ida", "asar", "apk analysis", "jadx", "wasm", "evm", "rea"]
+    vi_keywords: ["kỹ thuật đảo ngược", "dịch ngược", "phân tích nhị phân", "bóc tách asar", "dịch ngược apk", "phân tích mã máy"]
+    zh_keywords: ["逆向工程", "反编译", "反汇编", "二进制分析"]
     confidence_threshold: 0.85
     
   vietnam-payment-review:

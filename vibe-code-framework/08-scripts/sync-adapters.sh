@@ -44,11 +44,21 @@ param(
     [string]$Category = 'all',
     
     [Parameter(Mandatory=$false)]
-    [string]$SourcePath = $PSScriptRoot,
+    [string]$SourcePath = (Split-Path $PSScriptRoot -Parent),
     
     [Parameter(Mandatory=$false)]
-    [string]$TargetPath = (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent)
+    [string]$TargetPath = $PWD.Path,
+
+    [Parameter(Mandatory=$false)]
+    [string]$ManifestPath = '',
+
+    [Parameter(Mandatory=$false)]
+    [switch]$AllowOverwrite
 )
+
+if ([string]::IsNullOrWhiteSpace($ManifestPath)) {
+    $ManifestPath = Join-Path $SourcePath '00-governance/resource-manifest.json'
+}
 
 # Colors for output
 function Write-Success($message) {
@@ -61,6 +71,57 @@ function Write-Info($message) {
 
 function Write-Warning($message) {
     Write-Host "⚠️  $message" -ForegroundColor Yellow
+}
+
+function Test-ExecutionInput {
+    if (-not (Test-Path -LiteralPath $SourcePath -PathType Container)) {
+        Write-Host "❌ SourcePath must be an existing Resource Hub directory: $SourcePath" -ForegroundColor Red
+        return $false
+    }
+
+    if (-not (Test-Path -LiteralPath $ManifestPath -PathType Leaf)) {
+        Write-Host "❌ ManifestPath must point to the canonical Resource Hub manifest: $ManifestPath" -ForegroundColor Red
+        return $false
+    }
+
+    if (-not (Test-Path -LiteralPath $TargetPath -PathType Container)) {
+        Write-Host "❌ TargetPath must be an existing consumer project directory: $TargetPath" -ForegroundColor Red
+        return $false
+    }
+
+    $sourceFullPath = [IO.Path]::GetFullPath((Resolve-Path -LiteralPath $SourcePath).Path)
+    $targetFullPath = [IO.Path]::GetFullPath((Resolve-Path -LiteralPath $TargetPath).Path)
+    if ($sourceFullPath -eq $targetFullPath) {
+        Write-Host "❌ TargetPath must not be the Resource Hub SourcePath" -ForegroundColor Red
+        return $false
+    }
+
+    try {
+        $manifest = Get-Content -LiteralPath $ManifestPath -Raw | ConvertFrom-Json
+    } catch {
+        Write-Host "❌ ManifestPath is not valid JSON: $ManifestPath" -ForegroundColor Red
+        return $false
+    }
+
+    foreach ($requiredPath in $manifest.executionInputContract.sourcePath.mustContain) {
+        if (-not (Test-Path -LiteralPath (Join-Path $SourcePath $requiredPath))) {
+            Write-Host "❌ SourcePath is missing required canonical path: $requiredPath" -ForegroundColor Red
+            return $false
+        }
+    }
+
+    return $true
+}
+
+function Test-TargetFileWrite {
+    param([string]$TargetFile)
+
+    if ((Test-Path -LiteralPath $TargetFile -PathType Leaf) -and -not $AllowOverwrite) {
+        Write-Warning "Target exists; skipped (pass -AllowOverwrite to replace): $TargetFile"
+        return $false
+    }
+
+    return $true
 }
 
 # Tool configurations
@@ -118,8 +179,9 @@ function Sync-Rules {
         New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
     }
     
-    Get-ChildItem -Path $sourceDir -Filter "*.md" -File -Exclude "README.md" | ForEach-Object {
+    Get-ChildItem -LiteralPath $sourceDir -File | Where-Object { $_.Extension -eq '.md' -and $_.Name -ne 'README.md' } | ForEach-Object {
         $targetFile = Join-Path $targetDir ($_.BaseName + $Config.Extension)
+        if (-not (Test-TargetFileWrite -TargetFile $targetFile)) { return }
         Copy-Item -Path $_.FullName -Destination $targetFile -Force
         Write-Success "Synced: $($_.Name)"
     }
@@ -138,7 +200,7 @@ function Sync-Skills {
         return
     }
     
-    Get-ChildItem -Path $sourceDir -Directory -Exclude "README.md" | ForEach-Object {
+    Get-ChildItem -LiteralPath $sourceDir -Directory | Where-Object { $_.Name -ne 'README.md' } | ForEach-Object {
         $targetSkillDir = Join-Path $targetDir $_.Name
         if (-not (Test-Path $targetSkillDir)) {
             New-Item -ItemType Directory -Path $targetSkillDir -Force | Out-Null
@@ -146,6 +208,8 @@ function Sync-Skills {
         
         $skillFile = Join-Path $_.FullName "SKILL.md"
         if (Test-Path $skillFile) {
+            $targetFile = Join-Path $targetSkillDir 'SKILL.md'
+            if (-not (Test-TargetFileWrite -TargetFile $targetFile)) { return }
             Copy-Item -Path $skillFile -Destination $targetSkillDir -Force
             Write-Success "Synced: $($_.Name)/SKILL.md"
         }
@@ -169,8 +233,9 @@ function Sync-Agents {
         New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
     }
     
-    Get-ChildItem -Path $sourceDir -Filter "*.md" -File -Exclude "README.md" | ForEach-Object {
+    Get-ChildItem -LiteralPath $sourceDir -File | Where-Object { $_.Extension -eq '.md' -and $_.Name -ne 'README.md' } | ForEach-Object {
         $targetFile = Join-Path $targetDir $_.Name
+        if (-not (Test-TargetFileWrite -TargetFile $targetFile)) { return }
         Copy-Item -Path $_.FullName -Destination $targetFile -Force
         Write-Success "Synced: $($_.Name)"
     }
@@ -206,6 +271,15 @@ Write-Host "══════════════════════�
 Write-Host "   Vibe Code Framework — Adapter Sync" -ForegroundColor Magenta
 Write-Host "═══════════════════════════════════════════════════" -ForegroundColor Magenta
 Write-Host ""
+
+Write-Info "Source: $SourcePath"
+Write-Info "Target: $TargetPath"
+Write-Info "Manifest: $ManifestPath"
+Write-Info "AllowOverwrite: $AllowOverwrite"
+
+if (-not (Test-ExecutionInput)) {
+    exit 1
+}
 
 if ($Tool -eq "all") {
     foreach ($toolName in $ToolConfigs.Keys) {

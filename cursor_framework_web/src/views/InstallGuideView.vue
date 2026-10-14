@@ -5,7 +5,7 @@ import { useIntersectionObserver } from '../composables/useIntersectionObserver'
 const sectionRef = ref<HTMLElement | null>(null)
 const isVisible = ref(false)
 
-type MethodKey = 'gui' | 'powershell' | 'python' | 'manual'
+type MethodKey = 'gui' | 'powershell' | 'python' | 'manual' | 'vibecode'
 const activeMethod = ref<MethodKey>('gui')
 
 type Tone = 'success' | 'warning' | 'danger' | 'info'
@@ -315,6 +315,68 @@ const methods: InstallMethod[] = [
         solution: 'Pull repo mới (git pull), rồi copy lại. Hoặc dùng cách PowerShell one-liner cho các bản sau.'
       }
     ]
+  },
+  {
+    key: 'vibecode',
+    badge: 'Multi-Tool Vibe Code',
+    badgeTone: 'info',
+    title: 'Tool Vibe Code Phổ Biến',
+    oneLiner: 'Cursor, Windsurf, Claude Code, GitHub Copilot, Roo Code, Cline, Antigravity, Trae, Devin, Aider.',
+    forWho: 'Dev dùng nhiều công cụ AI coding, cần chuẩn hóa rules, skills, agents và SQLite memory.',
+    duration: '2 phút',
+    difficulty: 'Easy',
+    os: ['Windows', 'macOS', 'Linux'],
+    steps: [
+      {
+        title: 'Bước 1: Chạy kịch bản đồng bộ Adapter tự động',
+        detail: 'Framework tích hợp bộ adapter đa công cụ tự động chuyển đổi core rules, skills, và agents sang đúng cú pháp từng tool.',
+        code: '# Windows PowerShell\n.\\vibe-code-framework\\08-scripts\\sync-adapters.ps1\n\n# macOS / Linux\n./vibe-code-framework/08-scripts/sync-adapters.sh',
+        codeLabel: 'Terminal'
+      },
+      {
+        title: 'Bước 2: Cài đặt cho Cursor & Windsurf',
+        detail: 'Cursor nhận diện .cursor/rules/*.mdc, Windsurf đọc cấu hình .windsurfrules và .windsurf/rules/ ngay khi mở workspace.',
+        code: '# Đồng bộ riêng cho Windsurf\n.\\vibe-code-framework\\08-scripts\\sync-adapters.ps1 -Tool Windsurf\n\n# Khởi động Cascade Agent trong Windsurf: Ctrl + L',
+        codeLabel: 'Windsurf CLI'
+      },
+      {
+        title: 'Bước 3: Cài đặt cho Claude Code & OpenAI Codex',
+        detail: 'Claude Code tích hợp qua CLAUDE.md và .claude/skills/, Codex tương thích qua AGENTS.md và .agents/skills/.',
+        code: '# Cài đặt qua bộ ECC Universal v2.2.2 (hỗ trợ Claude Code & Codex)\nnpx ecc-universal@2.2.2 install --profile core --target claude',
+        codeLabel: 'Claude Code / Codex'
+      },
+      {
+        title: 'Bước 4: Cài đặt cho GitHub Copilot, Roo Code & Cline',
+        detail: 'Copilot nhận diện .github/copilot-instructions.md. Roo Code và Cline tự động nạp .roomodes và .clinerules tương thích hoàn hảo.',
+        code: '# Đồng bộ cho Copilot\n.\\vibe-code-framework\\08-scripts\\sync-adapters.ps1 -Tool Copilot\n\n# Copy cấu hình Roo / Cline\nCopy-Item .\\vibe-code-framework\\07-adapters\\copilot\\* .\\.github\\ -Recurse -Force',
+        codeLabel: 'Copilot / Roo / Cline'
+      },
+      {
+        title: 'Bước 5: Kích hoạt Agent & Lệnh Slash Commands',
+        detail: 'Mở Composer (Cursor), Cascade (Windsurf), hoặc terminal (Claude Code, Aider), gõ lệnh để bắt đầu quy trình Vibe Coding chuẩn mực.',
+        code: '/spec "Xây dựng hệ thống SaaS Multi-tenant với RLS"\n/build "Tạo trang landing page theo chuẩn frontend-taste"\n/vbs-scan "Quét lỗ hổng bảo mật 21 rule"\n/rea "Reverse engineer binary / assembly"',
+        codeLabel: 'Slash Commands'
+      }
+    ],
+    verify: [
+      { ok: true, label: 'Thư mục adapter tương ứng (.cursor, .claude, .windsurf, .agents, .github) đã được tạo', hint: 'Kiểm tra cấu trúc file trong workspace' },
+      { ok: true, label: 'Lệnh slash commands (/spec, /plan, /build, /rea) hiển thị trong chat', hint: 'Gõ / trong IDE để kiểm tra gợi ý lệnh' },
+      { ok: true, label: 'Bộ nhớ SQLite và ADRs được ghi nhận', hint: 'Kiểm tra file ~/.cursor/memory/decisions.sqlite' }
+    ],
+    troubleshooting: [
+      {
+        problem: 'Windsurf không tự nhận diện quy tắc trong .windsurfrules',
+        solution: 'Đảm bảo file .windsurfrules nằm ở thư mục gốc của workspace và restart Cascade Agent (Ctrl+L).'
+      },
+      {
+        problem: 'Claude Code báo thiếu tool hoặc lỗi permissions',
+        solution: 'Chạy npx ecc-universal@2.2.2 install --profile core --target claude để cập nhật hooks và MCP tools.'
+      },
+      {
+        problem: 'Roo Code / Cline không hiển thị custom modes chuyên biệt',
+        solution: 'Copy file .roomodes từ thư mục vibe-code-framework/07-adapters/ vào workspace root của bạn.'
+      }
+    ]
   }
 ]
 
@@ -356,6 +418,7 @@ const currentMethod = computed(() => methods.find((m) => m.key === activeMethod.
 const navItems = computed(() => [
   { id: 'overview', label: 'Tổng quan' },
   { id: 'choose', label: 'Chọn cách cài' },
+  { id: 'vibecode', label: 'Vibe Code Tools' },
   { id: 'prerequisites', label: 'Yêu cầu trước' },
   { id: 'install', label: 'Cài đặt' },
   { id: 'verify', label: 'Xác minh' },
@@ -635,6 +698,212 @@ async function handleCopy(code: string, key: string) {
                     </svg>
                   </div>
                 </button>
+              </div>
+            </article>
+
+            <!-- 2B. VIBE CODE TOOLS ECOSYSTEM -->
+            <article id="vibecode" class="ins-section">
+              <header class="ins-section-head">
+                <div class="ins-section-num">02b</div>
+                <div>
+                  <h2 class="ins-section-title">Hệ Sinh Thái Vibe Coding Đa Công Cụ</h2>
+                  <p class="ins-section-sub">
+                    Một nguồn tri thức chuẩn - hỗ trợ tất cả các tool vibe code phổ biến nhất hiện nay.
+                    Không bị trói buộc vào một IDE duy nhất.
+                  </p>
+                </div>
+              </header>
+
+              <!-- Grid of Supported Vibe Code Tools -->
+              <div class="ins-vibecode-grid">
+                <!-- 1. Cursor -->
+                <div class="ins-vibecode-card">
+                  <div class="ins-vibecode-card-header">
+                    <div class="ins-vibecode-icon bg-emerald">⚡</div>
+                    <div>
+                      <h3 class="ins-vibecode-name">Cursor IDE</h3>
+                      <span class="ins-vibecode-type">AI-First Native IDE</span>
+                    </div>
+                    <span class="ins-vibecode-status active">Native Drop-in</span>
+                  </div>
+                  <p class="ins-vibecode-desc">
+                    Hỗ trợ trọn vẹn 43 rules <code>.mdc</code>, 50 skills và SQLite memory layer. Tương thích Composer và Agent Mode.
+                  </p>
+                  <div class="ins-vibecode-path">
+                    <span class="path-label">Config:</span>
+                    <code>~/.cursor/rules/*.mdc</code>
+                  </div>
+                  <div class="ins-vibecode-cmd">
+                    <code>.\setup.bat --gui-picker</code>
+                  </div>
+                </div>
+
+                <!-- 2. Windsurf -->
+                <div class="ins-vibecode-card">
+                  <div class="ins-vibecode-card-header">
+                    <div class="ins-vibecode-icon bg-cyan">🌊</div>
+                    <div>
+                      <h3 class="ins-vibecode-name">Windsurf</h3>
+                      <span class="ins-vibecode-type">Codeium Cascade Agent</span>
+                    </div>
+                    <span class="ins-vibecode-status synced">Adapter Ready</span>
+                  </div>
+                  <p class="ins-vibecode-desc">
+                    Tự động xuất quy tắc sang <code>.windsurfrules</code> và <code>.windsurf/rules/</code>. Điều khiển Cascade flows đa tệp tin.
+                  </p>
+                  <div class="ins-vibecode-path">
+                    <span class="path-label">Config:</span>
+                    <code>.windsurfrules</code>
+                  </div>
+                  <div class="ins-vibecode-cmd">
+                    <code>.\vibe-code-framework\08-scripts\sync-adapters.ps1 -Tool Windsurf</code>
+                  </div>
+                </div>
+
+                <!-- 3. Claude Code -->
+                <div class="ins-vibecode-card">
+                  <div class="ins-vibecode-card-header">
+                    <div class="ins-vibecode-icon bg-amber">🧠</div>
+                    <div>
+                      <h3 class="ins-vibecode-name">Claude Code</h3>
+                      <span class="ins-vibecode-type">Anthropic CLI Pair</span>
+                    </div>
+                    <span class="ins-vibecode-status synced">ECC Universal</span>
+                  </div>
+                  <p class="ins-vibecode-desc">
+                    Giao tiếp qua <code>CLAUDE.md</code> và <code>.claude/skills/</code>. Hỗ trợ chạy headless, CI/CD và slash commands cực nhạy.
+                  </p>
+                  <div class="ins-vibecode-path">
+                    <span class="path-label">Config:</span>
+                    <code>CLAUDE.md & .claude/</code>
+                  </div>
+                  <div class="ins-vibecode-cmd">
+                    <code>npx ecc-universal@2.2.2 install --profile core --target claude</code>
+                  </div>
+                </div>
+
+                <!-- 4. GitHub Copilot -->
+                <div class="ins-vibecode-card">
+                  <div class="ins-vibecode-card-header">
+                    <div class="ins-vibecode-icon bg-blue">🐙</div>
+                    <div>
+                      <h3 class="ins-vibecode-name">GitHub Copilot</h3>
+                      <span class="ins-vibecode-type">Copilot Edits & Workspace</span>
+                    </div>
+                    <span class="ins-vibecode-status synced">Standard Instructions</span>
+                  </div>
+                  <p class="ins-vibecode-desc">
+                    Nạp chỉ dẫn vào <code>.github/copilot-instructions.md</code>, áp dụng đồng bộ trong VS Code, Visual Studio và JetBrains.
+                  </p>
+                  <div class="ins-vibecode-path">
+                    <span class="path-label">Config:</span>
+                    <code>.github/copilot-instructions.md</code>
+                  </div>
+                  <div class="ins-vibecode-cmd">
+                    <code>.\vibe-code-framework\08-scripts\sync-adapters.ps1 -Tool Copilot</code>
+                  </div>
+                </div>
+
+                <!-- 5. Roo Code & Cline -->
+                <div class="ins-vibecode-card">
+                  <div class="ins-vibecode-card-header">
+                    <div class="ins-vibecode-icon bg-purple">🤖</div>
+                    <div>
+                      <h3 class="ins-vibecode-name">Roo Code & Cline</h3>
+                      <span class="ins-vibecode-type">Autonomous Agents</span>
+                    </div>
+                    <span class="ins-vibecode-status synced">Custom Modes</span>
+                  </div>
+                  <p class="ins-vibecode-desc">
+                    Định hình chế độ làm việc chuyên sâu qua <code>.roomodes</code> (Architect, Reviewer, Fullstack, Security Auditor).
+                  </p>
+                  <div class="ins-vibecode-path">
+                    <span class="path-label">Config:</span>
+                    <code>.roomodes & .clinerules</code>
+                  </div>
+                  <div class="ins-vibecode-cmd">
+                    <code>Copy-Item .\07-adapters\roo-cline\.roomodes .\</code>
+                  </div>
+                </div>
+
+                <!-- 6. Google Antigravity -->
+                <div class="ins-vibecode-card">
+                  <div class="ins-vibecode-card-header">
+                    <div class="ins-vibecode-icon bg-emerald">🪐</div>
+                    <div>
+                      <h3 class="ins-vibecode-name">Google Antigravity</h3>
+                      <span class="ins-vibecode-type">Agentic SDK & Multi-Agent</span>
+                    </div>
+                    <span class="ins-vibecode-status active">Active Environment</span>
+                  </div>
+                  <p class="ins-vibecode-desc">
+                    Tương thích AGY CLI, tool use loops, background tasks, sidecars và kho <code>.agents/skills/</code> tự động kích hoạt.
+                  </p>
+                  <div class="ins-vibecode-path">
+                    <span class="path-label">Config:</span>
+                    <code>.agents/skills/ & AGENTS.md</code>
+                  </div>
+                  <div class="ins-vibecode-cmd">
+                    <code>.\vibe-code-framework\08-scripts\sync-adapters.ps1 -Tool Antigravity</code>
+                  </div>
+                </div>
+
+                <!-- 7. Trae & Devin / OpenHands -->
+                <div class="ins-vibecode-card">
+                  <div class="ins-vibecode-card-header">
+                    <div class="ins-vibecode-icon bg-orange">🚀</div>
+                    <div>
+                      <h3 class="ins-vibecode-name">Trae / Devin / OpenHands</h3>
+                      <span class="ins-vibecode-type">Autonomous Software Engineers</span>
+                    </div>
+                    <span class="ins-vibecode-status ready">Universal Spec</span>
+                  </div>
+                  <p class="ins-vibecode-desc">
+                    Định nghĩa quy trình phát triển và kiểm định 5 bước rõ ràng qua <code>AGENTS.md</code> để agent tự động code & fix bug.
+                  </p>
+                  <div class="ins-vibecode-path">
+                    <span class="path-label">Config:</span>
+                    <code>AGENTS.md / .openhands/</code>
+                  </div>
+                  <div class="ins-vibecode-cmd">
+                    <code>cat AGENTS.md | pbcopy</code>
+                  </div>
+                </div>
+
+                <!-- 8. Aider & Web Vibe Code -->
+                <div class="ins-vibecode-card">
+                  <div class="ins-vibecode-card-header">
+                    <div class="ins-vibecode-icon bg-indigo">🌐</div>
+                    <div>
+                      <h3 class="ins-vibecode-name">Aider / Bolt.new / v0</h3>
+                      <span class="ins-vibecode-type">Terminal & Web Vibe Coding</span>
+                    </div>
+                    <span class="ins-vibecode-status ready">Template Export</span>
+                  </div>
+                  <p class="ins-vibecode-desc">
+                    Mẫu prompt chuẩn mực và 22 bộ template HTML5/Vue 3 độc lập giúp dựng nhanh UI/UX mà không sợ AI bịa đặt layout.
+                  </p>
+                  <div class="ins-vibecode-path">
+                    <span class="path-label">Templates:</span>
+                    <code>public/templates/ [22 templates]</code>
+                  </div>
+                  <div class="ins-vibecode-cmd">
+                    <code>aider --read .cursor/rules/coding-standards.mdc</code>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Command Bar for Syncing -->
+              <div class="ins-sync-banner">
+                <div class="ins-sync-text">
+                  <div class="ins-sync-title">Đồng bộ toàn bộ công cụ chỉ bằng 1 lệnh duy nhất:</div>
+                  <p class="ins-sync-desc">
+                    Kịch bản sẽ tự động quét và phân phối các quy tắc chuẩn mực vào thư mục cấu hình của từng tool bạn cài đặt.
+                  </p>
+                </div>
+                <div class="ins-sync-cmd-box">
+                  <code>.\vibe-code-framework\08-scripts\sync-adapters.ps1</code>
+                </div>
               </div>
             </article>
 
@@ -2233,6 +2502,175 @@ async function handleCopy(code: string, key: string) {
   .ins-section-num {
     font-size: 24px;
   }
+}
+
+/* ─── Vibe Code Tools Grid ─── */
+.ins-vibecode-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.ins-vibecode-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all var(--t-base);
+}
+
+.ins-vibecode-card:hover {
+  border-color: var(--border-default);
+  transform: translateY(-2px);
+  background: var(--bg-raised);
+}
+
+.ins-vibecode-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ins-vibecode-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.ins-vibecode-icon.bg-emerald { background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.25); }
+.ins-vibecode-icon.bg-cyan { background: rgba(6, 182, 212, 0.12); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.25); }
+.ins-vibecode-icon.bg-amber { background: rgba(245, 158, 11, 0.12); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.25); }
+.ins-vibecode-icon.bg-blue { background: rgba(59, 130, 246, 0.12); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.25); }
+.ins-vibecode-icon.bg-purple { background: rgba(168, 85, 247, 0.12); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.25); }
+.ins-vibecode-icon.bg-orange { background: rgba(249, 115, 22, 0.12); color: #f97316; border: 1px solid rgba(249, 115, 22, 0.25); }
+.ins-vibecode-icon.bg-indigo { background: rgba(99, 102, 241, 0.12); color: #6366f1; border: 1px solid rgba(99, 102, 241, 0.25); }
+
+.ins-vibecode-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.ins-vibecode-type {
+  font-size: 11.5px;
+  color: var(--text-tertiary);
+  display: block;
+  margin-top: 2px;
+}
+
+.ins-vibecode-status {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+}
+
+.ins-vibecode-status.active {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--accent);
+  border: 1px solid var(--accent-line);
+}
+
+.ins-vibecode-status.synced {
+  background: rgba(59, 130, 246, 0.12);
+  color: #60a5fa;
+  border: 1px solid rgba(96, 165, 250, 0.3);
+}
+
+.ins-vibecode-status.ready {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.ins-vibecode-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.ins-vibecode-path {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.path-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
+
+.ins-vibecode-path code {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--accent);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.ins-vibecode-cmd code {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  display: block;
+  padding: 7px 10px;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  overflow-x: auto;
+}
+
+.ins-sync-banner {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.ins-sync-title {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.ins-sync-desc {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  margin-top: 3px;
+}
+
+.ins-sync-cmd-box code {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  background: var(--bg-surface);
+  border: 1px solid var(--accent-line);
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  color: var(--accent-bright);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: inline-block;
 }
 
 @media (prefers-reduced-motion: reduce) {

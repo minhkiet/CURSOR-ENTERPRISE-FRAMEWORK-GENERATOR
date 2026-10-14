@@ -26,43 +26,48 @@ TESTS = [
     ("ask", ["ask", "redesign landing page", "--root", ".cursor"], 30),
 ]
 
-failures = []
-for label, args, timeout in TESTS:
-    print(f"\n=== {label} ===")
-    t0 = time.perf_counter()
-    try:
-        r = subprocess.run(
-            [sys.executable, "-m", "cursor_framework", *args],
-            cwd=str(ROOT),
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-            encoding="utf-8",
-            errors="replace",
-        )
-        elapsed = time.perf_counter() - t0
-        if r.returncode == 0:
-            print(f"  OK ({elapsed:.1f}s) - {len(r.stdout or '')} bytes stdout")
-            if r.stderr.strip():
-                print(f"  stderr: {r.stderr.strip()[:300]}")
-        else:
-            print(f"  FAILED exit={r.returncode} ({elapsed:.1f}s)")
-            print(f"  stdout: {r.stdout[:500]}")
-            print(f"  stderr: {r.stderr[:500]}")
+def main() -> int:
+    """Run the smoke commands when invoked directly, not during pytest collection."""
+    failures = []
+    for label, args, timeout in TESTS:
+        print(f"\n=== {label} ===")
+        t0 = time.perf_counter()
+        try:
+            r = subprocess.run(
+                [sys.executable, "-m", "cursor_framework", *args],
+                cwd=str(ROOT),
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+                encoding="utf-8",
+                errors="replace",
+            )
+            elapsed = time.perf_counter() - t0
+            if r.returncode == 0:
+                print(f"  OK ({elapsed:.1f}s) - {len(r.stdout or '')} bytes stdout")
+                if r.stderr.strip():
+                    print(f"  stderr: {r.stderr.strip()[:300]}")
+            else:
+                print(f"  FAILED exit={r.returncode} ({elapsed:.1f}s)")
+                print(f"  stdout: {r.stdout[:500]}")
+                print(f"  stderr: {r.stderr[:500]}")
+                failures.append(label)
+        except subprocess.TimeoutExpired:
+            print(f"  TIMEOUT after {timeout}s")
             failures.append(label)
-    except subprocess.TimeoutExpired:
-        print(f"  TIMEOUT after {timeout}s")
-        failures.append(label)
-    except Exception as e:
-        print(f"  ERROR: {e}")
-        failures.append(label)
+        except Exception as e:
+            print(f"  ERROR: {e}")
+            failures.append(label)
 
-print("\n" + "=" * 60)
-if failures:
-    print(f"FAILURES ({len(failures)}):")
-    for f in failures:
-        print(f"  - {f}")
-    sys.exit(1)
-else:
+    print("\n" + "=" * 60)
+    if failures:
+        print(f"FAILURES ({len(failures)}):")
+        for failure in failures:
+            print(f"  - {failure}")
+        return 1
     print(f"ALL {len(TESTS)} COMMANDS PASSED")
-    sys.exit(0)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

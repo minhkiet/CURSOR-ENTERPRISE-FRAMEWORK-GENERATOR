@@ -68,5 +68,15 @@ namespace CursorSetupWpf.ViewModels
 
         // Info icon
         public string InfoIcon => "\uE946";
+
+        // Operational onboarding: the guide is an entry point into the real
+        // setup workflow, not a static documentation page.
+        public string PurposeTitle => LocalizationService.T("guide.purpose_title");
+        public string PurposeDescription => LocalizationService.T("guide.purpose_desc");
+        public string InstallActionLabel => LocalizationService.T("guide.action_install");
+        public string AgentsActionLabel => LocalizationService.T("guide.action_agents");
+        public string UtilitiesActionLabel => LocalizationService.T("guide.action_utilities");
+        public string PreflightActionLabel => LocalizationService.T("guide.action_preflight");
+        public string SafetyNote => LocalizationService.T("guide.safety_note");
     }
 }

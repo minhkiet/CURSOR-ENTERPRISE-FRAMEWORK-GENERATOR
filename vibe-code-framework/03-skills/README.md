@@ -35,6 +35,7 @@ skill-name/
 | [debug-error](./debug-error/) | Debug và fix lỗi systematic |
 | [fullstack-web](./fullstack-web/) | Fullstack web app (ASP.NET + React) |
 | [security-scan](./security-scan/) | Security vulnerability scan |
+| [frontend-design](./frontend-design/) | External frontend design skill; pending owner review |
 
 ## Ánh xạ sang Cursor
 
@@ -51,3 +52,22 @@ skill-name/
 03-skills/create-ui/SKILL.md  → .agents/skills/create-ui/SKILL.md
 ...
 ```
+
+## Bổ sung skill từ GitHub
+
+Dùng importer append-only tại `tools/skill_installer.py` để lấy một thư mục
+skill thật có `SKILL.md` từ GitHub vào Resource Hub:
+
+```powershell
+python tools/skill_installer.py add-github `
+  --repo owner/repository `
+  --skill-path skills/example `
+  --ref main
+```
+
+Thêm `--dry-run` để tải và kiểm tra trước mà không ghi file.
+
+Importer không ghi đè thư mục đã tồn tại, không xóa hoặc migration `.cursor`,
+và ghi provenance external vào
+`00-governance/records/external-skills.json`. Skill mới ở trạng thái
+`SOT-EXTERNAL`/`PENDING_REVIEW`; không có approval nào được suy diễn.

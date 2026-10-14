@@ -9,12 +9,12 @@ interface Stat {
 }
 
 const stats: Stat[] = [
-  { target: 720, label: 'Total files' },
-  { target: 39, label: 'Rules' },
-  { target: 27, label: 'Skills' },
-  { target: 329, label: 'Knowledge files' },
+  { target: 22, label: 'Templates' },
+  { target: 43, label: 'Rules (.mdc)' },
+  { target: 50, label: 'Skills' },
+  { target: 10, label: 'Vibe Code Tools' },
   { target: 18, label: 'Agents' },
-  { target: 5, label: 'MCP Servers', suffix: '' }
+  { target: 6, label: 'Theme Modes' }
 ]
 
 const displayValues = ref<number[]>(stats.map(() => 0))

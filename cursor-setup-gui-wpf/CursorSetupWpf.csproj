@@ -7,9 +7,9 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <NoWarn>$(NoWarn);CS8632</NoWarn>
     <AssemblyName>ToolRunCursor</AssemblyName>
-    <Version>4.4.0</Version>
-    <FileVersion>4.4.0</FileVersion>
-    <AssemblyVersion>4.4.0</AssemblyVersion>
+    <Version>4.5.0</Version>
+    <FileVersion>4.5.0</FileVersion>
+    <AssemblyVersion>4.5.0</AssemblyVersion>
     <Company>Cursor Enterprise</Company>
     <Product>Cursor Enterprise Framework Setup</Product>
     <Description>Setup tool for Cursor Enterprise Framework with MCP tools integration</Description>
@@ -21,14 +21,40 @@
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="Resources\*.txt">
+    <!-- WPF-specific bilingual resources contain the complete UI key set. -->
+    <Content Include="Resources\en.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <TargetPath>Resources\%(Filename)%(Extension)</TargetPath>
-    </None>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Resources\vi.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
     <Resource Include="Resources\Styles\*.xaml" />
     <Resource Include="Resources\Themes\*.xaml" />
     <Resource Include="setup.ico" />
+    <!-- Keep the additive-only GitHub skill importer available in packaged builds. -->
+    <Content Include="..\tools\skill_installer.py" Condition="Exists('..\tools\skill_installer.py')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+      <Link>tools\skill_installer.py</Link>
+    </Content>
   </ItemGroup>
+  <!-- Keep localization deterministic on incremental publish. -->
+  <Target Name="CopySharedLocalizationAfterPublish" AfterTargets="Publish">
+    <MakeDir Directories="$(PublishDir)Resources" />
+    <Copy
+      SourceFiles="$(MSBuildProjectDirectory)\Resources\en.txt;$(MSBuildProjectDirectory)\Resources\vi.txt"
+      DestinationFolder="$(PublishDir)Resources"
+      SkipUnchangedFiles="false" />
+  </Target>
+  <Target Name="CopySkillImporterAfterPublish" AfterTargets="Publish" Condition="Exists('$(MSBuildProjectDirectory)\..\tools\skill_installer.py')">
+    <MakeDir Directories="$(PublishDir)tools" />
+    <Copy
+      SourceFiles="$(MSBuildProjectDirectory)\..\tools\skill_installer.py"
+      DestinationFiles="$(PublishDir)tools\skill_installer.py"
+      SkipUnchangedFiles="false" />
+  </Target>
   <!-- MCP Tools - auto-include from ../tools directory -->
   <ItemGroup>
     <Content Include="..\tools\cursor-framework-mcp\**\*" Condition="Exists('..\tools\cursor-framework-mcp')">

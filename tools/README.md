@@ -13,3 +13,24 @@ The **Cursor Enterprise Framework bridge** lives at `.cursor/skills/sec_hackingt
 **Authorization is mandatory** for any active scan — see the bridge skill's gate. Passive/OSINT tools skip the gate.
 
 > For authorized security testing, bug bounty, CTFs, and research only.
+
+## Add a skill from GitHub
+
+The append-only importer adds a real `SKILL.md` directory to the canonical
+Resource Hub. It does not overwrite an existing skill, does not delete or
+migrate `.cursor` resources, and records external provenance in
+`vibe-code-framework/00-governance/records/external-skills.json`.
+
+```powershell
+python tools/skill_installer.py add-github `
+  --repo owner/repository `
+  --skill-path skills/example `
+  --ref main
+```
+
+Preview the remote skill first with `--dry-run`; this fetches and validates
+the content without writing the Resource Hub or provenance registry.
+
+If a repository contains more than one skill, `--skill-path` is required.
+Imported records remain `SOT-EXTERNAL`, `PENDING_REVIEW`, and
+`NOT_GRANTED` for approval until a real owner reviews them.
