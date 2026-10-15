@@ -20,6 +20,156 @@ export type Template = {
 
 export const templates: Template[] = [
   {
+    id: 'ui-ux',
+    slug: 'ui-ux',
+    name: 'UI/UX Enterprise System',
+    category: 'Enterprise UI/UX & Design Tokens',
+    tagline: 'Hệ thống UI/UX & Design Tokens chuẩn Enterprise',
+    description:
+      'Mẫu thiết kế UI/UX theo chuẩn Evondev & Enterprise guidelines: Design tokens (Tailwind v4 / CSS variables), wireframe 3 phương án với dữ liệu thật, ma trận trạng thái (empty, loading, error, success), bảng điều khiển tương tác, hierarchy typography và form controls chống AI-slop.',
+    industry: 'UI/UX SYSTEM',
+    accent: '#3b82f6',
+    accentSecondary: '#60a5fa',
+    bgGradient: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #2563eb 100%)',
+    icon: 'layout',
+    features: [
+      'Hệ thống Design Tokens (Tailwind v4 & CSS variables)',
+      'Wireframe switch: Chuyển đổi Low-Fi sang High-Fi tương tác',
+      'Ma trận trạng thái chuẩn: Empty, Loading, Error, Active',
+      'Form controls & Table dữ liệu chống AI-slop',
+      'Audit 5 trục: Correctness, Hierarchy, A11y, Contrast, Rhythm'
+    ],
+    highlights: [
+      { label: 'Chuẩn Design', value: 'WCAG 2.1 AA' },
+      { label: 'Token Variables', value: '140+' },
+      { label: 'Khảo sát người dùng', value: '98.6%' }
+    ],
+    tags: ['UI-UX', 'Design System', 'Tokens', 'Wireframe', 'Anti-Slop', 'Enterprise'],
+    fileSize: '275 KB',
+    pages: 6,
+    techStack: ['HTML5', 'CSS Tokens', 'Vanilla JS', 'Phosphor Icons']
+  },
+  {
+    id: 'dashboard-ui',
+    slug: 'dashboard-ui',
+    name: 'Dashboard UI Pro',
+    category: 'Admin Panel & Analytics',
+    tagline: 'Bảng điều khiển & quản trị dữ liệu chuyên sâu',
+    description:
+      'Giao diện Dashboard quản trị chuyên nghiệp chuẩn SaaS. Đồng bộ 100% Phosphor Icons, bảng dữ liệu lọc đa điều kiện, biểu đồ doanh thu trực quan, thống kê KPI thời gian thực, kanban task board và zero placeholder slop.',
+    industry: 'DASHBOARD PRO',
+    accent: '#0ea5e9',
+    accentSecondary: '#38bdf8',
+    bgGradient: 'linear-gradient(135deg, #082f49 0%, #0369a1 50%, #0284c7 100%)',
+    icon: 'chart-bar',
+    features: [
+      'KPI Stat Cards với biểu đồ mini sparkline & % tăng trưởng',
+      'Data Grid phân trang, sắp xếp, lọc đa cột & batch actions',
+      'Kanban Task Board kéo thả trạng thái linh hoạt',
+      'Bộ lọc thời gian (Hôm nay, 7 ngày, Quý, Custom date range)',
+      'Hệ thống Notice, Toast, Modal và Drawer đồng bộ'
+    ],
+    highlights: [
+      { label: 'Tốc độ phản hồi', value: '< 0.4s' },
+      { label: 'Components', value: '48+' },
+      { label: 'Data density', value: 'Tối ưu Cockpit' }
+    ],
+    tags: ['Dashboard', 'Data Table', 'Kanban', 'KPI Stats', 'Phosphor', 'Analytics'],
+    fileSize: '290 KB',
+    pages: 7,
+    techStack: ['HTML5', 'CSS3 Grid/Flex', 'Vanilla JS', 'Chart.js']
+  },
+  {
+    id: 'frontend-taste',
+    slug: 'frontend-taste',
+    name: 'Frontend Taste & Craft',
+    category: 'High-End Craft & Anti-Slop',
+    tagline: 'Giao diện đỉnh cao, chống AI-slop, phong cách Linear/Apple',
+    description:
+      'Mẫu giao diện thể hiện đẳng cấp thiết kế Frontend Taste. Tuân thủ 57 slop-test gates, cân chỉnh 3 dials (Variance: 8, Motion: 6, Density: 4), typography Geist tinh xảo, nhịp điệu khoảng trắng tự nhiên, loại bỏ hoàn toàn các vệt tím AI sáo rỗng.',
+    industry: 'FRONTEND TASTE',
+    accent: '#8b5cf6',
+    accentSecondary: '#c084fc',
+    bgGradient: 'linear-gradient(135deg, #18181b 0%, #3b0764 50%, #6b21a8 100%)',
+    icon: 'sparkles',
+    features: [
+      'Triết lý 3 Dials: Variance, Motion và Visual Density',
+      '57 Slop-Test Gates: Loại bỏ 100% AI cliché và generic cards',
+      'Typography phối hợp Geist Display & Geist Mono chuẩn mực',
+      'Micro-interactions và hiệu ứng ánh sáng bề mặt tinh tế',
+      'Bố cục đa dạng: Hero lệch trục, Bento Grid tương tác, Testimonial ticker'
+    ],
+    highlights: [
+      { label: 'Slop-Test Score', value: '57/57 Passed' },
+      { label: 'Lighthouse Perf', value: '100/100' },
+      { label: 'Aesthetic Tier', value: 'Awwwards SOTD' }
+    ],
+    tags: ['Anti-Slop', 'Linear Style', 'Craft', '57 Gates', 'Micro-Motion', 'Typography'],
+    fileSize: '260 KB',
+    pages: 6,
+    techStack: ['HTML5', 'CSS3 Modern', 'Vanilla JS', 'Spring Motion']
+  },
+  {
+    id: 'cms-landing-enterprise',
+    slug: 'cms-landing-enterprise',
+    name: 'CMS Landing Enterprise v4',
+    category: 'Full SaaS CRM/CMS/Wallet/Affiliate',
+    tagline: 'Hệ thống SaaS toàn diện: CRM, Landing, Ví & Affiliate F0-F3',
+    description:
+      'Kiến trúc SaaS Enterprise v4 hoàn chỉnh: Vue 3 + ASP.NET Core 9 + Dapper. Tích hợp CRM quản lý leads, Landing Builder kéo thả, Ví điểm thưởng & Hoa hồng đa tầng F0-F3, Cổng thanh toán SePay / ZaloPay / Stripe với Webhook idempotent.',
+    industry: 'ENTERPRISE SAAS',
+    accent: '#10b981',
+    accentSecondary: '#34d399',
+    bgGradient: 'linear-gradient(135deg, #022c22 0%, #064e3b 50%, #047857 100%)',
+    icon: 'buildings',
+    features: [
+      'Module CRM Lead & Customer Workspace với Pipeline Kanban',
+      'Landing Page Builder kéo thả với kho section mẫu dựng sẵn',
+      'Ví điểm thưởng (Points Wallet) & Rút hoa hồng tự động',
+      'Động cơ Affiliate đa tầng F0 -> F3 tính toán hoa hồng realtime',
+      'Tích hợp thanh toán SePay, QR VietQR, ZaloPay, Stripe Idempotent'
+    ],
+    highlights: [
+      { label: 'Kiến trúc', value: 'Clean + Dapper' },
+      { label: 'Cổng thanh toán', value: 'SePay + VietQR' },
+      { label: 'Hoa hồng Affiliate', value: 'Đa tầng F0-F3' }
+    ],
+    tags: ['SaaS CMS', 'CRM Pipeline', 'Affiliate F0-F3', 'Wallet', 'SePay', 'Landing Builder'],
+    fileSize: '360 KB',
+    pages: 8,
+    techStack: ['Vue 3', 'ASP.NET Core 9', 'Dapper', 'SQLite/Postgres']
+  },
+  {
+    id: 'image-workflow',
+    slug: 'image-workflow',
+    name: 'Image Workflow Studio',
+    category: 'AI Image & Asset Pipeline',
+    tagline: 'Pipeline tạo ảnh AI chuẩn phong cách & bóc tách asset web',
+    description:
+      'Workflow tự động hóa hình ảnh từ Screenshot/URL sang Asset thực tế. Kết hợp Web Cloner, Image Finder (Unsplash, Pexels) và Image Generator (Google Flow, DALL-E 3, Flux). Bao gồm kho Prompt blueprints, Negative prompts và công cụ định dạng tỷ lệ 16:9, 1:1, 9:16.',
+    industry: 'IMAGE WORKFLOW',
+    accent: '#f43f5e',
+    accentSecondary: '#fb7185',
+    bgGradient: 'linear-gradient(135deg, #4c0519 0%, #881337 50%, #be123c 100%)',
+    icon: 'image',
+    features: [
+      'Phân tích asset từ Screenshot & URL (bóc tách kích thước, màu, style)',
+      'Cây quyết định Asset: Giữ URL -> Tìm Stock -> Tạo ảnh AI Custom',
+      'Kho Prompt Blueprints chuẩn studio: Ánh sáng, bối cảnh, tỷ lệ',
+      'Bộ lọc Negative Prompt chống dị tật AI, chữ méo, bố cục hỏng',
+      'Asset Manifest Generator xuất file tải về cho dự án web'
+    ],
+    highlights: [
+      { label: 'Kho Prompt Mẫu', value: '35+ Blueprints' },
+      { label: 'Tỷ lệ khung hình', value: '16:9, 1:1, 9:16' },
+      { label: 'Asset Tối ưu', value: 'WebP / AVIF' }
+    ],
+    tags: ['Image Workflow', 'AI Generator', 'Web Cloner', 'Prompt Blueprint', 'Asset Pipeline'],
+    fileSize: '280 KB',
+    pages: 6,
+    techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Canvas API']
+  },
+  {
     id: 'crm',
     slug: 'crm',
     name: 'CRM Dashboard',

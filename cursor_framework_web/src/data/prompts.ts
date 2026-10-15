@@ -32,6 +32,8 @@ export interface PromptItem {
   applies: FrameworkRef[] // rules + skills + agents wired in
   expectedDelta: string // user-facing metric improvement
   trace: PromptExecutionStep[]
+  slashCommand?: string // e.g. /ui-ux, /dashboard-ui
+  tags?: string[]
 }
 
 export const PROMPTS: PromptItem[] = [
@@ -543,6 +545,489 @@ export const PROMPTS: PromptItem[] = [
         bullets: [
           'Tạo mã nguồn TypeScript / C# sạch thay thế hoàn toàn',
           'Bộ kiểm thử tự động xác minh tính tương thích 1:1'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'prompt-ui-ux',
+    category: 'Build',
+    title: 'UI/UX — Evondev Design System & Ma Trận 5 Trạng Thái',
+    oneLiner: 'Tạo hệ thống Design Tokens HSL, lưới 8px, ma trận nút bấm 5 trạng thái và kiểm định tương phản WCAG AA 4.5:1.',
+    slashCommand: '/ui-ux',
+    tags: ['Design System', 'Tokens', 'WCAG AA', 'Figma to Code', 'Evondev'],
+    prompt: `/ui-ux Tạo Design System chuẩn doanh nghiệp cho giao diện SaaS:
+1. Thiết lập bảng màu Tokens HSL có tính toán: Primary: hsl(210, 85%, 55%), Surface: #0f172a, Text: #f8fafc, Border: #334155.
+2. Lưới khoảng cách 8px grid (8px, 16px, 24px, 32px, 48px), bán kính bo góc 10px.
+3. Dựng ma trận component Nút bấm & Input đầy đủ 5 trạng thái: Default, Hover, Active, Disabled, Loading/Spinner.
+4. Kiểm tra tương phản màu WCAG 2.1 AA tối thiểu 4.5:1 cho văn bản thường và 3:1 cho thành phần UI.`,
+    applies: [
+      { type: 'skill', id: 'frontend-taste', reason: 'Quy chuẩn thẩm mỹ chuyên nghiệp, chống AI slop.' },
+      { type: 'skill', id: 'frontend-review', reason: 'Dual-gate kiểm định tương phản WCAG AA.' },
+      { type: 'rule', id: 'karpathy-guidelines', reason: 'Tối giản mã nguồn, cấu trúc token trực quan.' },
+      { type: 'rule', id: 'coding-standards', reason: 'Semantic CSS variables, không phụ thuộc thư viện nặng.' }
+    ],
+    expectedDelta: '100% WCAG AA · 0 Trạng thái thiếu · Tokens tái sử dụng 100%',
+    trace: [
+      {
+        phase: 'plan',
+        label: 'Khởi Tạo Bản Đồ Token & Lưới Khoảng Cách',
+        by: 'ui-visual-design',
+        bullets: [
+          'Khai báo CSS custom properties cho thang HSL, typography clamp(), và spacing',
+          'Thiết lập layout grid 8-point và quy tắc phân cấp thị giác (Visual Hierarchy)',
+          'Khảo sát bảng màu tương phản dark mode & light mode'
+        ]
+      },
+      {
+        phase: 'pre-review',
+        label: 'Cổng Thẩm Định Khả Năng Tiếp Cận (WCAG)',
+        by: 'frontend-review',
+        bullets: [
+          'Kiểm tra tỉ lệ tương phản màu text/background đạt 4.8:1 (vượt chuẩn AA 4.5:1)',
+          'Đảm bảo mọi phần tử tương tác có chỉ báo focus-visible rõ ràng',
+          'Quy định touch target tối thiểu 44x44px trên thiết bị di động'
+        ]
+      },
+      {
+        phase: 'run',
+        label: 'Hiện Thực Ma Trận 5-State Component',
+        by: 'full-output',
+        bullets: [
+          'Xây dựng Button component với đủ 5 states: default, hover, active, disabled, loading (SVG spinner)',
+          'Xây dựng Input text field có floating label, error state và helper text',
+          'Tích hợp hiệu ứng micro-interaction (scale 0.98 khi active, transition cubic-bezier)'
+        ]
+      },
+      {
+        phase: 'post-review',
+        label: 'Kiểm Thử Đa Trình Duyệt & Responsive',
+        by: 'frontend-review',
+        bullets: [
+          'Thử nghiệm trên 3 kích thước: Mobile (375px), Tablet (768px), Desktop (1440px)',
+          'Xác nhận không phát sinh layout shift hoặc vỡ typography',
+          'Kiểm tra tính năng chuyển đổi giao diện sáng/tối không làm đứt kết nối biến màu'
+        ]
+      },
+      {
+        phase: 'deliver',
+        label: 'Bàn Giao & Hướng Dẫn Sử Dụng',
+        by: 'workflow-engines',
+        bullets: [
+          'Xuất file token tokens.css và demo live tại /templates/ui-ux',
+          'Tài liệu hóa quy tắc mở rộng component cho toàn bộ nhóm phát triển'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'prompt-dashboard-ui',
+    category: 'Build',
+    title: 'Dashboard UI — Executive Cockpit, Real-time KPIs & Mini Kanban',
+    oneLiner: 'Xây dựng bảng điều khiển quản trị doanh nghiệp: 4 thẻ KPI động kèm biểu đồ SVG sparkline, bảng dữ liệu lọc đa tiêu chí và Kanban mini.',
+    slashCommand: '/dashboard-ui',
+    tags: ['Dashboard', 'KPI', 'Analytics', 'Kanban', 'Data Table'],
+    prompt: `/dashboard-ui Xây dựng giao diện Executive Analytics Cockpit gồm:
+1. 4 thẻ KPI động (Doanh thu tháng, Khách hàng hoạt động, Tỉ lệ chuyển đổi, ARR) tích hợp biểu đồ đường SVG mini sắc nét.
+2. Bảng dữ liệu khách hàng với thanh tìm kiếm thời gian thực, bộ lọc trạng thái đa tiêu chí, phân trang và huy hiệu màu ngữ nghĩa.
+3. Bảng Sprint Kanban 3 cột (Cần làm, Đang xử lý, Đã hoàn thành) có chỉ báo tiến độ phần trăm trực quan.
+4. Tối ưu thời gian tải < 0.8s, không phụ thuộc thư viện chart nặng nề (thuần SVG nhẹ < 5KB).`,
+    applies: [
+      { type: 'skill', id: 'frontend-taste', reason: 'Bố cục Cockpit tinh tế phong cách Vercel / Linear.' },
+      { type: 'skill', id: 'full-output', reason: 'Tạo mã nguồn đầy đủ HTML, CSS, JS tính toán số liệu thực.' },
+      { type: 'rule', id: 'architecture-patterns', reason: 'Tổ chức component dạng Widget độc lập, dễ mở rộng.' },
+      { type: 'skill', id: 'frontend-review', reason: 'Đảm bảo CLS = 0 khi render bảng dữ liệu.' }
+    ],
+    expectedDelta: 'Tải tức thì < 0.8s · 0 Layout Shift · Thuần SVG nhẹ < 5KB',
+    trace: [
+      {
+        phase: 'plan',
+        label: 'Thiết Kế Cấu Trúc Bố Cục Cockpit',
+        by: 'dashboard-ui',
+        bullets: [
+          'Phân vùng layout: Header điều hành, 4 thẻ KPI tóm tắt, Grid chính chứa Biểu đồ + Bảng dữ liệu + Kanban',
+          'Lựa chọn bảng màu hiển thị dữ liệu tài chính (Xanh lá dương, Đỏ cảnh báo, Xanh cyan xu hướng)'
+        ]
+      },
+      {
+        phase: 'pre-review',
+        label: 'Định Dạng Dữ Liệu & Thước Đo Hiệu Năng',
+        by: 'karpathy-guidelines',
+        bullets: [
+          'Định dạng tiền tệ chuẩn VND / USD và hiển thị tỉ lệ phần trăm tăng trưởng (+18.4%)',
+          'Cam kết không dùng thư viện Chart.js cồng kềnh, dùng SVG native render mượt mà'
+        ]
+      },
+      {
+        phase: 'run',
+        label: 'Lập Trình Widget Dữ Liệu Thực Tế',
+        by: 'full-output',
+        bullets: [
+          'Vẽ biểu đồ sparkline SVG dynamic với gradient fill và điểm cực trị',
+          'Dựng Data Table hỗ trợ sắp xếp theo cột và lọc khách hàng realtime',
+          'Triển khai Mini Kanban dạng thẻ kéo thả với thanh tiến độ hoàn thành'
+        ]
+      },
+      {
+        phase: 'post-review',
+        label: 'Kiểm Thử Mật Độ Thông Tin (Information Density)',
+        by: 'frontend-review',
+        bullets: [
+          'Đảm bảo người quản trị đọc hiểu toàn bộ tình hình kinh doanh chỉ trong 5 giây đầu',
+          'Xác nhận bảng cuộn mượt mà không giật lag trên màn hình di động 360px'
+        ]
+      },
+      {
+        phase: 'deliver',
+        label: 'Đóng Gói & Xuất Bản Mẫu Trực Quan',
+        by: 'workflow-engines',
+        bullets: [
+          'Template hoàn chỉnh sẵn sàng trải nghiệm tại /templates/dashboard-ui',
+          'Mã nguồn sạch, có comment giải thích rõ ràng từng dòng tính toán'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'prompt-frontend-taste',
+    category: 'Review',
+    title: 'Frontend Taste — 57 Hallmark Anti-Slop Gates & Craft Dials',
+    oneLiner: 'Quét và loại bỏ triệt để 57 bẫy AI-slop (glow tím lòe loẹt, 3 cột sao chép). Tinh chỉnh 3 dial: Variance, Motion, Density.',
+    slashCommand: '/frontend-taste',
+    tags: ['Anti-Slop', 'Taste', 'Hallmark', 'Bento Grid', 'Micro-Interactions'],
+    prompt: `/frontend-taste Quét và tái cấu trúc giao diện theo chuẩn 57 Hallmark Anti-Slop Gates:
+1. Triệt tiêu hoàn toàn hiệu ứng purple gradient blur vô nghĩa và typography font sao chép thô sơ.
+2. Phá vỡ bố cục 3 cột đối xứng nhàm chán bằng cấu trúc Bento Grid bất đối xứng giàu tính nhịp điệu.
+3. Thiết lập 3 thanh trượt điều hướng Craft Dials: Variance 75% (độ đa dạng layout), Motion Gentle 300ms (chuyển động tinh tế), Density Compact (mật độ thông tin cao phong cách Linear / Stripe).
+4. Bổ sung các chi tiết thủ công: subtle border 1px mờ, font mono cho số liệu và badge trạng thái tinh gọn.`,
+    applies: [
+      { type: 'skill', id: 'frontend-taste', reason: 'Bộ quy chuẩn thẩm mỹ hàng đầu chống giao diện generic AI.' },
+      { type: 'skill', id: 'frontend-redesign', reason: 'Tái thiết kế layout theo tư duy thiết kế đương đại.' },
+      { type: 'skill', id: 'frontend-review', reason: 'Thực thi kiểm tra 57 gates nghiêm ngặt.' },
+      { type: 'rule', id: 'karpathy-guidelines', reason: 'Tối giản hiệu ứng thừa, tôn vinh nội dung thực tế.' }
+    ],
+    expectedDelta: '57/57 Cổng Hallmark Đạt Chuẩn · Cảm giác thủ công đẳng cấp',
+    trace: [
+      {
+        phase: 'plan',
+        label: 'Quét 57 Bẫy Thẩm Mỹ AI (Slop Audit)',
+        by: 'frontend-taste',
+        bullets: [
+          'Phát hiện và đánh dấu các thẻ purple glow không phục vụ mục đích ngữ nghĩa',
+          'Nhận diện các khối văn bản Lorem Ipsum sáo rỗng cần thay thế bằng nội dung thực',
+          'Phân tích sự đơn điệu trong cấu trúc lưới giao diện'
+        ]
+      },
+      {
+        phase: 'pre-review',
+        label: 'Căn Chỉnh 3 Craft Dials Cơ Bản',
+        by: 'frontend-taste',
+        bullets: [
+          'Cài đặt Variance = 75%: Thay 3 thẻ kích thước bằng nhau bằng 1 hero Bento card + 2 thẻ bổ trợ',
+          'Cài đặt Motion = 300ms cubic-bezier: Chuyển động nhẹ nhàng, không gây mỏi mắt người dùng',
+          'Cài đặt Density = Compact: Giảm khoảng trắng vô lý, tăng lượng thông tin hữu ích trên màn hình đầu tiên'
+        ]
+      },
+      {
+        phase: 'run',
+        label: 'Tái Cấu Trúc Toàn Diện Layout & Typography',
+        by: 'frontend-redesign',
+        bullets: [
+          'Tạo Asymmetric Bento Grid với hiệu ứng viền 1px mờ cao cấp',
+          'Thay thế phông chữ mặc định bằng tổ hợp Typography có cá tính',
+          'Thêm hiệu ứng hover card mượt mà với ánh sáng spotlight định hướng chuột'
+        ]
+      },
+      {
+        phase: 'post-review',
+        label: 'Xác Thực 57 Cổng Kiểm Tra Sau Tinh Chỉnh',
+        by: 'frontend-review',
+        bullets: [
+          '0/57 lỗi AI-slop tồn dư (Đạt chứng nhận Craft Standard)',
+          'Độ phản hồi của giao diện trên mobile đạt 60fps mượt mà'
+        ]
+      },
+      {
+        phase: 'deliver',
+        label: 'Xuất Bản Mẫu Trực Quan Đẳng Cấp',
+        by: 'workflow-engines',
+        bullets: [
+          'Template trực quan sống động tại /templates/frontend-taste',
+          'Kèm bảng điều khiển tương tác 3 dial cho phép người dùng tự kéo thử nghiệm'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'prompt-cms-landing-enterprise',
+    category: 'Build',
+    title: 'CMS Enterprise v4 — CRM Pipeline, Ví Điểm & Affiliate F0-F3',
+    oneLiner: 'Khởi tạo hệ thống quản trị SaaS toàn diện: CRM pipeline 4 cột, ví điểm nạp/rút giả lập, mạng lưới hoa hồng 4 cấp F0-F3 và Webhook SePay/VietQR.',
+    slashCommand: '/cms-landing-enterprise',
+    tags: ['CMS', 'CRM', 'SaaS', 'Affiliate', 'Wallet', 'VietQR'],
+    prompt: `/cms-landing-enterprise Dựng kiến trúc và giao diện hệ thống SaaS Portal Enterprise v4:
+1. Phân hệ CRM quản lý Khách hàng tiềm năng dạng Kanban 4 cột (Mới, Đã liên hệ, Đàm phán, Chốt hợp đồng) với tổng giá trị deal.
+2. Ví điểm thưởng (Points Wallet) tích hợp mã QR nạp tiền và bộ mô phỏng lệnh rút tiền tức thì (Instant Withdrawal).
+3. Mạng lưới tiếp thị liên kết (Affiliate Tree) 4 tầng (F0: 20%, F1: 8%, F2: 4%, F3: 2%) tính toán hoa hồng thời gian thực.
+4. Module tiếp nhận Webhook thanh toán SePay / VietQR đảm bảo Idempotency (khóa trùng lặp) và ghi sổ kế toán kép an toàn.`,
+    applies: [
+      { type: 'rule', id: 'rule_fullstack-development', reason: 'Kiến trúc Fullstack ASP.NET Core Web API + React TSX.' },
+      { type: 'rule', id: 'security', reason: 'Bảo mật Webhook HMAC-SHA256 và khóa Idempotency.' },
+      { type: 'rule', id: 'enterprise-patterns', reason: 'Mô hình Clean Architecture và Domain-Driven Design.' },
+      { type: 'skill', id: 'full-output', reason: 'Tạo mã nguồn trọn vẹn không để sót skeleton hay TODO.' }
+    ],
+    expectedDelta: 'Full Stack SaaS Sẵn Sàng · Tính toán hoa hồng và đối soát chuẩn xác 100%',
+    trace: [
+      {
+        phase: 'plan',
+        label: 'Thiết Kế Thực Thể Cơ Sở Dữ Liệu & Hợp Đồng API',
+        by: 'enterprise-patterns',
+        bullets: [
+          'Mô hình hóa bảng Leads, Transactions, Wallets, AffiliateNodes, WebhookLogs',
+          'Xây dựng luồng giao dịch tài chính đảm bảo ACID và không mất tiền',
+          'Định nghĩa cấu trúc Webhook payload của SePay và PayOS'
+        ]
+      },
+      {
+        phase: 'pre-review',
+        label: 'Thẩm Tra Bảo Mật Giao Dịch & Tránh Race Condition',
+        by: 'security',
+        bullets: [
+          'Cơ chế phân tán Redis Lock cho thao tác rút điểm khỏi ví',
+          'Xác minh chữ ký điện tử HMAC trước khi kích hoạt cộng điểm vào tài khoản',
+          'Chặn đứng lỗi gian lận phân cấp hoa hồng lặp vòng'
+        ]
+      },
+      {
+        phase: 'run',
+        label: 'Triển Khai Giao Diện & Logic Nghiệp Vụ',
+        by: 'rule_fullstack-development',
+        bullets: [
+          'Dựng Kanban Board quản lý Leads CRM với thao tác chuyển cột mượt mà',
+          'Xây dựng Widget Ví Điểm: nạp tiền qua QR, lịch sử biến động số dư và lệnh rút tiền',
+          'Vẽ sơ đồ cây Affiliate 4 tầng hiển thị trực quan tỷ lệ % hoa hồng và số lượng thành viên'
+        ]
+      },
+      {
+        phase: 'post-review',
+        label: 'Kiểm Thử Đối Soát Tài Chính & Webhook Giả Lập',
+        by: 'frontend-review',
+        bullets: [
+          'Giả lập gửi 100 request Webhook đồng thời: 100% xử lý thành công đúng 1 lần (Idempotent)',
+          'Kiểm tra tính toán hoa hồng phân bổ cho F0, F1, F2, F3 khớp số lẻ đến từng đồng'
+        ]
+      },
+      {
+        phase: 'deliver',
+        label: 'Bàn Giao Trọn Bộ Mẫu Chạy Trực Tiếp',
+        by: 'workflow-engines',
+        bullets: [
+          'Mẫu chạy thực tế tại /templates/cms-landing-enterprise',
+          'Trang CMS Dashboard hoàn chỉnh tại /cms với đầy đủ số liệu'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'prompt-image-workflow',
+    category: 'Build',
+    title: 'Image Workflow — Studio AI Visuals, Đa Tỉ Lệ & Asset Manifest',
+    oneLiner: 'Quy trình 4 pha sáng tạo hình ảnh thương phẩm: Prompt Blueprint, Negative Prompt, tỉ lệ 16:9 / 1:1 / 9:16 và Asset Manifest JSON.',
+    slashCommand: '/image-workflow',
+    tags: ['Image Studio', 'Midjourney', 'Stable Diffusion', 'Asset Manifest', 'Design Pipeline'],
+    prompt: `/image-workflow Thiết lập quy trình tạo hình ảnh nhận diện thương hiệu chuẩn studio:
+1. Cấu trúc Prompt Blueprint với thông số quang học máy ảnh (Hasselblad 80mm f/2.8, ánh sáng khuếch tán softbox 4200K, độ sâu trường ảnh mỏng).
+2. Bộ Negative Prompt chuyên sâu loại bỏ dị tật ngón tay, mắt lệch, chữ rác và hiện tượng viền nhựa AI.
+3. Bố cục đa khung hình cho cùng một concept hình ảnh (16:9 Banner máy tính, 1:1 Thẻ tính năng, 9:16 Story di động).
+4. Xuất tệp Asset Manifest JSON theo dõi kích thước, định dạng WebP, alt text SEO và hash chống trùng lặp.`,
+    applies: [
+      { type: 'skill', id: 'frontend-taste', reason: 'Tư duy hình ảnh điện ảnh thực tế, chống dị tật AI.' },
+      { type: 'skill', id: 'full-output', reason: 'Tạo đủ prompt, negative prompt, CSS responsive và manifest.' },
+      { type: 'rule', id: 'coding-standards', reason: 'Cấu trúc thư mục tài nguyên và chuẩn định dạng WebP/AVIF tối ưu.' },
+      { type: 'skill', id: 'frontend-review', reason: 'Kiểm tra độ nét và kích thước file tải nhanh.' }
+    ],
+    expectedDelta: 'Hình ảnh chân thực sắc nét · Tương thích hoàn hảo mọi thiết bị · Không biến dạng',
+    trace: [
+      {
+        phase: 'plan',
+        label: 'Thiết Lập Phong Cách Thị Giác & Quang Học',
+        by: 'frontend-taste',
+        bullets: [
+          'Xác định Moodboard: Tối giản hiện đại, ánh sáng tự nhiên mềm mại, tông màu trung tính',
+          'Quy định thông số máy ảnh quang học thay vì từ khóa sáo rỗng "photorealistic 8k"',
+          'Phân bổ 3 tỉ lệ khung hình cho các vị trí hiển thị trên website'
+        ]
+      },
+      {
+        phase: 'pre-review',
+        label: 'Xây Dựng Bộ Negative Prompt Chống Dị Tật',
+        by: 'karpathy-guidelines',
+        bullets: [
+          'Chặn các lỗi: biến dạng bàn tay (extra fingers), mắt không đối xứng, viền ánh sáng nhựa',
+          'Loại bỏ các văn bản rác vô nghĩa tự sinh trên ảnh (gibberish text, watermarks)'
+        ]
+      },
+      {
+        phase: 'run',
+        label: 'Sinh Bộ Prompt Blueprint & Asset Manifest',
+        by: 'full-output',
+        bullets: [
+          'Viết Prompt Blueprint chi tiết cho từng tỉ lệ 16:9 (Hero), 1:1 (Feature Cards), 9:16 (Mobile Banner)',
+          'Tạo tệp asset-manifest.json lưu trữ metadata, kích thước tối ưu và thuộc tính SEO alt text'
+        ]
+      },
+      {
+        phase: 'post-review',
+        label: 'Kiểm Thử Responsive & Tải Nhanh',
+        by: 'frontend-review',
+        bullets: [
+          'Áp dụng thẻ <picture> với srcset đa độ phân giải (1x, 2x Retina)',
+          'Đảm bảo định dạng WebP / AVIF giúp giảm 70% dung lượng mà không vỡ hình'
+        ]
+      },
+      {
+        phase: 'deliver',
+        label: 'Bàn Giao Studio Trực Quan',
+        by: 'workflow-engines',
+        bullets: [
+          'Template tương tác Studio Visuals tại /templates/image-workflow',
+          'Tích hợp nút sao chép prompt và chuyển đổi nhanh tỉ lệ khung hình'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'prompt-vietqr-payment',
+    category: 'Build',
+    title: 'VietQR & SePay — Cổng Thanh Toán Tự Động & Idempotent Webhook',
+    oneLiner: 'Tự động tạo mã QR VietQR động theo đơn hàng, bắt Webhook SePay/PayOS với xác thực HMAC và khóa idempotency Redis.',
+    slashCommand: '/payment',
+    tags: ['Payment', 'VietQR', 'SePay', 'PayOS', 'Webhook', 'Fintech'],
+    prompt: `/payment Xây dựng cổng thanh toán VietQR và SePay tự động:
+1. Sinh mã QR theo chuẩn Napas247 chứa số tài khoản, mã ngân hàng, số tiền và mã nội dung chuyển khoản duy nhất.
+2. Endpoint nhận Webhook bảo mật với xác thực Secret Token và kiểm tra khóa idempotency trong Redis tránh xử lý tiền trùng lặp.
+3. Giao diện đồng hồ đếm ngược 15 phút, hướng dẫn chuyển khoản và tự động kiểm tra trạng thái thanh toán theo thời gian thực (Polling / WebSocket).
+4. Tự động cập nhật số dư ví hoặc kích hoạt đơn hàng ngay khi tiền vào tài khoản.`,
+    applies: [
+      { type: 'rule', id: 'security', reason: 'Bảo mật giao dịch thanh toán và xác thực chữ ký Webhook.' },
+      { type: 'rule', id: 'rule_fullstack-development', reason: 'Tích hợp end-to-end Backend API và Frontend UI.' },
+      { type: 'rule', id: 'api-patterns', reason: 'Thiết kế RESTful webhook receiver chuẩn idempotency.' },
+      { type: 'skill', id: 'full-output', reason: 'Triển khai toàn bộ luồng thanh toán, không thiếu sót xử lý lỗi.' }
+    ],
+    expectedDelta: 'Xác nhận thanh toán < 3s · 0 rủi ro trùng lặp · Trải nghiệm khách hàng 10/10',
+    trace: [
+      {
+        phase: 'plan',
+        label: 'Xây Dựng Kiến Trúc Giao Dịch & Mã Hóa Napas',
+        by: 'api-patterns',
+        bullets: [
+          'Tạo định dạng nội dung chuyển khoản: PREFIX + ORDER_ID (Ví dụ: SAAS1082)',
+          'Thiết lập schema lưu trữ lịch sử giao dịch và trạng thái đơn hàng (PENDING, PAID, EXPIRED)'
+        ]
+      },
+      {
+        phase: 'pre-review',
+        label: 'Thẩm Định Cơ Chế Phòng Chống Gian Lận (Anti-Fraud)',
+        by: 'security',
+        bullets: [
+          'Kiểm tra giá trị tiền thực nhận trùng khớp chính xác với số tiền đơn hàng',
+          'Thiết lập Rate Limiting và Whitelist IP cho máy chủ Webhook'
+        ]
+      },
+      {
+        phase: 'run',
+        label: 'Hiện Thực Giao Diện Thanh Toán & Webhook Handler',
+        by: 'rule_fullstack-development',
+        bullets: [
+          'Tạo giao diện hiển thị mã QR VietQR chất lượng cao kèm nút sao chép nhanh số tài khoản',
+          'Triển khai Webhook Controller xác thực token, kiểm tra Redis Idempotency Key trong 24h',
+          'Cập nhật giao diện tự động chúc mừng khi nhận được tín hiệu tiền vào tài khoản'
+        ]
+      },
+      {
+        phase: 'post-review',
+        label: 'Kiểm Thử Chịu Tải & Tình Huống Ngoại Lệ',
+        by: 'frontend-review',
+        bullets: [
+          'Xử lý tình huống chuyển thiếu tiền, chuyển thừa tiền hoặc đơn hàng hết hạn 15 phút',
+          'Đảm bảo giao diện thông báo rõ ràng cho người dùng cách xử lý sự cố'
+        ]
+      },
+      {
+        phase: 'deliver',
+        label: 'Đóng Gói & Tích Hợp Vào Hệ Thống CMS',
+        by: 'workflow-engines',
+        bullets: [
+          'Tích hợp liền mạch vào module Ví Điểm của CMS Landing Enterprise v4',
+          'Hướng dẫn kết nối tài khoản ngân hàng thực tế qua SePay.vn hoặc PayOS'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'prompt-seo-cwv',
+    category: 'Ship',
+    title: 'SEO & Core Web Vitals — Điểm 100/100, Schema.org & Meta Tags',
+    oneLiner: 'Tối ưu hiệu năng đỉnh cao: LCP < 1.2s, INP < 50ms, CLS 0, sinh thẻ OpenGraph mạng xã hội và cấu trúc JSON-LD chuẩn Google.',
+    slashCommand: '/seo-perf',
+    tags: ['SEO', 'Performance', 'Core Web Vitals', 'OpenGraph', 'Schema.org'],
+    prompt: `/seo-perf Kiểm định và tối ưu toàn diện hiệu năng và SEO trang web:
+1. Tối ưu Core Web Vitals: LCP < 1.2s (preload critical hero fonts/images), INP < 50ms (loại bỏ long tasks trên main thread), CLS = 0 (khai báo kích thước width/height cố định cho mọi hình ảnh).
+2. Thiết lập bộ thẻ Meta đầy đủ: OpenGraph, Twitter Cards, Canonical URL, Favicon đa thiết bị và Theme-Color.
+3. Nhúng cấu trúc dữ liệu Schema.org JSON-LD cho Organization, SoftwareApplication và FAQPage để tối ưu hiển thị Rich Snippets trên Google.
+4. Tự động sinh sitemap.xml và robots.txt chuẩn quy chuẩn tìm kiếm.`,
+    applies: [
+      { type: 'rule', id: 'performance', reason: 'Kỹ thuật tối ưu render path, giảm bundle size và asset preload.' },
+      { type: 'rule', id: 'deployment', reason: 'Cấu hình HTTP cache headers (Cache-Control max-age=31536000, immutable).' },
+      { type: 'skill', id: 'frontend-review', reason: 'Đo lường kiểm định chỉ số Lighthouse trực quan.' },
+      { type: 'rule', id: 'observability', reason: 'Tích hợp Web Vitals tracking gửi về analytics.' }
+    ],
+    expectedDelta: 'Lighthouse 98-100 · Tối ưu hiển thị mạng xã hội · Tăng tốc lập chỉ mục Google',
+    trace: [
+      {
+        phase: 'plan',
+        label: 'Phân Tích Đường Dẫn Hiển Thị Trọng Yếu (Critical Rendering Path)',
+        by: 'performance',
+        bullets: [
+          'Đo lường các điểm nghẽn tài nguyên chặn render (Render-blocking resources)',
+          'Lập danh sách các thẻ meta và structured data cần thiết cho từng trang'
+        ]
+      },
+      {
+        phase: 'pre-review',
+        label: 'Kiểm Định Chỉ Số Hiệu Năng Mục Tiêu',
+        by: 'karpathy-guidelines',
+        bullets: [
+          'Mục tiêu: LCP <= 1.2s, FID/INP <= 50ms, CLS == 0.000',
+          'Đảm bảo không đưa thêm script theo dõi bên thứ ba làm nghẽn luồng xử lý chính'
+        ]
+      },
+      {
+        phase: 'run',
+        label: 'Tối Ưu Mã Nguồn & Nhúng Cấu Trúc SEO',
+        by: 'full-output',
+        bullets: [
+          'Thêm link rel="preload" cho font woff2 và ảnh Hero chính',
+          'Tích hợp đoạn mã JSON-LD Schema.org chi tiết về doanh nghiệp và phần mềm',
+          'Thiết lập thẻ meta OpenGraph xem trước bắt mắt khi chia sẻ qua Zalo, Facebook, Telegram'
+        ]
+      },
+      {
+        phase: 'post-review',
+        label: 'Chạy Thử Nghiệm Google Rich Results & Lighthouse',
+        by: 'frontend-review',
+        bullets: [
+          'Kiểm tra Rich Results Test: 0 lỗi cảnh báo cú pháp JSON-LD',
+          'Lighthouse kiểm định đạt 99 Performance, 100 Accessibility, 100 Best Practices, 100 SEO'
+        ]
+      },
+      {
+        phase: 'deliver',
+        label: 'Xuất Bản Cấu Hình & Bàn Giao',
+        by: 'workflow-engines',
+        bullets: [
+          'Tệp sitemap.xml và robots.txt sẵn sàng deploy',
+          'Checklist duy trì thứ hạng SEO cho các lần cập nhật nội dung tiếp theo'
         ]
       }
     ]

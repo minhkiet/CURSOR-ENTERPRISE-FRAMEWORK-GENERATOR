@@ -291,6 +291,8 @@ btn.ok=OK
 btn.close=Close
 btn.retry=Retry
 btn.open_folder=Open Folder
+btn.collapse=Collapse
+btn.expand=Expand
 combobox.lang=Language
 combobox.culture=Select Language
 

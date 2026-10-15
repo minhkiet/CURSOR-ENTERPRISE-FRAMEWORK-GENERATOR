@@ -1978,49 +1978,96 @@ em { font-style: italic; }
   }
 }
 
-/* ─── FLOATING CONTACT BUTTONS ─── */
+/* ─── FLOATING CONTACT BUTTONS (MODERN ANTI-SLOP) ─── */
 .floating-contact {
   position: fixed;
-  bottom: 28px;
-  right: 28px;
+  bottom: 24px;
+  right: 24px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  z-index: 200;
+  gap: 10px;
+  z-index: 999;
 }
 
 .floating-btn {
-  width: 60px;
-  height: 60px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s;
-  animation: float-bounce 3s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
+  text-decoration: none;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16), 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease;
+  cursor: pointer;
 }
-.floating-btn_hotline { animation-delay: 0.2s; }
-.floating-btn_zalo { animation-delay: 0s; }
+
+.floating-btn_hotline {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+}
+
+.floating-btn_zalo {
+  background: linear-gradient(135deg, #0084ff 0%, #0062e0 100%);
+  color: #ffffff;
+}
 
 .floating-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  transform: translateY(-2px) scale(1.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24), 0 2px 6px rgba(0, 0, 0, 0.12);
 }
-.floating-btn svg { width: 100%; height: 100%; }
-.floating-btn_pulse {
+
+.floating-btn:active {
+  transform: scale(0.94);
+}
+
+.floating-btn svg {
+  display: block;
+  pointer-events: none;
+}
+
+.floating-tooltip {
   position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-  animation: pulse-ring 2s ease-out infinite;
+  right: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%) translateX(6px);
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: inherit;
 }
-.floating-btn_hotline .floating-btn_pulse { background: rgba(0, 136, 74, 0.3); }
-.floating-btn_zalo .floating-btn_pulse { background: rgba(0, 104, 255, 0.3); }
 
-@keyframes float-bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+.floating-btn:hover .floating-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) translateX(0);
 }
 
-@keyframes pulse-ring {
-  0% { transform: scale(1); opacity: 0.6; }
-  100% { transform: scale(1.4); opacity: 0; }
+@media (max-width: 768px) {
+  .floating-contact {
+    bottom: 18px;
+    right: 16px;
+    gap: 8px;
+  }
+  .floating-btn {
+    width: 42px;
+    height: 42px;
+  }
+  .floating-tooltip {
+    display: none !important;
+  }
 }

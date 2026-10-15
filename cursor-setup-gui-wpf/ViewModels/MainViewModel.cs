@@ -32,10 +32,15 @@ namespace CursorSetupWpf.ViewModels
             get => _selectedNavIndex;
             set
             {
+                if (value < 0) value = 0;
                 if (Set(ref _selectedNavIndex, value))
                 {
                     OnPropertyChanged(nameof(IsInstallPage));
                     OnPropertyChanged(nameof(InstallSurfaceHint));
+                    if (value == 0)
+                    {
+                        IsLogExpanded = true;
+                    }
                 }
             }
         }
@@ -43,6 +48,28 @@ namespace CursorSetupWpf.ViewModels
         public string InstallSurfaceHint => IsInstallPage
             ? LocalizationService.T("install.surface_active")
             : LocalizationService.T("install.surface_inactive");
+
+        // Collapsible Log Drawer
+        bool _isLogExpanded = true;
+        public bool IsLogExpanded
+        {
+            get => _isLogExpanded;
+            set
+            {
+                if (Set(ref _isLogExpanded, value))
+                {
+                    OnPropertyChanged(nameof(LogExpandIcon));
+                    OnPropertyChanged(nameof(LogToggleButtonText));
+                }
+            }
+        }
+        public string LogExpandIcon => IsLogExpanded ? "\uE70D" : "\uE70E";
+        public string LogToggleButtonText => IsLogExpanded
+            ? LocalizationService.T("btn.collapse")
+            : LocalizationService.T("btn.expand");
+        public string LatestLogLine => LogLines.Count > 0 ? LogLines[^1] : "";
+        public ICommand ToggleLogCommand { get; }
+        public ICommand ClearLogCommand { get; }
 
         public ThreadSafeObservableCollection<NavItem> NavItems { get; } = new();
         
@@ -329,7 +356,7 @@ namespace CursorSetupWpf.ViewModels
         }
 
         // Install path
-        string _installPath;
+        string _installPath = "";
         public string InstallPath
         {
             get => _installPath;
@@ -864,25 +891,27 @@ namespace CursorSetupWpf.ViewModels
             // Subscribe to culture changes for automatic UI refresh
             LocalizationService.CultureChanged += RefreshStrings;
             
-            // Nav items
+            // Nav items (0 to 14)
             NavItems.Add(new NavItem { Icon = "\uE8B7", TitleKey = "tab.install", Index = 0 });
-            // Keep the primary shell focused on setup, distribution and recovery.
-            // Framework servers, project runner, script generator, ECC and the
-            // standalone MCP page are intentionally not primary setup steps.
-            NavItems.Add(new NavItem { Icon = "\uE8F1", TitleKey = "tab.agents", Index = 1 });
-            NavItems.Add(new NavItem { Icon = "\uE8F1", TitleKey = "tab.components", Index = 2 });
+            NavItems.Add(new NavItem { Icon = "\uE748", TitleKey = "tab.agents", Index = 1 });
+            NavItems.Add(new NavItem { Icon = "\uE943", TitleKey = "tab.components", Index = 2 });
             NavItems.Add(new NavItem { Icon = "\uE713", TitleKey = "tab.advanced", Index = 3 });
             NavItems.Add(new NavItem { Icon = "\uE768", TitleKey = "tab.hooks", Index = 4 });
-            NavItems.Add(new NavItem { Icon = "\uE713", TitleKey = "tab.utilities", Index = 5 });
-            NavItems.Add(new NavItem { Icon = "\uE895", TitleKey = "tab.backup", Index = 6 });
-            NavItems.Add(new NavItem { Icon = "\uE777", TitleKey = "tab.updates", Index = 7 });
-            NavItems.Add(new NavItem { Icon = "\uE713", TitleKey = "tab.settings", Index = 8 });
-            NavItems.Add(new NavItem { Icon = "\uE82D", TitleKey = "tab.guide", Index = 9 });
+            NavItems.Add(new NavItem { Icon = "\uE74C", TitleKey = "tab.utilities", Index = 5 });
+            NavItems.Add(new NavItem { Icon = "\uE945", TitleKey = "tab.mcp", Index = 6 });
+            NavItems.Add(new NavItem { Icon = "\uE756", TitleKey = "tab.framework", Index = 7 });
+            NavItems.Add(new NavItem { Icon = "\uE768", TitleKey = "tab.project_runner", Index = 8 });
+            NavItems.Add(new NavItem { Icon = "\uE8A5", TitleKey = "tab.script_generator", Index = 9 });
+            NavItems.Add(new NavItem { Icon = "\uE897", TitleKey = "tab.ecc", Index = 10 });
+            NavItems.Add(new NavItem { Icon = "\uE895", TitleKey = "tab.backup", Index = 11 });
+            NavItems.Add(new NavItem { Icon = "\uE777", TitleKey = "tab.updates", Index = 12 });
+            NavItems.Add(new NavItem { Icon = "\uE713", TitleKey = "tab.settings", Index = 13 });
+            NavItems.Add(new NavItem { Icon = "\uE82D", TitleKey = "tab.guide", Index = 14 });
             
             _settings.Load();
-            _installPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".cursor");
-            _backupLocation = _settings.DefaultBackupPath;
-            _githubWorkspaceRoot = _githubSkills.FindWorkspaceRoot();
+            InstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".cursor");
+            BackupLocation = _settings.DefaultBackupPath;
+            GithubWorkspaceRoot = _githubSkills.FindWorkspaceRoot();
             
             // Languages (Default: Tiếng Việt)
             _languages.Add(new LanguageItem { Code = "vi", DisplayName = "Tiếng Việt" });
@@ -984,11 +1013,32 @@ namespace CursorSetupWpf.ViewModels
             OpenAgentsPageCommand = new RelayCommand(_ => NavigateTo(1));
             OpenUtilitiesPageCommand = new RelayCommand(_ => NavigateTo(5));
             RunGuidePreflightCommand = new AsyncRelayCommand(_ => RunGuidePreflightAsync());
+            ToggleLogCommand = new RelayCommand(_ => IsLogExpanded = !IsLogExpanded);
+            ClearLogCommand = new RelayCommand(_ =>
+            {
+                LogLines.Clear();
+                OnPropertyChanged(nameof(LatestLogLine));
+            });
 
             // Initialize agents
             InitializeAgents();
             RefreshAgentStatus();
             _ = ProbeGithubRuntimeAsync();
+
+            // Wire Installer events → log panel & progress
+            _installer.LogAppended += msg => Application.Current?.Dispatcher.Invoke(() =>
+            {
+                if (string.IsNullOrEmpty(msg)) return;
+                LogLines.Add(msg);
+                TrimLogLines();
+                OnPropertyChanged(nameof(LatestLogLine));
+            });
+            _installer.ProgressChanged += (val, status) => Application.Current?.Dispatcher.Invoke(() =>
+            {
+                ProgressValue = val;
+                if (!string.IsNullOrEmpty(status))
+                    StatusText = status;
+            });
 
             // Wire FrameworkRunner events → log panel
             _framework.LogAppended += msg => Application.Current?.Dispatcher.Invoke(() =>
@@ -1646,6 +1696,8 @@ namespace CursorSetupWpf.ViewModels
             OnPropertyChanged(nameof(HasNoBackups));
             OnPropertyChanged(nameof(InstallForAllAgentsLabel));
             OnPropertyChanged(nameof(McpLastSyncLabel));
+            OnPropertyChanged(nameof(LogToggleButtonText));
+            OnPropertyChanged(nameof(LatestLogLine));
             
             // Refresh all bound UI elements
             OnPropertyChanged(string.Empty);

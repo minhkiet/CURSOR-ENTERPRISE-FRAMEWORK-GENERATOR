@@ -212,6 +212,40 @@ def _build_parser() -> argparse.ArgumentParser:
     serve_api.add_argument("--host", default="127.0.0.1", help="Bind host (default: 127.0.0.1)")
     serve_api.add_argument("--port", type=int, default=8767, help="Bind port (default: 8767)")
 
+    # vibe: Multi-tool vibe coding sync and inspection
+    vibe = sub.add_parser(
+        "vibe",
+        help="Multi-tool vibe coding engine (detect, sync, status for Cursor, Windsurf, Claude Code, Antigravity, etc.)",
+        parents=[_common_flags()],
+    )
+    vibe.add_argument("action", nargs="?", default="status", choices=["detect", "sync", "status"], help="Action to execute")
+    vibe.add_argument("--tool", default="all", help="Target tool (cursor, windsurf, claude-code, antigravity, cline, roo, copilot, aider, codex, or all)")
+    vibe.add_argument("--dry-run", action="store_true", help="Simulate sync without writing files")
+    vibe.add_argument("--force", action="store_true", help="Overwrite existing configuration files")
+    vibe.add_argument("--workspace", default=None, help="Target workspace path (default: cwd)")
+
+    # redis: Redis Observability and memory management
+    r_parser = sub.add_parser(
+        "redis",
+        help="Redis Observability (metrics, hit ratio, slowlog triage, memory doctor)",
+        parents=[_common_flags()],
+    )
+    r_parser.add_argument("action", nargs="?", default="status", choices=["status", "metrics", "slowlog", "doctor"], help="Redis diagnostic action")
+    r_parser.add_argument("--url", default=None, help="Redis connection URL (default: env REDIS_URL or redis://localhost:6379/0)")
+    r_parser.add_argument("--limit", type=int, default=10, help="Slowlog entry limit (default: 10)")
+    r_parser.add_argument("--json", action="store_true", dest="as_json", help="Output raw JSON")
+
+    # prefect: Prefect workflow orchestration
+    pf_parser = sub.add_parser(
+        "prefect",
+        help="Prefect automated workflow orchestration (indexing, vibe sync, health checks)",
+        parents=[_common_flags()],
+    )
+    pf_parser.add_argument("action", nargs="?", default="list", choices=["run", "list"], help="Prefect action")
+    pf_parser.add_argument("--flow", default="all", choices=["index", "sync", "health", "all"], help="Target flow to run")
+    pf_parser.add_argument("--workspace", default=None, help="Target workspace path")
+    pf_parser.add_argument("--url", default=None, help="Redis connection URL for health checks")
+
     return parser
 
 
@@ -617,6 +651,148 @@ def _serve_api(args: argparse.Namespace) -> int:
     return 0
 
 
+def _vibe(args: argparse.Namespace) -> int:
+    """Multi-tool vibe coding sync and inspection handler."""
+    from .vibe_sync import VibeSyncEngine, VibeTool, get_vibe_summary
+
+    action = getattr(args, "action", "status")
+    workspace = getattr(args, "workspace", None)
+
+    if action in ("status", "detect"):
+        summary = get_vibe_summary(workspace)
+        print("Vibe Coding Environment Summary:")
+        print(f"Workspace: {summary['workspace_root']}")
+        print(f"Active Tools Detected ({summary['active_count']}):")
+        for t in summary["tools"]:
+            status_symbol = "✓" if t["detected"] else "·"
+            print(f"  [{status_symbol}] {t['display_name']} ({t['tool']}): {'Detected' if t['detected'] else 'Not active'}")
+            if t["reasons"]:
+                for r in t["reasons"]:
+                    print(f"      - {r}")
+        return 0
+
+    if action == "sync":
+        engine = VibeSyncEngine(workspace)
+        tool_arg = getattr(args, "tool", "all")
+        if tool_arg == "all":
+            target_tools = None
+        else:
+            try:
+                target_tools = [VibeTool(tool_arg)]
+            except ValueError:
+                print(f"Unknown tool '{tool_arg}'. Valid choices: {[t.value for t in VibeTool]}", file=sys.stderr)
+                return 1
+
+        dry_run = getattr(args, "dry_run", False)
+        force = getattr(args, "force", False)
+
+        report = engine.sync(tools=target_tools, dry_run=dry_run, force=force)
+        print(f"Vibe Sync Report ({'DRY RUN' if dry_run else 'EXECUTED'}):")
+        print(f"Workspace: {report.workspace_root}")
+        print(f"Synced tools: {[t.value for t in report.synced_tools]}")
+        for mod in report.files_modified:
+            print(f"  [{mod.action.upper()}] {mod.tool.value}: {mod.file_path.name} ({mod.description})")
+        if report.errors:
+            print("Errors encountered:", file=sys.stderr)
+            for err in report.errors:
+                print(f"  ! {err}", file=sys.stderr)
+            return 1
+        return 0
+
+    return 0
+
+
+def _redis(args: argparse.Namespace) -> int:
+    """Redis observability and diagnostics handler."""
+    from .redis_store import RedisObservability
+
+    obs = RedisObservability(redis_url=args.url)
+    action = getattr(args, "action", "status")
+
+    if action == "status":
+        connected = obs.ping()
+        print("Redis Observability Status:")
+        print(f"  URL: {obs.redis_url}")
+        print(f"  Library Installed: {obs.is_library_available}")
+        print(f"  Server Reachable: {connected}")
+        if not obs.is_library_available:
+            print("  Note: Run 'uv pip install redis' to enable Redis caching & observability.")
+        return 0 if connected else (0 if not obs.is_library_available else 1)
+
+    if action == "metrics":
+        metrics = obs.collect_metrics()
+        if getattr(args, "as_json", False):
+            print(json.dumps(metrics.to_dict(), indent=2))
+        else:
+            print("Redis Observability Metrics:")
+            print(f"  Connected: {metrics.is_connected}")
+            print(f"  Used Memory: {metrics.used_memory_human}")
+            print(f"  Connected Clients: {metrics.connected_clients}")
+            print(f"  Blocked Clients: {metrics.blocked_clients}")
+            print(f"  Throughput: {metrics.instantaneous_ops_per_sec} ops/sec")
+            print(f"  Cache Hits: {metrics.keyspace_hits} / Misses: {metrics.keyspace_misses}")
+            print(f"  Hit Ratio: {metrics.hit_ratio:.1%}")
+            print(f"  Rejected Connections: {metrics.rejected_connections}")
+            if metrics.alerts:
+                print("  ALERTS:")
+                for alert in metrics.alerts:
+                    print(f"    ! {alert}")
+        return 0
+
+    if action == "slowlog":
+        entries = obs.slowlog_get(limit=getattr(args, "limit", 10))
+        print(f"Redis SLOWLOG (Top {len(entries)}):")
+        if not entries:
+            print("  (No slow commands recorded or Redis offline)")
+        for entry in entries:
+            print(f"  [{entry.duration_micros}μs] #{entry.entry_id}: {entry.command}")
+        return 0
+
+    if action == "doctor":
+        report = obs.memory_doctor()
+        print("Redis MEMORY DOCTOR Summary:")
+        print(f"  {report}")
+        return 0
+
+    return 0
+
+
+def _prefect(args: argparse.Namespace) -> int:
+    """Prefect orchestration pipeline handler."""
+    from .prefect_flows import HAS_PREFECT, index_and_warm_flow, vibe_sync_flow, health_flow, full_maintenance_pipeline
+
+    action = getattr(args, "action", "list")
+    if action == "list":
+        print(f"Prefect Automation Engine (Prefect installed: {HAS_PREFECT}):")
+        print("  Available Flows:")
+        print("    - index: Scan workspace assets, build index, warm memory cache")
+        print("    - sync:  Detect active vibe coding tools and synchronize native instructions")
+        print("    - health: Audit memory manager and inspect Redis observability metrics")
+        print("    - all:   Execute the full end-to-end maintenance pipeline")
+        return 0
+
+    if action == "run":
+        target_flow = getattr(args, "flow", "all")
+        print(f"Running Prefect flow: '{target_flow}'...")
+        if target_flow == "index":
+            res = index_and_warm_flow(root_path=args.root, memory_path=args.memory_path)
+        elif target_flow == "sync":
+            res = vibe_sync_flow(workspace_root=getattr(args, "workspace", None))
+        elif target_flow == "health":
+            res = health_flow(redis_url=getattr(args, "url", None))
+        else:
+            res = full_maintenance_pipeline(
+                root_path=args.root,
+                memory_path=args.memory_path,
+                workspace_root=getattr(args, "workspace", None),
+                redis_url=getattr(args, "url", None),
+            )
+        print(json.dumps(res, indent=2, default=str))
+        return 0
+
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     # When invoked as `python -m cursor_framework tdam <subcmd> ...`,
     # the TDAM CLI parses its own subcommand via sys.argv.
@@ -644,6 +820,9 @@ def main(argv: list[str] | None = None) -> int:
         "session-clear": _session_clear,
         "context": _context,
         "serve-api": _serve_api,
+        "vibe": _vibe,
+        "redis": _redis,
+        "prefect": _prefect,
     }
 
     return dispatch[args.cmd](args)

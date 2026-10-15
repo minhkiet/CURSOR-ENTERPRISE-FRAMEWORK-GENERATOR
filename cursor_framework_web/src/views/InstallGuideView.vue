@@ -419,6 +419,7 @@ const navItems = computed(() => [
   { id: 'overview', label: 'Tổng quan' },
   { id: 'choose', label: 'Chọn cách cài' },
   { id: 'vibecode', label: 'Vibe Code Tools' },
+  { id: 'user-guide', label: 'Cẩm Nang HDSD' },
   { id: 'prerequisites', label: 'Yêu cầu trước' },
   { id: 'install', label: 'Cài đặt' },
   { id: 'verify', label: 'Xác minh' },
@@ -428,6 +429,15 @@ const navItems = computed(() => [
 ])
 
 const activeSection = ref<string>('overview')
+const copiedGuideCmd = ref<string | null>(null)
+
+function copyGuideCommand(cmd: string) {
+  navigator.clipboard.writeText(cmd)
+  copiedGuideCmd.value = cmd
+  setTimeout(() => {
+    copiedGuideCmd.value = null
+  }, 2200)
+}
 
 function setMethod(key: MethodKey) {
   activeMethod.value = key
@@ -903,6 +913,249 @@ async function handleCopy(code: string, key: string) {
                 </div>
                 <div class="ins-sync-cmd-box">
                   <code>.\vibe-code-framework\08-scripts\sync-adapters.ps1</code>
+                </div>
+              </div>
+            </article>
+
+            <!-- 02C. CẨM NANG HƯỚNG DẪN SỬ DỤNG CHO MỌI NGƯỜI (USER GUIDE) -->
+            <article id="user-guide" class="ins-section">
+              <header class="ins-section-head">
+                <div class="ins-section-num">02c</div>
+                <div>
+                  <h2 class="ins-section-title">Cẩm Nang Hướng Dẫn Sử Dụng & 5 Lệnh Chuyên Sâu</h2>
+                  <p class="ins-section-sub">
+                    Thiết kế hướng tới sản phẩm thực tế, UX/UI trực quan để ai cũng có thể đọc hiểu.
+                    Loại bỏ hoàn toàn phong cách AI thô kệch (glow tím lòe loẹt, layout 3 cột rỗng tuếch).
+                  </p>
+                </div>
+              </header>
+
+              <!-- 3-STEP QUICK WORKFLOW -->
+              <div class="ins-guide-workflow">
+                <div class="ins-guide-wf-card">
+                  <div class="ins-guide-wf-num">01</div>
+                  <div class="ins-guide-wf-title">Chọn Mẫu & Prompt</div>
+                  <p class="ins-guide-wf-desc">
+                    Truy cập kho <router-link to="/templates">Templates</router-link> để xem trước trang web thực tế có hiệu ứng tự cuộn, hoặc duyệt kho <router-link to="/prompts">Prompts</router-link> để chọn kịch bản theo mong muốn.
+                  </p>
+                  <div class="ins-guide-wf-tip">💡 Gợi ý: Mỗi mẫu đều có file HTML/CSS độc lập sẵn sàng xuất bản.</div>
+                </div>
+
+                <div class="ins-guide-wf-card">
+                  <div class="ins-guide-wf-num">02</div>
+                  <div class="ins-guide-wf-title">Kích Hoạt Trong Cursor</div>
+                  <p class="ins-guide-wf-desc">
+                    Mở Cursor IDE, nhấn <code>Ctrl + I</code> (Composer) hoặc <code>Ctrl + L</code> (Chat). Gõ lệnh slash (ví dụ: <code>/ui-ux</code>, <code>/frontend-taste</code>) và dán yêu cầu cụ thể của bạn.
+                  </p>
+                  <div class="ins-guide-wf-tip">⚡ Mẹo: AI sẽ tự nạp bộ Rules & Skills tương ứng mà bạn không cần cấu hình thêm.</div>
+                </div>
+
+                <div class="ins-guide-wf-card">
+                  <div class="ins-guide-wf-num">03</div>
+                  <div class="ins-guide-wf-title">Thẩm Định & Tự Cuộn</div>
+                  <p class="ins-guide-wf-desc">
+                    Mã nguồn sinh ra đã được thẩm định qua 57 cổng Hallmark chống AI slop. Bật tính năng <strong>⚡ Tự Cuộn (Auto-Scroll)</strong> để xem trang web chuyển động tự nhiên như đang được lướt thực tế.
+                  </p>
+                  <div class="ins-guide-wf-tip">🎯 Kết quả: Sản phẩm mang chất thủ công (Crafted Feel), sẵn sàng bàn giao khách hàng.</div>
+                </div>
+              </div>
+
+              <!-- 5 CORE SLASH COMMANDS SHOWCASE -->
+              <div class="ins-guide-block">
+                <h3 class="ins-guide-block-title">5 Lệnh Slash Cốt Lõi — Bấm để sao chép nhanh</h3>
+                <p class="ins-guide-block-desc">
+                  Đây là 5 lệnh chuyên sâu được thiết lập riêng nhằm giải quyết 5 vấn đề cốt lõi khi tạo sản phẩm web thương mại.
+                </p>
+
+                <div class="ins-guide-cmd-grid">
+                  <!-- 1. /ui-ux -->
+                  <div class="ins-guide-cmd-card">
+                    <div class="ins-guide-cmd-head">
+                      <div class="ins-guide-cmd-tag">Hệ Thống Thiết Kế</div>
+                      <button
+                        class="ins-guide-copy-btn"
+                        :class="{ copied: copiedGuideCmd === '/ui-ux' }"
+                        @click="copyGuideCommand('/ui-ux')"
+                      >
+                        {{ copiedGuideCmd === '/ui-ux' ? '✓ Đã chép' : 'Sao chép lệnh' }}
+                      </button>
+                    </div>
+                    <div class="ins-guide-cmd-code">/ui-ux</div>
+                    <div class="ins-guide-cmd-name">Evondev Design System & Ma Trận 5-State</div>
+                    <p class="ins-guide-cmd-detail">
+                      Tạo bảng Design Tokens HSL có tính toán, lưới 8px grid, xây dựng nút bấm & input đầy đủ 5 trạng thái (Default, Hover, Active, Disabled, Loading) và kiểm tra tương phản WCAG 2.1 AA tối thiểu 4.5:1.
+                    </p>
+                    <div class="ins-guide-cmd-example">
+                      <span class="ex-label">Ví dụ prompt:</span>
+                      <code>/ui-ux Xây dựng Design System cho nền tảng SaaS tài chính: Thang màu HSL, 8px grid, ma trận button 5-state và kiểm định WCAG AA.</code>
+                    </div>
+                  </div>
+
+                  <!-- 2. /dashboard-ui -->
+                  <div class="ins-guide-cmd-card">
+                    <div class="ins-guide-cmd-head">
+                      <div class="ins-guide-cmd-tag">Bảng Điều Hành</div>
+                      <button
+                        class="ins-guide-copy-btn"
+                        :class="{ copied: copiedGuideCmd === '/dashboard-ui' }"
+                        @click="copyGuideCommand('/dashboard-ui')"
+                      >
+                        {{ copiedGuideCmd === '/dashboard-ui' ? '✓ Đã chép' : 'Sao chép lệnh' }}
+                      </button>
+                    </div>
+                    <div class="ins-guide-cmd-code">/dashboard-ui</div>
+                    <div class="ins-guide-cmd-name">Cockpit Analytics, KPI Sparkline & Mini Kanban</div>
+                    <p class="ins-guide-cmd-detail">
+                      Dựng bảng điều khiển điều hành: 4 thẻ KPI động kèm biểu đồ đường SVG mượt mà (&lt;5KB), bảng dữ liệu khách hàng có tìm kiếm và lọc đa cột, cùng bảng sprint Kanban 3 cột trực quan.
+                    </p>
+                    <div class="ins-guide-cmd-example">
+                      <span class="ex-label">Ví dụ prompt:</span>
+                      <code>/dashboard-ui Tạo executive cockpit với 4 KPI sparklines, bảng dữ liệu phân trang có filter trạng thái và Kanban board 3 cột.</code>
+                    </div>
+                  </div>
+
+                  <!-- 3. /frontend-taste -->
+                  <div class="ins-guide-cmd-card">
+                    <div class="ins-guide-cmd-head">
+                      <div class="ins-guide-cmd-tag">Thẩm Mỹ & Đẳng Cấp</div>
+                      <button
+                        class="ins-guide-copy-btn"
+                        :class="{ copied: copiedGuideCmd === '/frontend-taste' }"
+                        @click="copyGuideCommand('/frontend-taste')"
+                      >
+                        {{ copiedGuideCmd === '/frontend-taste' ? '✓ Đã chép' : 'Sao chép lệnh' }}
+                      </button>
+                    </div>
+                    <div class="ins-guide-cmd-code">/frontend-taste</div>
+                    <div class="ins-guide-cmd-name">57 Hallmark Gates & Triệt Tiêu AI Slop</div>
+                    <p class="ins-guide-cmd-detail">
+                      Quét và loại bỏ hoàn toàn viền tím neon vô nghĩa và thẻ 3 cột sao chép. Thiết lập 3 thanh trượt Craft Dials: Variance 75% (layout bất đối xứng Bento Grid), Motion Gentle 300ms, Density Compact phong cách Linear.
+                    </p>
+                    <div class="ins-guide-cmd-example">
+                      <span class="ex-label">Ví dụ prompt:</span>
+                      <code>/frontend-taste Tinh chỉnh landing page theo chuẩn 57 Hallmark Gates, đổi bố cục 3 cột thành Bento grid và chỉnh 3 dial.</code>
+                    </div>
+                  </div>
+
+                  <!-- 4. /cms-landing-enterprise -->
+                  <div class="ins-guide-cmd-card">
+                    <div class="ins-guide-cmd-head">
+                      <div class="ins-guide-cmd-tag">SaaS Enterprise</div>
+                      <button
+                        class="ins-guide-copy-btn"
+                        :class="{ copied: copiedGuideCmd === '/cms-landing-enterprise' }"
+                        @click="copyGuideCommand('/cms-landing-enterprise')"
+                      >
+                        {{ copiedGuideCmd === '/cms-landing-enterprise' ? '✓ Đã chép' : 'Sao chép lệnh' }}
+                      </button>
+                    </div>
+                    <div class="ins-guide-cmd-code">/cms-landing-enterprise</div>
+                    <div class="ins-guide-cmd-name">CMS SaaS v4 — CRM Pipeline, Ví Điểm & Affiliate F0-F3</div>
+                    <p class="ins-guide-cmd-detail">
+                      Khởi tạo trọn vẹn giải pháp SaaS: Phân hệ CRM pipeline 4 cột, ví điểm nạp/rút giả lập thời gian thực, mạng lưới hoa hồng tiếp thị liên kết 4 tầng (F0-F3) và Webhook thanh toán SePay / VietQR đảm bảo Idempotency.
+                    </p>
+                    <div class="ins-guide-cmd-example">
+                      <span class="ex-label">Ví dụ prompt:</span>
+                      <code>/cms-landing-enterprise Khởi tạo cổng portal SaaS v4 gồm Kanban CRM, Ví nạp rút điểm, cây hoa hồng affiliate 4 tầng và webhook SePay.</code>
+                    </div>
+                  </div>
+
+                  <!-- 5. /image-workflow -->
+                  <div class="ins-guide-cmd-card">
+                    <div class="ins-guide-cmd-head">
+                      <div class="ins-guide-cmd-tag">Hình Ảnh Studio</div>
+                      <button
+                        class="ins-guide-copy-btn"
+                        :class="{ copied: copiedGuideCmd === '/image-workflow' }"
+                        @click="copyGuideCommand('/image-workflow')"
+                      >
+                        {{ copiedGuideCmd === '/image-workflow' ? '✓ Đã chép' : 'Sao chép lệnh' }}
+                      </button>
+                    </div>
+                    <div class="ins-guide-cmd-code">/image-workflow</div>
+                    <div class="ins-guide-cmd-name">Studio Visuals, Đa Khung Hình & Asset Manifest</div>
+                    <p class="ins-guide-cmd-detail">
+                      Quy trình 4 pha sáng tạo visual: Prompt Blueprint với thông số máy ảnh quang học (Hasselblad, softbox 4200K), Negative Prompt loại bỏ biến dạng AI, đa khung hình (16:9, 1:1, 9:16) và xuất asset-manifest.json.
+                    </p>
+                    <div class="ins-guide-cmd-example">
+                      <span class="ex-label">Ví dụ prompt:</span>
+                      <code>/image-workflow Tạo quy trình sản xuất ảnh thương phẩm cho fintech: prompt blueprint, negative prompt và asset manifest JSON.</code>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- COMPARISON TABLE: AI SLOP VS CRAFT ENTERPRISE -->
+              <div class="ins-guide-block">
+                <h3 class="ins-guide-block-title">Bảng So Sánh Đối Chiếu: Web Thuần AI vs Web Chuẩn Enterprise</h3>
+                <p class="ins-guide-block-desc">
+                  Hiểu rõ sự khác biệt giữa giao diện AI ngẫu nhiên chưa qua xử lý và giao diện được framework chuẩn hóa.
+                </p>
+
+                <div class="ins-guide-table-wrap">
+                  <table class="ins-guide-table">
+                    <thead>
+                      <tr>
+                        <th style="width: 22%;">Tiêu Chí Đánh Giá</th>
+                        <th style="width: 39%;" class="th-bad">Web Thuần AI Thô (AI Slop)</th>
+                        <th style="width: 39%;" class="th-good">Web Enterprise Chuẩn Taste (CEF)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="td-crit">Màu Sắc &amp; Đổ Bóng</td>
+                        <td class="td-bad">Lạm dụng gradient tím xanh neon vô tội vạ, blur dày đặc gây nhức mắt và khó đọc văn bản.</td>
+                        <td class="td-good">Thang màu Tokens HSL có tính toán ngữ nghĩa, viền mờ 1px tinh tế, đạt độ tương phản WCAG 2.1 AA tối thiểu 4.5:1.</td>
+                      </tr>
+                      <tr>
+                        <td class="td-crit">Bố Cục (Layout)</td>
+                        <td class="td-bad">Dàn trang 3 cột đều chằn chặn, thẻ hình chữ nhật đơn điệu lặp đi lặp lại không có điểm nhấn.</td>
+                        <td class="td-good">Cấu trúc Bento Grid bất đối xứng giàu nhịp điệu, phân cấp thị giác rõ ràng theo chuẩn Vercel và Linear.</td>
+                      </tr>
+                      <tr>
+                        <td class="td-crit">Trạng Thái Tương Tác</td>
+                        <td class="td-bad">Nút bấm chết hoặc chỉ đổi màu đơn giản; thiếu hoàn toàn trạng thái loading, disabled, error.</td>
+                        <td class="td-good">Ma trận 5 trạng thái hoàn chỉnh (Default, Hover, Active, Disabled, Loading/Spinner) kèm micro-interactions mượt mà.</td>
+                      </tr>
+                      <tr>
+                        <td class="td-crit">Dữ Liệu &amp; Nội Dung</td>
+                        <td class="td-bad">Văn bản "Lorem Ipsum" vô nghĩa, biểu đồ tĩnh vẽ giả không thể tương tác hoặc cập nhật.</td>
+                        <td class="td-good">Số liệu kinh doanh thực tế (VND/USD, tỷ lệ chuyển đổi, ARR, Churn) kèm biểu đồ sparklines SVG thuần nhẹ &lt;5KB.</td>
+                      </tr>
+                      <tr>
+                        <td class="td-crit">Quy Trình Kiểm Duyệt</td>
+                        <td class="td-bad">Sinh mã một lần không kiểm thử, dễ phát sinh lỗi vỡ layout trên mobile và thiếu tính bảo mật.</td>
+                        <td class="td-good">Hệ thống Dual-Gate: Pre-Review thẩm định phạm vi &amp; Post-Review kiểm tra 57 cổng Hallmark nghiêm ngặt.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- AUTO-SCROLL WEB INSPECTION GUIDE -->
+              <div class="ins-guide-block">
+                <h3 class="ins-guide-block-title">Hướng Dẫn Tính Năng: ⚡ Tự Động Cuộn Lướt Web (Auto-Scroll)</h3>
+                <p class="ins-guide-block-desc">
+                  Tính năng độc quyền giúp bạn và khách hàng có thể chiêm ngưỡng toàn bộ website một cách tự động, mượt mà mà không cần chạm tay vào chuột.
+                </p>
+
+                <div class="ins-guide-scroll-steps">
+                  <div class="ins-scroll-step">
+                    <div class="ins-scroll-badge">Cách 1</div>
+                    <div class="ins-scroll-title">Bật trong Thư Viện Templates</div>
+                    <p class="ins-scroll-desc">
+                      Tại trang <router-link to="/templates">Mẫu Giao Diện</router-link>, bạn chỉ cần bật công tắc <strong>⚡ Tự Động Cuộn Lướt Web (Showcase Mode)</strong> ở góc trên bên phải. Khi rê chuột vào bất kỳ thẻ mẫu nào, website bên trong sẽ tự động lướt từ trên xuống dưới.
+                    </p>
+                  </div>
+
+                  <div class="ins-scroll-step">
+                    <div class="ins-scroll-badge">Cách 2</div>
+                    <div class="ins-scroll-title">Thanh Điều Khiển Khi Xem Trực Tiếp</div>
+                    <p class="ins-scroll-desc">
+                      Khi bấm vào chi tiết một mẫu (ví dụ <code>/templates/ui-ux</code>), thanh công cụ nổi ở góc phải màn hình cho phép bạn:
+                      <strong>Bật/Dừng cuộn</strong>, đổi tốc độ lướt (<strong>1x · 2x · 3x</strong>), và đổi kích thước thiết bị (Máy tính 1440px · Máy tính bảng 768px · Di động 375px).
+                    </p>
+                  </div>
                 </div>
               </div>
             </article>
@@ -2671,6 +2924,327 @@ async function handleCopy(code: string, key: string) {
   color: var(--accent-bright);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   display: inline-block;
+}
+
+/* ─── 02C. USER GUIDE STYLES ────────────────────────────────────────── */
+
+.ins-guide-workflow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 36px;
+}
+
+.ins-guide-wf-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all var(--t-fast);
+}
+
+.ins-guide-wf-card:hover {
+  border-color: var(--accent-line);
+  transform: translateY(-2px);
+}
+
+.ins-guide-wf-num {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-line);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+}
+
+.ins-guide-wf-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.ins-guide-wf-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  flex: 1;
+}
+
+.ins-guide-wf-desc a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.ins-guide-wf-tip {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  border-top: 1px dashed var(--border-subtle);
+  padding-top: 8px;
+  line-height: 1.4;
+}
+
+.ins-guide-block {
+  margin-bottom: 36px;
+}
+
+.ins-guide-block-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.ins-guide-block-desc {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* 5 Core Commands Grid */
+.ins-guide-cmd-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.ins-guide-cmd-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all var(--t-fast);
+}
+
+.ins-guide-cmd-card:hover {
+  border-color: var(--accent-line);
+}
+
+.ins-guide-cmd-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ins-guide-cmd-tag {
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-line);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.ins-guide-copy-btn {
+  font-size: 11px;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--t-fast);
+}
+
+.ins-guide-copy-btn:hover {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.ins-guide-copy-btn.copied {
+  color: #fff;
+  background: var(--color-success);
+  border-color: var(--color-success);
+}
+
+.ins-guide-cmd-code {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.ins-guide-cmd-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+
+.ins-guide-cmd-detail {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.ins-guide-cmd-example {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ins-guide-cmd-example .ex-label {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.ins-guide-cmd-example code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-primary);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+/* Comparison Table */
+.ins-guide-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+}
+
+.ins-guide-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+
+.ins-guide-table th,
+.ins-guide-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: top;
+}
+
+.ins-guide-table th {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+}
+
+.ins-guide-table th.th-bad {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.06);
+}
+
+.ins-guide-table th.th-good {
+  color: var(--color-success);
+  background: rgba(16, 185, 129, 0.06);
+}
+
+.ins-guide-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.td-crit {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: inherit;
+}
+
+.td-bad {
+  color: var(--text-secondary);
+  background: rgba(239, 68, 68, 0.02);
+  line-height: 1.55;
+}
+
+.td-good {
+  color: var(--text-primary);
+  background: rgba(16, 185, 129, 0.02);
+  line-height: 1.55;
+}
+
+/* Auto-Scroll Steps */
+.ins-guide-scroll-steps {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.ins-scroll-step {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ins-scroll-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-line);
+  padding: 2px 8px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.ins-scroll-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.ins-scroll-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.ins-scroll-desc strong {
+  color: var(--accent);
+}
+
+.ins-scroll-desc a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (max-width: 860px) {
+  .ins-guide-workflow {
+    grid-template-columns: 1fr;
+  }
+  .ins-guide-scroll-steps {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

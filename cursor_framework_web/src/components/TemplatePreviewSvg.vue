@@ -11,10 +11,535 @@ const template = computed(() => templates.find((t) => t.slug === props.slug))
   <div class="template-thumbnail" :data-slug="slug">
     <div class="thumbnail-inner">
       <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <!-- 0A. UI-UX: ENTERPRISE DESIGN SYSTEM & TOKEN ARCHITECTURE           -->
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <svg
+        v-if="slug === 'ui-ux'"
+        class="thumbnail-svg"
+        viewBox="0 0 400 250"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
+        <defs>
+          <linearGradient id="uiux-bg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#0a0f1d" />
+            <stop offset="60%" stop-color="#0f172a" />
+            <stop offset="100%" stop-color="#1e293b" />
+          </linearGradient>
+          <linearGradient id="uiux-accent" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#3b82f6" />
+            <stop offset="100%" stop-color="#60a5fa" />
+          </linearGradient>
+        </defs>
+
+        <rect width="400" height="250" fill="url(#uiux-bg)" />
+
+        <!-- Chrome Bar -->
+        <rect x="0" y="0" width="400" height="22" fill="#050811" />
+        <circle cx="12" cy="11" r="3" fill="#ef4444" opacity="0.85" />
+        <circle cx="21" cy="11" r="3" fill="#eab308" opacity="0.85" />
+        <circle cx="30" cy="11" r="3" fill="#22c55e" opacity="0.85" />
+        <rect x="54" y="4" width="220" height="14" rx="4" fill="#0d1527" stroke="#1e293b" stroke-width="0.8" />
+        <text x="64" y="14.5" fill="#60a5fa" font-size="7.5" font-family="monospace">🔒 https://uiux.cef.dev/tokens-system</text>
+
+        <!-- Subnav / Breadcrumb -->
+        <rect x="0" y="22" width="400" height="24" fill="#0a1224" opacity="0.95" />
+        <text x="18" y="37" fill="#ffffff" font-size="9" font-weight="700">UI/UX DESIGN SYSTEM</text>
+        <text x="135" y="36.5" fill="#94a3b8" font-size="7">Design Tokens</text>
+        <text x="195" y="36.5" fill="#94a3b8" font-size="7">3 Wireframes</text>
+        <text x="250" y="36.5" fill="#94a3b8" font-size="7">State Matrix</text>
+        <rect x="315" y="27" width="70" height="14" rx="7" fill="url(#uiux-accent)" />
+        <text x="325" y="37" fill="#ffffff" font-size="7" font-weight="700">AUDIT 5-AXES</text>
+
+        <!-- Left Column: Token Specs & Scales -->
+        <rect x="18" y="54" width="130" height="182" rx="6" fill="#0d1529" stroke="#1e293b" stroke-width="1" />
+        <text x="28" y="70" fill="#60a5fa" font-size="7.5" font-weight="700">DESIGN TOKENS</text>
+        
+        <rect x="28" y="78" width="110" height="20" rx="3" fill="#13203d" />
+        <circle cx="38" cy="88" r="4" fill="#3b82f6" />
+        <text x="48" y="91" fill="#e2e8f0" font-size="6.5" font-family="monospace">--primary: #3b82f6</text>
+
+        <rect x="28" y="102" width="110" height="20" rx="3" fill="#13203d" />
+        <circle cx="38" cy="112" r="4" fill="#10b981" />
+        <text x="48" y="115" fill="#e2e8f0" font-size="6.5" font-family="monospace">--success: #10b981</text>
+
+        <rect x="28" y="126" width="110" height="20" rx="3" fill="#13203d" />
+        <rect x="34" y="132" width="8" height="8" rx="2" fill="#818cf8" />
+        <text x="48" y="139" fill="#e2e8f0" font-size="6.5" font-family="monospace">--radius-lg: 12px</text>
+
+        <rect x="28" y="150" width="110" height="20" rx="3" fill="#13203d" />
+        <text x="34" y="163" fill="#f59e0b" font-size="6.5" font-weight="700">8pt</text>
+        <text x="48" y="163" fill="#e2e8f0" font-size="6.5" font-family="monospace">--grid-rhythm: 8px</text>
+
+        <rect x="28" y="174" width="110" height="24" rx="3" fill="#1e293b" />
+        <text x="34" y="185" fill="#94a3b8" font-size="6">Typography Scale</text>
+        <text x="34" y="194" fill="#ffffff" font-size="7" font-weight="700">Geist Sans 32 / 16 / 12</text>
+
+        <rect x="28" y="204" width="110" height="22" rx="3" fill="#0f172a" stroke="#3b82f6" stroke-width="0.8" />
+        <circle cx="38" cy="215" r="3" fill="#22c55e" class="pulse-dot" />
+        <text x="46" y="218" fill="#38bdf8" font-size="6.5" font-weight="700">Contrast AA: 8.6:1</text>
+
+        <!-- Right Side: High-Fi Wireframe & State Matrix -->
+        <g class="float-slow">
+          <!-- Main Wireframe to High-Fi Preview Box -->
+          <rect x="158" y="54" width="224" height="135" rx="6" fill="#0f1b35" stroke="#3b82f6" stroke-width="1.2" />
+          <rect x="166" y="62" width="208" height="28" rx="4" fill="#152445" />
+          <text x="176" y="75" fill="#ffffff" font-size="8" font-weight="700">Đơn Hàng & Doanh Thu Q3</text>
+          <text x="176" y="85" fill="#60a5fa" font-size="6.5">Wireframe P2 · Lối Designer Chuẩn Evondev</text>
+          <rect x="328" y="67" width="40" height="16" rx="3" fill="#3b82f6" />
+          <text x="333" y="78" fill="#ffffff" font-size="6.5" font-weight="700">High-Fi</text>
+
+          <!-- Component State Matrix inside Card -->
+          <rect x="166" y="96" width="65" height="42" rx="3" fill="#132240" stroke="#1d4ed8" stroke-width="0.6" />
+          <text x="172" y="108" fill="#38bdf8" font-size="6" font-weight="700">STATE: ACTIVE</text>
+          <text x="172" y="120" fill="#ffffff" font-size="9" font-weight="800">4,829</text>
+          <text x="172" y="132" fill="#22c55e" font-size="6">+18.4% vs tháng trước</text>
+
+          <rect x="237" y="96" width="65" height="42" rx="3" fill="#132240" stroke="#1e293b" stroke-width="0.6" />
+          <text x="243" y="108" fill="#fbbf24" font-size="6" font-weight="700">STATE: LOADING</text>
+          <rect x="243" y="115" width="45" height="6" rx="3" fill="#1e293b" />
+          <rect x="243" y="125" width="30" height="6" rx="3" fill="#1e293b" />
+
+          <rect x="308" y="96" width="65" height="42" rx="3" fill="#132240" stroke="#ef4444" stroke-width="0.6" />
+          <text x="314" y="108" fill="#f87171" font-size="6" font-weight="700">STATE: ERROR</text>
+          <text x="314" y="120" fill="#fca5a5" font-size="6">Network Retry</text>
+          <rect x="314" y="125" width="35" height="9" rx="2" fill="#991b1b" />
+          <text x="320" y="132" fill="#ffffff" font-size="5.5">Thử lại</text>
+
+          <!-- Mini table row -->
+          <rect x="166" y="144" width="208" height="38" rx="3" fill="#101c36" />
+          <text x="174" y="156" fill="#94a3b8" font-size="6.5">KHÁCH HÀNG</text>
+          <text x="250" y="156" fill="#94a3b8" font-size="6.5">GÓI DỊCH VỤ</text>
+          <text x="330" y="156" fill="#94a3b8" font-size="6.5">TRẠNG THÁI</text>
+          <text x="174" y="172" fill="#f1f5f9" font-size="7" font-weight="600">Vinacorp JSC</text>
+          <text x="250" y="172" fill="#cbd5e1" font-size="7">Enterprise v4</text>
+          <rect x="328" y="163" width="38" height="12" rx="6" fill="#065f46" />
+          <text x="333" y="171.5" fill="#34d399" font-size="6" font-weight="700">ĐÃ DUYỆT</text>
+        </g>
+
+        <!-- Floating Badge -->
+        <g class="float-fast">
+          <rect x="170" y="196" width="200" height="24" rx="12" fill="#08101e" stroke="#3b82f6" stroke-width="1" />
+          <circle cx="182" cy="208" r="4" fill="#3b82f6" class="pulse-dot" />
+          <text x="192" y="212" fill="#93c5fd" font-size="7" font-weight="700">✨ Không AI-Slop · 100% Token Đồng Bộ</text>
+        </g>
+      </svg>
+
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <!-- 0B. DASHBOARD-UI: ADMIN COCKPIT & ANALYTICS PIPELINE               -->
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <svg
+        v-else-if="slug === 'dashboard-ui'"
+        class="thumbnail-svg"
+        viewBox="0 0 400 250"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
+        <defs>
+          <linearGradient id="dash-bg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#05131f" />
+            <stop offset="60%" stop-color="#082338" />
+            <stop offset="100%" stop-color="#0a1926" />
+          </linearGradient>
+          <linearGradient id="dash-chart" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.45" />
+            <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0.0" />
+          </linearGradient>
+        </defs>
+
+        <rect width="400" height="250" fill="url(#dash-bg)" />
+
+        <!-- Browser Bar -->
+        <rect x="0" y="0" width="400" height="22" fill="#030b12" />
+        <circle cx="12" cy="11" r="3" fill="#ef4444" opacity="0.85" />
+        <circle cx="21" cy="11" r="3" fill="#eab308" opacity="0.85" />
+        <circle cx="30" cy="11" r="3" fill="#22c55e" opacity="0.85" />
+        <rect x="54" y="4" width="210" height="14" rx="4" fill="#081827" stroke="#0e3a5f" stroke-width="0.8" />
+        <text x="64" y="14.5" fill="#38bdf8" font-size="7.5" font-family="monospace">🔒 https://dashboard.cef.dev/analytics</text>
+
+        <!-- Sidebar (Left) -->
+        <rect x="0" y="22" width="60" height="228" fill="#04101a" border-right="1px solid #0a2238" />
+        <rect x="12" y="32" width="16" height="16" rx="4" fill="#0ea5e9" />
+        <path d="M16 40 L20 44 L24 36" stroke="#ffffff" stroke-width="1.8" fill="none" />
+        
+        <rect x="10" y="60" width="40" height="16" rx="3" fill="#0c2b45" />
+        <text x="18" y="71" fill="#38bdf8" font-size="6.5" font-weight="700">DASH</text>
+        
+        <rect x="10" y="82" width="40" height="16" rx="3" fill="transparent" />
+        <text x="18" y="93" fill="#64748b" font-size="6.5">DATA</text>
+
+        <rect x="10" y="104" width="40" height="16" rx="3" fill="transparent" />
+        <text x="18" y="115" fill="#64748b" font-size="6.5">TASKS</text>
+
+        <rect x="10" y="126" width="40" height="16" rx="3" fill="transparent" />
+        <text x="18" y="137" fill="#64748b" font-size="6.5">LOGS</text>
+
+        <!-- Header Bar Inside -->
+        <rect x="60" y="22" width="340" height="26" fill="#061826" />
+        <text x="75" y="39" fill="#ffffff" font-size="9" font-weight="700">ANALYTICS COCKPIT PRO</text>
+        <rect x="250" y="27" width="75" height="16" rx="8" fill="#0a263d" stroke="#0ea5e9" stroke-width="0.8" />
+        <text x="258" y="38" fill="#38bdf8" font-size="6.5">Filter: 30 Ngày</text>
+        <circle cx="345" cy="35" r="7" fill="#0ea5e9" />
+        <text x="342" y="38" fill="#ffffff" font-size="7" font-weight="700">AD</text>
+
+        <!-- 3 KPI Cards -->
+        <g class="float-slow">
+          <rect x="75" y="56" width="98" height="52" rx="5" fill="#071e30" stroke="#0e3a5f" stroke-width="0.8" />
+          <text x="83" y="70" fill="#94a3b8" font-size="6.5">DOANH THU THỰC</text>
+          <text x="83" y="86" fill="#ffffff" font-size="12" font-weight="800">$184.9K</text>
+          <text x="83" y="99" fill="#22c55e" font-size="6" font-weight="700">↑ 24.8% vs tháng trước</text>
+
+          <rect x="181" y="56" width="98" height="52" rx="5" fill="#071e30" stroke="#0e3a5f" stroke-width="0.8" />
+          <text x="189" y="70" fill="#94a3b8" font-size="6.5">ACTIVE LEADS</text>
+          <text x="189" y="86" fill="#38bdf8" font-size="12" font-weight="800">3,420</text>
+          <text x="189" y="99" fill="#38bdf8" font-size="6" font-weight="700">12 Deal sắp chốt</text>
+
+          <rect x="287" y="56" width="98" height="52" rx="5" fill="#071e30" stroke="#0e3a5f" stroke-width="0.8" />
+          <text x="295" y="70" fill="#94a3b8" font-size="6.5">CONVERSION RATE</text>
+          <text x="295" y="86" fill="#fbbf24" font-size="12" font-weight="800">68.2%</text>
+          <text x="295" y="99" fill="#fbbf24" font-size="6" font-weight="700">Tối ưu Cockpit High-density</text>
+        </g>
+
+        <!-- Live Chart & Data Grid Table -->
+        <rect x="75" y="116" width="180" height="118" rx="6" fill="#082236" stroke="#0f4572" stroke-width="0.8" />
+        <text x="85" y="130" fill="#ffffff" font-size="7.5" font-weight="700">BIỂU ĐỒ DOANH THU & PIPELINE</text>
+        <!-- Area chart curve -->
+        <path d="M85 190 Q120 160 145 170 T200 145 T245 135 L245 200 L85 200 Z" fill="url(#dash-chart)" />
+        <path d="M85 190 Q120 160 145 170 T200 145 T245 135" stroke="#0ea5e9" stroke-width="2" fill="none" />
+        <circle cx="200" cy="145" r="3" fill="#38bdf8" />
+        <circle cx="245" cy="135" r="3" fill="#ffffff" />
+        <text x="85" y="215" fill="#64748b" font-size="6">T1  ·  T2  ·  T3  ·  T4  ·  T5  ·  T6</text>
+
+        <!-- Data Table (Right) -->
+        <rect x="263" y="116" width="122" height="118" rx="6" fill="#082236" stroke="#0f4572" stroke-width="0.8" />
+        <text x="271" y="130" fill="#38bdf8" font-size="7" font-weight="700">GIAO DỊCH GẦN NHẤT</text>
+        
+        <rect x="271" y="138" width="106" height="22" rx="3" fill="#0b2e49" />
+        <text x="276" y="149" fill="#ffffff" font-size="6.5" font-weight="700">#ORD-9821</text>
+        <text x="276" y="156" fill="#38bdf8" font-size="5.5">$14,200 · Paid</text>
+
+        <rect x="271" y="164" width="106" height="22" rx="3" fill="#0b2e49" />
+        <text x="276" y="175" fill="#ffffff" font-size="6.5" font-weight="700">#ORD-9820</text>
+        <text x="276" y="182" fill="#22c55e" font-size="5.5">$8,450 · Success</text>
+
+        <rect x="271" y="190" width="106" height="22" rx="3" fill="#0b2e49" />
+        <text x="276" y="201" fill="#ffffff" font-size="6.5" font-weight="700">#ORD-9819</text>
+        <text x="276" y="208" fill="#f59e0b" font-size="5.5">$6,120 · Pending</text>
+
+        <!-- Floating Badge -->
+        <g class="float-fast">
+          <rect x="240" y="96" width="145" height="18" rx="9" fill="#03101c" stroke="#0ea5e9" stroke-width="0.9" />
+          <circle cx="250" cy="105" r="2.5" fill="#22c55e" class="pulse-dot" />
+          <text x="256" y="108" fill="#38bdf8" font-size="6" font-weight="700">Đồng bộ 100% Phosphor Icons</text>
+        </g>
+      </svg>
+
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <!-- 0C. FRONTEND-TASTE: ANTI-SLOP CRAFT & 57 GATES                     -->
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <svg
+        v-else-if="slug === 'frontend-taste'"
+        class="thumbnail-svg"
+        viewBox="0 0 400 250"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
+        <defs>
+          <linearGradient id="taste-bg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#0a0a0f" />
+            <stop offset="50%" stop-color="#120e1e" />
+            <stop offset="100%" stop-color="#1e1333" />
+          </linearGradient>
+          <radialGradient id="taste-glow" cx="60%" cy="30%" r="50%">
+            <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.25" />
+            <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0.0" />
+          </radialGradient>
+        </defs>
+
+        <rect width="400" height="250" fill="url(#taste-bg)" />
+        <circle cx="240" cy="80" r="140" fill="url(#taste-glow)" />
+
+        <!-- Browser Bar -->
+        <rect x="0" y="0" width="400" height="22" fill="#060609" />
+        <circle cx="12" cy="11" r="3" fill="#ef4444" opacity="0.85" />
+        <circle cx="21" cy="11" r="3" fill="#eab308" opacity="0.85" />
+        <circle cx="30" cy="11" r="3" fill="#22c55e" opacity="0.85" />
+        <rect x="54" y="4" width="220" height="14" rx="4" fill="#13111c" stroke="#2a1f42" stroke-width="0.8" />
+        <text x="64" y="14.5" fill="#c084fc" font-size="7.5" font-family="monospace">🔒 https://taste.cef.dev/anti-slop-craft</text>
+
+        <!-- Minimalist Navbar -->
+        <rect x="0" y="22" width="400" height="24" fill="#0d0a17" opacity="0.9" />
+        <text x="20" y="37" fill="#ffffff" font-size="9" font-weight="700">TASTE FRONTEND</text>
+        <text x="130" y="36.5" fill="#a1a1aa" font-size="7">3 Dials</text>
+        <text x="175" y="36.5" fill="#a1a1aa" font-size="7">57 Slop Gates</text>
+        <text x="245" y="36.5" fill="#a1a1aa" font-size="7">Geist Craft</text>
+        <rect x="315" y="27" width="70" height="14" rx="7" fill="#8b5cf6" />
+        <text x="323" y="37" fill="#ffffff" font-size="6.5" font-weight="700">NO AI SLOP</text>
+
+        <!-- Hero Craft Typography -->
+        <g class="float-slow">
+          <rect x="20" y="56" width="120" height="14" rx="7" fill="#271447" stroke="#8b5cf6" stroke-width="0.8" />
+          <circle cx="28" cy="63" r="2.5" fill="#a855f7" class="pulse-dot" />
+          <text x="36" y="66" fill="#e9d5ff" font-size="6.5" font-weight="700">57 SLOP-TEST GATES</text>
+
+          <text x="20" y="90" fill="#ffffff" font-size="15" font-weight="800">Giao Diện Đỉnh Cao.</text>
+          <text x="20" y="108" fill="#c084fc" font-size="15" font-weight="800">Không Vết AI Slop.</text>
+          <text x="20" y="123" fill="#a1a1aa" font-size="7">Linear-style design · Nhịp điệu khoảng trắng tự nhiên · Tinh tế từng pixel.</text>
+
+          <!-- CTAs -->
+          <rect x="20" y="134" width="85" height="20" rx="5" fill="#8b5cf6" />
+          <text x="30" y="147" fill="#ffffff" font-size="7.5" font-weight="700">Khám Phá Gu Thiết Kế</text>
+          <rect x="112" y="134" width="65" height="20" rx="5" fill="#181329" stroke="#3e256b" stroke-width="0.8" />
+          <text x="122" y="147" fill="#d8b4fe" font-size="7.5">Audit 57 Gates</text>
+        </g>
+
+        <!-- 3 Dials Visual Widget (Right) -->
+        <rect x="220" y="56" width="165" height="168" rx="8" fill="#130e24" stroke="#4c1d95" stroke-width="1.2" />
+        <text x="232" y="72" fill="#ffffff" font-size="8" font-weight="700">BỘ BA THƯỚC ĐO (3 DIALS)</text>
+
+        <!-- Dial 1: Variance -->
+        <text x="232" y="90" fill="#e9d5ff" font-size="7" font-weight="600">VARIANCE (Bất Đối Xứng)</text>
+        <rect x="232" y="95" width="140" height="6" rx="3" fill="#2d174d" />
+        <rect x="232" y="95" width="112" height="6" rx="3" fill="#8b5cf6" />
+        <text x="350" y="90" fill="#a855f7" font-size="6.5" font-weight="700">8/10</text>
+
+        <!-- Dial 2: Motion -->
+        <text x="232" y="117" fill="#e9d5ff" font-size="7" font-weight="600">MOTION INTENSITY (Chuyển Động)</text>
+        <rect x="232" y="122" width="140" height="6" rx="3" fill="#2d174d" />
+        <rect x="232" y="122" width="84" height="6" rx="3" fill="#a855f7" />
+        <text x="350" y="117" fill="#c084fc" font-size="6.5" font-weight="700">6/10</text>
+
+        <!-- Dial 3: Density -->
+        <text x="232" y="144" fill="#e9d5ff" font-size="7" font-weight="600">VISUAL DENSITY (Mật Độ Thị Giác)</text>
+        <rect x="232" y="149" width="140" height="6" rx="3" fill="#2d174d" />
+        <rect x="232" y="149" width="56" height="6" rx="3" fill="#c084fc" />
+        <text x="350" y="144" fill="#e9d5ff" font-size="6.5" font-weight="700">4/10</text>
+
+        <!-- Bento Sample Box -->
+        <rect x="232" y="165" width="140" height="48" rx="5" fill="#1b1233" stroke="#581c87" stroke-width="0.8" />
+        <text x="240" y="180" fill="#f3e8ff" font-size="7" font-weight="700">Bento Grid Lệch Trục</text>
+        <text x="240" y="192" fill="#a78bfa" font-size="6">Không thẻ 3 cột generic · Khoảng trắng chuẩn</text>
+        <rect x="240" y="198" width="55" height="10" rx="3" fill="#8b5cf6" />
+        <text x="246" y="206" fill="#ffffff" font-size="5.5" font-weight="700">PASSED: 57/57</text>
+
+        <!-- Floating Badge -->
+        <g class="float-fast">
+          <rect x="20" y="174" width="175" height="48" rx="6" fill="#0d0a17" stroke="#a855f7" stroke-width="0.9" />
+          <circle cx="32" cy="190" r="3" fill="#22c55e" />
+          <text x="40" y="193" fill="#ffffff" font-size="7" font-weight="700">Cam Kết Chống AI Slop</text>
+          <text x="40" y="206" fill="#a1a1aa" font-size="6">Không gradient tím bừa bãi · Không icon vô nghĩa</text>
+        </g>
+      </svg>
+
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <!-- 0D. CMS-LANDING-ENTERPRISE: SAAS CRM, VÍ & AFFILIATE F0-F3         -->
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <svg
+        v-else-if="slug === 'cms-landing-enterprise'"
+        class="thumbnail-svg"
+        viewBox="0 0 400 250"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
+        <defs>
+          <linearGradient id="cms-bg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#021c16" />
+            <stop offset="60%" stop-color="#043329" />
+            <stop offset="100%" stop-color="#03211b" />
+          </linearGradient>
+          <linearGradient id="cms-gold" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#10b981" />
+            <stop offset="100%" stop-color="#34d399" />
+          </linearGradient>
+        </defs>
+
+        <rect width="400" height="250" fill="url(#cms-bg)" />
+
+        <!-- Browser Bar -->
+        <rect x="0" y="0" width="400" height="22" fill="#01100d" />
+        <circle cx="12" cy="11" r="3" fill="#ef4444" opacity="0.85" />
+        <circle cx="21" cy="11" r="3" fill="#eab308" opacity="0.85" />
+        <circle cx="30" cy="11" r="3" fill="#22c55e" opacity="0.85" />
+        <rect x="54" y="4" width="220" height="14" rx="4" fill="#04261f" stroke="#0a4d3f" stroke-width="0.8" />
+        <text x="64" y="14.5" fill="#34d399" font-size="7.5" font-family="monospace">🔒 https://cms.cef.dev/enterprise-v4</text>
+
+        <!-- Navbar -->
+        <rect x="0" y="22" width="400" height="24" fill="#03261f" opacity="0.9" />
+        <text x="18" y="37" fill="#ffffff" font-size="9" font-weight="700">CMS LANDING ENTERPRISE v4</text>
+        <text x="175" y="36.5" fill="#9ae6b4" font-size="7">CRM Leads</text>
+        <text x="235" y="36.5" fill="#9ae6b4" font-size="7">Ví & Điểm</text>
+        <text x="285" y="36.5" fill="#9ae6b4" font-size="7">Affiliate F0-F3</text>
+        <rect x="340" y="27" width="50" height="14" rx="7" fill="url(#cms-gold)" />
+        <text x="348" y="37" fill="#021c16" font-size="6.5" font-weight="800">SEPAY</text>
+
+        <!-- Left: SaaS Modules & Wallet Widget -->
+        <rect x="18" y="54" width="145" height="178" rx="6" fill="#042921" stroke="#065f46" stroke-width="1" />
+        <text x="28" y="69" fill="#34d399" font-size="7.5" font-weight="700">VÍ DOANH THU & ĐIỂM THƯỞNG</text>
+        
+        <rect x="28" y="76" width="125" height="40" rx="4" fill="#06382e" stroke="#10b981" stroke-width="0.7" />
+        <text x="36" y="89" fill="#a7f3d0" font-size="6">SỐ DƯ VÍ KHẢ DỤNG</text>
+        <text x="36" y="106" fill="#ffffff" font-size="12" font-weight="800">42,850,000 đ</text>
+
+        <!-- Affiliate Tier Nodes -->
+        <text x="28" y="132" fill="#34d399" font-size="7" font-weight="700">HỆ THỐNG HOA HỒNG F0 - F3</text>
+        <rect x="28" y="140" width="125" height="20" rx="3" fill="#074438" />
+        <text x="34" y="152" fill="#fcd34d" font-size="6.5" font-weight="700">F0 (Trực tiếp): 25%</text>
+        <text x="110" y="152" fill="#a7f3d0" font-size="6">+8,240K</text>
+
+        <rect x="28" y="164" width="125" height="20" rx="3" fill="#074438" />
+        <text x="34" y="176" fill="#6ee7b7" font-size="6.5" font-weight="700">F1 (Đại lý cấp 1): 10%</text>
+        <text x="110" y="176" fill="#a7f3d0" font-size="6">+3,850K</text>
+
+        <rect x="28" y="188" width="125" height="20" rx="3" fill="#074438" />
+        <text x="34" y="200" fill="#93c5fd" font-size="6.5" font-weight="700">F2 - F3: 5% & 2%</text>
+        <text x="110" y="200" fill="#a7f3d0" font-size="6">+1,920K</text>
+
+        <rect x="28" y="213" width="125" height="14" rx="3" fill="#059669" />
+        <text x="45" y="223" fill="#ffffff" font-size="6.5" font-weight="700">RÚT TIỀN TỰ ĐỘNG 24/7</text>
+
+        <!-- Right Side: CRM Leads Workspace & Landing Builder Preview -->
+        <g class="float-slow">
+          <rect x="175" y="54" width="207" height="135" rx="6" fill="#053127" stroke="#10b981" stroke-width="1.2" />
+          <rect x="183" y="62" width="191" height="26" rx="4" fill="#074436" />
+          <text x="193" y="74" fill="#ffffff" font-size="8" font-weight="700">CRM LEADS & LANDING BUILDER</text>
+          <text x="193" y="83" fill="#6ee7b7" font-size="6.5">Vue 3 + ASP.NET Core 9 + Dapper</text>
+          <rect x="325" y="67" width="42" height="15" rx="3" fill="#10b981" />
+          <text x="330" y="78" fill="#021c16" font-size="6.5" font-weight="700">Fullstack</text>
+
+          <!-- 3 Kanban Columns -->
+          <rect x="183" y="94" width="60" height="85" rx="3" fill="#073d31" />
+          <text x="189" y="105" fill="#34d399" font-size="6" font-weight="700">MỚI (14)</text>
+          <rect x="187" y="110" width="52" height="20" rx="2" fill="#0a5242" />
+          <text x="191" y="119" fill="#ffffff" font-size="5.5">BĐS Hoàng Gia</text>
+          <text x="191" y="126" fill="#34d399" font-size="5">250M · Qualified</text>
+
+          <rect x="249" y="94" width="60" height="85" rx="3" fill="#073d31" />
+          <text x="255" y="105" fill="#fcd34d" font-size="6" font-weight="700">ĐANG DEAL (8)</text>
+          <rect x="253" y="110" width="52" height="20" rx="2" fill="#0a5242" />
+          <text x="257" y="119" fill="#ffffff" font-size="5.5">TechCorp Global</text>
+          <text x="257" y="126" fill="#fcd34d" font-size="5">180M · Contract</text>
+
+          <rect x="314" y="94" width="60" height="85" rx="3" fill="#073d31" />
+          <text x="320" y="105" fill="#60a5fa" font-size="6" font-weight="700">CHỐT WON (22)</text>
+          <rect x="318" y="110" width="52" height="20" rx="2" fill="#0a5242" />
+          <text x="322" y="119" fill="#ffffff" font-size="5.5">VinSmart Edu</text>
+          <text x="322" y="126" fill="#60a5fa" font-size="5">420M · Paid 100%</text>
+        </g>
+
+        <!-- Floating Badge -->
+        <g class="float-fast">
+          <rect x="185" y="196" width="195" height="24" rx="12" fill="#021c16" stroke="#10b981" stroke-width="1" />
+          <circle cx="197" cy="208" r="3.5" fill="#10b981" class="pulse-dot" />
+          <text x="207" y="212" fill="#a7f3d0" font-size="6.5" font-weight="700">⚡ Webhook SePay/ZaloPay Idempotent 100%</text>
+        </g>
+      </svg>
+
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <!-- 0E. IMAGE-WORKFLOW: AI GENERATION & ASSET PIPELINE                 -->
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <svg
+        v-else-if="slug === 'image-workflow'"
+        class="thumbnail-svg"
+        viewBox="0 0 400 250"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
+        <defs>
+          <linearGradient id="img-bg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#2a0614" />
+            <stop offset="60%" stop-color="#4c0519" />
+            <stop offset="100%" stop-color="#1f030e" />
+          </linearGradient>
+          <linearGradient id="img-accent" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#f43f5e" />
+            <stop offset="100%" stop-color="#fb7185" />
+          </linearGradient>
+        </defs>
+
+        <rect width="400" height="250" fill="url(#img-bg)" />
+
+        <!-- Browser Bar -->
+        <rect x="0" y="0" width="400" height="22" fill="#120108" />
+        <circle cx="12" cy="11" r="3" fill="#ef4444" opacity="0.85" />
+        <circle cx="21" cy="11" r="3" fill="#eab308" opacity="0.85" />
+        <circle cx="30" cy="11" r="3" fill="#22c55e" opacity="0.85" />
+        <rect x="54" y="4" width="220" height="14" rx="4" fill="#290412" stroke="#5c0722" stroke-width="0.8" />
+        <text x="64" y="14.5" fill="#fb7185" font-size="7.5" font-family="monospace">🔒 https://image.cef.dev/visual-pipeline</text>
+
+        <!-- Navbar -->
+        <rect x="0" y="22" width="400" height="24" fill="#350616" opacity="0.9" />
+        <text x="18" y="37" fill="#ffffff" font-size="9" font-weight="700">IMAGE WORKFLOW STUDIO</text>
+        <text x="155" y="36.5" fill="#fecdd3" font-size="7">Web Cloner</text>
+        <text x="215" y="36.5" fill="#fecdd3" font-size="7">Image Finder</text>
+        <text x="280" y="36.5" fill="#fecdd3" font-size="7">AI Generator</text>
+        <rect x="335" y="27" width="55" height="14" rx="7" fill="url(#img-accent)" />
+        <text x="345" y="37" fill="#ffffff" font-size="6.5" font-weight="700">PROMPTS</text>
+
+        <!-- Left: Asset Pipeline Controls & Aspect Ratios -->
+        <rect x="18" y="54" width="135" height="178" rx="6" fill="#3b0617" stroke="#881337" stroke-width="1" />
+        <text x="28" y="69" fill="#fb7185" font-size="7.5" font-weight="700">ASSET RESOLUTION</text>
+
+        <!-- Aspect Ratio Buttons -->
+        <rect x="28" y="76" width="36" height="22" rx="3" fill="#881337" />
+        <text x="36" y="89" fill="#ffffff" font-size="6.5" font-weight="700">16:9</text>
+
+        <rect x="70" y="76" width="36" height="22" rx="3" fill="#4c0519" stroke="#9f1239" stroke-width="0.7" />
+        <text x="80" y="89" fill="#fda4af" font-size="6.5">1:1</text>
+
+        <rect x="112" y="76" width="32" height="22" rx="3" fill="#4c0519" stroke="#9f1239" stroke-width="0.7" />
+        <text x="119" y="89" fill="#fda4af" font-size="6.5">9:16</text>
+
+        <!-- Prompt Blueprint Box -->
+        <text x="28" y="112" fill="#fb7185" font-size="7" font-weight="700">PROMPT BLUEPRINT</text>
+        <rect x="28" y="118" width="115" height="48" rx="4" fill="#24030d" stroke="#5c0722" stroke-width="0.7" />
+        <text x="34" y="130" fill="#fecdd3" font-size="6" font-family="monospace">Cinematic dark office,</text>
+        <text x="34" y="140" fill="#fecdd3" font-size="6" font-family="monospace">#0C0C0C minimal desk,</text>
+        <text x="34" y="150" fill="#fb7185" font-size="6" font-family="monospace">8k, sharp focus --ar 16:9</text>
+
+        <!-- Negative Prompt -->
+        <text x="28" y="178" fill="#fda4af" font-size="6.5" font-weight="700">NEGATIVE PROMPT FILTER</text>
+        <rect x="28" y="184" width="115" height="24" rx="3" fill="#24030d" />
+        <text x="34" y="195" fill="#f43f5e" font-size="5.5" font-family="monospace">no blur, no deformed hands,</text>
+        <text x="34" y="203" fill="#f43f5e" font-size="5.5" font-family="monospace">no watermarks, no ai slop</text>
+
+        <rect x="28" y="213" width="115" height="14" rx="3" fill="#f43f5e" />
+        <text x="42" y="223" fill="#ffffff" font-size="6.5" font-weight="700">GENERATE 4K ASSET</text>
+
+        <!-- Right: Studio Visual Showcase Frame -->
+        <g class="float-slow">
+          <rect x="165" y="54" width="218" height="135" rx="6" fill="#420619" stroke="#f43f5e" stroke-width="1.2" />
+          <rect x="173" y="62" width="202" height="92" rx="4" fill="#1f020c" />
+          
+          <!-- Mockup image artwork inside -->
+          <circle cx="274" cy="100" r="28" fill="#881337" opacity="0.6" />
+          <polygon points="274,75 298,118 250,118" fill="#f43f5e" opacity="0.7" />
+          <polygon points="260,88 282,125 238,125" fill="#fda4af" opacity="0.4" />
+          <circle cx="230" cy="85" r="8" fill="#fcd34d" opacity="0.8" />
+
+          <!-- Asset stats under image -->
+          <text x="180" y="142" fill="#ffffff" font-size="7.5" font-weight="700">hero-workspace.webp</text>
+          <text x="280" y="142" fill="#fb7185" font-size="6.5">1920x1080 · 142 KB · WebP</text>
+
+          <rect x="173" y="160" width="202" height="24" rx="3" fill="#2d0513" />
+          <text x="182" y="171" fill="#fecdd3" font-size="6.5" font-weight="600">Asset Manifest Generated</text>
+          <text x="182" y="179" fill="#9f1239" font-size="5.5">12 photos Unsplash + 4 AI Generated assets mapped</text>
+          <rect x="335" y="164" width="35" height="16" rx="3" fill="#f43f5e" />
+          <text x="340" y="174" fill="#ffffff" font-size="6" font-weight="700">Export</text>
+        </g>
+
+        <!-- Floating Badge -->
+        <g class="float-fast">
+          <rect x="175" y="196" width="200" height="24" rx="12" fill="#1b020a" stroke="#f43f5e" stroke-width="1" />
+          <circle cx="187" cy="208" r="3.5" fill="#f43f5e" class="pulse-dot" />
+          <text x="196" y="212" fill="#fecdd3" font-size="6.5" font-weight="700">🎨 Flow + DALL-E 3 + Cloner Tự Động Hóa</text>
+        </g>
+      </svg>
+
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
       <!-- 1. INSURANCE: AEGIS BẢO AN - BẢO HIỂM TOÀN DIỆN 4.0                  -->
       <!-- ═══════════════════════════════════════════════════════════════════ -->
       <svg
-        v-if="slug === 'insurance'"
+        v-else-if="slug === 'insurance'"
         class="thumbnail-svg"
         viewBox="0 0 400 250"
         preserveAspectRatio="xMidYMid slice"

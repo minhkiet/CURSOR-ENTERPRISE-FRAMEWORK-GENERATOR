@@ -22,8 +22,8 @@ tab.guide=Hướng dẫn
 tab.mcp=MCP Servers
 tab.updates=Cập nhật
 tab.backup=Sao lưu & Khôi phục
-tab.settings=Cài đặt
-tab.framework=Công cụ
+tab.settings=Thiết lập
+tab.framework=Công cụ Framework
 tab.project_runner=Project Runner
 tab.script_generator=Tạo Script
 
@@ -181,6 +181,8 @@ btn.ok=OK
 btn.close=Đóng
 btn.retry=Thử lại
 btn.open_folder=Mở thư mục
+btn.collapse=Thu gọn
+btn.expand=Mở rộng
 combobox.lang=Ngôn ngữ
 combobox.culture=Chọn ngôn ngữ
 

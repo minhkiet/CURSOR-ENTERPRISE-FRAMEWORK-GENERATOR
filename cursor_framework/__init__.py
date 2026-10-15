@@ -118,6 +118,26 @@ _LAZY_EXPORTS = {
     "OffloadResult": "cursor_framework.tdam_integration",
     "create_tdam_integration": "cursor_framework.tdam_integration",
     "create_tdam_integration_from_env": "cursor_framework.tdam_integration",
+
+    # Vibe Coding Multi-Tool Engine
+    "VibeTool": "cursor_framework.vibe_sync",
+    "VibeDetector": "cursor_framework.vibe_sync",
+    "VibeSyncEngine": "cursor_framework.vibe_sync",
+    "VibeSyncReport": "cursor_framework.vibe_sync",
+    "get_vibe_summary": "cursor_framework.vibe_sync",
+
+    # Redis Observability & Storage
+    "RedisObservability": "cursor_framework.redis_store",
+    "RedisMemoryStore": "cursor_framework.redis_store",
+    "RedisMetricSnapshot": "cursor_framework.redis_store",
+    "SlowlogEntry": "cursor_framework.redis_store",
+
+    # Prefect Orchestration
+    "prefect_flows": "cursor_framework.prefect_flows",
+    "index_and_warm_flow": "cursor_framework.prefect_flows",
+    "vibe_sync_flow": "cursor_framework.prefect_flows",
+    "health_flow": "cursor_framework.prefect_flows",
+    "full_maintenance_pipeline": "cursor_framework.prefect_flows",
     
     # Code Graph & Memory System
     "CodeGraph": "cursor_framework.code_graph",

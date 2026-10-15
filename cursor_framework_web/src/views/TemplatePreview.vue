@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getTemplateById, templates } from '../data/templates'
 import DownloadModal from '../components/DownloadModal.vue'
@@ -13,6 +13,71 @@ const template = computed(() => getTemplateById(route.params.id as string))
 const viewMode = ref<'desktop' | 'tablet' | 'mobile'>('desktop')
 const showInfo = ref(true)
 const showDownloadModal = ref(false)
+
+const isAutoScrolling = ref(false)
+const scrollSpeed = ref<1 | 2 | 3>(1)
+let scrollInterval: ReturnType<typeof setInterval> | null = null
+let scrollDirection = 1
+
+function toggleAutoScroll() {
+  isAutoScrolling.value = !isAutoScrolling.value
+  if (isAutoScrolling.value) {
+    startAutoScroll()
+  } else {
+    stopAutoScroll()
+  }
+}
+
+function setSpeed(s: 1 | 2 | 3) {
+  scrollSpeed.value = s
+  if (isAutoScrolling.value) {
+    startAutoScroll()
+  }
+}
+
+function startAutoScroll() {
+  stopAutoScroll()
+  const iframe = iframeRef.value
+  if (!iframe) return
+
+  scrollInterval = setInterval(() => {
+    try {
+      const win = iframe.contentWindow
+      const doc = iframe.contentDocument || win?.document
+      if (doc && win) {
+        const current = win.scrollY || 0
+        const maxScroll = Math.max(
+          doc.documentElement.scrollHeight,
+          doc.body.scrollHeight
+        ) - win.innerHeight
+
+        if (maxScroll <= 0) return
+
+        if (current >= maxScroll - 8) {
+          scrollDirection = -1
+        } else if (current <= 8) {
+          scrollDirection = 1
+        }
+
+        const step = (scrollSpeed.value === 1 ? 2 : scrollSpeed.value === 2 ? 4.5 : 8) * scrollDirection
+        win.scrollBy({ top: step, behavior: 'auto' })
+      }
+    } catch (_e) {
+      // ignore
+    }
+  }, 25)
+}
+
+function stopAutoScroll() {
+  if (scrollInterval) {
+    clearInterval(scrollInterval)
+    scrollInterval = null
+  }
+}
+
+onUnmounted(() => {
+  stopAutoScroll()
+})
 
 const iframeSrc = computed(() => {
   if (!template.value) return ''
@@ -182,6 +247,29 @@ function refreshFrame() {
             <span class="url-dot"></span>
             <span class="url-text">cef.dev/templates/{{ template.id }}</span>
           </div>
+          <div class="device-auto-scroll">
+            <button
+              class="auto-scroll-toggle-btn"
+              :class="{ active: isAutoScrolling }"
+              @click="toggleAutoScroll"
+              :title="isAutoScrolling ? 'Tạm dừng cuộn' : 'Tự động cuộn lướt xem toàn bộ trang web'"
+            >
+              <svg v-if="!isAutoScrolling" viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
+              <svg v-else viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
+                <rect x="6" y="4" width="4" height="16"/>
+                <rect x="14" y="4" width="4" height="16"/>
+              </svg>
+              <span>{{ isAutoScrolling ? 'Dừng cuộn' : 'Tự cuộn lướt web' }}</span>
+            </button>
+            <div v-if="isAutoScrolling" class="scroll-speed-buttons">
+              <button :class="{ active: scrollSpeed === 1 }" @click="setSpeed(1)">1x</button>
+              <button :class="{ active: scrollSpeed === 2 }" @click="setSpeed(2)">2x</button>
+              <button :class="{ active: scrollSpeed === 3 }" @click="setSpeed(3)">3x</button>
+            </div>
+          </div>
+
           <div class="device-action">
             <button class="device-refresh" @click="refreshFrame" :aria-label="'Refresh preview'">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
@@ -621,6 +709,71 @@ function refreshFrame() {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.device-auto-scroll {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.auto-scroll-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--t-fast);
+}
+
+.auto-scroll-toggle-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--accent);
+}
+
+.auto-scroll-toggle-btn.active {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 12px var(--accent-dim);
+}
+
+.scroll-speed-buttons {
+  display: flex;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+  gap: 2px;
+}
+
+.scroll-speed-buttons button {
+  padding: 3px 7px;
+  font-size: 10.5px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: all var(--t-fast);
+}
+
+.scroll-speed-buttons button:hover {
+  color: var(--text-primary);
+}
+
+.scroll-speed-buttons button.active {
+  background: var(--accent);
+  color: var(--bg-canvas);
 }
 
 .device-action {

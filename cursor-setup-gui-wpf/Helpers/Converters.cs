@@ -11,10 +11,10 @@ namespace CursorSetupWpf.Helpers
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is int selectedIndex && parameter is string param)
+            if (value != null && int.TryParse(value.ToString(), out int selectedIndex) &&
+                parameter != null && int.TryParse(parameter.ToString(), out int targetIndex))
             {
-                if (int.TryParse(param, out int targetIndex))
-                    return selectedIndex == targetIndex ? Visibility.Visible : Visibility.Collapsed;
+                return selectedIndex == targetIndex ? Visibility.Visible : Visibility.Collapsed;
             }
             return Visibility.Collapsed;
         }

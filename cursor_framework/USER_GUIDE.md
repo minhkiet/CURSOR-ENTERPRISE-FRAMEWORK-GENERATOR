@@ -1,29 +1,40 @@
-# Cursor Enterprise Framework - Python Library
+# Cursor Enterprise Framework - Python Library & Vibe Coding Engine
 
-Hướng dẫn sử dụng đầy đủ cho `cursor_framework` — Python core library của Cursor Enterprise Framework.
+Production User Guide for `cursor_framework` — The unified AI vibe coding and knowledge framework.
 
-> **Version**: 1.3.0
-> **Python**: 3.10+
+> **Version**: 1.7.0
+> **Python**: 3.9+ (Optimized for `uv`)
+> **Vibe Tools Supported**: Cursor, Windsurf, Claude Code, Antigravity, Cline, Roo Code, Copilot, Aider, Codex
 > **License**: MIT
 
 ---
 
-## Mục lục
+## Table of Contents
 
-1. [Giới thiệu](#giới-thiệu)
-2. [Cài đặt](#cài-đặt)
-3. [Khởi đầu nhanh](#khởi-đầu-nhanh)
-4. [Các Module chính](#các-module-chính)
+1. [Introduction](#introduction)
+2. [Quick Setup with UV (<30s)](#quick-setup-with-uv-30s)
+3. [Multi-Tool Vibe Coding Engine](#multi-tool-vibe-coding-engine)
+   - [Supported AI Coding Tools](#supported-ai-coding-tools)
+   - [Tool Detection and Health Check](#tool-detection-and-health-check)
+   - [One-Command Sync across All Tools](#one-command-sync-across-all-tools)
+4. [Redis Observability & Distributed Memory](#redis-observability--distributed-memory)
+   - [Why Redis for AI Agents?](#why-redis-for-ai-agents)
+   - [Key Metrics to Watch](#key-metrics-to-watch)
+   - [Incident Triage: SLOWLOG & Memory Doctor](#incident-triage-slowlog--memory-doctor)
+   - [Zero-Crash Local Fallback](#zero-crash-local-fallback)
+5. [Prefect Automation Pipelines](#prefect-automation-pipelines)
+   - [Available Automated Flows](#available-automated-flows)
+   - [Scheduled Runs & Retries](#scheduled-runs--retries)
+6. [Core Framework Modules](#core-framework-modules)
    - [ContextRouter](#contextrouter)
    - [MemoryManager](#memorymanager)
    - [TokenOptimizer](#tokenoptimizer)
    - [SkillDiscovery](#skilldiscovery)
-   - [ContextBuilder](#contextbuilder)
    - [Workflow](#workflow)
-5. [TencentDB Agent Memory (TDAM)](#tencentdb-agent-memory-tdam)
-6. [CLI Commands](#cli-commands)
-7. [Patterns nâng cao](#patterns-nâng-cao)
-8. [API Reference](#api-reference)
+7. [TencentDB Agent Memory (TDAM)](#tencentdb-agent-memory-tdam)
+8. [CLI Commands Reference](#cli-commands-reference)
+9. [Production Recipes ("Thực chiến")](#production-recipes-thực-chiến)
+10. [Troubleshooting & FAQs](#troubleshooting--faqs)
 
 ---
 
@@ -48,47 +59,180 @@ Hướng dẫn sử dụng đầy đủ cho `cursor_framework` — Python core l
 
 ---
 
-## Cài đặt
+---
 
-### Cài đặt cơ bản
+## Quick Setup with UV (<30s)
 
+`uv` is an ultra-fast Python package manager. It installs and updates dependencies 10-100x faster than standard pip.
+
+### 1. Install or Verify UV
 ```bash
-pip install cursor-framework
+# Check if uv is installed
+uv --version
+
+# If not installed, install it:
+# Windows (PowerShell):
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# Linux / macOS:
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-### Cài đặt từ source
-
+### 2. Fast Environment Setup & One-Click Install
+Run `build_uv.bat` on Windows, or execute:
 ```bash
-git clone https://github.com/your-org/cursor-framework.git
-cd cursor-framework
-pip install -e .
+# Create virtual environment
+uv venv .venv
+
+# Activate environment:
+# Windows PowerShell:
+.venv\Scripts\Activate.ps1
+# Linux / macOS:
+source .venv/bin/activate
+
+# Install with all enterprise extras (Redis + Prefect + Rich + Click):
+uv pip install -e ".[all]"
 ```
 
-### Dependencies tùy chọn
-
+### 3. Run Commands Directly with Zero Global Pollution
 ```bash
-# Cho TDAM integration (HTTP client)
-pip install httpx
-
-# Cho TDAM CLI với giao diện đẹp
-pip install rich
-
-# Tất cả optional dependencies
-pip install cursor-framework[full]
+# Run any command directly via uv run
+uv run cursor-framework stats
+uv run cursor-framework vibe status
 ```
 
-### Cấu hình môi trường (cho TDAM)
+---
+
+## Multi-Tool Vibe Coding Engine
+
+Modern software development uses multiple AI vibe coding tools across teams and workflows. `cursor_framework` natively supports and synchronizes with all major vibe tools:
+
+### Supported AI Coding Tools
+
+| Tool | Primary Config | Rules / Skills Path | Gate Prefix | Target Use Case |
+|---|---|---|---|---|
+| **Cursor IDE** | `.cursorrules` | `.cursor/rules/`, `.cursor/skills/` | `K` | Surgical edits & MDC enterprise architecture |
+| **Windsurf** | `.windsurfrules` | `.windsurf/rules/` | `W` | Cascade multi-file refactoring |
+| **Claude Code** | `CLAUDE.md` | `.claude/skills/`, `.claude/rules/` | `C` | Terminal-native AI execution & tests |
+| **Antigravity** | `.gemini/config.json` | `.gemini/rules/`, `.agents/skills/` | `AG` | Autonomous multi-agent teams & artifacts |
+| **Cline** | `.clinerules` | `.cline/rules/` | `CL` | Autonomous step-by-step tool execution |
+| **Roo Code** | `.roorules` | `.roo/rules/`, `.roomodes` | `R` | Custom agent modes (Architect, Code, Ask) |
+| **GitHub Copilot**| `.github/copilot-instructions.md` | `.github/` | `CP` | Context-aware inline completions |
+| **Aider** | `.aider.conventions.md` | `.aider.conf.yml` | `AI` | Git-backed terminal pair programming |
+| **Codex** | `AGENTS.md` | `.codex/rules/` | `CX` | Universal enterprise rule source of truth |
+
+### Tool Detection and Health Check
+
+To inspect which vibe coding tools are active in your repository:
+```bash
+# Detect all active tools
+python -m cursor_framework vibe detect
+
+# Or check status with environment summary
+python -m cursor_framework vibe status
+```
+
+Example output:
+```text
+Vibe Coding Environment Summary:
+Workspace: D:\PROJECTS\MY_PROJECT
+Active Tools Detected (3):
+  [✓] Cursor IDE (cursor): Detected
+      - Directory/file marker '.cursor' exists
+  [✓] Claude Code (claude-code): Detected
+      - Primary configuration 'CLAUDE.md' exists
+  [✓] Windsurf / Cascade (windsurf): Detected
+      - Directory/file marker '.windsurf' exists
+  [·] Google Antigravity (antigravity): Not active
+  [·] Cline (cline): Not active
+```
+
+### One-Command Sync across All Tools
+
+Generate or update tool-native instructions and quality gates across your vibe coding tools with one command:
 
 ```bash
-# Windows PowerShell
-$env:TDAM_ENDPOINT = "http://127.0.0.1:8420"
-$env:TDAM_API_KEY = "your-api-key"
-$env:TDAM_SERVICE_ID = "your-service-id"
+# Preview what files will be created or modified (safe dry-run)
+python -m cursor_framework vibe sync --dry-run
 
-# Linux/Mac
-export TDAM_ENDPOINT="http://127.0.0.1:8420"
-export TDAM_API_KEY="your-api-key"
-export TDAM_SERVICE_ID="your-service-id"
+# Synchronize all detected tools in your workspace
+python -m cursor_framework vibe sync
+
+# Force sync for a specific tool (e.g. Claude Code or Windsurf)
+python -m cursor_framework vibe sync --tool claude-code --force
+python -m cursor_framework vibe sync --tool windsurf --force
+```
+
+---
+
+## Redis Observability & Distributed Memory
+
+`cursor_framework` includes a production-grade Redis distributed cache and real-time observability engine.
+
+### Why Redis for AI Agents?
+
+1. **Sub-millisecond Shared State**: When multiple background agents, IDE terminals, or cron tasks run, they read and write to the same memory without locking conflicts.
+2. **Automated Tiered TTL**:
+   - `HOT` tier: 1 hour TTL (frequently accessed context).
+   - `WARM` tier: 24 hours TTL (project metadata, recent files).
+   - `COLD` tier: 7 days TTL (long-term knowledge).
+3. **Zero-Crash Local Fallback**: If Redis is offline or not installed, the framework automatically falls back to local JSON storage (`.cache/memory.json`). Your code will **never crash** due to a Redis connection failure.
+
+### Key Metrics to Watch
+
+Run metrics inspection in your terminal:
+```bash
+python -m cursor_framework redis metrics
+```
+
+| Metric | What it Tells You | Alert When |
+|---|---|---|
+| `used_memory_human` | Current RAM used by Redis | > 80% of `maxmemory` (CRITICAL) |
+| `connected_clients` | Open client connections | Sudden spikes or connection leaks |
+| `blocked_clients` | Clients waiting on blocking operations | > 0 sustained (WARNING) |
+| `instantaneous_ops_per_sec` | Current command throughput | Drops during heavy workloads |
+| `hit_ratio` | Cache efficiency (`hits / (hits + misses)`) | < 80% (WARNING) |
+| `rejected_connections` | Reached `maxclients` cap | > 0 (CRITICAL) |
+
+### Incident Triage: SLOWLOG & Memory Doctor
+
+When an AI agent experiences latency or high memory usage:
+```bash
+# 1. Inspect slow queries exceeding execution threshold
+python -m cursor_framework redis slowlog --limit 10
+
+# 2. Run automated diagnostic summary
+python -m cursor_framework redis doctor
+
+# 3. Check connection status and server health
+python -m cursor_framework redis status
+```
+
+---
+
+## Prefect Automation Pipelines
+
+`cursor_framework` uses Prefect to automate maintenance flows with retries, caching, and health verification.
+
+> **Zero-Dependency Resilience**: If the `prefect` package is not installed, all flows run cleanly using built-in Python logging and sequential execution.
+
+### Available Automated Flows
+
+```bash
+# List all available flows
+python -m cursor_framework prefect list
+
+# Run the asset indexing and memory warm-up flow
+python -m cursor_framework prefect run --flow index
+
+# Run multi-tool vibe coding synchronization
+python -m cursor_framework prefect run --flow sync
+
+# Run Redis & memory health check flow
+python -m cursor_framework prefect run --flow health
+
+# Run the complete end-to-end maintenance pipeline
+python -m cursor_framework prefect run --flow all
 ```
 
 ---

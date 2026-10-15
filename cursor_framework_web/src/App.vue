@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import NavBar from './components/NavBar.vue'
 import FooterSection from './components/FooterSection.vue'
+import { SpeedInsights } from '@vercel/speed-insights/vue'
 </script>
 
 <template>
   <div class="app">
+    <SpeedInsights />
     <a href="#main" class="skip-link">Skip to content</a>
     <NavBar />
     <main id="main">
