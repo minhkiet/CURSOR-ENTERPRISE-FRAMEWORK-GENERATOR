@@ -1,0 +1,11 @@
+name = "evon:ui-ux"
+description = "UI/UX skill cho app - dashboard, danh sách, bảng, form, cài đặt, modal"
+command = "/evon:ui-ux"
+category = "ui-ux"
+triggers = ["dựng màn", "build a page", "design this screen", "redesign", "làm UI", "ui-ux", "evon", "xem giúp UI", "review UI"]
+skill_path = ".cursor/skills/evondev-ui-ux/SKILL.md"
+
+[config]
+auto_activate = true
+priority = 10
+language = ["vi", "en"]
