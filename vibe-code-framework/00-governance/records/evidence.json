@@ -1,0 +1,139 @@
+{
+  "schemaVersion": "1.0.0",
+  "records": [
+    {
+      "evidenceId": "EVD-RUNTIME-LOCAL-001",
+      "criterion": "COND-RUNTIME-001",
+      "command": "python -m venv .venv; .venv\\Scripts\\python.exe -m pip install -e .[dev]",
+      "status": "PASS",
+      "exitCode": 0,
+      "result": "project-local Python 3.12.14 and pytest installed; subsequent preflight reported COND-RUNTIME-001 PASS while overall verdict remained BLOCKED"
+    },
+    {
+      "evidenceId": "EVD-INVENTORY-001",
+      "criterion": "COND-INVENTORY-001",
+      "command": "08-scripts/inventory.ps1 -OutputPath 00-governance/records/cursor-inventory.json",
+      "status": "BLOCKED",
+      "exitCode": 0,
+      "result": "1,211 resources recorded; 910 remain UNKNOWN_RESOURCE with owner, source, dependency, approval, and rollback fields explicitly unresolved"
+    },
+    {
+      "evidenceId": "EVD-ADAPTER-SMOKE-002",
+      "criterion": "ADAPTER-001",
+      "command": "08-scripts/sync-adapters.ps1 -Tool Cursor -Category skills against an isolated temporary target",
+      "status": "PASS",
+      "exitCode": 0,
+      "result": "10 skill directories synced, including frontend-design; existing project .cursor was not touched"
+    },
+    {
+      "evidenceId": "EVD-VERIFY-006",
+      "criterion": "TEST-001",
+      "command": "bundled Python 3.12.14 venv -m pytest -q",
+      "status": "PASS",
+      "exitCode": 0,
+      "result": "136 passed and 5 subtests passed"
+    },
+    {
+      "evidenceId": "EVD-VERIFY-008",
+      "criterion": "FEATURE-IMPORT-GITHUB",
+      "command": "pytest -q tests/test_skill_installer.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "result": "append-only importer, provenance, validation, and overwrite protection tested"
+    },
+    {
+      "evidenceId": "EVD-VERIFY-009",
+      "criterion": "HUB-001",
+      "command": "vibe-code-framework/08-scripts/validate.ps1",
+      "status": "PASS",
+      "exitCode": 0,
+      "result": "framework is valid"
+    },
+    {
+      "evidenceId": "EVD-PREFLIGHT-001",
+      "criterion": "APPROVAL-001",
+      "command": "vibe-code-framework/08-scripts/preflight.ps1 -PythonPath <approved interpreter>",
+      "status": "BLOCKED",
+      "exitCode": 1,
+      "result": "runtime passed; 910 UNKNOWN_RESOURCE, conflict approval, real approval, and rollback verification remain blocked"
+    },
+    {
+      "evidenceId": "EVD-IMPORT-DRYRUN-001",
+      "criterion": "FEATURE-IMPORT-GITHUB",
+      "command": "tools/skill_installer.py add-github --repo anthropics/skills --skill-path skills/frontend-design/SKILL.md --ref main --dry-run",
+      "status": "PASS",
+      "exitCode": 0,
+      "result": "remote skill validated; SHA-256=19de668f2da4a0cd78cce1a5e7e10094ac01d0feb80bcc7190fee085ce49df32; no local files or provenance records written"
+    },
+    {
+      "evidenceId": "EVD-IMPORT-001",
+      "criterion": "FEATURE-IMPORT-GITHUB",
+      "command": "tools/skill_installer.py add-github --repo anthropics/skills --skill-path skills/frontend-design/SKILL.md --ref main",
+      "status": "PASS",
+      "exitCode": 0,
+      "result": "frontend-design added to the canonical Resource Hub; SHA-256=19de668f2da4a0cd78cce1a5e7e10094ac01d0feb80bcc7190fee085ce49df32; provenance record created"
+    },
+    {
+      "evidenceId": "EVD-ROLLBACK-TARGET-001",
+      "criterion": "COND-ROLLBACK-001",
+      "command": "rollback-target.ps1 Snapshot; mutate isolated target; Verify; rollback-target.ps1 Restore -ConfirmRestore; rollback-target.ps1 Verify",
+      "status": "PASS",
+      "exitCode": 0,
+      "verifiedAt": "2026-10-10T08:01:38.7051419Z",
+      "result": "Snapshot PASS for 2 files; drift detection returned exit code 1 as expected; target restored and SHA-256 values verified; final Verify PASS; unsafe whole .cursor target was rejected with exit code 1. Target-only smoke path: C:\\Users\\ADM\\AppData\\Local\\Temp\\vibe-rollback-smoke-d5ccdb2a1a694e4fb0964a5f9b315f4e\\target\\adapter; backup: C:\\Users\\ADM\\AppData\\Local\\Temp\\vibe-rollback-smoke-d5ccdb2a1a694e4fb0964a5f9b315f4e\\backup; canonical Resource Hub and host .cursor were not touched"
+    },
+    {
+      "evidenceId": "EVD-ADAPTER-SMOKE-003",
+      "criterion": "ADAPTER-001",
+      "command": "pwsh -NoProfile -File 08-scripts/sync-adapters.ps1 -Tool Cursor -Category skills -SourcePath vibe-code-framework -TargetPath <isolated target>",
+      "status": "PASS",
+      "exitCode": 0,
+      "verifiedAt": "2026-10-10T08:08:07.1702763Z",
+      "result": "10 canonical skill directories synced to C:\\Users\\ADM\\AppData\\Local\\Temp\\vibe-adapter-smoke-3c6c98d2b84e49448afc0b021f732867; frontend-design/SKILL.md discovered; host .cursor was not targeted"
+    },
+    {
+      "evidenceId": "EVD-BUILD-WEB-001",
+      "criterion": "BUILD-001",
+      "command": "npm run build",
+      "status": "PASS",
+      "exitCode": 0,
+      "result": "cursor_framework_web production build completed with vue-tsc and Vite; 107 modules transformed"
+    },
+    {
+      "evidenceId": "EVD-BUILD-WPF-001",
+      "criterion": "BUILD-001",
+      "command": "dotnet build cursor-setup-gui-wpf\\CursorSetupWpf.sln --no-restore; dotnet build CursorSetup.sln --no-restore",
+      "status": "PASS",
+      "exitCode": 0,
+      "result": "both WPF solution builds succeeded with 0 warnings and 0 errors"
+    },
+    {
+      "evidenceId": "EVD-OPERATIONAL-PREFLIGHT-001",
+      "criterion": "RUN-001",
+      "command": "pwsh -NoProfile -File 08-scripts/preflight.ps1 -OperationalOnly",
+      "status": "PASS",
+      "exitCode": 0,
+      "verifiedAt": "2026-10-10T08:30:04.1651908Z",
+      "result": "operational-only verdict PASS for runtime, acceptance, and target-only rollback; wholeEcosystemVerdict=BLOCKED and migrationAllowed=false"
+    },
+    {
+      "evidenceId": "EVD-ADAPTER-SMOKE-004",
+      "criterion": "ADAPTER-001",
+      "command": "sync-adapters.ps1 and install.ps1 with explicit isolated TargetPath; omitted TargetPath safety checks",
+      "status": "PASS",
+      "exitCode": 0,
+      "verifiedAt": "2026-10-10T08:33:19.0450021Z",
+      "result": "explicit sync exit 0 with 10 skills and explicit install exit 0; both commands reject omitted TargetPath with exit 1, preventing accidental writes to the current repository"
+    },
+    {
+      "evidenceId": "EVD-OPERATIONAL-PREFLIGHT-002",
+      "criterion": "RUN-001",
+      "command": "pwsh -NoProfile -File 08-scripts/preflight.ps1 -OperationalOnly after explicit-target safety changes",
+      "status": "PASS",
+      "exitCode": 0,
+      "verifiedAt": "2026-10-10T08:36:21.2566807Z",
+      "result": "operational-only verdict PASS; wholeEcosystemVerdict=BLOCKED and migrationAllowed=false"
+    }
+  ],
+  "notes": "Evidence records describe executed checks only. This register does not grant approval and does not authorize destructive migration."
+}

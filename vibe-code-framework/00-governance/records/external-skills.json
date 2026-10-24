@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "records": [
+    {
+      "resourceId": "external-skill-frontend-design",
+      "resourceType": "skill",
+      "canonicalSource": "https://github.com/anthropics/skills/tree/main/skills/frontend-design",
+      "sourceType": "SOT-EXTERNAL",
+      "owner": "EXTERNAL_OWNER_UNCONFIRMED",
+      "maintainer": "PENDING_ASSIGNMENT",
+      "consumers": [
+        "vibe-code-framework Resource Hub"
+      ],
+      "version": "main",
+      "sourceRepository": "anthropics/skills",
+      "sourcePath": "skills/frontend-design",
+      "contentSha256": "19de668f2da4a0cd78cce1a5e7e10094ac01d0feb80bcc7190fee085ce49df32",
+      "importedAt": "2026-10-10T06:21:53.941944+00:00",
+      "approvalStatus": "NOT_GRANTED",
+      "verificationStatus": "PENDING_REVIEW",
+      "notes": "Additive import only; no .cursor migration or destructive replacement was performed."
+    }
+  ],
+  "notes": "Append-only provenance for additive external skill imports. External ownership and approval are never inferred."
+}
