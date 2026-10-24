@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đăng Ký Lái Thử & Dịch Vụ — AutoPrime Motors</title>
+  <meta name="description" content="Đăng ký trải nghiệm lái thử tại nhà hoặc Showroom AutoPrime: Porsche Taycan, Mercedes-AMG, BMW, VinFast. Hỗ trợ thẩm định xe cũ Trade-in miễn phí." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="testdrive-page-body">
+
+  <!-- ─── TOP NOTIFICATION & HOTLINE BAR ─── -->
+  <aside class="top-bar">
+    <div class="container top-bar-inner">
+      <div class="top-left">
+        <span class="badge-live"><span class="pulse-dot"></span> Đội Xe Lái Thử Đã Sẵn Sàng 100%</span>
+        <span class="top-sep"></span>
+        <a href="tel:18006969" class="top-hotline">
+          <i class="ph-fill ph-phone-call"></i> Hotline Lái Thử: <strong>1800 6969</strong>
+        </a>
+      </div>
+      <div class="top-right">
+        <span class="top-offer"><i class="ph ph-shield-check"></i> Bảo hiểm hành khách & xe lái thử 100% trong suốt lộ trình</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ─── HEADER & NAVIGATION ─── -->
+  <header class="navbar" id="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="brand-logo" aria-label="AutoPrime Motors">
+        <div class="brand-icon">
+          <svg viewBox="0 0 36 36" fill="none">
+            <rect width="36" height="36" rx="8" fill="url(#apGrad)"/>
+            <path d="M7 23L18 8L29 23H22L18 16L14 23H7Z" fill="#ffffff"/>
+            <path d="M12 26H24V28H12V26Z" fill="#f59e0b"/>
+            <defs>
+              <linearGradient id="apGrad" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#0f172a"/>
+                <stop offset="1" stop-color="#1e293b"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">Auto<span class="text-accent">Prime</span></span>
+          <span class="brand-desc">Siêu Thị Ô Tô Đa Thương Hiệu</span>
+        </div>
+      </a>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html" class="nav-item">Trang Chủ & Kho Xe</a>
+        <a href="car-detail.html" class="nav-item">Chi Tiết Siêu Xe Taycan</a>
+        <a href="test-drive.html" class="nav-item active">Lái Thử & Dịch Vụ</a>
+        <a href="index.html#calculator" class="nav-item">Dự Toán Lăn Bánh</a>
+        <a href="index.html#brands" class="nav-item">Thương Hiệu</a>
+        <a href="index.html#showrooms" class="nav-item">Showroom</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="car-detail.html" class="btn btn-outline btn-sm hide-mobile">
+          <i class="ph ph-lightning"></i> Xem Siêu Xe Taycan
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── TEST DRIVE MAIN SECTION ─── -->
+  <section class="td-main-section">
+    <div class="container">
+      <div class="section-header text-center" style="max-width:760px; margin:0 auto 36px;">
+        <span class="sub-title"><i class="ph-fill ph-steering-wheel"></i> TRẢI NGHIỆM VẬN HÀNH THỰC TẾ</span>
+        <h1 class="section-title">Đăng Ký Lái Thử VIP & Đổi Xe Cũ</h1>
+        <p style="color:var(--text-muted); font-size:15px;">
+          Lựa chọn lái thử tại một trong 5 Showroom hiện đại của AutoPrime hoặc yêu cầu chuyên viên đưa xe cùng tài liệu đến tận nhà quý khách.
+        </p>
+      </div>
+
+      <div class="td-grid-layout">
+        <!-- Form -->
+        <div class="td-form-container">
+          <form id="tdForm" onsubmit="event.preventDefault(); submitTestDrive();">
+            
+            <div class="td-step">
+              <span class="td-step-num">1</span>
+              <div class="td-step-content">
+                <label class="td-label">Dòng Xe Quý Khách Muốn Lái Thử:</label>
+                <div class="car-select-grid">
+                  <label class="car-option active">
+                    <input type="radio" name="tdCar" value="Porsche Taycan 4S Electric" checked />
+                    <div class="co-info">
+                      <strong>Porsche Taycan 4S</strong>
+                      <span>530 Mã lực · Thuần điện 800V</span>
+                    </div>
+                  </label>
+                  <label class="car-option">
+                    <input type="radio" name="tdCar" value="Mercedes-AMG GT 53 4MATIC+" />
+                    <div class="co-info">
+                      <strong>Mercedes-AMG GT 53</strong>
+                      <span>435 Mã lực · Động cơ I6 Turbo</span>
+                    </div>
+                  </label>
+                  <label class="car-option">
+                    <input type="radio" name="tdCar" value="BMW 735i M-Sport Pure" />
+                    <div class="co-info">
+                      <strong>BMW 735i M-Sport</strong>
+                      <span>Sedan Chủ Tịch · Màn hình 31 inch</span>
+                    </div>
+                  </label>
+                  <label class="car-option">
+                    <input type="radio" name="tdCar" value="VinFast VF9 Plus 7 Chỗ" />
+                    <div class="co-info">
+                      <strong>VinFast VF9 Plus</strong>
+                      <span>402 Mã lực · Full công nghệ ADAS</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="td-step">
+              <span class="td-step-num">2</span>
+              <div class="td-step-content">
+                <label class="td-label">Hình Thức Lái Thử:</label>
+                <div class="location-toggle-grid">
+                  <label class="loc-card active">
+                    <input type="radio" name="locType" value="Tại Showroom AutoPrime Q7" checked />
+                    <i class="ph-fill ph-buildings"></i>
+                    <strong>Tại Showroom</strong>
+                    <span>Có đường thử chuyên dụng</span>
+                  </label>
+                  <label class="loc-card">
+                    <input type="radio" name="locType" value="Giao xe lái thử tận nhà riêng" />
+                    <i class="ph-fill ph-house-line"></i>
+                    <strong>Lái Thử Tận Nhà</strong>
+                    <span>Chuyên viên đưa xe đến nơi</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="td-step">
+              <span class="td-step-num">3</span>
+              <div class="td-step-content">
+                <label class="td-label">Thời Gian & Thông Tin Quý Khách:</label>
+                <div class="contact-fields-grid">
+                  <div class="field-item">
+                    <label>Ngày hẹn lái thử:</label>
+                    <input type="date" id="tdDate" required />
+                  </div>
+                  <div class="field-item">
+                    <label>Khung giờ:</label>
+                    <select id="tdTime">
+                      <option value="09:00">09:00 Sáng</option>
+                      <option value="10:30" selected>10:30 Sáng</option>
+                      <option value="14:30">14:30 Chiều</option>
+                      <option value="16:00">16:00 Chiều</option>
+                    </select>
+                  </div>
+                  <div class="field-item">
+                    <label>Họ và tên quý khách (*):</label>
+                    <input type="text" id="tdName" placeholder="Nguyễn Hoàng Nam" required />
+                  </div>
+                  <div class="field-item">
+                    <label>Số điện thoại / Zalo (*):</label>
+                    <input type="tel" id="tdPhone" placeholder="0912 xxx xxx" required />
+                  </div>
+                </div>
+
+                <div class="trade-in-check">
+                  <input type="checkbox" id="checkTradeIn" />
+                  <label for="checkTradeIn">Tôi có nhu cầu định giá & đổi xe cũ lấy xe mới (Trade-In)</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top:16px;">
+                  <i class="ph-bold ph-check"></i> Xác Nhận Đăng Ký Lái Thử Miễn Phí
+                </button>
+              </div>
+            </div>
+
+          </form>
+        </div>
+
+        <!-- Sidebar Benefits -->
+        <div class="td-benefits-col">
+          <div class="benefit-box">
+            <div class="bb-icon"><i class="ph-fill ph-shield-check"></i></div>
+            <h4>An Toàn Tuyệt Đối</h4>
+            <p>100% các dòng xe lái thử đều được bảo dưỡng định kỳ và trang bị gói bảo hiểm trách nhiệm toàn diện.</p>
+          </div>
+
+          <div class="benefit-box">
+            <div class="bb-icon"><i class="ph-fill ph-certificate"></i></div>
+            <h4>Chuyên Viên Kỹ Thuật Đồng Hành</h4>
+            <p>Chuyên gia lái xe an toàn hướng dẫn chi tiết các tính năng phanh tái tạo, Launch Control và trợ lái tự động.</p>
+          </div>
+
+          <div class="benefit-box">
+            <div class="bb-icon"><i class="ph-fill ph-arrows-clockwise"></i></div>
+            <h4>Thẩm Định Xe Cũ Trong 15 Phút</h4>
+            <p>Mang xe cũ đến Showroom để được kiểm tra 176 hạng mục bằng máy đọc lỗi chuyên dụng và nhận báo giá thu mua cao hơn thị trường 5%.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SUCCESS MODAL ─── -->
+  <div id="tdModal" class="booking-modal-backdrop" style="display:none">
+    <div class="booking-modal-card">
+      <div class="bm-icon" style="color:#f59e0b;"><i class="ph-fill ph-check-circle"></i></div>
+      <h3 style="font-family:var(--font-heading); font-size:22px;">Đã Tiếp Nhận Lịch Lái Thử!</h3>
+      <p id="tdModalMsg">Chuyên viên AutoPrime sẽ liên hệ với quý khách trong vòng 10 phút để xác nhận lịch trình.</p>
+      <div class="bm-code-box" style="border-color:var(--accent); color:var(--text-main);">
+        MÃ ĐĂNG KÝ: <strong id="tdCode" style="color:#fbbf24;">AP-DRIVE-7821</strong>
+      </div>
+      <button class="btn btn-primary" onclick="closeTdModal()">Hoàn Tất</button>
+    </div>
+  </div>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-col">
+        <div class="brand-text" style="margin-bottom:14px;">
+          <span class="brand-name" style="font-size:22px; color:var(--text-main);">Auto<span class="text-accent">Prime</span> Motors</span>
+        </div>
+        <p style="color:var(--text-muted); font-size:14px; line-height:1.6;">
+          Hệ thống siêu thị ô tô đa thương hiệu chính hãng & xe lướt kiểm định 176 hạng mục.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4 style="color:var(--accent); font-size:15px; margin-bottom:12px;">Các Trang Website</h4>
+        <ul style="list-style:none; display:flex; flex-direction:column; gap:8px; font-size:14px; color:var(--text-muted);">
+          <li><a href="index.html">Trang Chủ & Kho Xe Sẵn Có</a></li>
+          <li><a href="car-detail.html">Chi Tiết Siêu Xe Taycan 4S</a></li>
+          <li><a href="test-drive.html" style="color:var(--accent); font-weight:600;">Đăng Ký Lái Thử & Dịch Vụ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 style="color:var(--accent); font-size:15px; margin-bottom:12px;">Hotline Hỗ Trợ Khách Hàng</h4>
+        <strong style="color:var(--accent); font-size:20px; font-family:var(--font-heading);">1800 6969</strong>
+        <p style="color:var(--text-dim); font-size:13px; margin-top:4px;">Miễn phí cước gọi 24/7 toàn quốc</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dateInp = document.getElementById('tdDate');
+    if (dateInp) dateInp.value = tomorrow.toISOString().split('T')[0];
+
+    document.querySelectorAll('.car-option input').forEach(input => {
+      input.addEventListener('change', () => {
+        document.querySelectorAll('.car-option').forEach(c => c.classList.remove('active'));
+        input.closest('.car-option').classList.add('active');
+      });
+    });
+
+    document.querySelectorAll('.loc-card input').forEach(input => {
+      input.addEventListener('change', () => {
+        document.querySelectorAll('.loc-card').forEach(c => c.classList.remove('active'));
+        input.closest('.loc-card').classList.add('active');
+      });
+    });
+  });
+
+  function submitTestDrive() {
+    const car = document.querySelector('input[name="tdCar"]:checked').value;
+    const loc = document.querySelector('input[name="locType"]:checked').value;
+    const name = document.getElementById('tdName').value;
+    const date = document.getElementById('tdDate').value;
+    const time = document.getElementById('tdTime').value;
+
+    const code = 'AP-DRIVE-' + Math.floor(1000 + Math.random() * 9000);
+    document.getElementById('tdCode').innerText = code;
+    document.getElementById('tdModalMsg').innerText = 'Cảm ơn quý khách ' + name + '! Lịch hẹn lái thử mẫu xe ' + car + ' (' + loc + ') lúc ' + time + ' ngày ' + date + ' đã được đăng ký thành công.';
+    document.getElementById('tdModal').style.display = 'flex';
+  }
+
+  function closeTdModal() {
+    document.getElementById('tdModal').style.display = 'none';
+  }
+  </script>
+</body>
+</html>

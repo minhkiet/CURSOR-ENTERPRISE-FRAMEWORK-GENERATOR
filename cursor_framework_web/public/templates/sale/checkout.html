@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thanh Toán An Toàn · AURA Earbuds Pro</title>
+  <meta name="description" content="Thanh toán 1-click cho tai nghe flagship AURA Earbuds Pro. Miễn phí giao 2h, bảo hành 24 tháng, hỗ trợ COD & VietQR." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="checkout-page-body">
+
+<!-- ─── HEADER ─── -->
+<header class="checkout-header">
+  <div class="container checkout-header-inner">
+    <a href="index.html" class="logo">
+      <span class="logo-mark">A</span>
+      <span>AURA</span>
+    </a>
+    
+    <div class="checkout-steps-indicator">
+      <span class="step-item done"><i class="ph-fill ph-check"></i> Giỏ hàng</span>
+      <span class="step-sep"><i class="ph ph-caret-right"></i></span>
+      <span class="step-item active">Thông tin & Thanh toán</span>
+      <span class="step-sep"><i class="ph ph-caret-right"></i></span>
+      <span class="step-item">Xác nhận</span>
+    </div>
+
+    <div class="checkout-security-badge">
+      <i class="ph-fill ph-shield-check"></i>
+      <span>Bảo mật 256-bit SSL</span>
+    </div>
+  </div>
+</header>
+
+<!-- ─── CHECKOUT MAIN CONTAINER ─── -->
+<main class="container checkout-layout">
+  <!-- Left Column: Forms -->
+  <div class="checkout-form-column">
+    
+    <!-- Express Payment Quick Options -->
+    <div class="checkout-block express-pay-block">
+      <div class="cb-label">Thanh toán nhanh Express Checkout</div>
+      <div class="express-btn-grid">
+        <button type="button" class="btn-express btn-momo" onclick="selectExpress('MoMo')">
+          <span style="font-weight:900; background:#a50064; color:#fff; padding:2px 8px; border-radius:4px; font-size:12px;">MoMo</span>
+          <span>Ví MoMo</span>
+        </button>
+        <button type="button" class="btn-express btn-zalopay" onclick="selectExpress('ZaloPay')">
+          <span style="font-weight:900; background:#0068ff; color:#fff; padding:2px 8px; border-radius:4px; font-size:12px;">Zalo</span>
+          <span>ZaloPay</span>
+        </button>
+        <button type="button" class="btn-express btn-vietqr" onclick="selectExpress('VietQR')">
+          <i class="ph-fill ph-qr-code" style="color:#0891b2; font-size:18px;"></i>
+          <span>VietQR 24/7</span>
+        </button>
+      </div>
+      <div class="or-divider"><span>Hoặc nhập thông tin giao hàng</span></div>
+    </div>
+
+    <!-- Contact & Shipping Address -->
+    <div class="checkout-block">
+      <h3 class="block-title"><i class="ph ph-map-pin"></i> 1. Địa Chỉ Nhận Hàng</h3>
+      
+      <div class="form-row-2">
+        <div class="form-field">
+          <label>Họ và Tên Người Nhận *</label>
+          <input type="text" id="chkName" class="form-input" placeholder="Ví dụ: Nguyễn Hoàng Nam" value="Nguyễn Hoàng Nam" />
+        </div>
+        <div class="form-field">
+          <label>Số Điện Thoại (Nhận SMS giao hàng) *</label>
+          <input type="tel" id="chkPhone" class="form-input" placeholder="Ví dụ: 0912 345 678" value="0912 345 678" />
+        </div>
+      </div>
+
+      <div class="form-field" style="margin-top: 14px;">
+        <label>Email Nhận Hóa Đơn VAT Điện Tử</label>
+        <input type="email" id="chkEmail" class="form-input" placeholder="nam.nguyen@email.com" value="nam.nguyen@email.com" />
+      </div>
+
+      <div class="form-row-2" style="margin-top: 14px;">
+        <div class="form-field">
+          <label>Tỉnh / Thành Phố *</label>
+          <select id="chkCity" class="form-input" onchange="updateShippingEstimate()">
+            <option value="hcm" selected>TP. Hồ Chí Minh (Giao 2H miễn phí)</option>
+            <option value="hn">Hà Nội (Giao 2H miễn phí)</option>
+            <option value="dn">Đà Nẵng (Giao 24H)</option>
+            <option value="other">Tỉnh thành khác (Giao 1-2 ngày)</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Quận / Huyện *</label>
+          <input type="text" id="chkDistrict" class="form-input" placeholder="Ví dụ: Quận 1 / Ba Đình" value="Quận 1" />
+        </div>
+      </div>
+
+      <div class="form-field" style="margin-top: 14px;">
+        <label>Địa Chỉ Cụ Thể (Số nhà, tên đường, tòa nhà) *</label>
+        <input type="text" id="chkAddress" class="form-input" placeholder="Ví dụ: 124 Nguyễn Huệ, P. Bến Nghé" value="124 Nguyễn Huệ, P. Bến Nghé" />
+      </div>
+
+      <div class="form-field" style="margin-top: 14px;">
+        <label>Ghi Chú Cho Shipper</label>
+        <input type="text" id="chkNote" class="form-input" placeholder="Giao giờ hành chính, gọi trước khi đến..." value="Gọi trước 15 phút, giao giờ hành chính." />
+      </div>
+    </div>
+
+    <!-- Shipping Method -->
+    <div class="checkout-block">
+      <h3 class="block-title"><i class="ph ph-truck"></i> 2. Phương Thức Vận Chuyển</h3>
+      
+      <div class="shipping-opts">
+        <label class="ship-opt active">
+          <input type="radio" name="shippingMethod" checked />
+          <div class="so-content">
+            <div class="so-top">
+              <strong>Hỏa Tốc 2H Nội Thành (AURA Now)</strong>
+              <span class="so-badge">MIỄN PHÍ</span>
+            </div>
+            <p>Nhận hàng trong 2 tiếng tại TP.HCM & Hà Nội. Đóng gói hộp quà chống sốc cao cấp.</p>
+          </div>
+        </label>
+
+        <label class="ship-opt">
+          <input type="radio" name="shippingMethod" />
+          <div class="so-content">
+            <div class="so-top">
+              <strong>Giao Tiêu Chuẩn Toàn Quốc (1 - 2 Ngày)</strong>
+              <span class="so-badge">MIỄN PHÍ</span>
+            </div>
+            <p>Vận chuyển hỏa tốc qua Viettel Post / GHN với bảo hiểm 100% giá trị sản phẩm.</p>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Payment Method -->
+    <div class="checkout-block">
+      <h3 class="block-title"><i class="ph ph-credit-card"></i> 3. Hình Thức Thanh Toán</h3>
+      
+      <div class="payment-opts">
+        <label class="pay-opt active" onclick="setPayMethod('cod', this)">
+          <input type="radio" name="paymentOption" checked />
+          <div class="po-icon"><i class="ph-fill ph-hand-coins" style="color:#f97316;"></i></div>
+          <div class="po-info">
+            <strong>Thanh toán tiền mặt khi nhận hàng (COD)</strong>
+            <p>Được kiểm tra hàng, thử tai nghe trước khi thanh toán. An tâm tuyệt đối 100%.</p>
+          </div>
+        </label>
+
+        <label class="pay-opt" onclick="setPayMethod('vietqr', this)">
+          <input type="radio" name="paymentOption" />
+          <div class="po-icon"><i class="ph-fill ph-qr-code" style="color:#0891b2;"></i></div>
+          <div class="po-info">
+            <strong>Quét mã VietQR chuyển khoản 24/7</strong>
+            <p>Tự động xác nhận giao dịch qua app ngân hàng, không lo nhập sai số tài khoản.</p>
+          </div>
+        </label>
+
+        <label class="pay-opt" onclick="setPayMethod('card', this)">
+          <input type="radio" name="paymentOption" />
+          <div class="po-icon"><i class="ph-fill ph-credit-card" style="color:#3b82f6;"></i></div>
+          <div class="po-info">
+            <strong>Thẻ Quốc Tế Visa / Mastercard / JCB</strong>
+            <p>Bảo mật qua cổng thanh toán 3D Secure mã hóa OTP cấp 2.</p>
+          </div>
+        </label>
+
+        <label class="pay-opt" onclick="setPayMethod('installment', this)">
+          <input type="radio" name="paymentOption" />
+          <div class="po-icon"><i class="ph-fill ph-percent" style="color:#10b981;"></i></div>
+          <div class="po-info">
+            <strong>Trả góp 0% Lãi Suất (3 - 6 Tháng)</strong>
+            <p>Chỉ từ ₫415,000/tháng qua Fundiin / Kredivo hoặc thẻ tín dụng ngân hàng.</p>
+          </div>
+        </label>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right Column: Order Summary (Sticky) -->
+  <aside class="checkout-summary-column">
+    <div class="summary-box">
+      <h3 class="sum-title">Đơn Hàng Của Bạn (1 Sản Phẩm)</h3>
+
+      <!-- Item Preview -->
+      <div class="sum-item">
+        <div class="item-visual-wrap">
+          <svg viewBox="0 0 100 100" width="60" height="60" class="mini-svg-item">
+            <ellipse cx="35" cy="55" rx="20" ry="24" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
+            <ellipse cx="65" cy="55" rx="20" ry="24" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
+            <path d="M 20 40 Q 50 15 80 40" stroke="#1a1a1a" stroke-width="4" fill="none"/>
+          </svg>
+          <span class="item-qty-badge" id="itemQtyBadge">1</span>
+        </div>
+        <div class="item-meta">
+          <div class="item-name">AURA Earbuds Pro Flagship</div>
+          <div class="item-variant" id="selectedColorLabel">Màu: Onyx Black · Bảo hành 24 tháng</div>
+          <div class="color-picker-mini">
+            <button class="c-dot active" style="background:#1a1a1a" onclick="changeColor('Onyx Black', this)"></button>
+            <button class="c-dot" style="background:#f5f5f4" onclick="changeColor('Polar White', this)"></button>
+            <button class="c-dot" style="background:#1e3a8a" onclick="changeColor('Deep Navy', this)"></button>
+            <button class="c-dot" style="background:#7c2d12" onclick="changeColor('Terra Cotta', this)"></button>
+          </div>
+        </div>
+        <div class="item-price" id="lineItemPrice">₫2,490,000</div>
+      </div>
+
+      <!-- Quantity Adjuster -->
+      <div class="qty-controller-row">
+        <span>Số lượng mua:</span>
+        <div class="qty-stepper">
+          <button type="button" onclick="adjustQty(-1)">-</button>
+          <span id="qtyNumber">1</span>
+          <button type="button" onclick="adjustQty(1)">+</button>
+        </div>
+      </div>
+
+      <!-- Coupon Code Box -->
+      <div class="coupon-box">
+        <input type="text" id="couponInput" value="FLASH45" placeholder="Mã giảm giá" readonly />
+        <button type="button" class="btn-coupon" disabled>ĐÃ ÁP DỤNG</button>
+      </div>
+      <div class="coupon-applied-msg"><i class="ph-fill ph-check-circle"></i> Tiết kiệm 45% (₫2,000,000) từ Flash Sale Độc Quyền</div>
+
+      <!-- Financial Calculation -->
+      <div class="calc-divider"></div>
+
+      <div class="cost-rows">
+        <div class="cost-row">
+          <span>Giá niêm yết:</span>
+          <span class="old-price-line" id="dispOriginal">₫4,490,000</span>
+        </div>
+        <div class="cost-row discount-highlight">
+          <span>Ưu đãi Flash Sale (-45%):</span>
+          <span id="dispDiscount">-₫2,000,000</span>
+        </div>
+        <div class="cost-row">
+          <span>Phí giao hàng hỏa tốc 2H:</span>
+          <span class="free-text">MIỄN PHÍ</span>
+        </div>
+        <div class="cost-row">
+          <span>Thuế giá trị gia tăng (VAT 8%):</span>
+          <span>Đã bao gồm</span>
+        </div>
+
+        <div class="calc-divider"></div>
+
+        <div class="cost-total-row">
+          <span class="total-lbl">Tổng Thanh Toán:</span>
+          <span class="total-val" id="dispGrandTotal">₫2,490,000</span>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="button" class="btn btn-primary btn-full submit-order-btn" onclick="submitOrder()">
+        <i class="ph-fill ph-lock-key"></i> ĐẶT HÀNG NGAY · GIAO TẬN TAY
+      </button>
+
+      <!-- Trust Features -->
+      <div class="summary-guarantees">
+        <div class="sg-item"><i class="ph-fill ph-shield-check"></i> Đổi mới 30 ngày nếu phát sinh lỗi nhà sản xuất</div>
+        <div class="sg-item"><i class="ph-fill ph-package"></i> Đồng kiểm mở hộp kiểm tra tai nghe trước khi trả tiền</div>
+        <div class="sg-item"><i class="ph-fill ph-headphones"></i> Hotline hỗ trợ kỹ thuật và bảo hành: 1900 6868</div>
+      </div>
+
+    </div>
+  </aside>
+</main>
+
+<!-- ─── SUCCESS ORDER CONFIRMATION MODAL ─── -->
+<div class="modal-backdrop" id="orderSuccessModal">
+  <div class="modal-card">
+    <div class="modal-celebrate-icon">
+      <i class="ph-fill ph-check-circle"></i>
+    </div>
+    <h2>Đặt Hàng Thành Công!</h2>
+    <p class="modal-desc">
+      Cảm ơn quý khách đã tin tưởng chọn <strong style="color:#f97316">AURA Earbuds Pro</strong>. Đơn hàng đang được chuẩn bị đóng gói tại kho hỏa tốc.
+    </p>
+
+    <div class="order-receipt-card">
+      <div class="orc-row">
+        <span>Mã Đơn Hàng:</span>
+        <strong id="modalOrderCode" style="color:#0f172a; font-family:'Space Grotesk'">#AUR-VN-88291</strong>
+      </div>
+      <div class="orc-row">
+        <span>Người Nhận:</span>
+        <span id="modalReceiver">Nguyễn Hoàng Nam (0912 345 678)</span>
+      </div>
+      <div class="orc-row">
+        <span>Địa Chỉ Giao:</span>
+        <span id="modalAddress">124 Nguyễn Huệ, P. Bến Nghé, Quận 1, TP.HCM</span>
+      </div>
+      <div class="orc-row">
+        <span>Sản Phẩm:</span>
+        <span id="modalProductDetails">1x AURA Earbuds Pro (Onyx Black)</span>
+      </div>
+      <div class="orc-row">
+        <span>Hình Thức:</span>
+        <span id="modalPayMethod">Thanh toán khi nhận hàng (COD)</span>
+      </div>
+      <div class="orc-row total-highlight">
+        <span>Tổng Tiền Thanh Toán:</span>
+        <strong id="modalFinalPrice" style="color:#f97316; font-size:18px;">₫2,490,000</strong>
+      </div>
+    </div>
+
+    <!-- Live ETA Timer Box -->
+    <div class="eta-box">
+      <div class="eta-icon"><i class="ph-fill ph-lightning"></i></div>
+      <div>
+        <div class="eta-title">Dự kiến giao hàng hỏa tốc trong <strong>1 giờ 45 phút</strong></div>
+        <div class="eta-sub">Nhân viên giao nhận sẽ liên hệ trước khi đến địa chỉ của bạn</div>
+      </div>
+    </div>
+
+    <div class="modal-btns">
+      <button type="button" class="btn btn-primary btn-full" onclick="closeOrderModal()">Đã Lưu Đơn Hàng</button>
+      <a href="index.html" class="btn btn-outline btn-full" style="margin-top:8px;">Quay Lại Trang Sản Phẩm</a>
+    </div>
+  </div>
+</div>
+
+<!-- ─── FLOATING CONTACT BUTTONS ─── -->
+<div class="floating-contact">
+  <a href="tel:19006868" class="floating-btn floating-btn_hotline" aria-label="Gọi hotline: 1900 6868">
+    <span class="floating-tooltip">Hotline tư vấn: 1900 6868</span>
+    <svg viewBox="0 0 24 24" fill="white" width="22" height="22">
+      <path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.4-.1-.8 0-1.1.3l-2.2 2.2c-.3-.3.4-.7.2-1.1-.4-1.1-.6-2.3-.6-3.5 0-.6-.4-1-1-1H4c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"/>
+    </svg>
+  </a>
+  <a href="https://zalo.me" target="_blank" rel="noopener" class="floating-btn floating-btn_zalo" aria-label="Chat Zalo 24/7">
+    <span class="floating-tooltip">Chat Zalo Chuyên Viên</span>
+    <svg viewBox="0 0 32 32" fill="none" width="26" height="26">
+      <path d="M16 4C9.4 4 4 8.7 4 14.5c0 3.3 1.8 6.3 4.5 8.2l-1.2 4.4c-.1.5.4.9.9.6l5-2.8c.9.3 1.8.4 2.8.4 6.6 0 12-4.7 12-10.5S22.6 4 16 4Z" fill="white"/>
+      <text x="16" y="17.8" fill="#0068FF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="8.5" text-anchor="middle" letter-spacing="-0.3">Zalo</text>
+    </svg>
+  </a>
+</div>
+
+<!-- ─── JAVASCRIPT LOGIC ─── -->
+<script>
+let qty = 1;
+const unitOriginalPrice = 4490000;
+const unitSalePrice = 2490000;
+let currentColor = 'Onyx Black';
+let currentPaymentMethod = 'Thanh toán tiền mặt khi nhận hàng (COD)';
+
+function changeColor(colorName, btn) {
+  currentColor = colorName;
+  document.querySelectorAll('.c-dot').forEach(d => d.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('selectedColorLabel').textContent = `Màu: ${colorName} · Bảo hành 24 tháng`;
+}
+
+function adjustQty(delta) {
+  qty = Math.max(1, Math.min(10, qty + delta));
+  document.getElementById('qtyNumber').textContent = qty;
+  document.getElementById('itemQtyBadge').textContent = qty;
+  recalculateOrder();
+}
+
+function recalculateOrder() {
+  const originalTotal = unitOriginalPrice * qty;
+  const saleTotal = unitSalePrice * qty;
+  const discountTotal = originalTotal - saleTotal;
+
+  const fmt = (n) => '₫' + n.toLocaleString('vi-VN');
+
+  document.getElementById('lineItemPrice').textContent = fmt(saleTotal);
+  document.getElementById('dispOriginal').textContent = fmt(originalTotal);
+  document.getElementById('dispDiscount').textContent = '-' + fmt(discountTotal);
+  document.getElementById('dispGrandTotal').textContent = fmt(saleTotal);
+}
+
+function setPayMethod(type, el) {
+  document.querySelectorAll('.pay-opt').forEach(o => o.classList.remove('active'));
+  el.classList.add('active');
+  if (type === 'cod') currentPaymentMethod = 'Thanh toán tiền mặt khi nhận hàng (COD)';
+  if (type === 'vietqr') currentPaymentMethod = 'Quét mã VietQR chuyển khoản 24/7';
+  if (type === 'card') currentPaymentMethod = 'Thẻ Quốc Tế Visa / Mastercard';
+  if (type === 'installment') currentPaymentMethod = 'Trả góp 0% Lãi Suất';
+}
+
+function selectExpress(method) {
+  currentPaymentMethod = `Ví điện tử ${method}`;
+  submitOrder();
+}
+
+function updateShippingEstimate() {
+  const city = document.getElementById('chkCity').value;
+  // Dynamic feedback if needed
+}
+
+function submitOrder() {
+  const name = document.getElementById('chkName').value || 'Quý khách';
+  const phone = document.getElementById('chkPhone').value || 'Chưa cung cấp';
+  const address = document.getElementById('chkAddress').value || 'TP.HCM';
+  const cityText = document.getElementById('chkCity').options[document.getElementById('chkCity').selectedIndex].text;
+  const randomId = 'AUR-VN-' + Math.floor(10000 + Math.random() * 90000);
+
+  document.getElementById('modalOrderCode').textContent = '#' + randomId;
+  document.getElementById('modalReceiver').textContent = `${name} (${phone})`;
+  document.getElementById('modalAddress').textContent = `${address}, ${cityText}`;
+  document.getElementById('modalProductDetails').textContent = `${qty}x AURA Earbuds Pro (${currentColor})`;
+  document.getElementById('modalPayMethod').textContent = currentPaymentMethod;
+  document.getElementById('modalFinalPrice').textContent = document.getElementById('dispGrandTotal').textContent;
+
+  const modal = document.getElementById('orderSuccessModal');
+  if (modal) modal.classList.add('active');
+}
+
+function closeOrderModal() {
+  const modal = document.getElementById('orderSuccessModal');
+  if (modal) modal.classList.remove('active');
+}
+</script>
+
+</body>
+</html>

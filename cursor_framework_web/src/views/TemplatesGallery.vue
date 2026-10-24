@@ -257,7 +257,14 @@ onUnmounted(() => {
             <div class="template-card-body">
               <div class="template-card-meta">
                 <span class="template-card-category">{{ t.industry }}</span>
-                <span class="template-card-pages">{{ t.pages }} trang · {{ t.fileSize }}</span>
+                <span class="template-card-pages">
+                  <span v-if="t.pagesList && t.pagesList.length > 1" class="multi-page-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="10" height="10"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                    {{ t.pagesList.length }} trang
+                  </span>
+                  <span v-else>{{ t.pages }} sections</span>
+                  · {{ t.fileSize }}
+                </span>
               </div>
               <h3 class="template-card-title">{{ t.name }}</h3>
               <p class="template-card-tagline">{{ t.tagline }}</p>
@@ -744,6 +751,22 @@ onUnmounted(() => {
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.multi-page-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--accent-dim);
+  color: var(--accent);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  font-size: 10px;
 }
 
 .template-card-title {

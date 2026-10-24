@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đặt Bàn Trực Tuyến & Phòng VIP — Vị Xưa Quán (Michelin Selected)</title>
+  <meta name="description" content="Đặt bàn trực tuyến giữ chỗ đẹp tại Vị Xưa Quán: Chọn chi nhánh, phòng VIP Hoàng Cung máy lạnh riêng tư, mâm cơm gia đình 3 miền. Xác nhận tức thì." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="reservation-page-body">
+
+  <!-- ─── TOP NOTICE BAR ─── -->
+  <aside class="top-bar">
+    <div class="container top-bar-inner">
+      <div class="top-left">
+        <span class="badge-status"><span class="pulse-dot"></span> Bếp Đang Đón Khách (10:00 – 22:30)</span>
+        <span class="sep"></span>
+        <a href="tel:19008899" class="hotline-link">
+          <i class="ph-fill ph-phone-call"></i> Hotline Hỗ Trợ 24/7: <strong>1900 8899</strong>
+        </a>
+      </div>
+      <div class="top-right">
+        <span class="promo-text"><i class="ph-fill ph-sparkle"></i> Giữ bàn đẹp trong 15 phút không cần đặt cọc trước</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ─── HEADER & NAVIGATION ─── -->
+  <header class="navbar" id="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="brand-logo" aria-label="Vị Xưa Quán">
+        <div class="brand-pot-icon">
+          <svg viewBox="0 0 40 40" fill="none">
+            <circle cx="20" cy="20" r="18" fill="#451a03" stroke="#b45309" stroke-width="1.5"/>
+            <path d="M12 22C12 26 15.5 29 20 29C24.5 29 28 26 28 22H12Z" fill="#d97706"/>
+            <ellipse cx="20" cy="20" rx="9" ry="2.5" fill="#fef3c7"/>
+            <path d="M17 14C17 12 18 10 20 9C20 12 22 13 22 15" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M14 16C14 14.5 15 13 16 12" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">Vị Xưa <span class="brand-accent">Quán</span></span>
+          <span class="brand-tagline">Cơm Niêu & Ẩm Thực Cổ Truyền</span>
+        </div>
+      </a>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html" class="nav-item">Trang Chủ</a>
+        <a href="menu.html" class="nav-item">Thực Đơn Di Sản</a>
+        <a href="reservation.html" class="nav-item active">Đặt Bàn & Phòng VIP</a>
+        <a href="index.html#about" class="nav-item">Câu Chuyện Vị Xưa</a>
+        <a href="index.html#vouchers" class="nav-item">Voucher 15%</a>
+        <a href="index.html#branches" class="nav-item">Chi Nhánh</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="menu.html" class="btn btn-outline btn-sm hide-mobile">
+          <i class="ph ph-book-open"></i> Xem Thực Đơn
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── RESERVATION SECTION ─── -->
+  <section class="reservation-main-section">
+    <div class="container">
+      <div class="section-head text-center" style="max-width: 800px; margin: 0 auto 40px;">
+        <span class="sub-label"><i class="ph-fill ph-seal-check"></i> TIẾP ĐÓN TRỌNG THỊ</span>
+        <h1 class="section-title" style="margin: 12px 0;">
+          Đặt Bàn Trực Tuyến & Phòng VIP <br />
+          <span class="text-serif">Chu Đáo Từng Khoảnh Khắc Đoàn Viên</span>
+        </h1>
+        <p class="section-desc" style="color:var(--text-muted);">
+          Vui lòng điền thông tin để Vị Xưa chuẩn bị không gian ấm cúng nhất, thố cơm niêu nóng hổi vừa chín tới sẵn sàng đón tiếp quý thực khách.
+        </p>
+      </div>
+
+      <div class="res-layout-grid">
+        <!-- Left: Form -->
+        <div class="res-form-card">
+          <form id="mainBookingForm" onsubmit="event.preventDefault(); handleBookingSubmit();">
+
+            <!-- Step 1: Branch -->
+            <div class="form-step-block">
+              <span class="step-num-badge">1</span>
+              <div class="step-content">
+                <label class="step-title">Chọn Chi Nhánh Vị Xưa Quán:</label>
+                <div class="branch-selector-grid">
+                  <label class="branch-radio-card active">
+                    <input type="radio" name="branch" value="Thảo Điền, TP. Thủ Đức (TP.HCM)" checked />
+                    <div class="br-info">
+                      <strong>CN1: Thảo Điền (TP.HCM)</strong>
+                      <span>Biệt thự cổ ven sông, bãi đỗ xe ô tô 50 chỗ</span>
+                    </div>
+                  </label>
+                  <label class="branch-radio-card">
+                    <input type="radio" name="branch" value="Phố Cổ Hoàn Kiếm (Hà Nội)" />
+                    <div class="br-info">
+                      <strong>CN2: Hoàn Kiếm (Hà Nội)</strong>
+                      <span>Nhà cổ Bắc Bộ 1928, view hồ Gươm thanh bình</span>
+                    </div>
+                  </label>
+                  <label class="branch-radio-card">
+                    <input type="radio" name="branch" value="Bờ Sông Hàn (Đà Nẵng)" />
+                    <div class="br-info">
+                      <strong>CN3: Sông Hàn (Đà Nẵng)</strong>
+                      <span>Không gian mở đón gió biển & ngắm cầu Rồng</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 2: Party Size & Table Type -->
+            <div class="form-step-block">
+              <span class="step-num-badge">2</span>
+              <div class="step-content">
+                <label class="step-title">Số Lượng Thực Khách & Loại Phòng:</label>
+                <div class="table-type-grid">
+                  <label class="table-opt-btn active">
+                    <input type="radio" name="tableType" value="Bàn đôi 2 khách" checked />
+                    <i class="ph-fill ph-users"></i>
+                    <strong>Bàn Đôi</strong>
+                    <span>2 khách</span>
+                  </label>
+                  <label class="table-opt-btn">
+                    <input type="radio" name="tableType" value="Mâm gia đình 4-6 khách" />
+                    <i class="ph-fill ph-users-three"></i>
+                    <strong>Gia Đình</strong>
+                    <span>4–6 khách</span>
+                  </label>
+                  <label class="table-opt-btn">
+                    <input type="radio" name="tableType" value="Mâm đại gia đình 8-12 khách" />
+                    <i class="ph-fill ph-users-four"></i>
+                    <strong>Mâm Tiệc</strong>
+                    <span>8–12 khách</span>
+                  </label>
+                  <label class="table-opt-btn">
+                    <input type="radio" name="tableType" value="Phòng VIP Hoàng Cung (15-25 khách)" />
+                    <i class="ph-fill ph-crown"></i>
+                    <strong>Phòng VIP</strong>
+                    <span>15–25 khách</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 3: Date & Time -->
+            <div class="form-step-block">
+              <span class="step-num-badge">3</span>
+              <div class="step-content">
+                <label class="step-title">Ngày & Khung Giờ Đón Khách:</label>
+                <div class="datetime-grid">
+                  <div class="dt-field">
+                    <label>Ngày đến dùng bữa:</label>
+                    <input type="date" id="resDate" required />
+                  </div>
+                  <div class="dt-field">
+                    <label>Khung giờ phục vụ:</label>
+                    <select id="resTime" required>
+                      <optgroup label="Ca Trưa (11:00 – 14:00)">
+                        <option value="11:30">11:30 Trưa</option>
+                        <option value="12:00" selected>12:00 Trưa (Cao điểm)</option>
+                        <option value="12:30">12:30 Trưa</option>
+                        <option value="13:00">13:00 Trưa</option>
+                      </optgroup>
+                      <optgroup label="Ca Tối (17:30 – 22:00)">
+                        <option value="18:00">18:00 Tối</option>
+                        <option value="18:30">18:30 Tối</option>
+                        <option value="19:00">19:00 Tối (Ngắm cảnh đẹp)</option>
+                        <option value="19:30">19:30 Tối</option>
+                        <option value="20:00">20:00 Tối</option>
+                      </optgroup>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 4: Special Request & Pre-ordered Dishes -->
+            <div class="form-step-block">
+              <span class="step-num-badge">4</span>
+              <div class="step-content">
+                <label class="step-title">Mục Đích Buổi Tiệc & Yêu Cầu Riêng:</label>
+                <div class="occasion-pills">
+                  <label class="occ-pill"><input type="checkbox" value="Cơm sum họp gia đình" checked /> Cơm sum họp gia đình</label>
+                  <label class="occ-pill"><input type="checkbox" value="Tiếp đãi đối tác kinh doanh" /> Tiếp đãi đối tác</label>
+                  <label class="occ-pill"><input type="checkbox" value="Kỷ niệm ngày cưới / Sinh nhật" /> Sinh nhật / Kỷ niệm</label>
+                  <label class="occ-pill"><input type="checkbox" value="Có khách ăn chay" /> Có món chay</label>
+                </div>
+
+                <div id="preorderBox" class="preorder-notice-box" style="display:none">
+                  <i class="ph-fill ph-cooking-pot"></i>
+                  <div>
+                    <strong>Thực đơn đặt trước từ trang Menu:</strong>
+                    <div id="preorderList" style="font-size:12.5px; color:var(--text-main); margin-top:4px;"></div>
+                  </div>
+                </div>
+
+                <textarea id="resNotes" placeholder="Ghi chú thêm: bàn cạnh cửa sổ, ghế ăn cho trẻ em em bé, không cho bột ngọt..." rows="3"></textarea>
+              </div>
+            </div>
+
+            <!-- Step 5: Contact Info -->
+            <div class="form-step-block">
+              <span class="step-num-badge">5</span>
+              <div class="step-content">
+                <label class="step-title">Thông Tin Người Đặt Bàn:</label>
+                <div class="contact-grid">
+                  <div class="cg-field">
+                    <label>Họ và tên quý khách (*):</label>
+                    <input type="text" id="custName" placeholder="Nguyễn Văn A" required />
+                  </div>
+                  <div class="cg-field">
+                    <label>Số điện thoại / Zalo (*):</label>
+                    <input type="tel" id="custPhone" placeholder="0908 xxx xxx" required />
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top:20px;">
+                  <i class="ph-fill ph-check-circle"></i> Xác Nhận Giữ Bàn Đẹp Ngay
+                </button>
+                <span class="res-privacy-note"><i class="ph-fill ph-shield-check"></i> Xác nhận tức thì qua tin nhắn Zalo/SMS trong 60 giây</span>
+              </div>
+            </div>
+
+          </form>
+        </div>
+
+        <!-- Right: VIP Rooms Showcase & Direct Hotline -->
+        <div class="res-sidebar-col">
+          <!-- VIP Room 1 -->
+          <div class="vip-room-card">
+            <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80" alt="Phòng VIP Thăng Long" />
+            <div class="vrc-body">
+              <span class="vrc-badge">PHÒNG VIP ĐẠI TIỆC</span>
+              <h4>Phòng VIP Thăng Long (25 Khách)</h4>
+              <p>Nội thất gỗ lim thế kỷ 19, bàn tròn xoay mạ đồng cổ kính, hệ thống điều hòa độc lập và biểu diễn đàn tranh theo yêu cầu.</p>
+              <div class="vrc-features">
+                <span><i class="ph-fill ph-check"></i> Không gian riêng tư 100%</span>
+                <span><i class="ph-fill ph-check"></i> Phục vụ riêng từng món</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- VIP Room 2 -->
+          <div class="vip-room-card">
+            <img src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=600&q=80" alt="Sân Vườn Hoa Sen" />
+            <div class="vrc-body">
+              <span class="vrc-badge">KHÔNG GIAN MỞ</span>
+              <h4>Sảnh Vườn Sen Bắc Bộ</h4>
+              <p>Bàn ăn đặt bên hồ cá koi và hồ súng thanh tịnh. Thưởng thức niêu cơm nóng trong tiếng chuông gió du dương mộc mạc.</p>
+            </div>
+          </div>
+
+          <!-- Direct Hotline Card -->
+          <div class="hotline-help-card">
+            <i class="ph-fill ph-headset"></i>
+            <div>
+              <h4>Cần Đặt Tiệc Gấp Hôm Nay?</h4>
+              <p>Quản lý sảnh tiệc hỗ trợ chọn thực đơn và xếp phòng VIP tức thì:</p>
+              <a href="tel:19008899" class="hotline-big">1900 8899</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── BOOKING SUCCESS MODAL ─── -->
+  <div id="resSuccessModal" class="booking-modal-backdrop" style="display:none">
+    <div class="booking-modal-card">
+      <div class="bm-icon" style="color:#f59e0b;"><i class="ph-fill ph-check-circle"></i></div>
+      <h3 style="font-family:var(--font-serif); font-size:24px;">Xác Nhận Giữ Bàn Thành Công!</h3>
+      <p id="resSuccessMsg">Vị Xưa Quán rất hân hạnh được phục vụ quý khách.</p>
+      <div class="bm-code-box" style="border-color:var(--accent-bright); color:var(--text-main);">
+        MÃ ĐẶT BÀN: <strong id="resCode" style="color:#fde047;">VIXUA-9821</strong>
+      </div>
+      <p style="font-size:12.5px; color:var(--text-dim); margin-bottom:20px;">
+        Hệ thống đã gửi tin nhắn xác nhận kèm định vị Google Maps đến số điện thoại của bạn.
+      </p>
+      <div style="display:flex; gap:12px; justify-content:center;">
+        <a href="menu.html" class="btn btn-outline btn-sm">Xem Thêm Thực Đơn</a>
+        <button class="btn btn-primary btn-sm" onclick="closeResModal()">Hoàn Tất</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-col">
+        <div class="brand-text" style="margin-bottom:12px;">
+          <span class="brand-title" style="font-size:22px; color:var(--text-main);">Vị Xưa <span class="brand-accent">Quán</span></span>
+        </div>
+        <p style="color:var(--text-muted); font-size:14px; line-height:1.6;">
+          Gìn giữ mâm cơm di sản 3 miền đạt giải thưởng Michelin Selected 2024–2026.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4 style="color:var(--accent-bright); font-size:15px; margin-bottom:12px;">Các Trang Website</h4>
+        <ul style="list-style:none; display:flex; flex-direction:column; gap:8px; font-size:14px; color:var(--text-muted);">
+          <li><a href="index.html">Trang Chủ & Không Gian</a></li>
+          <li><a href="menu.html">Thực Đơn Di Sản 3 Miền</a></li>
+          <li><a href="reservation.html" style="color:var(--accent-bright); font-weight:600;">Đặt Bàn Trực Tuyến & Phòng VIP</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 style="color:var(--accent-bright); font-size:15px; margin-bottom:12px;">Hệ Thống 4 Chi Nhánh</h4>
+        <p style="color:var(--text-muted); font-size:13px; line-height:1.6;">
+          • TP.HCM: 28 Nguyễn Văn Hưởng, Thảo Điền<br/>
+          • Hà Nội: 14 Chân Cầm, Hoàn Kiếm<br/>
+          • Đà Nẵng: 82 Bạch Đằng, Hải Châu
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Set default date to today
+    const today = new Date().toISOString().split('T')[0];
+    const dateInp = document.getElementById('resDate');
+    if (dateInp) dateInp.value = today;
+
+    // Check pre-ordered items from sessionStorage
+    const storedDishes = sessionStorage.getItem('selectedDishes');
+    if (storedDishes) {
+      try {
+        const dishes = JSON.parse(storedDishes);
+        if (dishes.length > 0) {
+          const box = document.getElementById('preorderBox');
+          const list = document.getElementById('preorderList');
+          box.style.display = 'flex';
+          list.innerText = dishes.map(d => '• ' + d.name).join(' | ');
+        }
+      } catch (e) {}
+    }
+
+    // Radio style toggles
+    document.querySelectorAll('.branch-radio-card input').forEach(input => {
+      input.addEventListener('change', () => {
+        document.querySelectorAll('.branch-radio-card').forEach(c => c.classList.remove('active'));
+        input.closest('.branch-radio-card').classList.add('active');
+      });
+    });
+
+    document.querySelectorAll('.table-opt-btn input').forEach(input => {
+      input.addEventListener('change', () => {
+        document.querySelectorAll('.table-opt-btn').forEach(c => c.classList.remove('active'));
+        input.closest('.table-opt-btn').classList.add('active');
+      });
+    });
+  });
+
+  function handleBookingSubmit() {
+    const name = document.getElementById('custName').value;
+    const date = document.getElementById('resDate').value;
+    const time = document.getElementById('resTime').value;
+    const branch = document.querySelector('input[name="branch"]:checked').value;
+    const tableType = document.querySelector('input[name="tableType"]:checked').value;
+
+    const code = 'VIXUA-' + Math.floor(1000 + Math.random() * 9000);
+    document.getElementById('resCode').innerText = code;
+    document.getElementById('resSuccessMsg').innerText = 'Cảm ơn quý khách ' + name + '! Bàn (' + tableType + ') tại ' + branch + ' vào lúc ' + time + ' ngày ' + date + ' đã được giữ chỗ thành công.';
+    document.getElementById('resSuccessModal').style.display = 'flex';
+  }
+
+  function closeResModal() {
+    document.getElementById('resSuccessModal').style.display = 'none';
+  }
+  </script>
+</body>
+</html>

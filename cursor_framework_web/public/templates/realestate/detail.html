@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grand Riverside Villa #08 — NhaTot Luxury Real Estate</title>
+  <meta name="description" content="Chi tiết biệt thự đơn lập Grand Riverside Villa: 520m² ven sông Thảo Điền, hồ bơi riêng 85m², 5PN Master En-suite, garage 3 xe sang. Sổ hồng vĩnh viễn." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="detail-page-body">
+
+<!-- ─── NAV ─── -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="index.html" class="logo">
+      <svg class="logo-mark" viewBox="0 0 32 32" fill="none">
+        <rect x="4" y="4" width="24" height="24" rx="7" fill="currentColor"/>
+        <path d="M10 22 L16 10 L22 22 M13 17 H19" stroke="#fafbff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>nhatot<span class="logo-dot">.</span></span>
+    </a>
+    <ul class="nav-menu">
+      <li><a href="index.html">Trang Chủ</a></li>
+      <li><a href="detail.html" class="active">Chi Tiết Biệt Thự</a></li>
+      <li><a href="pricing.html">Bảng Giá & Sa Bàn</a></li>
+      <li><a href="index.html#features">Tính Năng</a></li>
+      <li><a href="index.html#customers">Đánh Giá</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="pricing.html" class="nav-ghost">Tải Báo Giá PDF</a>
+      <a href="#tour-form" class="nav-cta">
+        <i class="ph ph-calendar-check"></i>
+        Đặt lịch xem nhà VIP
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── BREADCRUMBS & TITLE ─── -->
+<section class="detail-hero-header">
+  <div class="container">
+    <div class="breadcrumbs">
+      <a href="index.html"><i class="ph ph-house"></i> Trang Chủ</a>
+      <span class="sep">/</span>
+      <a href="index.html">Biệt Thự Đơn Lập View Sông</a>
+      <span class="sep">/</span>
+      <span class="current">Grand Riverside Villa #08</span>
+    </div>
+
+    <div class="property-header-row">
+      <div class="ph-left">
+        <div class="ph-tags">
+          <span class="badge-status-gold"><i class="ph-fill ph-seal-check"></i> Độc Quyền Phân Phối</span>
+          <span class="badge-status-verified"><i class="ph-fill ph-shield-check"></i> Đã Kiểm Định Pháp Lý 100%</span>
+          <span class="badge-status-sub">Sổ Hồng Sở Hữu Lâu Dài</span>
+        </div>
+        <h1 class="property-title">
+          Grand Riverside Masterpiece Villa #08
+        </h1>
+        <p class="property-address">
+          <i class="ph-fill ph-map-pin"></i> Phân khu Đảo Ngọc Riverside, Nguyễn Văn Hưởng, Thảo Điền, TP. Thủ Đức, TP. Hồ Chí Minh
+        </p>
+      </div>
+
+      <div class="ph-right">
+        <div class="price-box">
+          <span class="price-label">Giá chuyển nhượng trọn gói:</span>
+          <div class="price-val">38.500.000.000 <span class="price-curr">VNĐ</span></div>
+          <div class="price-sub">Khoảng <strong>74,03 triệu/m²</strong> sàn · Chiết khấu thanh toán sớm <strong>11%</strong></div>
+        </div>
+        <div class="ph-actions">
+          <button class="btn btn-outline btn-share" onclick="navigator.clipboard.writeText(window.location.href); alert('Đã sao chép liên kết biệt thự!')">
+            <i class="ph ph-share-network"></i> Chia sẻ
+          </button>
+          <a href="#mortgage-calc" class="btn btn-outline">
+            <i class="ph ph-calculator"></i> Tính lãi vay
+          </a>
+          <a href="#tour-form" class="btn btn-primary">
+            <i class="ph ph-calendar-plus"></i> Đặt lịch xem VIP
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PHOTO GALLERY GRID ─── -->
+<section class="property-gallery-section">
+  <div class="container">
+    <div class="gallery-grid">
+      <!-- Main big photo -->
+      <div class="gallery-main" id="galleryMain">
+        <img
+          src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1400&q=80"
+          alt="Mặt tiền Biệt thự Grand Riverside Villa và hồ bơi vô cực"
+          id="mainGalleryImg"
+          loading="eager"
+        />
+        <div class="gallery-caption">Mặt tiền kiến trúc đương đại & hồ bơi điện phân muối 85m² hướng sông</div>
+        <span class="gallery-badge"><i class="ph ph-camera"></i> 5/28 Ảnh Siêu Nét</span>
+      </div>
+
+      <!-- 4 secondary photos -->
+      <div class="gallery-thumbs">
+        <div class="thumb-item active" onclick="swapGallery(this, 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1400&q=80', 'Mặt tiền kiến trúc đương đại & hồ bơi điện phân muối 85m² hướng sông')">
+          <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=600&q=80" alt="Mặt tiền biệt thự" />
+          <span class="thumb-label">Mặt tiền & Hồ bơi</span>
+        </div>
+        <div class="thumb-item" onclick="swapGallery(this, 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1400&q=80', 'Phòng khách thông tầng 7.2m với vách đá cẩm thạch Calacatta')">
+          <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=600&q=80" alt="Phòng khách" />
+          <span class="thumb-label">Phòng khách 7.2m</span>
+        </div>
+        <div class="thumb-item" onclick="swapGallery(this, 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1400&q=80', 'Phòng ngủ Master Tổng thống 72m² view trực diện hoàng hôn')">
+          <img src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=600&q=80" alt="Phòng ngủ Master" />
+          <span class="thumb-label">Phòng ngủ Master</span>
+        </div>
+        <div class="thumb-item" onclick="swapGallery(this, 'https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?auto=format&fit=crop&w=1400&q=80', 'Bếp đảo đá tự nhiên & Hầm rượu vang điều hòa nhiệt độ')">
+          <img src="https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?auto=format&fit=crop&w=600&q=80" alt="Bếp & Hầm rượu" />
+          <span class="thumb-label">Bếp & Hầm rượu</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── MAIN CONTENT TWO-COLUMN LAYOUT ─── -->
+<section class="detail-content-section">
+  <div class="container detail-content-grid">
+    <!-- Left column: Specs, Overview, Floorplans, Calculator, Amenities -->
+    <div class="detail-main-col">
+
+      <!-- Specs Bento Grid -->
+      <div class="detail-block">
+        <h2 class="block-title"><i class="ph-bold ph-faders"></i> Thông Số Kỹ Thuật Độc Quyền</h2>
+        <div class="specs-grid">
+          <div class="spec-card">
+            <div class="spec-icon"><i class="ph-fill ph-ruler"></i></div>
+            <div class="spec-info">
+              <span class="spec-label">Diện Tích Đất</span>
+              <strong class="spec-val">520 m²</strong>
+              <span class="spec-sub">Mặt tiền 20m x 26m vuông vức</span>
+            </div>
+          </div>
+          <div class="spec-card">
+            <div class="spec-icon"><i class="ph-fill ph-buildings"></i></div>
+            <div class="spec-info">
+              <span class="spec-label">Diện Tích Sàn XD</span>
+              <strong class="spec-val">780 m²</strong>
+              <span class="spec-sub">1 Trệt, 2 Lầu, 1 Sky Rooftop</span>
+            </div>
+          </div>
+          <div class="spec-card">
+            <div class="spec-icon"><i class="ph-fill ph-bed"></i></div>
+            <div class="spec-info">
+              <span class="spec-label">Phòng Ngủ</span>
+              <strong class="spec-val">5 Master En-Suite</strong>
+              <span class="spec-sub">Mỗi phòng đều có WC & ban công</span>
+            </div>
+          </div>
+          <div class="spec-card">
+            <div class="spec-icon"><i class="ph-fill ph-drop"></i></div>
+            <div class="spec-info">
+              <span class="spec-label">Hồ Bơi Riêng</span>
+              <strong class="spec-val">85 m²</strong>
+              <span class="spec-sub">Điện phân muối & sục Jacuzzi</span>
+            </div>
+          </div>
+          <div class="spec-card">
+            <div class="spec-icon"><i class="ph-fill ph-car-profile"></i></div>
+            <div class="spec-info">
+              <span class="spec-label">Hầm Garage</span>
+              <strong class="spec-val">3 Xe Siêu Sang</strong>
+              <span class="spec-sub">Trạm sạc điện Porsche/Tesla 22kW</span>
+            </div>
+          </div>
+          <div class="spec-card">
+            <div class="spec-icon"><i class="ph-fill ph-compass"></i></div>
+            <div class="spec-info">
+              <span class="spec-label">Hướng Nhà</span>
+              <strong class="spec-val">Đông Nam</strong>
+              <span class="spec-sub">Hứng gió sông mát mẻ quanh năm</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description & Story -->
+      <div class="detail-block">
+        <h2 class="block-title"><i class="ph-bold ph-article"></i> Tổng Quan Kiến Trúc & Giá Trị Độc Bản</h2>
+        <div class="property-narrative">
+          <p>
+            Tọa lạc tại vị trí kim cương ven sông Sài Gòn thuộc bán đảo Thảo Điền, <strong>Grand Riverside Villa #08</strong> là tuyệt tác kiến trúc nhiệt đới đương đại (Modern Tropical Architecture) được chắp bút bởi studio thiết kế danh tiếng quốc tế. Căn biệt thự sở hữu không gian mở tối đa với vách kính Low-E 3 lớp chạm sàn kịch trần, kết nối trọn vẹn khu vườn nhiệt đới xanh mát và dải sông thoáng đạt.
+          </p>
+          <p>
+            Nội thất được trang hoàng đồng bộ với các thương hiệu xa xỉ hàng đầu Châu Âu: Đá tự nhiên Calacatta nguyên khối nhập khẩu từ Ý, gỗ sồi Nga tự nhiên xử lý chống ẩm tiêu chuẩn nhiệt đới, thiết bị bếp Gaggenau (Đức), hệ thống chiếu sáng Flos và giải pháp nhà thông minh Crestron vận hành hoàn hảo chỉ qua một chạm trên iPhone hoặc màn hình cảm ứng trung tâm.
+          </p>
+          <div class="villa-highlights-list">
+            <div class="vh-item"><i class="ph-fill ph-check-circle"></i> Bến đỗ du thuyền cá nhân cập bờ ngay trước cửa biệt thự</div>
+            <div class="vh-item"><i class="ph-fill ph-check-circle"></i> Phòng chiếu phim tiêu chuẩn Dolby Atmos 9.2 và phòng gym riêng</div>
+            <div class="vh-item"><i class="ph-fill ph-check-circle"></i> Hầm rượu vang điều hòa âm 14°C sức chứa 800 chai</div>
+            <div class="vh-item"><i class="ph-fill ph-check-circle"></i> Hệ thống lọc nước tổng toàn nhà theo tiêu chuẩn nước uống tại vòi của Nhật Bản</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Floor Plan Viewer -->
+      <div class="detail-block" id="floorplans">
+        <div class="block-head-flex">
+          <div>
+            <h2 class="block-title"><i class="ph-bold ph-selection-foreground"></i> Mặt Bằng Kiến Trúc Chi Tiết</h2>
+            <p class="block-subtitle">Nhấp chọn tầng để xem bố cục công năng và diện tích chi tiết từng không gian</p>
+          </div>
+          <div class="floorplan-tabs">
+            <button class="fp-tab-btn active" onclick="switchFloorPlan(1)">Tầng 1 (Trệt)</button>
+            <button class="fp-tab-btn" onclick="switchFloorPlan(2)">Tầng 2 (Lầu 1)</button>
+            <button class="fp-tab-btn" onclick="switchFloorPlan(3)">Tầng 3 & Sky Rooftop</button>
+          </div>
+        </div>
+
+        <div class="floorplan-display" id="floorPlanBox">
+          <div class="fp-svg-wrapper">
+            <!-- Architectural visual schema -->
+            <svg viewBox="0 0 800 450" class="fp-svg" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="20" y="20" width="760" height="410" rx="12" fill="#fffdfa" stroke="#d97706" stroke-width="2"/>
+              <!-- Grid background -->
+              <defs>
+                <pattern id="fpGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+                  <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#fef3c7" stroke-width="1"/>
+                </pattern>
+              </defs>
+              <rect x="20" y="20" width="760" height="410" fill="url(#fpGrid)"/>
+
+              <!-- Dynamic plan elements for floor 1 -->
+              <g id="fpLayer1" class="fp-layer">
+                <!-- Garage -->
+                <rect x="40" y="40" width="220" height="150" rx="6" fill="#fef3c7" stroke="#b45309" stroke-width="1.5" stroke-dasharray="4 2"/>
+                <text x="150" y="115" text-anchor="middle" font-family="Geist" font-weight="600" font-size="14" fill="#78350f">GARAGE 3 SIÊU XE (65m²)</text>
+                
+                <!-- Grand Living Room -->
+                <rect x="280" y="40" width="320" height="230" rx="6" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+                <text x="440" y="145" text-anchor="middle" font-family="Geist" font-weight="700" font-size="16" fill="#92400e">ĐẠI SẢNH & PHÒNG KHÁCH (110m²)</text>
+                <text x="440" y="170" text-anchor="middle" font-family="Geist" font-size="12" fill="#b45309">Trần thông tầng cao 7.2m</text>
+
+                <!-- Gourmet Kitchen -->
+                <rect x="40" y="210" width="220" height="200" rx="6" fill="#fef9c3" stroke="#b45309" stroke-width="1.5"/>
+                <text x="150" y="305" text-anchor="middle" font-family="Geist" font-weight="600" font-size="14" fill="#78350f">BẾP SHOW & ĐẢO MARBLE (52m²)</text>
+
+                <!-- Saltwater Pool -->
+                <rect x="620" y="40" width="140" height="370" rx="8" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+                <text x="690" y="220" text-anchor="middle" font-family="Geist" font-weight="700" font-size="14" fill="#0369a1" transform="rotate(-90 690 220)">HỒ BƠI VÔ CỰC NƯỚC MẶN (85m²)</text>
+
+                <!-- Dining terrace -->
+                <rect x="280" y="290" width="320" height="120" rx="6" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/>
+                <text x="440" y="355" text-anchor="middle" font-family="Geist" font-weight="600" font-size="14" fill="#78350f">TERRACE BBQ VEN SÔNG (68m²)</text>
+              </g>
+
+              <!-- Dynamic plan elements for floor 2 (Hidden by default) -->
+              <g id="fpLayer2" class="fp-layer" style="display:none">
+                <rect x="40" y="40" width="360" height="240" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+                <text x="220" y="150" text-anchor="middle" font-family="Geist" font-weight="700" font-size="16" fill="#78350f">SUITE MASTER TỔNG THỐNG (72m²)</text>
+                <text x="220" y="175" text-anchor="middle" font-family="Geist" font-size="12" fill="#b45309">Phòng tắm đá cẩm thạch & Walk-in Wardrobe</text>
+
+                <rect x="420" y="40" width="340" height="170" rx="6" fill="#fffbeb" stroke="#b45309" stroke-width="1.5"/>
+                <text x="590" y="125" text-anchor="middle" font-family="Geist" font-weight="600" font-size="14" fill="#78350f">FAMILY LOUNGE & THƯ VIỆN (48m²)</text>
+
+                <rect x="40" y="300" width="340" height="110" rx="6" fill="#fef9c3" stroke="#b45309" stroke-width="1.5"/>
+                <text x="210" y="360" text-anchor="middle" font-family="Geist" font-weight="600" font-size="14" fill="#78350f">PHÒNG NGỦ JUNIOR 01 (36m²)</text>
+
+                <rect x="400" y="230" width="360" height="180" rx="6" fill="#fef9c3" stroke="#b45309" stroke-width="1.5"/>
+                <text x="580" y="325" text-anchor="middle" font-family="Geist" font-weight="600" font-size="14" fill="#78350f">PHÒNG NGỦ JUNIOR 02 (38m²)</text>
+              </g>
+
+              <!-- Dynamic plan elements for floor 3 (Hidden by default) -->
+              <g id="fpLayer3" class="fp-layer" style="display:none">
+                <rect x="40" y="40" width="420" height="220" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+                <text x="250" y="145" text-anchor="middle" font-family="Geist" font-weight="700" font-size="16" fill="#78350f">CINEMA DOLBY ATMOS & CIGAR LOUNGE (58m²)</text>
+                <text x="250" y="170" text-anchor="middle" font-family="Geist" font-size="12" fill="#b45309">Cách âm 5 lớp chuyên dụng</text>
+
+                <rect x="480" y="40" width="280" height="220" rx="6" fill="#fef9c3" stroke="#b45309" stroke-width="1.5"/>
+                <text x="620" y="150" text-anchor="middle" font-family="Geist" font-weight="600" font-size="14" fill="#78350f">PHÒNG TẬP GYM & SAUNA (45m²)</text>
+
+                <rect x="40" y="280" width="720" height="130" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+                <text x="400" y="350" text-anchor="middle" font-family="Geist" font-weight="700" font-size="16" fill="#15803d">VƯỜN THƯỢNG UYỂN & SKY BAR NGẮM HOÀNG HÔN SÔNG (120m²)</text>
+              </g>
+            </svg>
+          </div>
+          <div class="fp-legend">
+            <span class="legend-item"><span class="dot gold"></span> Khu sinh hoạt chung & Đại sảnh</span>
+            <span class="legend-item"><span class="dot blue"></span> Hồ bơi & Mặt nước</span>
+            <span class="legend-item"><span class="dot green"></span> Vườn cây cảnh & Cảnh quan xanh</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Mortgage & Cashflow Calculator -->
+      <div class="detail-block" id="mortgage-calc">
+        <div class="block-head-flex">
+          <div>
+            <h2 class="block-title"><i class="ph-bold ph-calculator"></i> Bảng Dự Toán Dòng Tiền & Lãi Vay Mua Nhà</h2>
+            <p class="block-subtitle">Hỗ trợ gói vay độc quyền từ ngân hàng liên kết: Ân hạn nợ gốc và lãi suất 0% trong 24 tháng đầu</p>
+          </div>
+        </div>
+
+        <div class="calc-container">
+          <div class="calc-inputs">
+            <div class="calc-field">
+              <div class="calc-field-head">
+                <label>Giá trị biệt thự (VNĐ):</label>
+                <span class="calc-display-val" id="dispPrice">38.5 Tỷ</span>
+              </div>
+              <input type="range" min="20" max="60" step="0.5" value="38.5" id="sliderPrice" oninput="updateMortgage()" />
+            </div>
+
+            <div class="calc-field">
+              <div class="calc-field-head">
+                <label>Tỷ lệ vay ngân hàng (%):</label>
+                <span class="calc-display-val" id="dispLoanPct">50% (19.25 Tỷ)</span>
+              </div>
+              <input type="range" min="20" max="70" step="5" value="50" id="sliderLoanPct" oninput="updateMortgage()" />
+            </div>
+
+            <div class="calc-field">
+              <div class="calc-field-head">
+                <label>Thời hạn vay:</label>
+                <span class="calc-display-val" id="dispYears">15 Năm (180 Tháng)</span>
+              </div>
+              <input type="range" min="5" max="25" step="1" value="15" id="sliderYears" oninput="updateMortgage()" />
+            </div>
+
+            <div class="calc-field">
+              <div class="calc-field-head">
+                <label>Lãi suất ưu đãi cố định (%/năm):</label>
+                <span class="calc-display-val" id="dispRate">6.8% / năm</span>
+              </div>
+              <input type="range" min="5.5" max="10" step="0.1" value="6.8" id="sliderRate" oninput="updateMortgage()" />
+            </div>
+          </div>
+
+          <div class="calc-results">
+            <div class="res-card-primary">
+              <span class="res-label">Thanh toán tháng đầu tiên (Gốc + Lãi)</span>
+              <div class="res-big-number" id="dispMonthlyTotal">216.027.777 <span class="res-unit">VNĐ</span></div>
+              <p class="res-note">*Ưu đãi đặc biệt: 0 VNĐ/tháng trong 24 tháng đầu khi tham gia gói hỗ trợ lãi suất!</p>
+            </div>
+
+            <div class="res-breakdown">
+              <div class="rb-row">
+                <span>Vốn tự có cần chuẩn bị (50%):</span>
+                <strong id="dispEquity">19.250.000.000 VNĐ</strong>
+              </div>
+              <div class="rb-row">
+                <span>Số tiền ngân hàng giải ngân:</span>
+                <strong id="dispLoanAmount">19.250.000.000 VNĐ</strong>
+              </div>
+              <div class="rb-row">
+                <span>Tiền gốc trả đều hàng tháng:</span>
+                <strong id="dispMonthlyPrincipal">106.944.444 VNĐ</strong>
+              </div>
+              <div class="rb-row">
+                <span>Tiền lãi tháng đầu tiên:</span>
+                <strong id="dispMonthlyInterest">109.083.333 VNĐ</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Surrounding Amenities Map / Grid -->
+      <div class="detail-block">
+        <h2 class="block-title"><i class="ph-bold ph-map-trifold"></i> Tiện Ích Thượng Lưu Liền Kề</h2>
+        <div class="amenities-grid">
+          <div class="amenity-card">
+            <div class="am-icon"><i class="ph-fill ph-boat"></i></div>
+            <div class="am-text">
+              <strong>Bến Du Thuyền Thảo Điền</strong>
+              <span>Cách 200m · 2 phút đi bộ</span>
+            </div>
+          </div>
+          <div class="amenity-card">
+            <div class="am-icon"><i class="ph-fill ph-graduation-cap"></i></div>
+            <div class="am-text">
+              <strong>Trường Quốc Tế BIS / ISHCMC</strong>
+              <span>Cách 800m · 3 phút di chuyển</span>
+            </div>
+          </div>
+          <div class="amenity-card">
+            <div class="am-icon"><i class="ph-fill ph-fork-knife"></i></div>
+            <div class="am-text">
+              <strong>Chuỗi Ẩm Thực Fine Dining Thảo Điền</strong>
+              <span>Cách 500m · Tuyến phố ẩm thực sang trọng</span>
+            </div>
+          </div>
+          <div class="amenity-card">
+            <div class="am-icon"><i class="ph-fill ph-first-aid"></i></div>
+            <div class="am-text">
+              <strong>Bệnh Viện Quốc Tế Vinmec Central Park</strong>
+              <span>Cách 2.5km · 7 phút qua cầu Sài Gòn</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right sticky column: Booking form & Agent Card -->
+    <aside class="detail-sidebar-col">
+      <div class="sticky-sidebar-box" id="tour-form">
+        <!-- Private Tour Booking Card -->
+        <div class="booking-card">
+          <div class="bc-head">
+            <span class="bc-badge">DỊCH VỤ 5 SAO</span>
+            <h3 class="bc-title">Đặt Lịch Tham Quan Biệt Thự</h3>
+            <p class="bc-desc">Được đón bằng xe Mercedes-Maybach hoặc Cano du thuyền riêng từ bến Bạch Đằng</p>
+          </div>
+
+          <form class="bc-form" onsubmit="event.preventDefault(); submitBooking();">
+            <div class="form-group">
+              <label for="bookName">Họ và tên quý khách (*):</label>
+              <input type="text" id="bookName" placeholder="Nguyễn Văn A" required />
+            </div>
+
+            <div class="form-group">
+              <label for="bookPhone">Số điện thoại / Zalo (*):</label>
+              <input type="tel" id="bookPhone" placeholder="0908 xxx xxx" required />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="bookDate">Ngày xem nhà:</label>
+                <input type="date" id="bookDate" required />
+              </div>
+              <div class="form-group">
+                <label for="bookTime">Khung giờ:</label>
+                <select id="bookTime">
+                  <option value="09:00">09:00 Sáng</option>
+                  <option value="10:30">10:30 Sáng</option>
+                  <option value="15:00" selected>15:00 Chiều</option>
+                  <option value="17:00">17:00 Hoàng Hôn</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-checkbox">
+              <input type="checkbox" id="bookChauffeur" checked />
+              <label for="bookChauffeur">Yêu cầu xe riêng Maybach đưa đón tận nhà</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg">
+              <i class="ph-bold ph-check"></i> Xác Nhận Lịch Xem VIP
+            </button>
+            <span class="bc-secure-note"><i class="ph-fill ph-lock-key"></i> Bảo mật 100% danh tính và thông tin cá nhân khách hàng</span>
+          </form>
+        </div>
+
+        <!-- Senior Agent Contact Box -->
+        <div class="agent-card-box">
+          <div class="ac-header">
+            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=200&q=80" alt="Nguyễn Hoàng Long" class="ac-avatar" />
+            <div class="ac-info">
+              <h4 class="ac-name">Nguyễn Hoàng Long</h4>
+              <span class="ac-role">Giám Đốc Khối BĐS Hạng Sang</span>
+              <span class="ac-exp"><i class="ph-fill ph-medal"></i> 12 năm kinh nghiệm Biệt Thự Sông</span>
+            </div>
+          </div>
+          <div class="ac-buttons">
+            <a href="tel:0938123456" class="btn btn-primary btn-sm">
+              <i class="ph-fill ph-phone-call"></i> 0938 123 456
+            </a>
+            <a href="https://zalo.me" target="_blank" class="btn btn-outline btn-sm">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.03 2 11c0 2.87 1.5 5.43 3.86 7.02l-.96 3.58a.75.75 0 00.98.9l3.86-1.55c.73.19 1.49.29 2.26.29 5.52 0 10-4.03 10-9s-4.48-9-10-9zm0 16c-.7 0-1.39-.09-2.05-.26a.75.75 0 00-.54.06l-2.6 1.04.64-2.4a.75.75 0 00-.18-.73C5.55 14.33 4.25 12.28 4.25 11c0-3.72 3.48-6.75 7.75-6.75s7.75 3.03 7.75 6.75-3.48 6.75-7.75 6.75z"/></svg>
+              Chat Zalo VIP
+            </a>
+          </div>
+        </div>
+
+        <!-- Next page hint -->
+        <div class="sidebar-page-link-card">
+          <span class="spl-tag">TRANG KẾ TIẾP</span>
+          <h4>Bảng Giá & Sa Bàn 12 Căn Biệt Thự</h4>
+          <p>Xem danh sách 12 căn biệt thự độc bản trong cùng phân khu Đảo Ngọc ven sông.</p>
+          <a href="pricing.html" class="btn btn-outline btn-sm btn-block">
+            Xem Bảng Giá Phân Khu <i class="ph ph-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ─── SUCCESS MODAL ─── -->
+<div id="bookingModal" class="booking-modal-backdrop" style="display:none">
+  <div class="booking-modal-card">
+    <div class="bm-icon"><i class="ph-fill ph-check-circle"></i></div>
+    <h3>Đã Đặt Lịch Xem Nhà Thành Công!</h3>
+    <p id="modalMsg">Chuyên viên cao cấp Nguyễn Hoàng Long sẽ liên hệ với quý khách trong vòng 15 phút để xác nhận điểm đón xe riêng.</p>
+    <div class="bm-code-box">MÃ ĐẶT LỊCH VIP: <strong id="modalCode">RIVERSIDE-VIP-9821</strong></div>
+    <button class="btn btn-primary" onclick="closeModal()">Đóng Cửa Sổ</button>
+  </div>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<footer class="footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <div class="logo">
+        <svg class="logo-mark" viewBox="0 0 32 32" fill="none">
+          <rect x="4" y="4" width="24" height="24" rx="7" fill="currentColor"/>
+          <path d="M10 22 L16 10 L22 22 M13 17 H19" stroke="#fafbff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>nhatot<span class="logo-dot">.</span></span>
+      </div>
+      <p class="footer-tagline">Nền tảng giao dịch BĐS hạng sang minh bạch hàng đầu Việt Nam.</p>
+      <div class="footer-copy">© 2026 NhaTot Luxury Division. All rights reserved.</div>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Các Trang Giao Diện</div>
+      <ul class="footer-links">
+        <li><a href="index.html">Trang Chủ & Danh Mục BĐS</a></li>
+        <li><a href="detail.html">Chi Tiết Biệt Thự Grand Villa</a></li>
+        <li><a href="pricing.html">Bảng Giá & Sa Bàn Phân Khu</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Hotline Tư Vấn VIP</div>
+      <p style="color:var(--text-2); font-size:14px; margin-bottom:8px;">Hỗ trợ 24/7 cho khách hàng thượng lưu:</p>
+      <strong style="color:var(--accent-2); font-size:18px;">1800 6868 (Miễn phí)</strong>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Gallery Swap
+function swapGallery(el, src, caption) {
+  document.querySelectorAll('.thumb-item').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const mainImg = document.getElementById('mainGalleryImg');
+  if (mainImg) mainImg.src = src;
+  const captionEl = document.querySelector('.gallery-caption');
+  if (captionEl && caption) captionEl.innerText = caption;
+}
+
+// Floorplan Switcher
+function switchFloorPlan(floorNum) {
+  document.querySelectorAll('.fp-tab-btn').forEach((btn, idx) => {
+    btn.classList.toggle('active', idx === (floorNum - 1));
+  });
+  const l1 = document.getElementById('fpLayer1');
+  const l2 = document.getElementById('fpLayer2');
+  const l3 = document.getElementById('fpLayer3');
+  if (l1) l1.style.display = floorNum === 1 ? 'block' : 'none';
+  if (l2) l2.style.display = floorNum === 2 ? 'block' : 'none';
+  if (l3) l3.style.display = floorNum === 3 ? 'block' : 'none';
+}
+
+// Mortgage Calculator
+function updateMortgage() {
+  const priceBil = parseFloat(document.getElementById('sliderPrice').value);
+  const loanPct = parseInt(document.getElementById('sliderLoanPct').value);
+  const years = parseInt(document.getElementById('sliderYears').value);
+  const ratePct = parseFloat(document.getElementById('sliderRate').value);
+
+  document.getElementById('dispPrice').innerText = priceBil.toFixed(1) + ' Tỷ';
+  const loanBil = (priceBil * loanPct) / 100;
+  document.getElementById('dispLoanPct').innerText = loanPct + '% (' + loanBil.toFixed(2) + ' Tỷ)';
+  document.getElementById('dispYears').innerText = years + ' Năm (' + (years * 12) + ' Tháng)';
+  document.getElementById('dispRate').innerText = ratePct.toFixed(1) + '% / năm';
+
+  const totalPrice = priceBil * 1000000000;
+  const loanAmount = (totalPrice * loanPct) / 100;
+  const equity = totalPrice - loanAmount;
+  const totalMonths = years * 12;
+  const monthlyPrincipal = loanAmount / totalMonths;
+  const monthlyRate = (ratePct / 100) / 12;
+  const monthlyInterest = loanAmount * monthlyRate;
+  const totalMonth1 = monthlyPrincipal + monthlyInterest;
+
+  document.getElementById('dispEquity').innerText = Math.round(equity).toLocaleString('vi-VN') + ' VNĐ';
+  document.getElementById('dispLoanAmount').innerText = Math.round(loanAmount).toLocaleString('vi-VN') + ' VNĐ';
+  document.getElementById('dispMonthlyPrincipal').innerText = Math.round(monthlyPrincipal).toLocaleString('vi-VN') + ' VNĐ';
+  document.getElementById('dispMonthlyInterest').innerText = Math.round(monthlyInterest).toLocaleString('vi-VN') + ' VNĐ';
+  document.getElementById('dispMonthlyTotal').innerHTML = Math.round(totalMonth1).toLocaleString('vi-VN') + ' <span class="res-unit">VNĐ</span>';
+}
+
+// Booking form
+function submitBooking() {
+  const name = document.getElementById('bookName').value;
+  const date = document.getElementById('bookDate').value;
+  const time = document.getElementById('bookTime').value;
+  const code = 'RIVERSIDE-VIP-' + Math.floor(1000 + Math.random() * 9000);
+  document.getElementById('modalCode').innerText = code;
+  document.getElementById('modalMsg').innerText = 'Cảm ơn quý khách ' + name + '! Lịch hẹn xem biệt thự lúc ' + time + ' ngày ' + date + ' đã được ghi nhận. Xe Maybach riêng sẽ liên hệ đón quý khách đúng giờ.';
+  document.getElementById('bookingModal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('bookingModal').style.display = 'none';
+}
+
+// Init default date to tomorrow
+document.addEventListener('DOMContentLoaded', () => {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const dateInput = document.getElementById('bookDate');
+  if (dateInput) {
+    dateInput.value = tomorrow.toISOString().split('T')[0];
+  }
+  updateMortgage();
+});
+</script>
+</body>
+</html>

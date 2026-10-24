@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, ref, onUnmounted } from 'vue'
+import { computed, ref, watch, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getTemplateById, templates } from '../data/templates'
+import { getTemplateById, templates, type TemplateSubPage } from '../data/templates'
 import DownloadModal from '../components/DownloadModal.vue'
 import TemplatePreviewSvg from '../components/TemplatePreviewSvg.vue'
 
@@ -9,6 +9,13 @@ const route = useRoute()
 const router = useRouter()
 
 const template = computed(() => getTemplateById(route.params.id as string))
+
+watch(
+  () => route.params.id,
+  () => {
+    activePage.value = 'index.html'
+  }
+)
 
 const viewMode = ref<'desktop' | 'tablet' | 'mobile'>('desktop')
 const showInfo = ref(true)
@@ -79,9 +86,26 @@ onUnmounted(() => {
   stopAutoScroll()
 })
 
+const activePage = ref<string>('index.html')
+
+const subPages = computed<TemplateSubPage[]>(() => {
+  if (!template.value) return []
+  if (template.value.pagesList && template.value.pagesList.length > 0) {
+    return template.value.pagesList
+  }
+  return [
+    { id: 'index', name: 'Trang Chủ', file: 'index.html', desc: 'Trang giới thiệu chính' }
+  ]
+})
+
+function selectPage(file: string) {
+  activePage.value = file
+  stopAutoScroll()
+}
+
 const iframeSrc = computed(() => {
   if (!template.value) return ''
-  return `/templates/${template.value.id}/index.html`
+  return `/templates/${template.value.id}/${activePage.value}`
 })
 
 const otherTemplates = computed(() =>
@@ -93,6 +117,7 @@ function backToGallery() {
 }
 
 function previewTemplate(id: string) {
+  activePage.value = 'index.html'
   router.push(`/templates/${id}`)
 }
 
@@ -108,11 +133,23 @@ const iframeRef = ref<HTMLIFrameElement | null>(null)
 
 function viewSource() {
   if (!template.value) return
-  window.open(`/templates/${template.value.id}/index.html`, '_blank')
+  window.open(`/templates/${template.value.id}/${activePage.value}`, '_blank')
 }
 
 function onIframeLoad() {
   try {
+    const win = iframeRef.value?.contentWindow
+    if (win && win.location) {
+      const pathname = win.location.pathname
+      const parts = pathname.split('/')
+      const currentFileName = parts[parts.length - 1]
+      if (currentFileName && currentFileName.endsWith('.html') && currentFileName !== activePage.value) {
+        const found = subPages.value.find((p) => p.file === currentFileName)
+        if (found) {
+          activePage.value = found.file
+        }
+      }
+    }
     iframeRef.value?.contentWindow?.scrollTo(0, 0)
   } catch (_e) {
     // ignore cross-origin access
@@ -212,8 +249,8 @@ function refreshFrame() {
           <span class="sidebar-label">File Info</span>
           <div class="sidebar-file">
             <div class="file-row">
-              <span>Pages</span>
-              <strong>{{ template.pages }}</strong>
+              <span>Trang thiết kế</span>
+              <strong>{{ subPages.length > 1 ? `${subPages.length} trang hoàn chỉnh` : `${template.pages} sections` }}</strong>
             </div>
             <div class="file-row">
               <span>Size</span>
@@ -224,10 +261,54 @@ function refreshFrame() {
               <strong>HTML/CSS/JS</strong>
             </div>
           </div>
+
+          <div v-if="subPages.length > 1" class="sidebar-pages-group">
+            <span class="sidebar-sublabel">Chuyển trang trực tiếp:</span>
+            <div class="sidebar-pages-list">
+              <button
+                v-for="p in subPages"
+                :key="p.file"
+                class="sidebar-page-item"
+                :class="{ active: activePage === p.file }"
+                @click="selectPage(p.file)"
+              >
+                <div class="sidebar-page-item-header">
+                  <span class="sidebar-page-name">{{ p.name }}</span>
+                  <span class="sidebar-page-pill">{{ p.file }}</span>
+                </div>
+                <p v-if="p.desc" class="sidebar-page-desc">{{ p.desc }}</p>
+              </button>
+            </div>
+          </div>
         </div>
       </aside>
 
       <div class="preview-stage">
+        <!-- Multi-page selector bar -->
+        <div v-if="subPages.length > 1" class="template-pages-bar">
+          <div class="pages-bar-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+            <span>Trang giao diện ({{ subPages.length }}):</span>
+          </div>
+          <div class="pages-tabs">
+            <button
+              v-for="p in subPages"
+              :key="p.file"
+              class="page-tab-btn"
+              :class="{ active: activePage === p.file }"
+              @click="selectPage(p.file)"
+              :title="p.desc || p.name"
+            >
+              <span class="page-tab-dot"></span>
+              <span class="page-tab-name">{{ p.name }}</span>
+              <span class="page-tab-file">{{ p.file }}</span>
+            </button>
+          </div>
+        </div>
+
         <div class="device-bar">
           <div class="device-modes">
             <button
@@ -245,7 +326,7 @@ function refreshFrame() {
           </div>
           <div class="device-url">
             <span class="url-dot"></span>
-            <span class="url-text">cef.dev/templates/{{ template.id }}</span>
+            <span class="url-text">cef.dev/templates/{{ template.id }}/{{ activePage }}</span>
           </div>
           <div class="device-auto-scroll">
             <button
@@ -627,10 +708,170 @@ function refreshFrame() {
   font-weight: 500;
 }
 
+.sidebar-pages-group {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border-subtle);
+}
+
+.sidebar-sublabel {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.sidebar-pages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebar-page-item {
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--t-fast);
+  font-family: inherit;
+}
+
+.sidebar-page-item:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-elevated);
+}
+
+.sidebar-page-item.active {
+  border-color: var(--accent);
+  background: var(--bg-elevated);
+}
+
+.sidebar-page-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+.sidebar-page-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sidebar-page-pill {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--accent);
+  background: rgba(16, 185, 129, 0.1);
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+.sidebar-page-desc {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
 .preview-stage {
   background: var(--bg-canvas);
   display: flex;
   flex-direction: column;
+}
+
+.template-pages-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 20px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  overflow-x: auto;
+}
+
+.pages-bar-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.pages-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.page-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all var(--t-fast);
+  font-family: inherit;
+}
+
+.page-tab-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+  background: var(--bg-elevated);
+}
+
+.page-tab-btn.active {
+  background: var(--bg-elevated);
+  border-color: var(--accent);
+  color: var(--text-primary);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.page-tab-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: background var(--t-fast);
+}
+
+.page-tab-btn.active .page-tab-dot {
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
+}
+
+.page-tab-name {
+  font-weight: 500;
+}
+
+.page-tab-file {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.page-tab-btn.active .page-tab-file {
+  color: var(--accent);
 }
 
 .device-bar {

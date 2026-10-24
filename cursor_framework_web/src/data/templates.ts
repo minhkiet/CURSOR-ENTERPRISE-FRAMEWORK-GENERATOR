@@ -1,3 +1,10 @@
+export type TemplateSubPage = {
+  id: string
+  name: string
+  file: string
+  desc?: string
+}
+
 export type Template = {
   id: string
   slug: string
@@ -15,6 +22,7 @@ export type Template = {
   tags: string[]
   fileSize: string
   pages: number
+  pagesList?: TemplateSubPage[]
   techStack: string[]
 }
 
@@ -197,6 +205,10 @@ export const templates: Template[] = [
     tags: ['Dashboard', 'Pipeline', 'Analytics', 'Automation'],
     fileSize: '248 KB',
     pages: 6,
+    pagesList: [
+      { id: 'index', name: 'Trang Chủ & CRM Platform', file: 'index.html', desc: 'Pipeline trực quan, quản lý lead & tự động hóa' },
+      { id: 'pricing', name: 'Bảng Giá & So Sánh Gói', file: 'pricing.html', desc: 'Ma trận gói cước Starter / Pro / Enterprise & ROI calculator' }
+    ],
     techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Chart.js']
   },
   {
@@ -227,6 +239,10 @@ export const templates: Template[] = [
     tags: ['E-commerce', 'High-converting', 'Mobile-first'],
     fileSize: '215 KB',
     pages: 5,
+    pagesList: [
+      { id: 'index', name: 'Trang Bán Hàng & Flash Sale', file: 'index.html', desc: 'Trang chi tiết tai nghe flagship AURA Pro, countdown timer & reviews' },
+      { id: 'checkout', name: 'Thanh Toán & Đặt Hàng 1-Click', file: 'checkout.html', desc: 'Quy trình checkout chuẩn Shopify Plus, coupon FLASH45 & giao hỏa tốc 2H' }
+    ],
     techStack: ['HTML5', 'CSS3', 'Vanilla JS']
   },
   {
@@ -497,6 +513,11 @@ export const templates: Template[] = [
     tags: ['Real Estate', 'Map', 'AI-match', 'Virtual Tour'],
     fileSize: '298 KB',
     pages: 7,
+    pagesList: [
+      { id: 'index', name: 'Trang Chủ & Danh Mục Dự Án', file: 'index.html', desc: '124K tin đăng, bộ lọc thông minh & bản đồ giá' },
+      { id: 'detail', name: 'Chi Tiết Biệt Thự Grand Villa', file: 'detail.html', desc: 'Thư viện ảnh 6 góc, mặt bằng 3 tầng, tính lãi vay & đặt lịch xem nhà VIP' },
+      { id: 'pricing', name: 'Bảng Giá & Sa Bàn Phân Khu', file: 'pricing.html', desc: 'Bảng giá 12 căn biệt thự view sông & chính sách ưu đãi 0%' }
+    ],
     techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Mapbox GL']
   },
   {
@@ -527,6 +548,11 @@ export const templates: Template[] = [
     tags: ['Travel', 'Tour', 'Booking', 'Southeast Asia'],
     fileSize: '262 KB',
     pages: 6,
+    pagesList: [
+      { id: 'index', name: 'Trang Chủ & Điểm Đến', file: 'index.html', desc: 'Khu nghỉ dưỡng sang trọng, tour đảo & review thực tế' },
+      { id: 'detail', name: 'Chi Tiết Oceanfront Villa', file: 'detail.html', desc: 'Biệt thự hồ bơi view biển, tiện ích thượng lưu & lịch trình 3N2Đ' },
+      { id: 'booking', name: 'Đặt Chỗ & Tour Trải Nghiệm', file: 'booking.html', desc: 'Chọn ngày nhận phòng, số lượng khách & du thuyền đưa đón' }
+    ],
     techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Mapbox GL']
   },
   {
@@ -797,6 +823,11 @@ export const templates: Template[] = [
     tags: ['Ô tô', 'Showroom', 'Xe lướt', 'Xe điện', 'Trả góp', 'Lái thử'],
     fileSize: '340 KB',
     pages: 6,
+    pagesList: [
+      { id: 'index', name: 'Trang Chủ & Kho Xe Sẵn Có', file: 'index.html', desc: 'Siêu thị ô tô đa thương hiệu, bộ lọc thông minh & chính sách bảo hành' },
+      { id: 'car-detail', name: 'Chi Tiết Siêu Xe Taycan', file: 'car-detail.html', desc: 'Trình đổi màu 360 độ, so sánh thông số mã lực/pin & dự toán trả góp' },
+      { id: 'test-drive', name: 'Đặt Lái Thử & Dịch Vụ', file: 'test-drive.html', desc: 'Đăng ký lái thử tại nhà miễn phí, thẩm định Trade-in & bảo dưỡng chính hãng' }
+    ],
     techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Phosphor Icons']
   },
   {
@@ -827,6 +858,11 @@ export const templates: Template[] = [
     tags: ['Nhà Hàng', 'Cơm Niêu', 'Ẩm Thực Việt', 'Michelin Selected', 'Voucher', 'Đặt Bàn'],
     fileSize: '325 KB',
     pages: 5,
+    pagesList: [
+      { id: 'index', name: 'Trang Chủ & Không Gian', file: 'index.html', desc: 'Câu chuyện ẩm thực di sản Michelin Selected, văn hóa nhà cổ & ưu đãi' },
+      { id: 'menu', name: 'Thực Đơn Di Sản 3 Miền', file: 'menu.html', desc: '120+ món ăn truyền thống, bộ lọc danh mục & tính tổng mâm cơm gia đình' },
+      { id: 'reservation', name: 'Đặt Bàn & Phòng VIP', file: 'reservation.html', desc: 'Chọn ngày giờ, sảnh tiệc riêng, phòng VIP Hoàng Cung kèm xác nhận tức thì' }
+    ],
     techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Phosphor Icons']
   }
 ]

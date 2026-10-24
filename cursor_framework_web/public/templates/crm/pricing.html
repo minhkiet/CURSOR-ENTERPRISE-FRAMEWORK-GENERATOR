@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bảng Giá & Gói Dịch Vụ — Helix CRM Enterprise</title>
+  <meta name="description" content="Bảng giá phần mềm quản lý quan hệ khách hàng Helix CRM: Gói Starter, Professional, Enterprise. Miễn phí dùng thử 14 ngày, chiết khấu 20% khi thanh toán năm." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="crm-pricing-body">
+
+<!-- ─── NAV ─── -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="index.html" class="logo">
+      <svg class="logo-mark" viewBox="0 0 32 32" fill="none">
+        <rect x="4" y="4" width="24" height="24" rx="7" fill="currentColor"/>
+        <path d="M11 11 L21 21 M21 11 L11 21" stroke="#fafbff" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <span>helix<span class="logo-dot">.</span></span>
+    </a>
+    <ul class="nav-menu">
+      <li><a href="index.html">Trang Chủ</a></li>
+      <li><a href="pricing.html" class="active">Bảng Giá & So Sánh</a></li>
+      <li><a href="index.html#features">Tính Năng</a></li>
+      <li><a href="index.html#workflow">Quy Trình</a></li>
+      <li><a href="index.html#customers">Khách Hàng</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="index.html" class="nav-ghost">Đăng Nhập</a>
+      <a href="#trial" class="nav-cta">
+        Dùng Thử 14 Ngày Miễn Phí
+        <i class="ph ph-arrow-up-right"></i>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── PRICING HERO ─── -->
+<header class="pricing-hero-section">
+  <div class="container text-center">
+    <div class="eyebrow" style="justify-content:center; margin-bottom:14px;">
+      <span class="eyebrow-dot"></span>
+      Minh bạch 100% · Không phí ẩn · Nâng hoặc hạ gói bất kỳ lúc nào
+    </div>
+    <h1 class="section-title">
+      Đầu Tư Cho Tăng Trưởng Doanh Số. <br />
+      <span class="hl">Chọn Gói Cước Phù Hợp Đội Ngũ Của Bạn.</span>
+    </h1>
+    <p class="section-desc" style="max-width:720px; margin:0 auto 28px;">
+      Hơn 3,400 doanh nghiệp B2B & công ty công nghệ tin dùng Helix CRM để chuẩn hóa quy trình bán hàng, giảm 65% thời gian nhập liệu thủ công.
+    </p>
+
+    <!-- Billing Cycle Toggle -->
+    <div class="billing-switcher-wrap">
+      <span class="billing-label" id="lblMonthly">Thanh toán hàng tháng</span>
+      <button class="switch-toggle-btn active" id="billingToggle" onclick="toggleBilling()" aria-label="Chuyển chu kỳ thanh toán">
+        <span class="switch-slider"></span>
+      </button>
+      <span class="billing-label active" id="lblAnnual">
+        Thanh toán theo năm <span class="discount-pill">Tiết kiệm 20%</span>
+      </span>
+    </div>
+  </div>
+</header>
+
+<!-- ─── PRICING CARDS ─── -->
+<section class="pricing-cards-section">
+  <div class="container">
+    <div class="crm-pricing-grid">
+
+      <!-- Tier 1: Starter -->
+      <div class="crm-price-card">
+        <div class="cpc-header">
+          <span class="cpc-tier-badge">KHỞI ĐỘNG</span>
+          <h3 class="cpc-tier-title">Starter</h3>
+          <p class="cpc-tier-desc">Dành cho startup, agency nhỏ và nhóm 1–5 nhân sự bán hàng cần quản lý lead cơ bản.</p>
+          <div class="cpc-price-box">
+            <span class="cpc-curr">$</span>
+            <span class="cpc-val" id="priceStarter">23</span>
+            <span class="cpc-cycle">/ user / tháng</span>
+          </div>
+          <span class="cpc-bill-note" id="billNoteStarter">Thanh toán theo năm ($276/user/năm)</span>
+        </div>
+
+        <a href="#trial" class="btn btn-outline btn-block">Bắt Đầu Dùng Thử 14 Ngày</a>
+
+        <div class="cpc-features-list">
+          <span class="cpc-fl-title">Bao gồm:</span>
+          <div class="cpc-fi"><i class="ph-fill ph-check-circle"></i> Tối đa 5 thành viên đội ngũ</div>
+          <div class="cpc-fi"><i class="ph-fill ph-check-circle"></i> 2,500 Contacts & Leads</div>
+          <div class="cpc-fi"><i class="ph-fill ph-check-circle"></i> 1 Pipeline Kanban trực quan</div>
+          <div class="cpc-fi"><i class="ph-fill ph-check-circle"></i> Đồng bộ Email 2 chiều (Gmail / Outlook)</div>
+          <div class="cpc-fi"><i class="ph-fill ph-check-circle"></i> Báo cáo doanh số tuần cơ bản</div>
+        </div>
+      </div>
+
+      <!-- Tier 2: Professional (Featured) -->
+      <div class="crm-price-card featured">
+        <div class="cpc-popular-badge"><i class="ph-fill ph-star"></i> LỰA CHỌN PHỔ BIẾN NHẤT</div>
+        <div class="cpc-header">
+          <span class="cpc-tier-badge gold">TĂNG TRƯỞNG NHANH</span>
+          <h3 class="cpc-tier-title">Professional</h3>
+          <p class="cpc-tier-desc">Dành cho doanh nghiệp vừa từ 5–25 nhân sự cần tự động hóa quy trình & dự báo doanh số.</p>
+          <div class="cpc-price-box">
+            <span class="cpc-curr">$</span>
+            <span class="cpc-val hl" id="pricePro">63</span>
+            <span class="cpc-cycle">/ user / tháng</span>
+          </div>
+          <span class="cpc-bill-note" id="billNotePro">Thanh toán theo năm ($756/user/năm) · Tiết kiệm $192</span>
+        </div>
+
+        <a href="#trial" class="btn btn-primary btn-block">Dùng Thử Pro Miễn Phí</a>
+
+        <div class="cpc-features-list">
+          <span class="cpc-fl-title">Toàn bộ tính năng Starter, cộng thêm:</span>
+          <div class="cpc-fi"><i class="ph-fill ph-check-circle"></i> Không giới hạn Contacts & Leads</div>
+          <div class="cpc-fi"><i class="ph-fill ph-check-circle"></i> Đa Pipeline bán hàng không giới hạn</div>
+          <div class="cpc-fi"><i class="ph-fill ph-check-circle"></i> Tự động hóa quy trình (Email drip & Task rules)</div>
+          <div class="cpc-fi"><i class="ph-fill ph-check-circle"></i> AI Lead Enrichment (Tự điền thông tin công ty)</div>
+          <div class="cpc-fi"><i class="ph-fill ph-check-circle"></i> Phân quyền chuyên sâu theo vai trò (Role-based)</div>
+          <div class="cpc-fi"><i class="ph-fill ph-check-circle"></i> Tích hợp Webhooks & REST API tốc độ cao</div>
+        </div>
+      </div>
+
+      <!-- Tier 3: Enterprise -->
+      <div class="crm-price-card">
+        <div class="cpc-header">
+          <span class="cpc-tier-badge">DOANH NGHIỆP</span>
+          <h3 class="cpc-tier-title">Enterprise</h3>
+          <p class="cpc-tier-desc">Dành cho tập đoàn quy mô lớn cần bảo mật khắt khe, tích hợp ERP và hỗ trợ 24/7 chuyên biệt.</p>
+          <div class="cpc-price-box">
+            <span class="cpc-curr">$</span>
+            <span class="cpc-val" id="priceEnterprise">159</span>
+            <span class="cpc-cycle">/ user / tháng</span>
+          </div>
+          <span class="cpc-bill-note" id="billNoteEnt">Thanh toán theo năm ($1,908/user/năm)</span>
+        </div>
+
+        <a href="#trial" class="btn btn-outline btn-block">Liên Hệ Tư Vấn Doanh Nghiệp</a>
+
+        <div class="cpc-features-list">
+          <span class="cpc-fl-title">Toàn bộ tính năng Pro, cộng thêm:</span>
+          <div class="cpc-fi"><i class="ph-fill ph-check-circle"></i> Đăng nhập một lần SSO / SAML & Okta</div>
+          <div class="cpc-fi"><i class="ph-fill ph-check-circle"></i> Cam kết SLA Uptime 99.99%</div>
+          <div class="cpc-fi"><i class="ph-fill ph-check-circle"></i> Kiểm toán hoạt động chi tiết (Audit logs)</div>
+          <div class="cpc-fi"><i class="ph-fill ph-check-circle"></i> Quản lý tài khoản riêng (Dedicated CS Manager)</div>
+          <div class="cpc-fi"><i class="ph-fill ph-check-circle"></i> Đào tạo nội bộ & Hỗ trợ chuyển đổi dữ liệu 1-1</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── INTERACTIVE ROI CALCULATOR ─── -->
+<section class="roi-section">
+  <div class="container">
+    <div class="roi-card-wrapper">
+      <div class="roi-left">
+        <span class="eyebrow"><span class="eyebrow-dot"></span> TÍNH HIỆU QUẢ ĐẦU TƯ (ROI)</span>
+        <h2 class="roi-title">Doanh Nghiệp Của Bạn Sẽ Tiết Kiệm & Thu Lời Bao Nhiêu?</h2>
+        <p class="roi-desc">
+          Điều chỉnh quy mô đội ngũ bán hàng và giá trị đơn hàng trung bình để xem con số hoàn vốn thực tế dựa trên số liệu khảo sát từ 500+ khách hàng Helix.
+        </p>
+
+        <div class="roi-sliders">
+          <div class="roi-slider-item">
+            <div class="rsi-head">
+              <label>Số lượng nhân viên bán hàng (Sales Reps):</label>
+              <strong id="dispReps">12 Nhân sự</strong>
+            </div>
+            <input type="range" min="2" max="60" value="12" id="slideReps" oninput="calcRoi()" />
+          </div>
+
+          <div class="roi-slider-item">
+            <div class="rsi-head">
+              <label>Giá trị trung bình mỗi hợp đồng (Deal Size):</label>
+              <strong id="dispDealSize">$5,000 USD</strong>
+            </div>
+            <input type="range" min="1000" max="30000" step="500" value="5000" id="slideDeal" oninput="calcRoi()" />
+          </div>
+        </div>
+      </div>
+
+      <div class="roi-right">
+        <div class="roi-results-box">
+          <div class="rrb-item">
+            <span class="rrb-lbl">Thời gian tiết kiệm mỗi tuần</span>
+            <div class="rrb-val" id="dispTimeSaved">108 Giờ</div>
+            <span class="rrb-sub">Tương đương ~9 giờ/nhân viên/tuần</span>
+          </div>
+
+          <div class="rrb-divider"></div>
+
+          <div class="rrb-item">
+            <span class="rrb-lbl">Doanh thu tăng thêm ước tính / năm</span>
+            <div class="rrb-val hl" id="dispRevGrowth">+$144,000 USD</div>
+            <span class="rrb-sub">Nhờ tỷ lệ chốt deal tăng thêm 28%</span>
+          </div>
+
+          <div class="rrb-divider"></div>
+
+          <div class="rrb-roi-badge">
+            Tỷ lệ hoàn vốn ước tính: <strong id="dispRoiPct">640% ROI</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FEATURE COMPARISON MATRIX ─── -->
+<section class="matrix-section">
+  <div class="container">
+    <div class="section-head text-center">
+      <div class="eyebrow"><span class="eyebrow-dot"></span> SO SÁNH TÍNH NĂNG CHI TIẾT</div>
+      <h2 class="section-title">Ma Trận Tính Năng Giữa Các Gói Cước</h2>
+    </div>
+
+    <div class="matrix-table-wrap">
+      <table class="crm-matrix-table">
+        <thead>
+          <tr>
+            <th style="width:40%;">Tính Năng</th>
+            <th style="width:20%;">Starter</th>
+            <th style="width:20%;" class="hl-col">Professional</th>
+            <th style="width:20%;">Enterprise</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="group-header"><td colspan="4">Quản Lý Pipeline & Leads</td></tr>
+          <tr><td>Số lượng contacts</td><td>2,500</td><td class="hl-col">Không giới hạn</td><td>Không giới hạn</td></tr>
+          <tr><td>Số lượng pipeline tùy chỉnh</td><td>1 Pipeline</td><td class="hl-col">Không giới hạn</td><td>Không giới hạn</td></tr>
+          <tr><td>Kéo thả Kanban trực quan</td><td><i class="ph-fill ph-check"></i></td><td class="hl-col"><i class="ph-fill ph-check"></i></td><td><i class="ph-fill ph-check"></i></td></tr>
+          <tr><td>Tự động lọc trùng lặp dữ liệu</td><td>-</td><td class="hl-col"><i class="ph-fill ph-check"></i></td><td><i class="ph-fill ph-check"></i></td></tr>
+
+          <tr class="group-header"><td colspan="4">Tự Động Hóa & AI</td></tr>
+          <tr><td>Email drip chuỗi tự động</td><td>-</td><td class="hl-col"><i class="ph-fill ph-check"></i></td><td><i class="ph-fill ph-check"></i></td></tr>
+          <tr><td>AI Lead Enrichment</td><td>-</td><td class="hl-col"><i class="ph-fill ph-check"></i></td><td><i class="ph-fill ph-check"></i></td></tr>
+          <tr><td>Tự động phân bổ lead thông minh</td><td>-</td><td class="hl-col"><i class="ph-fill ph-check"></i></td><td><i class="ph-fill ph-check"></i></td></tr>
+
+          <tr class="group-header"><td colspan="4">Bảo Mật & Quản Trị</td></tr>
+          <tr><td>Xác thực 2 yếu tố (2FA)</td><td><i class="ph-fill ph-check"></i></td><td class="hl-col"><i class="ph-fill ph-check"></i></td><td><i class="ph-fill ph-check"></i></td></tr>
+          <tr><td>SSO / SAML (Okta, Azure AD)</td><td>-</td><td class="hl-col">-</td><td><i class="ph-fill ph-check"></i></td></tr>
+          <tr><td>Báo cáo kiểm toán bảo mật (Audit log)</td><td>-</td><td class="hl-col">-</td><td><i class="ph-fill ph-check"></i></td></tr>
+          <tr><td>Cam kết SLA Uptime</td><td>99.5%</td><td class="hl-col">99.9%</td><td>99.99%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TRIAL CTA ─── -->
+<section class="final" id="trial">
+  <div class="container">
+    <div class="final-box text-center">
+      <div class="eyebrow" style="color:var(--accent);"><span class="eyebrow-dot"></span> KHÔNG CẦN THẺ TÍN DỤNG</div>
+      <h2>Sẵn Sàng Nâng Tầm Đội Ngũ Bán Hàng?</h2>
+      <p style="max-width:600px; margin:0 auto 24px; color:var(--text-2);">
+        Trải nghiệm toàn bộ sức mạnh của Helix CRM trong 14 ngày. Cài đặt xong trong 3 phút, nhập dữ liệu từ Excel / HubSpot / Pipedrive chỉ với 1 cú click.
+      </p>
+      <form class="final-form" onsubmit="event.preventDefault(); alert('Cảm ơn bạn! Liên kết kích hoạt tài khoản dùng thử 14 ngày đã được gửi vào email.');">
+        <input type="email" placeholder="Nhập địa chỉ email doanh nghiệp của bạn" required />
+        <button type="submit" class="btn btn-primary btn-lg">Dùng Thử Miễn Phí 14 Ngày</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer class="footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <div class="logo">
+        <svg class="logo-mark" viewBox="0 0 32 32" fill="none">
+          <rect x="4" y="4" width="24" height="24" rx="7" fill="currentColor"/>
+          <path d="M11 11 L21 21 M21 11 L11 21" stroke="#fafbff" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <span>helix<span class="logo-dot">.</span></span>
+      </div>
+      <p class="footer-tagline">Nền tảng CRM thế hệ mới tối ưu tỷ lệ chuyển đổi cho đội ngũ B2B sales.</p>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Trang Giao Diện</div>
+      <ul class="footer-links">
+        <li><a href="index.html">Trang Chủ & CRM Overview</a></li>
+        <li><a href="pricing.html">Bảng Giá & Ma Trận Tính Năng</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script>
+let isAnnual = true;
+
+function toggleBilling() {
+  isAnnual = !isAnnual;
+  const toggleBtn = document.getElementById('billingToggle');
+  const lblM = document.getElementById('lblMonthly');
+  const lblA = document.getElementById('lblAnnual');
+
+  if (isAnnual) {
+    toggleBtn.classList.add('active');
+    lblA.classList.add('active');
+    lblM.classList.remove('active');
+
+    document.getElementById('priceStarter').innerText = '23';
+    document.getElementById('pricePro').innerText = '63';
+    document.getElementById('priceEnterprise').innerText = '159';
+
+    document.getElementById('billNoteStarter').innerText = 'Thanh toán theo năm ($276/user/năm)';
+    document.getElementById('billNotePro').innerText = 'Thanh toán theo năm ($756/user/năm) · Tiết kiệm $192';
+    document.getElementById('billNoteEnt').innerText = 'Thanh toán theo năm ($1,908/user/năm)';
+  } else {
+    toggleBtn.classList.remove('active');
+    lblM.classList.add('active');
+    lblA.classList.remove('active');
+
+    document.getElementById('priceStarter').innerText = '29';
+    document.getElementById('pricePro').innerText = '79';
+    document.getElementById('priceEnterprise').innerText = '199';
+
+    document.getElementById('billNoteStarter').innerText = 'Thanh toán theo từng tháng';
+    document.getElementById('billNotePro').innerText = 'Thanh toán theo từng tháng';
+    document.getElementById('billNoteEnt').innerText = 'Thanh toán theo từng tháng';
+  }
+}
+
+function calcRoi() {
+  const reps = parseInt(document.getElementById('slideReps').value);
+  const deal = parseInt(document.getElementById('slideDeal').value);
+
+  document.getElementById('dispReps').innerText = reps + ' Nhân sự';
+  document.getElementById('dispDealSize').innerText = '$' + deal.toLocaleString('en-US') + ' USD';
+
+  const hoursSavedWeekly = reps * 9;
+  const revGain = reps * deal * 2.4;
+  const costAnnual = reps * 63 * 12;
+  const roiPct = Math.round((revGain / costAnnual) * 100);
+
+  document.getElementById('dispTimeSaved').innerText = hoursSavedWeekly + ' Giờ';
+  document.getElementById('dispRevGrowth').innerText = '+$' + Math.round(revGain).toLocaleString('en-US') + ' USD';
+  document.getElementById('dispRoiPct').innerText = roiPct + '% ROI';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  calcRoi();
+});
+</script>
+</body>
+</html>

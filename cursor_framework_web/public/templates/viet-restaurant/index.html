@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vị Xưa Quán — Cơm Niêu & Tinh Hoa Ẩm Thực Truyền Thống Việt</title>
+  <meta name="description" content="Nhà hàng Vị Xưa gìn giữ trọn vẹn phong vị mâm cơm gia đình truyền thống 3 miền Bắc - Trung - Nam: Cơm niêu cháy giòn, cá bống kho tộ, bún chả, canh cua đồng. Không gian mộc mạc ấm cúng, Michelin Selected." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ─── TOP NOTICE BAR ─── -->
+  <aside class="top-bar">
+    <div class="container top-bar-inner">
+      <div class="top-left">
+        <span class="badge-status"><span class="pulse-dot"></span> Đang đón khách (10:00 – 22:30)</span>
+        <span class="sep"></span>
+        <a href="tel:19008899" class="hotline-link">
+          <i class="ph-fill ph-phone-call"></i> Đặt Bàn Khẩn Cấp: <strong>1900 8899</strong>
+        </a>
+      </div>
+      <div class="top-right">
+        <span class="promo-text"><i class="ph-fill ph-gift"></i> Tặng E-Voucher Giảm 15% khi đặt bàn trước</span>
+        <span class="sep hide-mobile"></span>
+        <a href="#vouchers" class="voucher-link hide-mobile"><i class="ph ph-ticket"></i> Lấy Mã Giảm Giá</a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ─── HEADER & NAVIGATION ─── -->
+  <header class="navbar" id="navbar">
+    <div class="container nav-inner">
+      <a href="#" class="brand-logo" aria-label="Vị Xưa Quán Trang Chủ">
+        <div class="brand-pot-icon">
+          <svg viewBox="0 0 40 40" fill="none">
+            <circle cx="20" cy="20" r="18" fill="#451a03" stroke="#b45309" stroke-width="1.5"/>
+            <path d="M12 22C12 26 15.5 29 20 29C24.5 29 28 26 28 22H12Z" fill="#d97706"/>
+            <ellipse cx="20" cy="20" rx="9" ry="2.5" fill="#fef3c7"/>
+            <path d="M17 14C17 12 18 10 20 9C20 12 22 13 22 15" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M14 16C14 14.5 15 13 16 12" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">Vị Xưa <span class="brand-accent">Quán</span></span>
+          <span class="brand-tagline">Cơm Niêu & Ẩm Thực Cổ Truyền</span>
+        </div>
+      </a>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html" class="nav-item active">Trang Chủ</a>
+        <a href="menu.html" class="nav-item">Thực Đơn Di Sản</a>
+        <a href="reservation.html" class="nav-item">Đặt Bàn & Phòng VIP</a>
+        <a href="#about" class="nav-item">Câu Chuyện Vị Xưa</a>
+        <a href="#vouchers" class="nav-item">Voucher 15%</a>
+        <a href="#branches" class="nav-item">Chi Nhánh</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="menu.html" class="btn btn-outline btn-sm hide-mobile">
+          <i class="ph ph-book-open"></i> Xem Thực Đơn
+        </a>
+        <a href="reservation.html" class="btn btn-primary btn-sm">
+          <i class="ph ph-calendar-check"></i> Đặt Bàn Ngay
+        </a>
+        <button class="mobile-toggle" id="menuToggle" aria-label="Mở menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── HERO SECTION ─── -->
+  <section class="hero-section">
+    <div class="hero-bg-overlay"></div>
+    <div class="hero-ambient-glow"></div>
+    <div class="container hero-container">
+      <div class="hero-content">
+        <div class="hero-award-badge">
+          <i class="ph-fill ph-trophy"></i>
+          <span>Michelin Selected 2024 – 2026 • Top 10 Ẩm Thực Truyền Thống</span>
+        </div>
+        <h1 class="hero-title">
+          Vị Xưa Tinh Hoa <br />
+          <span class="text-serif">Trọn Vẹn Phong Vị Mâm Cơm Gia Đình Việt</span>
+        </h1>
+        <p class="hero-subtitle">
+          Khơi gợi ký ức nguồn cội qua từng thố cơm niêu cháy giòn 2 mặt, cá bống kho tộ quánh mật mía, bát canh cua đồng ngọt lịm cà pháo giòn tan. Không gian nhà cổ Bắc Bộ mộc mạc, tiếng đàn tranh êm dịu và lòng hiếu khách chân tình.
+        </p>
+
+        <div class="hero-actions">
+          <a href="reservation.html" class="btn btn-primary btn-lg">
+            <span>Đặt Bàn Giữ Chỗ Đẹp</span>
+            <i class="ph-bold ph-arrow-right"></i>
+          </a>
+          <a href="menu.html" class="btn btn-wood btn-lg">
+            <i class="ph ph-book-open"></i>
+            <span>Khám Phá 120+ Món Di Sản</span>
+          </a>
+        </div>
+
+        <div class="hero-badges-row">
+          <div class="badge-item">
+            <i class="ph-duotone ph-fire"></i>
+            <div>
+              <strong>38+ Năm</strong>
+              <span>Gìn giữ bí truyền</span>
+            </div>
+          </div>
+          <div class="badge-sep"></div>
+          <div class="badge-item">
+            <i class="ph-duotone ph-bowl-food"></i>
+            <div>
+              <strong>120+ Món</strong>
+              <span>Đặc sản di sản</span>
+            </div>
+          </div>
+          <div class="badge-sep"></div>
+          <div class="badge-item">
+            <i class="ph-duotone ph-plant"></i>
+            <div>
+              <strong>100% Sạch</strong>
+              <span>Nông sản tự nhiên</span>
+            </div>
+          </div>
+          <div class="badge-sep"></div>
+          <div class="badge-item">
+            <i class="ph-duotone ph-storefront"></i>
+            <div>
+              <strong>4 Chi Nhánh</strong>
+              <span>Hà Nội - ĐN - Sài Gòn</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Visual Card -->
+      <div class="hero-media-wrapper">
+        <div class="media-card-main">
+          <img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=700&q=80" alt="Mâm Cơm Niêu Truyền Thống Vị Xưa" class="hero-img-main" />
+          <div class="floating-dish-card">
+            <div class="fd-icon"><i class="ph-fill ph-sparkle"></i></div>
+            <div class="fd-info">
+              <strong>Cơm Niêu Cháy Giòn & Cá Kho Tộ</strong>
+              <span>Món ăn biểu tượng được yêu thích nhất</span>
+            </div>
+          </div>
+          <div class="floating-rate-card">
+            <span class="rate-num">4.9 ★</span>
+            <span class="rate-sub">4.800+ Thực khách đánh giá</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── ABOUT & PHILOSOPHY SECTION ─── -->
+  <section class="about-section" id="about">
+    <div class="container about-container">
+      <div class="about-images-mosaic">
+        <div class="mosaic-item m-one">
+          <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80" alt="Không gian nhà cổ Vị Xưa" />
+        </div>
+        <div class="mosaic-item m-two">
+          <img src="https://images.unsplash.com/photo-1552611052-33e04de081de?auto=format&fit=crop&w=600&q=80" alt="Bếp lửa niêu đất truyền thống" />
+        </div>
+        <div class="mosaic-experience-box">
+          <span class="exp-years">38</span>
+          <span class="exp-text">Năm Giữ Lửa Phong Vị Cổ Truyền</span>
+        </div>
+      </div>
+
+      <div class="about-text-content">
+        <span class="sub-label">CÂU CHUYỆN KHỞI NGUỒN</span>
+        <h2 class="section-title">Nơi Thời Gian Ngưng Đọng Bên Mâm Cơm Ấm Áp</h2>
+        <p class="about-lead">
+          Giữa nhịp sống đô thị hối hả, Vị Xưa Quán được dựng nên như một chốn đi về thanh bình, nơi khơi gợi lại những ký ức ngọt ngào nhất về mâm cơm của mẹ, của bà ngày xưa.
+        </p>
+        <p class="about-p">
+          Mỗi hạt gạo tại Vị Xưa được tuyển chọn từ vùng đồng bằng phù sa màu mỡ, nấu trong những chiếc niêu đất nung Bát Tràng tráng men tự nhiên, ủ trấu giữ nhiệt để tạo nên lớp cháy giòn vàng ruộm thơm lừng. Chúng tôi không sử dụng bột ngọt công nghiệp hay phụ gia; vị ngọt đậm đà hoàn toàn đến từ nước hầm xương hầm chậm 18 tiếng, nước mắm cốt nhĩ truyền thống Phú Quốc và mật mía xứ Nghệ.
+        </p>
+
+        <div class="philosophy-grid">
+          <div class="phil-item">
+            <div class="phil-icon"><i class="ph-duotone ph-leaf"></i></div>
+            <div>
+              <h4>Nguyên Liệu Đồng Quê Sạch</h4>
+              <p>Rau củ hữu cơ hái sớm từ nông trại sinh thái, cá tôm tươi sống đánh bắt tự nhiên.</p>
+            </div>
+          </div>
+          <div class="phil-item">
+            <div class="phil-icon"><i class="ph-duotone ph-cooking-pot"></i></div>
+            <div>
+              <h4>Niêu Đất Nung Gia Truyền</h4>
+              <p>Ủ nhiệt bằng kỹ thuật đốt than củi bí truyền, tạo lớp cháy 2 mặt thơm giòn rụm.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── TRADITIONAL MENU CATALOG ─── -->
+  <section class="menu-section" id="menu">
+    <div class="container">
+      <div class="section-header text-center">
+        <span class="sub-label">TINH HOA ẨM THỰC 3 MIỀN</span>
+        <h2 class="section-title">Thực Đơn Di Sản Vị Xưa</h2>
+        <p class="section-desc">Gần 120 món ăn truyền thống được chế biến tỉ mỉ dưới bàn tay nghệ nhân bếp trưởng 35 năm kinh nghiệm.</p>
+        
+        <div class="menu-tabs">
+          <button class="m-tab-btn active" data-filter="all">Tất Cả Món (8)</button>
+          <button class="m-tab-btn" data-filter="comnieu">Cơm Niêu & Kho Tộ</button>
+          <button class="m-tab-btn" data-filter="bac">Mâm Cơm Bắc Bộ</button>
+          <button class="m-tab-btn" data-filter="trung">Đặc Sản Xứ Huế & Miền Trung</button>
+          <button class="m-tab-btn" data-filter="nam">Hương Vị Nam Bộ</button>
+          <button class="m-tab-btn" data-filter="chay">Món Chay & Tráng Miệng</button>
+        </div>
+      </div>
+
+      <div class="menu-grid" id="menuGrid">
+        <!-- Dish 1: Cơm Niêu Cháy 2 Mặt Cá Bống Kho Tộ -->
+        <article class="dish-card" data-category="comnieu">
+          <div class="dish-media">
+            <span class="dish-badge hot">Món Đặc Sản Ký Danh</span>
+            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80" alt="Cơm Niêu Cháy Cá Kho Tộ" class="dish-img" loading="lazy" />
+          </div>
+          <div class="dish-body">
+            <div class="dish-title-row">
+              <h3 class="dish-name">Cơm Niêu Cháy Cá Bống Kho Tộ</h3>
+              <span class="dish-price">185.000 ₫</span>
+            </div>
+            <p class="dish-desc">Cơm niêu nấu bằng niêu đất Bát Tràng cháy giòn 2 mặt, cá bống suối kho tộ kẹo mật mía và tiêu sọ Phú Quốc cay nồng thơm ngát.</p>
+            <div class="dish-footer">
+              <span class="dish-tag"><i class="ph-fill ph-seal-check"></i> Độc quyền Vị Xưa</span>
+              <button class="btn-dish-order" data-dish="Cơm Niêu Cháy Cá Bống Kho Tộ" data-price="185000">Đặt Món</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Dish 2: Bún Chả Nướng Than Hoa Hà Thành -->
+        <article class="dish-card" data-category="bac">
+          <div class="dish-media">
+            <span class="dish-badge michelin">Michelin Đề Xuất</span>
+            <img src="https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=600&q=80" alt="Bún Chả Hà Nội" class="dish-img" loading="lazy" />
+          </div>
+          <div class="dish-body">
+            <div class="dish-title-row">
+              <h3 class="dish-name">Bún Chả Nướng Than Hoa Cổ Truyền</h3>
+              <span class="dish-price">125.000 ₫</span>
+            </div>
+            <p class="dish-desc">Chả miếng ba chỉ giòn bì, chả viên nướng kẹp que tre đượm mùi than hoa, nước chấm đu đủ cà rốt chua ngọt chuẩn vị phố cổ.</p>
+            <div class="dish-footer">
+              <span class="dish-tag"><i class="ph-fill ph-heart"></i> Món ăn được yêu thích</span>
+              <button class="btn-dish-order" data-dish="Bún Chả Nướng Than Hoa Cổ Truyền" data-price="125000">Đặt Món</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Dish 3: Phở Bò Tái Lăn Gầu Giòn Bát Đá -->
+        <article class="dish-card" data-category="bac">
+          <div class="dish-media">
+            <span class="dish-badge signature">Gia Truyền 3 Đời</span>
+            <img src="https://images.unsplash.com/photo-1585032226651-759b368d7246?auto=format&fit=crop&w=600&q=80" alt="Phở Bò Tái Lăn" class="dish-img" loading="lazy" />
+          </div>
+          <div class="dish-body">
+            <div class="dish-title-row">
+              <h3 class="dish-name">Phở Bò Tái Lăn Bát Đá Nóng Hổi</h3>
+              <span class="dish-price">145.000 ₫</span>
+            </div>
+            <p class="dish-desc">Bò tươi xào lăn lửa lớn dậy mùi tỏi gừng, nước dùng ninh xương bò nguyên chất 24h, giữ nhiệt sôi sùng sục trong bát đá tự nhiên.</p>
+            <div class="dish-footer">
+              <span class="dish-tag"><i class="ph-fill ph-fire"></i> Sôi sùng sục 15 phút</span>
+              <button class="btn-dish-order" data-dish="Phở Bò Tái Lăn Bát Đá" data-price="145000">Đặt Món</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Dish 4: Canh Cua Đồng Mồng Tơi Cà Pháo & Thịt Luộc -->
+        <article class="dish-card" data-category="comnieu bac">
+          <div class="dish-media">
+            <span class="dish-badge">Cơm Mẹ Nấu</span>
+            <img src="https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=600&q=80" alt="Canh Cua Cà Pháo" class="dish-img" loading="lazy" />
+          </div>
+          <div class="dish-body">
+            <div class="dish-title-row">
+              <h3 class="dish-name">Mâm Canh Cua Rau Đay Cà Pháo</h3>
+              <span class="dish-price">135.000 ₫</span>
+            </div>
+            <p class="dish-desc">Cua đồng giã tay đóng tảng dày béo ngậy, nấu rau đay mướp hương thanh mát, ăn kèm bát cà pháo muối giòn tan và đĩa thịt ba chỉ luộc mắm tôm.</p>
+            <div class="dish-footer">
+              <span class="dish-tag"><i class="ph-fill ph-leaf"></i> Thanh nhiệt giải nhiệt</span>
+              <button class="btn-dish-order" data-dish="Mâm Canh Cua Rau Đay Cà Pháo" data-price="135000">Đặt Món</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Dish 5: Nem Lụi Nướng Xứ Huế & Bánh Bèo Chén -->
+        <article class="dish-card" data-category="trung">
+          <div class="dish-media">
+            <span class="dish-badge gold">Ẩm Thực Cung Đình</span>
+            <img src="https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80" alt="Nem Lụi Huế" class="dish-img" loading="lazy" />
+          </div>
+          <div class="dish-body">
+            <div class="dish-title-row">
+              <h3 class="dish-name">Nem Lụi Sả Nướng & Bánh Bèo Tôm Chấy</h3>
+              <span class="dish-price">165.000 ₫</span>
+            </div>
+            <p class="dish-desc">Nem thịt thơm lừng hương sả tươi cuốn bánh tráng rau sống, chấm nước lèo gan đậu phộng đậm đà cùng mâm 8 chén bánh bèo tôm cháy giòn rụm.</p>
+            <div class="dish-footer">
+              <span class="dish-tag"><i class="ph-fill ph-sparkle"></i> Vị xưa Cố Đô Huế</span>
+              <button class="btn-dish-order" data-dish="Nem Lụi Sả Nướng & Bánh Bèo" data-price="165000">Đặt Món</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Dish 6: Bánh Xèo Tôm Nhảy Giòn Rụm Miền Tây -->
+        <article class="dish-card" data-category="nam">
+          <div class="dish-media">
+            <span class="dish-badge hot">Giòn Tan Vàng Ruộm</span>
+            <img src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=600&q=80" alt="Bánh Xèo Miền Tây" class="dish-img" loading="lazy" />
+          </div>
+          <div class="dish-body">
+            <div class="dish-title-row">
+              <h3 class="dish-name">Bánh Xèo Tôm Nhảy Nước Cốt Dừa</h3>
+              <span class="dish-price">155.000 ₫</span>
+            </div>
+            <p class="dish-desc">Vỏ bánh tráng mỏng giòn rụm thơm béo nước cốt dừa, nhân tôm đất tươi sống, thịt ba chỉ, đỗ xanh và đĩa rau rừng hơn 15 loại thảo mộc cuốn bánh tráng.</p>
+            <div class="dish-footer">
+              <span class="dish-tag"><i class="ph-fill ph-bowl-food"></i> Rau rừng Tây Nam Bộ</span>
+              <button class="btn-dish-order" data-dish="Bánh Xèo Tôm Nhảy" data-price="155000">Đặt Món</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Dish 7: Chả Ốc Nướng Lá Lốt Tây Hồ -->
+        <article class="dish-card" data-category="bac">
+          <div class="dish-media">
+            <span class="dish-badge">Món Nhắm Tinh Tế</span>
+            <img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80" alt="Chả Ốc Nướng" class="dish-img" loading="lazy" />
+          </div>
+          <div class="dish-body">
+            <div class="dish-title-row">
+              <h3 class="dish-name">Chả Ốc Nồi Đất Nướng Lá Lốt</h3>
+              <span class="dish-price">175.000 ₫</span>
+            </div>
+            <p class="dish-desc">Ốc nhồi Tây Hồ băm giòn sần sật trộn giò sống, mộc nhĩ, tiêu sọ, bọc kín lá lốt tươi nướng trên ngói gốm nóng hổi, chấm mắm gừng ớt hiểm cay nồng.</p>
+            <div class="dish-footer">
+              <span class="dish-tag"><i class="ph-fill ph-flame"></i> Nướng ngói gốm nóng</span>
+              <button class="btn-dish-order" data-dish="Chả Ốc Nồi Đất Nướng" data-price="175000">Đặt Món</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Dish 8: Chè Hạt Sen Long Nhãn & Trà Sen Tây Hồ -->
+        <article class="dish-card" data-category="chay">
+          <div class="dish-media">
+            <span class="dish-badge green">Tráng Miệng Tao Nhã</span>
+            <img src="https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=600&q=80" alt="Chè Sen Long Nhãn" class="dish-img" loading="lazy" />
+          </div>
+          <div class="dish-body">
+            <div class="dish-title-row">
+              <h3 class="dish-name">Chè Sen Long Nhãn Hưng Yên & Trà</h3>
+              <span class="dish-price">75.000 ₫</span>
+            </div>
+            <p class="dish-desc">Hạt sen Tịnh Tâm bở tơi ngọt bùi bọc trong cùi nhãn lồng Phố Hiến mọng nước, nấu đường phèn thanh mát cùng ấm trà sen ướp hoa gạo sớm.</p>
+            <div class="dish-footer">
+              <span class="dish-tag"><i class="ph-fill ph-plant"></i> Vị ngọt thanh khiết</span>
+              <button class="btn-dish-order" data-dish="Chè Sen Long Nhãn & Trà" data-price="75000">Đặt Món</button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── CUSTOMER EXPERIENCE & HOSPITALITY SERVICES ─── -->
+  <section class="experience-section" id="experience">
+    <div class="container">
+      <div class="text-center">
+        <span class="sub-label">DỊCH VỤ HƯỚNG TỚI SỰ THOẢI MÁI CỦA THỰC KHÁCH</span>
+        <h2 class="section-title">Trải Nghiệm Thưởng Thức Trọn Vẹn & Thư Thái</h2>
+        <p class="section-desc">Không chỉ dừng lại ở món ngon, chúng tôi chăm chút từng chi tiết nhỏ nhất để bữa ăn của bạn cùng gia đình trở thành khoảnh khắc đáng nhớ.</p>
+      </div>
+
+      <div class="exp-grid">
+        <div class="exp-card">
+          <div class="exp-icon"><i class="ph-duotone ph-door"></i></div>
+          <h3>Phòng VIP Riêng Tư Tiếp Khách</h3>
+          <p>Hệ thống 12 phòng VIP máy lạnh sang trọng, bài trí theo phong cách nhà cổ Bắc Bộ, có bàn xoay và ban công riêng biệt phù hợp cho tiệc gia đình và chiêu đãi đối tác.</p>
+          <span class="exp-pill">Sức chứa 8 – 40 khách</span>
+        </div>
+
+        <div class="exp-card">
+          <div class="exp-icon"><i class="ph-duotone ph-music-notes"></i></div>
+          <h3>Không Gian Âm Nhạc Truyền Thống</h3>
+          <p>Không gian tĩnh lặng nhẹ nhàng với giai điệu đàn tranh, sáo trúc và ca trù mộc mạc biểu diễn trực tiếp vào mỗi tối cuối tuần, mang đến cảm giác an yên sau ngày bận rộn.</p>
+          <span class="exp-pill">Biểu diễn T6, T7 & CN</span>
+        </div>
+
+        <div class="exp-card">
+          <div class="exp-icon"><i class="ph-duotone ph-baby"></i></div>
+          <h3>Khu Vui Chơi Trẻ Em An Toàn</h3>
+          <p>Khu vực trò chơi dân gian (tô tượng, ô ăn quan, tranh cát) có nhân viên hỗ trợ chăm sóc để các bậc phụ huynh hoàn toàn an tâm và thoải mái dùng bữa.</p>
+          <span class="exp-pill">Miễn phí 100%</span>
+        </div>
+
+        <div class="exp-card">
+          <div class="exp-icon"><i class="ph-duotone ph-car"></i></div>
+          <h3>Bãi Đỗ Xe Ô Tô Rộng Rãi Miễn Phí</h3>
+          <p>Tất cả 4 chi nhánh đều có bãi đỗ xe ô tô và xe máy rộng rãi ngay trước cửa, nhân viên an ninh bảo vệ trông giữ và hỗ trợ che dù tận tình khi trời mưa nắng.</p>
+          <span class="exp-pill">Trông xe 24/24 miễn phí</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── VOUCHERS & PROMOTIONS ─── -->
+  <section class="voucher-section" id="vouchers">
+    <div class="container">
+      <div class="voucher-box-wrapper">
+        <div class="vb-content">
+          <span class="sub-label text-gold">ƯU ĐÃI ĐỘC QUYỀN TRÊN WEBSITE</span>
+          <h2 class="vb-title">Nhận E-Voucher Giảm 15% – 25% Khi Đặt Bàn Trước</h2>
+          <p class="vb-desc">
+            Áp dụng cho tất cả hóa đơn dùng bữa tại các chi nhánh Vị Xưa Quán. Mã giảm giá sẽ được gửi ngay lập tức tới điện thoại hoặc Zalo của bạn.
+          </p>
+
+          <div class="vouchers-list">
+            <!-- Voucher 1 -->
+            <div class="v-ticket">
+              <div class="v-left">
+                <span class="v-percent">15%</span>
+                <span class="v-type">GIẢM TỔNG HÓA ĐƠN</span>
+              </div>
+              <div class="v-right">
+                <h4>Mã: <strong>VIXUA15</strong></h4>
+                <p>Áp dụng cho bàn từ 4 khách đặt trước ít nhất 2 giờ</p>
+                <button class="btn-copy-code" data-code="VIXUA15">Sao Chép Mã</button>
+              </div>
+            </div>
+
+            <!-- Voucher 2 -->
+            <div class="v-ticket">
+              <div class="v-left">
+                <span class="v-percent">25%</span>
+                <span class="v-type">COMBO SUM VẦY</span>
+              </div>
+              <div class="v-right">
+                <h4>Mã: <strong>SUMVAY25</strong></h4>
+                <p>Tiết kiệm 220.000đ khi gọi Combo Mâm Cơm Đoàn Viên 6 món</p>
+                <button class="btn-copy-code" data-code="SUMVAY25">Sao Chép Mã</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Claim Form -->
+        <div class="vb-form-side">
+          <div class="claim-form-card">
+            <h3><i class="ph-fill ph-ticket"></i> Đăng Ký Nhận Voucher SMS</h3>
+            <p>Nhập số điện thoại để nhận mã QR Voucher dùng ngay:</p>
+
+            <form id="voucherClaimForm" class="claim-form" onsubmit="event.preventDefault(); claimVoucher();">
+              <div class="f-group">
+                <label>Họ và tên quý khách:</label>
+                <input type="text" id="vName" class="f-input" placeholder="Nguyễn Văn Bình" required />
+              </div>
+              <div class="f-group">
+                <label>Số điện thoại nhận mã:</label>
+                <input type="tel" id="vPhone" class="f-input" placeholder="09xx xxx xxx" required />
+              </div>
+              <div class="f-group">
+                <label>Chọn chi nhánh bạn sẽ ghé:</label>
+                <select id="vBranch" class="f-select">
+                  <option value="hn-hoankiem">Hà Nội — Phố Cổ (28 Chân Cầm)</option>
+                  <option value="hn-tayho">Hà Nội — Hồ Tây (168 Quảng An)</option>
+                  <option value="danang">Đà Nẵng — Sông Hàn (42 Bạch Đằng)</option>
+                  <option value="hcm-q1">TP.HCM — Quận 1 (88 Pasteur)</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary btn-block btn-lg">
+                <i class="ph-bold ph-paper-plane-tilt"></i> Nhận Ngay Mã E-Voucher Qua SMS
+              </button>
+              <span class="claim-note"><i class="ph-fill ph-check-circle"></i> Mã voucher có hiệu lực trong 30 ngày.</span>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── REVIEWS & TESTIMONIALS ─── -->
+  <section class="reviews-section" id="reviews">
+    <div class="container">
+      <div class="text-center">
+        <span class="sub-label">CẢM NHẬN TỪ TRÁI TIM THỰC KHÁCH</span>
+        <h2 class="section-title">Hơn 4.800+ Lời Khen Ngợi & Đồng Điệu</h2>
+        <p class="section-desc">Mỗi lời khen, sự hài lòng của thực khách bốn phương là động lực để Vị Xưa gìn giữ bếp lửa di sản qua năm tháng.</p>
+      </div>
+
+      <div class="reviews-grid">
+        <div class="review-box">
+          <div class="r-stars"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
+          <p class="r-quote">
+            “Cơm niêu ở đây cháy giòn rụm cả hai mặt, cá bống kho kẹo mật mía vừa cay vừa béo ngậy ăn đưa cơm vô cùng. Không gian nhà cổ yên tĩnh, các cháu nhân viên mặc áo bà ba phục vụ rất lễ phép chu đáo. Gia đình tôi 3 thế hệ mỗi dịp cuối tuần đều tụ họp ở chi nhánh Hồ Tây.”
+          </p>
+          <div class="r-author">
+            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80" alt="Cô Nguyễn Thu Hà" />
+            <div>
+              <strong>Cô Nguyễn Thu Hà</strong>
+              <span>Giáo viên về hưu (Hà Nội) • Khách hàng thân thiết 6 năm</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="review-box">
+          <div class="r-stars"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
+          <p class="r-quote">
+            “Tôi đưa đoàn đối tác Nhật Bản đến ăn trưa tại chi nhánh Pasteur Quận 1. Các bạn Nhật khen nức nở món phở bò bát đá và bún chả nướng than hoa. Phòng VIP rất riêng tư, máy lạnh mát rượi, chỗ đỗ xe ô tô ngay trước sảnh cực kỳ thuận tiện.”
+          </p>
+          <div class="r-author">
+            <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80" alt="Anh Trần Thế Nam" />
+            <div>
+              <strong>Anh Trần Thế Nam</strong>
+              <span>Giám đốc Tài Chính (TP.HCM) • Đặt bàn tiệc ngoại giao</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="review-box">
+          <div class="r-stars"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
+          <p class="r-quote">
+            “An extraordinary culinary journey in Vietnam! The clay pot rice and Hanoi-style grilled pork are incredible. The Michelin recognition is truly well-deserved. Warm ambiance and soft traditional string music made our dinner unforgettable.”
+          </p>
+          <div class="r-author">
+            <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&q=80" alt="David & Sarah Miller" />
+            <div>
+              <strong>David & Sarah Miller</strong>
+              <span>Food Travel Writers (London, UK) • Michelin Guide Reviewer</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── BRANCHES DIRECTORY & ONLINE BOOKING ─── -->
+  <section class="branches-section" id="branches">
+    <div class="container">
+      <div class="branches-grid-layout">
+        <!-- Branches Info -->
+        <div class="branches-info-block">
+          <span class="sub-label">HỆ THỐNG CHI NHÁNH VỊ XƯA QUÁN</span>
+          <h2 class="section-title">Chỉ Dẫn Đường Tới 4 Chi Nhánh 3 Miền</h2>
+          <p class="section-desc">Mở cửa đón khách từ 10:00 đến 22:30 hàng ngày. Bãi đỗ xe ô tô miễn phí có bảo vệ phục vụ.</p>
+
+          <div class="branch-cards-list">
+            <!-- Branch 1 -->
+            <div class="b-card">
+              <div class="b-city">HÀ NỘI — TRUNG TÂM PHỐ CỔ</div>
+              <h4>Chi Nhánh 1: Số 28 Phố Chân Cầm, Q. Hoàn Kiếm</h4>
+              <p><i class="ph ph-map-pin"></i> Cách Hồ Gươm 300m, ngõ cổ kính rợp bóng cây, có bãi gửi xe ô tô tại phố Lý Quốc Sư.</p>
+              <p><i class="ph ph-phone"></i> Hotline Chi Nhánh: <strong>(024) 3928 8899</strong></p>
+            </div>
+
+            <!-- Branch 2 -->
+            <div class="b-card">
+              <div class="b-city">HÀ NỘI — BÁN ĐẢO TÂY HỒ</div>
+              <h4>Chi Nhánh 2: Số 168 Đường Quảng An, Q. Tây Hồ</h4>
+              <p><i class="ph ph-map-pin"></i> View trực diện mặt nước Hồ Tây thơ mộng, sân vườn rộng 800m², bãi đỗ 25 xe ô tô miễn phí.</p>
+              <p><i class="ph ph-phone"></i> Hotline Chi Nhánh: <strong>(024) 3719 8899</strong></p>
+            </div>
+
+            <!-- Branch 3 -->
+            <div class="b-card">
+              <div class="b-city">ĐÀ NẴNG — VEN SÔNG HÀN</div>
+              <h4>Chi Nhánh 3: Số 42 Đường Bạch Đằng, Q. Hải Châu</h4>
+              <p><i class="ph ph-map-pin"></i> Tuyến phố đi bộ sầm uất ngắm trọn Cầu Rồng phun lửa, không gian thoáng đãng đón gió biển.</p>
+              <p><i class="ph ph-phone"></i> Hotline Chi Nhánh: <strong>(0236) 388 8899</strong></p>
+            </div>
+
+            <!-- Branch 4 -->
+            <div class="b-card">
+              <div class="b-city">TP. HỒ CHÍ MINH — TRUNG TÂM QUẬN 1</div>
+              <h4>Chi Nhánh 4: Số 88 Đường Pasteur, P. Bến Nghé, Quận 1</h4>
+              <p><i class="ph ph-map-pin"></i> Liền kề Nhà thờ Đức Bà & Bưu điện thành phố, có tầng lửng VIP tiếp khách và phòng tiệc riêng.</p>
+              <p><i class="ph ph-phone"></i> Hotline Chi Nhánh: <strong>(028) 3822 8899</strong></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Booking Form Block -->
+        <div class="booking-form-block" id="booking">
+          <div class="booking-card">
+            <div class="book-badge">ĐẶT BÀN TRỰC TUYẾN</div>
+            <h3>Giữ Chỗ Trước — Thảnh Thơi Thưởng Thức</h3>
+            <p>Được ưu tiên chọn vị trí đẹp, phòng VIP hoặc bàn ngắm cảnh view hồ lãng mạn.</p>
+
+            <form id="reservationForm" class="res-form" onsubmit="event.preventDefault(); submitReservation();">
+              <div class="f-row-2">
+                <div class="f-col">
+                  <label><i class="ph ph-user"></i> Họ tên của bạn:</label>
+                  <input type="text" id="bName" class="f-input" placeholder="Ví dụ: Nguyễn Minh Đức" required />
+                </div>
+                <div class="f-col">
+                  <label><i class="ph ph-phone"></i> Số điện thoại:</label>
+                  <input type="tel" id="bPhone" class="f-input" placeholder="09xx xxx xxx" required />
+                </div>
+              </div>
+
+              <div class="f-row-2">
+                <div class="f-col">
+                  <label><i class="ph ph-users-three"></i> Số lượng khách:</label>
+                  <select id="bGuests" class="f-select">
+                    <option value="2">2 Khách (Bàn đôi)</option>
+                    <option value="4" selected>4 Khách (Bàn gia đình nhỏ)</option>
+                    <option value="6">6 Khách (Bàn gia đình vừa)</option>
+                    <option value="8">8 - 12 Khách (Bàn tiệc sum vầy)</option>
+                    <option value="20">Trên 15 Khách (Phòng VIP tiệc lớn)</option>
+                  </select>
+                </div>
+                <div class="f-col">
+                  <label><i class="ph ph-map-pin"></i> Chọn chi nhánh:</label>
+                  <select id="bBranch" class="f-select">
+                    <option value="hn-hoankiem">Hà Nội — Phố Cổ (Chân Cầm)</option>
+                    <option value="hn-tayho">Hà Nội — Hồ Tây (Quảng An)</option>
+                    <option value="danang">Đà Nẵng — Sông Hàn (Bạch Đằng)</option>
+                    <option value="hcm-q1">TP.HCM — Quận 1 (Pasteur)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="f-row-2">
+                <div class="f-col">
+                  <label><i class="ph ph-calendar"></i> Ngày dùng bữa:</label>
+                  <input type="date" id="bDate" class="f-input" required />
+                </div>
+                <div class="f-col">
+                  <label><i class="ph ph-clock"></i> Khung giờ đón khách:</label>
+                  <select id="bTime" class="f-select">
+                    <option value="11:30">11:30 (Ăn trưa sớm)</option>
+                    <option value="12:00" selected>12:00 (Ăn trưa cao điểm)</option>
+                    <option value="12:30">12:30 (Ăn trưa)</option>
+                    <option value="18:00">18:00 (Ăn tối sớm)</option>
+                    <option value="19:00">19:00 (Ăn tối lý tưởng)</option>
+                    <option value="19:30">19:30 (Ăn tối cao điểm)</option>
+                    <option value="20:00">20:00 (Ăn tối muộn)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="f-col">
+                <label><i class="ph ph-chat-text"></i> Yêu cầu đặc biệt (tùy chọn):</label>
+                <input type="text" id="bNote" class="f-input" placeholder="Ví dụ: Phòng riêng VIP, ghế ăn cho em bé, tổ chức sinh nhật..." />
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-block btn-lg">
+                <i class="ph-bold ph-check"></i> Xác Nhận Đặt Bàn Ngay
+              </button>
+              <p class="res-note"><i class="ph-fill ph-shield-check"></i> Nhân viên lễ tân sẽ gọi điện thoại xác nhận bàn trong vòng 5 phút.</p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-col-main">
+        <a href="#" class="brand-logo footer-logo">
+          <span class="brand-title">Vị Xưa <span class="brand-accent">Quán</span></span>
+        </a>
+        <p class="footer-desc">
+          Chuỗi nhà hàng ẩm thực di sản 3 miền gìn giữ mâm cơm gia đình cổ truyền Việt Nam. Tự hào được vinh danh Michelin Selected và sự yêu mến của hàng triệu thực khách.
+        </p>
+        <div class="footer-hotline">
+          <i class="ph-fill ph-phone-call"></i>
+          <div>
+            <span>Tổng đài đặt bàn & Góp ý dịch vụ:</span>
+            <strong>1900 8899 (1.000đ/phút)</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Thực Đơn Nổi Bật</h4>
+        <ul>
+          <li><a href="#menu">Cơm niêu cháy giòn 2 mặt</a></li>
+          <li><a href="#menu">Cá bống suối kho tộ mật mía</a></li>
+          <li><a href="#menu">Bún chả nướng que tre Hà Nội</a></li>
+          <li><a href="#menu">Phở bò tái lăn bát đá nóng</a></li>
+          <li><a href="#menu">Bánh xèo tôm nhảy miền Tây</a></li>
+          <li><a href="#menu">Chè sen long nhãn Phố Hiến</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Chi Nhánh Đón Khách</h4>
+        <ul>
+          <li><a href="#branches">28 Phố Chân Cầm, Hoàn Kiếm, HN</a></li>
+          <li><a href="#branches">168 Đường Quảng An, Tây Hồ, HN</a></li>
+          <li><a href="#branches">42 Đường Bạch Đằng, Đà Nẵng</a></li>
+          <li><a href="#branches">88 Đường Pasteur, Quận 1, TP.HCM</a></li>
+          <li><a href="#branches">Bãi đỗ xe ô tô miễn phí</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Dịch Vụ & Ưu Đãi</h4>
+        <ul>
+          <li><a href="#booking">Đặt bàn phòng VIP riêng tư</a></li>
+          <li><a href="#vouchers">E-Voucher giảm giá 15% - 25%</a></li>
+          <li><a href="#experience">Khu vui chơi trẻ em dân gian</a></li>
+          <li><a href="#experience">Biểu diễn nhạc cụ dân tộc</a></li>
+          <li><a href="#">Chính sách hội viên thân thiết</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container footer-bottom-inner">
+        <p>© 2026 Vị Xưa Quán — Công Ty Cổ Phần Ẩm Thực Di Sản Việt Nam. Mọi quyền được bảo lưu.</p>
+        <p class="designer-tag">Cursor Enterprise Framework Web Architecture</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Notification Toast -->
+  <div class="toast-notification" id="toastNotif">
+    <i class="ph-fill ph-check-circle"></i>
+    <span id="toastMsg">Thao tác thành công!</span>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

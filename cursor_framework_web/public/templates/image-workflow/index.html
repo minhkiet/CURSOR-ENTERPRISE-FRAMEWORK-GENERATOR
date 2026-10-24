@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Image Workflow Studio — Pipeline Tạo Ảnh AI & Bóc Tách Asset</title>
+<meta name="description" content="Quy trình tự động hóa hình ảnh từ Screenshot/URL sang Asset thực tế. Kết hợp Web Cloner, Image Finder (Unsplash, Pexels) và Image Generator (Google Flow, DALL-E 3)." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body class="img-theme">
+
+<!-- ─── HEADER ─── -->
+<header class="img-header">
+  <div class="img-container header-inner">
+    <div class="img-logo">
+      <div class="logo-box"><i class="ph-fill ph-camera"></i></div>
+      <div class="logo-text">
+        <span class="logo-name">IMAGE WORKFLOW</span>
+        <span class="logo-tag">Asset Pipeline Studio</span>
+      </div>
+    </div>
+
+    <nav class="img-nav">
+      <a href="#blueprints">Prompt Blueprints</a>
+      <a href="#aspect">Tỷ Lệ Khung Hình</a>
+      <a href="#manifest">Asset Manifest</a>
+    </nav>
+
+    <div class="header-actions">
+      <a href="#pipeline" class="btn btn-rose">
+        <i class="ph ph-play-circle"></i>
+        <span>Quy Trình 4 Pha</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- ─── HERO ─── -->
+<section class="img-hero">
+  <div class="img-container">
+    <div class="hero-tag">
+      <span class="tag-dot"></span>
+      <span>Tự Động Hóa Asset Cho Clone & Thiết Kế Web</span>
+    </div>
+
+    <h1 class="hero-title">
+      Biến ảnh chụp màn hình & URL<br/>
+      <span class="text-rose">thành bộ Asset chuẩn Studio 4K.</span>
+    </h1>
+
+    <p class="hero-desc">
+      Không cần tìm ảnh stock ngẫu nhiên. Pipeline kết hợp Web Cloner, tìm kiếm Unsplash/Pexels và tạo ảnh tùy biến qua Google Flow / DALL-E 3 / Flux với Prompt Blueprint chuẩn mực.
+    </p>
+
+    <div class="hero-stats">
+      <div class="h-stat">
+        <div class="hs-num">35+</div>
+        <div class="hs-lbl">Prompt Blueprints có sẵn</div>
+      </div>
+      <div class="h-stat">
+        <div class="hs-num">16:9 / 1:1 / 9:16</div>
+        <div class="hs-lbl">Tỷ lệ khung hình đa thiết bị</div>
+      </div>
+      <div class="h-stat">
+        <div class="hs-num">WebP / AVIF</div>
+        <div class="hs-lbl">Tự động nén & tối ưu tải trang</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SECTION 1: 4-PHASE PIPELINE ─── -->
+<section class="img-section" id="pipeline">
+  <div class="img-container">
+    <div class="section-head">
+      <span class="sec-label">WORKFLOW PIPELINE</span>
+      <h2>Quy Trình 4 Pha Xử Lý Hình Ảnh Chuẩn Mực</h2>
+      <p>Cây quyết định thông minh xác định khi nào nên giữ URL gốc, khi nào dùng ảnh stock và khi nào tạo mới bằng AI.</p>
+    </div>
+
+    <div class="pipeline-grid">
+      <div class="p-card">
+        <div class="p-num">01</div>
+        <h3>Phân Tích Asset</h3>
+        <p>Bóc tách toàn bộ ảnh từ Screenshot hoặc URL: Nhận diện vai trò (Hero, Avatar, Feature icon), phân tích bảng màu chính và phong cách ánh sáng.</p>
+        <div class="p-tag">Input: Screenshot / URL</div>
+      </div>
+
+      <div class="p-card">
+        <div class="p-num">02</div>
+        <h3>Cây Quyết Định (Decision Tree)</h3>
+        <p>Nếu là ảnh generic (văn phòng, thiên nhiên) → lấy Unsplash/Pexels. Nếu cần phong cách riêng biệt, thương hiệu độc quyền → đẩy sang pha tạo ảnh AI.</p>
+        <div class="p-tag">Logic: Stock vs AI Gen</div>
+      </div>
+
+      <div class="p-card active-p-card">
+        <div class="p-num">03</div>
+        <h3>Tạo Ảnh Bằng Prompt Blueprint</h3>
+        <p>Áp dụng bộ công thức prompt: Bối cảnh + Tone màu + Ánh sáng + Độ sắc nét + Bộ lọc Negative Prompt chống dị tật AI.</p>
+        <div class="p-tag accent">Engine: Google Flow / DALL-E</div>
+      </div>
+
+      <div class="p-card">
+        <div class="p-num">04</div>
+        <h3>Xuất Asset Manifest</h3>
+        <p>Đổi tên chuẩn SEO (hero-office.webp, avatar-lead.webp), tự động nén kích thước và gắn vào cấu trúc thư mục <code>public/assets/</code>.</p>
+        <div class="p-tag">Output: Production Ready</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SECTION 2: PROMPT BLUEPRINT BUILDER ─── -->
+<section class="img-section bg-card-section" id="blueprints">
+  <div class="img-container">
+    <div class="section-head">
+      <span class="sec-label">PROMPT BLUEPRINT STUDIO</span>
+      <h2>Kho Prompt Blueprints Theo Ngành Nghề</h2>
+      <p>Nhấp vào nút sao chép để dùng ngay trong Google Flow, DALL-E 3 hoặc Midjourney.</p>
+    </div>
+
+    <div class="blueprints-grid">
+      <!-- Prompt 1 -->
+      <div class="bp-card">
+        <div class="bp-top">
+          <span class="bp-cat">SaaS B2B & TECH</span>
+          <button class="copy-btn" onclick="copyPrompt(this)">
+            <i class="ph ph-copy"></i>
+            <span>Sao chép</span>
+          </button>
+        </div>
+        <h4>Cinematic Dark Office Workspace</h4>
+        <div class="bp-code">
+          <code>Cinematic modern tech office, minimal dark desk, #090d16 background, subtle cyan ambient lighting, ultra-clean aesthetic, high-end monitor showing dashboard analytics, architectural photography, Hasselblad 8k, sharp focus --ar 16:9 --v 6.0</code>
+        </div>
+        <div class="bp-neg">
+          <span>Negative:</span> no clutter, no distorted screens, no oversaturated purple, no stock photo smiles.
+        </div>
+      </div>
+
+      <!-- Prompt 2 -->
+      <div class="bp-card">
+        <div class="bp-top">
+          <span class="bp-cat">ẨM THỰC TRUYỀN THỐNG</span>
+          <button class="copy-btn" onclick="copyPrompt(this)">
+            <i class="ph ph-copy"></i>
+            <span>Sao chép</span>
+          </button>
+        </div>
+        <h4>Mâm Cơm Niêu & Ẩm Thực Việt Nam</h4>
+        <div class="bp-code">
+          <code>Traditional Vietnamese meal in authentic clay pot, steaming rice with golden crispy crust, braised fish in earthenware, fresh herbs on woven bamboo tray, warm rustic lighting, Michelin dining aesthetic, depth of field --ar 16:9</code>
+        </div>
+        <div class="bp-neg">
+          <span>Negative:</span> no plastic plates, no artificial neon colors, no fake western cutlery.
+        </div>
+      </div>
+
+      <!-- Prompt 3 -->
+      <div class="bp-card">
+        <div class="bp-top">
+          <span class="bp-cat">BẢO HIỂM & TÀI CHÍNH</span>
+          <button class="copy-btn" onclick="copyPrompt(this)">
+            <i class="ph ph-copy"></i>
+            <span>Sao chép</span>
+          </button>
+        </div>
+        <h4>Executive Trust & Golden Shield Visual</h4>
+        <div class="bp-code">
+          <code>Modern financial headquarters atrium, warm natural sunlight streaming through glass ceiling, confident Vietnamese business leaders in tailored navy suits, sleek architectural lines, trust and security vibe, premium cinematic tone --ar 16:9</code>
+        </div>
+        <div class="bp-neg">
+          <span>Negative:</span> no blurry faces, no disfigured hands, no cartoonish illustrations.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SECTION 3: ASPECT RATIOS & MANIFEST ─── -->
+<section class="img-section" id="aspect">
+  <div class="img-container">
+    <div class="section-head">
+      <span class="sec-label">RATIO & MANIFEST</span>
+      <h2>Định Dạng Tỷ Lệ Chuẩn Thiết Kế Web</h2>
+      <p>Đảm bảo giao diện hiển thị sắc nét trên cả màn hình Desktop 4K, Tablet và Mobile.</p>
+    </div>
+
+    <div class="ratio-manifest-grid">
+      <div class="ratio-showcase">
+        <div class="ratio-tabs">
+          <button class="ratio-tab active" data-ratio="16:9">16:9 (Hero & Banners)</button>
+          <button class="ratio-tab" data-ratio="1:1">1:1 (Features & Avatars)</button>
+          <button class="ratio-tab" data-ratio="9:16">9:16 (Mobile Story & Reels)</button>
+        </div>
+        <div class="ratio-preview-box">
+          <div class="ratio-inner-frame" id="ratio-frame">
+            <div class="ratio-info-tag">1920 x 1080 · WebP · 135 KB</div>
+            <div class="ratio-visual-center">
+              <i class="ph ph-image-square"></i>
+              <span>High-Res Studio Preview Frame</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="manifest-box" id="manifest">
+        <div class="manifest-header">
+          <span>ASSET MANIFEST JSON</span>
+          <span class="manifest-status">Auto-Sync</span>
+        </div>
+        <pre class="manifest-code"><code>{
+  "project": "enterprise-landing-v4",
+  "generated": "2026-10-15T11:20:00Z",
+  "assets": [
+    {
+      "name": "hero-workspace.webp",
+      "source": "google-flow-ai",
+      "ratio": "16:9",
+      "resolution": "1920x1080",
+      "size": "142KB"
+    },
+    {
+      "name": "customer-avatar-01.webp",
+      "source": "unsplash-cdn",
+      "ratio": "1:1",
+      "resolution": "400x400",
+      "size": "28KB"
+    }
+  ]
+}</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer class="img-footer">
+  <div class="img-container footer-inner">
+    <div>
+      <strong>Image Workflow Studio</strong> · Enterprise Asset Generation Framework
+    </div>
+    <div class="footer-links">
+      <a href="#pipeline">Quy Trình</a>
+      <a href="#blueprints">Blueprints</a>
+      <a href="#aspect">Tỷ Lệ Khung Hình</a>
+      <a href="/templates">Kho Templates</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function copyPrompt(btn) {
+    const code = btn.parentElement.parentElement.querySelector('code').textContent;
+    navigator.clipboard.writeText(code);
+    const span = btn.querySelector('span');
+    span.textContent = 'Đã chép!';
+    setTimeout(() => { span.textContent = 'Sao chép'; }, 2000);
+  }
+
+  // Interactive ratio tab switcher
+  const tabs = document.querySelectorAll('.ratio-tab');
+  const frame = document.getElementById('ratio-frame');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const ratio = tab.getAttribute('data-ratio');
+      if (ratio === '16:9') {
+        frame.style.aspectRatio = '16 / 9';
+        frame.querySelector('.ratio-info-tag').textContent = '1920 x 1080 · WebP · 135 KB';
+      } else if (ratio === '1:1') {
+        frame.style.aspectRatio = '1 / 1';
+        frame.querySelector('.ratio-info-tag').textContent = '1080 x 1080 · WebP · 98 KB';
+      } else if (ratio === '9:16') {
+        frame.style.aspectRatio = '9 / 16';
+        frame.querySelector('.ratio-info-tag').textContent = '1080 x 1920 · WebP · 160 KB';
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

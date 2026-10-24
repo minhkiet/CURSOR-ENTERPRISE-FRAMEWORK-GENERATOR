@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard UI Pro — SaaS Cockpit & Analytics Platform</title>
+<meta name="description" content="Dashboard quản trị chuyên nghiệp chuẩn SaaS với KPI cards, bộ lọc đa điều kiện, bảng dữ liệu phân trang và đồng bộ Phosphor Icons." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body class="dashboard-body">
+
+<div class="dash-layout">
+  <!-- ─── SIDEBAR BACKDROP ─── -->
+  <div class="sidebar-backdrop" id="dash-backdrop"></div>
+
+  <!-- ─── SIDEBAR ─── -->
+  <aside class="dash-sidebar" id="dash-sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon"><i class="ph-fill ph-chart-polar"></i></div>
+      <div class="brand-info">
+        <span class="brand-title">COCKPIT PRO</span>
+        <span class="brand-sub">SaaS Analytics v4</span>
+      </div>
+      <button class="sidebar-close-btn" id="dash-sidebar-close" aria-label="Đóng menu">
+        <i class="ph ph-x"></i>
+      </button>
+    </div>
+
+    <nav class="sidebar-menu">
+      <div class="menu-label">TỔNG QUAN</div>
+      <a href="#dashboard" class="menu-item active">
+        <i class="ph ph-squares-four"></i>
+        <span>Dashboard</span>
+        <span class="badge-count">Live</span>
+      </a>
+      <a href="#orders" class="menu-item">
+        <i class="ph ph-receipt"></i>
+        <span>Đơn Hàng</span>
+        <span class="badge-num">142</span>
+      </a>
+      <a href="#analytics" class="menu-item">
+        <i class="ph ph-chart-line-up"></i>
+        <span>Báo Cáo KPI</span>
+      </a>
+      <a href="#kanban" class="menu-item">
+        <i class="ph ph-kanban"></i>
+        <span>Kanban Tasks</span>
+      </a>
+
+      <div class="menu-label">QUẢN TRỊ</div>
+      <a href="#customers" class="menu-item">
+        <i class="ph ph-users"></i>
+        <span>Khách Hàng</span>
+      </a>
+      <a href="#settings" class="menu-item">
+        <i class="ph ph-gear"></i>
+        <span>Cài Đặt Hệ Thống</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="user-avatar">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80" alt="Avatar" />
+        <span class="online-dot"></span>
+      </div>
+      <div class="user-details">
+        <strong>Minh Kiet</strong>
+        <span>Lead Architect</span>
+      </div>
+      <button class="logout-btn" title="Đăng xuất"><i class="ph ph-sign-out"></i></button>
+    </div>
+  </aside>
+
+  <!-- ─── MAIN CONTENT ─── -->
+  <main class="dash-main">
+    <!-- Topbar (Full Width) -->
+    <header class="dash-topbar">
+      <div class="topbar-left">
+        <button class="topbar-toggle-btn" id="dash-menu-toggle" aria-label="Mở menu quản trị">
+          <i class="ph ph-list"></i>
+        </button>
+        <div class="topbar-search">
+          <i class="ph ph-magnifying-glass"></i>
+          <input type="text" placeholder="Tìm kiếm giao dịch, khách hàng, ID đơn (#ORD)..." />
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="filter-pill">
+          <i class="ph ph-calendar"></i>
+          <span>Tháng này (01/10 - 31/10)</span>
+          <i class="ph ph-caret-down"></i>
+        </div>
+
+        <button class="icon-btn" title="Thông báo">
+          <i class="ph ph-bell"></i>
+          <span class="notif-dot"></span>
+        </button>
+
+        <button class="btn btn-primary btn-sm">
+          <i class="ph ph-plus"></i>
+          <span>Tạo Báo Cáo</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="dash-scrollable">
+      <!-- ─── KPI CARDS ─── -->
+      <section class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-title">TỔNG DOANH THU THỰC</span>
+            <span class="kpi-icon icon-blue"><i class="ph ph-currency-dollar"></i></span>
+          </div>
+          <div class="kpi-val">$184,920.00</div>
+          <div class="kpi-trend trend-up">
+            <i class="ph ph-arrow-up-right"></i>
+            <span>+24.8%</span>
+            <span class="trend-lbl">so với tháng trước</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-title">ACTIVE LEADS</span>
+            <span class="kpi-icon icon-emerald"><i class="ph ph-users-three"></i></span>
+          </div>
+          <div class="kpi-val">3,420</div>
+          <div class="kpi-trend trend-up">
+            <i class="ph ph-arrow-up-right"></i>
+            <span>+12.5%</span>
+            <span class="trend-lbl">tỷ lệ phản hồi 94%</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-title">CHUYỂN ĐỔI DEAL</span>
+            <span class="kpi-icon icon-amber"><i class="ph ph-target"></i></span>
+          </div>
+          <div class="kpi-val">68.2%</div>
+          <div class="kpi-trend trend-up">
+            <i class="ph ph-arrow-up-right"></i>
+            <span>+4.1%</span>
+            <span class="trend-lbl">chu kỳ đóng 4.2 ngày</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-title">SYSTEM UPTIME SLA</span>
+            <span class="kpi-icon icon-sky"><i class="ph ph-shield-check"></i></span>
+          </div>
+          <div class="kpi-val">99.98%</div>
+          <div class="kpi-trend">
+            <i class="ph ph-clock"></i>
+            <span>Response: 140ms</span>
+            <span class="trend-lbl">Tier-3 Data Center</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── CHARTS & WORKFLOW ─── -->
+      <section class="visual-grid">
+        <div class="chart-card">
+          <div class="card-head">
+            <div>
+              <h3>Tốc Độ Tăng Trưởng Doanh Thu (2026)</h3>
+              <p>Dữ liệu hợp đồng đã ký và hoa hồng chi trả thực tế</p>
+            </div>
+            <div class="chart-legend">
+              <span class="lg-dot dot-blue"></span> Doanh thu
+              <span class="lg-dot dot-cyan"></span> Chi phí
+            </div>
+          </div>
+          <!-- SVG Area Chart -->
+          <div class="chart-stage">
+            <svg viewBox="0 0 700 240" class="line-svg">
+              <defs>
+                <linearGradient id="area-grad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.35"/>
+                  <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0.0"/>
+                </linearGradient>
+              </defs>
+              <!-- Grid lines -->
+              <line x1="0" y1="40" x2="700" y2="40" stroke="#1e293b" stroke-dasharray="4"/>
+              <line x1="0" y1="100" x2="700" y2="100" stroke="#1e293b" stroke-dasharray="4"/>
+              <line x1="0" y1="160" x2="700" y2="160" stroke="#1e293b" stroke-dasharray="4"/>
+              <line x1="0" y1="210" x2="700" y2="210" stroke="#1e293b"/>
+
+              <!-- Area fill -->
+              <path d="M0,200 Q100,160 200,180 T400,110 T600,60 L700,40 L700,210 L0,210 Z" fill="url(#area-grad)"/>
+              <!-- Line -->
+              <path d="M0,200 Q100,160 200,180 T400,110 T600,60 L700,40" fill="none" stroke="#0ea5e9" stroke-width="3"/>
+
+              <!-- Dots -->
+              <circle cx="200" cy="180" r="5" fill="#0ea5e9" stroke="#ffffff" stroke-width="2"/>
+              <circle cx="400" cy="110" r="5" fill="#0ea5e9" stroke="#ffffff" stroke-width="2"/>
+              <circle cx="600" cy="60" r="5" fill="#0ea5e9" stroke="#ffffff" stroke-width="2"/>
+            </svg>
+            <div class="axis-x">
+              <span>Tháng 1</span><span>Tháng 3</span><span>Tháng 5</span><span>Tháng 7</span><span>Tháng 9</span><span>Tháng 11</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Task Kanban Quick View -->
+        <div class="kanban-card" id="kanban">
+          <div class="card-head">
+            <div>
+              <h3>Tiến Độ Công Việc (Sprint 42)</h3>
+              <p>Phân bổ task cho đội ngũ kỹ thuật</p>
+            </div>
+            <span class="badge-pill">8 Đang Chạy</span>
+          </div>
+
+          <div class="kanban-mini-list">
+            <div class="mini-task">
+              <div class="task-top">
+                <span class="task-tag tag-high">Ưu tiên cao</span>
+                <span class="task-due">Hạn: Hôm nay</span>
+              </div>
+              <div class="task-title">Tối ưu hóa bảng SQL Server với Index bao phủ</div>
+              <div class="task-meta">
+                <span><i class="ph ph-chat-circle"></i> 4 comments</span>
+                <span class="task-user">MK</span>
+              </div>
+            </div>
+
+            <div class="mini-task">
+              <div class="task-top">
+                <span class="task-tag tag-med">Bình thường</span>
+                <span class="task-due">Hạn: Ngày mai</span>
+              </div>
+              <div class="task-title">Đồng bộ Phosphor Icons & loại bỏ generic SVGs</div>
+              <div class="task-meta">
+                <span><i class="ph ph-check-square"></i> 12/12 test gates</span>
+                <span class="task-user">TH</span>
+              </div>
+            </div>
+
+            <div class="mini-task">
+              <div class="task-top">
+                <span class="task-tag tag-done">Đã hoàn thành</span>
+                <span class="task-due">SLA 100%</span>
+              </div>
+              <div class="task-title">Tích hợp Webhook SePay & Xác thực HMAC</div>
+              <div class="task-meta">
+                <span><i class="ph ph-seal-check"></i> Idempotency verified</span>
+                <span class="task-user">HQ</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── ADVANCED DATA TABLE ─── -->
+      <section class="table-section" id="orders">
+        <div class="table-header-bar">
+          <div>
+            <h3>Danh Sách Hợp Đồng & Giao Dịch Gần Nhất</h3>
+            <p>Hỗ trợ phân trang, lọc trạng thái và xuất báo cáo CSV</p>
+          </div>
+          <div class="table-actions">
+            <div class="search-mini">
+              <i class="ph ph-magnifying-glass"></i>
+              <input type="text" placeholder="Tìm theo ID hoặc Khách hàng..." />
+            </div>
+            <button class="btn btn-secondary btn-sm"><i class="ph ph-funnel"></i> Lọc Nâng Cao</button>
+            <button class="btn btn-secondary btn-sm"><i class="ph ph-export"></i> Xuất CSV</button>
+          </div>
+        </div>
+
+        <div class="dash-table-wrap">
+          <table class="dash-table">
+            <thead>
+              <tr>
+                <th width="40"><input type="checkbox" /></th>
+                <th>MÃ ĐƠN HÀNG</th>
+                <th>KHÁCH HÀNG / DOANH NGHIỆP</th>
+                <th>GÓI DỊCH VỤ</th>
+                <th>GIÁ TRỊ</th>
+                <th>PHƯƠNG THỨC</th>
+                <th>NGÀY TẠO</th>
+                <th>TRẠNG THÁI</th>
+                <th width="60">HÀNH ĐỘNG</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox" /></td>
+                <td><code>#ORD-9821</code></td>
+                <td>
+                  <div class="table-client">
+                    <strong>Tập Đoàn BĐS An Thịnh</strong>
+                    <span>anthinh@corp.vn</span>
+                  </div>
+                </td>
+                <td>Enterprise SaaS Pro</td>
+                <td class="table-val">$14,200.00</td>
+                <td><span class="pay-method"><i class="ph ph-bank"></i> SePay QR</span></td>
+                <td>15/10/2026</td>
+                <td><span class="status-tag status-paid">ĐÃ THANH TOÁN</span></td>
+                <td><button class="row-btn"><i class="ph ph-dots-three-vertical"></i></button></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" /></td>
+                <td><code>#ORD-9820</code></td>
+                <td>
+                  <div class="table-client">
+                    <strong>F&B Sài Gòn Chuỗi 24 Quán</strong>
+                    <span>ketoan@fbsaigon.com</span>
+                  </div>
+                </td>
+                <td>CMS Landing Fullstack</td>
+                <td class="table-val">$8,450.00</td>
+                <td><span class="pay-method"><i class="ph ph-credit-card"></i> ZaloPay</span></td>
+                <td>15/10/2026</td>
+                <td><span class="status-tag status-paid">ĐÃ THANH TOÁN</span></td>
+                <td><button class="row-btn"><i class="ph ph-dots-three-vertical"></i></button></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" /></td>
+                <td><code>#ORD-9819</code></td>
+                <td>
+                  <div class="table-client">
+                    <strong>Edutech Alpha Academy</strong>
+                    <span>contact@alpha.edu.vn</span>
+                  </div>
+                </td>
+                <td>Lộ Trình Gia Sư 1-1</td>
+                <td class="table-val">$6,120.00</td>
+                <td><span class="pay-method"><i class="ph ph-qr-code"></i> VietQR</span></td>
+                <td>14/10/2026</td>
+                <td><span class="status-tag status-pending">CHỜ XÁC NHẬN</span></td>
+                <td><button class="row-btn"><i class="ph ph-dots-three-vertical"></i></button></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" /></td>
+                <td><code>#ORD-9818</code></td>
+                <td>
+                  <div class="table-client">
+                    <strong>Logistics Vận Tải Đông Dương</strong>
+                    <span>ops@dongduonglog.com</span>
+                  </div>
+                </td>
+                <td>Cockpit Fleet Tracking</td>
+                <td class="table-val">$22,800.00</td>
+                <td><span class="pay-method"><i class="ph ph-bank"></i> Wire Transfer</span></td>
+                <td>14/10/2026</td>
+                <td><span class="status-tag status-paid">ĐÃ THANH TOÁN</span></td>
+                <td><button class="row-btn"><i class="ph ph-dots-three-vertical"></i></button></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" /></td>
+                <td><code>#ORD-9817</code></td>
+                <td>
+                  <div class="table-client">
+                    <strong>Spa & Thẩm Mỹ Viện Hương Sen</strong>
+                    <span>huongsen@wellness.vn</span>
+                  </div>
+                </td>
+                <td>Beauty Booking Suite</td>
+                <td class="table-val">$3,200.00</td>
+                <td><span class="pay-method"><i class="ph ph-credit-card"></i> MoMo</span></td>
+                <td>13/10/2026</td>
+                <td><span class="status-tag status-refunded">HOÀN TIỀN</span></td>
+                <td><button class="row-btn"><i class="ph ph-dots-three-vertical"></i></button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-footer-bar">
+          <span class="table-info">Hiển thị 1 đến 5 trên 142 hợp đồng</span>
+          <div class="pagination">
+            <button class="page-btn disabled"><i class="ph ph-caret-left"></i></button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn"><i class="ph ph-caret-right"></i></button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script>
+  // Mobile Sidebar Drawer Toggle
+  const sidebarToggle = document.getElementById('dash-menu-toggle');
+  const sidebarClose = document.getElementById('dash-sidebar-close');
+  const sidebar = document.getElementById('dash-sidebar');
+  const backdrop = document.getElementById('dash-backdrop');
+  const menuLinks = document.querySelectorAll('.menu-item');
+
+  function openSidebar() {
+    if (sidebar) sidebar.classList.add('open');
+    if (backdrop) backdrop.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeSidebar() {
+    if (sidebar) sidebar.classList.remove('open');
+    if (backdrop) backdrop.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  if (sidebarToggle) sidebarToggle.addEventListener('click', openSidebar);
+  if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
+  if (backdrop) backdrop.addEventListener('click', closeSidebar);
+  menuLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      menuLinks.forEach(m => m.classList.remove('active'));
+      link.classList.add('active');
+      if (window.innerWidth < 900) closeSidebar();
+    });
+  });
+</script>
+
+</body>
+</html>
