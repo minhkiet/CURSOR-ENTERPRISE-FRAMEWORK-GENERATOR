@@ -114,6 +114,20 @@ namespace CursorSetupWpf.Services
         public bool SupportsRules { get; init; } = true;
         public string Description { get; init; } = "";
         public string Icon { get; init; } = "\uE8B7"; // Default icon
+
+        /// <summary>
+        /// Real configuration root of the agent, relative to the install base.
+        /// Verified against a live install: Cursor ".cursor", Codex ".codex",
+        /// Antigravity ".gemini/antigravity", Windsurf ".codeium/windsurf".
+        /// </summary>
+        public string GlobalRoot { get; init; } = "";
+
+        /// <summary>
+        /// Extra destinations for a framework category, relative to the install
+        /// base. The agents.md ecosystem (Codex, Antigravity) shares skills and
+        /// agents through ".agents", and Antigravity keeps rules in ".gemini".
+        /// </summary>
+        public Dictionary<string, string[]> CategoryTargets { get; init; } = new();
     }
 
     public class Installer
@@ -148,7 +162,7 @@ namespace CursorSetupWpf.Services
                 "cursor-framework-mcp",
                 "cursor_framework_mcp.server",
                 "Framework MCP",
-                "Cursor Enterprise Framework — rules, skills, agents registry.",
+                "VibeCode Enterprise Framework — rules, skills, agents registry.",
                 new[]
                 {
                     "get_rule", "get_skill", "get_agent", "analyze_task",
@@ -236,6 +250,7 @@ namespace CursorSetupWpf.Services
                 SkillsPath = ".cursor/skills",
                 RulesPath = ".cursor/rules",
                 AgentsPath = ".cursor/agents",
+                GlobalRoot = ".cursor",
                 GatePrefix = "K",
                 EnvVars = new[] { "CURSOR_IDE", "CURSOR_PROJECT" },
                 InstallUrl = "https://cursor.com",
@@ -248,9 +263,16 @@ namespace CursorSetupWpf.Services
             {
                 Agent = TargetAgent.Codex,
                 Name = "Codex (cursor.com)",
-                SkillsPath = ".cursor/skills",
-                RulesPath = ".cursor/rules",
-                AgentsPath = ".cursor/agents",
+                SkillsPath = ".codex/skills",
+                RulesPath = ".codex/rules",
+                AgentsPath = ".codex/agents",
+                GlobalRoot = ".codex",
+                // Codex reads both its own tree and the shared agents.md tree.
+                CategoryTargets = new()
+                {
+                    ["skills"] = new[] { ".codex/skills", ".agents/skills" },
+                    ["agents"] = new[] { ".codex/agents", ".agents/agents" },
+                },
                 GatePrefix = "CX",
                 EnvVars = new[] { "CODEX_ENABLED", "ORIGIN_HOST" },
                 InstallUrl = "https://origin.cursor.com",
@@ -266,6 +288,7 @@ namespace CursorSetupWpf.Services
                 SkillsPath = ".claude/skills",
                 RulesPath = ".claude/rules",
                 AgentsPath = ".claude/agents",
+                GlobalRoot = ".claude",
                 GatePrefix = "C",
                 EnvVars = new[] { "CLAUDE_IDE", "CLAUDE_API_KEY" },
                 InstallUrl = "https://claude.com/code",
@@ -281,6 +304,7 @@ namespace CursorSetupWpf.Services
                 SkillsPath = ".grok/skills",
                 RulesPath = ".grok/rules",
                 AgentsPath = ".grok/agents",
+                GlobalRoot = ".grok",
                 GatePrefix = "G",
                 EnvVars = new[] { "GROK_API_KEY" },
                 InstallUrl = "https://x.com/grok",
@@ -297,6 +321,7 @@ namespace CursorSetupWpf.Services
                 SkillsPath = ".cline/skills",
                 RulesPath = ".cline/rules",
                 AgentsPath = ".cline/agents",
+                GlobalRoot = ".cline",
                 GatePrefix = "CL",
                 EnvVars = new[] { "ANTHROPIC_API_KEY" },
                 InstallUrl = "https://marketplace.visualstudio.com/items?itemName=cline.clyde",
@@ -312,6 +337,7 @@ namespace CursorSetupWpf.Services
                 SkillsPath = ".continue/rules",
                 RulesPath = ".continue/rules",
                 AgentsPath = ".continue/agents",
+                GlobalRoot = ".continue",
                 GatePrefix = "CO",
                 EnvVars = new[] { "OPENAI_API_KEY" },
                 InstallUrl = "https://marketplace.visualstudio.com/items?itemName=Continue.continue",
@@ -328,6 +354,7 @@ namespace CursorSetupWpf.Services
                 SkillsPath = ".gemini/skills",
                 RulesPath = ".gemini/rules",
                 AgentsPath = ".gemini/agents",
+                GlobalRoot = ".gemini",
                 GatePrefix = "GM",
                 EnvVars = new[] { "GEMINI_API_KEY" },
                 InstallUrl = "https://ai.google.dev/gemini-api",
@@ -343,6 +370,7 @@ namespace CursorSetupWpf.Services
                 SkillsPath = ".vibe/skills",
                 RulesPath = ".vibe/rules",
                 AgentsPath = ".vibe/agents",
+                GlobalRoot = ".vibe",
                 GatePrefix = "KC",
                 EnvVars = new[] { "KIMI_API_KEY" },
                 InstallUrl = "https://kimi.moonshot.cn",
@@ -358,6 +386,7 @@ namespace CursorSetupWpf.Services
                 SkillsPath = ".aider",
                 RulesPath = ".aider",
                 AgentsPath = ".aider",
+                GlobalRoot = ".aider",
                 GatePrefix = "A",
                 EnvVars = new[] { "AIDER_MODEL" },
                 InstallUrl = "https://aider.chat",
@@ -374,6 +403,7 @@ namespace CursorSetupWpf.Services
                 SkillsPath = ".zed",
                 RulesPath = ".zed",
                 AgentsPath = ".zed/agents",
+                GlobalRoot = ".zed",
                 GatePrefix = "Z",
                 EnvVars = new[] { "ZEDAI_API_KEY" },
                 InstallUrl = "https://zed.dev",
@@ -386,9 +416,18 @@ namespace CursorSetupWpf.Services
             {
                 Agent = TargetAgent.Windsurf,
                 Name = "WindSurf",
-                SkillsPath = ".windsurf/rules",
+                SkillsPath = ".windsurf/skills",
                 RulesPath = ".windsurf/rules",
                 AgentsPath = ".windsurf/workflows",
+                // Windsurf keeps its runtime state under the Codeium home.
+                GlobalRoot = ".codeium/windsurf",
+                CategoryTargets = new()
+                {
+                    ["rules"] = new[] { ".windsurf/rules" },
+                    ["skills"] = new[] { ".windsurf/skills" },
+                    ["workflows"] = new[] { ".windsurf/workflows" },
+                    ["mcp"] = new[] { ".codeium/windsurf/mcp" },
+                },
                 GatePrefix = "W",
                 EnvVars = new[] { "WINDSURF_API_KEY" },
                 InstallUrl = "https://codeium.com/windsurf",
@@ -401,9 +440,10 @@ namespace CursorSetupWpf.Services
             {
                 Agent = TargetAgent.Copilot,
                 Name = "GitHub Copilot",
-                SkillsPath = ".github/copilot",
-                RulesPath = ".github/copilot",
-                AgentsPath = ".github/copilot",
+                SkillsPath = ".github/instructions",
+                RulesPath = ".github/instructions",
+                AgentsPath = ".github/agents",
+                GlobalRoot = ".github",
                 GatePrefix = "CP",
                 EnvVars = new[] { "GITHUB_TOKEN" },
                 InstallUrl = "https://github.com/features/copilot",
@@ -417,9 +457,10 @@ namespace CursorSetupWpf.Services
             {
                 Agent = TargetAgent.Roo,
                 Name = "Roo Code",
-                SkillsPath = ".roo/rules",
+                SkillsPath = ".roo/skills",
                 RulesPath = ".roo/rules",
                 AgentsPath = ".roo/modes",
+                GlobalRoot = ".roo",
                 GatePrefix = "R",
                 EnvVars = new[] { "OPENAI_API_KEY" },
                 InstallUrl = "https://marketplace.visualstudio.com/items?itemName=rooveterinaryinc.roo-cline",
@@ -433,12 +474,26 @@ namespace CursorSetupWpf.Services
             {
                 Agent = TargetAgent.Antigravity,
                 Name = "Antigravity",
-                SkillsPath = ".gemini/skills",
+                // Antigravity reads skills and agents from the shared agents.md
+                // tree and keeps rules in the Gemini home.
+                SkillsPath = ".agents/skills",
                 RulesPath = ".gemini/rules",
-                AgentsPath = ".gemini/agents",
+                AgentsPath = ".agents/agents",
+                // Verified live: %USERPROFILE%\.gemini\antigravity holds
+                // mcp.json, hooks.json and the mcp\ package folder.
+                GlobalRoot = ".gemini/antigravity",
+                CategoryTargets = new()
+                {
+                    ["rules"] = new[] { ".gemini/rules" },
+                    ["skills"] = new[] { ".agents/skills" },
+                    ["agents"] = new[] { ".agents/agents" },
+                    ["commands"] = new[] { ".gemini/commands" },
+                    ["hooks"] = new[] { ".gemini/antigravity/hooks" },
+                    ["mcp"] = new[] { ".gemini/antigravity/mcp" },
+                },
                 GatePrefix = "AG",
                 EnvVars = new[] { "GEMINI_API_KEY" },
-                InstallUrl = "https://github.com",
+                InstallUrl = "https://antigravity.google",
                 SupportsMcp = true,
                 SupportsRules = true,
                 Description = "Next-gen vibe coding tool",
@@ -452,11 +507,11 @@ namespace CursorSetupWpf.Services
             if (zipPath == null)
                 throw new Exception($"Framework archive not found: {ZipScanner.EMBEDDED_ZIP_NAME}");
 
-            string installPath = ResolveInstallPath(config.InstallPath);
+            string installPath = GetAgentRoot(TargetAgent.Cursor, config.InstallPath);
             Directory.CreateDirectory(installPath);
 
             ProgressChanged?.Invoke(10, "Extracting framework files...");
-            await ExtractZipAsync(zipPath, installPath, config.ForceOverwrite, selections);
+            await ExtractZipAsync(zipPath, config.InstallPath, TargetAgent.Cursor, config.ForceOverwrite, selections);
 
             ProgressChanged?.Invoke(80, "Registering MCP servers...");
             var (mcpOk, mcpMsg) = await SyncMcpConfigAsync(installPath);
@@ -478,24 +533,70 @@ namespace CursorSetupWpf.Services
             ProgressChanged?.Invoke(100, "Installation complete!");
         }
 
-        string ResolveInstallPath(string path)
+        /// <summary>
+        /// Resolve the real configuration root of an agent below an install base.
+        /// The base is normally the user profile, so Cursor resolves to
+        /// "&lt;profile&gt;\.cursor" and Antigravity to
+        /// "&lt;profile&gt;\.gemini\antigravity" — the folder Antigravity actually
+        /// reads its mcp.json, hooks.json and mcp packages from.
+        /// </summary>
+        public static string GetAgentRoot(TargetAgent agent, string basePath)
         {
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
+            var config = GetAgentConfig(agent);
+            string root = config?.GlobalRoot ?? "";
+            string full = Path.GetFullPath(basePath);
+            if (string.IsNullOrEmpty(root)) return full;
 
-            string autoCursorPath = Path.Combine(path, ".cursor");
-            if (!path.EndsWith(".cursor", StringComparison.OrdinalIgnoreCase))
+            string rootNative = root.Replace('/', Path.DirectorySeparatorChar);
+            if (full.EndsWith(rootNative, StringComparison.OrdinalIgnoreCase)) return full;
+
+            string firstSegment = rootNative.Split(Path.DirectorySeparatorChar)[0];
+            if (full.EndsWith(firstSegment, StringComparison.OrdinalIgnoreCase))
             {
-                if (Directory.Exists(autoCursorPath))
-                    return autoCursorPath;
-                Directory.CreateDirectory(autoCursorPath);
-                return autoCursorPath;
+                string remainder = rootNative[(firstSegment.Length)..].TrimStart(Path.DirectorySeparatorChar);
+                if (remainder.Length == 0) return full;
+                return Path.GetFullPath(Path.Combine(full, remainder));
             }
-            return path;
+
+            return Path.GetFullPath(Path.Combine(full, rootNative));
         }
 
-        async Task ExtractZipAsync(string zipPath, string destDir, bool force, List<CategorySelection> selections, int startPct = 10, int endPct = 85)
+        /// <summary>
+        /// Absolute destinations for a framework category, relative to the install
+        /// base. Agents may read the same category from more than one place; the
+        /// shared agents.md tree is installed additively next to the agent root.
+        /// </summary>
+        static List<string> ResolveCategoryTargets(AgentInstallConfig config, string installBase, string category, bool isCategory)
         {
+            var targets = new List<string>();
+            if (!isCategory)
+            {
+                // Root-level archive entries (AGENTS.md, cursor.json, cursor_framework\...)
+                targets.Add(Path.Combine(installBase, config.GlobalRoot));
+                return targets;
+            }
+
+            string[] relatives;
+            if (!config.CategoryTargets.TryGetValue(category, out relatives!)
+                || relatives.Length == 0)
+            {
+                relatives = new[]
+                {
+                    string.IsNullOrEmpty(config.GlobalRoot) ? category : config.GlobalRoot + "/" + category
+                };
+            }
+
+            foreach (var relative in relatives)
+                targets.Add(Path.Combine(installBase, relative.Replace('/', Path.DirectorySeparatorChar)));
+            return targets;
+        }
+
+        async Task ExtractZipAsync(string zipPath, string installBase, TargetAgent agent, bool force, List<CategorySelection> selections, int startPct = 10, int endPct = 85)
+        {
+            var agentConfig = GetAgentConfig(agent) ?? new AgentInstallConfig { Agent = agent };
+            string agentRoot = GetAgentRoot(agent, installBase);
+            Directory.CreateDirectory(agentRoot);
+
             await Task.Run(() =>
             {
                 var snapshot = selections.ToDictionary(s => s.Category, s => s.SelectedItems, StringComparer.OrdinalIgnoreCase);
@@ -509,42 +610,55 @@ namespace CursorSetupWpf.Services
                     current++;
                     if (string.IsNullOrEmpty(entry.Name)) continue;
 
-                    if (!ShouldExtract(entry.FullName, snapshot, out string reason))
+                    string normalized = entry.FullName.Replace('\\', '/');
+                    var parts = normalized.Split('/');
+                    string topCategory = parts.Length > 0 ? parts[0] : "";
+                    bool isCategory = parts.Length >= 2
+                        && ZipScanner.CategoryOrder.Contains(topCategory, StringComparer.OrdinalIgnoreCase);
+
+                    if (!ShouldExtract(normalized, snapshot, out string reason))
                     {
-                        LogAppended?.Invoke($"[SKIP-CAT] {entry.FullName} ({reason})");
+                        LogAppended?.Invoke($"[SKIP-CAT] {normalized} ({reason})");
                         int pct = startPct + (int)((current * (double)(endPct - startPct)) / total);
                         ProgressChanged?.Invoke(pct, $"Skipping... {current}/{total}");
                         continue;
                     }
 
-                    string filePath = Path.Combine(destDir, entry.FullName);
-                    string dir = Path.GetDirectoryName(filePath)!;
-                    if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
+                    string relativeInside = isCategory
+                        ? string.Join("/", parts.Skip(1))
+                        : normalized;
 
-                    bool extract = true;
-                    if (File.Exists(filePath) && !force)
+                    foreach (string targetDir in ResolveCategoryTargets(agentConfig, installBase, topCategory, isCategory))
                     {
-                        // Overwrite empty/stub files left by older installs (e.g. 13-byte rules).
-                        long existingLen = new FileInfo(filePath).Length;
-                        if (existingLen > 64)
-                        {
-                            LogAppended?.Invoke($"[SKIP] {entry.FullName}");
-                            extract = false;
-                            skipped++;
-                        }
-                    }
+                        string filePath = Path.Combine(targetDir, relativeInside.Replace('/', Path.DirectorySeparatorChar));
+                        string dir = Path.GetDirectoryName(filePath)!;
+                        if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
 
-                    if (extract)
-                    {
-                        try
+                        bool extract = true;
+                        if (File.Exists(filePath) && !force)
                         {
-                            entry.ExtractToFile(filePath, overwrite: true);
-                            LogAppended?.Invoke($"[COPY] {entry.FullName}");
-                            copied++;
+                            // Overwrite empty/stub files left by older installs (e.g. 13-byte rules).
+                            long existingLen = new FileInfo(filePath).Length;
+                            if (existingLen > 64)
+                            {
+                                LogAppended?.Invoke($"[SKIP] {normalized}");
+                                extract = false;
+                                skipped++;
+                            }
                         }
-                        catch (Exception ex)
+
+                        if (extract)
                         {
-                            LogAppended?.Invoke($"[ERROR] {entry.FullName}: {ex.Message}");
+                            try
+                            {
+                                entry.ExtractToFile(filePath, overwrite: true);
+                                LogAppended?.Invoke($"[COPY] {normalized}");
+                                copied++;
+                            }
+                            catch (Exception ex)
+                            {
+                                LogAppended?.Invoke($"[ERROR] {normalized}: {ex.Message}");
+                            }
                         }
                     }
 
@@ -682,6 +796,32 @@ namespace CursorSetupWpf.Services
         // ===================== MCP Server Sync =====================
 
         /// <summary>
+        /// Configuration dialect each agent uses for MCP server registration.
+        /// Writing the wrong shape makes the agent silently ignore the servers.
+        /// </summary>
+        public enum McpConfigFormat
+        {
+            /// <summary>JSON document with a top-level "mcpServers" object.</summary>
+            JsonMcpServers,
+            /// <summary>JSON document where "mcpServers" sits at the root (Claude Code user scope).</summary>
+            JsonRootMcpServers,
+            /// <summary>TOML document with [mcp_servers.&lt;key&gt;] tables (Codex).</summary>
+            CodexToml,
+        }
+
+        /// <summary>
+        /// The MCP configuration dialect an agent actually reads.
+        /// </summary>
+        public static McpConfigFormat GetMcpConfigFormat(TargetAgent agent) => agent switch
+        {
+            // Codex reads ~/.codex/config.toml and ignores mcp.json entirely.
+            TargetAgent.Codex => McpConfigFormat.CodexToml,
+            // Claude Code keeps user-scope servers in ~/.claude.json.
+            TargetAgent.ClaudeCode => McpConfigFormat.JsonRootMcpServers,
+            _ => McpConfigFormat.JsonMcpServers,
+        };
+
+        /// <summary>
         /// Path to global MCP configuration file per target agent.
         /// </summary>
         public static string GetMcpConfigPath(TargetAgent agent = TargetAgent.Cursor)
@@ -694,8 +834,10 @@ namespace CursorSetupWpf.Services
             return agent switch
             {
                 TargetAgent.Cursor => Path.Combine(home, ".cursor", "mcp.json"),
-                TargetAgent.Codex => Path.Combine(home, ".codex", "mcp.json"),
-                TargetAgent.ClaudeCode => Path.Combine(home, ".claude", "mcp.json"),
+                // Codex only honours config.toml.
+                TargetAgent.Codex => Path.Combine(home, ".codex", "config.toml"),
+                // Claude Code reads user-scope servers from ~/.claude.json.
+                TargetAgent.ClaudeCode => Path.Combine(home, ".claude.json"),
                 TargetAgent.Antigravity => Path.Combine(home, ".gemini", "antigravity", "mcp.json"),
                 TargetAgent.Windsurf => Path.Combine(home, ".codeium", "windsurf", "mcp_config.json"),
                 TargetAgent.Cline => Path.Combine(appData, "Code", "User", "globalStorage", "saoudrizwan.claude-dev", "settings", "cline_mcp_settings.json"),
@@ -714,7 +856,7 @@ namespace CursorSetupWpf.Services
             string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             return agent switch
             {
-                TargetAgent.ClaudeCode => Path.Combine(home, ".claude", "hooks.json"),
+                TargetAgent.ClaudeCode => Path.Combine(home, ".claude", "settings.json"),
                 TargetAgent.Antigravity => Path.Combine(home, ".gemini", "antigravity", "hooks.json"),
                 _ => Path.Combine(home, ".cursor", "hooks.json"),
             };
@@ -731,6 +873,14 @@ namespace CursorSetupWpf.Services
             {
                 string path = GetMcpConfigPath(agent);
                 if (!File.Exists(path)) return false;
+
+                if (GetMcpConfigFormat(agent) == McpConfigFormat.CodexToml)
+                {
+                    string toml = File.ReadAllText(path);
+                    return McpCatalog.Any(entry =>
+                        toml.Contains($"[mcp_servers.{entry.ServerKey}]", StringComparison.OrdinalIgnoreCase));
+                }
+
                 using var doc = JsonDocument.Parse(File.ReadAllText(path));
                 if (!doc.RootElement.TryGetProperty("mcpServers", out var servers))
                     return false;
@@ -862,6 +1012,167 @@ namespace CursorSetupWpf.Services
         }
 
         /// <summary>
+        /// Read a property from an MCP server entry, which may be a plain
+        /// dictionary or a parsed JSON element depending on the source file.
+        /// </summary>
+        static bool TryGetServerProp(object? entry, string name, out object? value)
+        {
+            value = null;
+            switch (entry)
+            {
+                case JsonElement el when el.ValueKind == JsonValueKind.Object:
+                    if (el.TryGetProperty(name, out var prop))
+                    {
+                        value = prop;
+                        return true;
+                    }
+                    return false;
+                case IDictionary<string, object> dict:
+                    if (dict.TryGetValue(name, out var v))
+                    {
+                        value = v;
+                        return true;
+                    }
+                    return false;
+                default:
+                    return false;
+            }
+        }
+
+        static string AsPlainString(object? value) => value switch
+        {
+            null => "",
+            JsonElement je when je.ValueKind == JsonValueKind.String => je.GetString() ?? "",
+            JsonElement je => je.ToString(),
+            _ => value.ToString() ?? "",
+        };
+
+        static string TomlString(string raw)
+        {
+            var sb = new StringBuilder("\"");
+            foreach (char c in raw)
+            {
+                if (c == '\\') sb.Append("\\\\");
+                else if (c == '"') sb.Append("\\\"");
+                else if (c == '\n') sb.Append("\\n");
+                else if (c == '\r') sb.Append("\\r");
+                else if (c == '\t') sb.Append("\\t");
+                else sb.Append(c);
+            }
+            sb.Append('"');
+            return sb.ToString();
+        }
+
+        static string TomlArray(object? value)
+        {
+            var items = new List<string>();
+            if (value is JsonElement je && je.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var item in je.EnumerateArray())
+                    items.Add(TomlString(AsPlainString(item)));
+            }
+            else if (value is IEnumerable<object> seq)
+            {
+                foreach (var item in seq)
+                    items.Add(TomlString(AsPlainString(item)));
+            }
+            else if (value is IEnumerable<string> strings)
+            {
+                foreach (var item in strings)
+                    items.Add(TomlString(item));
+            }
+            return "[" + string.Join(", ", items) + "]";
+        }
+
+        static bool TryGetEnvMap(object? value, out Dictionary<string, string> map)
+        {
+            map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            if (value is JsonElement el && el.ValueKind == JsonValueKind.Object)
+            {
+                foreach (var prop in el.EnumerateObject())
+                    map[prop.Name] = AsPlainString(prop.Value);
+                return map.Count > 0;
+            }
+            if (value is IDictionary<string, object> dict)
+            {
+                foreach (var kv in dict)
+                    map[kv.Key] = AsPlainString(kv.Value);
+                return map.Count > 0;
+            }
+            if (value is IDictionary<string, string> strs)
+            {
+                foreach (var kv in strs)
+                    map[kv.Key] = kv.Value;
+                return map.Count > 0;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Render MCP servers as Codex TOML tables.
+        /// </summary>
+        static string BuildCodexTomlSections(Dictionary<string, object> servers)
+        {
+            var sb = new StringBuilder();
+            foreach (var (key, entry) in servers)
+            {
+                sb.AppendLine($"[mcp_servers.{key}]");
+                if (TryGetServerProp(entry, "command", out var command))
+                    sb.AppendLine($"command = {TomlString(AsPlainString(command))}");
+                if (TryGetServerProp(entry, "args", out var args))
+                    sb.AppendLine($"args = {TomlArray(args)}");
+                if (TryGetServerProp(entry, "cwd", out var cwd))
+                    sb.AppendLine($"cwd = {TomlString(AsPlainString(cwd))}");
+                if (TryGetServerProp(entry, "url", out var url))
+                    sb.AppendLine($"url = {TomlString(AsPlainString(url))}");
+                if (TryGetServerProp(entry, "env", out var env) && TryGetEnvMap(env, out var envMap))
+                {
+                    sb.AppendLine();
+                    sb.AppendLine($"[mcp_servers.{key}.env]");
+                    foreach (var (envKey, envValue) in envMap)
+                        sb.AppendLine($"{envKey} = {TomlString(envValue)}");
+                }
+                sb.AppendLine();
+            }
+            return sb.ToString().TrimEnd('\n') + "\n";
+        }
+
+        /// <summary>
+        /// Replace the managed [mcp_servers.*] tables in an existing Codex
+        /// config.toml while leaving every other table untouched.
+        /// </summary>
+        static string MergeCodexToml(string existingToml, Dictionary<string, object> servers)
+        {
+            string[] lines = existingToml.Replace("\r\n", "\n").Split('\n');
+            var kept = new List<string>();
+            bool skipBlock = false;
+
+            foreach (var line in lines)
+            {
+                string trimmed = line.Trim();
+                if (trimmed.StartsWith("[") && trimmed.EndsWith("]"))
+                {
+                    string section = trimmed.Trim('[', ']').Trim();
+                    skipBlock = false;
+                    foreach (var key in servers.Keys)
+                    {
+                        if (section.Equals("mcp_servers." + key, StringComparison.OrdinalIgnoreCase)
+                            || section.StartsWith("mcp_servers." + key + ".", StringComparison.OrdinalIgnoreCase))
+                        {
+                            skipBlock = true;
+                            break;
+                        }
+                    }
+                }
+                if (!skipBlock) kept.Add(line);
+            }
+
+            string body = string.Join("\n", kept).TrimEnd('\n');
+            string addition = BuildCodexTomlSections(servers);
+            return string.IsNullOrEmpty(body) ? addition : body + "\n\n" + addition;
+        }
+
+        /// <summary>
         /// Synchronize ~/.cursor/mcp.json with packages under <paramref name="installPath"/>/mcp.
         /// <summary>
         /// Synchronize MCP configuration with packages under <paramref name="installPath"/>/mcp
@@ -874,17 +1185,18 @@ namespace CursorSetupWpf.Services
                 try
                 {
                     string resolvedInstall = string.IsNullOrWhiteSpace(installPath)
-                        ? Path.Combine(
-                            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                            ".cursor")
-                        : ResolveInstallPath(installPath);
+                        ? GetAgentRoot(agent,
+                            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile))
+                        : GetAgentRoot(agent, installPath);
 
                     string path = GetMcpConfigPath(agent);
                     string dir = Path.GetDirectoryName(path)!;
                     if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
 
+                    McpConfigFormat format = GetMcpConfigFormat(agent);
+
                     Dictionary<string, object> existing = new();
-                    if (File.Exists(path))
+                    if (File.Exists(path) && format != McpConfigFormat.CodexToml)
                     {
                         try
                         {
@@ -898,15 +1210,42 @@ namespace CursorSetupWpf.Services
                         }
                         catch (Exception ex)
                         {
-                            LogAppended?.Invoke($"[MCP] existing mcp.json unreadable, recreating: {ex.Message}");
+                            LogAppended?.Invoke($"[MCP] existing config unreadable, recreating: {ex.Message}");
                         }
                     }
 
                     var merged = MergeMcpConfig(existing, resolvedInstall);
                     var opts = new JsonSerializerOptions { WriteIndented = true };
                     string jsonOutput = JsonSerializer.Serialize(merged, opts);
-                    File.WriteAllText(path, jsonOutput);
-                    LogAppended?.Invoke($"[MCP] synced global agent config: {path}");
+
+                    if (format == McpConfigFormat.CodexToml)
+                    {
+                        // Codex ignores mcp.json; it only reads config.toml tables.
+                        var servers = merged.TryGetValue("mcpServers", out var rawServers)
+                            && rawServers is Dictionary<string, object> serverDict
+                                ? serverDict
+                                : new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+
+                        string existingToml = File.Exists(path) ? File.ReadAllText(path) : "";
+                        string mergedToml = MergeCodexToml(existingToml, servers);
+                        File.WriteAllText(path, mergedToml);
+                        LogAppended?.Invoke($"[MCP] synced Codex config.toml: {path}");
+                    }
+                    else if (format == McpConfigFormat.JsonRootMcpServers)
+                    {
+                        // Claude Code keeps user-scope servers at the root of ~/.claude.json.
+                        existing["mcpServers"] = merged["mcpServers"];
+                        existing.Remove("version");
+                        existing.Remove("syncedAt");
+                        string claudeJson = JsonSerializer.Serialize(existing, opts);
+                        File.WriteAllText(path, claudeJson);
+                        LogAppended?.Invoke($"[MCP] synced Claude Code config: {path}");
+                    }
+                    else
+                    {
+                        File.WriteAllText(path, jsonOutput);
+                        LogAppended?.Invoke($"[MCP] synced global agent config: {path}");
+                    }
 
                     // Also write local workspace copy
                     try
@@ -929,7 +1268,6 @@ namespace CursorSetupWpf.Services
                 }
             });
         }
-
         // ===================== Hooks Sync =====================
 
         /// <summary>
@@ -943,10 +1281,9 @@ namespace CursorSetupWpf.Services
                 try
                 {
                     string resolvedInstall = string.IsNullOrWhiteSpace(installPath)
-                        ? Path.Combine(
-                            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                            ".cursor")
-                        : ResolveInstallPath(installPath);
+                        ? GetAgentRoot(agent,
+                            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile))
+                        : GetAgentRoot(agent, installPath);
 
                     string hooksPath = GetHooksConfigPath(agent);
                     string cursorHome = Path.GetDirectoryName(hooksPath)!;
@@ -1066,13 +1403,7 @@ namespace CursorSetupWpf.Services
         /// Get the base path for a specific agent's framework installation.
         /// </summary>
         public static string GetAgentInstallPath(TargetAgent agent, string basePath)
-        {
-            var config = GetAgentConfig(agent);
-            if (config == null) return basePath;
-
-            string agentPath = config.SkillsPath.Split('/')[0]; // e.g. ".cursor", ".claude", ".grok"
-            return Path.Combine(basePath, agentPath);
-        }
+            => GetAgentRoot(agent, basePath);
 
         /// <summary>
         /// Install framework for a specific agent.
@@ -1093,20 +1424,9 @@ namespace CursorSetupWpf.Services
                 if (zipPath == null)
                     return (false, "Framework archive not found");
 
-                // Determine install path based on agent
-                string installPath;
-                if (agent == TargetAgent.Cursor || agent == TargetAgent.Codex)
-                {
-                    // Cursor and Codex share the same path
-                    installPath = ResolveInstallPath(installBasePath);
-                }
-                else
-                {
-                    // Claude Code and Grok have separate paths
-                    installPath = Path.Combine(installBasePath, agentConfig.SkillsPath.Split('/')[0]);
-                    if (!Directory.Exists(installPath))
-                        Directory.CreateDirectory(installPath);
-                }
+                // Each agent installs into its own verified configuration root.
+                string installPath = GetAgentRoot(agent, installBasePath);
+                Directory.CreateDirectory(installPath);
 
                 LogAppended?.Invoke($"[AGENT] Installing for {agentConfig.Name}...");
                 LogAppended?.Invoke($"[AGENT] Gate prefix: {agentConfig.GatePrefix}");
@@ -1115,7 +1435,7 @@ namespace CursorSetupWpf.Services
 
                 // Extract framework files
                 ProgressChanged?.Invoke(10, $"Extracting files for {agentConfig.Name}...");
-                await ExtractZipAsync(zipPath, installPath, config.ForceOverwrite, selections);
+                await ExtractZipAsync(zipPath, installBasePath, agentConfig.Agent, config.ForceOverwrite, selections);
 
                 // Sync MCP for agents that support it
                 if (agentConfig.SupportsMcp)
@@ -1196,15 +1516,7 @@ namespace CursorSetupWpf.Services
 
             foreach (var config in AgentCatalog)
             {
-                string agentPath;
-                if (config.Agent == TargetAgent.Cursor || config.Agent == TargetAgent.Codex)
-                {
-                    agentPath = ResolveInstallPath(basePath);
-                }
-                else
-                {
-                    agentPath = Path.Combine(basePath, config.SkillsPath.Split('/')[0]);
-                }
+                string agentPath = GetAgentRoot(config.Agent, basePath);
 
                 string manifestPath = Path.Combine(agentPath, "agent-manifest.json");
                 bool installed = File.Exists(manifestPath);

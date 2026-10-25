@@ -355,7 +355,7 @@ namespace CursorSetupWpf.ViewModels
             }
         }
 
-        // Install path
+        // Install path — the base directory that contains the per-agent roots.
         string _installPath = "";
         public string InstallPath
         {
@@ -363,7 +363,39 @@ namespace CursorSetupWpf.ViewModels
             set
             {
                 if (Set(ref _installPath, value))
+                {
                     OnPropertyChanged(nameof(CanInstall));
+                    OnPropertyChanged(nameof(ResolvedInstallPath));
+                    OnPropertyChanged(nameof(InstallTargetLabel));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Where the framework actually lands for the selected agent. Each agent
+        /// owns a different configuration root, so this resolves to the Cursor
+        /// folder for Cursor and to ".gemini\antigravity" for Antigravity.
+        /// </summary>
+        public string ResolvedInstallPath
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(InstallPath)) return "";
+                var agent = SelectedAgent?.Agent ?? CursorSetupWpf.Services.TargetAgent.Cursor;
+                return Installer.GetAgentRoot(agent, InstallPath);
+            }
+        }
+
+        /// <summary>
+        /// Human readable destination for the selected agent.
+        /// </summary>
+        public string InstallTargetLabel
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(ResolvedInstallPath)) return "";
+                string agentName = SelectedAgent?.DisplayName ?? "Cursor IDE";
+                return LocalizationService.T("install.target_prefix", agentName) + " " + ResolvedInstallPath;
             }
         }
 
@@ -750,6 +782,8 @@ namespace CursorSetupWpf.ViewModels
                     OnPropertyChanged(nameof(IsClineSelected));
                     OnPropertyChanged(nameof(IsRooSelected));
                     OnPropertyChanged(nameof(McpConfigPathLabel));
+                    OnPropertyChanged(nameof(ResolvedInstallPath));
+                    OnPropertyChanged(nameof(InstallTargetLabel));
                     CheckMcpStatus();
                 }
             }
@@ -909,7 +943,8 @@ namespace CursorSetupWpf.ViewModels
             NavItems.Add(new NavItem { Icon = "\uE82D", TitleKey = "tab.guide", Index = 14 });
             
             _settings.Load();
-            InstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".cursor");
+            // The base folder that holds the per-agent configuration roots.
+            InstallPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             BackupLocation = _settings.DefaultBackupPath;
             GithubWorkspaceRoot = _githubSkills.FindWorkspaceRoot();
             

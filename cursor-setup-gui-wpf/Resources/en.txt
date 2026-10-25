@@ -1,5 +1,5 @@
-app.title=Cursor Enterprise Framework - Setup
-app.title_short=Cursor Enterprise Framework
+app.title=VibeCode Enterprise Framework - Setup
+app.title_short=VibeCode Enterprise Framework
 app.subtitle=v4.5.0 - Framework distribution tool for multiple Vibe Coders
 safety.title=Safe package boundary
 safety.body=Choose an explicit target for distribution. Packaging never edits .cursor and never substitutes for governance approval.
@@ -7,7 +7,7 @@ safety.badge=BLOCKED · governance approval required
 log.title=Operational log
 loading_components=Loading components...
 scan_archive_not_found=Framework archive not found next to the installer.
-place_zip_hint=Place cursor-setup.zip next to ToolRunCursor.exe or select the correct workspace folder.
+place_zip_hint=Place cursor-setup.zip next to VibeCodeEnterpriseFramework.exe or select the correct workspace folder.
 scan_failed=Failed to scan archive
 scanning=Scanning components...
 scanned_log=Components scanned: {0} categories
@@ -37,13 +37,13 @@ hooks.hint=Disable a hook by unchecking its checkbox. Edit the script to overrid
 components_desc=Choose which components to install. Defaults: all selected.
 advanced_desc=Optional resources. Defaults: all selected.
 
-guide.welcome=Welcome to Cursor Enterprise Framework
+guide.welcome=Welcome to VibeCode Enterprise Framework
 guide.intro=Enterprise AI Coding Framework with 39 rules, 17 skills, 36 knowledge bases, 4 agent personas and pre/post review gates system.
 guide.steps_title=Installation Steps
 
 # GuideView - Welcome Banner
 guide.welcome_banner=User Guide
-guide.welcome_banner_desc=Cursor Enterprise Framework Setup - Install in 5 easy steps.
+guide.welcome_banner_desc=VibeCode Enterprise Framework Setup - Install in 5 easy steps.
 
 # GuideView - Step 1
 guide.step1_title=Select installation location
@@ -73,8 +73,8 @@ guide.step5_title=Press Install to begin installation
 guide.step5_desc=The installation process will display detailed logs. After completion, restart Cursor IDE to load the new components.
 
 # GuideView - About Section
-guide.about_title=About Cursor Enterprise Framework
-guide.about_intro=Cursor Enterprise Framework is an AI-augmented development toolkit for Cursor IDE. It includes:
+guide.about_title=About VibeCode Enterprise Framework
+guide.about_intro=VibeCode Enterprise Framework is an AI-augmented development toolkit for Cursor IDE. It includes:
 guide.architecture_title=Architecture & Design
 guide.architecture_desc=Clean Architecture, Hexagonal Architecture, CQRS, Event Sourcing, Domain-Driven Design
 guide.ai_agent_title=AI Agent Skills
@@ -98,7 +98,7 @@ guide.tip=Tip: After installation, restart Cursor IDE to load the new components
 
 # Expanded Guide Content (English)
 guide.expanded.title=Complete Installation Guide
-guide.expanded.subtitle=Detailed instructions for Cursor Enterprise Framework setup
+guide.expanded.subtitle=Detailed instructions for VibeCode Enterprise Framework setup
 
 # Prerequisites
 guide.prereq.title=Prerequisites
@@ -111,7 +111,7 @@ guide.prereq.note=Note: You can also install to user folder without admin rights
 
 # Installation Steps Detailed
 guide.install.step1.title=Step 1: Select Installation Location
-guide.install.step1.desc=Choose where Cursor Enterprise Framework files will be installed. Default location is your Cursor user folder.
+guide.install.step1.desc=Choose where VibeCode Enterprise Framework files will be installed. Default location is your Cursor user folder.
 guide.install.step1.default_path=Default: %USERPROFILE%\.cursor
 guide.install.step1.create_new=Create new .cursor folder
 guide.install.step1.browse=Click Browse to select existing folder
@@ -149,7 +149,7 @@ guide.install.step5.complete=Restart Cursor IDE after installation completes
 
 # Features Overview
 guide.features.title=Framework Features
-guide.features.subtitle=What you get with Cursor Enterprise Framework
+guide.features.subtitle=What you get with VibeCode Enterprise Framework
 
 guide.features.rules.title=Development Rules (39 rules)
 guide.features.rules.desc=Comprehensive coding standards, architecture patterns, and best practices for enterprise development.
@@ -207,7 +207,8 @@ guide.shortcuts.ctrl_shift_d=Ctrl+Shift+D - Deploy command
 guide.shortcuts.ctrl_shift_p=Ctrl+Shift+P - Project Indexer
 
 install.location=Installation Location
-install.location_hint=Select where Cursor Enterprise Framework will be installed
+install.location_hint=Select where VibeCode Enterprise Framework will be installed
+install.target_prefix=Installs into:
 install.browse=Browse...
 install.new_folder=+ New Folder
 install.force=Overwrite existing files (--force)
@@ -235,7 +236,7 @@ column.component=Component
 column.description=Description
 no_description=(no description)
 
-log.install_header=Cursor Enterprise Framework Setup
+log.install_header=VibeCode Enterprise Framework Setup
 log.install_to=Install to: {0}
 log.using_existing=Using existing .cursor folder: {0}
 log.created=Created: {0}
@@ -277,7 +278,7 @@ msgbox.dir_error_title=Error
 msgbox.dir_error_msg=Could not create directory: {0}
 msgbox.install_failed=Installation failed: {0}
 msgbox.complete_title=Installation Complete
-msgbox.complete_msg=Cursor Enterprise Framework installed successfully!\n\nLocation: {0}\n\nPlease restart Cursor IDE.
+msgbox.complete_msg=VibeCode Enterprise Framework installed successfully!\n\nLocation: {0}\n\nPlease restart Cursor IDE.
 
 btn.cancel=Cancel
 btn.start=Start
@@ -356,7 +357,7 @@ hooks.timeout_desc=Maximum timeout for each hook
 hooks.fail_safe=Fail-safe mode
 hooks.fail_safe_desc=Hook errors will not block installation
 
-footer.copyright=© 2026 Cursor Enterprise Framework
+footer.copyright=© 2026 VibeCode Enterprise Framework
 footer.license=MIT License
 footer.version=Version {0}
 
@@ -383,7 +384,7 @@ mcp.opening_config=Opening config file...
 
 # Updates tab
 updates.title=Updates
-updates.subtitle=Check for new versions of the Cursor Enterprise Framework.
+updates.subtitle=Check for new versions of the VibeCode Enterprise Framework.
 updates.current_version=Installed version
 updates.latest_version=Latest version
 updates.check=Check for updates
@@ -468,7 +469,7 @@ framework.dashboard_title=Dashboard Servers
 framework.build_title=Build & Index Tools
 framework.graph_title=Graph & Session Tools
 framework.about_title=About cursor_framework
-framework.about_desc=cursor_framework is a Python CLI bundled with Cursor Enterprise Framework, providing commands to manage skills, agents, memory and workflow. This framework is written in pure Python with no third-party dependencies.
+framework.about_desc=cursor_framework is a Python CLI bundled with VibeCode Enterprise Framework, providing commands to manage skills, agents, memory and workflow. This framework is written in pure Python with no third-party dependencies.
 framework.about_commands=Commands:
 framework.about_command_list=serve, serve-graph, serve-api, scan, index, warm, stats, graph, dump-graph, session-stats, session-clear
 mcp.discovered_tools=Discovered Tools
@@ -507,7 +508,7 @@ btn.deselect_all=Deselect all
 
 # Install page
 install.page_title=Install
-install.page_subtitle=Select installation location and options for Cursor Enterprise Framework.
+install.page_subtitle=Select installation location and options for VibeCode Enterprise Framework.
 install.optional=OPTIONAL
 install.skip_tip=Skip if only want a clean install.
 

@@ -16,7 +16,7 @@ $OutputZip = Join-Path $BuildDir "cursor-setup.zip"
 $TempZip = Join-Path $env:TEMP "cursor-setup-build-$([System.Guid]::NewGuid().ToString('N')).zip"
 
 Write-Host ""
-Write-Host "Cursor Enterprise Framework Packager v4.5.0" -ForegroundColor Cyan
+Write-Host "VibeCode Enterprise Framework Packager v4.5.0" -ForegroundColor Cyan
 Write-Host "===========================================" -ForegroundColor Cyan
 Write-Host "Config : $Config" -ForegroundColor Gray
 Write-Host "Source : $SourceDir"

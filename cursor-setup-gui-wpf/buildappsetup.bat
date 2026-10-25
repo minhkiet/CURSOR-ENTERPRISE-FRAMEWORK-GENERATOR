@@ -1,7 +1,7 @@
 @echo off
 REM ============================================================
 REM buildappsetup.bat
-REM Cursor Enterprise Framework - Build Script v4.5.0
+REM VibeCode Enterprise Framework - Build Script v4.5.0
 REM ============================================================
 REM Purpose:
 REM   1. Check prerequisites (dotnet, scripts, MCP tools)
@@ -18,7 +18,7 @@ REM   buildappsetup.bat /clean       (clean bin/obj before build)
 REM   buildappsetup.bat /help        (show this help)
 REM
 REM Outputs (in bin\<Config>\net8.0-windows\win-x64\publish\):
-REM   - ToolRunCursor.exe             (self-contained single-file WPF installer)
+REM   - VibeCodeEnterpriseFramework.exe             (self-contained single-file WPF installer)
 REM   - cursor-setup.zip              (framework archive)
 REM   - Resources\vi.txt             (Vietnamese localization)
 REM   - Resources\en.txt             (English localization)
@@ -69,7 +69,7 @@ set "OUTPUT_DIR=%PROJECT_DIR%\bin\%BUILD_CONFIG%\%TFM%\%BUILD_RID%\publish"
 REM ----- Header -----
 echo.
 echo ===========================================================
-echo  Cursor Enterprise Framework - Build Script v4.5.0
+echo  VibeCode Enterprise Framework - Build Script v4.5.0
 echo ===========================================================
 echo  Project   : %PROJECT_DIR%
 echo  Config    : %BUILD_CONFIG%
@@ -194,14 +194,14 @@ echo.
 set "MISSING=0"
 
 REM Check .exe in publish folder
-if exist "%OUTPUT_DIR%\ToolRunCursor.exe" (
-    for %%A in ("%OUTPUT_DIR%\ToolRunCursor.exe") do (
+if exist "%OUTPUT_DIR%\VibeCodeEnterpriseFramework.exe" (
+    for %%A in ("%OUTPUT_DIR%\VibeCodeEnterpriseFramework.exe") do (
         set "ZS=%%~zA"
         set /a "ZM=ZS / 1048576"
-        echo   [OK] ToolRunCursor.exe ^(!ZM! MB^)
+        echo   [OK] VibeCodeEnterpriseFramework.exe ^(!ZM! MB^)
     )
 ) else (
-    echo   [MISSING] ToolRunCursor.exe  ^(expected in %OUTPUT_DIR%\^)
+    echo   [MISSING] VibeCodeEnterpriseFramework.exe  ^(expected in %OUTPUT_DIR%\^)
     set "MISSING=1"
 )
 
@@ -262,11 +262,11 @@ echo ===========================================================
 echo  Output : %OUTPUT_DIR%
 echo.
 echo  Artifacts:
-if exist "%OUTPUT_DIR%\ToolRunCursor.exe" (
-    for %%A in ("%OUTPUT_DIR%\ToolRunCursor.exe") do (
+if exist "%OUTPUT_DIR%\VibeCodeEnterpriseFramework.exe" (
+    for %%A in ("%OUTPUT_DIR%\VibeCodeEnterpriseFramework.exe") do (
         set "ZS=%%~zA"
         set /a "ZM=ZS / 1048576"
-        echo    - ToolRunCursor.exe ^(!ZM! MB^) self-contained
+        echo    - VibeCodeEnterpriseFramework.exe ^(!ZM! MB^) self-contained
     )
 )
 if exist "%OUTPUT_DIR%\cursor-setup.zip" (

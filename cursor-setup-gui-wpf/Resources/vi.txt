@@ -1,5 +1,5 @@
-app.title=Cursor Enterprise Framework - Trình cài đặt
-app.title_short=Cursor Enterprise Framework
+app.title=VibeCode Enterprise Framework - Trình cài đặt
+app.title_short=VibeCode Enterprise Framework
 app.subtitle=v4.5.0 - Công cụ phân phối framework cho nhiều Vibe Coder
 safety.title=Ranh giới đóng gói an toàn
 safety.body=Chọn target rõ ràng để phân phối tài nguyên. Đóng gói không sửa .cursor và không thay thế approval governance.
@@ -7,7 +7,7 @@ safety.badge=BLOCKED · cần phê duyệt governance
 log.title=Nhật ký vận hành
 loading_components=Đang tải các thành phần...
 scan_archive_not_found=Không tìm thấy tệp framework bên cạnh trình cài đặt.
-place_zip_hint=Hãy đặt tệp cursor-setup.zip cạnh ToolRunCursor.exe hoặc chọn đúng thư mục workspace.
+place_zip_hint=Hãy đặt tệp cursor-setup.zip cạnh VibeCodeEnterpriseFramework.exe hoặc chọn đúng thư mục workspace.
 scan_failed=Không thể quét tệp archive
 scanning=Đang quét các thành phần...
 scanned_log=Đã quét: {0} nhóm thành phần
@@ -37,13 +37,13 @@ hooks.hint=Bỏ chọn checkbox để tắt hook. Sửa script để thay đổi
 components_desc=Chọn các thành phần muốn cài đặt. Mặc định: chọn tất cả.
 advanced_desc=Tài nguyên tùy chọn. Mặc định: chọn tất cả.
 
-guide.welcome=Chào mừng đến với Cursor Enterprise Framework
+guide.welcome=Chào mừng đến với VibeCode Enterprise Framework
 guide.intro=Framework AI lập trình doanh nghiệp với 39 rules, 17 skills, 36 knowledge bases, 4 agent personas và hệ thống pre/post review gates. Hỗ trợ đầy đủ tiếng Việt.
 guide.steps_title=Các bước cài đặt
 
 # GuideView - Welcome Banner
 guide.welcome_banner=Hướng dẫn sử dụng
-guide.welcome_banner_desc=Cursor Enterprise Framework Setup - Cài đặt trong 5 bước đơn giản.
+guide.welcome_banner_desc=VibeCode Enterprise Framework Setup - Cài đặt trong 5 bước đơn giản.
 
 # GuideView - Step 1
 guide.step1_title=Chọn đường dẫn cài đặt
@@ -73,8 +73,8 @@ guide.step5_title=Nhấn Install để bắt đầu cài đặt
 guide.step5_desc=Quá trình cài đặt sẽ hiển thị log chi tiết. Sau khi hoàn tất, khởi động lại Cursor IDE để tải các thành phần mới.
 
 # GuideView - About Section
-guide.about_title=Về Cursor Enterprise Framework
-guide.about_intro=Cursor Enterprise Framework là bộ công cụ phát triển AI-augmented cho Cursor IDE. Bao gồm:
+guide.about_title=Về VibeCode Enterprise Framework
+guide.about_intro=VibeCode Enterprise Framework là bộ công cụ phát triển AI-augmented cho Cursor IDE. Bao gồm:
 guide.architecture_title=Kiến trúc & Thiết kế
 guide.architecture_desc=Clean Architecture, Hexagonal Architecture, CQRS, Event Sourcing, Domain-Driven Design
 guide.ai_agent_title=AI Agent Skills
@@ -97,7 +97,8 @@ guide.step5_desc=Nhấn "Cài đặt" để bắt đầu. Quá trình sẽ tự 
 guide.tip=Mẹo: Sau khi cài xong, hãy khởi động lại Cursor IDE để tải các thành phần mới.
 
 install.location=Vị trí cài đặt
-install.location_hint=Chọn nơi sẽ cài đặt Cursor Enterprise Framework
+install.location_hint=Chọn nơi sẽ cài đặt VibeCode Enterprise Framework
+install.target_prefix=Cài đặt vào:
 install.browse=Duyệt...
 install.new_folder=+ Thư mục mới
 install.force=Ghi đè tệp đã tồn tại (--force)
@@ -125,7 +126,7 @@ column.component=Thành phần
 column.description=Mô tả
 no_description=(không có mô tả)
 
-log.install_header=Cursor Enterprise Framework - Trình cài đặt
+log.install_header=VibeCode Enterprise Framework - Trình cài đặt
 log.install_to=Cài vào: {0}
 log.using_existing=Sử dụng thư mục .cursor có sẵn: {0}
 log.created=Đã tạo: {0}
@@ -167,7 +168,7 @@ msgbox.dir_error_title=Lỗi
 msgbox.dir_error_msg=Không thể tạo thư mục: {0}
 msgbox.install_failed=Cài đặt thất bại: {0}
 msgbox.complete_title=Cài đặt hoàn tất
-msgbox.complete_msg=Đã cài đặt Cursor Enterprise Framework thành công!\n\nVị trí: {0}\n\nHãy khởi động lại Cursor IDE.
+msgbox.complete_msg=Đã cài đặt VibeCode Enterprise Framework thành công!\n\nVị trí: {0}\n\nHãy khởi động lại Cursor IDE.
 
 btn.cancel=Hủy
 btn.start=Khởi động
@@ -246,7 +247,7 @@ hooks.timeout_desc=Thời gian chờ tối đa cho mỗi hook
 hooks.fail_safe=An toàn khi lỗi
 hooks.fail_safe_desc=Hook lỗi sẽ không chặn cài đặt
 
-footer.copyright=© 2026 Cursor Enterprise Framework
+footer.copyright=© 2026 VibeCode Enterprise Framework
 footer.license=MIT License
 footer.version=Phiên bản {0}
 
@@ -273,7 +274,7 @@ mcp.opening_config=Đang mở file cấu hình...
 
 # Updates tab
 updates.title=Cập nhật
-updates.subtitle=Kiểm tra phiên bản mới của Cursor Enterprise Framework.
+updates.subtitle=Kiểm tra phiên bản mới của VibeCode Enterprise Framework.
 updates.current_version=Phiên bản đang cài
 updates.latest_version=Phiên bản mới nhất
 updates.check=Kiểm tra cập nhật
@@ -358,7 +359,7 @@ framework.dashboard_title=Dashboard Servers
 framework.build_title=Công cụ Build & Index
 framework.graph_title=Công cụ Graph & Session
 framework.about_title=Về cursor_framework
-framework.about_desc=cursor_framework là Python CLI đi kèm Cursor Enterprise Framework, cung cấp các commands để quản lý skills, agents, memory và workflow. Framework này được viết bằng Python thuần, không phụ thuộc third-party libraries.
+framework.about_desc=cursor_framework là Python CLI đi kèm VibeCode Enterprise Framework, cung cấp các commands để quản lý skills, agents, memory và workflow. Framework này được viết bằng Python thuần, không phụ thuộc third-party libraries.
 framework.about_commands=Commands:
 framework.about_command_list=serve, serve-graph, serve-api, scan, index, warm, stats, graph, dump-graph, session-stats, session-clear
 mcp.discovered_tools=Công cụ đã phát hiện
@@ -397,7 +398,7 @@ btn.deselect_all=Bỏ chọn tất cả
 
 # Install page
 install.page_title=Cài đặt
-install.page_subtitle=Chọn đường dẫn và tùy chọn cài đặt cho Cursor Enterprise Framework.
+install.page_subtitle=Chọn đường dẫn và tùy chọn cài đặt cho VibeCode Enterprise Framework.
 install.optional=TÙY CHỌN
 install.skip_tip=Bỏ qua nếu chỉ muốn cài đơn giản.
 
@@ -433,7 +434,7 @@ script_gen.project_selected=Đã chọn project
 
 # Expanded Guide Content (Vietnamese)
 guide.expanded.title=Hướng dẫn cài đặt chi tiết
-guide.expanded.subtitle=Hướng dẫn đầy đủ cho Cursor Enterprise Framework
+guide.expanded.subtitle=Hướng dẫn đầy đủ cho VibeCode Enterprise Framework
 
 # Prerequisites - Điều kiện tiên quyết
 guide.prereq.title=Điều kiện tiên quyết
@@ -446,7 +447,7 @@ guide.prereq.note=Lưu ý: Có thể cài vào thư mục user mà không cần 
 
 # Installation Steps Detailed - Các bước cài đặt chi tiết
 guide.install.step1.title=Bước 1: Chọn vị trí cài đặt
-guide.install.step1.desc=Chọn nơi lưu trữ các file của Cursor Enterprise Framework. Vị trí mặc định là thư mục Cursor user.
+guide.install.step1.desc=Chọn nơi lưu trữ các file của VibeCode Enterprise Framework. Vị trí mặc định là thư mục Cursor user.
 guide.install.step1.default_path=Mặc định: %USERPROFILE%\.cursor
 guide.install.step1.create_new=Tạo thư mục .cursor mới
 guide.install.step1.browse=Nhấn Duyệt để chọn thư mục có sẵn
@@ -484,7 +485,7 @@ guide.install.step5.complete=Khởi động lại Cursor IDE sau khi cài đặt
 
 # Features Overview - Tổng quan tính năng
 guide.features.title=Tính năng của Framework
-guide.features.subtitle=Những gì bạn nhận được với Cursor Enterprise Framework
+guide.features.subtitle=Những gì bạn nhận được với VibeCode Enterprise Framework
 
 guide.features.rules.title=Development Rules (39 rules)
 guide.features.rules.desc=Bộ tiêu chuẩn lập trình toàn diện, architecture patterns và best practices cho phát triển doanh nghiệp.

@@ -6,13 +6,13 @@
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <NoWarn>$(NoWarn);CS8632</NoWarn>
-    <AssemblyName>ToolRunCursor</AssemblyName>
+    <AssemblyName>VibeCodeEnterpriseFramework</AssemblyName>
     <Version>4.5.0</Version>
     <FileVersion>4.5.0</FileVersion>
     <AssemblyVersion>4.5.0</AssemblyVersion>
-    <Company>Cursor Enterprise</Company>
-    <Product>Cursor Enterprise Framework Setup</Product>
-    <Description>Setup tool for Cursor Enterprise Framework with MCP tools integration</Description>
+    <Company>VibeCode</Company>
+    <Product>VibeCode Enterprise Framework</Product>
+    <Description>Setup tool for VibeCode Enterprise Framework with MCP tools integration</Description>
     <Copyright>Copyright 2026</Copyright>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
