@@ -10,6 +10,13 @@ Features:
     - Gate execution (pre-review and post-review)
     - Skill combination rules
     - Skill metadata management
+    - Cross-agent skill compatibility detection
+
+Supports multiple vibe coding agents:
+    - Cursor IDE
+    - Codex (cursor.com)
+    - Claude Code (@cursor/codex)
+    - Grok (x.com/grok)
 
 Usage:
     >>> from cursor_framework import SkillDiscovery
@@ -17,15 +24,24 @@ Usage:
     >>> skills = discovery.detect_skills("Create a landing page for SaaS")
     >>> print(skills)
     [Skill.FRONTEND_TASTE, Skill.FULL_OUTPUT, Skill.FRONTEND_REVIEW]
+    
+    >>> # Cross-agent skill detection
+    >>> from cursor_framework.skill_discovery import CrossAgentSkillDiscovery
+    >>> cross_discovery = CrossAgentSkillDiscovery()
+    >>> skills = cross_discovery.detect_compatible_skills("Build a security audit")
+    >>> print(f"Compatible with {len(skills)} agents")
 """
 
+from collections import deque
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Optional
 import json
 import os
+import re
 
 
 class GateType(Enum):
@@ -92,11 +108,24 @@ class SkillRegistry:
         """Initialize default skills from framework."""
         default_skills = [
             SkillMetadata(
+                name="fullstack-web-development",
+                version="1.0.0",
+                description="ASP.NET Core Web API + React TSX fullstack development with 30 core rules and end-to-end flow",
+                tags=["fullstack", "aspnetcore", "react", "typescript", "rest-api", "jwt"],
+                path=".cursor/skills/fullstack-web-development/SKILL.md",
+                pre_review_sections=["01"],
+                post_review_sections=["23"],
+                trigger_keywords=[
+                    "fullstack", "fullstack web", "asp.net core react", "dotnet react",
+                    "react typescript dotnet", "build fullstack", "web api react", "/fullstack"
+                ],
+            ),
+            SkillMetadata(
                 name="frontend-taste",
                 version="1.0.0",
                 description="Anti-slop frontend for landing pages and portfolios",
                 tags=["frontend", "design", "landing", "taste"],
-                path=".cursor/skills/frontend-taste/SKILL.md",
+                path=".cursor/skills/ui_frontend-taste/SKILL.md",
                 pre_review_sections=["0.A", "0.B", "0.C", "0.D", "0.E", "0.F"],
                 post_review_sections=["6.A", "6.B", "6.C", "6.D", "6.E", "6.F", "6.G", "6.H"],
                 trigger_keywords=[
@@ -110,7 +139,7 @@ class SkillRegistry:
                 version="1.0.0",
                 description="Upgrade UI on existing codebase",
                 tags=["frontend", "redesign", "upgrade", "improve"],
-                path=".cursor/skills/frontend-redesign/SKILL.md",
+                path=".cursor/skills/ui_frontend-redesign/SKILL.md",
                 pre_review_sections=["0.A", "0.B", "0.C", "0.D", "0.E"],
                 post_review_sections=["4.A", "4.B", "4.C", "4.D", "4.E"],
                 trigger_keywords=[
@@ -123,7 +152,7 @@ class SkillRegistry:
                 version="1.0.0",
                 description="Quality gate for all frontend tasks",
                 tags=["frontend", "review", "quality", "gate"],
-                path=".cursor/skills/frontend-review/SKILL.md",
+                path=".cursor/skills/ui_frontend-review/SKILL.md",
                 pre_review_sections=["A.1", "A.2", "A.3"],
                 post_review_sections=["B.1", "B.2", "B.3", "B.4", "B.5", "B.6", "B.7"],
                 trigger_keywords=[
@@ -136,7 +165,7 @@ class SkillRegistry:
                 version="1.0.0",
                 description="Ensure full implementation without truncation",
                 tags=["output", "completeness", "implementation"],
-                path=".cursor/skills/full-output/SKILL.md",
+                path=".cursor/skills/special_full-output/SKILL.md",
                 pre_review_sections=["0.A", "0.B"],
                 post_review_sections=["5.A", "5.B", "5.C"],
                 trigger_keywords=[
@@ -146,24 +175,67 @@ class SkillRegistry:
             ),
             SkillMetadata(
                 name="security-review",
-                version="1.0.0",
-                description="Comprehensive security review",
-                tags=["security", "vulnerability", "audit"],
-                path=".cursor/skills/security-review/SKILL.md",
+                version="1.1.0",  # sync 2026-07-15: marketing security extensions
+                description=(
+                    "Comprehensive security review (OWASP Top 10 + 30 Marketing Security "
+                    "Additions MSA-01..30 covering GDPR/CCPA, cookie banner parity, "
+                    "email auth, ad platform privacy, dark patterns, AI marketing risks)"
+                ),
+                tags=["security", "vulnerability", "audit", "owasp", "gdpr", "consent", "privacy", "marketing-security"],
+                path=".cursor/skills/sec_security-review/SKILL.md",
                 pre_review_sections=["S.1", "S.2", "S.3"],
                 post_review_sections=["Security-1", "Security-2", "Security-3", "Security-4", "Security-5", "Security-6", "Security-7", "Security-8", "Security-9"],
                 trigger_keywords=[
                     "security", "vulnerability", "penetration", "owasp", "xss",
                     "sql injection", "ssrf", "csrf", "authentication", "authorization",
-                    "apk decompile", "binary analysis", "prompt injection", "exploit"
+                    "apk decompile", "binary analysis", "prompt injection", "exploit",
+                    # 🆕 Marketing security triggers (sync 2026-07-15)
+                    "gdpr", "ccpa", "lgpd", "pipl", "pdpd",
+                    "consent", "cookie banner", "cookie consent", "dsar",
+                    "right to deletion", "data subject request", "dpo",
+                    "dark pattern", "roach motel", "confirmshaming",
+                    "email authentication", "spf", "dkim", "dmarc",
+                    "unsubscribe", "rfc 8058", "one-click unsubscribe",
+                    "webhook signature", "hmac",
+                    "meta capi", "tiktok events api", "google consent mode",
+                    "limited data use", "ld flag",
+                    "customer match", "hashed pii",
+                    "auto-renewal", "click-to-cancel", "cancellation",
+                    "iptc", "att", "app tracking transparency",
+                    "ai marketing", "hallucination", "fabricated stats",
+                    "data breach", "security incident", "leak",
+                    "coppa", "hipaa", "bipa",
+                    "right to be forgotten", "data export",
+                    "double opt-in", "single opt-in",
+                    "consent management", "consent mode",
+                    "/security", "/privacy", "/gdpr", "/consent",
                 ],
+            ),
+            SkillMetadata(
+                name="security-auditor-agent",
+                version="1.0.0",
+                description=(
+                    "Security Auditor agent — full OWASP Top 10 + 30 MSA marketing "
+                    "security additions. Cite CWE/CVE; BLOCK on dark patterns, "
+                    "pre-checked consent, PII to public LLM, missing SPF/DKIM/DMARC."
+                ),
+                tags=["agent", "security", "auditor", "owasp", "marketing-security"],
+                path=".cursor/agents/security-auditor.md",
+                pre_review_sections=["scope-audit"],
+                post_review_sections=["risk-prioritized", "owasp-coverage"],
+                trigger_keywords=[
+                    "/audit", "security audit", "pre-deploy review",
+                    "owasp audit", "cookie banner audit", "consent audit",
+                    "dark pattern audit", "marketing security review",
+                ],
+                dependencies=["security-review"],
             ),
             SkillMetadata(
                 name="vietnam-payment-review",
                 version="1.0.0",
                 description="Vietnam payment provider review",
                 tags=["payment", "vietnam", "momo", "sepay"],
-                path=".cursor/skills/vietnam-payment-review/SKILL.md",
+                path=".cursor/skills/sec_vietnam-payment-review/SKILL.md",
                 pre_review_sections=["payment-pre"],
                 post_review_sections=["payment-post"],
                 trigger_keywords=[
@@ -171,6 +243,351 @@ class SkillRegistry:
                     "vnpay", "vietnam payment", "payment integration", "thanh toan"
                 ],
                 dependencies=["security-review"],
+            ),
+            # Marketing umbrella — single entry representing 47 marketingskills
+            # concept-refs (sync 2026-07-15 with coreyhaines31/marketingskills,
+            # 39k stars). Per skill-registry.mdc §9, NO SKILL.md file is
+            # created; routing happens via `.cursor/knowledge/marketing/decision-tree.md §11`.
+            SkillMetadata(
+                name="marketing",
+                version="1.7.0",
+                description=(
+                    "47 marketing concept-refs across 9 categories "
+                    "(Conversion, Content, SEO, Paid, Measurement, Retention, "
+                    "Growth, Strategy, Sales/RevOps) — synced from "
+                    "coreyhaines31/marketingskills into existing "
+                    ".cursor/knowledge/marketing/*.md sections. No new "
+                    "SKILL.md files (concept-ref pattern, see skill-registry.mdc §9)."
+                ),
+                tags=[
+                    "marketing", "growth", "cro", "conversion", "signup",
+                    "onboarding", "copywriting", "cold-email", "email-sequence",
+                    "seo", "programmatic-seo", "ai-seo", "schema", "aso",
+                    "paid-ads", "ad-creative", "analytics", "ab-testing",
+                    "churn-prevention", "co-marketing", "free-tools", "referrals",
+                    "launch", "pricing", "offers", "revops", "prospecting",
+                    "pr", "customer-research", "marketing-council",
+                    "marketing-loops", "product-marketing"
+                ],
+                # Path points to the umbrella knowledge folder, not a single SKILL.md.
+                # Per-skill routing is done at runtime via decision-tree.md §11.
+                path=".cursor/knowledge/marketing/",
+                pre_review_sections=[
+                    # Generic pre-gates — concept-ref pattern means each request
+                    # routes via decision-tree §11 first.
+                    "marketing-pre-product-context",  # verify .agents/product-marketing.md exists
+                    "marketing-pre-preflight",  # checklist.md §9.X pre-launch blockers
+                ],
+                post_review_sections=[
+                    "marketing-post-antipattern",  # anti-pattern.md §9.X
+                    "marketing-post-faq",  # faq.md §9.X
+                ],
+                trigger_keywords=[
+                    "marketing", "growth", "cro", "conversion", "signup",
+                    "onboarding", "popup", "paywall", "copywriting",
+                    "cold email", "newsletter", "sms", "social content",
+                    "seo", "programmatic seo", "ai seo", "schema", "aso",
+                    "paid ads", "google ads", "meta ads", "ad creative",
+                    "analytics", "ab test", "a/b test", "split test",
+                    "churn", "retention", "dunning",
+                    "co-marketing", "free tool", "referral",
+                    "launch", "pricing", "offer",
+                    "revops", "lead scoring", "mql", "sql",
+                    "prospecting", "outbound", "pr", "press release",
+                    "haro", "directory submission", "customer research",
+                    "jtbd", "marketing council", "marketing loops",
+                    "product marketing", "icp", "positioning"
+                ],
+                # Marketing requires mandatory pre-read of product context.
+                dependencies=["product-marketing-context"],
+            ),
+            # ── Agents (sync 2026-07-15) — 10 specialized agents registered as
+            # skills so context_router.py can route user requests to them via
+            # the same keyword + intent pipeline. The path points to each
+            # agent's .md profile at .cursor/agents/{name}.md.
+            SkillMetadata(
+                name="debugger",
+                version="1.0.0",
+                description=(
+                    "4-phase root-cause investigator: reproduce → isolate → "
+                    "fix → verify. Forms ≤ 3 hypotheses per round, tests "
+                    "cheapest first. Never ships a fix without regression test."
+                ),
+                tags=["debug", "bug-fix", "root-cause", "diagnostic"],
+                path=".cursor/agents/debugger.md",
+                pre_review_sections=[
+                    "debugger-pre-repro",  # minimal reproducible case required
+                ],
+                post_review_sections=[
+                    "debugger-post-verify",  # 5-step verification, regression test
+                ],
+                trigger_keywords=[
+                    "debug", "bug", "fix bug", "fix error", "repro",
+                    "root cause", "intermittent", "stack trace", "exception",
+                    "fix lỗi", "sửa lỗi", "lỗi", "bug report"
+                ],
+            ),
+            SkillMetadata(
+                name="ui-designer",
+                version="1.0.0",
+                description=(
+                    "UI/UX designer for design tokens, components, layouts, "
+                    "and production-ready specs. Outputs token-driven Tailwind/"
+                    "CSS ready to paste. Always ships empty/loading/error states."
+                ),
+                tags=["design", "ui", "ux", "tokens", "components"],
+                path=".cursor/agents/ui-designer.md",
+                pre_review_sections=[
+                    "ui-designer-pre-goal",  # user goal + aesthetic direction
+                ],
+                post_review_sections=[
+                    "ui-designer-post-states",  # all states + a11y baseline
+                ],
+                trigger_keywords=[
+                    "design ui", "ui design", "ux", "design system",
+                    "design tokens", "component spec", "redesign",
+                    "thiết kế ui", "thiết kế giao diện", "giao diện",
+                    "wireframe", "mockup", "landing page design"
+                ],
+            ),
+            SkillMetadata(
+                name="web-cloner",
+                version="1.0.0",
+                description=(
+                    "Playwright-driven website cloner. Fidelity levels L1–L4. "
+                    "Respects robots.txt, copyright, and rate limits. Outputs "
+                    "to .cursor/clones/{domain}/ as self-contained project."
+                ),
+                tags=["clone", "playwright", "mirror", "copy"],
+                path=".cursor/agents/web-cloner.md",
+                pre_review_sections=[
+                    "web-cloner-pre-compliance",  # robots.txt + ToS check
+                ],
+                post_review_sections=[
+                    "web-cloner-post-verification",  # visual diff ≤ 2% + a11y
+                ],
+                trigger_keywords=[
+                    "clone", "copy website", "mirror", "replicate site",
+                    "clone web", "copy site", "sao chép web",
+                    "/clone", "/copy", "/mirror"
+                ],
+            ),
+            SkillMetadata(
+                name="web-scraper",
+                version="1.0.0",
+                description=(
+                    "Structured content extraction via Playwright. Categories: "
+                    "sdk, api, ui, test, qc, article, table, list, code. "
+                    "≤ 1 req/sec · cites source URLs in every output file."
+                ),
+                tags=["scrape", "extract", "playwright", "docs"],
+                path=".cursor/agents/web-scraper.md",
+                pre_review_sections=[
+                    "web-scraper-pre-robots",  # robots.txt + ToS check
+                ],
+                post_review_sections=[
+                    "web-scraper-post-verify",  # 95% source match + coverage
+                ],
+                trigger_keywords=[
+                    "scrape", "extract", "crawl", "fetch docs",
+                    "scrape web", "lấy nội dung", "trích xuất",
+                    "/scrape", "/extract", "/docs",
+                    "pull documentation", "scrape article"
+                ],
+            ),
+            SkillMetadata(
+                name="refactor-specialist",
+                version="1.0.0",
+                description=(
+                    "Behavior-preserving code refactoring. 15 smells → 15 "
+                    "recipes. One commit per smell; never mixed with features. "
+                    "Refuses to refactor without an existing test safety net."
+                ),
+                tags=["refactor", "smells", "cleanup", "boy-scout"],
+                path=".cursor/agents/refactor-specialist.md",
+                pre_review_sections=[
+                    "refactor-pre-test-baseline",  # tests must pass before
+                ],
+                post_review_sections=[
+                    "refactor-post-behavior",  # behavior unchanged + metrics
+                ],
+                trigger_keywords=[
+                    "refactor", "cleanup", "code smell", "tech debt",
+                    "boy scout", "extract function", "rename",
+                    "refactor code", "dọn dẹp code", "/refactor"
+                ],
+            ),
+            SkillMetadata(
+                name="deployment-engineer",
+                version="1.0.0",
+                description=(
+                    "Production deployment: 10-gate pre-flight, canary → "
+                    "ramp → verify phases, rollback rehearsed ≤ 1 min. "
+                    "Coordinates with migration-specialist for schema changes."
+                ),
+                tags=["deploy", "release", "rollback", "observability"],
+                path=".cursor/agents/deployment-engineer.md",
+                pre_review_sections=[
+                    "deploy-pre-checklist",  # 10-gate pre-flight
+                ],
+                post_review_sections=[
+                    "deploy-post-verify",  # SLO + business KPI check
+                ],
+                trigger_keywords=[
+                    "deploy", "release", "ship", "rollout", "production",
+                    "canary", "blue green", "deploy to prod",
+                    "triển khai", "release phiên bản",
+                    "/deploy", "/release", "/ship"
+                ],
+            ),
+            SkillMetadata(
+                name="migration-specialist",
+                version="1.0.0",
+                description=(
+                    "Schema, data, and framework migrations. Expand → migrate → "
+                    "contract (3 deploys, not 1). Always reversible, idempotent, "
+                    "throttled. Coordinates with deployment-engineer."
+                ),
+                tags=["migration", "schema", "backfill", "alter-table"],
+                path=".cursor/agents/migration-specialist.md",
+                pre_review_sections=[
+                    "migration-pre-audit",  # schema + callers + SLO audit
+                ],
+                post_review_sections=[
+                    "migration-post-verify",  # row counts + checksums + lag
+                ],
+                trigger_keywords=[
+                    "migrate", "migration", "schema change", "backfill",
+                    "add column", "drop column", "rename column",
+                    "data migration", "framework upgrade",
+                    "/migrate", "di trú", "migration script"
+                ],
+            ),
+            SkillMetadata(
+                name="doc-writer",
+                version="1.0.0",
+                description=(
+                    "Technical writer: README, ADR, runbook, API reference. "
+                    "Diátaxis framework (tutorial · how-to · reference · "
+                    "explanation). Every example runnable, every link checked."
+                ),
+                tags=["docs", "readme", "adr", "runbook"],
+                path=".cursor/agents/doc-writer.md",
+                pre_review_sections=[
+                    "doc-pre-audience",  # reader profile + goal
+                ],
+                post_review_sections=[
+                    "doc-post-verification",  # all examples verified runnable
+                ],
+                trigger_keywords=[
+                    "write docs", "readme", "documentation", "adr",
+                    "runbook", "tutorial", "api reference",
+                    "viết tài liệu",
+                    "/doc", "/readme", "/adr", "/runbook"
+                ],
+            ),
+            SkillMetadata(
+                name="devops-engineer",
+                version="1.0.0",
+                description=(
+                    "CI/CD, IaC, containers, observability. Four golden signals "
+                    "(latency, traffic, errors, saturation). Reproducible from "
+                    "scratch ≤ 1 hour. Tagged resources for cost tracking."
+                ),
+                tags=["ci-cd", "iac", "kubernetes", "observability"],
+                path=".cursor/agents/devops-engineer.md",
+                pre_review_sections=[
+                    "devops-pre-slo",  # SLO must be defined before infra work
+                ],
+                post_review_sections=[
+                    "devops-post-verify",  # pipeline + alerts wired
+                ],
+                trigger_keywords=[
+                    "ci", "cd", "pipeline", "infrastructure", "iac",
+                    "terraform", "kubernetes", "docker",
+                    "ci/cd", "build pipeline", "/build", "container"
+                ],
+            ),
+            SkillMetadata(
+                name="marketing-strategist",
+                version="1.0.0",
+                description=(
+                    "Product marketing & growth strategist. 9 categories: "
+                    "Conversion, Content, SEO, Paid, Measurement, Retention, "
+                    "Growth Eng, Strategy, Sales/RevOps. Numbers before opinions."
+                ),
+                tags=["marketing", "growth", "positioning", "funnel"],
+                path=".cursor/agents/marketing-strategist.md",
+                pre_review_sections=[
+                    "marketing-strategist-pre-metric",  # define measurable goal
+                ],
+                post_review_sections=[
+                    "marketing-strategist-post-tracking",  # tracking plan wired
+                ],
+                trigger_keywords=[
+                    "marketing", "growth", "positioning", "funnel",
+                    "cro", "seo strategy", "paid ads", "retention",
+                    "churn", "pricing", "launch",
+                    "chiến lược marketing", "/marketing", "/growth"
+                ],
+            ),
+            # Test Analysis Skill
+            SkillMetadata(
+                name="test-analysis",
+                version="1.0.0",
+                description="Comprehensive test analysis covering functional, UI, integration, and e2e testing",
+                tags=["testing", "quality", "functional", "UI-test", "integration", "e2e"],
+                path=".cursor/skills/test_test-analysis/SKILL.md",
+                pre_review_sections=["T.1"],
+                post_review_sections=["T.2"],
+                trigger_keywords=[
+                    "test", "testing", "unit test", "integration test", "e2e test",
+                    "ui test", "component test", "functional test", "verify",
+                    "test case", "test coverage", "regression", "mock", "fixture",
+                    "tdd", "bdd", "vitest", "jest", "playwright", "cypress"
+                ],
+            ),
+            # Performance Optimization Skill
+            SkillMetadata(
+                name="perf-optimization",
+                version="1.0.0",
+                description="Performance optimization covering memory, speed, token efficiency, and caching",
+                tags=["performance", "optimization", "memory", "speed", "token", "caching"],
+                path=".cursor/skills/perf_perf-optimization/SKILL.md",
+                pre_review_sections=["P.1"],
+                post_review_sections=["P.2"],
+                trigger_keywords=[
+                    "performance", "optimize", "memory", "speed", "fast", "slow",
+                    "token", "cost", "cache", "profiling", "benchmark", "bundle", "size"
+                ],
+            ),
+            # Stability Skill
+            SkillMetadata(
+                name="stability",
+                version="1.0.0",
+                description="Stability and reliability through error handling, resilience patterns, and monitoring",
+                tags=["stability", "reliability", "error-handling", "resilience", "monitoring"],
+                path=".cursor/skills/util_stability/SKILL.md",
+                pre_review_sections=["S.1"],
+                post_review_sections=["S.2"],
+                trigger_keywords=[
+                    "stability", "reliability", "error", "exception", "crash", "fail",
+                    "resilience", "retry", "fallback", "circuit breaker", "timeout"
+                ],
+            ),
+            # Data Quality Skill
+            SkillMetadata(
+                name="data-quality",
+                version="1.0.0",
+                description="Data quality and database skill covering validation, schema design, migrations",
+                tags=["data", "database", "validation", "schema", "migration", "sql"],
+                path=".cursor/skills/db_data-quality/SKILL.md",
+                pre_review_sections=["D.1"],
+                post_review_sections=["D.2"],
+                trigger_keywords=[
+                    "data", "database", "schema", "migration", "validation",
+                    "sql", "query", "orm", "prisma", "drizzle", "index", "integrity"
+                ],
             ),
         ]
 
@@ -209,6 +626,21 @@ class SkillRegistry:
         return skill.dependencies if skill else []
 
 
+# ponytail: shared registry — SkillRegistry() rebuilds ~50 SkillMetadata
+# objects and the keyword/dependency graph each call. `_shared_registry`
+# returns a process-wide singleton so Workflow / ContextBuilder / CLI
+# don't pay 50× per process. Construct via `SkillRegistry()` still works
+# for users who want isolation.
+@lru_cache(maxsize=1)
+def _shared_registry() -> "SkillRegistry":
+    return SkillRegistry()
+
+
+def get_shared_registry() -> SkillRegistry:
+    """Return the process-wide shared SkillRegistry (lazy)."""
+    return _shared_registry()
+
+
 class GateExecutor:
     """
     Executes pre-review and post-review gates for skills.
@@ -238,6 +670,9 @@ class GateExecutor:
         checked = len(skill.pre_review_sections)
         passed_items = 0
         failed_items = []
+
+        # Inject skill_name into context for section matching
+        context = {**context, "skill_name": skill.name}
 
         for section in skill.pre_review_sections:
             if self._check_pre_section(section, context):
@@ -278,6 +713,9 @@ class GateExecutor:
         passed_items = 0
         failed_items = []
 
+        # Inject skill_name into context for section matching
+        context = {**context, "skill_name": skill.name}
+
         for section in skill.post_review_sections:
             if self._check_post_section(section, context):
                 passed_items += 1
@@ -299,12 +737,125 @@ class GateExecutor:
         return result
 
     def _check_pre_section(self, section: str, context: dict) -> bool:
-        """Check if a pre-review section passes."""
-        return True
+        """
+        Check if a pre-review section passes validation.
+        
+        Validates that required context keys exist and have valid values
+        for the given section identifier.
+        
+        Section identifiers can be:
+        - Numeric: "0.A", "0.B", "S.1", etc. (from skill registry)
+        - Named: "taste-pre", "security-pre", etc. (for custom checks)
+        """
+        section_lower = section.lower()
+        section_clean = re.sub(r'[\d.]+', '', section_lower).strip() or section_lower
+        
+        # Common required context keys
+        required_keys = context.get("required_keys", [])
+        for key in required_keys:
+            if key not in context:
+                return False
+        
+        # Get skill name from context for better matching
+        skill_name = context.get("skill_name", "").lower().replace("-", " ")
+        
+        # Check for specific section validations based on content keywords
+        # These map section patterns to required context
+        
+        # Frontend taste / design sections
+        if any(kw in section_clean for kw in ["taste", "design", "ui", "aesthetic", "goal"]):
+            return "goal" in context or "request" in context or "design_goal" in context
+        
+        # Security sections
+        if any(kw in section_clean for kw in ["security", "auth", "vuln", "auth"]):
+            return context.get("auth_checked", False) or "auth" in context or "security" in skill_name
+        
+        # Review / quality sections
+        if any(kw in section_clean for kw in ["review", "quality", "audit", "check"]):
+            return context.get("code_baseline", False) or "code" in context or "request" in context
+        
+        # Output / implementation sections
+        if any(kw in section_clean for kw in ["output", "implement", "complete", "scope"]):
+            return "scope" in context or "request" in context
+        
+        # Debug / repro sections
+        if any(kw in section_clean for kw in ["debug", "repro", "bug", "error"]):
+            return context.get("reproducible", False) or "error" in context or "bug" in context
+        
+        # Marketing / strategy sections
+        if any(kw in section_clean for kw in ["market", "cro", "growth", "strategy"]):
+            return "goal" in context or "product" in context or "request" in context
+        
+        # Compliance / robots sections
+        if any(kw in section_clean for kw in ["compliance", "robot", "scrap"]):
+            return context.get("compliance_checked", False) or context.get("robots_checked", False) or "url" in context
+        
+        # Default: require basic request context
+        return bool(context.get("request") or context.get("text") or context.get("goal"))
 
     def _check_post_section(self, section: str, context: dict) -> bool:
-        """Check if a post-review section passes."""
-        return True
+        """
+        Check if a post-review section passes validation.
+        
+        Validates that implementation meets quality criteria for the section.
+        """
+        section_lower = section.lower()
+        section_clean = re.sub(r'[\d.]+', '', section_lower).strip() or section_lower
+        
+        # Get skill name from context for better matching
+        skill_name = context.get("skill_name", "").lower().replace("-", " ")
+        
+        # Check for specific post-section validations based on content keywords
+        
+        # Frontend taste / design sections
+        if any(kw in section_clean for kw in ["taste", "design", "ui", "aesthetic"]):
+            return context.get("taste_check", False) or "output" in context
+        
+        # Security sections - require no critical vulnerabilities
+        if any(kw in section_clean for kw in ["security", "vuln", "auth", "audit"]):
+            vulns = context.get("vulnerabilities", [])
+            critical = [v for v in vulns if v.get("severity") == "critical"]
+            return len(critical) == 0
+        
+        # Review / quality sections
+        if any(kw in section_clean for kw in ["review", "quality", "check"]):
+            return context.get("quality_pass", False) or "output" in context
+        
+        # Output / implementation sections - require complete implementation
+        if any(kw in section_clean for kw in ["output", "implement", "complete", "scope"]):
+            is_complete = context.get("is_complete", True)
+            has_todos = context.get("has_todos", False)
+            return is_complete and not has_todos
+        
+        # Marketing sections - require no anti-patterns
+        if any(kw in section_clean for kw in ["market", "cro", "antipattern"]):
+            return context.get("no_antipatterns", True)
+        
+        # Debug / verify sections - require regression test passed
+        if any(kw in section_clean for kw in ["debug", "verify", "repro"]):
+            return context.get("regression_pass", False) or context.get("tests_pass", False)
+        
+        # Compliance / scraping sections
+        if any(kw in section_clean for kw in ["compliance", "robot", "scrap", "coverage"]):
+            if "diff_acceptable" in context:
+                return context.get("diff_acceptable", True)
+            coverage = context.get("source_coverage", 0)
+            return coverage >= 0.95
+        
+        # Test / behavior sections
+        if any(kw in section_clean for kw in ["test", "behavior", "regression"]):
+            return context.get("tests_pass", False) or context.get("behavior_preserved", True)
+        
+        # Deploy / migration sections
+        if any(kw in section_clean for kw in ["deploy", "migrate", "slo", "pipeline"]):
+            return context.get("slo_verified", False) or context.get("pipeline_wired", False)
+        
+        # Payment sections
+        if any(kw in section_clean for kw in ["payment", "checkout"]):
+            return context.get("payment_flow_verified", False)
+        
+        # Default: require output exists
+        return "output" in context or "result" in context
 
     def get_results(self) -> list[GateResult]:
         """Get all gate execution results."""
@@ -379,10 +930,17 @@ class SkillDiscovery:
         Args:
             base_path: Base path for skill files
         """
-        self.registry = SkillRegistry()
+        # ponytail: use the shared registry so successive SkillDiscovery
+        # instances (one per Workflow / ContextBuilder) don't rebuild the
+        # 50+ skill metadata objects. The cache invalidation contract
+        # remains: callers that need an isolated registry can pass their
+        # own via `SkillRegistry()` and assign to `self.registry`.
+        self.registry = get_shared_registry()
         self.gate_executor = GateExecutor()
         self.base_path = base_path or os.getcwd()
-        self._discovery_history: list[DetectedSkill] = []
+        # ponytail: bounded history prevents unbounded growth on long-running
+        # processes (skill discovery tracks every detection for stats).
+        self._discovery_history: deque[DetectedSkill] = deque(maxlen=1000)
         self._skill_file_cache: dict[str, tuple[float, str]] = {}
 
     def detect_skills(self, request: str) -> list[DetectedSkill]:
@@ -586,3 +1144,338 @@ class SkillDiscovery:
 def create_discovery(base_path: Optional[str] = None) -> SkillDiscovery:
     """Factory function to create a configured SkillDiscovery."""
     return SkillDiscovery(base_path=base_path)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Cross-Agent Skill Discovery
+# ─────────────────────────────────────────────────────────────────────────────
+
+@dataclass
+class CrossAgentSkill:
+    """A skill compatible with multiple agents."""
+    skill: str
+    confidence: float
+    compatible_agents: list[str]
+    primary_agent: str
+    gates: list[str]
+
+
+class CrossAgentSkillDiscovery:
+    """
+    Skill discovery for cross-agent compatibility.
+
+    Detects skills that work across multiple vibe coding agents
+    and provides agent-specific routing.
+
+    Integrates with ECC (Enhanced Code Copilot) for extended skill coverage.
+    ECC provides 68 agents, 292 skills, and 94 commands across multiple harnesses.
+    """
+
+    # Universal skill triggers that work across all agents
+    UNIVERSAL_SKILLS = [
+        "karpathy-coding",
+        "frontend-taste",
+        "frontend-review",
+        "full-output",
+        "security-review",
+        "reverse-engineer-anything",
+        "test-analysis",
+        "perf-optimization",
+        "stability",
+        "data-quality",
+    ]
+
+    # Agent-specific skill mappings
+    AGENT_SKILL_MAPPINGS = {
+        "cursor": [
+            "ponytail",
+            "frontend-redesign",
+            "vietnam-payment-review",
+            "vietnam-address",
+            "bazi",
+            "document-ocr",
+            "weknora-kb",
+            "weknora-agent",
+            "video-generation",
+            "pixelrag",
+            "visual-explainer",
+            "open-design",
+            "skill-installer",
+            "reverse-engineer-anything",
+        ],
+        "codex": [
+            "ponytail",
+            "frontend-redesign",
+            "vietnam-payment-review",
+            "reverse-engineer-anything",
+        ],
+        "claude-code": [
+            "claude-specific",
+        ],
+        "grok": [
+            "grok-specific",
+        ],
+    }
+
+    # ECC skill categories (from ECC 2.2.2 - 292 skills)
+    ECC_SKILL_CATEGORIES = {
+        "planner": ["planner", "plan", "strategy", "roadmap"],
+        "reviewer": ["reviewer", "review", "audit", "code-review"],
+        "security": ["security", "vulnerability", "audit", "owasp", "reverse-engineering", "reverse", "rea", "decompile"],
+        "tdd": ["tdd", "test-driven", "test-first", "unit-test"],
+        "frontend": ["frontend", "ui", "css", "react", "vue", "angular"],
+        "backend": ["backend", "api", "server", "database"],
+        "devops": ["devops", "deploy", "ci-cd", "docker", "kubernetes"],
+        "data": ["data", "sql", "nosql", "analytics"],
+        "ml": ["machine-learning", "ml", "ai", "model"],
+        "docs": ["docs", "documentation", "readme", "api-doc"],
+    }
+
+    def __init__(self, base_path: Optional[str] = None):
+        """
+        Initialize cross-agent skill discovery.
+
+        Args:
+            base_path: Base path for skill files
+        """
+        import os as _os
+        self.base_path = base_path or _os.getcwd()
+        self.base_discovery = SkillDiscovery(base_path)
+        self._ecc_components: Optional[dict] = None
+
+    def detect_compatible_skills(self, request: str) -> list[CrossAgentSkill]:
+        """
+        Detect skills compatible with all agents.
+
+        Args:
+            request: The user request
+
+        Returns:
+            List of CrossAgentSkill with agent compatibility info
+        """
+        detected_skills = self.base_discovery.detect_skills(request)
+        results = []
+
+        for skill in detected_skills:
+            # Check universal compatibility
+            if skill.skill in self.UNIVERSAL_SKILLS:
+                compatible = ["cursor", "codex", "claude-code", "grok", "universal"]
+            else:
+                compatible = [skill.skill]  # Agent-specific
+
+            results.append(CrossAgentSkill(
+                skill=skill.skill,
+                confidence=skill.confidence,
+                compatible_agents=compatible,
+                primary_agent="cursor",
+                gates=self._get_universal_gates(),
+            ))
+
+        return results
+
+    def _get_universal_gates(self) -> list[str]:
+        """Get universal gate list."""
+        return ["U.1", "U.2", "U.3", "U.4", "U.5", "U.6", "U.7", "§X", "§Y"]
+
+    def get_universal_skills(self) -> list[str]:
+        """Get list of skills that work across all agents."""
+        return self.UNIVERSAL_SKILLS.copy()
+
+    def get_agent_skills(self, agent: str) -> list[str]:
+        """
+        Get skills specific to an agent.
+
+        Args:
+            agent: Agent identifier
+
+        Returns:
+            List of agent-specific skill names
+        """
+        return self.AGENT_SKILL_MAPPINGS.get(agent, []).copy()
+
+    def get_skill_compatibility(self, skill_name: str) -> dict[str, bool]:
+        """
+        Get compatibility matrix for a skill.
+
+        Args:
+            skill_name: Name of the skill
+
+        Returns:
+            Dictionary mapping agent names to compatibility bool
+        """
+        is_universal = skill_name in self.UNIVERSAL_SKILLS
+
+        compatibility = {}
+        for agent in ["cursor", "codex", "claude-code", "grok"]:
+            if is_universal:
+                compatibility[agent] = True
+            else:
+                compatibility[agent] = skill_name in self.AGENT_SKILL_MAPPINGS.get(agent, [])
+
+        return compatibility
+
+    def recommend_skill_order(self, skills: list[str]) -> list[str]:
+        """
+        Reorder skills for optimal cross-agent compatibility.
+
+        Args:
+            skills: List of skill names
+
+        Returns:
+            Reordered list with universal skills first
+        """
+        universal = [s for s in skills if s in self.UNIVERSAL_SKILLS]
+        agent_specific = [s for s in skills if s not in self.UNIVERSAL_SKILLS]
+        return universal + agent_specific
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # ECC Integration Methods
+    # ─────────────────────────────────────────────────────────────────────────
+
+    def load_ecc_components(self, ecc_path: Optional[str] = None) -> dict:
+        """
+        Load ECC components for skill discovery.
+
+        Args:
+            ecc_path: Path to ECC repository (auto-detected if not provided)
+
+        Returns:
+            dict with ECC components by type
+        """
+        if self._ecc_components is not None:
+            return self._ecc_components
+
+        try:
+            from cursor_framework.ecc_integration import ECCIntegration
+            ecc = ECCIntegration()
+            components = ecc.discover_components(ecc_path)
+            self._ecc_components = components
+            return components
+        except ImportError:
+            # ECC module not available
+            self._ecc_components = {}
+            return {}
+        except Exception:
+            self._ecc_components = {}
+            return {}
+
+    def detect_ecc_skills(self, request: str) -> list[CrossAgentSkill]:
+        """
+        Detect ECC-specific skills from a request.
+
+        Args:
+            request: The user request
+
+        Returns:
+            List of CrossAgentSkill with ECC skill matches
+        """
+        request_lower = request.lower()
+        components = self.load_ecc_components()
+
+        results = []
+        for category, keywords in self.ECC_SKILL_CATEGORIES.items():
+            # Check if any category keyword matches
+            matches = any(kw.lower() in request_lower for kw in keywords)
+            if matches:
+                # Find components in this category
+                ecc_skills = components.get("skills", [])
+                category_skills = [
+                    s for s in ecc_skills
+                    if any(kw.lower() in s.name.lower() or kw.lower() in s.description.lower()
+                           for kw in keywords)
+                ]
+
+                for skill in category_skills[:5]:  # Limit to 5 per category
+                    results.append(CrossAgentSkill(
+                        skill=f"ecc:{skill.name}",
+                        confidence=0.7,
+                        compatible_agents=["claude-code", "cursor", "codex", "universal"],
+                        primary_agent="claude-code",
+                        gates=self._get_ecc_gates(category),
+                    ))
+
+        return results
+
+    def _get_ecc_gates(self, category: str) -> list[str]:
+        """Get gate list for ECC skill category."""
+        gate_map = {
+            "planner": ["ecc-pre-plan", "ecc-post-plan"],
+            "reviewer": ["ecc-pre-review", "ecc-post-review"],
+            "security": ["ecc-pre-security", "ecc-post-security"],
+            "tdd": ["ecc-pre-tdd", "ecc-post-tdd"],
+            "frontend": ["ecc-pre-frontend", "ecc-post-frontend"],
+            "backend": ["ecc-pre-backend", "ecc-post-backend"],
+            "devops": ["ecc-pre-devops", "ecc-post-devops"],
+            "data": ["ecc-pre-data", "ecc-post-data"],
+            "ml": ["ecc-pre-ml", "ecc-post-ml"],
+            "docs": ["ecc-pre-docs", "ecc-post-docs"],
+        }
+        return gate_map.get(category, ["ecc-pre", "ecc-post"])
+
+    def get_ecc_compatible_skills(self, request: str) -> list[CrossAgentSkill]:
+        """
+        Get all skills including ECC-specific ones.
+
+        Args:
+            request: The user request
+
+        Returns:
+            Combined list of native + ECC skills
+        """
+        native_skills = self.detect_compatible_skills(request)
+        ecc_skills = self.detect_ecc_skills(request)
+
+        # Combine and deduplicate
+        all_skills = {}
+        for skill in native_skills + ecc_skills:
+            if skill.skill not in all_skills or skill.confidence > all_skills[skill.skill].confidence:
+                all_skills[skill.skill] = skill
+
+        return list(all_skills.values())
+
+    def get_ecc_skill_summary(self) -> dict:
+        """
+        Get summary of available ECC skills by category.
+
+        Returns:
+            dict mapping category to skill count
+        """
+        components = self.load_ecc_components()
+        summary = {}
+
+        for category in self.ECC_SKILL_CATEGORIES:
+            keywords = self.ECC_SKILL_CATEGORIES[category]
+            ecc_skills = components.get("skills", [])
+            count = sum(
+                1 for s in ecc_skills
+                if any(kw.lower() in s.name.lower() or kw.lower() in s.description.lower()
+                       for kw in keywords)
+            )
+            summary[category] = count
+
+        return summary
+
+    def get_harness_skills(self, harness: str) -> list[str]:
+        """
+        Get skills available for a specific harness.
+
+        Args:
+            harness: Harness identifier (claude, codex, cursor, etc.)
+
+        Returns:
+            List of skill names available for the harness
+        """
+        base_skills = self.AGENT_SKILL_MAPPINGS.get(harness, [])
+
+        # Add ECC skills that work with this harness
+        ecc_skills = []
+        if harness in ["claude-code", "cursor", "codex"]:
+            components = self.load_ecc_components()
+            ecc_skills = [s.name for s in components.get("skills", [])[:20]]
+
+        return self.UNIVERSAL_SKILLS + base_skills + ecc_skills
+
+
+def create_cross_agent_discovery(base_path: Optional[str] = None) -> CrossAgentSkillDiscovery:
+    """Factory function to create a configured CrossAgentSkillDiscovery."""
+    return CrossAgentSkillDiscovery(base_path=base_path)

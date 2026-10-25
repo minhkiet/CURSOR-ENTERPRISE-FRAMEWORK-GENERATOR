@@ -41,16 +41,24 @@
 .cursor/scripts/weknora/
 
 # --- Python build / package artifacts ---
+.venv/
+venv/
+build/
+dist/
+.coverage
 cursor_framework/__pycache__/
 cursor_framework/*.egg-info/
 cursor_framework/review/
 cursor_framework/tests/
 cursor_framework/utils/__pycache__/
+**/__pycache__/
+*.pyc
+*.egg-info/
 cursor_framework_web/dist/
 cursor_framework_web/node_modules/
 cursor_framework_web/scripts/
-cursor_framework_web/public/templates/
 cursor_framework_web/*.tsbuildinfo
+*.tsbuildinfo
 
 # --- .NET build artifacts ---
 cursor-setup-gui/bin/
@@ -63,6 +71,14 @@ demos/*/.next/
 demos/*/.turbo/
 demos/*/out/
 demos/*/dist/
+
+# --- Vendored third-party (submodules) ---
+vendor/*/node_modules/
+vendor/*/dist/
+vendor/*/.next/
+vendor/*/.turbo/
+vendor/*/out/
+vendor/*/build/
 
 # --- Installer / release artifacts ---
 cursor-setup.exe
@@ -114,6 +130,7 @@ Thumbs.db
 *~
 .vscode/
 .idea/
+.vs/
 *.sublime-*
 
 # --- Log files ---
@@ -123,3 +140,5 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 /demos/fitness/node_modules
+/cursor-setup-gui-wpf/bin
+/cursor-setup-gui-wpf/obj

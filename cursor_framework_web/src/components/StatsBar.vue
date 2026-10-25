@@ -9,11 +9,12 @@ interface Stat {
 }
 
 const stats: Stat[] = [
-  { target: 668, label: 'Total files' },
-  { target: 41, label: 'Rules' },
-  { target: 18, label: 'Skills' },
-  { target: 272, label: 'Knowledge files' },
-  { target: 8, label: 'Agents' }
+  { target: 22, label: 'Templates' },
+  { target: 43, label: 'Rules (.mdc)' },
+  { target: 50, label: 'Skills' },
+  { target: 10, label: 'Vibe Code Tools' },
+  { target: 18, label: 'Agents' },
+  { target: 6, label: 'Theme Modes' }
 ]
 
 const displayValues = ref<number[]>(stats.map(() => 0))
@@ -129,9 +130,15 @@ onUnmounted(() => {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   align-items: center;
   position: relative;
+}
+
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .stat-item {

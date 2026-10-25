@@ -1,0 +1,66 @@
+﻿---
+description: Multi-Language Request Processing - Redirect to new modular files
+created: 2026-06-26
+version: 2.0.0
+tags: [multilingual, translation, vibe-code, redirect]
+---
+
+# Multi-Language Request Processing
+
+> **⚠️ DEPRECATED: This file has been split into modular components.**
+
+## Cấu trúc mới
+
+File gốc `multi-language-vibe-code.mdc` (~2860 lines) đã được tách thành 3 files nhỏ hơn:
+
+### 1. [[rule_intent-detection]] (~550 lines)
+- **Language Detection Engine** - Detect 13+ languages
+- **Intent Analysis** - Primary intent classification (build/fix/redesign/review)
+- **Domain Classification** - frontend, backend, security, payment, etc.
+- **Skill Auto-Discovery** - Multilingual keyword matching
+- **Clarification Flow** - Ambiguity detection và user clarification
+
+### 2. [[vibe-code-protocol]] (~700 lines)
+- **Vibe Code Execution Workflow** - Pre-review → Implementation → Post-review
+- **Pre-Execution Validation Gate** - Request clarity, intent confidence, skills matched
+- **Auth-Specific Handling** - Login, register, OAuth detection và security checklist
+- **Vietnam Payment Handling** - MoMo, SePay, PayOS, VNPay, ZaloPay, VietQR
+- **Dynamic Confidence Thresholds** - Context-aware skill matching
+- **Retry Logic** - Fallback strategies (Primary → Conservative → Minimal)
+
+### 3. [[proto_multi-language-processing]] (~300 lines)
+- **Translation Layer** - Vietnamese → English matrix
+- **Language Detection Patterns** - Character set và keyword detection
+- **Translation Algorithm** - Semantic-preserving translation
+- **Quick Reference** - Common translations
+
+## Liên kết
+
+| File | Mục đích | Lines |
+|------|----------|-------|
+| [[rule_intent-detection]] | Intent + Skill Discovery + Clarification | ~550 |
+| [[vibe-code-protocol]] | Execution + Validation + Auth/Payment | ~700 |
+| [[proto_multi-language-processing]] | Translation + Language Detection | ~300 |
+
+## Lý do split
+
+1. **Performance** - File nhỏ hơn, load nhanh hơn
+2. **Maintainability** - Mỗi file có responsibility riêng
+3. **Modularity** - Import chỉ phần cần thiết
+4. **Collaboration** - Team có thể edit parallel
+
+## Navigation
+
+```
+Multi-Language Processing
+├── [[rule_intent-detection]]     ← Intent Analysis & Skill Discovery
+├── [[vibe-code-protocol]]   ← Execution Workflow & Validation
+└── [[proto_multi-language-processing]] ← Translation Layer
+```
+
+## Related Rules
+
+- [[rule_skill-integration]] — Skill Auto-Discovery & Execution Protocol (base)
+- [[rule_skill-registry]] — Single source of truth cho skills
+- [[proto_context-router]] — Context routing rules
+- [[proto_memory-first]] — Memory context management

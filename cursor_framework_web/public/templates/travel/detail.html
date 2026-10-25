@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oceanfront Pool Villa 3N2Đ — VietTravel Luxury Retreats</title>
+  <meta name="description" content="Khu nghỉ dưỡng 6 sao Vịnh Vĩnh Hy. Biệt thự hồ bơi vô cực view biển 280m², quản gia riêng 24/7, du thuyền ngắm hoàng hôn và ẩm thực Michelin." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="travel-detail-body">
+
+<!-- ─── NAV ─── -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="index.html" class="logo">
+      <svg class="logo-mark" viewBox="0 0 32 32" fill="none">
+        <rect x="4" y="4" width="24" height="24" rx="7" fill="currentColor"/>
+        <path d="M11 11 L21 16 L11 21 Z" fill="#fafbff"/>
+      </svg>
+      <span>viet<span class="logo-dot">.</span>travel</span>
+    </a>
+    <ul class="nav-menu">
+      <li><a href="index.html">Trang Chủ</a></li>
+      <li><a href="detail.html" class="active">Oceanfront Villa (Chi Tiết)</a></li>
+      <li><a href="booking.html">Đặt Chỗ & Tour</a></li>
+      <li><a href="index.html#destinations">Điểm Đến</a></li>
+      <li><a href="index.html#reviews">Đánh Giá</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="tel:19006868" class="nav-ghost"><i class="ph ph-phone"></i> Hotline VIP</a>
+      <a href="booking.html" class="nav-cta">
+        Đặt Chỗ Ngay
+        <i class="ph ph-arrow-up-right"></i>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── HERO & GALLERY ─── -->
+<header class="detail-hero">
+  <div class="container">
+    <div class="detail-breadcrumbs">
+      <a href="index.html">Trang Chủ</a> <i class="ph ph-caret-right"></i>
+      <a href="index.html#destinations">Ninh Thuận / Vịnh Vĩnh Hy</a> <i class="ph ph-caret-right"></i>
+      <span>Aman Sanctuary Oceanfront Pool Villa</span>
+    </div>
+
+    <div class="detail-title-row">
+      <div>
+        <div class="detail-badge-group">
+          <span class="pill-badge pill-gold"><i class="ph-fill ph-crown"></i> Hạng Thượng Lưu Exclusive</span>
+          <span class="pill-badge pill-cyan"><i class="ph-fill ph-shield-check"></i> Đạt Chuẩn Forbes Travel Guide 5-Star</span>
+        </div>
+        <h1 class="detail-heading">Oceanfront Sanctuary Pool Villa (3N2Đ)</h1>
+        <p class="detail-location">
+          <i class="ph-fill ph-map-pin"></i> Vịnh Vĩnh Hy, Vườn Quốc Gia Núi Chúa, Ninh Thuận · 45 phút đưa đón Maybach từ Sân bay Cam Ranh
+        </p>
+      </div>
+      <div class="detail-price-box">
+        <div class="price-from">Trọn gói nghỉ dưỡng 3N2Đ</div>
+        <div class="price-num">48.000.000₫ <span class="price-unit">/ 2 khách</span></div>
+        <div class="price-note">Bao gồm đưa đón Maybach, Butler 24/7 & Sunset Cruise</div>
+      </div>
+    </div>
+
+    <!-- Interactive 5-Photo Gallery -->
+    <div class="gallery-wrapper">
+      <div class="gallery-main">
+        <img id="mainGalleryImg" src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1600&q=85" alt="Oceanfront Infinity Pool Villa" />
+        <div class="gallery-caption" id="galleryCaption">Hồ bơi vô cực nước mặn 65m² hướng thẳng vịnh biển Vĩnh Hy ngút ngàn</div>
+      </div>
+      <div class="gallery-thumbs">
+        <button class="thumb-btn active" onclick="switchGallery('https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1600&q=85', 'Hồ bơi vô cực nước mặn 65m² hướng thẳng vịnh biển Vĩnh Hy ngút ngàn', this)">
+          <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=400&q=70" alt="Hồ bơi vô cực" />
+          <span>Hồ bơi vô cực</span>
+        </button>
+        <button class="thumb-btn" onclick="switchGallery('https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1600&q=85', 'Master Bedroom với giường King-size nhìn trọn vẹn bình minh trên biển', this)">
+          <img src="https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=400&q=70" alt="Master Bedroom" />
+          <span>Phòng ngủ King</span>
+        </button>
+        <button class="thumb-btn" onclick="switchGallery('https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1600&q=85', 'Du thuyền Catamaran riêng đón hoàng hôn và tiệc Champagne trên vịnh', this)">
+          <img src="https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=400&q=70" alt="Du thuyền riêng" />
+          <span>Du thuyền riêng</span>
+        </button>
+        <button class="thumb-btn" onclick="switchGallery('https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1600&q=85', 'Bữa sáng nổi hồ bơi Floating Breakfast & đầu bếp ẩm thực theo yêu cầu', this)">
+          <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=400&q=70" alt="Floating Breakfast" />
+          <span>Bữa sáng nổi</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Specs Bar -->
+    <div class="specs-bar">
+      <div class="spec-pill">
+        <i class="ph-duotone ph-arrows-out-cardinal"></i>
+        <div>
+          <div class="spec-val">280 m²</div>
+          <div class="spec-sub">Diện tích villa</div>
+        </div>
+      </div>
+      <div class="spec-pill">
+        <i class="ph-duotone ph-users"></i>
+        <div>
+          <div class="spec-val">4 Lớn + 2 Trẻ</div>
+          <div class="spec-sub">Sức chứa tối đa</div>
+        </div>
+      </div>
+      <div class="spec-pill">
+        <i class="ph-duotone ph-swimming-pool"></i>
+        <div>
+          <div class="spec-val">Vô cực 65m²</div>
+          <div class="spec-sub">Điện phân muối ấm</div>
+        </div>
+      </div>
+      <div class="spec-pill">
+        <i class="ph-duotone ph-user-circle-gear"></i>
+        <div>
+          <div class="spec-val">Butler 24/7</div>
+          <div class="spec-sub">Quản gia riêng biệt</div>
+        </div>
+      </div>
+      <div class="spec-pill">
+        <i class="ph-duotone ph-boat"></i>
+        <div>
+          <div class="spec-val">Sunset Cruise</div>
+          <div class="spec-sub">Du thuyền vịnh riêng</div>
+        </div>
+      </div>
+      <div class="spec-pill">
+        <i class="ph-duotone ph-car-profile"></i>
+        <div>
+          <div class="spec-val">Maybach V-Class</div>
+          <div class="spec-sub">Đưa đón Cam Ranh 2 chiều</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ─── MAIN CONTENT: ITINERARY & CALCULATOR ─── -->
+<main class="container detail-content-layout">
+  <!-- Left Column: Itinerary, Features, Highlights -->
+  <div class="detail-main-col">
+
+    <!-- Day-by-Day Interactive Itinerary -->
+    <section class="itinerary-section">
+      <div class="section-title-wrap">
+        <div class="eyebrow"><i class="ph-fill ph-calendar-check"></i> Trải Nghiệm Thượng Lưu</div>
+        <h2>Lịch Trình Chi Tiết 3 Ngày 2 Đêm Tuyệt Tác</h2>
+        <p>Từng khoảnh khắc được quản gia và chuyên gia trải nghiệm chăm sóc riêng biệt, không gò bó thời gian.</p>
+      </div>
+
+      <!-- Itinerary Tabs -->
+      <div class="itin-tabs">
+        <button class="itin-tab-btn active" onclick="switchDay(1, this)">
+          <span class="day-num">NGÀY 01</span>
+          <span class="day-name">Hạ Cánh & Hoàng Hôn Du Thuyền</span>
+        </button>
+        <button class="itin-tab-btn" onclick="switchDay(2, this)">
+          <span class="day-num">NGÀY 02</span>
+          <span class="day-name">Lặn San Hô & Tiệc Nướng Bãi Cát</span>
+        </button>
+        <button class="itin-tab-btn" onclick="switchDay(3, this)">
+          <span class="day-num">NGÀY 03</span>
+          <span class="day-name">Yoga Bình Minh & Floating Breakfast</span>
+        </button>
+      </div>
+
+      <!-- Itinerary Panels -->
+      <div class="itin-panels">
+        <!-- Day 1 Panel -->
+        <div id="day-panel-1" class="itin-panel active">
+          <div class="timeline-step">
+            <div class="time-col">13:30</div>
+            <div class="step-card">
+              <h4>Đón Tại Sân Bay Quốc Tế Cam Ranh</h4>
+              <p>Xe Maybach đón tại cửa VIP sân bay Cam Ranh. Khăn ướt hương thảo mộc, nước dừa tươi ướp lạnh và tablet giải trí trên xe trong suốt hành trình 45 phút qua cung đường đèo ven biển đẹp nhất Việt Nam.</p>
+              <div class="step-tags"><span><i class="ph ph-check"></i> Xe riêng Maybach</span><span><i class="ph ph-check"></i> Lối đi VIP sân bay</span></div>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="time-col">15:00</div>
+            <div class="step-card">
+              <h4>Nghi Thức Nhận Phòng & Trà Chiều Bản Địa</h4>
+              <p>Quản gia riêng chào đón bằng nghi thức ngân chuông Tây Tạng truyền thống. Thưởng thức trà sâm Fansipan và bánh mật ong rừng Núi Chúa tại phòng khách biệt thự với tầm nhìn 180 độ bao quát đại dương.</p>
+              <div class="step-tags"><span><i class="ph ph-check"></i> Quản gia riêng 24/7</span><span><i class="ph ph-check"></i> Trà chiều chào mừng</span></div>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="time-col">17:15</div>
+            <div class="step-card">
+              <h4>Du Thuyền Catamaran Ngắm Hoàng Hôn Vịnh Biển</h4>
+              <p>Khởi hành từ cầu cảng riêng của khu nghỉ dưỡng. Du ngoạn vịnh Vĩnh Hy lúc hoàng hôn buông xuống trên vách đá granit. Thưởng thức rượu Champagne Moët & Chandon cùng canapé do đầu bếp chuẩn bị riêng.</p>
+              <div class="step-tags"><span><i class="ph ph-check"></i> Du thuyền Catamaran</span><span><i class="ph ph-check"></i> Champagne & Canapé</span></div>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="time-col">19:30</div>
+            <div class="step-card">
+              <h4>Tiệc Tối Hải Sản Michelin Selected Tại Nhà Hàng Cliff-top</h4>
+              <p>Thực đơn 5 món lấy cảm hứng từ hải sản tươi sống đánh bắt trong ngày tại địa phương: Tôm hùm bông nướng phô mai nấm truffle, cá bớp áp chảo bơ chanh sả, soup bào ngư tươi.</p>
+              <div class="step-tags"><span><i class="ph ph-check"></i> Menu 5 món tinh hoa</span><span><i class="ph ph-check"></i> Bàn VIP view vực biển</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Day 2 Panel -->
+        <div id="day-panel-2" class="itin-panel">
+          <div class="timeline-step">
+            <div class="time-col">07:30</div>
+            <div class="step-card">
+              <h4>Bữa Sáng Tươi Mới Theo Menu Chọn Món</h4>
+              <p>Bữa sáng tự chọn tại nhà hàng hoặc phục vụ tận bàn ăn ngoài trời của villa: Nước ép hữu cơ ép lạnh, bánh mì nướng bơ tươi lò gạch, phở thăn bò wagyu xông khói thảo mộc.</p>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="time-col">09:30</div>
+            <div class="step-card">
+              <h4>Thám Hiểm Rạn San Hô & Chèo Thuyền Kayak Đáy Kính</h4>
+              <p>Được hướng dẫn bởi chuyên gia sinh học biển. Trải nghiệm lặn ngắm rạn san hô nguyên sơ thuộc vùng lõi Khu bảo tồn Biển Vườn Quốc Gia Núi Chúa với thiết bị lặn chuyên nghiệp Mares.</p>
+              <div class="step-tags"><span><i class="ph ph-check"></i> Thiết bị lặn Mares</span><span><i class="ph ph-check"></i> Chuyên gia đồng hành</span></div>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="time-col">15:00</div>
+            <div class="step-card">
+              <h4>Liệu Trình Spa Thư Giãn Chuông Xoay 90 Phút</h4>
+              <p>Trải nghiệm tại Ocean Spa Pavilion trên mặt nước. Sử dụng tinh dầu sen trắng Việt Nam và thảo dược Núi Chúa kết hợp kỹ thuật massage đá nóng bazan và thanh tẩy cơ thể bằng muối khoáng.</p>
+              <div class="step-tags"><span><i class="ph ph-check"></i> 90 phút trị liệu đôi</span><span><i class="ph ph-check"></i> Chuông xoay Tây Tạng</span></div>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="time-col">18:45</div>
+            <div class="step-card">
+              <h4>Private Beach BBQ: Tiệc Nướng Bãi Cát Riêng Dưới Ánh Sao</h4>
+              <p>Bàn tiệc riêng tư thắp đèn bão lung linh trực tiếp bên mép sóng. Đầu bếp riêng phục vụ tại chỗ các loại sò điệp điệp đỏ nướng mỡ hành, tôm hùm baby nướng sa tế và bò Tomahawk thượng hạng.</p>
+              <div class="step-tags"><span><i class="ph ph-check"></i> Đầu bếp riêng</span><span><i class="ph ph-check"></i> Nhạc công Violin biểu diễn</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Day 3 Panel -->
+        <div id="day-panel-3" class="itin-panel">
+          <div class="timeline-step">
+            <div class="time-col">06:00</div>
+            <div class="step-card">
+              <h4>Yoga & Thiền Định Đón Bình Minh Vách Đá</h4>
+              <p>Buổi tập Yoga buổi sáng do Master Hatha Yoga quốc tế hướng dẫn tại đài quan sát bằng gỗ tếch trên vách đá cheo leo, hòa mình vào thanh âm sóng vỗ và nắng sớm trong lành.</p>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="time-col">08:00</div>
+            <div class="step-card">
+              <h4>Bữa Sáng Nổi Floating Breakfast Tại Hồ Bơi Biệt Thự</h4>
+              <p>Khay thuyền gỗ bồng bềnh trên mặt hồ bơi vô cực với trái cây nhiệt đới, bánh sừng bò hạnh nhân mới nướng, trứng Benedict sốt nấm và trà hoa hồng lạnh.</p>
+              <div class="step-tags"><span><i class="ph ph-check"></i> Chụp ảnh kỷ niệm flycam</span><span><i class="ph ph-check"></i> Setup nổi cao cấp</span></div>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="time-col">12:00</div>
+            <div class="step-card">
+              <h4>Thủ Tục Check-out Linh Hoạt & Maybach Tiễn Sân Bay</h4>
+              <p>Quản gia hỗ trợ đóng gói hành lý và quà lưu niệm mật ong rừng Núi Chúa chính gốc. Xe Maybach đưa đoàn trở về sân bay Cam Ranh theo giờ bay của quý khách.</p>
+              <div class="step-tags"><span><i class="ph ph-check"></i> Late check-out miễn phí</span><span><i class="ph ph-check"></i> Hộp quà đặc sản tri ân</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Villa Amenities Bento Grid -->
+    <section class="amenities-section">
+      <div class="section-title-wrap">
+        <div class="eyebrow"><i class="ph-fill ph-sparkle"></i> Tiện Ích Đẳng Cấp</div>
+        <h2>Tiện Nghi Đặc Quyền Dành Cho Biệt Thự</h2>
+      </div>
+
+      <div class="amenities-bento">
+        <div class="am-card">
+          <i class="ph-duotone ph-swimming-pool am-icon"></i>
+          <h4>Hồ Bơi Nước Mặn Điện Phân</h4>
+          <p>Hệ thống xử lý nước tự nhiên không Clo, duy trì nhiệt độ ấm 28-30°C quanh năm, ngắm trọn sao trời ban đêm.</p>
+        </div>
+        <div class="am-card">
+          <i class="ph-duotone ph-brandy am-icon"></i>
+          <h4>Hầm Rượu & Sommelier Riêng</h4>
+          <p>Tủ bảo quản hơn 150 dòng rượu vang hảo hạng Bordeaux, Champagne và Single Malt Whisky danh giá.</p>
+        </div>
+        <div class="am-card">
+          <i class="ph-duotone ph-television-simple am-icon"></i>
+          <h4>Âm Thanh Bang & Olufsen</h4>
+          <p>Dàn loa cao cấp B&O Beosound không dây toàn bộ khuôn viên villa, kết nối Apple AirPlay và Spotify Hi-Fi.</p>
+        </div>
+        <div class="am-card">
+          <i class="ph-duotone ph-bathtub am-icon"></i>
+          <h4>Bồn Tắm Đá Cẩm Thạch Nguyên Khối</h4>
+          <p>Bồn tắm lộ thiên view đại dương kèm muối khoáng Epsom và thảo mộc tự nhiên được thay mới mỗi chiều.</p>
+        </div>
+        <div class="am-card">
+          <i class="ph-duotone ph-wifi-high am-icon"></i>
+          <h4>Starlink Wi-Fi Tốc Độ Cao 300Mbps</h4>
+          <p>Kết nối internet vệ tinh ổn định ngay cả giữa khu bảo tồn thiên nhiên, phục vụ làm việc từ xa mượt mà.</p>
+        </div>
+        <div class="am-card">
+          <i class="ph-duotone ph-first-aid-kit am-icon"></i>
+          <h4>Bác Sĩ & Y Tá Trực 24/7</h4>
+          <p>Đội ngũ y tế chăm sóc sức khỏe gia đình thường trực tại trạm y tế khu nghỉ dưỡng, đảm bảo an tâm tuyệt đối.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Verified Guest Reviews -->
+    <section class="guest-reviews-section">
+      <div class="section-title-wrap">
+        <div class="eyebrow"><i class="ph-fill ph-star"></i> Cảm Nhận Thực Tế</div>
+        <h2>Đánh Giá Của Các Khách Nghỉ Dưỡng Thượng Lưu</h2>
+      </div>
+
+      <div class="reviews-list">
+        <article class="guest-review-card">
+          <div class="gr-header">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Doanh nhân Hoàng Thu Thủy" class="gr-avatar" />
+            <div>
+              <h4 class="gr-name">Chị Hoàng Thu Thủy</h4>
+              <p class="gr-title">Phó Chủ Tịch Tập Đoàn BĐS An Khang · Kỳ nghỉ kỷ niệm 10 năm ngày cưới</p>
+            </div>
+            <div class="gr-stars">
+              <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+            </div>
+          </div>
+          <p class="gr-body">
+            "Chúng tôi đã đi nghỉ dưỡng ở Aman Tokyo, Six Senses Zighy Bay nhưng Oceanfront Villa tại Vĩnh Hy thực sự mang lại cảm giác biệt lập và thanh tịnh hiếm có. Quản gia Minh chuẩn bị bữa tối bên bãi biển đẹp như một giấc mơ, rượu vang phục vụ đúng nhiệt độ và du thuyền riêng đưa chúng tôi đi ngắm hoàng hôn ngập tràn cảm xúc. Chắc chắn sẽ quay lại vào dịp sinh nhật tới!"
+          </p>
+        </article>
+
+        <article class="guest-review-card">
+          <div class="gr-header">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80" alt="Anh Trần Quốc Tuấn" class="gr-avatar" />
+            <div>
+              <h4 class="gr-name">Anh Trần Quốc Tuấn</h4>
+              <p class="gr-title">Founder TechVenture Vietnam · Đi cùng gia đình 4 người</p>
+            </div>
+            <div class="gr-stars">
+              <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+            </div>
+          </div>
+          <p class="gr-body">
+            "Hai bé nhà tôi cực kỳ thích rạn san hô và hoạt động kayak đáy kính. Xe Maybach đưa đón đúng giờ từng phút, nhân viên chu đáo nhớ từng sở thích ăn uống kiêng đường của bà xã. Hồ bơi nước ấm điện phân muối không gây cay mắt trẻ nhỏ. Một trải nghiệm 10/10 xứng đáng từng đồng chi trả."
+          </p>
+        </article>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Right Column: Sticky Booking & Price Calculator Widget -->
+  <aside class="detail-sidebar">
+    <div class="calc-widget-card" id="calcWidget">
+      <div class="calc-header">
+        <div class="calc-title">Dự Toán Kỳ Nghỉ Riêng Tư</div>
+        <div class="calc-sub">Tự động tính chi phí & các dịch vụ nâng cấp</div>
+      </div>
+
+      <div class="calc-body">
+        <!-- Package Picker -->
+        <div class="calc-field">
+          <label class="calc-label"><i class="ph ph-package"></i> Gói Kỳ Nghỉ Lựa Chọn</label>
+          <select id="packageSelect" onchange="calculateStayCost()" class="calc-input">
+            <option value="48000000" data-days="3">Trọn gói 3N2Đ Nghỉ Dưỡng Tinh Hoa (48.000.000₫)</option>
+            <option value="68000000" data-days="4">Trọn gói 4N3Đ Khám Phá Toàn Diện (68.000.000₫)</option>
+            <option value="92000000" data-days="5">Trọn gói 5N4Đ Thượng Lưu Tuyệt Đỉnh (92.000.000₫)</option>
+          </select>
+        </div>
+
+        <!-- Guest count -->
+        <div class="calc-field">
+          <label class="calc-label"><i class="ph ph-users"></i> Số Lượng Khách Tham Gia</label>
+          <div class="counter-control">
+            <button type="button" onclick="changeGuest(-1)">-</button>
+            <span id="guestCountDisplay">2 Người lớn (Tiêu chuẩn)</span>
+            <button type="button" onclick="changeGuest(1)">+</button>
+          </div>
+        </div>
+
+        <!-- VIP Add-ons -->
+        <div class="calc-field">
+          <label class="calc-label"><i class="ph ph-plus-circle"></i> Trải Nghiệm Nâng Cấp Tùy Chọn</label>
+          <div class="addons-list">
+            <label class="addon-item">
+              <input type="checkbox" id="addonBbq" value="4500000" onchange="calculateStayCost()" checked />
+              <div class="addon-info">
+                <span class="addon-name">Private Beach BBQ Tôm Hùm (+4.5M)</span>
+                <span class="addon-desc">Tiệc nướng bãi cát riêng có đầu bếp & nến</span>
+              </div>
+            </label>
+            <label class="addon-item">
+              <input type="checkbox" id="addonSpa" value="3200000" onchange="calculateStayCost()" checked />
+              <div class="addon-info">
+                <span class="addon-name">Gói Spa Chuông Xoay Cặp Đôi (+3.2M)</span>
+                <span class="addon-desc">90 phút massage đá nóng & thảo dược</span>
+              </div>
+            </label>
+            <label class="addon-item">
+              <input type="checkbox" id="addonHeli" value="12000000" onchange="calculateStayCost()" />
+              <div class="addon-info">
+                <span class="addon-name">Trực Thăng Ngắm Vịnh 20 Phút (+12M)</span>
+                <span class="addon-desc">Bay ngắm toàn cảnh Vườn Quốc Gia Núi Chúa</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Price Breakdown -->
+        <div class="price-breakdown">
+          <div class="pb-row">
+            <span>Giá gói cơ bản</span>
+            <span id="pbBasePrice">48.000.000₫</span>
+          </div>
+          <div class="pb-row">
+            <span>Phụ thu khách thêm</span>
+            <span id="pbExtraGuests">0₫</span>
+          </div>
+          <div class="pb-row">
+            <span>Trải nghiệm nâng cấp</span>
+            <span id="pbAddons">7.700.000₫</span>
+          </div>
+          <div class="pb-row discount-row">
+            <span>Ưu đãi đặt sớm (Early-Bird -10%)</span>
+            <span id="pbDiscount">-5.570.000₫</span>
+          </div>
+          <div class="pb-divider"></div>
+          <div class="pb-total">
+            <span>Tổng Ước Tính:</span>
+            <span class="total-amount" id="pbTotalAmount">50.130.000₫</span>
+          </div>
+          <div class="pb-deposit">
+            Đặt cọc giữ chỗ 30%: <strong id="pbDeposit">15.039.000₫</strong> (Còn lại thanh toán khi check-in)
+          </div>
+        </div>
+
+        <!-- Action Button -->
+        <a href="booking.html" class="btn btn-primary btn-full calc-cta-btn" id="bookNowBtn">
+          Chuyển Sang Bước Đặt Chỗ <i class="ph ph-arrow-right"></i>
+        </a>
+
+        <div class="calc-guarantees">
+          <div><i class="ph-fill ph-check-circle"></i> Miễn phí hủy trước 7 ngày</div>
+          <div><i class="ph-fill ph-check-circle"></i> Hỗ trợ đổi ngày 01 lần không phụ phí</div>
+          <div><i class="ph-fill ph-check-circle"></i> Cam kết hoàn tiền 100% nếu không đúng cam kết</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<!-- ─── FLOATING CONTACT BUTTONS ─── -->
+<div class="floating-contact">
+  <a href="tel:19006868" class="floating-btn floating-btn_hotline" aria-label="Gọi hotline VIP">
+    <span class="floating-tooltip">Hotline VIP: 1900 6868</span>
+    <svg viewBox="0 0 24 24" fill="white" width="22" height="22">
+      <path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.4-.1-.8 0-1.1.3l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1.1-.4-1.1-.6-2.3-.6-3.5 0-.6-.4-1-1-1H4c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"/>
+    </svg>
+  </a>
+  <a href="https://zalo.me" target="_blank" rel="noopener" class="floating-btn floating-btn_zalo" aria-label="Chat Zalo hỗ trợ kỳ nghỉ">
+    <span class="floating-tooltip">Chat Zalo Chuyên Viên</span>
+    <svg viewBox="0 0 32 32" fill="none" width="26" height="26">
+      <path d="M16 4C9.4 4 4 8.7 4 14.5c0 3.3 1.8 6.3 4.5 8.2l-1.2 4.4c-.1.5.4.9.9.6l5-2.8c.9.3 1.8.4 2.8.4 6.6 0 12-4.7 12-10.5S22.6 4 16 4Z" fill="white"/>
+      <text x="16" y="17.8" fill="#0068FF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="8.5" text-anchor="middle" letter-spacing="-0.3">Zalo</text>
+    </svg>
+  </a>
+</div>
+
+<!-- ─── JAVASCRIPT LOGIC ─── -->
+<script>
+// Interactive Photo Gallery
+function switchGallery(imgUrl, caption, btn) {
+  const mainImg = document.getElementById('mainGalleryImg');
+  const captionEl = document.getElementById('galleryCaption');
+  if (mainImg) mainImg.src = imgUrl;
+  if (captionEl) captionEl.textContent = caption;
+  document.querySelectorAll('.thumb-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+// Day Tabs
+function switchDay(day, btn) {
+  document.querySelectorAll('.itin-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.itin-tab-btn').forEach(b => b.classList.remove('active'));
+  const target = document.getElementById('day-panel-' + day);
+  if (target) target.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+// Guest Counter
+let guestCount = 2;
+function changeGuest(delta) {
+  guestCount = Math.max(2, Math.min(6, guestCount + delta));
+  const el = document.getElementById('guestCountDisplay');
+  if (el) {
+    if (guestCount === 2) {
+      el.textContent = '2 Người lớn (Tiêu chuẩn)';
+    } else {
+      el.textContent = guestCount + ' Người lớn (' + (guestCount - 2) + ' phụ thu)';
+    }
+  }
+  calculateStayCost();
+}
+
+// Calculator Logic
+function calculateStayCost() {
+  const pkgSelect = document.getElementById('packageSelect');
+  if (!pkgSelect) return;
+  const basePrice = parseInt(pkgSelect.value) || 48000000;
+  
+  // Extra guest surcharge: 8,000,000 / guest
+  const extraGuests = Math.max(0, guestCount - 2);
+  const extraGuestCost = extraGuests * 8000000;
+
+  // Addons
+  let addonsCost = 0;
+  const bbq = document.getElementById('addonBbq');
+  const spa = document.getElementById('addonSpa');
+  const heli = document.getElementById('addonHeli');
+  if (bbq && bbq.checked) addonsCost += parseInt(bbq.value) || 0;
+  if (spa && spa.checked) addonsCost += parseInt(spa.value) || 0;
+  if (heli && heli.checked) addonsCost += parseInt(heli.value) || 0;
+
+  const subtotal = basePrice + extraGuestCost + addonsCost;
+  const discount = Math.round(subtotal * 0.10); // 10% early bird
+  const total = subtotal - discount;
+  const deposit = Math.round(total * 0.30);
+
+  const fmt = (n) => n.toLocaleString('vi-VN') + '₫';
+
+  document.getElementById('pbBasePrice').textContent = fmt(basePrice);
+  document.getElementById('pbExtraGuests').textContent = extraGuestCost > 0 ? fmt(extraGuestCost) : '0₫';
+  document.getElementById('pbAddons').textContent = fmt(addonsCost);
+  document.getElementById('pbDiscount').textContent = '-' + fmt(discount);
+  document.getElementById('pbTotalAmount').textContent = fmt(total);
+  document.getElementById('pbDeposit').textContent = fmt(deposit);
+}
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', () => {
+  calculateStayCost();
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>UI/UX Enterprise System — Gu Evondev, Design Tokens & Anti-Slop</title>
+<meta name="description" content="Hệ thống UI/UX chuẩn Enterprise với Design Tokens, Wireframe 3 phương án, ma trận trạng thái và quy chuẩn không thuần AI." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ─── HEADER ─── -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-box"><i class="ph ph-layout"></i></div>
+      <div class="logo-text">
+        <span class="logo-name">Enterprise UI/UX</span>
+        <span class="logo-badge">Evondev Guide</span>
+      </div>
+    </div>
+
+    <!-- Desktop Nav -->
+    <nav class="nav">
+      <a href="#tokens">Design Tokens</a>
+      <a href="#wireframes">Wireframe P1-P3</a>
+      <a href="#state-matrix">State Matrix</a>
+      <a href="#audit">Audit 5 Trục</a>
+    </nav>
+
+    <!-- Desktop Actions -->
+    <div class="header-actions">
+      <button class="btn btn-secondary" id="mode-toggle">
+        <i class="ph ph-arrows-clockwise"></i>
+        <span>Toggle Hi-Fi / Lo-Fi</span>
+      </button>
+      <a href="#audit" class="btn btn-primary">
+        <span>Audit 5 Trục</span>
+        <i class="ph ph-check-circle"></i>
+      </a>
+    </div>
+
+    <!-- Mobile Menu Toggle Button -->
+    <button class="mobile-toggle" id="uiux-menu-toggle" aria-label="Mở menu điều hướng">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ─── MOBILE DRAWER & BACKDROP ─── -->
+<div class="mobile-drawer" id="uiux-drawer" role="dialog" aria-modal="true" aria-label="Menu điều hướng">
+  <div class="mobile-drawer-header">
+    <div class="logo">
+      <div class="logo-box"><i class="ph ph-layout"></i></div>
+      <div class="logo-text">
+        <span class="logo-name">Enterprise UI/UX</span>
+        <span class="logo-badge">Evondev Guide</span>
+      </div>
+    </div>
+    <button class="drawer-close" id="uiux-drawer-close" aria-label="Đóng menu">
+      <i class="ph ph-x"></i>
+    </button>
+  </div>
+  <nav class="mobile-nav">
+    <a href="#tokens" class="mobile-nav-link"><i class="ph ph-palette"></i><span>Design Tokens</span></a>
+    <a href="#wireframes" class="mobile-nav-link"><i class="ph ph-browsers"></i><span>Wireframe P1-P3</span></a>
+    <a href="#state-matrix" class="mobile-nav-link"><i class="ph ph-squares-four"></i><span>State Matrix</span></a>
+    <a href="#audit" class="mobile-nav-link"><i class="ph ph-check-circle"></i><span>Audit 5 Trục</span></a>
+  </nav>
+  <div class="mobile-drawer-actions">
+    <button class="btn btn-secondary w-full" id="mobile-mode-toggle">
+      <i class="ph ph-arrows-clockwise"></i>
+      <span>Toggle Hi-Fi / Lo-Fi</span>
+    </button>
+    <a href="#audit" class="btn btn-primary w-full" id="mobile-cta-btn">
+      <span>Chạy Audit 5 Trục</span>
+      <i class="ph ph-check-circle"></i>
+    </a>
+  </div>
+</div>
+<div class="mobile-backdrop" id="uiux-backdrop"></div>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="hero-content">
+      <div class="tag-pill">
+        <span class="tag-dot"></span>
+        <span>Chuẩn Design System 2026 · Không AI-Slop</span>
+      </div>
+      <h1 class="hero-title">
+        Quy chuẩn UI/UX thực chiến.<br/>
+        <span class="text-gradient">Làm như một Designer chuyên nghiệp.</span>
+      </h1>
+      <p class="hero-desc">
+        Loại bỏ hoàn toàn cảm giác "AI tạo ra". Tiếp cận theo đúng thứ tự: Brief → 2-3 Wireframe với nội dung thực tế → Token hóa màu sắc & nhịp điệu khoảng trắng → Kiểm tra ma trận trạng thái trước khi code.
+      </p>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-num">140+</div>
+          <div class="stat-lbl">CSS Tokens (Tailwind v4)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">WCAG AA</div>
+          <div class="stat-lbl">Tương phản & Trợ năng 8.6:1</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">0% Slop</div>
+          <div class="stat-lbl">Không gradient màu tím vô cớ</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-preview-card">
+      <div class="mock-browser">
+        <div class="mock-header">
+          <div class="mock-dots">
+            <span></span><span></span><span></span>
+          </div>
+          <div class="mock-url">uiux.cef.dev/tokens-system</div>
+          <div class="live-pill">LIVE SYNC</div>
+        </div>
+        <div class="mock-body" id="preview-stage">
+          <div class="token-demo-grid">
+            <div class="demo-card">
+              <span class="demo-lbl">Primary Accent</span>
+              <div class="color-sample" style="background: var(--primary);"></div>
+              <code>var(--primary): #3b82f6</code>
+            </div>
+            <div class="demo-card">
+              <span class="demo-lbl">Success Signal</span>
+              <div class="color-sample" style="background: var(--success);"></div>
+              <code>var(--success): #10b981</code>
+            </div>
+            <div class="demo-card">
+              <span class="demo-lbl">8pt Grid Rhythm</span>
+              <div class="spacing-box">
+                <span>8px</span><span>16px</span><span>24px</span>
+              </div>
+              <code>var(--space-2..6)</code>
+            </div>
+            <div class="demo-card">
+              <span class="demo-lbl">Corner Radius</span>
+              <div class="radius-box"></div>
+              <code>var(--radius-lg): 12px</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SECTION 1: DESIGN TOKENS ─── -->
+<section class="section" id="tokens">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">DESIGN TOKENS</div>
+      <h2 class="section-title">Hệ thống biến số độc lập, đồng bộ toàn diện</h2>
+      <p class="section-sub">Dự án sử dụng token CSS thuần tương thích hoàn toàn với Tailwind v4 `@theme`, dễ dàng tùy biến giao diện mà không cần sửa code component.</p>
+    </div>
+
+    <div class="token-table-wrap">
+      <table class="token-table">
+        <thead>
+          <tr>
+            <th>Token Name</th>
+            <th>Mục Đích Sử Dụng</th>
+            <th>Giá Trị Mặc Định</th>
+            <th>Xem Trước</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>--primary</code></td>
+            <td>Màu nhận diện thương hiệu & tương tác chính</td>
+            <td><code>#3b82f6</code></td>
+            <td><span class="swatch" style="background: #3b82f6;"></span> Blue 500</td>
+          </tr>
+          <tr>
+            <td><code>--bg-canvas</code></td>
+            <td>Màu nền gốc của toàn bộ website</td>
+            <td><code>#090d16</code></td>
+            <td><span class="swatch" style="background: #090d16; border: 1px solid #334155;"></span> Dark Canvas</td>
+          </tr>
+          <tr>
+            <td><code>--bg-surface</code></td>
+            <td>Màu nền của thẻ Card, Modal, Dropdown</td>
+            <td><code>#111827</code></td>
+            <td><span class="swatch" style="background: #111827;"></span> Elevated Surface</td>
+          </tr>
+          <tr>
+            <td><code>--success</code></td>
+            <td>Trạng thái thành công, tích cực, đã thanh toán</td>
+            <td><code>#10b981</code></td>
+            <td><span class="swatch" style="background: #10b981;"></span> Emerald 500</td>
+          </tr>
+          <tr>
+            <td><code>--danger</code></td>
+            <td>Cảnh báo lỗi, hành động hủy, xóa dữ liệu</td>
+            <td><code>#ef4444</code></td>
+            <td><span class="swatch" style="background: #ef4444;"></span> Rose 500</td>
+          </tr>
+          <tr>
+            <td><code>--radius-md</code></td>
+            <td>Bo góc chuẩn cho Button, Input field</td>
+            <td><code>8px</code></td>
+            <td><span class="radius-pill" style="border-radius: 8px;">Button 8px</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SECTION 2: WIREFRAME PROCESS ─── -->
+<section class="section bg-elevated" id="wireframes">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">QUY TRÌNH WIREFRAME</div>
+      <h2 class="section-title">3 Phương Án Wireframe trước khi viết code</h2>
+      <p class="section-sub">Không bao giờ bắt tay dựng giao diện khi chưa có bản khung rõ ràng kèm dữ liệu mẫu thực tế.</p>
+    </div>
+
+    <div class="wireframe-grid">
+      <div class="wire-card">
+        <div class="wire-badge">PHƯƠNG ÁN 1 (MẶC ĐỊNH)</div>
+        <h3>Bố Cục Cột Đôi (Two-Column Master-Detail)</h3>
+        <p>Cột trái hiển thị danh sách bộ lọc và thống kê tổng quan; cột phải hiển thị chi tiết dữ liệu theo dạng bảng hoặc thẻ tương tác.</p>
+        <div class="wire-frame-illu">
+          <div class="w-side"></div>
+          <div class="w-main">
+            <div class="w-bar"></div>
+            <div class="w-block"></div>
+            <div class="w-block"></div>
+          </div>
+        </div>
+        <ul class="wire-features">
+          <li><i class="ph ph-check"></i> Tối ưu màn hình Desktop & Tablet</li>
+          <li><i class="ph ph-check"></i> Xem nhanh chi tiết không cần chuyển trang</li>
+        </ul>
+      </div>
+
+      <div class="wire-card active-card">
+        <div class="wire-badge accent">PHƯƠNG ÁN 2 (KHUYÊN DÙNG)</div>
+        <h3>Bento Grid Bất Đối Xứng</h3>
+        <p>Phân cấp thông tin rõ rệt bằng kích cỡ thẻ: Thẻ số liệu chính chiếm diện tích lớn, các tiện ích phụ thu gọn tinh gọn.</p>
+        <div class="wire-frame-illu">
+          <div class="w-bento">
+            <div class="b-big"></div>
+            <div class="b-sm"></div>
+            <div class="b-sm"></div>
+          </div>
+        </div>
+        <ul class="wire-features">
+          <li><i class="ph ph-check"></i> Điểm nhấn thị giác mạnh mẽ</li>
+          <li><i class="ph ph-check"></i> Đạt chuẩn Anti-Slop 57 Gates</li>
+        </ul>
+      </div>
+
+      <div class="wire-card">
+        <div class="wire-badge">PHƯƠNG ÁN 3</div>
+        <h3>Bảng Dữ Liệu Tối Ưu Mật Độ (Cockpit Dense)</h3>
+        <p>Dành riêng cho người dùng chuyên nghiệp cần theo dõi hàng trăm dòng dữ liệu cùng lúc với thao tác phím tắt nhanh.</p>
+        <div class="wire-frame-illu">
+          <div class="w-dense">
+            <div class="w-row"></div>
+            <div class="w-row"></div>
+            <div class="w-row"></div>
+            <div class="w-row"></div>
+          </div>
+        </div>
+        <ul class="wire-features">
+          <li><i class="ph ph-check"></i> Hỗ trợ sắp xếp & lọc đa cột</li>
+          <li><i class="ph ph-check"></i> Thao tác bàn phím thuận tiện</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SECTION 3: STATE MATRIX ─── -->
+<section class="section" id="state-matrix">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">MA TRẬN TRẠNG THÁI</div>
+      <h2 class="section-title">Mỗi Component đều có 5 trạng thái thiết kế</h2>
+      <p class="section-sub">Tránh lỗi giao diện trống rỗng hoặc đơ giao diện bằng cách thiết kế chỉn chu từng trạng thái.</p>
+    </div>
+
+    <div class="state-grid">
+      <div class="state-box">
+        <div class="state-header"><span class="badge badge-success">Active / Filled</span></div>
+        <h4>Dữ Liệu Đầy Đủ</h4>
+        <p>Hiển thị các hàng hóa, biểu đồ và số liệu rõ ràng với phân trang mượt mà.</p>
+        <div class="sample-content active-sample">
+          <div class="user-pill">
+            <div class="u-avatar">AD</div>
+            <div class="u-meta"><strong>Vinacorp Logistics</strong><span>Gói Enterprise</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="state-box">
+        <div class="state-header"><span class="badge badge-warning">Loading Skeleton</span></div>
+        <h4>Đang Tải (Skeleton)</h4>
+        <p>Hiệu ứng shimmer mượt mà giữ nguyên cấu trúc layout, không gây giật màn hình.</p>
+        <div class="sample-content">
+          <div class="skeleton-line" style="width: 70%;"></div>
+          <div class="skeleton-line" style="width: 90%;"></div>
+          <div class="skeleton-line" style="width: 45%;"></div>
+        </div>
+      </div>
+
+      <div class="state-box">
+        <div class="state-header"><span class="badge badge-neutral">Empty State</span></div>
+        <h4>Chưa Có Dữ Liệu</h4>
+        <p>Thông điệp lịch sự kèm nút kêu gọi hành động (CTA) hướng dẫn người dùng bắt đầu.</p>
+        <div class="sample-content empty-sample">
+          <i class="ph ph-folder-open empty-icon"></i>
+          <span>Chưa có giao dịch nào</span>
+          <button class="btn btn-sm btn-primary">Tạo mới</button>
+        </div>
+      </div>
+
+      <div class="state-box">
+        <div class="state-header"><span class="badge badge-danger">Error State</span></div>
+        <h4>Lỗi Mạng Hoặc Hệ Thống</h4>
+        <p>Giải thích rõ lý do kèm nút "Thử lại ngay" không bắt người dùng tải lại cả trang.</p>
+        <div class="sample-content error-sample">
+          <i class="ph ph-warning-circle error-icon"></i>
+          <span>Không thể tải danh sách đơn</span>
+          <button class="btn btn-sm btn-secondary">Thử lại</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <div>
+      <strong>UI/UX Enterprise System</strong> · Framework Generator 2026
+    </div>
+    <div class="footer-links">
+      <a href="#tokens">Tokens</a>
+      <a href="#wireframes">Wireframe</a>
+      <a href="#state-matrix">State Matrix</a>
+      <a href="/templates">Kho Templates</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Simple interactive toggle for Lo-Fi wireframe mode
+  const toggleBtn = document.getElementById('mode-toggle');
+  const mobileToggleBtn = document.getElementById('mobile-mode-toggle');
+  let isLoFi = false;
+
+  function toggleLoFi() {
+    isLoFi = !isLoFi;
+    document.body.classList.toggle('lo-fi-mode', isLoFi);
+    const txt = isLoFi ? 'Switch to Hi-Fi Mode' : 'Switch to Lo-Fi Mode';
+    if (toggleBtn) toggleBtn.querySelector('span').textContent = txt;
+    if (mobileToggleBtn) mobileToggleBtn.querySelector('span').textContent = txt;
+  }
+
+  if (toggleBtn) toggleBtn.addEventListener('click', toggleLoFi);
+  if (mobileToggleBtn) mobileToggleBtn.addEventListener('click', toggleLoFi);
+
+  // Mobile Drawer Toggle
+  const menuToggle = document.getElementById('uiux-menu-toggle');
+  const drawerClose = document.getElementById('uiux-drawer-close');
+  const drawer = document.getElementById('uiux-drawer');
+  const backdrop = document.getElementById('uiux-backdrop');
+  const mobileLinks = document.querySelectorAll('.mobile-nav-link, #mobile-cta-btn');
+
+  function openDrawer() {
+    drawer.classList.add('open');
+    backdrop.classList.add('open');
+    menuToggle.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDrawer() {
+    drawer.classList.remove('open');
+    backdrop.classList.remove('open');
+    menuToggle.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  if (menuToggle) menuToggle.addEventListener('click', () => {
+    if (drawer.classList.contains('open')) closeDrawer();
+    else openDrawer();
+  });
+
+  if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
+  if (backdrop) backdrop.addEventListener('click', closeDrawer);
+  mobileLinks.forEach(link => link.addEventListener('click', closeDrawer));
+</script>
+
+</body>
+</html>

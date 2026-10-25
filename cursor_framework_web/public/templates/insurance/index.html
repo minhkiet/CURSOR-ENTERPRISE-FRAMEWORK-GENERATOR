@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aegis Bảo An — Bảo Hiểm Toàn Diện & Bồi Thường 24h Trực Tuyến</title>
+  <meta name="description" content="Aegis Bảo An cung cấp các giải pháp bảo hiểm sức khỏe, nhân thọ, ô tô và du lịch chuẩn quốc tế. Chi trả bồi thường 24h qua App, bảo lãnh 680+ bệnh viện toàn quốc." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ─── TOP EMERGENCY & ASSISTANCE BAR ─── -->
+  <aside class="top-banner" aria-label="Thông tin hỗ trợ khẩn cấp">
+    <div class="container top-banner-inner">
+      <div class="top-banner-left">
+        <span class="pulse-badge"><span class="pulse-dot"></span> Bồi thường 24/7 trực tuyến</span>
+        <span class="top-divider"></span>
+        <a href="tel:19006868" class="hotline-link">
+          <i class="ph-fill ph-phone-call"></i>
+          Hotline khẩn cấp: <strong>1900 6868</strong>
+        </a>
+        <span class="top-divider hide-mobile"></span>
+        <span class="top-subtext hide-mobile">
+          <i class="ph ph-shield-check"></i> Cấp phép bởi Bộ Tài Chính số 102/GP/KDBH
+        </span>
+      </div>
+      <div class="top-banner-right">
+        <a href="#claim" class="top-action-link"><i class="ph ph-receipt"></i> Tra cứu bồi thường</a>
+        <a href="#hospitals" class="top-action-link hide-mobile"><i class="ph ph-hospital"></i> 680+ Bệnh viện liên kết</a>
+        <div class="lang-switch">
+          <span class="lang-active">VIE</span>
+          <span class="lang-sep">/</span>
+          <span class="lang-opt">ENG</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ─── PRIMARY NAVIGATION ─── -->
+  <nav class="nav" id="mainNav">
+    <div class="container nav-inner">
+      <a href="#" class="logo" aria-label="Aegis Bảo An Trang Chủ">
+        <div class="logo-symbol">
+          <svg viewBox="0 0 40 40" fill="none">
+            <rect width="40" height="40" rx="10" fill="url(#logoGrad)"/>
+            <path d="M20 9L11 13.5V21C11 27.2 14.8 32.9 20 34.5C25.2 32.9 29 27.2 29 21V13.5L20 9Z" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16 21.5L19 24.5L24.5 18" stroke="#38bdf8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs>
+              <linearGradient id="logoGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#0284c7"/>
+                <stop offset="1" stop-color="#0f172a"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <span class="brand-title">Aegis<span class="brand-accent">BảoAn</span></span>
+          <span class="brand-slogan">Bảo hiểm toàn diện & Bền vững</span>
+        </div>
+      </a>
+
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="#about" class="nav-link">Về Công Ty</a></li>
+        <li class="has-dropdown">
+          <a href="#products" class="nav-link">Sản Phẩm <i class="ph ph-caret-down"></i></a>
+          <div class="dropdown-pane">
+            <a href="#products" data-cat="health" class="dropdown-item">
+              <i class="ph-duotone ph-heartbeat"></i>
+              <div>
+                <strong>Bảo hiểm Sức Khỏe CarePlus</strong>
+                <p>Chi trả viện phí đến 2 tỷ/năm, bảo lãnh toàn cầu</p>
+              </div>
+            </a>
+            <a href="#products" data-cat="life" class="dropdown-item">
+              <i class="ph-duotone ph-shield-plus"></i>
+              <div>
+                <strong>Bảo hiểm Nhân Thọ & Hưu Trí</strong>
+                <p>Tích lũy tài chính, bảo vệ tương lai trọn đời</p>
+              </div>
+            </a>
+            <a href="#products" data-cat="auto" class="dropdown-item">
+              <i class="ph-duotone ph-car"></i>
+              <div>
+                <strong>Bảo hiểm Xe Cơ Giới AutoCare</strong>
+                <p>Cứu hộ 24/7 trong 30 phút, bảo hiểm thủy kích</p>
+              </div>
+            </a>
+            <a href="#products" data-cat="travel" class="dropdown-item">
+              <i class="ph-duotone ph-airplane-tilt"></i>
+              <div>
+                <strong>Bảo hiểm Du Lịch Quốc Tế</strong>
+                <p>Chuẩn Visa Schengen, hỗ trợ y tế khẩn cấp</p>
+              </div>
+            </a>
+            <a href="#products" data-cat="business" class="dropdown-item">
+              <i class="ph-duotone ph-buildings"></i>
+              <div>
+                <strong>Bảo hiểm Doanh Nghiệp & Tài Sản</strong>
+                <p>Bảo vệ nhà xưởng, văn phòng & nhân sự then chốt</p>
+              </div>
+            </a>
+          </div>
+        </li>
+        <li><a href="#compare" class="nav-link">So Sánh Gói</a></li>
+        <li><a href="#reviews" class="nav-link">Khách Hàng Đánh Giá</a></li>
+        <li><a href="#guide" class="nav-link">Hướng Dẫn Mua</a></li>
+        <li><a href="#claim" class="nav-link">Bồi Thường</a></li>
+        <li><a href="#faq" class="nav-link">Hỏi Đáp</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="#calculator" class="btn btn-outline nav-calc-btn">
+          <i class="ph ph-calculator"></i>
+          <span>Tính phí nhanh</span>
+        </a>
+        <a href="#consult" class="btn btn-primary nav-cta">
+          <span>Nhận Báo Giá</span>
+          <i class="ph ph-arrow-up-right"></i>
+        </a>
+        <button class="menu-toggle" id="menuToggle" aria-label="Mở menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ─── HERO SECTION ─── -->
+  <header class="hero">
+    <div class="hero-backdrop"></div>
+    <div class="hero-glow"></div>
+    <div class="container hero-container">
+      <div class="hero-content">
+        <div class="badge-pill">
+          <span class="badge-tag"><i class="ph-fill ph-seal-check"></i> Xếp hạng A+ AM Best</span>
+          <span class="badge-text">Cam kết bồi thường 100% minh bạch</span>
+        </div>
+
+        <h1 class="hero-title">
+          An Tâm Tương Lai,<br />
+          <span class="gradient-text">Vững Bước Hiện Tại.</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          Giải pháp bảo hiểm thế hệ mới tích hợp công nghệ số 4.0. Khám phá 5 dòng sản phẩm bảo vệ sức khỏe, nhân thọ, tài sản & du lịch với thủ tục giải quyết bồi thường trực tuyến <strong>trong 24 giờ</strong>.
+        </p>
+
+        <div class="hero-stats-row">
+          <div class="hero-stat-item">
+            <span class="stat-number">4.8M<span class="stat-plus">+</span></span>
+            <span class="stat-label">Khách hàng tin chọn</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="hero-stat-item">
+            <span class="stat-number">1.850<span class="stat-plus">Tỷ</span></span>
+            <span class="stat-label">Chi trả bồi thường 2025</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="hero-stat-item">
+            <span class="stat-number">680<span class="stat-plus">+</span></span>
+            <span class="stat-label">Bệnh viện bảo lãnh viện phí</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="hero-stat-item">
+            <span class="stat-number">99.4<span class="stat-plus">%</span></span>
+            <span class="stat-label">Tỷ lệ hài lòng bồi thường</span>
+          </div>
+        </div>
+
+        <div class="hero-cta-group">
+          <a href="#calculator" class="btn btn-primary btn-lg">
+            <span>Tính phí bảo hiểm trực tuyến</span>
+            <i class="ph ph-calculator"></i>
+          </a>
+          <a href="#guide" class="btn btn-ghost btn-lg">
+            <i class="ph-fill ph-play-circle"></i>
+            <span>Xem quy trình 4 bước mua</span>
+          </a>
+        </div>
+
+        <div class="hero-trust-bar">
+          <span class="trust-title">Bảo lãnh viện phí trực tiếp tại:</span>
+          <div class="trust-logos">
+            <span class="trust-tag">Bệnh viện Vinmec</span>
+            <span class="trust-tag">Bệnh viện FV</span>
+            <span class="trust-tag">Bệnh viện Việt Pháp</span>
+            <span class="trust-tag">Bệnh viện Hoàn Mỹ</span>
+            <span class="trust-tag">Bệnh viện Tâm Anh</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── INTERACTIVE QUICK QUOTE CALCULATOR ─── -->
+      <div class="hero-calculator-wrap" id="calculator">
+        <div class="calc-card">
+          <div class="calc-card-header">
+            <div class="calc-badge">Công Cụ Ước Tính Phí</div>
+            <h3 class="calc-title">Báo Giá Nhanh Trong 30 Giây</h3>
+            <p class="calc-desc">Tự do chọn dòng sản phẩm và mức bảo vệ phù hợp với ngân sách gia đình</p>
+          </div>
+
+          <form id="quickCalcForm" class="calc-form" onsubmit="return false;">
+            <div class="form-group">
+              <label for="insType"><i class="ph ph-shield"></i> Loại hình bảo hiểm</label>
+              <select id="insType" class="calc-select">
+                <option value="health" selected>Bảo hiểm Sức Khỏe Toàn Diện (CarePlus)</option>
+                <option value="life">Bảo hiểm Nhân Thọ & Hưu Trí (An Thịnh)</option>
+                <option value="auto">Bảo hiểm Vật Chất Ô Tô (AutoCare)</option>
+                <option value="travel">Bảo hiểm Du Lịch Quốc Tế (GlobeSecure)</option>
+                <option value="business">Bảo hiểm Tài Sản Doanh Nghiệp (BizShield)</option>
+              </select>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="insAge"><i class="ph ph-user"></i> Độ tuổi người được bảo hiểm</label>
+                <select id="insAge" class="calc-select">
+                  <option value="child">0 - 17 tuổi (Trẻ em)</option>
+                  <option value="young" selected>18 - 35 tuổi (Thanh niên)</option>
+                  <option value="mid">36 - 50 tuổi (Trung niên)</option>
+                  <option value="senior">51 - 65 tuổi (Cao niên)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="insGender"><i class="ph ph-gender-intersex"></i> Giới tính</label>
+                <select id="insGender" class="calc-select">
+                  <option value="male" selected>Nam</option>
+                  <option value="female">Nữ</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="label-with-val">
+                <label for="coverageLimit"><i class="ph ph-coins"></i> Hạn mức bảo vệ tối đa / năm</label>
+                <span id="coverageValueLabel" class="val-highlight">1.000.000.000 đ</span>
+              </div>
+              <input type="range" id="coverageLimit" min="200" max="2000" step="100" value="1000" class="calc-range" />
+              <div class="range-marks">
+                <span>200 Triệu</span>
+                <span>1 Tỷ</span>
+                <span>2 Tỷ</span>
+              </div>
+            </div>
+
+            <div class="calc-result-box">
+              <div class="result-label">Phí bảo hiểm ước tính:</div>
+              <div class="result-price-wrap">
+                <span class="price-val" id="estimatedPrice">385.000</span>
+                <span class="price-unit">VNĐ / tháng</span>
+              </div>
+              <p class="result-note"><i class="ph-fill ph-check-circle"></i> Đã bao gồm quyền lợi nội trú, ngoại trú và cấp cứu 24/7</p>
+            </div>
+
+            <div class="calc-action-row">
+              <button type="button" class="btn btn-primary btn-block" id="btnConsultNow">
+                <span>Đăng ký nhận bảng minh họa chi tiết</span>
+                <i class="ph ph-paper-plane-tilt"></i>
+              </button>
+            </div>
+            <p class="calc-guarantee"><i class="ph ph-lock-key"></i> Cam kết bảo mật thông tin 100% · Không gọi làm phiền</p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── ABOUT COMPANY SECTION ─── -->
+  <section class="section about-section" id="about">
+    <div class="container">
+      <div class="section-header text-center">
+        <span class="section-tag">Về Aegis Bảo An</span>
+        <h2 class="section-title">25 Năm Đi Cùng Hàng Triệu Mái Ấm Gia Đình Việt</h2>
+        <p class="section-subtitle">
+          Thành lập năm 2001, Aegis Bảo An là định chế bảo hiểm tài chính hàng đầu khu vực, được Bộ Tài Chính Việt Nam cấp phép hoạt động và quản lý bởi tập đoàn Aegis Financial Group (Singapore).
+        </p>
+      </div>
+
+      <div class="about-grid">
+        <div class="about-card highlight">
+          <div class="about-icon"><i class="ph-duotone ph-trophy"></i></div>
+          <h3>Top 3 Doanh Nghiệp Bảo Hiểm Uy Tín</h3>
+          <p>Liên tục được bình chọn giải thưởng Doanh Nghiệp Bảo Hiểm Tiêu Biểu Việt Nam (Vietnam Insurance Awards) 5 năm liền 2021 - 2025.</p>
+          <div class="card-metric">
+            <strong>25+</strong>
+            <span>Năm kinh nghiệm thị trường</span>
+          </div>
+        </div>
+
+        <div class="about-card">
+          <div class="about-icon"><i class="ph-duotone ph-vault"></i></div>
+          <h3>Năng Lực Tài Chính Vững Chắc</h3>
+          <p>Vốn điều lệ hơn 12.500 tỷ đồng. Tỷ lệ biên khả năng thanh toán đạt 280%, vượt xa yêu cầu khắt khe của cơ quan quản lý nhà nước.</p>
+          <div class="card-metric">
+            <strong>12.500 Tỷ</strong>
+            <span>Vốn điều lệ cam kết</span>
+          </div>
+        </div>
+
+        <div class="about-card">
+          <div class="about-icon"><i class="ph-duotone ph-device-mobile-camera"></i></div>
+          <h3>Hệ Sinh Thái Số E-Claim 24h</h3>
+          <p>Ứng dụng Aegis Care cho phép kê khai bồi thường trực tuyến chỉ bằng ảnh chụp điện thoại. 85% hồ sơ được chi trả tự động trong ngày.</p>
+          <div class="card-metric">
+            <strong>24 Giờ</strong>
+            <span>Thời gian thanh toán trung bình</span>
+          </div>
+        </div>
+
+        <div class="about-card">
+          <div class="about-icon"><i class="ph-duotone ph-handshake"></i></div>
+          <h3>Mạng Lưới Chi Nhánh Phủ Rộng</h3>
+          <p>Hiện diện tại 63 tỉnh thành với hơn 140 văn phòng tổng đại lý và 22.000 chuyên viên tư vấn tài chính chuyên nghiệp, chuẩn mực.</p>
+          <div class="card-metric">
+            <strong>63</strong>
+            <span>Tỉnh thành có mặt</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── PRODUCTS CATALOG SECTION ─── -->
+  <section class="section products-section" id="products">
+    <div class="container">
+      <div class="section-header text-center">
+        <span class="section-tag">Danh Mục Sản Phẩm</span>
+        <h2 class="section-title">Giải Pháp Bảo Hiểm May Đo Cho Mọi Nhu Cầu</h2>
+        <p class="section-subtitle">
+          Từ bảo vệ sức khỏe y tế, xây dựng quỹ tương lai con cái đến bảo vệ tài sản doanh nghiệp. Minh bạch quyền lợi, mức phí tối ưu.
+        </p>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="product-tabs" role="tablist">
+        <button class="tab-btn active" data-filter="all">Tất cả sản phẩm</button>
+        <button class="tab-btn" data-filter="health"><i class="ph ph-heartbeat"></i> Sức Khỏe</button>
+        <button class="tab-btn" data-filter="life"><i class="ph ph-shield-plus"></i> Nhân Thọ</button>
+        <button class="tab-btn" data-filter="auto"><i class="ph ph-car"></i> Xe Cơ Giới</button>
+        <button class="tab-btn" data-filter="travel"><i class="ph ph-airplane-tilt"></i> Du Lịch</button>
+        <button class="tab-btn" data-filter="business"><i class="ph ph-buildings"></i> Doanh Nghiệp</button>
+      </div>
+
+      <div class="products-grid">
+        <!-- Product 1: Health CarePlus -->
+        <article class="prod-card" data-category="health">
+          <div class="prod-badge-rec">Bán chạy nhất</div>
+          <div class="prod-header">
+            <div class="prod-icon health"><i class="ph-duotone ph-first-aid-kit"></i></div>
+            <div class="prod-title-wrap">
+              <span class="prod-cat">Bảo hiểm Sức Khỏe</span>
+              <h3 class="prod-title">Aegis CarePlus Toàn Diện</h3>
+            </div>
+          </div>
+          <p class="prod-desc">
+            Bảo vệ viện phí y tế cao cấp, tiếp cận các bệnh viện quốc tế hàng đầu mà không cần lo lắng về chi phí điều trị đắt đỏ.
+          </p>
+          <div class="prod-price-box">
+            <span class="price-prefix">Phí chỉ từ:</span>
+            <div class="price-num">320.000 <span>VNĐ / tháng</span></div>
+          </div>
+          <ul class="prod-features">
+            <li><i class="ph-fill ph-check-circle"></i> Hạn mức bảo vệ lên đến <strong>2 Tỷ đồng / năm</strong></li>
+            <li><i class="ph-fill ph-check-circle"></i> Bảo lãnh viện phí tại 680+ bệnh viện quốc tế (Vinmec, FV, Hoàn Mỹ...)</li>
+            <li><i class="ph-fill ph-check-circle"></i> Chi trả nội trú, phẫu thuật, ngoại trú, nha khoa & thai sản</li>
+            <li><i class="ph-fill ph-check-circle"></i> Không giới hạn số ngày nằm viện & phòng tiêu chuẩn đơn</li>
+            <li><i class="ph-fill ph-check-circle"></i> Cấp cứu khẩn cấp SOS toàn cầu 24/7</li>
+          </ul>
+          <div class="prod-actions">
+            <button class="btn btn-primary btn-block open-detail-modal" data-product="health">Xem Bảng Quyền Lợi</button>
+            <a href="#consult" class="btn btn-outline btn-block">Nhận Báo Giá Nhanh</a>
+          </div>
+        </article>
+
+        <!-- Product 2: Life An Thinh -->
+        <article class="prod-card" data-category="life">
+          <div class="prod-header">
+            <div class="prod-icon life"><i class="ph-duotone ph-coins"></i></div>
+            <div class="prod-title-wrap">
+              <span class="prod-cat">Bảo hiểm Nhân Thọ</span>
+              <h3 class="prod-title">An Thịnh Toàn Gia & Hưu Trí</h3>
+            </div>
+          </div>
+          <p class="prod-desc">
+            Giải pháp kép: Bảo vệ thu nhập người trụ cột trước mọi biến cố và tích lũy đầu tư sinh lời an toàn cho hưu trí an nhàn.
+          </p>
+          <div class="prod-price-box">
+            <span class="price-prefix">Phí chỉ từ:</span>
+            <div class="price-num">950.000 <span>VNĐ / tháng</span></div>
+          </div>
+          <ul class="prod-features">
+            <li><i class="ph-fill ph-check-circle"></i> Bảo vệ tài chính người trụ cột đến <strong>3 Tỷ đồng</strong></li>
+            <li><i class="ph-fill ph-check-circle"></i> Lãi suất cam kết tối thiểu và chia bảo tức lũy tích định kỳ</li>
+            <li><i class="ph-fill ph-check-circle"></i> Quỹ học vấn cho con cái tốt nghiệp đại học</li>
+            <li><i class="ph-fill ph-check-circle"></i> Miễn đóng phí khi mắc 88 bệnh lý nghiêm trọng</li>
+            <li><i class="ph-fill ph-check-circle"></i> Quyền linh hoạt rút tiền mặt sau năm thứ 3</li>
+          </ul>
+          <div class="prod-actions">
+            <button class="btn btn-primary btn-block open-detail-modal" data-product="life">Xem Bảng Quyền Lợi</button>
+            <a href="#consult" class="btn btn-outline btn-block">Nhận Báo Giá Nhanh</a>
+          </div>
+        </article>
+
+        <!-- Product 3: Auto AutoCare -->
+        <article class="prod-card" data-category="auto">
+          <div class="prod-header">
+            <div class="prod-icon auto"><i class="ph-duotone ph-car"></i></div>
+            <div class="prod-title-wrap">
+              <span class="prod-cat">Bảo hiểm Xe Cơ Giới</span>
+              <h3 class="prod-title">AutoCare Vật Chất Ô Tô</h3>
+            </div>
+          </div>
+          <p class="prod-desc">
+            Bảo vệ toàn diện cho xế cưng: va quẹt, tai nạn, cháy nổ, ngập nước (thủy kích) và cứu hộ miễn phí không giới hạn khoảng cách.
+          </p>
+          <div class="prod-price-box">
+            <span class="price-prefix">Phí chỉ từ:</span>
+            <div class="price-num">450.000 <span>VNĐ / tháng</span></div>
+          </div>
+          <ul class="prod-features">
+            <li><i class="ph-fill ph-check-circle"></i> Đền bù 100% giá trị tổn thất vật chất thân vỏ xe</li>
+            <li><i class="ph-fill ph-check-circle"></i> <strong>Bảo hiểm thủy kích</strong> do ngập nước đô thị</li>
+            <li><i class="ph-fill ph-check-circle"></i> Cứu hộ 24/7 đến hiện trường trong vòng 30 phút</li>
+            <li><i class="ph-fill ph-check-circle"></i> Sửa chữa tại garage chính hãng (Toyota, Mercedes, Hyundai...)</li>
+            <li><i class="ph-fill ph-check-circle"></i> Bảo hiểm mất cắp bộ phận (gương, logo, radar)</li>
+          </ul>
+          <div class="prod-actions">
+            <button class="btn btn-primary btn-block open-detail-modal" data-product="auto">Xem Bảng Quyền Lợi</button>
+            <a href="#consult" class="btn btn-outline btn-block">Nhận Báo Giá Nhanh</a>
+          </div>
+        </article>
+
+        <!-- Product 4: Travel GlobeSecure -->
+        <article class="prod-card" data-category="travel">
+          <div class="prod-header">
+            <div class="prod-icon travel"><i class="ph-duotone ph-airplane-tilt"></i></div>
+            <div class="prod-title-wrap">
+              <span class="prod-cat">Bảo hiểm Du Lịch</span>
+              <h3 class="prod-title">GlobeSecure Quốc Tế</h3>
+            </div>
+          </div>
+          <p class="prod-desc">
+            Chứng nhận bảo hiểm hợp chuẩn xin Visa Schengen, Châu Âu, Mỹ, Nhật Bản, Hàn Quốc. Cấp chứng nhận điện tử tức thì sau 5 phút.
+          </p>
+          <div class="prod-price-box">
+            <span class="price-prefix">Phí chỉ từ:</span>
+            <div class="price-num">120.000 <span>VNĐ / chuyến</span></div>
+          </div>
+          <ul class="prod-features">
+            <li><i class="ph-fill ph-check-circle"></i> Chi phí y tế tai nạn & ốm đau nước ngoài đến <strong>2,5 Tỷ đồng</strong></li>
+            <li><i class="ph-fill ph-check-circle"></i> Bồi thường trễ chuyến bay (>4h) & thất lạc hành lý</li>
+            <li><i class="ph-fill ph-check-circle"></i> Chi trả hủy chuyến bay do tình huống bất khả kháng</li>
+            <li><i class="ph-fill ph-check-circle"></i> Vận chuyển y tế cấp cứu quốc tế không giới hạn chi phí</li>
+            <li><i class="ph-fill ph-check-circle"></i> Đạt 100% chuẩn quy định thị thực các đại sứ quán</li>
+          </ul>
+          <div class="prod-actions">
+            <button class="btn btn-primary btn-block open-detail-modal" data-product="travel">Xem Bảng Quyền Lợi</button>
+            <a href="#consult" class="btn btn-outline btn-block">Nhận Báo Giá Nhanh</a>
+          </div>
+        </article>
+
+        <!-- Product 5: Business Shield -->
+        <article class="prod-card" data-category="business">
+          <div class="prod-header">
+            <div class="prod-icon business"><i class="ph-duotone ph-buildings"></i></div>
+            <div class="prod-title-wrap">
+              <span class="prod-cat">Bảo hiểm Doanh Nghiệp</span>
+              <h3 class="prod-title">BizShield Tài Sản & Cháy Nổ</h3>
+            </div>
+          </div>
+          <p class="prod-desc">
+            Lá chắn an toàn cho nhà xưởng, văn phòng, kho hàng, máy móc thiết bị và bảo vệ trách nhiệm pháp lý trước bên thứ ba.
+          </p>
+          <div class="prod-price-box">
+            <span class="price-prefix">Phí chỉ từ:</span>
+            <div class="price-num">1.200.000 <span>VNĐ / tháng</span></div>
+          </div>
+          <ul class="prod-features">
+            <li><i class="ph-fill ph-check-circle"></i> Bảo hiểm cháy nổ bắt buộc theo quy định Nghị định 97/NĐ-CP</li>
+            <li><i class="ph-fill ph-check-circle"></i> Bảo vệ thiệt hại tài sản do bão lũ, sét đánh, sự cố điện</li>
+            <li><i class="ph-fill ph-check-circle"></i> Bồi thường gián đoạn hoạt động sản xuất kinh doanh</li>
+            <li><i class="ph-fill ph-check-circle"></i> Bảo hiểm tai nạn lao động & sức khỏe nhân viên tập thể</li>
+            <li><i class="ph-fill ph-check-circle"></i> Đội ngũ kỹ sư khảo sát rủi ro an toàn PCCC miễn phí</li>
+          </ul>
+          <div class="prod-actions">
+            <button class="btn btn-primary btn-block open-detail-modal" data-product="business">Xem Bảng Quyền Lợi</button>
+            <a href="#consult" class="btn btn-outline btn-block">Nhận Báo Giá Nhanh</a>
+          </div>
+        </article>
+
+        <!-- Product 6: Senior Care -->
+        <article class="prod-card" data-category="health">
+          <div class="prod-header">
+            <div class="prod-icon health"><i class="ph-duotone ph-bandaids"></i></div>
+            <div class="prod-title-wrap">
+              <span class="prod-cat">Bảo hiểm Sức Khỏe Cha Mẹ</span>
+              <h3 class="prod-title">SilverCare Người Cao Tuổi</h3>
+            </div>
+          </div>
+          <p class="prod-desc">
+            Chương trình đặc biệt bảo vệ cha mẹ từ 50 - 75 tuổi. Không yêu cầu khám sức khỏe đầu vào phiền hà, chấp nhận bệnh nền có sẵn.
+          </p>
+          <div class="prod-price-box">
+            <span class="price-prefix">Phí chỉ từ:</span>
+            <div class="price-num">480.000 <span>VNĐ / tháng</span></div>
+          </div>
+          <ul class="prod-features">
+            <li><i class="ph-fill ph-check-circle"></i> Tiếp nhận người tham gia bảo hiểm đến <strong>75 tuổi</strong></li>
+            <li><i class="ph-fill ph-check-circle"></i> Chi trả điều trị bệnh tim mạch, huyết áp, tiểu đường sau thời gian chờ</li>
+            <li><i class="ph-fill ph-check-circle"></i> Viện phí giường bệnh & điều dưỡng tại nhà</li>
+            <li><i class="ph-fill ph-check-circle"></i> Dịch vụ đặt lịch khám ưu tiên tại các bệnh viện tuyến đầu</li>
+            <li><i class="ph-fill ph-check-circle"></i> Đường dây hỗ trợ tư vấn bác sĩ gia đình trực tuyến 24/7</li>
+          </ul>
+          <div class="prod-actions">
+            <button class="btn btn-primary btn-block open-detail-modal" data-product="silver">Xem Bảng Quyền Lợi</button>
+            <a href="#consult" class="btn btn-outline btn-block">Nhận Báo Giá Nhanh</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── PLAN COMPARISON MATRIX ─── -->
+  <section class="section compare-section" id="compare">
+    <div class="container">
+      <div class="section-header text-center">
+        <span class="section-tag">Bảng So Sánh Quyền Lợi</span>
+        <h2 class="section-title">So Sánh 3 Gói Bảo Hiểm Sức Khỏe Tiêu Biểu</h2>
+        <p class="section-subtitle">Minh bạch đến từng điều khoản. Không chi phí ẩn, không thủ tục phức tạp.</p>
+      </div>
+
+      <div class="compare-table-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th class="col-criteria">Quyền Lợi Bảo Hiểm</th>
+              <th class="col-tier">
+                <div class="tier-head">
+                  <span class="tier-name">Gói Cơ Bản</span>
+                  <span class="tier-price">250.000 đ/th</span>
+                </div>
+              </th>
+              <th class="col-tier highlighted">
+                <div class="tier-head">
+                  <span class="tier-badge">Khuyên Dùng</span>
+                  <span class="tier-name">Gói Vàng (Gold)</span>
+                  <span class="tier-price">480.000 đ/th</span>
+                </div>
+              </th>
+              <th class="col-tier">
+                <div class="tier-head">
+                  <span class="tier-name">Gói Kim Cương (VIP)</span>
+                  <span class="tier-price">890.000 đ/th</span>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Hạn mức bảo vệ tối đa / năm</strong></td>
+              <td>300 Triệu đồng</td>
+              <td class="cell-hl"><strong>1 Tỷ đồng</strong></td>
+              <td><strong>2 Tỷ đồng</strong></td>
+            </tr>
+            <tr>
+              <td>Chi phí nằm viện nội trú & phẫu thuật</td>
+              <td>Chi trả 100% thực tế</td>
+              <td class="cell-hl">Chi trả 100% thực tế</td>
+              <td>Chi trả 100% thực tế</td>
+            </tr>
+            <tr>
+              <td>Tiền phòng & giường / ngày</td>
+              <td>1.500.000 đ/ngày</td>
+              <td class="cell-hl">3.500.000 đ/ngày (Phòng riêng)</td>
+              <td>Không giới hạn (Phòng VIP/Suite)</td>
+            </tr>
+            <tr>
+              <td>Khám & Điều trị Ngoại Trú (Khám, xét nghiệm, thuốc)</td>
+              <td>10 Triệu/năm</td>
+              <td class="cell-hl"><strong>25 Triệu/năm</strong></td>
+              <td><strong>50 Triệu/năm</strong></td>
+            </tr>
+            <tr>
+              <td>Chăm sóc Thai sản & Sinh con trọn gói</td>
+              <td><i class="ph ph-x-circle text-muted"></i> Không áp dụng</td>
+              <td class="cell-hl">30 Triệu/năm</td>
+              <td>60 Triệu/năm</td>
+            </tr>
+            <tr>
+              <td>Chăm sóc Nha khoa (Trám, nhổ răng, lấy cao)</td>
+              <td><i class="ph ph-x-circle text-muted"></i> Không áp dụng</td>
+              <td class="cell-hl">5 Triệu/năm</td>
+              <td>15 Triệu/năm</td>
+            </tr>
+            <tr>
+              <td>Phạm vi bảo lãnh viện phí</td>
+              <td>Bệnh viện công lập toàn quốc</td>
+              <td class="cell-hl"><strong>680+ Bệnh viện công & tư quốc tế</strong></td>
+              <td><strong>Toàn cầu (Châu Á & Toàn Thế Giới)</strong></td>
+            </tr>
+            <tr>
+              <td>Dịch vụ xe cứu thương khẩn cấp</td>
+              <td>Hỗ trợ 2.000.000 đ</td>
+              <td class="cell-hl">Miễn phí 100%</td>
+              <td>Miễn phí 100% + Cứu hộ trực thăng</td>
+            </tr>
+            <tr>
+              <td>Hành động</td>
+              <td><a href="#consult" class="btn btn-outline btn-sm">Chọn Gói</a></td>
+              <td class="cell-hl"><a href="#consult" class="btn btn-primary btn-sm">Chọn Gói Này</a></td>
+              <td><a href="#consult" class="btn btn-outline btn-sm">Chọn Gói</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── REVIEWS & REAL CLAIM STORIES ─── -->
+  <section class="section reviews-section" id="reviews">
+    <div class="container">
+      <div class="section-header text-center">
+        <span class="section-tag">Đánh Giá & Trải Nghiệm Khách Hàng</span>
+        <h2 class="section-title">Câu Chuyện Chi Trả Bồi Thường Thực Tế</h2>
+        <p class="section-subtitle">
+          Niềm tin được khẳng định qua hành động. Dưới đây là những khách hàng đã nhận tiền bồi thường nhanh chóng và minh bạch từ Aegis Bảo An.
+        </p>
+      </div>
+
+      <div class="reviews-overview-box">
+        <div class="rev-score-big">
+          <span class="score-num">4.9</span>
+          <div class="stars-gold">
+            <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+          </div>
+          <span class="score-count">Dựa trên 18.520+ đánh giá xác thực</span>
+        </div>
+        <div class="rev-bars">
+          <div class="bar-row">
+            <span>5 sao</span>
+            <div class="bar-track"><div class="bar-fill" style="width: 92%"></div></div>
+            <span>92%</span>
+          </div>
+          <div class="bar-row">
+            <span>4 sao</span>
+            <div class="bar-track"><div class="bar-fill" style="width: 6%"></div></div>
+            <span>6%</span>
+          </div>
+          <div class="bar-row">
+            <span>3 sao</span>
+            <div class="bar-track"><div class="bar-fill" style="width: 1.5%"></div></div>
+            <span>1.5%</span>
+          </div>
+        </div>
+        <div class="rev-badges">
+          <div class="rb-item"><i class="ph-fill ph-clock-countdown"></i> <strong>24h</strong> Duyệt hồ sơ</div>
+          <div class="rb-item"><i class="ph-fill ph-shield-check"></i> <strong>100%</strong> Đúng điều khoản hợp đồng</div>
+          <div class="rb-item"><i class="ph-fill ph-chats-circle"></i> <strong>24/7</strong> Hỗ trợ tận tâm</div>
+        </div>
+      </div>
+
+      <!-- Real Claim Case Studies Grid -->
+      <div class="claims-grid">
+        <article class="claim-card">
+          <div class="claim-tag-status"><i class="ph-fill ph-check-circle"></i> Đã chi trả bồi thường</div>
+          <div class="claim-amount">385.000.000 VNĐ</div>
+          <div class="claim-type">Phẫu thuật tim nội trú tại Vinmec Times City</div>
+          <p class="claim-quote">
+            "Khi bác sĩ chỉ định phẫu thuật đặt stent tim gấp, gia đình tôi vô cùng lo lắng về chi phí. May mắn có thẻ Aegis CarePlus Gold, bệnh viện đã bảo lãnh 100% viện phí ngay tại quầy thu ngân. Chúng tôi không phải ứng trước một đồng nào!"
+          </p>
+          <div class="claim-user">
+            <div class="user-avatar" style="background: #0284c7">TH</div>
+            <div class="user-meta">
+              <strong>Anh Trần Quốc Huy</strong>
+              <span>Kỹ sư CNTT · Hà Nội · HĐ: AG-HN-88492</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="claim-card">
+          <div class="claim-tag-status"><i class="ph-fill ph-check-circle"></i> Đã chi trả bồi thường</div>
+          <div class="claim-amount">68.500.000 VNĐ</div>
+          <div class="claim-type">Thai sản & sinh con trọn gói tại BV Quốc Tế Hạnh Phúc</div>
+          <p class="claim-quote">
+            "Mình mua gói thai sản từ khi chuẩn bị có em bé. Đến ngày sinh, dịch vụ bảo lãnh rất êm đềm, phòng riêng nghỉ dưỡng thoải mái. Xuất viện nhân viên bảo hiểm gọi điện hỏi thăm chu đáo và hướng dẫn thủ tục cực nhanh."
+          </p>
+          <div class="claim-user">
+            <div class="user-avatar" style="background: #e11d48">ML</div>
+            <div class="user-meta">
+              <strong>Chị Nguyễn Mai Lan</strong>
+              <span>Giám đốc Marketing · TP.HCM · HĐ: AG-SG-44109</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="claim-card">
+          <div class="claim-tag-status"><i class="ph-fill ph-check-circle"></i> Đã chi trả bồi thường</div>
+          <div class="claim-amount">142.000.000 VNĐ</div>
+          <div class="claim-type">Cứu hộ thủy kích ngập nước xe Mercedes C200</div>
+          <p class="claim-quote">
+            "Đợt bão vừa rồi đường ngập sâu khiến xe tôi chết máy. Gọi hotline cứu hộ Aegis lúc 11h đêm, đúng 25 phút sau xe cứu hộ đã có mặt cẩu về xưởng chính hãng. Giám định viên làm việc chuyên nghiệp, xe được đại tu thay linh kiện mới tinh."
+          </p>
+          <div class="claim-user">
+            <div class="user-avatar" style="background: #16a34a">HN</div>
+            <div class="user-meta">
+              <strong>Anh Lê Hoàng Nam</strong>
+              <span>Doanh nhân · Đà Nẵng · HĐ: AG-DN-12093</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── 4-STEP BUYING GUIDE SECTION ─── -->
+  <section class="section guide-section" id="guide">
+    <div class="container">
+      <div class="section-header text-center">
+        <span class="section-tag">Hướng Dẫn Mua Bảo Hiểm</span>
+        <h2 class="section-title">4 Bước Sở Hữu Hợp Đồng Bảo Hiểm Trong 5 Phút</h2>
+        <p class="section-subtitle">
+          Quy trình 100% trực tuyến hiện đại. Cấp Giấy chứng nhận bảo hiểm điện tử có giá trị pháp lý tương đương văn bản giấy.
+        </p>
+      </div>
+
+      <div class="steps-flow">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <div class="step-icon"><i class="ph-duotone ph-magnifying-glass"></i></div>
+          <h3>Chọn Gói & Nhận Báo Giá</h3>
+          <p>Sử dụng công cụ tính phí trực tuyến để chọn gói quyền lợi phù hợp độ tuổi, giới tính và ngân sách tài chính của gia đình bạn.</p>
+          <span class="step-duration"><i class="ph ph-timer"></i> Mất 1 phút</span>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <div class="step-icon"><i class="ph-duotone ph-note-pencil"></i></div>
+          <h3>Kê Khai Thông Tin Trực Tuyến</h3>
+          <p>Điền thông tin cá nhân (CCCD) và trả lời bảng câu hỏi sức khỏe online đơn giản, bảo mật SSL mã hóa 256-bit chuẩn ngân hàng.</p>
+          <span class="step-duration"><i class="ph ph-timer"></i> Mất 2 phút</span>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <div class="step-icon"><i class="ph-duotone ph-credit-card"></i></div>
+          <h3>Ký Điện Tử & Thanh Toán Đa Kênh</h3>
+          <p>Ký hợp đồng bằng mã OTP gửi về điện thoại. Thanh toán linh hoạt qua VietQR, thẻ tín dụng, ATM hoặc trả góp lãi suất 0%.</p>
+          <span class="step-duration"><i class="ph ph-timer"></i> Mất 1 phút</span>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">04</div>
+          <div class="step-icon"><i class="ph-duotone ph-device-mobile"></i></div>
+          <h3>Nhận Thẻ Bảo Lãnh Điện Tử</h3>
+          <p>Nhận Giấy chứng nhận bảo hiểm có chữ ký số qua Email và kích hoạt thẻ bảo lãnh viện phí số ngay trên ứng dụng Aegis Care.</p>
+          <span class="step-duration"><i class="ph ph-check"></i> Kích hoạt ngay lập tức</span>
+        </div>
+      </div>
+
+      <!-- Claim Guide Box -->
+      <div class="claim-guide-banner" id="claim">
+        <div class="cgb-content">
+          <div class="cgb-badge">Thủ tục bồi thường 1 chạm</div>
+          <h3 class="cgb-title">Quy Trình Yêu Cầu Bồi Thường Siêu Tốc 24 Giờ</h3>
+          <p class="cgb-desc">
+            Không cần nộp hóa đơn giấy gốc đối với các khoản bồi thường dưới 10 triệu đồng. Chỉ cần mở App Aegis Care, chụp ảnh hóa đơn thuốc, kết quả khám và nhận tiền chuyển khoản trực tiếp vào tài khoản ngân hàng trong vòng 24 giờ làm việc.
+          </p>
+          <div class="cgb-actions">
+            <a href="#consult" class="btn btn-primary">Tải Mẫu Đơn Bồi Thường</a>
+            <a href="tel:19006868" class="btn btn-outline"><i class="ph ph-phone-call"></i> Hỗ trợ Hotline 1900 6868</a>
+          </div>
+        </div>
+        <div class="cgb-visual">
+          <div class="mockup-phone">
+            <div class="phone-bar"></div>
+            <div class="phone-screen">
+              <div class="ps-header">
+                <i class="ph ph-shield-check"></i> E-Claim Thành Công
+              </div>
+              <div class="ps-amount">+12.450.000 đ</div>
+              <p class="ps-note">Đã chuyển khoản bồi thường vào TK Techcombank</p>
+              <div class="ps-status-pill">Thời gian duyệt: 4 giờ 15 phút</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── HOSPITAL LOCATOR SECTION ─── -->
+  <section class="section hospitals-section" id="hospitals">
+    <div class="container">
+      <div class="section-header text-center">
+        <span class="section-tag">Mạng Lưới Y Tế Liên Kết</span>
+        <h2 class="section-title">Hơn 680+ Bệnh Viện & Phòng Khám Bảo Lãnh Toàn Quốc</h2>
+        <p class="section-subtitle">Chỉ cần xuất trình CCCD và Thẻ bảo hiểm Aegis số tại quầy thu ngân để được bảo lãnh viện phí trực tiếp không cần thanh toán tiền mặt.</p>
+      </div>
+
+      <div class="hospital-filter-bar">
+        <div class="search-input-wrap">
+          <i class="ph ph-magnifying-glass"></i>
+          <input type="text" id="hospitalSearch" placeholder="Tìm tên bệnh viện hoặc quận/huyện..." />
+        </div>
+        <div class="city-filter-buttons">
+          <button class="city-btn active" data-city="all">Tất cả (680+)</button>
+          <button class="city-btn" data-city="hanoi">Hà Nội</button>
+          <button class="city-btn" data-city="hcm">TP. Hồ Chí Minh</button>
+          <button class="city-btn" data-city="danang">Đà Nẵng</button>
+          <button class="city-btn" data-city="cantho">Cần Thơ</button>
+        </div>
+      </div>
+
+      <div class="hospitals-grid" id="hospitalsGrid">
+        <div class="hosp-card" data-city="hcm">
+          <div class="hosp-header">
+            <h4>Bệnh Viện Quốc Tế Vinmec Central Park</h4>
+            <span class="hosp-badge">Nội trú & Ngoại trú</span>
+          </div>
+          <p class="hosp-address"><i class="ph ph-map-pin"></i> 208 Nguyễn Hữu Cảnh, P. 22, Q. Bình Thạnh, TP.HCM</p>
+          <div class="hosp-footer">
+            <span class="hosp-phone"><i class="ph ph-phone"></i> 028 3622 1166</span>
+            <span class="hosp-guarantee"><i class="ph-fill ph-check-circle"></i> Bảo lãnh tức thì</span>
+          </div>
+        </div>
+
+        <div class="hosp-card" data-city="hanoi">
+          <div class="hosp-header">
+            <h4>Bệnh Viện Đa Khoa Quốc Tế Vinmec Times City</h4>
+            <span class="hosp-badge">Nội trú & Ngoại trú</span>
+          </div>
+          <p class="hosp-address"><i class="ph ph-map-pin"></i> 458 Minh Khai, P. Vĩnh Tuy, Q. Hai Bà Trưng, Hà Nội</p>
+          <div class="hosp-footer">
+            <span class="hosp-phone"><i class="ph ph-phone"></i> 024 3974 3556</span>
+            <span class="hosp-guarantee"><i class="ph-fill ph-check-circle"></i> Bảo lãnh tức thì</span>
+          </div>
+        </div>
+
+        <div class="hosp-card" data-city="hcm">
+          <div class="hosp-header">
+            <h4>Bệnh Viện FV (Franco-Vietnamese Hospital)</h4>
+            <span class="hosp-badge">Nội trú & Ngoại trú</span>
+          </div>
+          <p class="hosp-address"><i class="ph ph-map-pin"></i> 6 Nguyễn Lương Bằng, Tân Phú, Quận 7, TP.HCM</p>
+          <div class="hosp-footer">
+            <span class="hosp-phone"><i class="ph ph-phone"></i> 028 5411 3333</span>
+            <span class="hosp-guarantee"><i class="ph-fill ph-check-circle"></i> Bảo lãnh tức thì</span>
+          </div>
+        </div>
+
+        <div class="hosp-card" data-city="hanoi">
+          <div class="hosp-header">
+            <h4>Bệnh Viện Việt Pháp Hà Nội (HFH)</h4>
+            <span class="hosp-badge">Nội trú & Ngoại trú</span>
+          </div>
+          <p class="hosp-address"><i class="ph ph-map-pin"></i> Số 1 Phương Mai, Q. Đống Đa, Hà Nội</p>
+          <div class="hosp-footer">
+            <span class="hosp-phone"><i class="ph ph-phone"></i> 024 3577 1100</span>
+            <span class="hosp-guarantee"><i class="ph-fill ph-check-circle"></i> Bảo lãnh tức thì</span>
+          </div>
+        </div>
+
+        <div class="hosp-card" data-city="danang">
+          <div class="hosp-header">
+            <h4>Bệnh Viện Đa Khoa Hoàn Mỹ Đà Nẵng</h4>
+            <span class="hosp-badge">Nội trú & Ngoại trú</span>
+          </div>
+          <p class="hosp-address"><i class="ph ph-map-pin"></i> 291 Nguyễn Văn Linh, P. Thạc Gián, Q. Thanh Khê, Đà Nẵng</p>
+          <div class="hosp-footer">
+            <span class="hosp-phone"><i class="ph ph-phone"></i> 0236 3650 676</span>
+            <span class="hosp-guarantee"><i class="ph-fill ph-check-circle"></i> Bảo lãnh tức thì</span>
+          </div>
+        </div>
+
+        <div class="hosp-card" data-city="cantho">
+          <div class="hosp-header">
+            <h4>Bệnh Viện Quốc Tế Phương Châu Cần Thơ</h4>
+            <span class="hosp-badge">Nội trú & Ngoại trú</span>
+          </div>
+          <p class="hosp-address"><i class="ph ph-map-pin"></i> 300 Nguyễn Văn Cừ nối dài, P. An Khánh, Q. Ninh Kiều, Cần Thơ</p>
+          <div class="hosp-footer">
+            <span class="hosp-phone"><i class="ph ph-phone"></i> 1900 54 54 66</span>
+            <span class="hosp-guarantee"><i class="ph-fill ph-check-circle"></i> Bảo lãnh tức thì</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FAQ ACCORDION SECTION ─── -->
+  <section class="section faq-section" id="faq">
+    <div class="container">
+      <div class="section-header text-center">
+        <span class="section-tag">Giải Đáp Thắc Mắc</span>
+        <h2 class="section-title">Các Câu Hỏi Thường Gặp Về Bảo Hiểm</h2>
+        <p class="section-subtitle">Tất cả những gì bạn cần biết trước khi ký kết hợp đồng bảo hiểm.</p>
+      </div>
+
+      <div class="faq-accordion" id="faqAccordion">
+        <div class="faq-item active">
+          <button class="faq-question">
+            <span>Thời gian chờ áp dụng cho các bệnh lý là bao lâu?</span>
+            <i class="ph ph-caret-down"></i>
+          </button>
+          <div class="faq-answer">
+            <p>
+              Đối với bảo hiểm sức khỏe Aegis CarePlus:
+              <br />• <strong>Tai nạn:</strong> Có hiệu lực ngay lập tức sau 24h cấp hợp đồng.
+              <br />• <strong>Bệnh thông thường (cảm sốt, viêm họng, đau ruột thừa...):</strong> Áp dụng thời gian chờ 30 ngày.
+              <br />• <strong>Bệnh đặc biệt (ung thư, tim mạch, u bướu) & bệnh có sẵn:</strong> Áp dụng thời gian chờ 365 ngày (1 năm).
+              <br />• <strong>Thai sản:</strong> Áp dụng thời gian chờ 270 ngày (9 tháng) đối với sinh con.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>Tôi có thể mua một hợp đồng bảo hiểm cho cả gia đình được không?</span>
+            <i class="ph ph-caret-down"></i>
+          </button>
+          <div class="faq-answer">
+            <p>
+              Hoàn toàn được! Gói <strong>Gia Đình Vun Đắp</strong> cho phép người đứng tên hợp đồng gộp chung vợ/chồng và các con dưới 18 tuổi vào một hợp đồng duy nhất. Đặc biệt, gia đình từ 3 thành viên trở lên được chiết khấu giảm trực tiếp 15% tổng phí bảo hiểm hàng năm.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>Nếu tôi đi khám tại bệnh viện không nằm trong danh sách bảo lãnh thì sao?</span>
+            <i class="ph ph-caret-down"></i>
+          </button>
+          <div class="faq-answer">
+            <p>
+              Bạn vẫn được chi trả 100% quyền lợi theo điều khoản hợp đồng! Bạn chỉ cần thanh toán viện phí trước, lấy hóa đơn điện tử hoặc phiếu thu kèm bảng kê chi phí điều trị. Sau đó mở App Aegis Care, chụp ảnh giấy tờ và nộp hồ sơ e-Claim. Chúng tôi sẽ hoàn trả tiền về tài khoản ngân hàng của bạn trong 24 giờ.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>Tôi có bị tăng phí hoặc hủy hợp đồng nếu năm trước yêu cầu bồi thường nhiều không?</span>
+            <i class="ph ph-caret-down"></i>
+          </button>
+          <div class="faq-answer">
+            <p>
+              Aegis Bảo An cam kết <strong>Quyền Tái Tục Hợp Đồng Đảm Bảo</strong>. Chúng tôi không bao giờ đơn phương hủy hợp đồng cá nhân chỉ vì khách hàng có lịch sử yêu cầu bồi thường trong năm trước, mang lại sự bảo vệ ổn định và an tâm trọn vẹn cho bạn và gia đình.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>Thủ tục cứu hộ ô tô khi gặp sự cố thủy kích hoặc tai nạn diễn ra như thế nào?</span>
+            <i class="ph ph-caret-down"></i>
+          </button>
+          <div class="faq-answer">
+            <p>
+              Bạn chỉ cần gọi ngay hotline <strong>1900 6868 (Phím 1)</strong>. Tổng đài định vị vị trí xe và điều động xe cứu hộ chuyên dụng gần nhất đến hiện trường trong 30 phút. Xe được đưa về xưởng chính hãng được ủy quyền, giám định viên sẽ lập biên bản hiện trường số và tiến hành duyệt lệnh sửa chữa ngay trong ngày.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── LEAD CONSULTATION FORM SECTION ─── -->
+  <section class="section consult-section" id="consult">
+    <div class="container">
+      <div class="consult-wrapper">
+        <div class="consult-left">
+          <span class="section-tag">Tư Vấn Miễn Phí 1-1</span>
+          <h2 class="consult-title">Để Chuyên Viên Tài Chính Thiết Kế Giải Pháp Riêng Cho Bạn</h2>
+          <p class="consult-desc">
+            Điền thông tin bên cạnh để nhận bảng phân tích quyền lợi & dự toán phí bảo hiểm chi tiết, hoàn toàn miễn phí và không ràng buộc mua bảo hiểm.
+          </p>
+
+          <div class="consult-perks">
+            <div class="cp-item">
+              <i class="ph-fill ph-check-circle"></i>
+              <div>
+                <strong>Báo giá chính xác trong 15 phút</strong>
+                <p>Chuyên viên hoạch định tài chính liên hệ tư vấn tận tâm</p>
+              </div>
+            </div>
+            <div class="cp-item">
+              <i class="ph-fill ph-check-circle"></i>
+              <div>
+                <strong>Tặng voucher tầm soát sức khỏe 2.000.000đ</strong>
+                <p>Áp dụng cho hợp đồng bảo hiểm sức khỏe tham gia trong tháng</p>
+              </div>
+            </div>
+            <div class="cp-item">
+              <i class="ph-fill ph-check-circle"></i>
+              <div>
+                <strong>Bảo mật thông tin khách hàng tuyệt đối</strong>
+                <p>Tuân thủ chuẩn bảo vệ dữ liệu cá nhân theo Nghị định 13/2023/NĐ-CP</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="consult-right">
+          <form id="leadForm" class="consult-form" onsubmit="return false;">
+            <div class="form-group">
+              <label for="fullName">Họ và tên của bạn <span class="req">*</span></label>
+              <input type="text" id="fullName" placeholder="Ví dụ: Nguyễn Văn An" required />
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="phone">Số điện thoại <span class="req">*</span></label>
+                <input type="tel" id="phone" placeholder="090x xxx xxx" required />
+              </div>
+              <div class="form-group">
+                <label for="email">Địa chỉ Email</label>
+                <input type="email" id="email" placeholder="email@example.com" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="targetProduct">Gói bảo hiểm bạn đang quan tâm</label>
+              <select id="targetProduct">
+                <option value="health" selected>Bảo hiểm Sức Khỏe Cao Cấp (Aegis CarePlus)</option>
+                <option value="life">Bảo hiểm Nhân Thọ & Hưu Trí (An Thịnh Toàn Gia)</option>
+                <option value="auto">Bảo hiểm Vật Chất Ô Tô (AutoCare)</option>
+                <option value="travel">Bảo hiểm Du Lịch Quốc Tế (GlobeSecure)</option>
+                <option value="business">Bảo hiểm Doanh Nghiệp & Cháy Nổ (BizShield)</option>
+                <option value="other">Tư vấn gói kết hợp cho cả gia đình</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="message">Ghi chú hoặc yêu cầu riêng (nếu có)</label>
+              <textarea id="message" rows="3" placeholder="Số lượng thành viên trong gia đình, khoảng ngân sách mong muốn..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg" id="submitLeadBtn">
+              <span>Gửi Yêu Cầu Nhận Báo Giá Miễn Phí</span>
+              <i class="ph ph-arrow-right"></i>
+            </button>
+            <p class="form-subnote"><i class="ph ph-shield-check"></i> Chúng tôi không chia sẻ thông tin của bạn cho bất kỳ bên thứ ba nào.</p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-top">
+        <div class="footer-col brand-col">
+          <div class="footer-logo">
+            <svg viewBox="0 0 40 40" fill="none" width="32" height="32">
+              <rect width="40" height="40" rx="10" fill="#0284c7"/>
+              <path d="M20 9L11 13.5V21C11 27.2 14.8 32.9 20 34.5C25.2 32.9 29 27.2 29 21V13.5L20 9Z" stroke="#ffffff" stroke-width="2.4"/>
+            </svg>
+            <span class="brand-title">Aegis<span class="brand-accent">BảoAn</span></span>
+          </div>
+          <p class="footer-desc">
+            Tổng Công Ty Cổ Phần Bảo Hiểm Aegis Bảo An. Thành viên tập đoàn tài chính Aegis Financial Group (Singapore). Bảo vệ hàng triệu gia đình và doanh nghiệp Việt Nam vững bước tương lai.
+          </p>
+          <div class="footer-license">
+            <i class="ph-fill ph-seal-check"></i> Giấy phép thành lập và hoạt động số 102/GP/KDBH do Bộ Tài Chính cấp ngày 15/08/2001.
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-heading">Sản Phẩm</h4>
+          <ul class="footer-links">
+            <li><a href="#products">Bảo hiểm Sức Khỏe CarePlus</a></li>
+            <li><a href="#products">Bảo hiểm Nhân Thọ & Hưu Trí</a></li>
+            <li><a href="#products">Bảo hiểm Vật Chất Ô Tô AutoCare</a></li>
+            <li><a href="#products">Bảo hiểm Du Lịch Toàn Cầu</a></li>
+            <li><a href="#products">Bảo hiểm Cháy Nổ & Tài Sản</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-heading">Khách Hàng</h4>
+          <ul class="footer-links">
+            <li><a href="#claim">Quy trình bồi thường trực tuyến</a></li>
+            <li><a href="#hospitals">Mạng lưới 680+ bệnh viện liên kết</a></li>
+            <li><a href="#calculator">Tính phí bảo hiểm trực tuyến</a></li>
+            <li><a href="#guide">Hướng dẫn kê khai thông tin y tế</a></li>
+            <li><a href="#faq">Câu hỏi thường gặp (FAQ)</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-heading">Liên Hệ & Trụ Sở</h4>
+          <div class="footer-contact-item">
+            <i class="ph ph-map-pin"></i>
+            <span>Tòa nhà Aegis Tower, 68 Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh</span>
+          </div>
+          <div class="footer-contact-item">
+            <i class="ph ph-phone"></i>
+            <span>Hotline bồi thường 24/7: <strong>1900 6868</strong></span>
+          </div>
+          <div class="footer-contact-item">
+            <i class="ph ph-envelope"></i>
+            <span>Email: <strong>cskh@aegisbaoan.vn</strong></span>
+          </div>
+          <div class="footer-socials">
+            <a href="#" aria-label="Facebook"><i class="ph-fill ph-facebook-logo"></i></a>
+            <a href="#" aria-label="YouTube"><i class="ph-fill ph-youtube-logo"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="ph-fill ph-linkedin-logo"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="fb-left">
+          © 2026 Aegis Bảo An Insurance Joint Stock Company. Bản quyền thuộc về Aegis Bảo An.
+        </div>
+        <div class="fb-right">
+          <a href="#">Điều khoản sử dụng</a>
+          <span class="sep">•</span>
+          <a href="#">Chính sách bảo mật dữ liệu</a>
+          <span class="sep">•</span>
+          <a href="#">Quy tắc bồi thường</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ─── PRODUCT DETAIL MODAL ─── -->
+  <div class="modal-backdrop" id="productModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <button class="modal-close" id="modalCloseBtn" aria-label="Đóng modal">&times;</button>
+      <div class="modal-header">
+        <div class="modal-badge" id="modalCategoryBadge">Bảo hiểm Sức Khỏe</div>
+        <h3 class="modal-title" id="modalTitle">Chi Tiết Quyền Lợi Bảo Hiểm</h3>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Injected via script.js -->
+      </div>
+      <div class="modal-footer">
+        <a href="#consult" class="btn btn-primary" id="modalCtaBtn">Đăng Ký Tư Vấn Gói Này</a>
+        <button class="btn btn-ghost" id="modalCancelBtn">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── TOAST NOTIFICATION ─── -->
+  <div class="toast-notification" id="toastNotification" role="alert" aria-live="assertive">
+    <i class="ph-fill ph-check-circle toast-icon"></i>
+    <div class="toast-content">
+      <h4 class="toast-title" id="toastTitle">Thành công!</h4>
+      <p class="toast-message" id="toastMsg">Yêu cầu báo giá của bạn đã được tiếp nhận.</p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

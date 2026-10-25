@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đặt Chỗ & Tour Nghỉ Dưỡng — VietTravel Luxury</title>
+  <meta name="description" content="Hệ thống đặt chỗ trực tuyến khu nghỉ dưỡng và tour cao cấp VietTravel. Thanh toán bảo mật, xác nhận tức thì, hỗ trợ quản gia 24/7." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="travel-booking-body">
+
+<!-- ─── NAV ─── -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="index.html" class="logo">
+      <svg class="logo-mark" viewBox="0 0 32 32" fill="none">
+        <rect x="4" y="4" width="24" height="24" rx="7" fill="currentColor"/>
+        <path d="M11 11 L21 16 L11 21 Z" fill="#fafbff"/>
+      </svg>
+      <span>viet<span class="logo-dot">.</span>travel</span>
+    </a>
+    <ul class="nav-menu">
+      <li><a href="index.html">Trang Chủ</a></li>
+      <li><a href="detail.html">Oceanfront Villa (Chi Tiết)</a></li>
+      <li><a href="booking.html" class="active">Đặt Chỗ & Tour</a></li>
+      <li><a href="index.html#destinations">Điểm Đến</a></li>
+      <li><a href="index.html#reviews">Đánh Giá</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="tel:19006868" class="nav-ghost"><i class="ph ph-phone"></i> Hotline VIP</a>
+      <a href="detail.html" class="nav-cta">
+        Xem Chi Tiết Villa
+        <i class="ph ph-arrow-up-right"></i>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── BOOKING HEADER ─── -->
+<header class="booking-page-header">
+  <div class="container text-center">
+    <div class="eyebrow" style="justify-content:center; margin-bottom:12px;">
+      <span class="eyebrow-dot"></span>
+      Bảo mật 100% SSL · Xác nhận tự động qua SMS & Zalo trong 3 phút
+    </div>
+    <h1 class="section-title">Hệ Thống Đặt Chỗ & Nghỉ Dưỡng Thượng Lưu</h1>
+    <p class="section-desc" style="max-width: 640px; margin: 0 auto;">
+      Trải nghiệm quy trình đặt phòng minh bạch. Hỗ trợ thanh toán linh hoạt, trả góp 0% và quản gia riêng chăm sóc từ khi khởi hành.
+    </p>
+  </div>
+</header>
+
+<!-- ─── BOOKING ENGINE LAYOUT ─── -->
+<div class="container booking-layout">
+  <!-- Left Side: Interactive Steps Form -->
+  <div class="booking-form-col">
+
+    <!-- Step 1: Select Retreat / Tour Package -->
+    <div class="booking-card">
+      <div class="bcard-header">
+        <div class="bcard-num">01</div>
+        <div>
+          <h3>Lựa Chọn Kỳ Nghỉ Hoặc Tour Trải Nghiệm</h3>
+          <p>Mỗi gói nghỉ dưỡng đều bao gồm dịch vụ đưa đón và phòng suite tiêu chuẩn 5-6 sao</p>
+        </div>
+      </div>
+
+      <div class="package-selection-grid">
+        <label class="pkg-card active" onclick="selectPackage(this, 48000000, 'Oceanfront Sanctuary Pool Villa (3N2Đ)', 'Vịnh Vĩnh Hy, Ninh Thuận', 3)">
+          <input type="radio" name="tourPackage" checked />
+          <div class="pkg-img">
+            <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=600&q=80" alt="Oceanfront Villa" />
+            <span class="pkg-badge">Được Đặt Nhiều Nhất</span>
+          </div>
+          <div class="pkg-details">
+            <div class="pkg-loc"><i class="ph-fill ph-map-pin"></i> Vịnh Vĩnh Hy, Ninh Thuận</div>
+            <h4 class="pkg-title">Oceanfront Sanctuary Pool Villa (3N2Đ)</h4>
+            <div class="pkg-specs">
+              <span><i class="ph ph-arrows-out"></i> 280m²</span>
+              <span><i class="ph ph-swimming-pool"></i> Hồ bơi vô cực</span>
+              <span><i class="ph ph-boat"></i> Du thuyền vịnh</span>
+            </div>
+            <div class="pkg-price">48.000.000₫ <small>/ 2 khách</small></div>
+          </div>
+        </label>
+
+        <label class="pkg-card" onclick="selectPackage(this, 32000000, 'Đảo Ngọc Phú Quốc Private Beach Retreat (4N3Đ)', 'Bãi Khem, Phú Quốc', 4)">
+          <input type="radio" name="tourPackage" />
+          <div class="pkg-img">
+            <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80" alt="Phú Quốc Retreat" />
+          </div>
+          <div class="pkg-details">
+            <div class="pkg-loc"><i class="ph-fill ph-map-pin"></i> Bãi Khem, Phú Quốc</div>
+            <h4 class="pkg-title">Đảo Ngọc Phú Quốc Retreat (4N3Đ)</h4>
+            <div class="pkg-specs">
+              <span><i class="ph ph-arrows-out"></i> 210m²</span>
+              <span><i class="ph ph-sun-dim"></i> Bãi cát riêng</span>
+              <span><i class="ph ph-champagne"></i> Rượu vang tặng kèm</span>
+            </div>
+            <div class="pkg-price">32.000.000₫ <small>/ 2 khách</small></div>
+          </div>
+        </label>
+
+        <label class="pkg-card" onclick="selectPackage(this, 19500000, 'Du Thuyền Di Sản Hạ Long Heritage Cruise (2N1Đ)', 'Vịnh Lan Hạ, Hạ Long', 2)">
+          <input type="radio" name="tourPackage" />
+          <div class="pkg-img">
+            <img src="https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=600&q=80" alt="Hạ Long Heritage Cruise" />
+          </div>
+          <div class="pkg-details">
+            <div class="pkg-loc"><i class="ph-fill ph-map-pin"></i> Vịnh Lan Hạ, Hạ Long</div>
+            <h4 class="pkg-title">Du Thuyền Hạ Long Heritage (2N1Đ)</h4>
+            <div class="pkg-specs">
+              <span><i class="ph ph-boat"></i> Cabin ban công riêng</span>
+              <span><i class="ph ph-fork-knife"></i> Full board 4 bữa</span>
+              <span><i class="ph ph-fish"></i> Chèo kayak hang động</span>
+            </div>
+            <div class="pkg-price">19.500.000₫ <small>/ 2 khách</small></div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Step 2: Schedule & Guests -->
+    <div class="booking-card">
+      <div class="bcard-header">
+        <div class="bcard-num">02</div>
+        <div>
+          <h3>Thời Gian Nhận Phòng & Số Lượng Khách</h3>
+          <p>Linh hoạt lựa chọn ngày khởi hành, miễn phí đổi ngày 01 lần</p>
+        </div>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label><i class="ph ph-calendar"></i> Ngày Nhận Phòng (Check-in)</label>
+          <input type="date" id="checkinDate" class="booking-input" value="2026-08-15" onchange="updateDates()" />
+        </div>
+        <div class="form-group">
+          <label><i class="ph ph-calendar-check"></i> Ngày Trả Phòng (Check-out)</label>
+          <input type="date" id="checkoutDate" class="booking-input" value="2026-08-18" onchange="updateDates()" />
+        </div>
+      </div>
+
+      <div class="form-grid-2" style="margin-top: 16px;">
+        <div class="form-group">
+          <label><i class="ph ph-users"></i> Người Lớn (Từ 12 tuổi)</label>
+          <div class="counter-wrap">
+            <button type="button" class="btn-cnt" onclick="updateGuestNum('adult', -1)">-</button>
+            <span id="adultCount">2</span>
+            <button type="button" class="btn-cnt" onclick="updateGuestNum('adult', 1)">+</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label><i class="ph ph-baby"></i> Trẻ Em (Dưới 12 tuổi)</label>
+          <div class="counter-wrap">
+            <button type="button" class="btn-cnt" onclick="updateGuestNum('child', -1)">-</button>
+            <span id="childCount">0</span>
+            <button type="button" class="btn-cnt" onclick="updateGuestNum('child', 1)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: VIP Enhancements -->
+    <div class="booking-card">
+      <div class="bcard-header">
+        <div class="bcard-num">03</div>
+        <div>
+          <h3>Đặc Quyền Bổ Sung Tùy Chọn</h3>
+          <p>Cá nhân hóa trải nghiệm theo mong muốn riêng của quý khách</p>
+        </div>
+      </div>
+
+      <div class="addons-grid">
+        <label class="addon-box">
+          <input type="checkbox" id="addMaybach" value="0" checked disabled />
+          <div class="addon-detail">
+            <div class="ab-title">Xe Riêng Maybach Đưa Đón 2 Chiều <span class="badge-free">ĐÃ BAO GỒM</span></div>
+            <div class="ab-desc">Đón tiễn tận cửa tại sân bay Cam Ranh / Tân Sơn Nhất / Nội Bài</div>
+          </div>
+        </label>
+
+        <label class="addon-box">
+          <input type="checkbox" id="addBbq" value="4500000" onchange="recalculateTotal()" checked />
+          <div class="addon-detail">
+            <div class="ab-title">Tiệc Nướng Hải Sản Bãi Cát Riêng Dưới Ánh Sao (+4.500.000₫)</div>
+            <div class="ab-desc">Bao gồm đầu bếp riêng, tôm hùm bông, sò điệp và rượu vang trắng</div>
+          </div>
+        </label>
+
+        <label class="addon-box">
+          <input type="checkbox" id="addSpa" value="3200000" onchange="recalculateTotal()" checked />
+          <div class="addon-detail">
+            <div class="ab-title">Liệu Trình Spa Chuông Xoay Tây Tạng Cặp Đôi (+3.200.000₫)</div>
+            <div class="ab-desc">90 phút massage tinh dầu hoa sen và đá nóng Himalaya trên mặt vịnh</div>
+          </div>
+        </label>
+
+        <label class="addon-box">
+          <input type="checkbox" id="addHeli" value="12000000" onchange="recalculateTotal()" />
+          <div class="addon-detail">
+            <div class="ab-title">Trực Thăng Ngắm Vịnh 20 Phút (+12.000.000₫)</div>
+            <div class="ab-desc">Ngắm toàn cảnh vẻ đẹp kỳ vĩ của Vườn Quốc Gia Núi Chúa từ trên cao</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Step 4: Guest Contact Details -->
+    <div class="booking-card">
+      <div class="bcard-header">
+        <div class="bcard-num">04</div>
+        <div>
+          <h3>Thông Tin Đại Diện Đặt Chỗ</h3>
+          <p>Mọi chứng từ và mã xác nhận sẽ được gửi trực tiếp qua SMS & Email</p>
+        </div>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label>Họ và Tên Quý Khách *</label>
+          <input type="text" id="custName" class="booking-input" placeholder="Ví dụ: Nguyễn Văn Hùng" value="Nguyễn Văn Hùng" />
+        </div>
+        <div class="form-group">
+          <label>Số Điện Thoại / Zalo Nhận Mã *</label>
+          <input type="tel" id="custPhone" class="booking-input" placeholder="0901 234 567" value="0901 888 999" />
+        </div>
+      </div>
+
+      <div class="form-grid-2" style="margin-top: 16px;">
+        <div class="form-group">
+          <label>Địa Chỉ Email Nhận Hợp Đồng *</label>
+          <input type="email" id="custEmail" class="booking-input" placeholder="hung.nguyen@company.com" value="hung.nguyen@enterprise.vn" />
+        </div>
+        <div class="form-group">
+          <label>Dịp Đặc Biệt (Kỷ niệm / Sinh nhật...)</label>
+          <input type="text" id="custOccasion" class="booking-input" placeholder="Ví dụ: Kỷ niệm 10 năm ngày cưới" value="Kỷ niệm 10 năm ngày cưới" />
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top: 16px;">
+        <label>Yêu Cầu Đặc Biệt Cho Quản Gia & Nhà Hàng</label>
+        <textarea id="custNotes" class="booking-textarea" rows="2" placeholder="Dị ứng thực phẩm, tầng cao view biển, chuẩn bị nến bánh kem...">Chuẩn bị bánh kem kỷ niệm và hoa hồng tươi tại phòng ngủ trước giờ check-in.</textarea>
+      </div>
+    </div>
+
+    <!-- Step 5: Payment Options -->
+    <div class="booking-card">
+      <div class="bcard-header">
+        <div class="bcard-num">05</div>
+        <div>
+          <h3>Phương Thức Thanh Toán Linh Hoạt</h3>
+          <p>Chỉ cần đặt cọc trước 30% để giữ chỗ, 70% còn lại thanh toán khi nhận phòng</p>
+        </div>
+      </div>
+
+      <div class="payment-methods-grid">
+        <label class="pay-method-item active" onclick="selectPayment(this)">
+          <input type="radio" name="payMethod" checked />
+          <div class="pm-icon"><i class="ph-duotone ph-qr-code"></i></div>
+          <div class="pm-text">
+            <strong>VietQR / Chuyển Khoản Nhanh 24/7</strong>
+            <small>Miễn phí giao dịch · Khớp lệnh tự động trong 5 giây</small>
+          </div>
+        </label>
+
+        <label class="pay-method-item" onclick="selectPayment(this)">
+          <input type="radio" name="payMethod" />
+          <div class="pm-icon"><i class="ph-duotone ph-credit-card"></i></div>
+          <div class="pm-text">
+            <strong>Thẻ Quốc Tế Visa / Mastercard / JCB</strong>
+            <small>Cổng thanh toán bảo mật 3D Secure 2.0</small>
+          </div>
+        </label>
+
+        <label class="pay-method-item" onclick="selectPayment(this)">
+          <input type="radio" name="payMethod" />
+          <div class="pm-icon"><i class="ph-duotone ph-percent"></i></div>
+          <div class="pm-text">
+            <strong>Trả Góp 0% Lãi Suất (3 - 6 - 12 Tháng)</strong>
+            <small>Liên kết 28 ngân hàng lớn tại Việt Nam</small>
+          </div>
+        </label>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right Side: Sticky Order Summary & Submit -->
+  <aside class="booking-summary-col">
+    <div class="summary-card">
+      <div class="sc-head">
+        <h3>Tóm Tắt Đặt Chỗ</h3>
+        <span class="sc-badge">Mã đặt tạm: #VT-8942</span>
+      </div>
+
+      <div class="sc-item-preview">
+        <img id="sumImg" src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=400&q=70" alt="Villa" />
+        <div>
+          <h4 id="sumTitle">Oceanfront Sanctuary Pool Villa</h4>
+          <p id="sumLoc"><i class="ph-fill ph-map-pin"></i> Vịnh Vĩnh Hy, Ninh Thuận</p>
+          <div class="sum-dates-pill" id="sumDates">15/08/2026 - 18/08/2026 (3 Đêm)</div>
+        </div>
+      </div>
+
+      <div class="sc-divider"></div>
+
+      <div class="sc-costs">
+        <div class="sc-row">
+          <span>Gói nghỉ dưỡng:</span>
+          <strong id="sumBasePrice">48.000.000₫</strong>
+        </div>
+        <div class="sc-row">
+          <span>Khách tham gia:</span>
+          <span id="sumGuestInfo">2 Người lớn</span>
+        </div>
+        <div class="sc-row">
+          <span>Phụ thu khách thêm:</span>
+          <span id="sumExtraGuest">0₫</span>
+        </div>
+        <div class="sc-row">
+          <span>Trải nghiệm nâng cấp:</span>
+          <span id="sumAddons">7.700.000₫</span>
+        </div>
+        <div class="sc-row">
+          <span>Phí phục vụ resort (5%):</span>
+          <span id="sumServiceFee">2.785.000₫</span>
+        </div>
+        <div class="sc-row">
+          <span>Thuế VAT du lịch (8%):</span>
+          <span id="sumVat">4.456.000₫</span>
+        </div>
+        <div class="sc-row discount-row">
+          <span>Ưu đãi đặt sớm (-15% Early Bird):</span>
+          <strong id="sumDiscount">-8.355.000₫</strong>
+        </div>
+
+        <div class="sc-divider"></div>
+
+        <div class="sc-grand-total">
+          <div class="gt-label">Tổng Chi Phí Trọn Gói:</div>
+          <div class="gt-amount" id="sumGrandTotal">54.586.000₫</div>
+        </div>
+
+        <div class="sc-deposit-box">
+          <div class="dep-label">Số Tiền Đặt Cọc Giữ Chỗ (30%):</div>
+          <div class="dep-amount" id="sumDepositAmount">16.375.800₫</div>
+          <div class="dep-note">70% còn lại (38.210.200₫) thanh toán khi nhận phòng</div>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-primary btn-full submit-booking-btn" onclick="openConfirmationModal()">
+        <i class="ph-fill ph-lock-key"></i> Xác Nhận & Giữ Chỗ Ngay
+      </button>
+
+      <div class="sc-policies">
+        <div><i class="ph ph-shield-check"></i> Hoàn trả 100% nếu hủy trước 7 ngày</div>
+        <div><i class="ph ph-calendar"></i> Hỗ trợ đổi ngày không thu phí quản lý</div>
+        <div><i class="ph ph-headset"></i> Chuyên viên chăm sóc riêng gọi sau 3 phút</div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- ─── CONFIRMATION MODAL ─── -->
+<div class="modal-backdrop" id="confirmModal">
+  <div class="modal-container">
+    <div class="modal-icon-success">
+      <i class="ph-fill ph-check-circle"></i>
+    </div>
+    <h2>Đặt Chỗ Thành Công!</h2>
+    <p class="modal-sub">Mã giữ chỗ của quý khách là <strong class="hl" id="modalBookingCode">#VT-VHY-9982</strong></p>
+
+    <div class="modal-details-card">
+      <div class="md-row">
+        <span>Gói Nghỉ Dưỡng:</span>
+        <strong id="modalPkgName">Oceanfront Sanctuary Pool Villa</strong>
+      </div>
+      <div class="md-row">
+        <span>Thời Gian:</span>
+        <span id="modalStayDates">15/08/2026 - 18/08/2026 (3 Đêm)</span>
+      </div>
+      <div class="md-row">
+        <span>Khách Hàng:</span>
+        <span id="modalCustName">Nguyễn Văn Hùng (0901 888 999)</span>
+      </div>
+      <div class="md-row">
+        <span>Tiền Cọc (30%):</span>
+        <strong class="text-accent" id="modalDepositNum">16.375.800₫</strong>
+      </div>
+    </div>
+
+    <!-- VietQR Mock Box -->
+    <div class="vietqr-box">
+      <div class="qr-header">Quét mã VietQR để thanh toán tiền cọc tức thì</div>
+      <div class="qr-code-mock">
+        <svg viewBox="0 0 100 100" width="140" height="140" fill="#0c4a6e">
+          <rect x="10" y="10" width="25" height="25" fill="#0c4a6e" />
+          <rect x="15" y="15" width="15" height="15" fill="#fff" />
+          <rect x="18" y="18" width="9" height="9" fill="#0c4a6e" />
+          <rect x="65" y="10" width="25" height="25" fill="#0c4a6e" />
+          <rect x="70" y="15" width="15" height="15" fill="#fff" />
+          <rect x="73" y="18" width="9" height="9" fill="#0c4a6e" />
+          <rect x="10" y="65" width="25" height="25" fill="#0c4a6e" />
+          <rect x="15" y="70" width="15" height="15" fill="#fff" />
+          <rect x="18" y="73" width="9" height="9" fill="#0c4a6e" />
+          <circle cx="50" cy="50" r="10" fill="#06b6d4" />
+          <rect x="45" y="20" width="8" height="15" fill="#0c4a6e"/>
+          <rect x="68" y="55" width="18" height="8" fill="#0c4a6e"/>
+          <rect x="45" y="70" width="15" height="15" fill="#0c4a6e"/>
+        </svg>
+      </div>
+      <div class="qr-info">
+        <div>Ngân hàng: <strong>MBBank Quân Đội (Chi nhánh Hà Nội)</strong></div>
+        <div>Số tài khoản: <strong>8888 9999 6868</strong></div>
+        <div>Chủ tài khoản: <strong>CTCP VIETTRAVEL VIETNAM</strong></div>
+        <div>Nội dung: <strong class="text-accent" id="modalQrMemo">VT VHY 9982</strong></div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-primary btn-full" onclick="closeModal()">Đã Lưu Thông Tin Đặt Chỗ</button>
+      <a href="index.html" class="btn btn-outline btn-full" style="margin-top: 8px;">Trở Về Trang Chủ</a>
+    </div>
+  </div>
+</div>
+
+<!-- ─── FLOATING CONTACT BUTTONS ─── -->
+<div class="floating-contact">
+  <a href="tel:19006868" class="floating-btn floating-btn_hotline" aria-label="Gọi hotline VIP">
+    <span class="floating-tooltip">Hotline VIP: 1900 6868</span>
+    <svg viewBox="0 0 24 24" fill="white" width="22" height="22">
+      <path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.4-.1-.8 0-1.1.3l-2.2 2.2c-.3-.3.4-.7.2-1.1-.4-1.1-.6-2.3-.6-3.5 0-.6-.4-1-1-1H4c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"/>
+    </svg>
+  </a>
+  <a href="https://zalo.me" target="_blank" rel="noopener" class="floating-btn floating-btn_zalo" aria-label="Chat Zalo hỗ trợ kỳ nghỉ">
+    <span class="floating-tooltip">Chat Zalo Chuyên Viên</span>
+    <svg viewBox="0 0 32 32" fill="none" width="26" height="26">
+      <path d="M16 4C9.4 4 4 8.7 4 14.5c0 3.3 1.8 6.3 4.5 8.2l-1.2 4.4c-.1.5.4.9.9.6l5-2.8c.9.3 1.8.4 2.8.4 6.6 0 12-4.7 12-10.5S22.6 4 16 4Z" fill="white"/>
+      <text x="16" y="17.8" fill="#0068FF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="8.5" text-anchor="middle" letter-spacing="-0.3">Zalo</text>
+    </svg>
+  </a>
+</div>
+
+<!-- ─── JAVASCRIPT LOGIC ─── -->
+<script>
+let currentPackage = {
+  price: 48000000,
+  title: 'Oceanfront Sanctuary Pool Villa (3N2Đ)',
+  location: 'Vịnh Vĩnh Hy, Ninh Thuận',
+  nights: 3,
+  img: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=400&q=70'
+};
+
+let adults = 2;
+let children = 0;
+
+function selectPackage(cardEl, price, title, loc, nights) {
+  document.querySelectorAll('.pkg-card').forEach(c => c.classList.remove('active'));
+  cardEl.classList.add('active');
+  const imgEl = cardEl.querySelector('.pkg-img img');
+  currentPackage = {
+    price: price,
+    title: title,
+    location: loc,
+    nights: nights,
+    img: imgEl ? imgEl.src : ''
+  };
+
+  document.getElementById('sumTitle').textContent = title;
+  document.getElementById('sumLoc').innerHTML = '<i class="ph-fill ph-map-pin"></i> ' + loc;
+  if (imgEl) document.getElementById('sumImg').src = imgEl.src;
+  
+  recalculateTotal();
+}
+
+function updateGuestNum(type, delta) {
+  if (type === 'adult') {
+    adults = Math.max(1, Math.min(8, adults + delta));
+    document.getElementById('adultCount').textContent = adults;
+  } else {
+    children = Math.max(0, Math.min(6, children + delta));
+    document.getElementById('childCount').textContent = children;
+  }
+  recalculateTotal();
+}
+
+function updateDates() {
+  const dIn = document.getElementById('checkinDate').value;
+  const dOut = document.getElementById('checkoutDate').value;
+  if (dIn && dOut) {
+    const diff = (new Date(dOut) - new Date(dIn)) / (1000 * 60 * 60 * 24);
+    const nights = Math.max(1, Math.round(diff));
+    document.getElementById('sumDates').textContent = `${dIn.split('-').reverse().join('/')} - ${dOut.split('-').reverse().join('/')} (${nights} Đêm)`;
+  }
+}
+
+function selectPayment(el) {
+  document.querySelectorAll('.pay-method-item').forEach(m => m.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function recalculateTotal() {
+  const basePrice = currentPackage.price;
+  
+  // Extra guests: 8,000,000 for each adult > 2, 4,000,000 for each child
+  const extraAdults = Math.max(0, adults - 2);
+  const extraGuestCost = (extraAdults * 8000000) + (children * 4000000);
+
+  // Addons
+  let addonsCost = 0;
+  const bbq = document.getElementById('addBbq');
+  const spa = document.getElementById('addSpa');
+  const heli = document.getElementById('addHeli');
+  if (bbq && bbq.checked) addonsCost += parseInt(bbq.value) || 0;
+  if (spa && spa.checked) addonsCost += parseInt(spa.value) || 0;
+  if (heli && heli.checked) addonsCost += parseInt(heli.value) || 0;
+
+  const subtotal = basePrice + extraGuestCost + addonsCost;
+  const serviceFee = Math.round(subtotal * 0.05); // 5% service
+  const vat = Math.round(subtotal * 0.08); // 8% VAT
+  const discount = Math.round(subtotal * 0.15); // 15% Early bird
+  const grandTotal = subtotal + serviceFee + vat - discount;
+  const deposit = Math.round(grandTotal * 0.30);
+
+  const fmt = (n) => n.toLocaleString('vi-VN') + '₫';
+
+  document.getElementById('sumBasePrice').textContent = fmt(basePrice);
+  document.getElementById('sumGuestInfo').textContent = `${adults} Người lớn${children > 0 ? ', ' + children + ' Trẻ em' : ''}`;
+  document.getElementById('sumExtraGuest').textContent = extraGuestCost > 0 ? fmt(extraGuestCost) : '0₫';
+  document.getElementById('sumAddons').textContent = fmt(addonsCost);
+  document.getElementById('sumServiceFee').textContent = fmt(serviceFee);
+  document.getElementById('sumVat').textContent = fmt(vat);
+  document.getElementById('sumDiscount').textContent = '-' + fmt(discount);
+  document.getElementById('sumGrandTotal').textContent = fmt(grandTotal);
+  document.getElementById('sumDepositAmount').textContent = fmt(deposit);
+}
+
+function openConfirmationModal() {
+  const name = document.getElementById('custName').value || 'Quý khách';
+  const phone = document.getElementById('custPhone').value || 'Chưa cung cấp';
+  const randomCode = 'VT-VHY-' + Math.floor(1000 + Math.random() * 9000);
+  
+  document.getElementById('modalBookingCode').textContent = '#' + randomCode;
+  document.getElementById('modalPkgName').textContent = currentPackage.title;
+  document.getElementById('modalStayDates').textContent = document.getElementById('sumDates').textContent;
+  document.getElementById('modalCustName').textContent = `${name} (${phone})`;
+  document.getElementById('modalDepositNum').textContent = document.getElementById('sumDepositAmount').textContent;
+  document.getElementById('modalQrMemo').textContent = randomCode.replace(/-/g, ' ');
+
+  const modal = document.getElementById('confirmModal');
+  if (modal) modal.classList.add('active');
+}
+
+function closeModal() {
+  const modal = document.getElementById('confirmModal');
+  if (modal) modal.classList.remove('active');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  updateDates();
+  recalculateTotal();
+});
+</script>
+
+</body>
+</html>

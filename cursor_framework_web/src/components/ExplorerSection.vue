@@ -27,9 +27,9 @@ const fileTree: FileNode[] = [
         type: 'folder',
         kind: 'rule',
         children: [
-          { name: 'karpathy-guidelines.mdc', path: '.cursor/rules/karpathy-guidelines.mdc', type: 'file', kind: 'rule', size: '3.2 KB' },
-          { name: 'architecture-patterns.mdc', path: '.cursor/rules/architecture-patterns.mdc', type: 'file', kind: 'rule', size: '8.4 KB' },
-          { name: 'security.mdc', path: '.cursor/rules/security.mdc', type: 'file', kind: 'rule', size: '6.7 KB' },
+          { name: 'rule_karpathy-guidelines.mdc', path: '.cursor/rules/rule_karpathy-guidelines.mdc', type: 'file', kind: 'rule', size: '3.2 KB' },
+          { name: 'ref_architecture-patterns.mdc', path: '.cursor/rules/ref_architecture-patterns.mdc', type: 'file', kind: 'rule', size: '8.4 KB' },
+          { name: 'ref_security.mdc', path: '.cursor/rules/ref_security.mdc', type: 'file', kind: 'rule', size: '6.7 KB' },
           { name: '+ 36 more', path: '.cursor/rules', type: 'file', kind: 'rule', size: '39 files' }
         ]
       },
@@ -39,9 +39,9 @@ const fileTree: FileNode[] = [
         type: 'folder',
         kind: 'skill',
         children: [
-          { name: 'karpathy-coding', path: '.cursor/skills/karpathy-coding', type: 'file', kind: 'skill', size: 'SKILL.md' },
-          { name: 'ponytail', path: '.cursor/skills/ponytail', type: 'file', kind: 'skill', size: 'SKILL.md' },
-          { name: 'frontend-review', path: '.cursor/skills/frontend-review', type: 'file', kind: 'skill', size: 'SKILL.md' },
+          { name: 'code_karpathy-coding', path: '.cursor/skills/code_karpathy-coding', type: 'file', kind: 'skill', size: 'SKILL.md' },
+          { name: 'special_ponytail', path: '.cursor/skills/special_ponytail', type: 'file', kind: 'skill', size: 'SKILL.md' },
+          { name: 'ui_frontend-review', path: '.cursor/skills/ui_frontend-review', type: 'file', kind: 'skill', size: 'SKILL.md' },
           { name: '+ 14 more', path: '.cursor/skills', type: 'file', kind: 'skill', size: '17 skills' }
         ]
       },

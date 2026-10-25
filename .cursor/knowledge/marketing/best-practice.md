@@ -1721,3 +1721,737 @@ class CampaignPreDeploymentService {
   }
 }
 ```
+
+---
+
+# 9. marketingskills Integration (sync 2026-07-15)
+
+> Tích hợp [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) (⭐39k) vào CEF. Áp dụng **concept-ref pattern** (xem `skill-registry.mdc §8.1`) — KHÔNG tạo `SKILL.md` mới, mà map mỗi skill category vào section tương ứng trong file này.
+
+## 9.1 Conversion Optimization Patterns
+
+### 9.1.1 Above-the-Fold Clarity (1s test)
+- Headline phải truyền tải value proposition trong **<8 từ**
+- Subheadline hỗ trợ với **specificity** (numbers, outcomes, timeframes)
+- Primary CTA visible without scroll trên **mobile (375px) + desktop (1440px)**
+- Hero image/video KHÔNG chặn copy chính (contrast ratio ≥ 4.5:1)
+
+**Anti-pattern:** "Welcome to Our Platform" — generic, không chỉ ra value.
+
+### 9.1.2 Form Friction Reduction
+- Mỗi field bớt = conversion lift **~5-10%** (research tổng hợp)
+- Multi-step form > single-step dài (psychological commitment)
+- Inline validation, real-time feedback
+- Social proof cạnh CTA (testimonial, "X people signed up today")
+- Field types: prefer dropdown > free text khi options enumerable
+
+### 9.1.3 CTA Copy Framework
+```
+Pattern: [Verb] + [Object] + [Qualifier]
+"Start free trial" (no qualifier)         → 0% lift
+"Start 14-day free trial" (number)        → +12%
+"Start 14-day free trial — no card" (no-friction) → +27%
+```
+
+### 9.1.4 Onboarding Activation Metrics
+- **Aha moment** = action predict retention (e.g., Slack: team sends 2000 msgs, Facebook: 7 friends in 10 days)
+- Time-to-aha < 5 min cho self-serve SaaS
+- Drop-off rate per step: < 20% mỗi step, nếu cao hơn → UX issue
+- Empty states phải có CTA rõ ràng, không chỉ illustration
+
+### 9.1.5 Popup Trigger Heuristics
+- Exit-intent: 5-15% save rate, 0-2% revenue lift
+- Scroll-depth 60-80%: subscription intent higher
+- Time-delay 30-60s: avoid premature interruption
+- Frequency cap: 1x/7days per visitor
+- Mobile: bottom-slide > center modal (>70% accidental-close rate)
+
+### 9.1.6 Paywall A/B Test Variables
+- Price point (anchor + decoy)
+- Trial length (7 vs 14 vs 30 days)
+- Card-required vs no-card
+- Feature gating depth (hard wall vs soft wall)
+- Discount stack (first-month vs annual)
+
+---
+
+## 9.2 Copywriting Patterns
+
+### 9.2.1 Headline Formulas (đã proven)
+```
+1. [Number] + [Adjective] + [Keyword] + [Promise]
+   "7 Proven Ways to Double Your Email Open Rate"
+
+2. [How to] + [Verb] + [Keyword] + [Without/By]
+   "How to Write Cold Emails That Get Replies (Without Being Salesy)"
+
+3. [Keyword] + [For] + [Audience]
+   "Project Management for Distributed Teams"
+
+4. [Question] + [Desired Outcome]
+   "What If Your Landing Page Converted 2x in 30 Days?"
+
+5. [Mistake/Why] + [Common belief] + [Reframe]
+   "Why Most 'Growth Hacks' Fail (And What Actually Works)"
+```
+
+### 9.2.2 Email Subject Line Patterns
+- Personalization `{first_name}` → +2-5% open rate
+- Curiosity gap: "The one thing I changed about..." → +14%
+- Numbers: "3 questions before you..." → +18%
+- Urgency (genuine): "Last 6 hours" → +30% open, -8% trust
+- Lowercase-only: "a quick question" → +5% vs Title Case
+- Length: 30-50 chars optimal, >70 chars truncate trên mobile
+
+### 9.2.3 CTA Placement & Density
+- Above the fold: 1 primary CTA, no secondary
+- Per section: 1 CTA per ~300-400px scroll
+- End of page: 1 closing CTA (slightly different angle)
+- Total CTAs: 3-5 per landing page (more = decision paralysis)
+
+### 9.2.4 Cold Email Sequence (4-step B2B)
+```
+Day 0:  Hook (specific observation about prospect)
+Day 3:  Value prop + social proof (1 case study)
+Day 7:  Pattern interrupt (different angle, e.g., question)
+Day 14: Breakup email ("Should I close your file?")
+```
+Reply rate target: **8-15%** step 1, **2-4%** overall.
+
+### 9.2.5 SMS Compliance
+- TCPA (US), GDPR (EU), Decree 13/2023/NĐ-CP (VN): explicit opt-in required
+- Frequency: 4-8 msgs/tháng max for marketing
+- Always include STOP keyword + sender ID
+- Time window: 9am-8pm recipient local time only
+- Conversion: SMS open rate **98%**, CTR **19%** (vs email 22% / 2.6%)
+
+### 9.2.6 Social Content Adaptation (1 idea → 5 platforms)
+```
+Source idea: 300-word blog post
+├── LinkedIn:   200-400 word text post, 1-2 line breaks, hook in first 2 lines
+├── Twitter/X:  3-7 tweet thread, 1 idea/tweet, numbered
+├── Instagram:  carousel 8-10 slides (1080x1350) + caption
+├── TikTok:     30-60s talking head, script = first 5s hook
+└── Email:      newsletter w/ 1 main idea + 1 CTA
+```
+
+### 9.2.7 Programmatic Video Frameworks
+- Template: 8 scenes × 4-7s = 30-50s output
+- Replace text + 1 B-roll per scene
+- Tools: Hyperframes, Captions.ai, FFmpeg pipeline
+- Output formats: 9:16 (TikTok/Reels/Shorts), 1:1 (LinkedIn), 16:9 (YouTube)
+
+---
+
+## 9.3 SEO & Discovery Patterns
+
+### 9.3.1 AI Search Optimization (AEO / GEO / LLMO)
+- **llms.txt** file: `/llms.txt` describing site in plain markdown cho LLM crawlers
+- Schema.org markup: every page có ít nhất 1 schema type (Article, Product, Organization, FAQPage)
+- Concise answers in first 50 words of content (LLM extraction sweet spot)
+- Citations: outbound to authoritative sources (.edu, .gov, research)
+- FAQ schema → 30-40% lift in AI-overview inclusion
+- Tone: factual, declarative (not opinionated) → preferred by Perplexity/Claude/GPT
+
+### 9.3.2 Programmatic SEO Page Template
+```
+URL pattern: /[category]-for-[use-case]
+Data source: keyword research export (Ahrefs, GSC)
+Title:      "{Keyword}: {Year} Guide + {X} Examples"
+Sections:   1) Definition, 2) How it works, 3) {X} examples (data-driven), 4) FAQ
+Internal:   3-5 links to related programmatic pages + 1 to pillar content
+```
+Quality bar: each page phải có **≥3 unique data points** không có ở competitors.
+
+### 9.3.3 Site Architecture Decision Tree
+```
+< 50 pages:   flat (all top-level)
+50-500:       2-level categories
+500-5000:     3-level, faceted nav
+5000+:        taxonomy + programmatic, internal search essential
+```
+URL hygiene: lowercase, hyphen-separated, no params for canonical.
+
+### 9.3.4 Schema Markup Priorities (by impact)
+1. **Product** + Offer + AggregateRating (e-commerce)
+2. **FAQPage** (30-40% SERP-feature lift)
+3. **Organization** + sameAs (knowledge panel)
+4. **Article** + author + datePublished (news/blog)
+5. **BreadcrumbList** (replaces breadcrumb in SERP)
+6. **LocalBusiness** (local pack)
+7. **SoftwareApplication** (B2B SaaS)
+
+### 9.3.5 ASO Key Fields
+- App title (30 chars): keyword + brand
+- Subtitle (30 chars): secondary keyword
+- Description (4000 chars): first 3 lines = screenshot preview (most important)
+- Keywords field (100 chars iOS): comma-separated, no spaces
+- A/B test: icons (5-15% install rate lift), screenshots (10-25%)
+
+---
+
+## 9.4 Paid Ads Patterns
+
+### 9.4.1 Campaign Structure (Google Ads)
+```
+Account
+├── Campaign 1: Brand (always-on, exact match)
+├── Campaign 2: Non-brand search
+│   ├── Ad group: high intent (e.g., "buy X")
+│   ├── Ad group: mid intent (e.g., "X vs Y")
+│   └── Ad group: low intent (e.g., "what is X")
+└── Campaign 3: Performance Max (cross-network)
+```
+**Rule:** max 3 campaigns/ad group level, 5-7 keywords per ad group.
+
+### 9.4.2 RSA (Responsive Search Ad) Best Practices
+- 15 headlines, 4 descriptions (max)
+- Pin position 1-2 headlines cho branding
+- Include keyword in at least 3 headlines
+- 3 different CTAs across descriptions
+- Ad strength target: "Good" or "Excellent"
+
+### 9.4.3 Meta Ads Creative Iteration
+- Refresh creative mỗi **7-14 ngày** (fatigue threshold)
+- Test 1 variable at a time: image, copy, CTA
+- Frequency cap: < 3/7days cho cold audiences
+- Hook in first 1-3 seconds of video (60% drop-off after 3s)
+
+### 9.4.4 LinkedIn Ads Targeting
+- Job title + seniority + company size = highest intent
+- Matched Audiences: upload list, retarget site visitors, lookalike
+- Lead gen forms: 2-3x higher conversion than landing pages (less friction)
+
+---
+
+## 9.5 Paid Ads: Creative Generation
+
+### 9.5.1 Bulk Ad Creative Framework
+```
+1. Define angle matrix (3 pains × 3 desires = 9 hooks)
+2. Generate 3 variants per hook = 27 ads
+3. Test 5 ads/campaign, kill bottom 3 after $50 spend
+4. Scale winner to 2x budget, repeat
+```
+
+### 9.5.2 Headline Patterns (high CTR)
+- "{Number} {timeframe} to {outcome}" — "5 minutes to set up"
+- "The {category} for {specific audience}" — "The CRM for indie founders"
+- "{Outcome} without {pain}" — "More demos without cold calling"
+- Question form — "Still using spreadsheets for X?"
+
+---
+
+## 9.6 Analytics & A/B Testing Patterns
+
+### 9.6.1 Event Taxonomy (North Star + supporting)
+```
+North Star Metric (1): e.g., "Weekly Active Users" (WAU)
+Driver Events (3-5):  e.g., "Session Started", "Feature Used", "Invited Friend"
+Conversion Events:   e.g., "Subscribed", "Upgraded", "Referred"
+```
+
+### 9.6.2 A/B Test Sample Size Quick-Reference
+```
+Baseline CR | MDE 5%   | MDE 10%  | MDE 20%
+─────────────────────────────────────────────────
+2%          | 75k/variant | 19k | 5k
+5%          | 30k        | 8k  | 2k
+10%         | 15k        | 4k  | 1k
+```
+**Rule:** don't stop tests before sample size reached, even if "winner" obvious.
+
+### 9.6.3 Pre-deployment Analytics Checklist
+- [ ] Event names follow `noun_verb` convention (e.g., `checkout_completed`)
+- [ ] Properties attached for segmentation (plan, source, device)
+- [ ] Server-side tracking for compliance-critical events
+- [ ] Consent mode enabled (GDPR)
+- [ ] UTM taxonomy documented
+- [ ] Dashboard reflects North Star + 3 drivers
+
+---
+
+## 9.7 Retention Patterns
+
+### 9.7.1 Cancel Flow Structure (save rate 20-40% target)
+```
+1. Cancellation reason (required, multi-choice)
+2. Dynamic save offer based on reason:
+   ├── "Too expensive"  → discount or downgrade
+   ├── "Not using it"   → pause + reactivation reminder
+   ├── "Missing feature"→ roadmap preview + workaround
+   └── "Other"          → feedback text + retention-team call
+3. Confirmation step (delay subscription end by N days)
+4. Final confirmation (reversible for 24h)
+```
+
+### 9.7.2 Dunning Sequence (failed payment recovery)
+```
+Day 0:  Failed payment notification
+Day 3:  Reminder (soft)
+Day 7:  Reminder (urgent) + update payment CTA
+Day 14: Final notice (account will be suspended)
+Day 21: Account paused, data retained for 60 days
+Day 60: Account deleted (with confirmation email Day 55)
+```
+Recovery target: **40-60%** of failed payments.
+
+### 9.7.3 Engagement Decay Signals
+- Login frequency: < 1/week = at-risk
+- Feature usage: < 3 distinct features/month = at-risk
+- NPS drop: ≥2 points = investigate
+- Support tickets: increasing = churn-imminent
+
+---
+
+## 9.8 Growth Engineering Patterns
+
+### 9.8.1 Referral Program Mechanics
+```
+Double-sided incentive: referrer + referee both get X
+- X = 10-25% of monthly subscription value
+- Cap: prevent abuse (e.g., 12 referrals/year)
+- Fraud signals: same IP, same card, same device fingerprint
+- Tier system: 1-5 refs = $$, 6-15 = $$$, 16+ = $$$$
+```
+Conversion lift: 3-5x vs no referral program.
+
+### 9.8.2 Free Tool Strategy
+```
+Lead gen tool:        Calculator, grader, generator (e.g., "What's your SEO score?")
+SEO value tool:       Static pages with programmatic data (e.g., "X for Y industry")
+Engagement tool:      Template library, design assets, code snippets
+Distribution:         Embed widget → viral loop; required email to download result
+```
+Cost per lead: 60-80% lower than gated content.
+
+### 9.8.3 Co-Marketing Playbook
+```
+1. Identify non-competing, same-ICP partners (10-30)
+2. Offer: cross-promo in newsletter, joint webinar, content swap
+3. Co-create: case study, whitepaper, podcast episode
+4. Track: UTM-tagged links, dedicated landing pages
+5. Measure: pipeline generated, CAC shared
+```
+
+---
+
+## 9.9 Strategy & Monetization Patterns
+
+### 9.9.1 Marketing Plan (Quarterly)
+```
+Week 1-2:   Set OKRs (1 North Star + 3-5 supporting)
+Week 2-4:   Channel selection + budget allocation
+Week 4-12:  Execute + weekly standup (blockers + learnings)
+Week 12-13: Retro + next-quarter planning
+```
+
+### 9.9.2 Pricing Tiers (3-tier rule)
+```
+Entry:    $X         (1-2 core features, removes friction)
+Main:     $3-5X      (target offer, most features, default)
+Top:      $9-10X     (everything + premium, social proof anchor)
+```
+- Top tier acts as **anchor** for main tier ("value contrast")
+- Entry tier captures price-sensitive segment
+- Annual = **16-20% discount** vs monthly
+
+### 9.9.3 Offer Construction (Hormozi Value Equation)
+```
+Value = (Dream Outcome × Perceived Likelihood) / (Time Delay × Effort & Sacrifice)
+```
+Increase numerator, decrease denominator:
+- **Bonus stack**: 3-5 complementary bonuses with $ value
+- **Guarantee**: 30-day, 60-day, lifetime (longer = more conversions)
+- **Urgency**: genuine deadline, quantity limit, bonus expiry
+- **Scarcity**: cohort-based, cohort-exclusive features
+
+### 9.9.4 Launch Phases
+```
+Pre-launch (4-6 weeks before):
+  - Build waitlist (target 1k+ signups for product, 5k+ for SaaS)
+  - Seed influencers + early reviewers
+  - Prepare content backlog (10-15 assets)
+
+Launch week:
+  - Email blast (segmented: waitlist, customers, partners)
+  - Social announcement (3 posts/3 days)
+  - PR outreach (HARO + 10-15 targeted journalists)
+  - Product Hunt launch (Tuesday-Thursday, 12:01am PT)
+
+Post-launch (4-6 weeks):
+  - Iterate on feedback (private beta → public improvements)
+  - Retarget launch visitors
+  - Customer success focus (retention > acquisition in week 1-4)
+```
+
+### 9.9.5 Marketing Ideas Triage (140 ideas → 3 priorities)
+```
+1. Map ideas to funnel stage + expected impact
+2. Score: (impact 1-5) × (effort 1-5, inverted) × (confidence 1-5)
+3. Pick top 3 ideas per quarter, 1 per month
+4. Each idea: 1 owner, 1 metric, 1 deadline
+```
+
+---
+
+## 9.10 Sales Enablement & RevOps
+
+### 9.10.1 Lead Scoring (explicit + implicit)
+```
+Explicit (40% weight):
+  - Job title: VP+ = 30, Manager = 20, IC = 5
+  - Company size: 500+ = 25, 50-499 = 15, <50 = 5
+  - Industry fit: tier 1 = 25, tier 2 = 15, tier 3 = 5
+
+Implicit (60% weight):
+  - Pricing page visit: +20
+  - Demo request: +40
+  - Repeat visits (3+/week): +15
+  - Email engagement: open 3+ = +10, click 2+ = +20
+
+Threshold: MQL ≥ 60, SQL ≥ 80
+```
+
+### 9.10.2 Sales Enablement Collateral
+```
+By funnel stage:
+  - Awareness:      blog posts, social, podcast episodes
+  - Consideration:  case studies, comparison guides, ROI calculator
+  - Decision:       demo script, proposal template, security FAQ
+  - Onboarding:     implementation guide, success checklist, video walkthrough
+```
+
+### 9.10.3 Prospecting Multi-Channel Sequence
+```
+Day 0:  Email (cold, specific hook)
+Day 2:  LinkedIn connect request (note: short, no ask)
+Day 5:  Email follow-up (different angle)
+Day 8:  LinkedIn DM (share resource, not pitch)
+Day 12: Email (breakup / "should I close your file?")
+Day 20: Phone (if number available)
+Day 30: Final email (door open for future)
+```
+
+### 9.10.4 Public Relations Playbook
+```
+Tier 1 targets:   TechCrunch, The Verge, Forbes, WSJ (HARO daily)
+Tier 2 targets:   Industry-specific pubs (e.g., MarTech for marketing)
+Tier 3 targets:   Newsletters, podcasts, substack writers
+
+Pitch formula:   Hook (newsworthy angle) + Context (why now) + Asset (data, story, founder quote)
+Subject line:    <60 chars, specific, no clickbait
+Follow-up:       1 follow-up after 4-5 business days, then move on
+```
+
+### 9.10.5 Customer Research (JTBD Framework)
+```
+Job statement template:
+  When [situation/context], I want to [motivation], so I can [expected outcome].
+
+Interview questions:
+  1. Walk me through the last time you [did the job].
+  2. What were you doing before/after?
+  3. What almost stopped you? What actually did?
+  4. What did you do instead? (existing alternatives)
+  5. How would you describe a perfect solution?
+```
+
+### 9.10.6 Directory Submissions (for AI/SaaS products)
+```
+Tier 1:    Product Hunt, BetaList, Hacker News (Show HN), Reddit
+Tier 2:    G2, Capterra, GetApp, TrustRadius (B2B SaaS)
+Tier 3:    AppSumo, SaaSHub, There's An AI For That, OpenAI indexes
+Tier 4:    Vertical-specific (MCP registries, indie hacker communities, niche newsletters)
+```
+Submission cadence: **1-2/week** để avoid spam signals.
+
+### 9.10.7 Marketing Council (multi-persona brainstorm)
+```
+Personas:  CMO, CRO specialist, SEO lead, Copy chief, Growth PM
+Process:   1 brief → 5 independent takes → synthesize top 3 actionable angles
+Duration:  30-60 min
+Output:    1 prioritized idea list with rationale
+Frequency: 1x/2 weeks for strategic, 1x/week for tactical
+```
+
+### 9.10.8 Marketing Loops (recurring agent workflows)
+```
+Loop types:
+  1. Content loop:   keyword research → draft → publish → measure → iterate (weekly)
+  2. SEO loop:       audit top 20 pages → fix technical issues → re-measure (monthly)
+  3. Outreach loop:  prospecting → enrichment → sequence → reply handling (daily)
+  4. Retention loop: engagement signal → intervention → outcome tracking (real-time)
+
+Implementation:
+  - Triggers: cron, event, threshold-based
+  - State: external (DB) for resumability
+  - Logging: every step + outcome for observability
+  - Halt conditions: explicit guardrails (budget, time, error rate)
+```
+
+---
+
+## 9.11 Kết nối với các file khác
+
+- **Architecture** (`architecture.md`): mỗi section ở đây có 1 section tương ứng trong `architecture.md §4-§13` cho system design
+- **Anti-pattern** (`anti-pattern.md`): mỗi pattern ở đây có anti-pattern tương ứng
+- **Checklist** (`checklist.md`): pre-deployment checklist cho mỗi campaign type
+- **Decision tree** (`decision-tree.md`): flow chart cho "skill nào dùng khi nào"
+- **FAQ** (`faq.md`): Q&A thường gặp
+- **Glossary** (`glossary.md §9`): mapping từ skill name → section
+
+---
+
+## 10. Marketing Security & Privacy Best Practices (sync 2026-07-15)
+
+> Bổ sung từ [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) (v2.6.0, 39.5k stars). Marketing security là intersection giữa growth/UX và security/privacy. Áp dụng cho mọi campaign, landing page, email, paid ad, tracking setup. Cross-reference `.cursor/rules/security.mdc` (technical security) + `.cursor/agents/security-auditor.md` (review).
+
+**Nguyên tắc vàng (gold rules):**
+
+| # | Nguyên tắc | Áp dụng |
+|---|------------|---------|
+| 1 | **Consent first** — không thu thập data nào trước khi user opt-in rõ ràng | Tracking, email, SMS, push, cookies |
+| 2 | **Privacy by default** — strictest privacy mode là default | Cookie banner, account settings, sharing |
+| 3 | **Transparency** — nói rõ bạn thu thập gì, dùng để làm gì, share với ai | Privacy policy, cookie notice, ad disclosures |
+| 4 | **Data minimization** — chỉ thu thập data bạn thực sự dùng | Form fields, tracking events, CRM fields |
+| 5 | **Purpose limitation** — dùng data chỉ cho mục đích đã nói | Re-purposing list, behavioral ads |
+| 6 | **Right to be forgotten** — xóa data khi user yêu cầu, không hỏi lý do | Account deletion, list removal, log redaction |
+| 7 | **No dark patterns** — consent UI phải trung thực, không pre-checked, không "X" để reject | Cookie banner, unsubscribe, opt-out |
+| 8 | **Security in depth** — defense in depth, không single point of failure | Auth on webhooks, signed URLs, scoped tokens |
+
+### 10.1 Consent Management & Cookie Banners
+
+**Best practice:**
+- **Granular consent**: tách consent theo mục đích (analytics, marketing, personalization) — không all-or-nothing
+- **Reject cùng dễ như accept** (GDPR + EDPB guidelines): "Reject all" button phải cùng style, cùng vị trí, cùng số click như "Accept all"
+- **No pre-checked boxes**: tất cả opt-in phải là affirmative action
+- **Persistent preferences**: lưu consent state, không hỏi lại mỗi lần visit
+- **Easy withdrawal**: user có thể đổi ý bất kỳ lúc nào từ footer link
+- **Server-side enforcement**: không phụ thuộc client-side consent (server cũng phải respect consent state)
+
+**Implementation pattern (TCF v2.2 / IAB compliant):**
+```typescript
+// ✅ Best practice: server-side consent gate
+async function trackEvent(userId: string, event: MarketingEvent) {
+  const consent = await getConsentState(userId);
+
+  // Hard gate at server — never trust client
+  if (event.category === 'analytics' && !consent.analytics) return;
+  if (event.category === 'marketing' && !consent.marketing) return;
+  if (event.category === 'personalization' && !consent.personalization) return;
+
+  return analytics.track(userId, event);
+}
+
+// ✅ Cookie banner — equal prominence
+<CookieBanner>
+  <p>We use cookies for [purposes].</p>
+  <Button variant="primary">Accept all</Button>
+  <Button variant="primary">Reject all</Button>   {/* equal weight, equal placement */}
+  <Link href="/cookies/preferences">Customize</Link>
+</CookieBanner>
+```
+
+**Cross-reference:** `ads` skill (ad compliance), `analytics` skill (consent-aware tracking).
+
+### 10.2 Privacy-Compliant Analytics & Tracking
+
+**Best practice:**
+- **Consent-aware SDK initialization**: không load analytics SDK khi consent = false
+- **IP anonymization**: Google Analytics IP Anonymization enabled
+- **Server-side tracking preferred**: server-side GTM, server-side Meta CAPI, server-side TikTok Events API — bypasses ITP/cookie restrictions + improves accuracy
+- **First-party data strategy**: first-party cookies > third-party (post-ITP, post-3p cookie deprecation)
+- **Data clean rooms**: cho partner data sharing (Snowflake, AWS Clean Rooms, Habu) — không share raw PII
+- **PII redaction in logs**: emails, phones, addresses, IDs phải được hash/redacted trước khi log
+- **Retention windows**: define và enforce (analytics: 14 months, marketing: 24 months, financial: 7 years)
+
+**Anti-patterns to avoid:**
+- Loading Facebook Pixel before consent (violates GDPR + ePrivacy)
+- Using `email` as user_id in analytics (PII leak to ad platforms)
+- Tracking without IP anonymization
+- Storing raw PII in event properties
+- Cross-site tracking without explicit opt-in
+
+### 10.3 GDPR / CCPA / LGPD / PIPL Compliance
+
+**Best practice:**
+- **Lawful basis documented**: cho mỗi processing activity (consent, contract, legitimate interest, legal obligation)
+- **Records of Processing Activities (ROPA)**: GDPR Art. 30 — maintain internal record
+- **Data Protection Impact Assessment (DPIA)**: cho high-risk processing (profiling, large-scale, sensitive data)
+- **Privacy by design**: mọi feature mới phải pass privacy review trước launch
+- **Cross-border transfer mechanism**: SCCs, adequacy decisions, BCRs cho EU→US transfer
+- **DPO appointed**: required cho large-scale monitoring hoặc sensitive data
+- **72-hour breach notification**: clock starts khi biết về breach, không phải khi breach xảy ra
+- **Right to access**: respond trong 30 days (GDPR) / 45 days (CCPA)
+- **Right to portability**: machine-readable format (JSON, CSV)
+
+**Regional checklist:**
+| Region | Law | Key requirements |
+|---|---|---|
+| EU | GDPR | Consent, breach notification, DPO, DPIA, ROPA |
+| California | CCPA / CPRA | Opt-out, access, deletion, financial incentives disclosure |
+| Brazil | LGPD | Similar to GDPR, ANPD oversight |
+| China | PIPL | Data localization, separate consent, security assessment for cross-border |
+| Vietnam | PDPD (2023) | Consent, data subject rights, cross-border restrictions |
+| Thailand | PDPA | Similar to GDPR |
+| Global | Cookie laws | ePrivacy Directive (EU), PECR (UK), LGPD (BR) |
+
+### 10.4 Email Marketing Security & Compliance
+
+**Best practice:**
+- **Authentication mandatory**: SPF + DKIM + DMARC (DMARC policy: `p=quarantine` minimum, `p=reject` ideal)
+- **TLS for SMTP**: enforce TLS 1.2+ cho outbound + inbound SMTP
+- **List hygiene**: hard-bounce suppression, soft-bounce retry 3x trong 72h rồi suppress
+- **Confirmed opt-in (double opt-in)**: cho EU + B2B best practice
+- **One-click unsubscribe (RFC 8058)**: List-Unsubscribe-Post header, không cần login
+- **Physical address required**: CAN-SPAM (US), CASL (Canada), GDPR transparency
+- **Sender identity clear**: "From" phải là recognizable entity, không misleading
+- **Honor opt-out trong 10 days** (CAN-SPAM) / immediately (GDPR)
+- **No rented/3rd-party lists**: chỉ gửi cho opt-in contacts
+
+**DMARC record example:**
+```
+v=DMARC1; p=reject; rua=mailto:dmarc@yourdomain.com; ruf=mailto:forensic@yourdomain.com; pct=100; adkim=s; aspf=s
+```
+
+### 10.5 Paid Ads Compliance (Google, Meta, TikTok, LinkedIn)
+
+**Best practice:**
+- **Ad disclosure clear**: "Ad", "Sponsored", "Paid partnership" — không hidden
+- **No misleading claims**: substantiated claims only (FTC, EU UCPD)
+- **Prohibited content**: no discrimination, no harmful products, no misleading health/financial claims
+- **Landing page transparency**: terms, privacy, contact info visible
+- **Conversion API server-side**: prefer Meta CAPI, TikTok Events API, Google Enhanced Conversions — better privacy + accuracy
+- **Limited data use flags**: Meta LDU flag for California users (CCPA compliance)
+- **Restricted data processing**: honor user privacy choices through ad platform APIs
+- **Customer data hashing**: SHA-256 of email/phone before upload to ad platforms (no raw PII)
+- **Ad policy compliance**: respect industry-specific rules (alcohol, gambling, finance, healthcare)
+- **Creative review**: claim verification, before/after disclosure, AI-generated content labeling
+
+### 10.6 Customer Research Privacy
+
+**Best practice:**
+- **Interview consent recorded**: explicit audio/video consent before recording
+- **Anonymization in research outputs**: strip PII from quotes + research artifacts
+- **Recruitment privacy**: panel data handling per IAB + ESOMAR guidelines
+- **Incentive tax compliance**: 1099 forms (US) for > $600/yr incentives
+- **Data retention limit**: 12 months cho raw research data, 24 months cho aggregated insights
+- **Vendor assessment**: research panel vendors must pass security review (SOC2, GDPR)
+- **Special category data**: health, biometric, children — extra protections required (GDPR Art. 9)
+
+### 10.7 Public Relations & Crisis Communications
+
+**Best practice:**
+- **Embargo verified**: respect embargo dates/times (legal consequences if broken)
+- **Source verification**: verify facts before going public (reputational + legal risk)
+- **Crisis comms protocol**: pre-approved spokesperson, legal review, hold statements ready
+- **Disclosure compliance**: Reg FD (public companies), materiality standards
+- **Crisis playbook documented**: ransomware, data breach, product recall, leadership scandal
+- **Customer comms channels**: status page, in-app banner, email — all aligned
+- **Post-crisis review**: blameless postmortem, customer follow-up, regulatory reporting
+
+### 10.8 Webhook Security & Marketing Integrations
+
+**Best practice:**
+- **Signed webhooks**: HMAC-SHA256 signature verification (Stripe, Shopify, HubSpot pattern)
+- **Replay protection**: timestamp + nonce in signature payload
+- **IP allowlisting**: when possible (e.g., Stripe webhook source IPs)
+- **Secret rotation**: rotate signing keys every 90 days
+- **TLS 1.2+ only**: never accept HTTP webhooks
+- **Idempotency keys**: prevent double-processing on retry
+- **Audit log**: log all webhook deliveries + signature verification results
+- **Scoped tokens**: integration tokens với minimum required permissions only
+
+### 10.9 Schema Markup Without PII Leak
+
+**Best practice:**
+- **No PII in structured data**: schema.org không designed cho PII
+- **Aggregate ratings only**: individual reviewer names redacted
+- **Product schema**: giá + availability public, internal SKUs không public
+- **Organization schema**: public contact info only, không internal employees
+- **FAQ schema**: support knowledge base content, không customer-specific answers
+- **Review schema**: comply with FTC + Google guidelines (no incentivized reviews without disclosure)
+
+### 10.10 ASO (App Store Optimization) Compliance
+
+**Best practice:**
+- **App privacy labels accurate**: Apple App Store, Google Play data safety sections
+- **App tracking transparency (ATT)**: iOS 14.5+ requires explicit consent for IDFA access
+- **Privacy nutrition labels**: declare data collection + tracking honestly
+- **No misleading screenshots**: actual app UI, not aspirational
+- **Age rating accurate**: especially for children (COPPA, GDPR-K)
+- **Children apps**: no behavioral ads, no third-party SDKs collecting data (COPPA Rule)
+
+### 10.11 Sales Enablement Data Hygiene
+
+**Best practice:**
+- **Lead data minimization**: chỉ thu thập data sales actually uses
+- **No sensitive categories**: không collect health, religion, political, sexual orientation
+- **Consent provenance**: log where + when consent was given
+- **Cross-team data sharing**: contractual basis + technical safeguards
+- **Compensation data confidential**: không leak trong sales enablement materials
+- **Demo data sanitized**: use synthetic data, not real customer data
+
+### 10.12 SEO Privacy Considerations
+
+**Best practice:**
+- **Log redaction**: IP addresses, user agents redacted in server logs (14-month retention max)
+- **Search analytics privacy**: anonymize query data before sharing with third parties
+- **AI search optimization (AEO/GEO)**: respect robots.txt + opt-out from training
+- **Competitor research legality**: chỉ public data, không scrape behind auth
+- **Customer data in comparison pages**: aggregate only, no individual customer comparisons without consent
+- **No PII in URL slugs**: `example.com/user/john-doe` violates privacy
+
+### 10.13 Churn Prevention Data Ethics
+
+**Best practice:**
+- **Save offers fair**: không dùng dark patterns (pre-checked retention discount, hidden cancel button)
+- **Cancellation flow 1-click**: không 4-step phone tree, không "are you sure sure sure?"
+- **Dunning emails respectful**: không shame-based language, không threaten
+- **Win-back segmentation**: không target vulnerable populations (recently unemployed, health crisis)
+- **Data deletion on cancel**: hard delete PII trong 30 days (some jurisdictions: immediately)
+
+### 10.14 Marketing Operations Security
+
+**Best practice:**
+- **SSO mandatory**: cho mọi marketing tool (HubSpot, Mailchimp, Google Ads, Meta)
+- **Role-based access**: editor / approver / admin với least privilege
+- **API key rotation**: 90-day rotation, scoped keys (read-only when possible)
+- **Audit logging**: mọi config change logged (who, when, what)
+- **Vendor security review**: SOC2 Type II or equivalent cho mọi marketing vendor
+- **Data Processing Agreements (DPA)**: GDPR Art. 28 compliant contracts
+- **Incident response plan**: marketing data breach playbook (separate from engineering)
+- **Backup + recovery**: weekly backups, quarterly restore drills
+
+### 10.15 Cross-Channel Identity Resolution Privacy
+
+**Best practice:**
+- **Deterministic matching preferred**: explicit user identifier (email hash) > probabilistic
+- **Hash with SHA-256 + salt**: before sharing with ad platforms
+- **No cross-device fingerprinting without consent**: probabilistic device graphs require explicit opt-in
+- **PII isolation**: identity resolution vendor gets hashed data, not raw PII
+- **Data clean rooms for partner data**: aggregate only, no row-level sharing
+
+### 10.16 Marketing AI Security
+
+**Best practice:**
+- **No customer PII to public LLMs**: OpenAI, Anthropic APIs không phải nơi để send raw customer data
+- **On-prem or VPC for sensitive use cases**: cho regulated industries (finance, healthcare)
+- **Prompt injection defense**: validate + sanitize inputs to AI marketing tools (email subject, ad copy generation)
+- **AI-generated content labeling**: disclose khi ad copy, image, video là AI-generated (FTC, EU AI Act)
+- **Training data opt-out**: respect robots.txt + opt-out signals for AI training
+- **Hallucination guardrails**: AI-generated facts phải verified trước khi publish (legal + reputational risk)
+- **Vendor security review**: cho AI vendors (data retention policy, training data use, breach history)
+
+---
+
+## 10.17 Kết nối với file khác
+
+- **Anti-pattern** (`anti-pattern.md §10`): dark patterns, hidden tracking, PII leaks
+- **Checklist** (`checklist.md §11`): pre-launch security checklist
+- **Architecture** (`architecture.md §5`): privacy-by-design + consent mgmt architecture
+- **Decision tree** (`decision-tree.md §12`): security-aware marketing routing
+- **FAQ** (`faq.md §10`): marketing security FAQs
+- **Glossary** (`glossary.md §14`): marketing security terms (GDPR, CCPA, dark patterns, ...)
+- **Cross-rule**: `.cursor/rules/security.mdc` (technical), `.cursor/rules/auth.mdc` (auth), `.cursor/agents/security-auditor.md` (review)

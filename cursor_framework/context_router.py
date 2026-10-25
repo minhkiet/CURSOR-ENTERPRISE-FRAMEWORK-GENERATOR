@@ -36,6 +36,8 @@ class IntentType(Enum):
     SECURITY_AUDIT = "security_audit"
     DESIGN = "design"
     DEPLOYMENT = "deployment"
+    MARKETING_PLANNING = "marketing_planning"
+    MARKETING_EXECUTION = "marketing_execution"
     GENERAL = "general"
 
 
@@ -51,6 +53,7 @@ class Domain(Enum):
     MOBILE = "mobile"
     AI_ML = "ai_ml"
     INFRASTRUCTURE = "infrastructure"
+    MARKETING = "marketing"
     GENERAL = "general"
 
 
@@ -72,6 +75,25 @@ class Skill(Enum):
     DATABASE_OPTIMIZATION = "database-optimization"
     RAG_BUILDER = "rag-builder"
     VECTOR_SEARCH_REVIEW = "vector-search-review"
+    # Marketing concept-ref (47 marketingskills → existing knowledge files, see
+    # .cursor/rules/skill-registry.mdc §9). One umbrella Skill enum value because
+    # the concept-ref pattern doesn't create per-skill files — Agent routes
+    # within the umbrella via knowledge/marketing/decision-tree.md §11.
+    MARKETING = "marketing"
+    # ── Agents (sync 2026-07-15) ── 10 specialized agents registered as
+    # routable skills. Each maps to .cursor/agents/{name}.md. The router
+    # dispatches user intent keywords → agent via SKILL_TRIGGERS below;
+    # the actual behavior is governed by each agent's profile.
+    DEBUGGER = "debugger"
+    UI_DESIGNER = "ui-designer"
+    WEB_CLONER = "web-cloner"
+    WEB_SCRAPER = "web-scraper"
+    REFACTOR_SPECIALIST = "refactor-specialist"
+    DEPLOYMENT_ENGINEER = "deployment-engineer"
+    MIGRATION_SPECIALIST = "migration-specialist"
+    DOC_WRITER = "doc-writer"
+    DEVOPS_ENGINEER = "devops-engineer"
+    MARKETING_STRATEGIST = "marketing-strategist"
 
 
 @dataclass
@@ -139,6 +161,31 @@ class IntentClassifier:
             "deploy", "release", "publish", "push", "ship", "production",
             "staging", "ci/cd", "pipeline"
         ],
+        # Marketing intents (sync 2026-07-15 with marketingskills repo).
+        # Distinguish planning vs execution so the agent can route to
+        # `.cursor/knowledge/marketing/decision-tree.md §11` accordingly.
+        IntentType.MARKETING_PLANNING: [
+            "marketing plan", "go-to-market", "gtm", "quarterly plan",
+            "marketing strategy", "launch strategy", "launch plan",
+            "positioning", "icp", "ideal customer profile",
+            "marketing research", "competitor research", "competitive analysis",
+            "audience research", "customer research", "jtbd",
+            "marketing brainstorm", "marketing council", "tactic catalog"
+        ],
+        IntentType.MARKETING_EXECUTION: [
+            "cro", "conversion rate", "optimize conversion", "ab test", "a/b test",
+            "split test", "cold email", "outreach", "cold outreach", "prospecting",
+            "seo audit", "programmatic seo", "schema markup", "structured data",
+            "llms.txt", "ai seo", "llmo", "aso", "app store",
+            "ads", "google ads", "meta ads", "facebook ads", "linkedin ads",
+            "ad creative", "creative testing",
+            "email sequence", "newsletter", "drip", "sms marketing",
+            "paywall", "churn prevention", "dunning",
+            "referral", "co-marketing", "free tool",
+            "pricing", "pricing strategy", "tier",
+            "pr pitch", "media pitch", "haro",
+            "directory submission", "marketing loop"
+        ],
     }
 
     # Domain keywords mapping
@@ -171,6 +218,20 @@ class IntentClassifier:
         Domain.AI_ML: [
             "ai", "ml", "llm", "openai", "claude", "gemini", "gpt", "embedding",
             "rag", "vector", "prompt", "token", "model"
+        ],
+        Domain.MARKETING: [
+            # 9 marketingskills categories → umbrella Domain.MARKETING
+            "marketing", "growth", "cro", "conversion", "signup", "onboarding",
+            "popup", "paywall", "copywriting", "cold email", "newsletter",
+            "sms marketing", "social content", "seo", "programmatic seo",
+            "ai seo", "schema", "aso", "paid ads", "google ads", "meta ads",
+            "facebook ads", "linkedin ads", "ad creative", "ab test",
+            "a/b test", "split test", "analytics", "tracking plan",
+            "churn", "retention", "dunning", "co-marketing", "free tool",
+            "referral", "launch", "pricing", "offer", "revops", "lead scoring",
+            "mql", "sql", "prospecting", "outbound", "pr", "press release",
+            "haro", "directory submission", "customer research", "jtbd",
+            "marketing loop", "icp", "positioning"
         ],
     }
 
@@ -277,6 +338,112 @@ class ContextRouter:
         Skill.PERFORMANCE_AUDIT: [
             "performance", "optimize speed", "slow", "latency", "bundle size"
         ],
+        # Marketing umbrella — 47 marketingskills concept-refs are routed
+        # within MARKETING via `.cursor/knowledge/marketing/decision-tree.md §11`
+        # (no per-skill SKILL.md files; see skill-registry.mdc §9).
+        Skill.MARKETING: [
+            "marketing", "growth", "cro", "conversion rate", "conversion",
+            "signup", "sign-up", "register", "onboarding", "activation",
+            "popup", "pop-up", "modal", "exit-intent", "paywall",
+            "upgrade flow", "trial expiration",
+            "copywriting", "copy editing", "cold email", "outreach",
+            "email sequence", "newsletter", "drip campaign", "lifecycle email",
+            "sms marketing", "tcpa", "social content", "social post",
+            "instagram", "linkedin post", "tiktok script",
+            "image gen", "ai image", "dall-e", "midjourney",
+            "video script", "video marketing",
+            "seo", "seo audit", "technical seo", "ai seo", "llmo", "geo", "aeo",
+            "llms.txt", "programmatic seo", "schema markup", "json-ld",
+            "rich snippets", "structured data", "aso", "app store optimization",
+            "site architecture", "information architecture", "url structure",
+            "competitor page", "comparison page", "vs page", "alternatives page",
+            "paid ads", "google ads", "meta ads", "facebook ads", "linkedin ads",
+            "ad creative", "ad copy", "creative testing",
+            "analytics", "tracking plan", "event tracking", "ga4", "mixpanel",
+            "ab test", "a/b test", "split test", "experiment",
+            "churn", "churn prevention", "cancel flow", "retention", "dunning",
+            "co-marketing", "joint webinar", "partnership marketing",
+            "free tool", "calculator", "grader", "lead magnet tool",
+            "referral", "referral program", "affiliate",
+            "marketing ideas", "marketing tactics", "growth tactics",
+            "marketing psychology", "mental models", "loss aversion", "social proof",
+            "marketing plan", "quarterly plan", "go-to-market", "gtm",
+            "launch", "product launch", "launch strategy",
+            "pricing", "pricing strategy", "pricing page", "tier pricing",
+            "offer", "offer construction", "value equation", "guarantee",
+            "revops", "lead scoring", "lead lifecycle", "mql", "sql",
+            "sales enablement", "sales deck", "pitch deck", "one-pager",
+            "prospecting", "outbound", "cold call", "sales sequence",
+            "public relations", "press release", "media pitch", "haro",
+            "pr campaign", "pr strategy", "pr outreach",
+            "directory submission", "directory listing", "saas directories",
+            "customer research", "user interview", "jtbd", "jobs to be done",
+            "competitor", "competitor profiling", "battlecard", "positioning",
+            "marketing council", "marketing brainstorm", "multi-persona",
+            "marketing loops", "recurring agent", "marketing workflow",
+            "product marketing", "product context", "icp",
+            "marketing research", "marketing strategy"
+        ],
+        # ── Agent skill triggers (sync 2026-07-15) ──
+        # Each agent routes via compact trigger set; long-tail variants live
+        # in skill_discovery.py so context_router stays lean.
+        Skill.DEBUGGER: [
+            "debug", "bug", "fix bug", "fix error", "repro", "reproduce",
+            "root cause", "intermittent", "stack trace", "exception",
+            "fix lỗi", "sửa lỗi", "lỗi", "bug report", "/debug", "/fix"
+        ],
+        Skill.UI_DESIGNER: [
+            "design ui", "ui design", "ux", "design system",
+            "design tokens", "component spec", "redesign",
+            "thiết kế ui", "thiết kế giao diện", "wireframe",
+            "mockup", "landing page design", "/design", "/ui"
+        ],
+        Skill.WEB_CLONER: [
+            "clone", "copy website", "mirror", "replicate site",
+            "clone web", "copy site", "sao chép web",
+            "/clone", "/copy", "/mirror"
+        ],
+        Skill.WEB_SCRAPER: [
+            "scrape", "extract", "crawl", "fetch docs",
+            "scrape web", "lấy nội dung", "trích xuất",
+            "/scrape", "/extract", "/docs",
+            "pull documentation", "scrape article"
+        ],
+        Skill.REFACTOR_SPECIALIST: [
+            "refactor", "cleanup", "code smell", "tech debt",
+            "extract function", "rename",
+            "refactor code", "dọn dẹp code", "/refactor"
+        ],
+        Skill.DEPLOYMENT_ENGINEER: [
+            "deploy", "release", "ship", "rollout", "production deploy",
+            "canary", "blue green", "deploy to prod",
+            "triển khai", "release phiên bản",
+            "/deploy", "/release", "/ship"
+        ],
+        Skill.MIGRATION_SPECIALIST: [
+            "migrate", "migration", "schema change", "backfill",
+            "add column", "drop column", "rename column",
+            "data migration", "framework upgrade",
+            "/migrate", "di trú", "migration script"
+        ],
+        Skill.DOC_WRITER: [
+            "write docs", "readme", "documentation", "adr",
+            "runbook", "tutorial", "api reference",
+            "viết tài liệu",
+            "/doc", "/readme", "/adr", "/runbook"
+        ],
+        Skill.DEVOPS_ENGINEER: [
+            "ci", "cd", "pipeline", "infrastructure", "iac",
+            "terraform", "kubernetes", "docker",
+            "ci/cd", "build pipeline", "/build", "container"
+        ],
+        Skill.MARKETING_STRATEGIST: [
+            "marketing", "growth", "positioning", "funnel",
+            "cro strategy", "seo strategy", "paid ads",
+            "retention strategy", "churn", "pricing strategy",
+            "launch strategy", "growth strategy",
+            "chiến lược marketing", "/marketing", "/growth"
+        ],
     }
 
     # Skill combination rules
@@ -287,6 +454,28 @@ class ContextRouter:
         "multi_file": [Skill.FULL_OUTPUT, Skill.FRONTEND_REVIEW],
         "security_task": [Skill.SECURITY_REVIEW],
         "payment_task": [Skill.VIETNAM_PAYMENT_REVIEW, Skill.SECURITY_REVIEW],
+        # Marketing combinations — when user request hits marketing umbrella,
+        # these secondary skills may be added by the agent:
+        #   - FULL_OUTPUT (if build request)
+        #   - karpathy-coding overlay (mandatory for any code-generating marketing task)
+        "marketing_task": [Skill.MARKETING],
+        "marketing_build": [Skill.MARKETING, Skill.FULL_OUTPUT],
+        # ── Agent combinations (sync 2026-07-15) ──
+        # When multiple agents collaborate, list primary + supporting.
+        "debug_fix": [Skill.DEBUGGER],
+        "design_system": [Skill.UI_DESIGNER, Skill.FULL_OUTPUT],
+        "clone_site": [Skill.WEB_CLONER],
+        "extract_content": [Skill.WEB_SCRAPER],
+        "refactor_code": [Skill.REFACTOR_SPECIALIST, Skill.FULL_OUTPUT],
+        "deploy_release": [Skill.DEPLOYMENT_ENGINEER],
+        "db_migration": [Skill.MIGRATION_SPECIALIST, Skill.DEPLOYMENT_ENGINEER],
+        "write_docs": [Skill.DOC_WRITER],
+        "infra_change": [Skill.DEVOPS_ENGINEER, Skill.DEPLOYMENT_ENGINEER],
+        "marketing_strategy": [Skill.MARKETING_STRATEGIST, Skill.MARKETING],
+        # Priority composition sets — when multiple agents could apply (e.g., UI
+        # design + frontend-taste), the agent listed first takes routing
+        # precedence; secondary is invoked via SKILL_COMBINATIONS only.
+        "ui_design_priority": [Skill.UI_DESIGNER, Skill.FRONTEND_TASTE, Skill.FRONTEND_REVIEW],
     }
 
     def __init__(self):

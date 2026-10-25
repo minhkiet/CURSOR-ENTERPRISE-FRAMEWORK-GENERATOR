@@ -1,0 +1,48 @@
+{
+  "mcpServers": {
+    "cursor-framework": {
+      "command": "C:\\Python312\\python.exe",
+      "args": ["-m", "cursor_framework_mcp.server"],
+      "cwd": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\tools\\cursor-framework-mcp",
+      "env": {
+        "CURSOR_WORKSPACE_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "WORKSPACE_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "CURSOR_FRAMEWORK_CACHE_MAX_RULES": "20",
+        "CURSOR_FRAMEWORK_CACHE_MAX_SKILLS": "30",
+        "CURSOR_FRAMEWORK_CACHE_MAX_AGENTS": "10",
+        "CURSOR_FRAMEWORK_CACHE_TTL_MINUTES": "30"
+      },
+      "description": "Cursor Enterprise Framework - Rules, Skills, Agents registry with auto-discovery and caching"
+    },
+    "cursor-autopilot": {
+      "command": "C:\\Python312\\python.exe",
+      "args": ["-m", "cursor_autopilot_mcp.server"],
+      "cwd": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\tools\\cursor-autopilot-mcp",
+      "env": {
+        "CURSOR_WORKSPACE_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "WORKSPACE_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "CURSOR_FRAMEWORK_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\tools\\cursor-framework-mcp"
+      },
+      "description": "Auto-execution engine for Cursor Enterprise Framework - runs workflows, gates, and suggestions"
+    },
+    "cursor-memory": {
+      "command": "C:\\Python312\\python.exe",
+      "args": ["-m", "cursor_memory_mcp.server"],
+      "cwd": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\tools\\cursor-memory-mcp",
+      "env": {
+        "CURSOR_WORKSPACE_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "WORKSPACE_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
+        "CURSOR_MEMORY_CACHE_DIR": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\.cache\\cursor-memory-mcp",
+        "CURSOR_CONTEXT_TOKEN_BUDGET": "100000",
+        "CURSOR_MEMORY_AUTO_PRUNE": "true"
+      },
+      "description": "Memory and context management for Cursor - stores, recalls, compresses, and syncs memory"
+    }
+  },
+  "_meta": {
+    "version": "1.0.0",
+    "framework_version": "3.1.0",
+    "total_tools": 26,
+    "description": "Cursor Enterprise Framework MCP stack - framework registry + autopilot + memory management"
+  }
+}

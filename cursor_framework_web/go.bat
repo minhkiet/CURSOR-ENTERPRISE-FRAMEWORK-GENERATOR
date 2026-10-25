@@ -35,7 +35,6 @@ echo   Starting CEF Vue App Dev Server...
 echo ================================================
 echo.
 echo   Local:   http://localhost:5173
-echo   Network: http://192.168.1.100:5173
 echo.
 echo   Press Ctrl+C to stop
 echo.

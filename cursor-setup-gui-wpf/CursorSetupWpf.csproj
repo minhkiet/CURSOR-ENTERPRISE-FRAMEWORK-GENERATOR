@@ -1,0 +1,81 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS8632</NoWarn>
+    <AssemblyName>VibeCodeEnterpriseFramework</AssemblyName>
+    <Version>4.5.0</Version>
+    <FileVersion>4.5.0</FileVersion>
+    <AssemblyVersion>4.5.0</AssemblyVersion>
+    <Company>VibeCode</Company>
+    <Product>VibeCode Enterprise Framework</Product>
+    <Description>Setup tool for VibeCode Enterprise Framework with MCP tools integration</Description>
+    <Copyright>Copyright 2026</Copyright>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <ApplicationIcon>setup.ico</ApplicationIcon>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- WPF-specific bilingual resources contain the complete UI key set. -->
+    <Content Include="Resources\en.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Resources\vi.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+    <Resource Include="Resources\Styles\*.xaml" />
+    <Resource Include="Resources\Themes\*.xaml" />
+    <Resource Include="setup.ico" />
+    <!-- Keep the additive-only GitHub skill importer available in packaged builds. -->
+    <Content Include="..\tools\skill_installer.py" Condition="Exists('..\tools\skill_installer.py')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+      <Link>tools\skill_installer.py</Link>
+    </Content>
+  </ItemGroup>
+  <!-- Keep localization deterministic on incremental publish. -->
+  <Target Name="CopySharedLocalizationAfterPublish" AfterTargets="Publish">
+    <MakeDir Directories="$(PublishDir)Resources" />
+    <Copy
+      SourceFiles="$(MSBuildProjectDirectory)\Resources\en.txt;$(MSBuildProjectDirectory)\Resources\vi.txt"
+      DestinationFolder="$(PublishDir)Resources"
+      SkipUnchangedFiles="false" />
+  </Target>
+  <Target Name="CopySkillImporterAfterPublish" AfterTargets="Publish" Condition="Exists('$(MSBuildProjectDirectory)\..\tools\skill_installer.py')">
+    <MakeDir Directories="$(PublishDir)tools" />
+    <Copy
+      SourceFiles="$(MSBuildProjectDirectory)\..\tools\skill_installer.py"
+      DestinationFiles="$(PublishDir)tools\skill_installer.py"
+      SkipUnchangedFiles="false" />
+  </Target>
+  <!-- MCP Tools - auto-include from ../tools directory -->
+  <ItemGroup>
+    <Content Include="..\tools\cursor-framework-mcp\**\*" Condition="Exists('..\tools\cursor-framework-mcp')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>tools\cursor-framework-mcp\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\tools\cursor-autopilot-mcp\**\*" Condition="Exists('..\tools\cursor-autopilot-mcp')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>tools\cursor-autopilot-mcp\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\tools\cursor-memory-mcp\**\*" Condition="Exists('..\tools\cursor-memory-mcp')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>tools\cursor-memory-mcp\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\tools\mcp-config-template.json" Condition="Exists('..\tools\mcp-config-template.json')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>tools\mcp-config-template.json</Link>
+    </Content>
+    <Content Include="..\tools\MCP-INTEGRATION.md" Condition="Exists('..\tools\MCP-INTEGRATION.md')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>tools\MCP-INTEGRATION.md</Link>
+    </Content>
+  </ItemGroup>
+</Project>

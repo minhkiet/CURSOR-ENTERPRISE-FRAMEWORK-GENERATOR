@@ -26,6 +26,7 @@ import hashlib
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any, Optional
 
 from .context_builder import ContextBuilder, ContextResult
 from .indexer import Indexer
@@ -43,6 +44,7 @@ class WorkflowResult:
     memory_misses: int
     asset_count: int
     latency_ms: float = 0.0
+    phase_ms: dict[str, float] = field(default_factory=dict)
 
 
 class Workflow:
@@ -61,10 +63,26 @@ class Workflow:
         max_skills: int = 5,
         auto_watch: bool = False,
         watch_interval: float = 5.0,
+        strict_persist: bool = False,
     ) -> None:
+        """
+        Args:
+            root: Path to the `.cursor` directory.
+            memory_path: Path to the persisted JSON memory file.
+            max_tokens: Token budget for ContextBuilder.
+            max_skills: Cap on skills per request.
+            auto_watch: Spawn a background Watcher to invalidate cache
+                when files change.
+            watch_interval: Watcher poll interval (seconds).
+            strict_persist: When True, persist memory after every ask
+                (including cache hits). Defaults to False so the hit path
+                stays allocation-free. Set to True for tests / CI that
+                assert on disk state after a hit.
+        """
         self.root = Path(root).resolve()
         self.memory_path = Path(memory_path)
         self.max_skills = max_skills
+        self.strict_persist = strict_persist
         self.builder = ContextBuilder(root=self.root, max_tokens=max_tokens)
         self.memory = MemoryManager()
         self.store = MemoryStore(self.memory_path)
@@ -73,8 +91,10 @@ class Workflow:
         restored = self.store.load_into(self.memory)
         self._restored_entries = restored
 
-        # Lazy asset index — built once, reused.
+        # Lazy asset index — built only on cache miss.
         self._index: Indexer | None = None
+        # Memoize ETag across calls; invalidated by watcher events.
+        self._etag_cache: tuple[str, str] | None = None
 
         # Optional auto-watcher: re-index on file change so INDEX.json stays
         # fresh without manual scan. Lazy import avoids a hard dep at
@@ -99,8 +119,103 @@ class Workflow:
 
     @staticmethod
     def _request_key(request: str) -> str:
-        """Stable hash for cache lookup — same request → same key."""
+        """Stable hash for cache lookup."""
         return "request:" + hashlib.md5(request.encode("utf-8")).hexdigest()
+
+    def _compute_etag(self) -> str:
+        """
+        Compute ETag from skill file mtimes.
+
+        Returns a hash of all skill file modification times.
+        Invalidates cache when any skill file changes.
+
+        Ponytail: memoized per (root, mtime_signature). The signature
+        collapses all file mtimes into a single string we hash once.
+        Watcher events invalidate the cache via `_etag_cache = None`.
+        A full scan on every ask() is the prior behaviour — this cuts
+        the hot path from O(framework files) to O(1) on cache hit.
+        """
+        if self._etag_cache is not None:
+            return self._etag_cache[0]
+
+        etag_parts: list[str] = []
+
+        # Walk skill directories and collect mtimes
+        skill_dirs = [
+            self.root / "skills",
+            self.root / "rules",
+            self.root / "agents",
+        ]
+
+        for skill_dir in skill_dirs:
+            if not skill_dir.exists():
+                continue
+            for path in sorted(skill_dir.rglob("*")):
+                if path.is_file():
+                    try:
+                        mtime = path.stat().st_mtime
+                        etag_parts.append(f"{path.relative_to(self.root)}:{mtime}")
+                    except OSError:
+                        pass
+
+        # Also include INDEX.json mtime if exists
+        index_path = self.root / "INDEX.json"
+        if index_path.exists():
+            try:
+                mtime = index_path.stat().st_mtime
+                etag_parts.append(f"INDEX.json:{mtime}")
+            except OSError:
+                pass
+
+        # Hash all parts together
+        combined = "|".join(sorted(etag_parts))
+        etag = hashlib.md5(combined.encode("utf-8")).hexdigest()
+        self._etag_cache = (etag, combined)
+        return etag
+
+    def invalidate_cache(self, key_pattern: str | None = None) -> int:
+        """
+        Invalidate cached entries.
+        
+        Args:
+            key_pattern: If provided, only invalidate keys matching this pattern.
+                        If None, invalidates all HOT tier entries.
+        
+        Returns:
+            Number of entries invalidated
+        """
+        if key_pattern:
+            # Delete specific keys matching pattern
+            deleted = 0
+            for tier in MemoryTier:
+                keys_to_delete = [
+                    k for k in self.memory._storage[tier]
+                    if key_pattern in k
+                ]
+                for k in keys_to_delete:
+                    self.memory.delete(k, tier)
+                    deleted += 1
+            return deleted
+        else:
+            # Clear all HOT tier (session cache)
+            count = len(self.memory._storage[MemoryTier.HOT])
+            self.memory._storage[MemoryTier.HOT].clear()
+            return count
+
+    def _coerce_to_context_result(self, cached: Any) -> Optional[ContextResult]:
+        """Re-wrap a JSON-deserialized dict into ContextResult for cross-process cache hits."""
+        if isinstance(cached, ContextResult):
+            return cached
+        if isinstance(cached, dict) and cached.get("text") is not None:
+            return ContextResult(
+                text=cached.get("text", ""),
+                tokens=cached.get("tokens", 0),
+                skill_count=cached.get("skill_count", 0),
+                truncated=cached.get("truncated", False),
+                skills_used=cached.get("skills_used", []),
+                skipped=cached.get("skipped", []),
+            )
+        return None
 
     def ask(self, request: str) -> WorkflowResult:
         """
@@ -108,11 +223,11 @@ class Workflow:
 
         Flow:
             1. Compute request hash key
-            2. Check memory cache → if fresh HIT with valid ContextResult,
+            2. Check memory cache → if fresh HIT with valid ContextResult and matching ETag,
                return cached value
             3. Otherwise: ensure index, build context via ContextBuilder
             4. Store context in memory (HOT tier, 1h TTL)
-            5. Persist memory to disk
+            5. Persist memory to disk (only if dirty — hit path may skip)
 
         Note on `from_cache`:
             True only when the cached value round-trips as a real
@@ -120,42 +235,79 @@ class Workflow:
             JSON-serialized dataclass comes back as a plain dict, so
             Workflow gracefully rebuilds — `from_cache=False` but
             `memory_hits` still increments (the key lookup hit).
+
+        Note on ETag:
+            Cache is invalidated when skill files change (based on mtime).
+            The ETag is stored alongside the cached ContextResult.
         """
         # ponytail: time the full ask() call so callers can surface
         # cache-hit vs cache-miss latency in dashboards / benchmarks.
         started = time.perf_counter()
+        phase_ms: dict[str, float] = {}
 
-        idx = self._ensure_index()
-        key = self._request_key(request)
+        # Cache hit path: skip Indexer.scan entirely. ETag is memoized
+        # so we only walk the framework tree on first call or after
+        # watcher invalidation.
+        etag_start = time.perf_counter()
+        current_etag = self._compute_etag()
+        phase_ms["etag_ms"] = (time.perf_counter() - etag_start) * 1000
 
-        cached = self.memory.retrieve(key)
-        if cached is not None and isinstance(cached, ContextResult):
-            # ponytail: persist memory on cache hit too — process crash
-            # between hits should not lose stats or HOT-tier entries.
-            # Cheap (~few KB JSON) so we don't gate it behind a flag.
-            self.store.save(self.memory)
+        # Create cache key with ETag for proper invalidation
+        base_key = self._request_key(request)
+        cache_key = f"{base_key}:{current_etag}"
+
+        cached = self.memory.retrieve(cache_key)
+        raw_cached = cached
+        if cached is not None:
+            cached = self._coerce_to_context_result(cached)
+        if cached is not None:
+            # ponytail: persist-on-hit is now optional via save_if_dirty.
+            # Cache hits don't mutate memory, so the dirty flag stays
+            # False and the JSON write is skipped — unless the caller
+            # opted into strict_persist.
+            if self.strict_persist:
+                self.store.save(self.memory)
+            else:
+                self.store.save_if_dirty(self.memory)
+            asset_count = (
+                self._index.result.totals.get("grand_total", 0)
+                if self._index is not None
+                else 0
+            )
+            phase_ms["total_ms"] = (time.perf_counter() - started) * 1000
             return WorkflowResult(
                 context=cached,
                 from_cache=True,
                 memory_hits=self.memory._hits,
                 memory_misses=self.memory._misses,
-                asset_count=idx.result.totals.get("grand_total", 0),
+                asset_count=asset_count,
                 latency_ms=(time.perf_counter() - started) * 1000,
+                phase_ms=phase_ms,
             )
         # ponytail: cached value may be a plain dict after JSON round-trip
         # (dataclass loses its type through json). Fall back to rebuild.
-        if cached is not None:
-            self.memory.delete(key)
+        # Also check for stale cache (different ETag).
+        if raw_cached is not None:
+            self.memory.delete(cache_key)
 
-        # Cache miss — build fresh
+        # Cache miss — build fresh. Indexer.scan only runs here.
+        idx_start = time.perf_counter()
+        idx = self._ensure_index()
+        phase_ms["index_ms"] = (time.perf_counter() - idx_start) * 1000
+
+        build_start = time.perf_counter()
         context = self.builder.build(request, max_skills=self.max_skills)
+        phase_ms["build_ms"] = (time.perf_counter() - build_start) * 1000
 
         # Store in HOT tier so rapid follow-ups hit cache
-        self.memory.store(key, context, tier=MemoryTier.HOT, priority=8)
+        # Include ETag in key for proper invalidation
+        self.memory.store(cache_key, context, tier=MemoryTier.HOT, priority=8)
 
-        # Persist after every successful build so we never lose state
-        self.store.save(self.memory)
+        # Persist after every successful build so we never lose state.
+        # store() marks the manager dirty, so save_if_dirty does the work.
+        self.store.save_if_dirty(self.memory)
 
+        phase_ms["total_ms"] = (time.perf_counter() - started) * 1000
         return WorkflowResult(
             context=context,
             from_cache=False,
@@ -163,6 +315,7 @@ class Workflow:
             memory_misses=self.memory._misses,
             asset_count=idx.result.totals.get("grand_total", 0),
             latency_ms=(time.perf_counter() - started) * 1000,
+            phase_ms=phase_ms,
         )
 
     def stats(self) -> dict[str, int]:
@@ -187,11 +340,22 @@ class Workflow:
         }
 
     def _on_watch_change(self, paths: list) -> None:
-        """Watcher callback: invalidate index so next ask() rebuilds it."""
+        """
+        Watcher callback: invalidate index so next ask() rebuilds it.
+
+        Also invalidates HOT tier cache so stale skill files don't return
+        old cached results.
+        """
         # ponytail: don't scan inside the watcher thread — let the next
         # ask() do it on the main thread (avoid concurrency bugs in
         # Indexer.scan() which mutates self.result).
         self._index = None
+        # ponytail: also invalidate the memoized ETag so the next ask()
+        # walks the framework tree and re-derives a fresh hash.
+        self._etag_cache = None
+
+        # Invalidate HOT tier cache so changed files trigger fresh builds
+        self.invalidate_cache()  # Clears all HOT tier entries
 
     def stop_watching(self) -> None:
         """Stop the background auto-watcher if running."""

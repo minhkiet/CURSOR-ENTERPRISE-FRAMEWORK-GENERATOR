@@ -20,10 +20,10 @@ const mouseY = ref(50)
 const prefersReducedMotion = ref(false)
 
 const metrics: Metric[] = [
-  { value: '41', label: 'MDC rules' },
-  { value: '18', label: 'Skills' },
-  { value: '272', label: 'Knowledge files' },
-  { value: '8', label: 'Specialist agents' }
+  { value: '22', label: 'Mẫu Templates' },
+  { value: '43', label: 'Rules (.mdc)' },
+  { value: '50', label: 'Skills' },
+  { value: '10+', label: 'Vibe Code Tools' }
 ]
 
 const capabilities: Capability[] = [
@@ -34,13 +34,13 @@ const capabilities: Capability[] = [
   },
   {
     icon: 'memory',
-    title: 'Memory First',
-    desc: 'Reuses past decisions, ADRs, and bug fixes from local SQLite.'
+    title: 'Memory First + TDAM',
+    desc: 'Layered memory (L0–L3) with symbolic Mermaid canvas — up to 92% token savings.'
   },
   {
     icon: 'token',
     title: 'Token Optimized',
-    desc: 'Compression and lazy loading cuts context use by up to 40%.'
+    desc: 'TDAM offloading + compression + lazy loading cuts context use by up to 47%.'
   }
 ]
 
@@ -136,9 +136,8 @@ const titleWords2 = ['for', 'AI', 'coding', 'agents.']
           </h1>
 
           <p class="hero-sub" :class="{ visible: isVisible }">
-            41 rules, 18 skills, 272 knowledge files, 8 specialist personas.
-            One drop-in <code class="hero-code">.cursor/</code> directory that pushes
-            your coding agent from prototype to production.
+            43 rules, 50 skills, 22 templates thực tế, 18 specialist agents và 6 theme.
+            Tương thích tất cả các tool vibe code phổ biến: Cursor, Windsurf, Claude Code, Copilot, Roo, Cline, Antigravity.
           </p>
 
           <div class="hero-cta" :class="{ visible: isVisible }">
@@ -177,7 +176,7 @@ const titleWords2 = ['for', 'AI', 'coding', 'agents.']
               <div class="hero-window-dots">
                 <span></span><span></span><span></span>
               </div>
-              <div class="hero-window-title">.cursor/skills/frontend-taste</div>
+              <div class="hero-window-title">.cursor/skills/ui_frontend-taste</div>
               <div class="hero-window-action">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="16 18 22 12 16 6"/>

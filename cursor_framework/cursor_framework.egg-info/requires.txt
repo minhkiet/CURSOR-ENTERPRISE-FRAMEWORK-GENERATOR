@@ -1,14 +1,15 @@
-pydantic>=2.0.0
-
-[all]
-pytest>=7.0.0
-pytest-cov>=4.0.0
-requests>=2.31.0
-python-dotenv>=1.0.0
+watchfiles>=0.21.0
+httpx>=0.25.0
+rich>=13.7.0
+click>=8.1.7
 
 [dev]
-pytest>=7.0.0
-pytest-cov>=4.0.0
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+black>=23.0.0
+ruff>=0.1.0
 
-[http]
-requests>=2.31.0
+[server]
+uvicorn>=0.24.0
+fastapi>=0.104.0

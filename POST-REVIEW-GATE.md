@@ -338,4 +338,50 @@ Pattern: "—" (em-dash): 0 matches in new component files
 
 ---
 
-**Signed off**: 2026-07-05 · Redesign Market Pro 2026 · Cursor Enterprise Framework Generator
+## 11. Marketing post-review gates (universal, sync 2026-07-15)
+
+> Áp dụng cho bất kỳ campaign/launch/feature nào dùng marketing skills. Source: marketingskills (39k stars) → `.cursor/knowledge/marketing/checklist.md §9`, `anti-pattern.md §9`, `faq.md §9`, `decision-tree.md §11`.
+
+### 11.1 Pre-launch gates (must pass before ship)
+
+| Gate | Source | Blocker if fail |
+|---|---|---|
+| Conversion tracking pixel firing | checklist §9.5.1 | YES |
+| Product-marketing context loaded (`.agents/product-marketing.md`) | glossary §13, decision-tree §11.10 | YES |
+| Pre-flight blockers resolved (per category) | checklist §9.10 | YES |
+| Email deliverability (SPF/DKIM/DMARC) | checklist §9.2.1 | YES |
+| Schema markup validated (Rich Results Test) | checklist §9.3.4 | YES |
+| Conversion event tracked + funnel reports built | checklist §9.5.1 | YES |
+| Frequency caps set on ads | checklist §9.4.1 | YES |
+| Landing page scent-match với ad copy | checklist §9.4.1 | YES |
+
+### 11.2 Post-launch gates (must check after launch)
+
+| Gate | Source | Blocker if fail |
+|---|---|---|
+| Anti-pattern audit (per category) | anti-pattern §9.1-§9.9 | YES (remediate) |
+| Spam complaint rate < 0.1% (email) | faq §9.2, checklist §9.2.1 | YES (remediate) |
+| Churn delta within 5% baseline | best-practice §7.1, checklist §9.6.1 | YES (remediate) |
+| Dunning recovery rate > 40% in 14d | architecture §4.6.3 | NO (optimize) |
+| Save offer take rate > 5% of cancel intent | best-practice §7.1 | NO (optimize) |
+| A/B test reached sample size + duration | checklist §9.5.2, decision-tree §11.5 | YES (do not ship) |
+| Attribution model: no double-count | architecture §4.5.3, anti-pattern §9.5.4 | YES (remediate) |
+| TCPA/GDPR compliance verified | checklist §9.2.3, anti-pattern §9.2.5 | YES (legal blocker) |
+
+### 11.3 Marketing persona review
+
+Trigger `/review` với persona marketing (nếu có), nếu không thì self-check theo faq.md §9.
+
+### 11.4 Reference
+
+- All 47 marketing skills listed in `.cursor/rules/skill-registry.mdc §9.1.1-§9.1.10`
+- Pre-flight per-category: `.cursor/knowledge/marketing/checklist.md §9.10`
+- Anti-patterns: `.cursor/knowledge/marketing/anti-pattern.md §9`
+- FAQ: `.cursor/knowledge/marketing/faq.md §9`
+- Decision tree: `.cursor/knowledge/marketing/decision-tree.md §11`
+
+---
+
+**Signed off (Market Pro 2026 Redesign)**: 2026-07-05 · Redesign Market Pro 2026 · Cursor Enterprise Framework Generator
+
+**Marketing gates added (sync 2026-07-15)**: §11 above · Applies to all marketing-domain tasks · See skill-registry.mdc §9

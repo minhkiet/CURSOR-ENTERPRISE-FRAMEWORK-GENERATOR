@@ -1774,3 +1774,602 @@ class SecureDataService {
   }
 }
 ```
+
+---
+
+## 9. marketingskills Anti-Patterns (sync 2026-07-15)
+
+> Top failure modes cho 9 category từ [marketingskills](https://github.com/coreyhaines31/marketingskills). Mỗi section nêu symptom, root cause, fix.
+
+### 9.1 Conversion Optimization Anti-Patterns
+
+**9.1.1 Optimizing form fields instead of motivation**
+- **Symptom**: A/B testing input length, button color, microcopy → +0.5% conversion
+- **Root cause**: Visitor motivation is the limiting factor, not UX friction
+- **Fix**: Rework the offer/value prop FIRST; then optimize friction
+
+**9.1.2 Pre-filling form fields to "help" users**
+- **Symptom**: Smart-defaults reduces field count; conversion drops
+- **Root cause**: Pre-fills often wrong; users don't notice; submission produces bad data
+- **Fix**: Use only canonical defaults (country = user's locale); never pre-fill personal data
+
+**9.1.3 Welcome email drip fired before user is "ready"**
+- **Symptom**: Welcome Day-1 open rate < 10%, unsubscribes spike
+- **Root cause**: User just signed up; overwhelmed by immediate asks
+- **Fix**: Send welcome → wait for activation event → then drip value
+
+**9.1.4 Exit-intent popup on every page**
+- **Symptom**: Popup CTR high, capture rate low, brand feels spammy
+- **Root cause**: Popups interrupt intent; on every page is over-rotation
+- **Fix**: Show on high-intent pages only (pricing, blog end); cap at 1/visit; dismissible
+
+**9.1.5 Skipping onboarding → "figure it out yourself" product**
+- **Symptom**: Trial-to-paid conversion < 5%; day-1 activation < 30%
+- **Root cause**: No guided path; users never reach aha moment
+- **Fix**: 3-step activation checklist with progress bar; empty states that teach
+
+### 9.2 Content & Copy Anti-Patterns
+
+**9.2.1 Subject line: RE:Viagra at scale**
+- **Symptom**: High open rate from curiosity, no clicks, spam complaints
+- **Root cause**: Misleading subject drives opens, not engagement
+- **Fix**: A/B subject lines by genuine angle, not tricks; aim for > 10% click rate
+
+**9.2.2 Send-everyone-the-same-email blast**
+- **Symptom**: Mass unsubscribes after every newsletter
+- **Root cause**: One-size-fits-all content doesn't respect segment interests
+- **Fix**: Segment by behavior, role, stage; personalize hero + CTA
+
+**9.2.3 Long-form copy without structure**
+- **Symptom**: Skim depth 30%, bounce rate high
+- **Root cause**: Wall of text with no scannable hierarchy
+- **Fix**: Bullet-3-then-elaborate, subheadings every 200 words, bold key phrases
+
+**9.2.4 Cold-email copy-paste with first name only**
+- **Symptom**: Reply rate < 1%, hard bounces increasing
+- **Root cause**: One variable token doesn't make email relevant
+- **Fix**: Reference trigger event (new funding, hiring, blog post) in 1 sentence
+
+**9.2.5 Sending SMS without opt-in**
+- **Symptom**: TCPA/text-law complaints, fines ($500-$1500/message in US)
+- **Root cause**: Marketing uses business phone numbers without consent
+- **Fix**: Double opt-in for SMS; clear opt-out language; honor STOP within 1 minute
+
+**9.2.6 Image generation: random surreal visuals**
+- **Symptom**: Brand incoherence, low engagement on social
+- **Root cause**: AI image gen without brand style guide
+- **Fix**: Style reference (3-5 brand adjectives), negative prompts, human review
+
+### 9.3 SEO & Discovery Anti-Patterns
+
+**9.3.1 "Just write more content" with no keyword strategy**
+- **Symptom**: 200+ blog posts, organic traffic flat
+- **Root cause**: Volume without search-intent targeting = zero ranking gains
+- **Fix**: Keyword research first, cluster by topic, internal-link to pillar page
+
+**9.3.2 Programmatic SEO = spam**
+- **Symptom**: 10k pages indexed, manual action from Google, traffic drops to 0
+- **Root cause**: Thin content, no unique value per page, doorway intent
+- **Fix**: Add unique data per page (real examples, original research); human-quality bar
+
+**9.3.3 llms.txt copied from competitor**
+- **Symptom**: AI search engines cite competitor content
+- **Root cause**: Generic / non-specific to your product
+- **Fix**: Write to YOUR product/audience; include unique data points
+
+**9.3.4 Schema dump: marking up everything wrong**
+- **Symptom**: Manual action for spammy structured data
+- **Root cause**: FAQPage with non-questions; Product without offers; irrelevant markup
+- **Fix**: Match schema.org spec exactly; validate with Rich Results Test
+
+**9.3.5 Site architecture: 4-level deep URLs**
+- **Symptom**: Crawl budget wasted; low ranking on long-tail
+- **Root cause**: Categorical depth > 3; every click costs crawl budget
+- **Fix**: Flatten to /[category]/[page]; max 3 URL levels; breadcrumbs as nav
+
+**9.3.6 ASO: keyword stuffing title**
+- **Symptom**: App store rejects; rank drops after update
+- **Root cause**: Title + keyword field same words = spam
+- **Fix**: Title (brand + 1-2 key terms); subtitle for 2-3 more; keyword field for remaining
+
+### 9.4 Paid & Distribution Anti-Patterns
+
+**9.4.1 Launching ads with no conversion event tracked**
+- **Symptom**: Spend $5k, "conversions" show but no qualified leads
+- **Root cause**: Optimizing for micro-conversions (page view) instead of macro
+- **Fix**: Track qualified lead, signup, sale — whichever maps to LTV
+
+**9.4.2 Ad creative fatigue: same ad for 30+ days**
+- **Symptom**: CTR drops 50% over month; CPM increases
+- **Root cause**: Audience sees same creative, ignores
+- **Fix**: Rotate creative every 7-14 days; build 3-5 ad variants upfront
+
+**9.4.3 "Set and forget" retargeting**
+- **Symptom**: Retargeting list of 50k people, conversion 0.1%
+- **Root cause**: Audience stale; products/prices changed; no creative refresh
+- **Fix**: Refresh audience every 30 days; cap audience size; exclude converters
+
+**9.4.4 Scaling winners before profitability validated**
+- **Symptom**: CPA doubles as spend scales; LTV/CAC < 1
+- **Root cause**: Optimizing platform-side (ROAS 3) but blended ROAS < 1
+- **Fix**: Verify LTV/CAC > 3 before scale; reserve 20% budget for new tests
+
+### 9.5 Measurement & Testing Anti-Patterns
+
+**9.5.1 "Test everything"**
+- **Symptom**: 50+ running tests, none reach significance, results noise
+- **Root cause**: Underpowered tests, multiple comparisons
+- **Fix**: Max 3 concurrent tests per page; require MDE + sample size calc
+
+**9.5.2 Stopping tests at first significance**
+- **Symptom**: Ship a "winning" variant that reverts over time
+- **Root cause**: Peeking; p < 0.05 is not the same as confirmed effect
+- **Fix**: Pre-register duration; use sequential testing or full sample size
+
+**9.5.3 Tracking vanity metrics**
+- **Symptom**: Page views up 30%, revenue flat
+- **Root cause**: Optimizing for traffic, not pipeline or revenue
+- **Fix**: North-star metric: weekly active + revenue per active
+
+**9.5.4 Mixing attribution across events**
+- **Symptom**: Channel A "credited" 3x for one conversion
+- **Root cause**: Multiple events trigger conversion; double-count
+- **Fix**: One canonical conversion event; deduplicate by user+session
+
+### 9.6 Retention Anti-Patterns
+
+**9.6.1 Dunning from day 0 of failed payment**
+- **Symptom**: Cancellation rate spikes; complaints about aggressive
+- **Root cause**: Most failures are temporary (insufficient funds, expired card)
+- **Fix**: Wait 3 days after first failure; retry with smart backoff
+
+**9.6.2 Save offer = free 1 year**
+- **Symptom**: Users learn to ask for 100% off; gross margin collapses
+- **Root cause**: Single-skill save flow with no segmentation
+- **Fix**: Tiered save (10% / 25% / 50% / downgrade) by churn reason
+
+**9.6.3 Pause subscription without usage tracking**
+- **Symptom**: User pauses, never returns; resurrected count 0
+- **Root cause**: Pause = hidden cancel; no re-engagement
+- **Fix**: Pause = 30/60/90 day cap; re-engage at 50% of pause window
+
+### 9.7 Growth Engineering Anti-Patterns
+
+**9.7.1 Free tool = thinly-veiled landing page**
+- **Symptom**: Tool ranks #1, but converts 0% to product
+- **Root cause**: Tool doesn't deliver value, just collects email
+- **Fix**: Solve real problem; reveal product as natural next step (not forced)
+
+**9.7.2 Referral program without fraud guardrails**
+- **Symptom**: 30% of referrals are fraud (same IP, device, family)
+- **Root cause**: No matching engine; reward per email
+- **Fix**: Match by device fingerprint + payment method + IP; review top referrers
+
+**9.7.3 Co-marketing with non-overlapping ICP**
+- **Symptom**: Joint webinar, 100 attendees, 0 leads
+- **Root cause**: Audience mismatch; one side dominates
+- **Fix**: ICP overlap test; co-marketing with 3-5x audience overlap wins
+
+### 9.8 Strategy & Monetization Anti-Patterns
+
+**9.8.1 Pricing page with 5 plans**
+- **Symptom**: Decision paralysis; most pick middle or no-plan
+- **Root cause**: Choice overload; no clear "default"
+- **Fix**: 3 plans (good/better/best); highlight middle as recommended
+
+**9.8.2 Launch with no waitlist**
+- **Symptom**: Day 1 traffic spike, then fade; momentum lost
+- **Root cause**: No pre-built audience; product hunt alone insufficient
+- **Fix**: 4-6 week pre-launch; waitlist; email warm-up; ambassador seeding
+
+**9.8.3 Offer with no clear guarantee**
+- **Symptom**: Conversion 1%, refund rate 5%
+- **Root cause**: Risk on buyer; high-intent users drop off
+- **Fix**: Risk-reversal (30-day money back, no-questions); visible CTA
+
+**9.8.4 Yearly plan: "save 17%" off monthly x 12**
+- **Symptom**: Annual take rate < 10%
+- **Root cause**: Math doesn't trigger; user values cash flow
+- **Fix**: Position annual as "2 months free" or "X% off, paid upfront"
+
+### 9.9 Sales & RevOps Anti-Patterns
+
+**9.9.1 Lead scoring: only form-fill weight**
+- **Symptom**: MQL volume huge, SQL conversion 1%
+- **Root cause**: Form fills ≠ intent; self-reported intent ≠ behavior
+- **Fix**: Combine behavior (visit pricing, request demo) with form data
+
+**9.9.2 Routing by territory, not expertise**
+- **Symptom**: Mid-market leads routed to SMB reps; close rate low
+- **Root cause**: Territory > fit; reps unfamiliar with segment
+- **Fix**: Route by segment + product fit; territory only as tie-breaker
+
+**9.9.3 Sales enablement: deck for every stage, none used**
+- **Symptom**: Reps create own decks; brand incoherence; off-message
+- **Root cause**: Decks not stage-aware; don't map to discovery
+- **Fix**: Stage-aware collateral; track usage; retire unused
+
+**9.9.4 Pitching features, not outcomes**
+- **Symptom**: Demo shows all 47 features, no qualified pipeline
+- **Root cause**: Feature tour ≠ value articulation
+- **Fix**: Frame features as outcomes (e.g., "Reduce churn 20% via __")
+
+**9.9.5 Cold outreach: blast to whole role**
+- **Symptom**: 1k emails/week, 3 replies, 0 deals
+- **Root cause**: Targeting by job title only; no trigger events
+- **Fix**: Layer intent signals (hiring, funding, blog) on top of role
+
+**9.9.6 PR pitching: untargeted blast**
+- **Symptom**: 0 coverage, journalist unsubscribes
+- **Root cause**: Pitching wrong beat; press release vs. story
+- **Fix**: Research journalist's recent articles; pitch angle that fits
+
+**9.9.7 Customer research: only "power users"**
+- **Symptom**: Insights biased toward existing fans
+- **Root cause**: Sampling bias; missing pain points of churned users
+- **Fix**: Mix of activated, churned, never-activated; tier sample by segment
+
+**9.9.8 Marketing council without context**
+- **Symptom**: Brainstorm outputs generic ("be more authentic")
+- **Root cause**: Personas lack product/audience context
+- **Fix**: Pass product-marketing context (see glossary §13) to each persona
+
+**9.9.9 Marketing loops: hard-coded assumptions**
+- **Symptom**: Outreach loop sends stale templates forever
+- **Root cause**: Loop has no feedback mechanism or refresh
+- **Fix**: Loop reads current data; refreshes weekly; abort on quality drop
+
+**9.9.10 Directory spam: 100 submissions in 1 day**
+- **Symptom**: Some directories flag; profile rejected
+- **Root cause**: Mass submission triggers spam detection
+- **Fix**: 1-2 submissions/week; quality bar (full profile, screenshot, link)
+
+---
+
+## 10. Marketing Security & Privacy Anti-Patterns (sync 2026-07-15)
+
+> Bổ sung từ [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) (v2.6.0) — đặc biệt các skills: `analytics`, `ads`, `cold-email`, `emails`, `customer-research`, `schema`, `prospecting`, `churn-prevention`, `sales-enablement`. Cross-reference `.cursor/knowledge/marketing/best-practice.md §10` (best practices), `.cursor/agents/security-auditor.md` (review).
+
+### 10.1 Cookie Banner & Consent Anti-Patterns
+
+**10.1.1 Pre-checked consent boxes**
+- **Vấn đề**: Cookie banner có analytics/marketing tracking pre-checked, user phải manually uncheck
+- **Vi phạm**: GDPR Art. 7 (consent must be freely given), ePrivacy Directive, CCPA
+- **Hậu quả**: regulatory fines (max 4% global revenue under GDPR), reputational damage
+- **Fix**: All checkboxes unchecked by default; "Accept all" + "Reject all" buttons cùng prominence
+
+**10.1.2 Hidden "Reject all" button**
+- **Vấn đề**: "Accept all" prominent, "Reject all" hidden behind "Customize" hoặc low-contrast link
+- **Vi phạm**: EDPB Guidelines 03/2022 on dark patterns, GDPR Art. 7
+- **Hậu quả**: CNIL (France) fined Google €150M (2022), Meta €390M (2023)
+- **Fix**: Equal prominence, equal placement, equal visual weight
+
+**10.1.3 Cookie wall without reject option**
+- **Vấn đề**: Force accept cookies to access content (cookie wall)
+- **Vi phạm**: GDPR (consent must be freely given — not a precondition)
+- **Fix**: Always provide reject option; paywall with consent acceptable, but not "accept or leave"
+
+**10.1.4 Consent refresh fatigue**
+- **Vấn đề**: Show cookie banner mỗi session/day, even after user choice
+- **Vi phạm**: GDPR, ePrivacy (consent persists until withdrawn)
+- **Fix**: Honor previous choice; only re-prompt when purpose changes or consent expires (12 months max)
+
+**10.1.5 Faking consent collection**
+- **Vấn đề**: Log "consent=true" without actually collecting consent
+- **Vi phạm**: GDPR, FTC, CCPA — false records
+- **Fix**: Real consent UI; server-side validation; audit trail
+
+### 10.2 Tracking & Analytics Anti-Patterns
+
+**10.2.1 Loading tracking SDK before consent**
+- **Vấn đề**: Google Tag Manager, Facebook Pixel, TikTok Pixel fire before consent check
+- **Vi phạm**: GDPR, ePrivacy, CCPA, multiple ad platform ToS
+- **Hậu quả**: Regulatory fines, ad account suspension, privacy complaints
+- **Fix**: Consent-mode gates (Google Consent Mode v2, Meta Limited Data Use flag); server-side validation
+
+**10.2.2 Using email as user_id in analytics**
+- **Vấn đề**: Pass `user_id: 'john@example.com'` to GA4, Mixpanel, Amplitude
+- **Vi phạm**: PII leak to ad platforms, analytics vendors
+- **Fix**: Use opaque user IDs (UUID), store email separately in CRM
+
+**10.2.3 Logging PII in events**
+- **Vấn đề**: Event properties include raw email, phone, address, SSN
+- **Vi phạm**: GDPR data minimization, CCPA, breach exposure
+- **Fix**: Redact/hash PII before logging; log only necessary fields
+
+**10.2.4 IP address logging without anonymization**
+- **Vấn đề**: Store raw IPs in server logs, analytics
+- **Vi phạm**: GDPR (IP = personal data per CJEU ruling), CCPA
+- **Fix**: IP anonymization (last octet zeroed); 14-month max retention
+
+**10.2.5 Cross-site tracking without explicit consent**
+- **Vấn đề**: Third-party cookies, fingerprinting across sites without user opt-in
+- **Vi phạm**: ePrivacy Directive, GDPR, browser policies (Safari ITP, Firefox ETP, Chrome 3p cookie deprecation)
+- **Fix**: First-party data strategy; explicit opt-in for cross-site tracking
+
+**10.2.6 Selling analytics data without disclosure**
+- **Vấn đề**: Aggregate user data shared with third parties without consent or notice
+- **Vi phạm**: GDPR Art. 6 (lawful basis), CCPA, FTC Section 5
+- **Fix**: DPA with vendors; explicit consent for data sharing; privacy policy disclosure
+
+### 10.3 Email Marketing Anti-Patterns
+
+**10.3.1 Missing SPF/DKIM/DMARC**
+- **Vấn đề**: Email authentication not configured; spoofing possible
+- **Vi phạm**: DMARC requirement from Gmail/Yahoo (Feb 2024), Microsoft Outlook
+- **Hậu quả**: Emails to spam, deliverability collapse
+- **Fix**: SPF + DKIM + DMARC `p=quarantine` (min) hoặc `p=reject` (recommended)
+
+**10.3.2 Plaintext SMTP**
+- **Vấn đề**: SMTP on port 25 without TLS
+- **Vi phạm**: Modern email security standards
+- **Fix**: TLS 1.2+ enforced on outbound + inbound SMTP
+
+**10.3.3 Sending without confirmed opt-in (B2B best practice)**
+- **Vấn đề**: Single opt-in (email signup auto-confirms)
+- **Vi phạm**: GDPR (consent must be informed + unambiguous), CASL (Canada requires express consent)
+- **Fix**: Double opt-in for EU; single opt-in acceptable for US with clear disclosure
+
+**10.3.4 Misleading From header**
+- **Vấn đề**: `From: "Account Security" <marketing@...>`
+- **Vi phạm**: CAN-SPAM, CASL, GDPR transparency
+- **Fix**: Clear sender identity; matches domain; not deceptive
+
+**10.3.5 No physical address**
+- **Vấn đề**: Footer without valid physical postal address
+- **Vi phạm**: CAN-SPAM (US), CASL (Canada)
+- **Fix**: Include valid physical address in every email footer
+
+**10.3.6 Honor opt-out > 10 days**
+- **Vấn đề**: Ignore unsubscribe requests, or process slowly
+- **Vi phạm**: CAN-SPAM (10 days max), GDPR (immediate), CASL
+- **Fix**: Process unsubscribe immediately; suppress within 24h
+
+**10.3.7 No one-click unsubscribe**
+- **Vấn đề**: Unsubscribe requires login, multi-step form
+- **Vi phạm**: Gmail/Yahoo Feb 2024 requirement (RFC 8058)
+- **Fix**: List-Unsubscribe-Post header; one-click unsubscribe link in headers + body
+
+**10.3.8 Continuing to email after unsubscribe**
+- **Vấn đề**: User unsubscribes, but still receives emails (technical bug or worse, deliberate)
+- **Vi phạm**: All major spam laws; reputational risk
+- **Fix**: Suppression list at SMTP relay level; audit log; regular suppression list verification
+
+### 10.4 Paid Ads Compliance Anti-Patterns
+
+**10.4.1 Hidden ad disclosure**
+- **Vấn đề**: Sponsored content without "Ad" or "Sponsored" label
+- **Vi phạm**: FTC Endorsement Guidelines, EU UCPD, ad platform ToS
+- **Fix**: Clear "Ad" / "Sponsored" / "Paid partnership" labels
+
+**10.4.2 Unsubstantiated claims**
+- **Vấn đề**: "Best in class", "#1 in market", "100% guaranteed" without evidence
+- **Vi phạm**: FTC Section 5, EU UCPD, Google Ads policy, Meta Ads policy
+- **Hậu quả**: Ad rejection, account suspension, regulatory action
+- **Fix**: Substantiate every claim; avoid superlatives without proof
+
+**10.4.3 Conversion API missing client-side AND server-side**
+- **Vấn đề**: Only browser pixel fires; no server-side event sharing (loses iOS 14.5+ conversions)
+- **Vi phạm**: Not a violation, but degrades measurement accuracy significantly post-ATT
+- **Fix**: Implement both client + server events; Meta CAPI, TikTok Events API, Google Enhanced Conversions
+
+**10.4.4 Raw PII upload to ad platforms**
+- **Vấn đề**: Upload CSV with `email`, `phone`, `name` to Meta/Google customer match
+- **Vi phạm**: Platform ToS, privacy best practice
+- **Fix**: SHA-256 hash before upload; salt recommended
+
+**10.4.5 Discriminatory targeting**
+- **Vấn đề**: Exclude protected categories (race, religion, sexual orientation, health) from ad targeting
+- **Vi phạm**: Civil Rights Act, EU AI Act, ad platform anti-discrimination policies
+- **Fix**: Review targeting criteria; remove protected classes; periodic audit
+
+**10.4.6 Prohibited content**
+- **Vấn đề**: Ads for regulated products (alcohol, gambling, pharma, financial) without proper authorization
+- **Vi phạm**: Industry-specific regulations, ad platform policies
+- **Fix**: Pre-approval process; age gating; geographic restrictions; certifications
+
+**10.4.7 No AI-generated content disclosure**
+- **Vấn đề**: AI-generated ad copy/image/video without disclosure
+- **Vi phạm**: FTC guidance (2023), EU AI Act, platform-specific rules
+- **Fix**: Label AI-generated content; maintain human review process
+
+### 10.5 Data Collection Form Anti-Patterns
+
+**10.5.1 Required fields beyond necessity**
+- **Vấn đề**: Phone number required for newsletter signup; SSN for free trial
+- **Vi phạm**: GDPR data minimization (Art. 5(1)(c))
+- **Fix**: Only collect what you actually use; mark optional fields clearly
+
+**10.5.2 Pre-checked marketing opt-in**
+- **Vấn đề**: Form signup auto-subscribes user to marketing emails
+- **Vi phạm**: GDPR, ePrivacy, CCPA, CAN-SPAM
+- **Fix**: Unchecked opt-in checkbox; clear language about what they're signing up for
+
+**10.5.3 No clear privacy policy link**
+- **Vấn đề**: Form without privacy policy link near submit button
+- **Vi phạm**: GDPR transparency, CCPA notice at collection
+- **Fix**: Link to privacy policy above submit button; explain data use
+
+**10.5.4 Hidden data sharing disclosure**
+- **Vấn đề**: Privacy policy buried; data sharing with third parties not prominent
+- **Vi phạm**: CCPA, GDPR, FTC
+- **Fix**: Layered privacy notice; prominent "who we share with" section
+
+**10.5.5 Form auto-fills hidden fields with tracking data**
+- **Vấn đề**: Hidden fields auto-populated with email, FB click ID, Google click ID
+- **Vi phạm**: GDPR if collected without consent; CCPA notice requirements
+- **Fix**: Only collect declared fields; click IDs in URL parameters only if needed + disclosed
+
+### 10.6 Dark Patterns in Conversion Flows
+
+**10.6.1 Roach motel (easy in, hard out)**
+- **Vấn đề**: Easy signup, painful cancellation (multi-step phone call, "are you sure?" 4x, hidden cancel button)
+- **Vi phạm**: FTC Click-to-Cancel Rule (2024), CCPA, GDPR dark patterns guidance
+- **Fix**: Cancellation parity — same number of clicks, same level of friction as signup
+
+**10.6.2 Confirmshaming**
+- **Vấn đề**: "No thanks, I don't want to save money" instead of "No thanks"
+- **Vi phạm**: GDPR dark patterns guidance, EDPB
+- **Fix**: Neutral language for opt-out options
+
+**10.6.3 Hidden costs / drip pricing**
+- **Vấn đề**: Service fee, taxes added at last step
+- **Vi phạm**: FTC, EU UCPD, Restore Online Shoppers' Confidence Act
+- **Fix**: Show all-in price early; transparency from step 1
+
+**10.6.4 Urgency fabrication**
+- **Vấn đề**: "Only 2 left!" when inventory is plentiful; fake countdown timers that reset
+- **Vi phạm**: FTC Section 5, EU UCPD, ad platform policies
+- **Fix**: Real scarcity; honest countdown; no fake urgency
+
+**10.6.5 Forced continuity / silent subscription**
+- **Vấn đề**: "Free trial" that auto-charges without clear notice; cancellation hidden
+- **Vi phạm**: FTC, Restore Online Shoppers' Confidence Act (US), CRD (EU)
+- **Fix**: Clear trial end date + reminder email; easy cancellation; consent to auto-renewal
+
+**10.6.6 Misdirection / visual hierarchy tricks**
+- **Vấn đề**: Accept button green, hidden in plain sight; Reject option grey tiny text
+- **Vi phạm**: GDPR, CCPA, EDPB
+- **Fix**: Equal visual weight for choices
+
+### 10.7 Customer Research Anti-Patterns
+
+**10.7.1 Recording interviews without consent**
+- **Vấn đề**: Record audio/video of customer interviews without explicit consent
+- **Vi phạm**: GDPR, CCPA, biometric data laws (Illinois BIPA), wiretap laws
+- **Hậu quả**: Class-action lawsuits (BIPA $1k-$5k per violation)
+- **Fix**: Written consent before recording; clear disclosure of use
+
+**10.7.2 Using incentives that coerce**
+- **Vấn đề**: $500 gift card for 30-min interview (induces participation even when uncomfortable)
+- **Vi phạm**: Research ethics guidelines (ESOMAR, Insights Association)
+- **Fix**: Reasonable compensation proportional to time
+
+**10.7.3 Researching vulnerable populations without safeguards**
+- **Vấn đề**: Research on children, health patients, economically vulnerable without extra protections
+- **Vi phạm**: GDPR Art. 8 (children), Art. 9 (special categories), COPPA, IRB requirements
+- **Fix**: IRB review, parental consent for minors, special safeguards
+
+**10.7.4 Selling research data to third parties**
+- **Vấn đề**: Aggregate research findings sold to vendors without disclosure
+- **Vi phạm**: GDPR, CCPA, contractual breach
+- **Fix**: Anonymization; explicit disclosure; opt-out mechanism
+
+### 10.8 Webhook & Integration Anti-Patterns
+
+**10.8.1 Unsigned webhooks**
+- **Vấn đề**: Webhook endpoint without signature verification
+- **Vi phạm**: PCI-DSS (if payment), security best practice
+- **Hậu quả**: Forged events; data corruption; financial loss
+- **Fix**: HMAC-SHA256 signature verification; timestamp + nonce; replay protection
+
+**10.8.2 Webhook secret in code**
+- **Vấn đề**: Signing secret hardcoded in repo
+- **Vi phạm**: Secrets management (security.mdc §8)
+- **Fix**: Environment variable or secret manager; rotated every 90 days
+
+**10.8.3 Accepting HTTP webhooks**
+- **Vấn đề**: Webhook receiver accepts plain HTTP
+- **Vi phạm**: Modern security standards
+- **Fix**: HTTPS only; TLS 1.2+ minimum
+
+**10.8.4 Idempotency not handled**
+- **Vấn đề**: Webhook retry causes duplicate processing (double charge, double notification)
+- **Vi phạm**: Reliability best practice
+- **Fix**: Idempotency keys; state tracking; deduplication
+
+### 10.9 Sales Enablement Anti-Patterns
+
+**10.9.1 Demo with real customer data**
+- **Vấn đề**: Use real customer names, data in sales demos
+- **Vi phạm**: Customer contracts (typically), GDPR, NDAs
+- **Hậu quả**: Trust loss; legal liability
+- **Fix**: Synthetic demo data; anonymized; or explicit customer consent for case study use
+
+**10.9.2 Sales data hoarding**
+- **Vấn đề**: Sales reps keep lead data in personal spreadsheets, no central CRM
+- **Vi phạm**: Data minimization principle; security risk (departing employees take data)
+- **Fix**: Central CRM; role-based access; audit logs
+
+**10.9.3 PII in sales materials**
+- **Vấn đề**: Customer name, contact info visible in pitch decks, screenshots
+- **Vi phạm**: Customer data minimization
+- **Fix**: Anonymize case studies; redacted screenshots; explicit consent for named references
+
+### 10.10 Churn & Cancellation Anti-Patterns
+
+**10.10.1 Cancellation phone-tree hell**
+- **Vấn đề**: "To cancel, call 1-800-... between 9-5 EST, hold for 45 min, talk to retention"
+- **Vi phạm**: FTC Click-to-Cancel Rule (2024), EU CRD, CCPA
+- **Fix**: In-app one-click cancel; same parity as signup
+
+**10.10.2 Pre-checked retention offers**
+- **Vấn đề**: "Stay at 50% off" pre-checked as default during cancel flow
+- **Vi phạm**: GDPR dark patterns, EDPB
+- **Fix**: Clear choice; opt-in to offers
+
+**10.10.3 Guilt-trip cancel flows**
+- **Vấn đề**: "Are you sure? Your data will be lost! You'll miss out! Your team loves you!"
+- **Vi phạm**: GDPR dark patterns
+- **Fix**: Neutral factual language; clear consequences
+
+**10.10.4 Data deletion refusal**
+- **Vấn đề**: After cancellation, company refuses to delete data "for legal reasons"
+- **Vi phạm**: GDPR Art. 17 (right to erasure), CCPA
+- **Fix**: Document retention obligations vs. user rights; legal review; honor deletion requests
+
+### 10.11 AI Marketing Anti-Patterns
+
+**10.11.1 Sending customer PII to public LLMs**
+- **Vấn đề**: Use OpenAI/Anthropic API with raw customer emails, support tickets
+- **Vi phạm**: GDPR data transfer, vendor ToS, data breach exposure
+- **Fix**: Anonymize before LLM; use enterprise tier with data retention controls; on-prem for sensitive
+
+**10.11.2 Hallucinated facts in marketing copy**
+- **Vấn đề**: AI generates statistics, quotes, citations that don't exist
+- **Vi phạm**: FTC Section 5, reputational risk
+- **Fix**: Human-in-the-loop verification; citation checking; no AI-generated facts without source
+
+**10.11.3 AI-generated content without disclosure**
+- **Vấn đề**: AI-written blog posts, social, emails without labeling
+- **Vi phạm**: FTC, EU AI Act, platform-specific rules
+- **Fix**: Transparent labeling; AI disclosure policy
+
+**10.11.4 Prompt injection in email subjects**
+- **Vấn đề**: User-controlled input (email subject from form) directly passed to LLM
+- **Vi phạm**: OWASP LLM Top 10 (LLM01: Prompt Injection)
+- **Fix**: Sanitize user inputs; structured prompts with delimiters; output validation
+
+**10.11.5 AI training on customer data without consent**
+- **Vấn đề**: Vendor uses customer data to train their models
+- **Vi phạm**: GDPR, CCPA, contractual
+- **Fix**: Zero-retention agreements; opt-out from training; vendor review
+
+### 10.12 Crisis Communications Anti-Patterns
+
+**10.12.1 Slow disclosure of data breach**
+- **Vấn đề**: Discover breach, delay public disclosure
+- **Vi phạm**: GDPR 72-hour notification, SEC cybersecurity disclosure rules (US, 2023)
+- **Fix**: Pre-built incident response plan; legal review within hours
+
+**10.12.2 Inconsistent messaging across channels**
+- **Vấn đề**: Status page says X, email says Y, social says Z
+- **Vi phạm**: Trust, regulatory scrutiny
+- **Fix**: Single source of truth; approved spokesperson; central messaging
+
+**10.12.3 Blaming customers for security incidents**
+- **Vấn đề**: "Users should have used 2FA" deflection after breach
+- **Vi phạm**: Reputational; possible regulatory
+- **Fix**: Take responsibility; explain remediation; support affected users
+
+---
+
+## 10.13 Kết nối với file khác
+
+- **Best practice** (`best-practice.md §10`): marketing security best practices
+- **Checklist** (`checklist.md §11`): pre-launch security checklist
+- **Architecture** (`architecture.md §5`): privacy-by-design architecture
+- **Decision tree** (`decision-tree.md §12`): security-aware marketing routing
+- **FAQ** (`faq.md §10`): marketing security FAQs
+- **Glossary** (`glossary.md §14`): marketing security terms
+- **Cross-rule**: `.cursor/rules/security.mdc`, `.cursor/rules/auth.mdc`

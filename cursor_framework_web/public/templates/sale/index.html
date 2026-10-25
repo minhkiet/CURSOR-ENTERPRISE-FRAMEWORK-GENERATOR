@@ -46,10 +46,10 @@
     </ul>
     <div class="nav-actions">
       <button class="nav-icon"><i class="ph ph-magnifying-glass"></i></button>
-      <button class="nav-cart">
+      <a href="checkout.html" class="nav-cart" aria-label="Giỏ hàng & Thanh toán">
         <i class="ph ph-shopping-bag"></i>
-        <span class="cart-badge">3</span>
-      </button>
+        <span class="cart-badge">1</span>
+      </a>
     </div>
   </div>
 </nav>
@@ -165,14 +165,14 @@
       </div>
 
       <div class="hero-cta">
-        <button class="btn btn-primary btn-xl">
+        <a href="checkout.html" class="btn btn-primary btn-xl">
           <i class="ph-fill ph-shopping-bag"></i>
           <span>Mua ngay · ₫2,490,000</span>
-        </button>
-        <button class="btn btn-ghost btn-xl">
+        </a>
+        <a href="checkout.html" class="btn btn-ghost btn-xl">
           <i class="ph ph-credit-card"></i>
           Trả góp 0%
-        </button>
+        </a>
       </div>
 
       <ul class="hero-perks">
@@ -433,10 +433,10 @@
         <div class="cd"><div class="cd-num" id="fs">12</div><div class="cd-label">giây</div></div>
       </div>
       <p>Sau thời gian này, giá sẽ trở lại <s>₫4,490,000</s>. Đừng bỏ lỡ.</p>
-      <button class="btn btn-final btn-xl">
+      <a href="checkout.html" class="btn btn-final btn-xl">
         MUA NGAY · ₫2,490,000
         <i class="ph ph-arrow-right"></i>
-      </button>
+      </a>
     </div>
   </div>
 </section>
@@ -456,5 +456,23 @@
 </footer>
 
 <script src="script.js"></script>
+
+<!-- ─── FLOATING CONTACT BUTTONS ─── -->
+<div class="floating-contact">
+  <a href="tel:19008687" class="floating-btn floating-btn_hotline" aria-label="Gọi hotline: 1900 8687">
+    <span class="floating-tooltip">Hotline tư vấn: 1900 8687</span>
+    <svg viewBox="0 0 24 24" fill="white" width="22" height="22">
+      <path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.4-.1-.8 0-1.1.3l-2.2 2.2c-.3-.3.4-.7.2-1.1-.4-1.1-.6-2.3-.6-3.5 0-.6-.4-1-1-1H4c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"/>
+    </svg>
+  </a>
+  <a href="https://zalo.me" target="_blank" rel="noopener" class="floating-btn floating-btn_zalo" aria-label="Chat Zalo 24/7">
+    <span class="floating-tooltip">Chat Zalo Chuyên Viên</span>
+    <svg viewBox="0 0 32 32" fill="none" width="26" height="26">
+      <path d="M16 4C9.4 4 4 8.7 4 14.5c0 3.3 1.8 6.3 4.5 8.2l-1.2 4.4c-.1.5.4.9.9.6l5-2.8c.9.3 1.8.4 2.8.4 6.6 0 12-4.7 12-10.5S22.6 4 16 4Z" fill="white"/>
+      <text x="16" y="17.8" fill="#0068FF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="8.5" text-anchor="middle" letter-spacing="-0.3">Zalo</text>
+    </svg>
+  </a>
+</div>
+
 </body>
 </html>

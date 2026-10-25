@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CMS Landing Enterprise v4 — CRM, Landing Builder, Ví & Affiliate</title>
+<meta name="description" content="Hệ sinh thái SaaS Enterprise v4: Vue 3 + ASP.NET Core 9 + Dapper. Tích hợp CRM Leads, Landing Builder, Ví điểm thưởng & Hệ thống Affiliate đa tầng F0-F3." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body class="cms-theme">
+
+<!-- ─── TOP NOTIFICATION BAR ─── -->
+<div class="top-announcement">
+  <div class="cms-container ann-inner">
+    <span><i class="ph-fill ph-check-circle text-emerald"></i> Cổng thanh toán SePay & VietQR tự động khớp đơn 100% (Webhook Idempotent)</span>
+    <span class="ann-pill">ASP.NET 9 + Dapper</span>
+  </div>
+</div>
+
+<!-- ─── HEADER ─── -->
+<header class="cms-header">
+  <div class="cms-container cms-header-inner">
+    <div class="cms-logo">
+      <div class="logo-gem"><i class="ph-fill ph-buildings"></i></div>
+      <div class="logo-titles">
+        <span class="logo-main">CMS LANDING ENTERPRISE</span>
+        <span class="logo-sub">Version 4.0.0 · Multi-Tenant</span>
+      </div>
+    </div>
+
+    <nav class="cms-nav">
+      <a href="#crm">CRM Leads</a>
+      <a href="#affiliate">Affiliate F0-F3</a>
+      <a href="#architecture">Kiến Trúc Multi-Tenant</a>
+    </nav>
+
+    <div class="cms-header-actions">
+      <a href="#wallet" class="wallet-badge" title="Số dư ví tích lũy">
+        <i class="ph-fill ph-wallet"></i>
+        <span>Ví: 42,850,000 đ</span>
+      </a>
+      <a href="#builder" class="btn btn-emerald">
+        <span>Landing Builder</span>
+        <i class="ph ph-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- ─── HERO ─── -->
+<section class="cms-hero">
+  <div class="cms-container">
+    <div class="hero-center">
+      <div class="cms-tag">
+        <span class="tag-gem"></span>
+        <span>Giải Pháp SaaS Toàn Diện Doanh Nghiệp</span>
+      </div>
+
+      <h1 class="hero-h1">
+        Nền tảng CRM, Landing Page &<br/>
+        <span class="text-gold">Động Cơ Affiliate Đa Tầng F0–F3.</span>
+      </h1>
+
+      <p class="hero-p">
+        Tối ưu hóa phễu bán hàng toàn diện từ lúc khách điền form trên landing page, tự động đưa vào CRM, quản lý điểm thưởng trong Ví và tự động trích hoa hồng cho mạng lưới đại lý.
+      </p>
+
+      <div class="hero-btns">
+        <a href="#crm" class="btn btn-emerald btn-lg">Trải Nghiệm CRM Pipeline</a>
+        <a href="#affiliate" class="btn btn-dark btn-lg">Xem Sơ Đồ Affiliate</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SECTION 1: CRM WORKSPACE ─── -->
+<section class="cms-section" id="crm">
+  <div class="cms-container">
+    <div class="section-title-wrap">
+      <span class="sec-badge">LEAD & CUSTOMER WORKSPACE</span>
+      <h2>Pipeline Quản Lý Khách Hàng Real-Time</h2>
+      <p>Kéo thả trạng thái leads theo chuẩn Kanban, tự động đồng bộ SignalR và phân quyền RBAC.</p>
+    </div>
+
+    <div class="crm-pipeline-board">
+      <!-- Col 1 -->
+      <div class="pipeline-col">
+        <div class="col-head">
+          <span class="col-name">LEAD MỚI</span>
+          <span class="col-count">14</span>
+        </div>
+        <div class="lead-card">
+          <div class="lead-top">
+            <strong>Nguyễn Văn Bình</strong>
+            <span class="lead-tag tag-blue">Hot Lead</span>
+          </div>
+          <p>Yêu cầu tư vấn gói BĐS Đô Thị 2.5 Tỷ</p>
+          <div class="lead-foot">
+            <span><i class="ph ph-phone"></i> 0918.xxx.892</span>
+            <span class="lead-agent">MK</span>
+          </div>
+        </div>
+
+        <div class="lead-card">
+          <div class="lead-top">
+            <strong>Trần Thu Hà</strong>
+            <span class="lead-tag tag-emerald">Từ Landing</span>
+          </div>
+          <p>Đăng ký khóa học Gia Sư 1-1 Lớp 12</p>
+          <div class="lead-foot">
+            <span><i class="ph ph-envelope"></i> thuha@gmail.com</span>
+            <span class="lead-agent">HQ</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Col 2 -->
+      <div class="pipeline-col">
+        <div class="col-head">
+          <span class="col-name">ĐANG TƯ VẤN / DEMO</span>
+          <span class="col-count">8</span>
+        </div>
+        <div class="lead-card">
+          <div class="lead-top">
+            <strong>Công ty TechCorp</strong>
+            <span class="lead-tag tag-amber">SLA 24h</span>
+          </div>
+          <p>Dự án triển khai CMS 50 chi nhánh</p>
+          <div class="lead-foot">
+            <span><i class="ph ph-clock"></i> Gọi lại lúc 14:00</span>
+            <span class="lead-agent">TH</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Col 3 -->
+      <div class="pipeline-col">
+        <div class="col-head">
+          <span class="col-name">HỢP ĐỒNG ĐÃ KÝ (WON)</span>
+          <span class="col-count">24</span>
+        </div>
+        <div class="lead-card card-won">
+          <div class="lead-top">
+            <strong>VinSmart Edu Center</strong>
+            <span class="lead-tag tag-won">Đã Duyệt</span>
+          </div>
+          <p>Giá trị: 420,000,000 đ · Hoa hồng F0: 25%</p>
+          <div class="lead-foot">
+            <span><i class="ph ph-seal-check"></i> Đã kích hoạt</span>
+            <span class="lead-agent">MK</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SECTION 2: VÍ & AFFILIATE F0-F3 ─── -->
+<section class="cms-section bg-darker" id="wallet">
+  <div class="cms-container">
+    <div class="section-title-wrap">
+      <span class="sec-badge">WALLET & COMMISSION ENGINE</span>
+      <h2>Hệ Thống Ví Điểm & Hoa Hồng Affiliate F0–F3</h2>
+      <p>Tính toán phân chia hoa hồng tự động theo từng cấp độ đại lý, đảm bảo minh bạch và kiểm toán Audit Log.</p>
+    </div>
+
+    <div class="wallet-affiliate-grid">
+      <!-- Wallet Box -->
+      <div class="wallet-card">
+        <div class="w-top">
+          <div>
+            <span class="w-label">TỔNG SỐ DƯ KHẢ DỤNG</span>
+            <div class="w-balance">42,850,000 <small>VND</small></div>
+          </div>
+          <div class="w-icon"><i class="ph-fill ph-wallet"></i></div>
+        </div>
+
+        <div class="w-stats-row">
+          <div>
+            <span class="ws-lbl">Điểm Tích Lũy</span>
+            <strong>8,450 pts</strong>
+          </div>
+          <div>
+            <span class="ws-lbl">Đã Rút Về</span>
+            <strong>125,000,000 đ</strong>
+          </div>
+          <div>
+            <span class="ws-lbl">Hoa Hồng Chờ Duyệt</span>
+            <strong>3,800,000 đ</strong>
+          </div>
+        </div>
+
+        <div class="w-actions">
+          <button class="btn btn-emerald btn-block" onclick="alert('Mở form yêu cầu rút tiền tự động về tài khoản ngân hàng!')">
+            <i class="ph ph-bank"></i>
+            <span>Rút Tiền Nhanh 24/7 (VietQR)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Affiliate Tree Structure -->
+      <div class="affiliate-tree-card" id="affiliate">
+        <div class="tree-header">
+          <h3>Sơ Đồ Hoa Hồng Đại Lý Đa Cấp (F0 - F3)</h3>
+          <span class="pill-active">Tỷ lệ cố định 42%</span>
+        </div>
+
+        <div class="tree-nodes">
+          <div class="tree-node node-f0">
+            <div class="node-badge">F0 (Người giới thiệu trực tiếp)</div>
+            <div class="node-main">
+              <span class="node-pct">25%</span>
+              <span class="node-desc">Nhận 25% giá trị hợp đồng thanh toán lần đầu & tái tục</span>
+            </div>
+          </div>
+
+          <div class="tree-node node-f1">
+            <div class="node-badge">F1 (Đại lý cấp 1)</div>
+            <div class="node-main">
+              <span class="node-pct">10%</span>
+              <span class="node-desc">Nhận 10% doanh số từ toàn bộ nhánh F0 cấp dưới</span>
+            </div>
+          </div>
+
+          <div class="tree-node node-f2">
+            <div class="node-badge">F2 & F3 (Đại lý cấp 2 - 3)</div>
+            <div class="node-main">
+              <span class="node-pct">5% & 2%</span>
+              <span class="node-desc">Thưởng phát triển hệ thống và chăm sóc cộng tác viên</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SECTION 3: LANDING BUILDER PREVIEW ─── -->
+<section class="cms-section" id="builder">
+  <div class="cms-container">
+    <div class="section-title-wrap">
+      <span class="sec-badge">DRAG & DROP LANDING BUILDER</span>
+      <h2>Trình Kéo Thả Landing Page Động</h2>
+      <p>Hơn 50+ khối Section mẫu dựng sẵn, tối ưu hóa tỷ lệ chuyển đổi, xuất file HTML/Next.js/Vue tĩnh tức thì.</p>
+    </div>
+
+    <div class="builder-mockup">
+      <div class="builder-sidebar">
+        <span class="b-title">THƯ VIỆN SECTIONS</span>
+        <div class="b-item active"><i class="ph ph-image"></i> Hero Section (Dark Tech)</div>
+        <div class="b-item"><i class="ph ph-list-dashes"></i> Feature Bento Grid</div>
+        <div class="b-item"><i class="ph ph-currency-dollar"></i> Bảng Giá Pricing Table</div>
+        <div class="b-item"><i class="ph ph-quotes"></i> Testimonials Khách Hàng</div>
+        <div class="b-item"><i class="ph ph-chat-circle-dots"></i> Form Thu Thập Lead CRM</div>
+      </div>
+
+      <div class="builder-stage">
+        <div class="stage-bar">
+          <div class="stage-dots"><span></span><span></span><span></span></div>
+          <span class="stage-title">Xem trước trực tiếp (Desktop View · 100% Responsive)</span>
+          <button class="stage-btn"><i class="ph ph-eye"></i> Live</button>
+        </div>
+        <div class="stage-content">
+          <div class="mock-hero-preview">
+            <span class="m-badge">SEPAY VERIFIED</span>
+            <h2>Khóa Học Bán Hàng Đỉnh Cao 2026</h2>
+            <p>Hệ thống tự động kích hoạt tài khoản trong 30 giây ngay sau khi quét mã QR thanh toán.</p>
+            <div class="m-cta-row">
+              <button class="m-btn-act">Đăng Ký Ngay · 1,490,000 đ</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer class="cms-footer">
+  <div class="cms-container footer-flex">
+    <div>
+      <strong>CMS Landing Enterprise v4</strong> · Kiến Trúc Vue 3 & ASP.NET Core 9
+    </div>
+    <div class="footer-links">
+      <a href="#crm">CRM Leads</a>
+      <a href="#wallet">Ví Doanh Thu</a>
+      <a href="#affiliate">Hoa Hồng F0-F3</a>
+      <a href="/templates">Kho Templates</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

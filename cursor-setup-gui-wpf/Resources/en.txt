@@ -1,0 +1,749 @@
+app.title=VibeCode Enterprise Framework - Setup
+app.title_short=VibeCode Enterprise Framework
+app.subtitle=v4.5.0 - Framework distribution tool for multiple Vibe Coders
+safety.title=Safe package boundary
+safety.body=Choose an explicit target for distribution. Packaging never edits .cursor and never substitutes for governance approval.
+safety.badge=BLOCKED · governance approval required
+log.title=Operational log
+loading_components=Loading components...
+scan_archive_not_found=Framework archive not found next to the installer.
+place_zip_hint=Place cursor-setup.zip next to VibeCodeEnterpriseFramework.exe or select the correct workspace folder.
+scan_failed=Failed to scan archive
+scanning=Scanning components...
+scanned_log=Components scanned: {0} categories
+scan_error=ERROR scanning archive: {0}
+ready_to_install=Ready to install
+
+tab.install=Install
+tab.components=Components
+tab.advanced=Advanced
+tab.hooks=Hooks
+tab.guide=Guide
+tab.mcp=MCP Servers
+tab.updates=Updates
+tab.backup=Backup & Restore
+tab.settings=Settings
+tab.framework=Tools
+tab.project_runner=Project Runner
+tab.script_generator=Script Generator
+
+hooks.desc=Optional integration with the cursor_framework Python library. Hooks run as background subprocess and never block installation. Disable any hook to skip it.
+hooks.prescan_label=Pre-scan: validate ZIP before extraction
+hooks.prescan_script_label=Python arguments (passed to `python`):
+hooks.postinstall_label=Post-install: write INDEX.json for Dashboard / Workflow
+hooks.postinstall_script_label=Python arguments (passed to `python`):
+hooks.hint=Disable a hook by unchecking its checkbox. Edit the script to override the default command. Both hooks are fail-safe — if Python is missing or the script errors, the installer continues normally.
+
+components_desc=Choose which components to install. Defaults: all selected.
+advanced_desc=Optional resources. Defaults: all selected.
+
+guide.welcome=Welcome to VibeCode Enterprise Framework
+guide.intro=Enterprise AI Coding Framework with 39 rules, 17 skills, 36 knowledge bases, 4 agent personas and pre/post review gates system.
+guide.steps_title=Installation Steps
+
+# GuideView - Welcome Banner
+guide.welcome_banner=User Guide
+guide.welcome_banner_desc=VibeCode Enterprise Framework Setup - Install in 5 easy steps.
+
+# GuideView - Step 1
+guide.step1_title=Select installation location
+guide.step1_desc=Press 'Browse...' to select a folder or 'Create folder' to create a new .cursor folder. Default location is ~/.cursor (Cursor configuration folder).
+guide.step1_tip=If you have previously installed the framework, the program will ask whether to overwrite existing files.
+
+# GuideView - Step 2
+guide.step2_title=Select components to install
+guide.step2_desc=Go to the Components tab to select:
+guide.step2_item1=rules: development rules and guidelines
+guide.step2_item2=skills: specialized skills for AI agents
+guide.step2_item3=agents: Prompts for Claude, GPT, Gemini
+guide.step2_item4=commands: Shortcut commands for Cursor IDE
+guide.step2_item5=hooks: Integration scripts for automation
+guide.step2_item6=knowledge: Knowledge bases and documentation
+
+# GuideView - Step 3
+guide.step3_title=Configure advanced options
+guide.step3_desc=The Advanced tab contains optional resources. The Hooks tab allows enabling/disabling Python framework (cursor_framework) integration - uncheck if not needed.
+
+# GuideView - Step 4
+guide.step4_title=Review your selections
+guide.step4_desc=Read carefully the selected options. Press 'Select all' / 'Deselect all' to quickly adjust. The status bar at the bottom shows the number of selected components.
+
+# GuideView - Step 5
+guide.step5_title=Press Install to begin installation
+guide.step5_desc=The installation process will display detailed logs. After completion, restart Cursor IDE to load the new components.
+
+# GuideView - About Section
+guide.about_title=About VibeCode Enterprise Framework
+guide.about_intro=VibeCode Enterprise Framework is an AI-augmented development toolkit for Cursor IDE. It includes:
+guide.architecture_title=Architecture & Design
+guide.architecture_desc=Clean Architecture, Hexagonal Architecture, CQRS, Event Sourcing, Domain-Driven Design
+guide.ai_agent_title=AI Agent Skills
+guide.ai_agent_desc=Karpathy coding discipline, Ponytail lazy senior, Vibe coding overlay, Frontend review
+guide.devtools_title=Development Tools
+guide.devtools_desc=Build Memory, Knowledge Compiler, Project Indexer, Embeddings Builder
+guide.deploy_ops_title=Deployment & Ops
+guide.deploy_ops_desc=Vercel, Cloudflare, Docker, Kubernetes, Serverless, CI/CD templates
+
+guide.step1=Step 1: Install
+guide.step1_desc=Choose install location and required components. Default: install all.
+guide.step2=Step 2: Components
+guide.step2_desc=Choose rules, skills, agents and commands you want to use. You can uncheck items you don't need.
+guide.step3=Step 3: Advanced
+guide.step3_desc=Configure knowledge bases, references, workflows and other optional resources.
+guide.step4=Step 4: Hooks
+guide.step4_desc=Configure pre-scan and post-install hooks for deeper integration with cursor_framework.
+guide.step5=Step 5: Complete
+guide.step5_desc=Click "Install" to begin. The process will automatically extract, copy files and run post-install build steps.
+guide.tip=Tip: After installation, restart Cursor IDE to load the new components.
+
+# Expanded Guide Content (English)
+guide.expanded.title=Complete Installation Guide
+guide.expanded.subtitle=Detailed instructions for VibeCode Enterprise Framework setup
+
+# Prerequisites
+guide.prereq.title=Prerequisites
+guide.prereq.subtitle=Before you begin
+guide.prereq.item1=Cursor IDE installed on your computer
+guide.prereq.item2=cursor-setup.zip file (download from GitHub releases)
+guide.prereq.item3=Windows 10/11 or Windows Server 2019+
+guide.prereq.item4=Administrator rights (for system-wide installation)
+guide.prereq.note=Note: You can also install to user folder without admin rights.
+
+# Installation Steps Detailed
+guide.install.step1.title=Step 1: Select Installation Location
+guide.install.step1.desc=Choose where VibeCode Enterprise Framework files will be installed. Default location is your Cursor user folder.
+guide.install.step1.default_path=Default: %USERPROFILE%\.cursor
+guide.install.step1.create_new=Create new .cursor folder
+guide.install.step1.browse=Click Browse to select existing folder
+guide.install.step1.overwrite=If folder exists, select Overwrite to replace files
+
+guide.install.step2.title=Step 2: Choose Components
+guide.install.step2.desc=Select which framework components to install. All items are selected by default.
+guide.install.step2.component1=Rules (39 development guidelines and standards)
+guide.install.step2.component2=Skills (50+ specialized AI agent skills)
+guide.install.step2.component3=Agents (18 agent personas and prompts)
+guide.install.step2.component4=Commands (28 slash commands for Cursor IDE)
+guide.install.step2.component5=Hooks (Python integration scripts)
+guide.install.step2.component6=Knowledge (329 knowledge bases and references)
+guide.install.step2.tip=Tip: Uncheck components you don't need to reduce installation size.
+
+guide.install.step3.title=Step 3: Advanced Options (Optional)
+guide.install.step3.desc=Configure additional settings for experienced users.
+guide.install.step3.option1=References - Architecture patterns, coding standards
+guide.install.step3.option2=Workflows - Automated task workflows
+guide.install.step3.option3=Templates - Project templates and boilerplates
+guide.install.step3.option4=Memory - Workspace memory system
+guide.install.step3.option5=Scripts - Utility scripts and tools
+
+guide.install.step4.title=Step 4: Configure Hooks (Optional)
+guide.install.step4.desc=Hooks integrate with cursor_framework Python library for advanced automation.
+guide.install.step4.prescan=Pre-scan Hook: Validate ZIP archive before extraction
+guide.install.step4.postinstall=Post-install Hook: Generate INDEX.json for Dashboard
+guide.install.step4.disable=Disable hooks by unchecking - installation will continue normally
+
+guide.install.step5.title=Step 5: Install
+guide.install.step5.desc=Review your selections and click Install to begin.
+guide.install.step5.review=Review selected components in the status bar
+guide.install.step5.logs=Installation logs will display in real-time
+guide.install.step5.complete=Restart Cursor IDE after installation completes
+
+# Features Overview
+guide.features.title=Framework Features
+guide.features.subtitle=What you get with VibeCode Enterprise Framework
+
+guide.features.rules.title=Development Rules (39 rules)
+guide.features.rules.desc=Comprehensive coding standards, architecture patterns, and best practices for enterprise development.
+
+guide.features.skills.title=AI Agent Skills (50+ skills)
+guide.features.skills.desc=Specialized skills for frontend, backend, security, testing, and deployment. Includes Karpathy coding discipline and Ponytail lazy senior principles.
+
+guide.features.agents.title=Agent Personas (18 personas)
+guide.features.agents.desc=Pre-configured prompts for Code Reviewer, Security Auditor, Test Engineer, Web Performance Auditor, and more.
+
+guide.features.commands.title=Slash Commands (28 commands)
+guide.features.commands.desc=Quick commands like /build, /test, /review, /deploy, /security for common development tasks.
+
+guide.features.knowledge.title=Knowledge Bases (329)
+guide.features.knowledge.desc=Extensive documentation, references, and guides for various technologies and frameworks.
+
+# Usage Guide
+guide.usage.title=How to Use
+guide.usage.subtitle=Getting started after installation
+
+guide.usage.restart.title=1. Restart Cursor IDE
+guide.usage.restart.desc=Close and reopen Cursor to load the new framework components.
+
+guide.usage.slash.title=2. Use Slash Commands
+guide.usage.slash.desc=Type / in Cursor to see available commands. Try /build, /test, /review, /spec, /plan
+
+guide.usage.skills.title=3. Access Skills
+guide.usage.skills.desc=Skills are automatically loaded. Use @ followed by skill name to activate specialized skills.
+
+guide.usage.agent.title=4. Agent Personas
+guide.usage.agent.desc=Request code review with /review, security audit with /security, or performance check with /webperf
+
+# Troubleshooting
+guide.trouble.title=Troubleshooting
+guide.trouble.subtitle=Common issues and solutions
+
+guide.trouble.issue1=Q: Components not loading after install?
+guide.trouble.solve1=Restart Cursor IDE. If still not working, check if .cursor folder exists in your home directory.
+
+guide.trouble.issue2=Q: Installation failed with permission error?
+guide.trouble.solve2=Run the installer as Administrator, or install to user folder instead.
+
+guide.trouble.issue3=Q: How to update the framework?
+guide.trouble.solve3=Download new cursor-setup.zip and run the installer again. Select Overwrite to update files.
+
+guide.trouble.issue4=Q: How to uninstall?
+guide.trouble.solve4=Delete the .cursor folder in your home directory. The framework is self-contained.
+
+# Keyboard Shortcuts
+guide.shortcuts.title=Keyboard Shortcuts
+guide.shortcuts.ctrl_s=Ctrl+Shift+B - Build command
+guide.shortcuts.ctrl_r=Ctrl+Shift+T - Test command
+guide.shortcuts.ctrl_shift_r=Ctrl+Shift+R - Review command
+guide.shortcuts.ctrl_shift_d=Ctrl+Shift+D - Deploy command
+guide.shortcuts.ctrl_shift_p=Ctrl+Shift+P - Project Indexer
+
+install.location=Installation Location
+install.location_hint=Select where VibeCode Enterprise Framework will be installed
+install.target_prefix=Installs into:
+install.browse=Browse...
+install.new_folder=+ New Folder
+install.force=Overwrite existing files (--force)
+install.skip_cursor=Skip Cursor running check
+install.tip=Tip: Switch to the 'Components' and 'Advanced' tabs to choose which rules, skills, and other resources to include.
+install.build_options=Post-install build steps (optional)
+install.build_options_desc=Run these after files are extracted. Leave all unchecked for a clean install.
+install.build_memory=Build Memory System
+install.compile_knowledge=Compile Knowledge
+install.build_index=Build Project Index
+install.build_embeddings=Build Embeddings
+install.package_framework=Package Framework
+install.build_exe_note=Note: 'Package Framework' may take a few minutes (creates cursor-setup.zip).
+install.build_memory_tt=Rebuild workspace memory index and short-term recall cache.
+install.compile_knowledge_tt=Recompile framework knowledge base into runtime form.
+install.build_index_tt=Regenerate project symbol/usage index for faster navigation.
+install.build_embeddings_tt=Build/refresh vector embeddings for semantic search.
+install.package_framework_tt=Create redistributable cursor-setup.zip from the installed framework.
+
+select_all=Select all {0}
+always_installed={0}  (always installed)
+selected_count={0}/{1} selected
+summary.components=Components: {0}/{1} selected
+column.component=Component
+column.description=Description
+no_description=(no description)
+
+log.install_header=VibeCode Enterprise Framework Setup
+log.install_to=Install to: {0}
+log.using_existing=Using existing .cursor folder: {0}
+log.created=Created: {0}
+log.could_not_create=Could not create directory: {0}
+log.copy=Installing to: {0}
+log.cancelled_by_user=Installation cancelled by user.
+log.checking_cursor=Checking if Cursor IDE is running...
+log.cursor_running_title=Cursor Running
+log.cursor_running_msg=Cursor IDE appears to be running. Please close it before installation.\n\nClick 'Yes' to continue anyway, or 'No' to cancel.
+log.zip_not_found=Framework archive not found: {0}\n\nPlease ensure cursor-setup.zip is in the same folder as cursor-setup.exe.
+log.found_archive=Found framework archive: {0}
+log.extracting=Extracting selected components...
+log.preparing=Preparing installation...
+log.extracting_files=Extracting framework files...
+log.finalizing=Finalizing...
+log.complete=Installation complete!
+log.complete_header=Installation completed successfully!
+log.installed_to=Installed to: {0}
+log.restart_cursor=Please restart Cursor IDE to load the new components.
+log.post_install=Running post-install build steps...
+log.hook_post_install=Generating INDEX.json...
+log.post_step===> {0}
+log.post_done=    OK ({0:0.0}s)
+log.post_failed=    FAILED (exit {0})
+log.extracting_progress=Extracting... {0}/{1}
+log.skipping=Skipping... {0}/{1}
+log.copy_action=[COPY] {0}
+log.skip_action=[SKIP] {0}
+log.skip_cat_action=[SKIP-CAT] {0} ({1})
+log.error_action=[ERROR] {0}: {1}
+log.summary=Summary: {0} copied, {1} skipped (existing), {2} skipped (not selected)
+log.selected_components=Selected components:
+log.total_selected=Total selected: {0}
+
+msgbox.cancel_confirm_title=Confirm Cancel
+msgbox.cancel_confirm_msg=Installation in progress. Are you sure you want to cancel?
+msgbox.error_title=Error
+msgbox.dir_error_title=Error
+msgbox.dir_error_msg=Could not create directory: {0}
+msgbox.install_failed=Installation failed: {0}
+msgbox.complete_title=Installation Complete
+msgbox.complete_msg=VibeCode Enterprise Framework installed successfully!\n\nLocation: {0}\n\nPlease restart Cursor IDE.
+
+btn.cancel=Cancel
+btn.start=Start
+btn.open=Open
+btn.run=Run
+btn.install=Install
+btn.please_wait=Please wait...
+btn.yes=Yes
+btn.no=No
+btn.ok=OK
+btn.close=Close
+btn.retry=Retry
+btn.open_folder=Open Folder
+btn.collapse=Collapse
+btn.expand=Expand
+combobox.lang=Language
+combobox.culture=Select Language
+
+step.prepare=Prepare
+step.extract=Extract
+step.deploy=Deploy
+step.complete=Complete
+
+status.initializing=Initializing...
+status.scanning=Scanning components...
+status.found=Found {0} components
+status.extracting=Extracting...
+status.verifying=Verifying...
+status.complete=Complete!
+status.error=An error occurred
+status.cancelled=Cancelled
+status.cancelled_by_user=Cancelled by user
+status.ready=Ready
+status.installing=Installing...
+
+validate.path_required=Please select an installation location
+validate.path_invalid=Invalid path
+validate.disk_space=Insufficient disk space
+validate.permission=No permission to write to directory
+validate.cursor_running=Cursor IDE is running, please close it first
+
+category.rules=Rules
+category.skills=Skills
+category.agents=Agents
+category.commands=Commands
+category.hooks=Hooks
+category.knowledge=Knowledge Bases
+category.references=References
+category.workflows=Workflows
+category.templates=Templates
+category.memory=Memory
+category.scripts=Scripts
+category.prompts=Prompts
+
+advanced.title=Advanced Configuration
+advanced.desc=Advanced options for experienced users
+advanced.legacy_mode=Legacy compatibility mode
+advanced.legacy_desc=Enable for compatibility with older framework versions
+advanced.experimental=Experimental
+advanced.experimental_desc=Enable experimental features (not recommended for production)
+advanced.verbose_log=Verbose logging
+advanced.verbose_desc=Detailed logging for debugging
+advanced.dry_run=Dry-run mode
+advanced.dry_run_desc=Simulate installation without changing system
+advanced.backup=Backup before install
+advanced.backup_desc=Create backup before overwrite
+
+hooks.title=Hooks Configuration
+hooks.desc=Python integration with cursor_framework
+hooks.enable=Enable hooks
+hooks.prescan=Pre-scan hook
+hooks.postinstall=Post-install hook
+hooks.custom_script=Custom script
+hooks.timeout=Timeout (seconds)
+hooks.timeout_desc=Maximum timeout for each hook
+hooks.fail_safe=Fail-safe mode
+hooks.fail_safe_desc=Hook errors will not block installation
+
+footer.copyright=© 2026 VibeCode Enterprise Framework
+footer.license=MIT License
+footer.version=Version {0}
+
+# MCP Servers tab
+mcp.title=MCP Servers
+mcp.subtitle=Manage Model Context Protocol servers bundled with the framework.
+mcp.sync_all=Sync All MCP Servers
+mcp.check_status=Re-check Status
+mcp.framework=Framework MCP
+mcp.framework_desc=Rules, skills, agents and command discovery.
+mcp.autopilot=Autopilot MCP
+mcp.autopilot_desc=Multi-step task automation over the framework catalog.
+mcp.memory=Memory MCP
+mcp.memory_desc=Persistent workspace memory and short-term recall cache.
+mcp.installed=Installed
+mcp.not_installed=Not installed
+mcp.tools_count={0} tools
+mcp.last_sync=Last sync: {0}
+mcp.last_sync_never=Never synced
+mcp.config_path=Config: {0}
+mcp.sync_success=Synced {0} MCP servers
+mcp.sync_failed=MCP sync failed: {0}
+mcp.opening_config=Opening config file...
+
+# Updates tab
+updates.title=Updates
+updates.subtitle=Check for new versions of the VibeCode Enterprise Framework.
+updates.current_version=Installed version
+updates.latest_version=Latest version
+updates.check=Check for updates
+updates.download=Download update
+updates.last_checked=Last checked: {0}
+updates.last_checked_never=Never checked
+updates.up_to_date=You are running the latest version.
+updates.update_available=Update available
+updates.changelog=Changelog
+updates.check_failed=Update check failed: {0}
+updates.download_started=Download started
+
+# Backup & Restore tab
+backup.title=Backup & Restore
+backup.subtitle=Save snapshots of your framework configuration.
+backup.create=Create backup now
+backup.restore=Restore
+backup.delete=Delete
+backup.refresh=Refresh list
+backup.location=Backup folder
+backup.browse=Browse...
+backup.auto=Auto-backup before install
+backup.empty=No backups yet. Click 'Create backup now' to make one.
+backup.created=Backup created: {0}
+backup.restored=Backup restored successfully
+backup.delete_confirm_title=Delete backup?
+backup.delete_confirm_msg=Permanently delete this backup file?
+backup.restore_confirm_title=Restore backup?
+backup.restore_confirm_msg=This will replace your current framework files. Continue?
+
+# Settings tab
+settings.title=Settings
+settings.subtitle=Configure the installer behaviour.
+settings.theme=Theme
+settings.theme_indigo=Indigo (default)
+settings.theme_dark=Dark
+settings.theme_light=Light
+settings.theme_system=Follow system
+settings.autostart=Start with Windows
+settings.autostart_desc=Launch the installer on Windows login (admin required).
+settings.notify_complete=Notify on completion
+settings.notify_error=Notify on errors
+settings.log_path=Log file location
+settings.browse=Browse...
+settings.saved=Settings saved
+settings.path_required=Please choose a folder
+
+# Framework Tools tab
+framework.title=Framework Tools
+framework.subtitle=Launch cursor_framework components directly.
+framework.dashboard=Dashboard Server
+framework.dashboard_desc=Start Dashboard HTTP server on port 8765
+framework.graph_viz=Skills Graph
+framework.graph_viz_desc=D3 visualization on port 8766
+framework.api_server=API Server
+framework.api_server_desc=Cursor integration API server on port 8767
+framework.scan=Scan Workspace
+framework.scan_desc=Scan .cursor/ and display INDEX
+framework.build_index=Build Index
+framework.build_index_desc=Generate INDEX.json + INDEX.md
+framework.warm_cache=Warm Cache
+framework.warm_cache_desc=Force full index + memory persist
+framework.stats=Statistics
+framework.stats_desc=Display Workflow stats
+framework.skill_graph=Skill Graph
+framework.skill_graph_desc=Print skill dependency graph JSON
+framework.code_graph=Code Graph
+framework.code_graph_desc=Dump project code graph
+framework.session_stats=Session Stats
+framework.session_stats_desc=Show session memory statistics
+framework.clear_session=Clear Session
+framework.clear_session_desc=Clear session memory cache
+framework.running=Running...
+framework.started=Started: {0}
+framework.stopped=Stopped: {0}
+framework.failed=Failed (exit {0})
+framework.not_found=cursor_framework not found in install directory
+framework.open_browser=Open browser
+framework.cancel=Cancel command
+framework.running_note=Another command is running - please wait or press Cancel
+framework.dashboard_title=Dashboard Servers
+framework.build_title=Build & Index Tools
+framework.graph_title=Graph & Session Tools
+framework.about_title=About cursor_framework
+framework.about_desc=cursor_framework is a Python CLI bundled with VibeCode Enterprise Framework, providing commands to manage skills, agents, memory and workflow. This framework is written in pure Python with no third-party dependencies.
+framework.about_commands=Commands:
+framework.about_command_list=serve, serve-graph, serve-api, scan, index, warm, stats, graph, dump-graph, session-stats, session-clear
+mcp.discovered_tools=Discovered Tools
+settings.appearance_label=Appearance
+settings.startup_label=Startup
+settings.notifications_label=Notifications
+settings.logging_label=Logging
+settings.save_label=Save settings
+backup.configuration_label=Configuration
+backup.snapshots_label=Snapshots
+
+# HooksView localization
+hooks.page_title=Hooks
+hooks.page_desc=Optional integration with the Python cursor_framework library. Hooks run in the background, do not block installation.
+hooks.prescan_title=Pre-scan: Check ZIP before extraction
+hooks.prescan_desc=Run `python -m cursor_framework.indexer --validate` to validate the archive before extract.
+hooks.prescan_script_label=Python arguments (passed to `python`):
+hooks.postinstall_title=Post-install: Generate INDEX.json for Dashboard
+hooks.postinstall_desc=Run `python -m cursor_framework.indexer` after installation to generate INDEX.json for Dashboard and Workflow modules.
+hooks.postinstall_script_label=Python arguments (passed to `python`):
+hooks.about_title=About Hooks
+hooks.about_desc=Uncheck the checkbox to skip a hook. Edit the script to change the default command. Both hooks are safe — if Python is not found or the script errors, the installer continues normally.
+
+# ComponentsView
+components.title=Components
+components.subtitle=Select rules, skills, agents, commands, and hooks to install.
+components.items=items
+
+# AdvancedView
+advanced.title=Advanced
+advanced.subtitle=Optional resources: prompts, references, workflows, templates, memory, scripts.
+
+# Common buttons
+btn.select_all=Select all
+btn.deselect_all=Deselect all
+
+# Install page
+install.page_title=Install
+install.page_subtitle=Select installation location and options for VibeCode Enterprise Framework.
+install.optional=OPTIONAL
+install.skip_tip=Skip if only want a clean install.
+
+# Project Runner tab
+project_runner.title=Project Runner
+project_runner.subtitle=Run framework tools on any project workspace.
+project_runner.select_project=Select Project Folder
+project_runner.browse=Browse...
+project_runner.detected_projects=Detected Projects
+project_runner.run_on_project=Run on Project
+project_runner.ask_placeholder=Type your request here...
+project_runner.no_project_selected=Please select a project folder first
+project_runner.current_path=Current project:
+project_runner.select_folder=Select Folder
+
+# Script Generator tab
+script_gen.title=Script Generator
+script_gen.subtitle=Generate .bat installer scripts for web apps, desktop apps, Vercel, databases, AI, and more — ready to run in any project.
+script_gen.filter_label=Category
+script_gen.project_label=Project:
+script_gen.output_label=Output:
+script_gen.use_ps=Use PowerShell
+script_gen.blocks_label=Script blocks
+script_gen.preview_label=Script preview
+script_gen.generate_selected=Generate Selected
+script_gen.generate_all=Generate All
+script_gen.generate_all_tip=Generate all checked scripts as .bat files
+script_gen.copy_preview=Copy
+script_gen.save_preview=Save File
+script_gen.open_output=Open Folder
+script_gen.project_selected=Project selected
+
+# ECC (Enhanced Code Copilot) tab
+ecc.title=ECC Integration
+ecc.subtitle=Enhanced Code Copilot v2.2.2 - 68 agents, 292 skills, 94 commands
+ecc.status=Status
+ecc.installed=Installed
+ecc.not_installed=Not installed
+ecc.clone=Clone Repository
+ecc.refresh=Refresh Status
+ecc.hooks=Enable Hooks
+ecc.harnesses=Supported Harnesses
+ecc.features=Key Features
+ecc.install_failed=Install failed
+ecc.install_success=Installation successful
+ecc.repo_cloned=Repository cloned successfully
+ecc.repo_exists=Repository already exists
+ecc.git_required=Git is required for this operation
+ecc.node_required=Node.js is required for npm-based installation
+ecc.agents=Agents
+ecc.skills=Skills
+ecc.commands=Commands
+ecc.active_vibe_coder=Active Vibe Coder:
+ecc.gate=Gate
+ecc.installing=Installing
+ecc.error=Error
+ecc.cloning_repo=Cloning repository
+ecc.clone_failed=Clone failed
+ecc.install_script_not_found=Install script not found
+ecc.repo_not_found=Repository not found. Clone first.
+ecc.hooks_memory=Hooks & Memory
+ecc.hooks_memory_desc=Session summaries, continuous learning, instincts, and context controls
+ecc.agent_shield=AgentShield
+ecc.agent_shield_desc=Scanning for prompts, hooks, MCP config, permissions, secrets, and agent files
+ecc.workflow=Workflow Engine
+ecc.workflow_desc=plan → implement → review → verify → remember → improve
+ecc.install_commands=Installation Commands
+ecc.claude_code=Claude Code:
+ecc.codex=Codex:
+ecc.cursor=Cursor:
+ecc.guided_setup=Guided Setup:
+ecc.harness_claude_desc=Native ecc@ecc plugin with full hooks
+ecc.harness_codex_desc=Native plugin or legacy sync
+ecc.harness_cursor_desc=Project-local adapter
+ecc.harness_gemini_desc=Project-local config
+ecc.harness_zed_desc=Project-local adapter
+ecc.harness_kimi_desc=Project-local install
+ecc.harness_copilot_desc=copilot-instructions.md
+ecc.harness_antigravity_desc=Project-local adapter
+tab.ecc=ECC
+
+# Vibe Coder selector
+vibe_coder.label=Vibe Coder
+vibe_coder.tooltip=Select your AI coding assistant
+
+# Vibe Tools
+vibe_tool.cursor=Cursor IDE
+vibe_tool.cursor_desc=Cursor IDE with AI-powered coding
+vibe_tool.antigravity=Antigravity
+vibe_tool.antigravity_desc=Next-gen vibe coding tool
+vibe_tool.codex=OpenAI Codex
+vibe_tool.codex_desc=OpenAI Codex CLI
+vibe_tool.claude_code=Claude Code
+vibe_tool.claude_code_desc=Anthropic Claude Code
+vibe_tool.grok=Grok CLI
+vibe_tool.grok_desc=xAI Grok CLI
+vibe_tool.gemini=Gemini CLI
+vibe_tool.gemini_desc=Google Gemini CLI
+vibe_tool.zed=Zed AI
+vibe_tool.zed_desc=Zed AI Editor
+vibe_tool.kimi=Kimi Code
+vibe_tool.kimi_desc=Kimi Code AI
+vibe_tool.copilot=GitHub Copilot
+vibe_tool.copilot_desc=GitHub Copilot CLI
+vibe_tool.windsurf=WindSurf
+vibe_tool.windsurf_desc=Codeium WindSurf IDE
+vibe_tool.continue=Continue.dev
+vibe_tool.continue_desc=Open-source AI coding assistant
+vibe_tool.cline=Cline
+vibe_tool.cline_desc=Autonomous coding agent for VSCode
+vibe_tool.roo=Roo Code
+vibe_tool.roo_desc=Flexible AI coding assistant for VSCode
+vibe_tool.aider=Aider
+vibe_tool.aider_desc=CLI tool for pair programming with AI
+
+# evondev-ui-ux Skill
+evondev.title=UI/UX Design
+evondev.subtitle=Professional UI/UX design skill based on evondevKit
+evondev.description=Dashboard, forms, tables, modals, settings with design system and tokens
+evondev.components=UI Components
+evondev.components_desc=26 production-ready UI components
+evondev.layouts=Layouts
+evondev.layouts_desc=5 layout templates (app, form, overlay, pricing, kanban)
+evondev.tokens=Design Tokens
+evondev.tokens_desc=CSS tokens for colors, typography, spacing
+evondev.rules=Design Rules
+evondev.rules_desc=7 design rule categories
+evondev.process=Design Process
+evondev.process_desc=Wireframe-first workflow with 2-3 options
+evondev.brief=Brief
+evondev.wireframe=Wireframe
+evondev.build=Build
+evondev.designer_mode=Designer Mode
+evondev.designer_mode_desc=Create UI as a designer with wireframes first
+evondev.flat_style=Flat Style
+evondev.glassmorphism=Glassmorphism
+evondev.gradient=Gradient
+evondev.dark_mode=Dark Mode
+evondev.light_mode=Light Mode
+
+# Vibe Framework Directories
+vibe_framework.title=Vibe Code Framework
+vibe_framework.subtitle=Standard directories for cross-platform AI coding
+vibe_framework.install=Install for All Vibe Coders
+vibe_framework.install_desc=Install framework to all supported AI coding tools
+vibe_framework.directories=Framework Directories
+vibe_framework.skills_dir=Skills Directory
+vibe_framework.rules_dir=Rules Directory
+vibe_framework.agents_dir=Agents Directory
+vibe_framework.commands_dir=Commands Directory
+vibe_framework.prompts_dir=Prompts Directory
+vibe_framework.workflows_dir=Workflows Directory
+vibe_framework.templates_dir=Templates Directory
+vibe_framework.config_dir=Config Directory
+vibe_framework.primary=Primary Frameworks
+vibe_framework.secondary=Secondary Frameworks
+vibe_framework.vscode=VSCode Extensions
+
+# Agent Management & Installation
+agent.title=Agent Manager
+agent.installed=Installed
+agent.not_installed=Not Installed
+agent.install_success=Successfully installed for {0}
+agent.install_failed=Agent installation failed: {0}
+agent.all_agents_success=Successfully installed for all agents!
+agent.all_agents_partial=Installation partially completed: {0}
+install.all_agents=Install for all Vibe Coders
+install.single_agent=Install for selected agent
+vibe_coder.select=Select your Vibe Coder tool
+
+# Project Runner
+project_runner.running=Running framework command...
+project_runner.ask_title=Ask the Framework
+project_runner.ask_subtitle=Run a natural language request through the workflow pipeline
+project_runner.run_ask=Run Ask
+project_runner.output=Output
+project_runner.clear=Clear
+
+# Common Units & Labels
+common.items_unit=items
+script_gen.scripts_unit=scripts
+script_gen.commands_unit=command(s)
+script_gen.cat_all=All
+script_gen.cat_web=Web
+script_gen.cat_desktop=Desktop
+script_gen.cat_deploy=Deploy
+script_gen.cat_database=Database
+script_gen.cat_ai=AI / LLM
+script_gen.cat_utility=Utility
+
+# Multi-agent hub & safe utilities
+tab.agents=Vibe Coders
+tab.utilities=Safe utilities
+agent.hub_title=Vibe Coder Hub
+agent.hub_subtitle=Install and sync the framework across AI coding agents with an explicit target.
+agent.select_all=Select all
+agent.deselect_all=Deselect
+agent.install_selected=Install selected agents
+agent.sync_selected=Sync selected MCP
+agent.open_folder=Open folder
+agent.docs=Docs
+utilities.title=Operational utilities
+utilities.subtitle=Probe runtimes, import skills additively, and inspect governance without mutating existing data.
+skill_import.title=Add a skill from GitHub
+skill_import.subtitle=A dry-run is required before import. Existing skills are never overwritten; .cursor is never migrated or deleted.
+skill_import.validate=Validate / dry-run
+skill_import.import=Import additive
+skill_import.workspace=Workspace root
+skill_import.target=Canonical target
+skill_import.runtime=Python runtime:
+skill_import.blocked=BLOCKED · a real Python interpreter and valid evidence are required.
+skill_import.repository=GitHub repository
+skill_import.path=Skill path / ref
+skill_import.name=Optional skill id
+skill_import.browse=Browse
+skill_import.open=Open
+skill_import.refresh_runtime=Check Python
+governance.tools_title=Governance & diagnostics
+governance.open_records=Open governance records
+governance.scan=Run governance scan
+agent.selection_hint=Select one or more agents. Installation writes only to the selected target and never moves .cursor resources automatically.
+agent.mcp_supported=MCP supported
+agent.mcp_unavailable=MCP adapter unavailable
+guide.purpose_title=What is this tool for?
+guide.purpose_desc=Package and install selected framework resources into an explicit target for Cursor or another Vibe Coder. This is a distribution/setup tool; it does not grant governance approvals, resolve UNKNOWN_RESOURCE records, or migrate/delete .cursor in bulk.
+guide.action_install=Start installation
+guide.action_agents=Manage Vibe Coders
+guide.action_utilities=Open utilities
+guide.action_preflight=Run readiness check
+guide.safety_note=BLOCKED is a real governance state. PASS only describes an operational check with evidence; BLOCKED is not an installation failure.
+guide.preflight.running=Checking archive readiness...
+guide.preflight.blocked=BLOCKED · cursor-setup.zip was not found
+guide.preflight.ready=Ready · discovered {0} item(s)
+guide.preflight.error=Preflight did not complete · see operational log
+install.page_subtitle=Choose an explicit target, resource scope and safe options to distribute the framework. No automatic .cursor migration.
+install.location_hint=The target receives the selected files. Choose a clear project/agent path instead of relying on an ambiguous default.
+install.surface_active=Installation step active
+install.surface_inactive=Select Install in the sidebar to run the distribution workflow

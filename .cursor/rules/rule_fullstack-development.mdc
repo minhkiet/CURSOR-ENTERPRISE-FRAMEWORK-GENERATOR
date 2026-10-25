@@ -1,0 +1,101 @@
+---
+description: Fullstack Web Development Rule - ASP.NET Core Web API + React + TypeScript + TSX. Enforces end-to-end data flow, REST conventions, JWT auth, database persistence, strict validation, and 17-point verification checklist.
+globs: ["**/*.cs", "**/*.tsx", "**/*.ts", "**/*.jsx", "**/*.js", "**/appsettings*.json"]
+created: 2026-10-05
+version: 1.0.0
+tags: [fullstack, aspnetcore, react, typescript, tsx, rest-api, jwt-auth, database, clean-architecture, end-to-end]
+---
+
+# Fullstack Web Development Protocol (ASP.NET Core + React + TypeScript)
+
+## Mục tiêu
+Quy định tiêu chuẩn phát triển, chỉnh sửa, và debug ứng dụng web Fullstack end-to-end:
+- **Backend:** ASP.NET Core Web API (C#)
+- **Frontend:** React + TypeScript + TSX
+- **Database:** Cơ sở dữ liệu hiện có của dự án (SQL Server, PostgreSQL, MySQL, SQLite, v.v.)
+- **API:** RESTful API với JSON Envelope chuẩn
+- **Auth:** JWT Bearer & Policy/Role-based Authorization
+
+## Nguyên tắc Dòng dữ liệu Bắt buộc (End-to-End Flow)
+Mọi tính năng fullstack phải đi xuyên suốt toàn bộ chuỗi:
+```text
+React UI Component
+  └──▶ API Service (src/services/*.ts)
+        └──▶ ASP.NET Core Controller ([ApiController])
+              └──▶ Application Service (Interfaces & Implementations)
+                    └──▶ Data Access / DbContext / Repository
+                          └──▶ Database
+                    ◀─── Database Entity / Result
+              ◀─── Service Response DTO
+        ◀─── ApiResponse<T> Envelope
+  ◀─── React State / Query Cache Update
+UI Re-render với Dữ liệu Thật
+```
+
+## Thứ tự Ưu tiên (Priority Order)
+```text
+Correctness > Existing functionality > Security > Maintainability > Performance > Simplicity > Token efficiency
+```
+
+---
+
+## 1. Kiểm tra Dự án trước khi Code (Project Analysis)
+1. Xác định cấu trúc thư mục backend & frontend.
+2. Kiểm tra phiên bản .NET, DI registration trong `Program.cs`.
+3. Kiểm tra React router, HTTP client (Axios/fetch), và UI library.
+4. Kiểm tra ORM/Database (EF Core/Dapper) và migrations hiện có.
+5. Kiểm tra cơ chế JWT Auth và token storage.
+6. Xác định chính xác các file cần chỉnh sửa trước khi bắt đầu.
+7. **Tuyệt đối không đoán kiến trúc hoặc rewrite code đang hoạt động.**
+
+---
+
+## 2. Quy chuẩn Backend (ASP.NET Core Web API)
+- **Controllers:** Chỉ xử lý HTTP request/response, routing, và status code. Không chứa logic nghiệp vụ hay gọi database trực tiếp.
+- **DTOs:** Bắt buộc dùng DTO cho mọi request và response. **Tuyệt đối không trả Entity database trực tiếp về client.**
+- **Auth:** Phân loại rõ 4 cấp độ: `Public`, `Authenticated`, `Authorized`, `Admin`. Sử dụng `[Authorize]` và policies.
+- **Secrets:** Không commit secret keys, connection strings, hay private keys vào mã nguồn. Sử dụng Environment Variables hoặc Secret Manager.
+- **HTTP Status Codes:**
+  - `200 OK` (Thành công có body)
+  - `201 Created` (Tạo mới thành công)
+  - `204 No Content` (Xóa/Cập nhật thành công không trả body)
+  - `400 Bad Request` (Dữ liệu không hợp lệ)
+  - `401 Unauthorized` (Chưa đăng nhập / Token hết hạn)
+  - `403 Forbidden` (Không đủ quyền)
+  - `404 Not Found` (Không tìm thấy tài nguyên)
+  - `409 Conflict` (Xung đột trạng thái / trùng lặp)
+- **Validation:** Validation ở backend là bắt buộc và tối thượng. Không tin tưởng dữ liệu client. Sử dụng FluentValidation hoặc DataAnnotations.
+- **Exception Handling:** Sử dụng Global Exception Middleware. Tuyệt đối không để lộ stack trace ra response trong môi trường production.
+
+---
+
+## 3. Quy chuẩn Frontend (React + TypeScript + TSX)
+- **API Client:** Tập trung toàn bộ network calls trong `src/services/` hoặc `src/api/`. Không viết `fetch` hay `axios` trực tiếp trong component JSX.
+- **Types:** Đồng bộ 1:1 giữa TypeScript interfaces và Backend DTOs.
+- **Auth & Protected Routes:** Đính kèm `Authorization: Bearer <token>` qua Axios interceptors. Xử lý 401 tự động refresh hoặc redirect về login (chống loop).
+- **Responsive:** Đảm bảo hiển thị hoàn hảo trên Mobile, Tablet, và Desktop. Không để tràn ngang (horizontal overflow).
+- **Forms:** Xử lý đầy đủ: Validation errors, Loading indicator, Disabled state khi đang submit, và chống double submit.
+- **Component Reusability:** Tái sử dụng components sẵn có của dự án. Không code duplicate UI.
+
+---
+
+## 4. An toàn Thay đổi & Bảo tồn Code cũ (Preservation Mandate)
+- Không viết lại toàn bộ dự án hoặc thay thế framework.
+- Không thay đổi contract API nếu không có yêu cầu.
+- Không tự ý sửa schema database khi chưa cần thiết.
+- Tái sử dụng trước ➔ Sửa đổi sau ➔ Chỉ tạo mới khi thực sự cần.
+- Luôn tạo bản diff nhỏ nhất, an toàn nhất (surgical change).
+
+---
+
+## 5. Check-list Xác minh trước khi Hoàn thành (Verification Gate)
+Trước khi kết thúc task, kiểm tra toàn bộ:
+- [ ] Backend compile không lỗi (`dotnet build`).
+- [ ] Frontend compile không lỗi (`tsc --noEmit` hoặc build check).
+- [ ] Endpoint API hoạt động đúng HTTP status code và payload envelope.
+- [ ] Dữ liệu lưu vào database thành công và truy vấn ra chính xác.
+- [ ] Phân quyền hoạt động chuẩn (401/403 khi thiếu quyền).
+- [ ] Validation bắt lỗi chính xác và hiển thị thông báo thân thiện.
+- [ ] Giao diện responsive trên mobile và desktop.
+- [ ] Không có broken imports, dead routes, hoặc fake mock data khi đã có real API.
+- [ ] Không để lộ secret hay sensitive credentials.

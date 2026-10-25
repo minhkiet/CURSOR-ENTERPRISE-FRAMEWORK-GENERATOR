@@ -6,3 +6,9 @@ pydantic>=2.0.0
 # Optional dependencies for full functionality
 requests>=2.31.0        # For HTTP utilities
 python-dotenv>=1.0.0    # For environment management
+
+# TencentDB Agent Memory integration
+httpx>=0.24.0           # HTTP client for TDAM Gateway API
+
+# TDAM CLI (optional - beautiful terminal UI)
+rich>=13.0.0            # For TDAM CLI beautiful output

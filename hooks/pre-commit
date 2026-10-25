@@ -1,0 +1,99 @@
+#!/bin/bash
+# Pre-commit hook for Cursor Framework
+# Automatically warms cache and validates skills before commit
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo -e "${YELLOW}[Cursor Framework]${NC} Running pre-commit checks..."
+
+# Check if cursor_framework is available
+FRAMEWORK_ROOT="${FRAMEWORK_ROOT:-.cursor}"
+MEMORY_PATH="${MEMORY_PATH:-.cache/memory.json}"
+
+# Check if Python is available
+if ! command -v python &> /dev/null && ! command -v python3 &> /dev/null; then
+    echo -e "${RED}✗${NC} Python not found. Skipping framework checks."
+    exit 0
+fi
+
+PYTHON_CMD="python"
+command -v python3 &> /dev/null && PYTHON_CMD="python3"
+
+# Function to run framework command
+run_framework() {
+    $PYTHON_CMD -m cursor_framework "$@" --root "$FRAMEWORK_ROOT" 2>/dev/null
+}
+
+# Check if cursor_framework module is available
+if ! $PYTHON_CMD -c "import cursor_framework" 2>/dev/null; then
+    echo -e "${YELLOW}⚠${NC} cursor_framework not installed. Skipping framework checks."
+    exit 0
+fi
+
+# Run framework stats before commit
+echo -e "${YELLOW}[1/3]${NC} Checking framework stats..."
+STATS=$(run_framework stats 2>/dev/null)
+if [ $? -eq 0 ]; then
+    ASSETS=$(echo "$STATS" | grep -o '"assets_indexed": [0-9]*' | grep -o '[0-9]*' || echo "0")
+    echo -e "${GREEN}✓${NC} Framework loaded: $ASSETS assets indexed"
+else
+    echo -e "${YELLOW}⚠${NC} Could not get framework stats"
+fi
+
+# Scan for changes in .cursor directory
+if [ -d "$FRAMEWORK_ROOT" ]; then
+    echo -e "${YELLOW}[2/3]${NC} Scanning framework files..."
+    CHANGES=$(git diff --name-only "$FRAMEWORK_ROOT" 2>/dev/null | wc -l)
+    ADDS=$(git diff --cached --name-only "$FRAMEWORK_ROOT" 2>/dev/null | wc -l)
+    TOTAL=$((CHANGES + ADDS))
+    
+    if [ "$TOTAL" -gt 0 ]; then
+        echo -e "${GREEN}✓${NC} $TOTAL framework file(s) changed"
+        
+        # Warm cache if framework files changed
+        echo -e "${YELLOW}[3/3]${NC} Warming framework cache..."
+        run_framework warm > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            echo -e "${GREEN}✓${NC} Cache warmed successfully"
+        fi
+    else
+        echo -e "${GREEN}✓${NC} No framework file changes"
+    fi
+fi
+
+# Check for common issues
+echo -e "${YELLOW}[Extra]${NC} Running validation checks..."
+
+# Check for broken skill references
+if [ -f "$FRAMEWORK_ROOT/INDEX.json" ]; then
+    if command -v jq &> /dev/null; then
+        # Validate INDEX.json structure
+        if jq empty "$FRAMEWORK_ROOT/INDEX.json" 2>/dev/null; then
+            echo -e "${GREEN}✓${NC} INDEX.json is valid JSON"
+        else
+            echo -e "${RED}✗${NC} INDEX.json is malformed"
+            echo "Consider running: python -m cursor_framework index"
+        fi
+    fi
+fi
+
+# Check for required directories
+REQUIRED_DIRS=("skills" "rules" "agents")
+MISSING=0
+for dir in "${REQUIRED_DIRS[@]}"; do
+    if [ ! -d "$FRAMEWORK_ROOT/$dir" ]; then
+        echo -e "${RED}✗${NC} Missing required directory: $FRAMEWORK_ROOT/$dir"
+        MISSING=$((MISSING + 1))
+    fi
+done
+
+if [ $MISSING -eq 0 ]; then
+    echo -e "${GREEN}✓${NC} All required directories present"
+fi
+
+echo -e "${YELLOW}[Cursor Framework]${NC} Pre-commit checks completed!"
+exit 0

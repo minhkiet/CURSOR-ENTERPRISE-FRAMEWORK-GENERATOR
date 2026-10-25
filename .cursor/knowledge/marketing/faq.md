@@ -1568,3 +1568,448 @@ class PreferenceCenterService {
   }
 }
 ```
+
+---
+
+# 9. marketingskills FAQ (sync 2026-07-15)
+
+> Q&A per category. Mỗi câu trỏ về best-practice/anti-pattern/checklist section.
+
+## 9.1 Conversion Optimization FAQ
+
+**Q9.1.1 — Tôi có nên thêm nhiều field vào form để qualify lead?**
+> Không. Tối đa 5 fields cho B2C, 8 cho B2B. Lead quality giảm theo số field. Nếu cần qualify, dùng progressive profiling (hỏi thêm sau khi có first-party data). Xem `best-practice.md §2.2`, `anti-pattern.md §9.1.2`.
+
+**Q9.1.2 — A/B test bao lâu thì đủ?**
+> Min 1 tuần (capture weekday cycle), tối thiểu 2 tuần (capture seasonality). Tính sample size bằng công thức power analysis trước khi bắt đầu. Xem `checklist.md §9.5.2`, `decision-tree.md §11.5`.
+
+**Q9.1.3 — Welcome email Day 1 đáng hay không?**
+> Có, với activation event NOT đã đạt. Đợi user activate, mới drip value emails. Xem `anti-pattern.md §9.1.3`.
+
+**Q9.1.4 — Tỷ lệ popup hiển thị bao nhiêu là hợp lý?**
+> Không phải 100% visitor. Cap 1 popup/session, 1 lần/7 ngày dismissal. Chiếu trên high-intent pages (pricing, blog end). Xem `anti-pattern.md §9.1.4`, `checklist.md §9.1.2`.
+
+**Q9.1.5 — Paywall hiện ở đâu thì tốt nhất?**
+> Tại feature limit hit (softwall) HOẶC trial expiring (trial-paywall). Không bật từ session đầu. Xem `best-practice.md §5.2`, `decision-tree.md §11.1`.
+
+**Q9.1.6 — Activation event là gì?**
+> Action mà user mới dùng = "experienced value". Ví dụ: project created, first message sent, first invite accepted. Track qua `funnel.activation_achieved`. Xem `architecture.md §4.1.1`.
+
+**Q9.1.7 — CTA copy nên test bao nhiêu variants?**
+> 2-3 variants per test. > 3 = underpowered. A/B + ad creative? Dùng multivariate. Xem `best-practice.md §2.4`, `anti-pattern.md §9.5.1`.
+
+## 9.2 Content & Copy FAQ
+
+**Q9.2.1 — Subject line có nên caps-lock không?**
+> Không, trừ khi A/B test chứng minh. Caps giảm open rate trung bình 5-10%. Xem `anti-pattern.md §9.2.1`, `best-practice.md §2.1`.
+
+**Q9.2.2 — Cold email reply rate bao nhiêu là tốt?**
+> 3-8% là benchmark tốt cho B2B (industry average ~1%). Nếu < 1% xem lại targeting và personalization. Xem `anti-pattern.md §9.2.4`, `best-practice.md §2.5`.
+
+**Q9.2.3 — Newsletter gửi lúc mấy giờ?**
+> Tuỳ audience. B2B: Tue-Thu 9-11am recipient local. B2C: varies (test). Xem `architecture.md §4.2.2`, `checklist.md §9.2.1`.
+
+**Q9.2.4 — SMS compliance Mỹ / EU khác nhau thế nào?**
+> Mỹ (TCPA): opt-in bắt buộc, fine $500-$1500 per message. EU (GDPR + ePrivacy): explicit consent + opt-out rõ ràng. Xem `checklist.md §9.2.3`, `anti-pattern.md §9.2.5`.
+
+**Q9.2.5 — Image AI gen cho marketing có cần brand style guide không?**
+> Có, không thì output lệch brand. Define 3-5 adjectives + negative prompts. Xem `anti-pattern.md §9.2.6`, `best-practice.md §2.7`.
+
+**Q9.2.6 — Video script framework nào phổ biến?**
+> AIDA, PAS, BAB. Chọn theo mục tiêu: AIDA (awareness), PAS (pain-led), BAB (before-after-bridge). Xem `best-practice.md §2.8`.
+
+**Q9.2.7 — Có nên gửi email cho người chưa mở email 6 tháng?**
+> Không. Chạy re-engagement sequence trước (xem `decision-tree.md §10`). Sau 2-3 email không phản hồi → suppress. Xem `architecture.md §4.2.2`.
+
+## 9.3 SEO & Discovery FAQ
+
+**Q9.3.1 — Page không index, phải làm gì?**
+> 1) Check robots.txt + meta robots (noindex?). 2) Submit URL qua GSC. 3) Internal link từ page authority cao. 4) Check canonical. Xem `checklist.md §9.3.1`, `architecture.md §4.3.1`.
+
+**Q9.3.2 — Schema markup có cần thiết không?**
+> Có cho rich snippets (FAQ, Product, Recipe). Mark up đúng spec, validate Rich Results Test. Mark up sai = manual action. Xem `architecture.md §4.3.3`, `anti-pattern.md §9.3.4`.
+
+**Q9.3.3 — Cannibalization keyword — fix thế nào?**
+> Gộp 2 page thành 1 (chuyển nội dung, 301 redirect), hoặc chỉnh keyword target của 1 page (sửa H1, title, content). Xem `faq.md §3.3` (original), `best-practice.md §3.1`.
+
+**Q9.3.4 — llms.txt thực sự ảnh hưởng AI search?**
+> Có nhưng chưa ranking confirmed. Tốt nhất coi là một signal yếu. Robot allow GPTBot quan trọng hơn. Xem `architecture.md §4.3.4`, `checklist.md §9.3.2`.
+
+**Q9.3.5 — Programmatic SEO build 10k pages có an toàn không?**
+> KHÔNG nếu doorway intent hoặc thin content. CÓ nếu unique data per page. Manual action Google dễ dàng. Xem `anti-pattern.md §9.3.2`, `architecture.md §4.3.2`.
+
+**Q9.3.6 — URL depth tối đa?**
+> 3 levels max: /category/page. /a/b/c/d = crawl budget waste. Xem `anti-pattern.md §9.3.5`, `architecture.md §4.3.1`.
+
+**Q9.3.7 — Local SEO khác SEO thường thế nào?**
+> Local SEO thêm Google Business Profile, NAP consistency, LocalBusiness schema, review signal. Xem `best-practice.md §3.4`, `checklist.md §9.3.4`.
+
+**Q9.3.8 — AI Overview (Google SGE) tối ưu thế nào?**
+> Schema FAQPage + clear answer per question (40-60 words). E-E-A-T signals (author, dates, sources). Xem `best-practice.md §3.1`, `checklist.md §9.3.2`.
+
+**Q9.3.9 — ASO khác SEO thế nào?**
+> ASO ngắn hơn (title 30 chars), optimize cho conversion (screenshot, ratings), keyword research qua App Store Connect. Xem `best-practice.md §3.5`, `checklist.md §9.3.5`.
+
+## 9.4 Paid & Distribution FAQ
+
+**Q9.4.1 — Budget daily bao nhiêu để Google optimize?**
+> Min $50-100/day per ad set cho conversion optimization. < $30 = learning phase không exit. Xem `checklist.md §9.4.1`, `best-practice.md §4.1`.
+
+**Q9.4.2 — LTV/CAC tỷ lệ nào là tốt?**
+> > 3 là healthy. 1-3 = acceptable growth phase. < 1 = burning cash. Xem `anti-pattern.md §9.4.4`, `best-practice.md §4.1`.
+
+**Q9.4.3 — Khi nào thì refresh creative?**
+> Mỗi 7-14 ngày hoặc khi frequency > 3/week user. Xem `anti-pattern.md §9.4.2`, `best-practice.md §4.2`.
+
+**Q9.4.4 — Lookalike audience size bao nhiêu?**
+> Start 1%, expand to 5-10% nếu performance OK. < 1% = audience too narrow. Xem `best-practice.md §4.1`.
+
+**Q9.4.5 — LinkedIn ads có đắt quá không?**
+> CPM cao ($15-30 vs Meta $5-10) nhưng B2B quality tốt hơn. Test với objective "conversation" trước. Xem `best-practice.md §4.1`.
+
+## 9.5 Measurement & Testing FAQ
+
+**Q9.5.1 — Tracking plan là gì?**
+> Document event names + properties. Single source of truth giữa PM, eng, marketing. Ví dụ: `funnel.signup_completed {user_id, method, source, timestamp}`. Xem `architecture.md §4.5.1`, `checklist.md §9.5.1`.
+
+**Q9.5.2 — Multi-touch attribution hay last-touch?**
+> Start last-touch (đơn giản, đủ dùng). Khi > $50k/mo spend, thử data-driven (Shapley). Xem `architecture.md §4.5.3`, `decision-tree.md §11.5`.
+
+**Q9.5.3 — Sample size bao nhiêu?**
+> Calculator: baseline conversion, MDE, alpha 0.05, power 0.8. Ví dụ baseline 5%, MDE +10% (tuyệt đối) → ~1,900/variant. Xem `checklist.md §9.5.2`.
+
+**Q9.5.4 — A/B test stop criteria?**
+> 1) Sample size đạt + p < 0.05  HOẶC  2) Max duration (4 weeks). Không peek. Xem `anti-pattern.md §9.5.2`, `checklist.md §9.5.2`.
+
+**Q9.5.5 — Tracking Google Consent Mode v2 cần làm gì?**
+> Implement gtag consent signals (ad_storage, analytics_storage, etc.). Required cho EU users từ 2024. Xem `architecture.md §3.1`, original compliance §4.
+
+**Q9.5.6 — Server-side tracking có cần không?**
+> Có, với iOS 14.5+ ITP, browser ad blockers, cookie deprecation. Migration từ pixel → Conversion API + Enhanced Conversions. Xem `architecture.md §4.4.1`, `best-practice.md §6.1`.
+
+## 9.6 Retention FAQ
+
+**Q9.6.1 — Churn rate tốt bao nhiêu?**
+> B2B SaaS: < 5% annual (best), 5-10% (OK), > 10% (alarming). B2C: < 5% monthly. Track cohort, không phải aggregate. Xem `architecture.md §4.6.1`, `best-practice.md §7.1`.
+
+**Q9.6.2 — Save offer nên cho bao nhiêu phần trăm?**
+> Discount 10-30% thường đủ. > 50% = training users to expect. Tier theo churn reason. Xem `anti-pattern.md §9.6.2`, `architecture.md §4.6.2`.
+
+**Q9.6.3 — Dunning Day 0 vs Day 3?**
+> Day 3 — đợi retry tự động (max issuer attempts), tránh aggressive. Xem `anti-pattern.md §9.6.1`, `architecture.md §4.6.3`.
+
+**Q9.6.4 — Pause subscription vs cancel?**
+> Offer pause 30/60/90 ngày. ~30-40% pause users quay lại so với < 5% cancel → return. Xem `best-practice.md §7.1`, `anti-pattern.md §9.6.3`.
+
+**Q9.6.5 — NPS bao nhiêu là tốt?**
+> B2B SaaS: > 30 (good), > 50 (world-class). Track trend, không phải single score. Cohort by tenure. Xem `best-practice.md §7.1`, `architecture.md §4.6.1`.
+
+**Q9.6.6 — Win-back flow cần cách nhau bao lâu?**
+> Day 30, Day 90, Day 180 với offer giảm dần. Sau Day 180 → suppress. Xem `best-practice.md §7.1`.
+
+## 9.7 Growth Engineering FAQ
+
+**Q9.7.1 — Free tool có nên email gate?**
+> Tùy. Without gate → viral tốt hơn. With gate → more leads nhưng lower viral. Test cả hai. Xem `architecture.md §4.7.1`, `anti-pattern.md §9.7.1`.
+
+**Q9.7.2 — Referral reward bao nhiêu %?**
+> 10-25% giá trị first order/subscription là sweet spot. < 10% không motivate, > 25% unsustainable. Xem `best-practice.md §9.3`, `architecture.md §4.7.2`.
+
+**Q9.7.3 — Co-marketing partner chọn thế nào?**
+> ICP overlap > 30%, audience size similar, brand safe. Test với 1 campaign trước khi commit long-term. Xem `anti-pattern.md §9.7.3`, `architecture.md §4.7.3`.
+
+**Q9.7.4 — Free tool có cần original content?**
+> Có, otherwise = landing page disguise. Tools mà rank vì unique value mới bền. Xem `anti-pattern.md §9.7.1`, `best-practice.md §9.2`.
+
+**Q9.7.5 — Referral fraud thường gặp?**
+> Self-referral, family members (same IP), fake emails (disposable), card testing (fullz). Match device + payment + IP. Xem `anti-pattern.md §9.7.2`, `architecture.md §4.7.2`.
+
+## 9.8 Strategy & Monetization FAQ
+
+**Q9.8.1 — Pricing test thế nào?**
+> A/B nhiều plan configurations (price points + features). Đo chuyển đổi + LTV. KHÔNG test giảm giá liên tục. Xem `best-practice.md §10.4`, `architecture.md §4.8.1`.
+
+**Q9.8.2 — Free trial vs freemium?**
+> Free trial: cho full feature trong X ngày. Freemium: free tier vĩnh viễn. B2B SaaS thường trial, B2C/mobile freemium. Xem `best-practice.md §10.4`.
+
+**Q9.8.3 — Khi nào launch?**
+> Tue-Thu, 12:01am PT (Product Hunt reset) hoặc 8-10am EST. Tránh Fri/Sat/Sun. Tránh holidays. Xem `best-practice.md §10.3`, `architecture.md §4.8.3`.
+
+**Q9.8.4 — Annual discount bao nhiêu?**
+> 15-20% (1-2 months free). > 25% giảm LTV quá nhiều. Xem `anti-pattern.md §9.8.4`, `best-practice.md §10.4`.
+
+**Q9.8.5 — Offer stack có cần thiết?**
+> Có, để tăng perceived value. 3-5 items, mỗi cái phải có $ value specific. Xem `best-practice.md §10.5`, `architecture.md §4.8.2`.
+
+**Q9.8.6 — Marketing plan cadence?**
+> Quarterly plan, weekly standup, monthly retro, quarterly reallocation. Xem `architecture.md §4.8.4`, `best-practice.md §10.1`.
+
+**Q9.8.7 — Launch budget bao nhiêu?**
+> Tuỳ company size. Pre-launch: 30% budget (content, PR). Launch week: 50%. Post-launch: 20% (retarget). Xem `best-practice.md §10.3`.
+
+## 9.9 Sales & RevOps FAQ
+
+**Q9.9.1 — Lead scoring có bao nhiêu yếu tố?**
+> 5-10 max. Mix explicit (form, intent self-report) + implicit (page visits, email engagement, pricing view). Xem `architecture.md §4.9.1`, `anti-pattern.md §9.9.1`.
+
+**Q9.9.2 — MQL → SQL conversion bao nhiêu là tốt?**
+> 20-30% healthy. < 10% = MQL quality issue OR SQL too strict. Track lag time. Xem `architecture.md §4.9.1`, `best-practice.md §11.7`.
+
+**Q9.9.3 — Demo script cần thiết không?**
+> Có, structured discovery-led. Features mapped to outcomes. 30-45 min. Xem `anti-pattern.md §9.9.4`, `checklist.md §9.9.2`.
+
+**Q9.9.4 — Cold outreach cadence?**
+> 5-7 touches multi-channel: email Day 0, 3, 7 → LinkedIn Day 5, 10 → phone Day 8, 14. Reply handling: ASAP. Xem `architecture.md §4.9.3`, `best-practice.md §11.2`.
+
+**Q9.9.5 — PR pitch response rate?**
+> 1-3% reply rate cho cold pitch (industry avg). HARO responds: 10-20%. Xem `best-practice.md §11.3`, `anti-pattern.md §9.9.6`.
+
+**Q9.9.6 — Customer interview bao nhiêu đủ?**
+> 5-10 per persona. Saturation thường sau 6-8. Mix activated + churned. Xem `anti-pattern.md §9.9.7`, `best-practice.md §11.5`.
+
+**Q9.9.7 — Marketing council cần bao nhiêu personas?**
+> 5-7 personas (CMO, CRO, SEO, Copy, Growth, Product). Mỗi persona 1 system prompt. Xem `best-practice.md §11.7`, `architecture.md §4.9.7`.
+
+**Q9.9.8 — Marketing loops cần stateful?**
+> Có, nếu > 1 hour task. Trạng thái phải persisted (DB) để resume sau restart. Xem `architecture.md §4.9.8`, `anti-pattern.md §9.9.9`.
+
+**Q9.9.9 — Directory submission bao nhiêu là đủ?**
+> 50-100 directories tier-tagged. 1-2/week. Tránh spam submission (100/ngày = flag). Xem `best-practice.md §11.4`, `anti-pattern.md §9.9.10`.
+
+## 9.10 Marketing Engineering FAQ
+
+**Q9.10.1 — Marketing stack recommended tối thiểu?**
+> CRM (HubSpot/Salesforce) + Email (Klaviyo/Mailchimp) + Analytics (GA4/Mixpanel) + SEO (Ahrefs/SEMrush) + Ad platforms (Meta/Google). Xem `architecture.md §4.X` (per category).
+
+**Q9.10.2 — CDP (Customer Data Platform) cần không?**
+> Cần khi > 5 sources hoặc cần cross-channel identity. Segment, RudderStack, mParticle. Xem `architecture.md §4.X`.
+
+**Q9.10.3 — MarTech vs custom code?**
+> MarTech cho standard needs. Custom khi logic phức tạp, scale cao, hoặc unique data model. Xem `architecture.md §4.X`.
+
+**Q9.10.4 — AI trong marketing — dùng ở đâu?**
+> Content gen (draft, not publish), personalization, segmentation, scoring, copy iteration. KHÔNG thay decision-making. Xem `best-practice.md §X.X` (per category).
+
+---
+
+## 10. Marketing Security & Privacy FAQ (sync 2026-07-15)
+
+> Bổ sung từ [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) v2.6.0. Mục này trả lời các câu hỏi thường gặp về security/privacy trong marketing. Cross-reference `.cursor/knowledge/marketing/best-practice.md §10`, `.cursor/agents/security-auditor.md`.
+
+### 10.1 Cookie Banner & Consent
+
+**Q10.1.1 — Cookie banner bắt buộc cho website nào?**
+> Bắt buộc nếu: (a) target EU users (GDPR + ePrivacy), (b) target California users (CCPA), (c) target UK users (PECR), (d) target Brazil users (LGPD). Best practice: luôn implement cho mọi site, bất kể region. Xem `best-practice.md §10.1`, `checklist.md §11.1`.
+
+**Q10.1.2 — "Reject all" button có bắt buộc không?**
+> Có, nếu target EU (EDPB Guidelines 03/2022). CNIL (France) đã fine Google €150M (2022), Meta €390M (2023) vì không có. Button phải cùng prominence như "Accept all". Xem `anti-pattern.md §10.1.2`.
+
+**Q10.1.3 — Consent refresh bao lâu một lần?**
+> Maximum 12 tháng, hoặc khi purposes thay đổi. Không hỏi mỗi session. Xem `best-practice.md §10.1`, `checklist.md §11.1`.
+
+**Q10.1.4 — Client-side consent gate có đủ không?**
+> KHÔNG. Phải enforce cả server-side. Client-side có thể bypass qua devtools, MITM, ad blockers. Server-side gate là bắt buộc cho production. Xem `architecture.md §5.3`, `best-practice.md §10.1`.
+
+**Q10.1.5 — TCF (Transparency & Consent Framework) là gì?**
+> Industry standard (IAB Europe) cho consent management. TCF v2.2 compliant CMP (Consent Management Platform) cần thiết cho programmatic ads. Xem `architecture.md §5.2`.
+
+### 10.2 Tracking & Analytics
+
+**Q10.2.1 — Google Consent Mode v2 là gì?**
+> API Google cung cấp để pass consent signals từ website → Google tags. Có 4 signals: ad_storage, analytics_storage, ad_user_data, ad_personalization. Required cho EU users từ March 2024. Xem `best-practice.md §10.2`, `architecture.md §5.3`.
+
+**Q10.2.2 — IP anonymization là gì và có cần không?**
+> Last octet của IP zeroed trước khi store. Required cho EU users (CJEU ruling: IP = personal data). Google Analytics có sẵn feature. Xem `best-practice.md §10.2`, `anti-pattern.md §10.2.4`.
+
+**Q10.2.3 — Server-side tracking là gì? Tại sao quan trọng?**
+> Tracking events được gửi từ server (not browser). Lợi ích: bypass ad blockers, ITP restrictions; accurate iOS 14.5+ measurement; better privacy. Examples: GTM Server, Meta CAPI, TikTok Events API. Xem `architecture.md §5.8`.
+
+**Q10.2.4 — Email có nên làm user_id trong analytics?**
+> KHÔNG. Email = PII, leak vào ad platforms và analytics vendors. Dùng opaque UUIDs. Xem `anti-pattern.md §10.2.2`, `best-practice.md §10.2`.
+
+**Q10.2.5 — First-party vs third-party cookies?**
+> First-party: set by your domain, persists longer (Safari ITP, Firefox ETP). Third-party: set by ad platforms, increasingly blocked. Strategy: first-party cho identity, server-side cho ad platforms. Xem `best-practice.md §10.2`.
+
+**Q10.2.6 — Data clean room là gì?**
+> Môi trường chia sẻ data với partners mà không ai thấy raw data của người kia. Examples: Snowflake, AWS Clean Rooms, Habu. Dùng cho partner data analysis. Xem `best-practice.md §10.2`, `architecture.md §5.4`.
+
+### 10.3 GDPR / CCPA / Regional Privacy
+
+**Q10.3.1 — GDPR áp dụng cho công ty nào?**
+> Bất kỳ công ty nào process data của EU residents, regardless of where công ty đặt. Phạt: max 4% global annual revenue hoặc €20M, tùy cái nào cao hơn. Xem `best-practice.md §10.3`.
+
+**Q10.3.2 — CCPA / CPRA áp dụng cho ai?**
+> California residents. Trigger: (a) revenue > $25M, hoặc (b) buy/sell/share data of > 100k consumers/households/devices, hoặc (c) derive > 50% revenue from selling data. Xem `best-practice.md §10.3`.
+
+**Q10.3.3 — Right to deletion workflow?**
+> 1. Verify identity (auth + security questions). 2. Log request (audit). 3. Check legal holds (tax, fraud). 4. Anonymize or delete. 5. Cascade to vendors (with DPA). 6. Notify user. 7. Audit completion. Deadline: 30 days (GDPR) / 45 days (CCPA). Xem `architecture.md §5.5`.
+
+**Q10.3.4 — DPO (Data Protection Officer) bắt buộc khi nào?**
+> Required khi: (a) public authority, (b) large-scale systematic monitoring, (c) large-scale processing of special categories (health, biometric, etc.). Xem `best-practice.md §10.3`.
+
+**Q10.3.5 — Data breach notification timing?**
+> GDPR: 72 hours từ khi biết. SEC (US public companies): 4 business days từ materiality determination. CCPA: variable. Xem `best-practice.md §10.3`, `checklist.md §11.4`.
+
+**Q10.3.6 — Cross-border data transfer (EU → US)?**
+> Cần cơ chế: SCCs (Standard Contractual Clauses), adequacy decision, BCRs (Binding Corporate Rules). Data Privacy Framework (EU-US, 2023) provides new mechanism. Xem `best-practice.md §10.3`, `architecture.md §5.4`.
+
+**Q10.3.7 — LGPD (Brazil), PIPL (China), PDPD (Vietnam) có gì khác GDPR?**
+> Tương tự GDPR nhưng có nuances: LGPD có ANPD oversight, PIPL có data localization, PDPD có cross-border restrictions. Xem `best-practice.md §10.3`.
+
+### 10.4 Email Marketing Security
+
+**Q10.4.1 — SPF, DKIM, DMARC là gì?**
+> SPF (Sender Policy Framework): DNS record cho biết IPs authorized gửi email từ domain. DKIM (DomainKeys Identified Mail): cryptographic signature verify email không bị sửa. DMARC (Domain-based Message Authentication): policy cho SPF/DKIM failures (`p=none`, `p=quarantine`, `p=reject`). Required bởi Gmail/Yahoo từ Feb 2024. Xem `best-practice.md §10.4`, `architecture.md §5.9`.
+
+**Q10.4.2 — DMARC policy nào phù hợp?**
+> Start với `p=none` để monitor. Move to `p=quarantine` sau khi clean. Recommended: `p=reject` (strictest). Xem `checklist.md §11.3`.
+
+**Q10.4.3 — Double opt-in có cần thiết không?**
+> Best practice cho EU (GDPR), Canada (CASL). Optional cho US nhưng recommended cho deliverability. Single opt-in chấp nhận được cho US với clear disclosure. Xem `best-practice.md §10.4`, `anti-pattern.md §10.3.3`.
+
+**Q10.4.4 — One-click unsubscribe (RFC 8058) là gì?**
+> Header `List-Unsubscribe-Post: List-Unsubscribe=One-Click` cho phép user unsubscribe mà không cần mở email, không cần login. Required bởi Gmail/Yahoo từ Feb 2024. Xem `best-practice.md §10.4`, `checklist.md §11.3`.
+
+**Q10.4.5 — Cold email có hợp pháp không?**
+> B2B: generally OK ở US (CAN-SPAM) với proper disclosure, opt-out, physical address. EU: requires opt-in (GDPR). Canda: requires express consent (CASL). Purchased/scraped lists: NEVER OK. Xem `anti-pattern.md §1.1`, `decision-tree.md §12.2`.
+
+**Q10.4.6 — Email open rate tracking có còn accurate?**
+> Không — Apple Mail Privacy Protection (MPP), other proxies inflate open rates. Focus on click rates, conversion rates thay vì open rates. Xem `best-practice.md §10.4`.
+
+### 10.5 Paid Ads Security
+
+**Q10.5.1 — Meta CAPI là gì? Tại sao cần?**
+> Conversions API: server-side events gửi từ your backend → Meta. Cần thiết vì iOS 14.5+ App Tracking Transparency, ad blockers, ITP. Best practice: client pixel + server CAPI với deduplication. Xem `architecture.md §5.8`, `best-practice.md §10.5`.
+
+**Q10.5.2 — Customer Match upload cần hash PII không?**
+> CÓ. SHA-256 hash email/phone trước khi upload. Raw PII vi phạm platform ToS và privacy. Xem `best-practice.md §10.5`, `anti-pattern.md §10.4.4`.
+
+**Q10.5.3 — Limited Data Use flag (Meta) là gì?**
+> Flag trong Meta CAPI/Pixel events cho California users. Honors CCPA opt-out. Required cho California compliance. Xem `best-practice.md §10.5`, `checklist.md §11.5`.
+
+**Q10.5.4 — AI-generated ad copy có cần disclose?**
+> CÓ. FTC guidance (2023) + EU AI Act yêu cầu disclosure cho AI-generated content. Label rõ ràng trong ad. Xem `best-practice.md §10.13`, `anti-pattern.md §10.4.7`.
+
+**Q10.5.5 — Discriminatory targeting bị cấm ở đâu?**
+> Everywhere. Civil Rights Act (US), EU AI Act, ad platform anti-discrimination policies. Không target theo race, religion, sexual orientation, health, etc. Xem `anti-pattern.md §10.4.5`.
+
+### 10.6 Dark Patterns & Conversion Ethics
+
+**Q10.6.1 — Dark pattern là gì?**
+> UI/UX design deceptive, manipulate users into actions họ không intended. Examples: hidden unsubscribe, pre-checked boxes, confirmshaming, fake urgency. EDPB Guidelines 03/2022 + FTC Click-to-Cancel Rule cấm. Xem `anti-pattern.md §10.6`.
+
+**Q10.6.2 — FTC Click-to-Cancel Rule là gì?**
+> Rule (2024) yêu cầu cancellation phải dễ như signup. Same number of clicks, same level of friction. Áp dụng cho subscriptions, negative option features, free-to-pay conversions. Xem `anti-pattern.md §10.6.1`, `checklist.md §11.12`.
+
+**Q10.6.3 — Roach motel pattern là gì?**
+> Easy in, hard out. Easy signup, painful cancellation. Vi phạm FTC Click-to-Cancel + EU CRD. Xem `anti-pattern.md §10.6.1`.
+
+**Q10.6.4 — Confirmshaming là gì?**
+> Opt-out language designed to shame user. VD: "No thanks, I don't want to save money" thay vì "No thanks". Vi phạm GDPR dark patterns guidance. Xem `anti-pattern.md §10.6.2`.
+
+**Q10.6.5 — Drip pricing là gì?**
+> Hidden fees added at last step. Required to show all-in price early. FTC + EU UCPD violation. Xem `anti-pattern.md §10.6.3`.
+
+### 10.7 Customer Research Privacy
+
+**Q10.7.1 — Recording customer interviews cần consent gì?**
+> Written consent (preferred) hoặc explicit verbal consent recorded. Document: who, when, what, how used, how long stored. Xem `best-practice.md §10.6`, `checklist.md §11.8`.
+
+**Q10.7.2 — Research data retention bao lâu?**
+> Raw data: 12 months max. Aggregated insights: 24 months max. Honor right to withdraw mid-study. Xem `best-practice.md §10.6`, `architecture.md §5.5`.
+
+**Q10.7.3 — Research trên children cần gì?**
+> Parental consent + IRB review + extra safeguards. GDPR Art. 8 (under 16 or member-state-specific). COPPA (US, under 13). Xem `best-practice.md §10.6`, `anti-pattern.md §10.7.3`.
+
+**Q10.7.4 — Research vendor security review?**
+> Verify SOC2 Type II, GDPR compliance, ESOMAR/IAB compliance, DPA. Xem `checklist.md §11.8`.
+
+### 10.8 Webhook & Integration Security
+
+**Q10.8.1 — Webhook signature verification hoạt động thế nào?**
+> Sender ký payload với secret (HMAC-SHA256), receiver verify signature. Thêm timestamp + nonce để prevent replay. Xem `architecture.md §5.10`, `best-practice.md §10.8`.
+
+**Q10.8.2 — Webhook secret nên lưu ở đâu?**
+> Environment variable hoặc secret manager (Vault, AWS Secrets Manager, Doppler). KHÔNG trong code. Rotate 90 ngày. Xem `best-practice.md §10.8`, `anti-pattern.md §10.8.2`.
+
+**Q10.8.3 — Webhook có cần HTTPS không?**
+> CÓ. TLS 1.2+ minimum. KHÔNG nhận HTTP webhooks. Xem `anti-pattern.md §10.8.3`, `checklist.md §11.9`.
+
+**Q10.8.4 — Idempotency key là gì? Tại sao quan trọng?**
+> Unique key per webhook event. Prevent double-processing khi sender retry. Verify qua state store (Redis, DB). Xem `architecture.md §5.10`, `anti-pattern.md §10.8.4`.
+
+### 10.9 Sales & CRM Security
+
+**Q10.9.1 — Lead data minimization principle?**
+> Chỉ collect data sales actually uses. Không collect health, religion, political affiliation, sexual orientation, biometric. Xem `best-practice.md §10.11`, `checklist.md §11.7`.
+
+**Q10.9.2 — Demo data có nên là real customer data?**
+> KHÔNG. Dùng synthetic data hoặc anonymized data. Real customer data trong demo = vi phạm customer contracts + privacy. Xem `anti-pattern.md §10.9.1`, `checklist.md §11.10`.
+
+**Q10.9.3 — Lead scoring rules có cần disclosed?**
+> Transparency là good practice. Internal documentation should explain scoring criteria. Customers don't need full transparency (proprietary). Xem `checklist.md §11.7`.
+
+### 10.10 AI Marketing Security
+
+**Q10.10.1 — Có nên gửi customer PII cho OpenAI/Anthropic public API?**
+> KHÔNG. PII leaks qua API. Dùng enterprise tier (zero retention) hoặc anonymize trước. Xem `anti-pattern.md §10.11.1`, `best-practice.md §10.13`.
+
+**Q10.10.2 — AI-generated content có cần human review?**
+> CÓ, especially cho: facts, statistics, citations, claims about products/people. Hallucination là real risk. FTC + reputational risk. Xem `anti-pattern.md §10.11.2`, `checklist.md §11.13`.
+
+**Q10.10.3 — Prompt injection là gì trong marketing?**
+> User-controlled input (email subject from form, customer name in template) passed to LLM without sanitization. Attacker injects malicious prompts. Defense: validate + sanitize, structured prompts, output validation. Xem `anti-pattern.md §10.11.4`, OWASP LLM01.
+
+**Q10.10.4 — AI training opt-out là gì?**
+> Some vendors use customer data to train models. Opt-out through DPA, vendor settings, or zero-retention contracts. Required cho compliance. Xem `anti-pattern.md §10.11.5`.
+
+### 10.11 Crisis Communications
+
+**Q10.11.1 — Data breach response timing?**
+> GDPR: notify supervisory authority within 72 hours. SEC (US public companies): 4 business days từ materiality determination. Customer notification: ASAP, clear, actionable. Xem `best-practice.md §10.7`, `checklist.md §11.14`.
+
+**Q10.11.2 — Status page nên host ở đâu?**
+> Separate infrastructure (e.g., statuspage.io, Better Uptime) — survives main outage. Pre-built templates cho common incidents. Xem `checklist.md §11.14`.
+
+**Q10.11.3 — Crisis comms spokesperson?**
+> 1-2 trained individuals, available 24/7. Pre-approved hold statements. Legal review SLA defined. Xem `best-practice.md §10.7`, `checklist.md §11.14`.
+
+### 10.12 Marketing Stack Vendor Security
+
+**Q10.12.1 — Vendor security review checklist?**
+> SOC2 Type II (or ISO 27001), GDPR compliance, DPA available, sub-processor transparency, incident response SLA, encryption, penetration tests. Xem `architecture.md §5.15`, `checklist.md §11.15`.
+
+**Q10.12.2 — DPA (Data Processing Agreement) là gì?**
+> Contract required by GDPR Art. 28 giữa data controller và data processor. Defines: purpose, scope, type of data, duration, sub-processors, security measures, deletion obligations. Xem `best-practice.md §10.3`, `checklist.md §11.15`.
+
+**Q10.12.3 — Vendor SOC2 expiry thì sao?**
+> Vendor review immediately. Some certifications have grace period. Document risk acceptance if continuing without current cert. Consider alternate vendor. Xem `architecture.md §5.15`.
+
+### 10.13 General Privacy Questions
+
+**Q10.13.1 — PII là gì?**
+> Personally Identifiable Information: any data có thể identify individual. Includes: name, email, phone, address, SSN, IP address (per CJEU), cookie IDs, device IDs. Xem `glossary.md §14`.
+
+**Q10.13.2 — Special category data là gì?**
+> GDPR Art. 9: race, ethnicity, political opinions, religious beliefs, trade union membership, genetic data, biometric data, health data, sex life, sexual orientation. Extra protections required. Xem `glossary.md §14`.
+
+**Q10.13.3 — Anonymization vs pseudonymization?**
+> Anonymization: irreversible, data no longer personal. Pseudonymization: replace identifiers with tokens, still personal but harder to link. GDPR applies to pseudonymized. Xem `glossary.md §14`.
+
+**Q10.13.4 — Right to data portability?**
+> GDPR Art. 20: user có quyền nhận data của họ trong machine-readable format (JSON, CSV). Provided free, within 30 days. Xem `glossary.md §14`.
+
+**Q10.13.5 — Lawful basis nào cho email marketing?**
+> Consent (most common for B2C), legitimate interest (sometimes B2B, but risky), contract (transactional only, not marketing). Xem `glossary.md §14`, `best-practice.md §10.3`.
+
+---
+
+## 10.14 Kết nối với file khác
+
+- **Best practice** (`best-practice.md §10`): marketing security best practices
+- **Anti-pattern** (`anti-pattern.md §10`): marketing security anti-patterns
+- **Checklist** (`checklist.md §11`): pre-launch security checklist
+- **Architecture** (`architecture.md §5`): privacy-by-design architecture
+- **Decision tree** (`decision-tree.md §12`): security-aware routing
+- **Glossary** (`glossary.md §14`): marketing security terms
+- **Cross-rule**: `.cursor/rules/security.mdc`, `.cursor/agents/security-auditor.md`

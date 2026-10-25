@@ -1,6 +1,10 @@
 app.title=Cursor Enterprise Framework - Trình cài đặt
 app.title_short=Cursor Enterprise Framework
-app.subtitle=v4.3.0 - Enterprise AI Coding Framework
+app.subtitle=v4.4.0 - Bộ khung AI lập trình doanh nghiệp
+safety.title=Ranh giới đóng gói an toàn
+safety.body=Staging chỉ ghi vào gói build. Thư mục .cursor không bị sửa bởi quá trình đóng gói.
+safety.badge=BLOCKED · cần phê duyệt governance
+log.title=Nhật ký vận hành
 loading_components=Đang tải thành phần...
 scan_archive_not_found=Không tìm thấy file framework kế bên trình cài đặt.
 place_zip_hint=Đặt cursor-setup.zip cạnh cursor-setup.exe.

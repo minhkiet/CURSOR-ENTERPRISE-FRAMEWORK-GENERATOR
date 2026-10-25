@@ -10,19 +10,35 @@ Features:
     - Context window optimization
     - Smart summarization
     - Priority-based context retention
+    - TDAM Symbolic Memory integration (Mermaid Canvas)
 
 Usage:
     >>> from cursor_framework import TokenOptimizer, TokenBudget
     >>> optimizer = TokenOptimizer(max_tokens=100000)
     >>> compressed = optimizer.compress(context, target_tokens=8000)
+    
+    # With TDAM Symbolic Memory:
+    >>> from cursor_framework import TokenOptimizer, TDAMIntegration
+    >>> optimizer = TokenOptimizer()
+    >>> optimizer.set_tdam(tdam)
+    >>> result = optimizer.compact_with_mermaid(messages, ratio=0.7)
 """
 
+import json
+import logging
+import re
+from collections import deque
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Optional
-import json
-import re
+from typing import TYPE_CHECKING, Any, Optional
+
+if TYPE_CHECKING:
+    from .tdam_integration import TDAMIntegration, OffloadResult, ConversationTurn
+
+from .tdam_integration import OffloadStrategy
+
+logger = logging.getLogger(__name__)
 
 
 class TokenBudget:
@@ -146,14 +162,22 @@ class TokenOptimizer:
     context management for efficient LLM interactions.
     """
 
-    # Average tokens per character ratio (conservative estimate)
-    TOKENS_PER_CHAR = 0.25
+    # Token estimation: GPT models average ~0.75 tokens/word for English.
+    # For multilingual support, we use a word-based estimation with
+    # language-aware adjustment. This is more accurate than char-based.
+    TOKENS_PER_WORD = 0.75
+
+    # Fallback char-based ratio for short texts or mixed content
+    TOKENS_PER_CHAR_FALLBACK = 0.25
+
+    # ponytail: frozenset for O(1) char membership in estimate_tokens.
+    _SPECIAL_CHARS = frozenset(".,;:!?()[]{}\n")
 
     # Priority keywords for different content types
     PRIORITY_INDICATORS = {
-        "high": ["critical", "essential", "required", "must", "important", "key"],
-        "medium": ["should", "recommended", "useful", "relevant"],
-        "low": ["optional", "maybe", "possible", "example"],
+        "high": frozenset(("critical", "essential", "required", "must", "important", "key")),
+        "medium": frozenset(("should", "recommended", "useful", "relevant")),
+        "low": frozenset(("optional", "maybe", "possible", "example")),
     }
 
     def __init__(
@@ -171,11 +195,21 @@ class TokenOptimizer:
         self.max_tokens = max_tokens
         self.compression_threshold = compression_threshold
         self.budget = TokenBudget(max_tokens)
-        self._compression_history: list[CompressionResult] = []
+        # ponytail: bounded history prevents unbounded growth on long-running
+        # processes. 1000 entries is far above any realistic per-process
+        # compression count and keeps memory footprint negligible.
+        self._compression_history: deque[CompressionResult] = deque(maxlen=1000)
 
     def estimate_tokens(self, text: str) -> int:
         """
         Estimate token count for text.
+
+        Uses word-based estimation for accuracy:
+        - GPT models average ~0.75 tokens/word for English
+        - Multilingual/short text falls back to char-based estimation
+
+        For code content, tokens are estimated higher due to special characters
+        and shorter variable names.
 
         Args:
             text: Text to estimate
@@ -183,7 +217,53 @@ class TokenOptimizer:
         Returns:
             Estimated token count
         """
-        return int(len(text) * self.TOKENS_PER_CHAR)
+        if not text:
+            return 0
+
+        # ponytail: single char-scan that counts both whitespace (for
+        # word count) and special chars in one pass. Replaces the older
+        # text.split() + sum(...) loop pair.
+        word_count = 0
+        special_count = 0
+        in_word = False
+        special = self._SPECIAL_CHARS
+        for ch in text:
+            if ch.isspace():
+                if in_word:
+                    word_count += 1
+                    in_word = False
+            else:
+                in_word = True
+                if ch in special:
+                    special_count += 1
+        if in_word:
+            word_count += 1
+
+        if word_count == 0:
+            # Fallback for very short or no-whitespace text
+            return max(1, int(len(text) * self.TOKENS_PER_CHAR_FALLBACK))
+
+        # Detect content type for more accurate estimation
+        head = text[:500]
+        is_code = (
+            text.startswith("```")
+            or "def " in head
+            or "function " in head
+            or "const " in head
+            or "class " in head
+            or "import " in head
+        )
+
+        if is_code:
+            # Code tends to have shorter "words" but more tokens
+            # Estimate ~1.5 tokens per code "word"
+            return max(word_count, int(word_count * 1.5))
+
+        # Standard text: ~0.75 tokens per word
+        # Add overhead for punctuation and formatting
+        base_tokens = word_count * self.TOKENS_PER_WORD
+        special_tokens = special_count * 0.1
+        return max(word_count, int(base_tokens + special_tokens))
 
     def compress(
         self,
@@ -309,7 +389,7 @@ class TokenOptimizer:
                 content_lines.append(segment.content)
                 current_tokens += segment.tokens
 
-        return f"{summary_segment}\n\n{''.join(content_lines)}"
+        return f"{summary_segment}\n\n{'\n'.join(content_lines)}"
 
     def _create_segments(self, lines: list[str]) -> list[TokenSegment]:
         """Create prioritized segments from text lines."""
@@ -330,10 +410,12 @@ class TokenOptimizer:
 
     def _calculate_priority(self, line: str) -> int:
         """Calculate priority score for a line."""
-        line_lower = line.lower()
+        line_lower = line.casefold()
         priority = 5
 
         for level, keywords in self.PRIORITY_INDICATORS.items():
+            # ponytail: substring membership check (casefold already applied).
+            # frozenset iter is fine here — keywords are short and small.
             if any(kw in line_lower for kw in keywords):
                 if level == "high":
                     priority = 9
@@ -525,6 +607,171 @@ class TokenOptimizer:
     def available_for_context(self) -> int:
         """Get available tokens for context."""
         return self.budget.available_for_context
+
+    # === TDAM Symbolic Memory Integration ===
+
+    def set_tdam(self, tdam: "TDAMIntegration") -> None:
+        """
+        Attach TDAM integration for symbolic memory compression.
+
+        Args:
+            tdam: TDAMIntegration instance
+        """
+        self._tdam = tdam
+
+    def compact_with_mermaid(
+        self,
+        session_id: str,
+        messages: list[dict],
+        ratio: float = 0.7,
+        context_window: int = 128000,
+    ) -> Optional["OffloadResult"]:
+        """
+        Compact conversation using TDAM Mermaid Canvas.
+
+        This uses TDAM's offload API to:
+        1. Offload verbose tool logs to external storage
+        2. Convert state to lightweight Mermaid symbols
+        3. Return compressed messages + canvas for traceability
+
+        Args:
+            session_id: Session identifier
+            messages: Conversation messages (list of dicts with role/content)
+            ratio: Target compression ratio (0.0-1.0)
+            context_window: Context window size
+
+        Returns:
+            OffloadResult with compressed content and canvas
+        """
+        if not hasattr(self, "_tdam") or self._tdam is None:
+            logger.warning("TDAM not configured, using local compression")
+            return None
+
+        # Convert dict messages to ConversationTurn
+        from .tdam_integration import ConversationTurn
+
+        turns = [
+            ConversationTurn(
+                role=m.get("role", "user"),
+                content=m.get("content", ""),
+                tool_name=m.get("tool_name"),
+                tool_result=m.get("tool_result"),
+            )
+            for m in messages
+        ]
+
+        result = self._tdam.compact_context(
+            session_id, turns, ratio=ratio, context_window=context_window
+        )
+
+        if result:
+            # Update compression stats
+            self._compression_history.append(
+                CompressionResult(
+                    original_tokens=result.tokens_before,
+                    compressed_tokens=result.tokens_after,
+                    compression_ratio=result.compression_ratio,
+                    strategy_used=CompressionStrategy.SEMANTIC,
+                    summary=f"Mermaid compact: {len(messages)} → {len(result.messages)} messages",
+                )
+            )
+
+        return result
+
+    def build_mermaid_context(
+        self,
+        session_id: str,
+        current_task: str,
+        max_tokens: int = 4000,
+    ) -> dict[str, Any]:
+        """
+        Build context with Mermaid canvas for task execution.
+
+        Combines TDAM layered memory recall with Mermaid canvas
+        for efficient context window usage.
+
+        Args:
+            session_id: Session identifier
+            current_task: Current task description
+            max_tokens: Maximum tokens for context
+
+        Returns:
+            Dict with {persona, memories, canvas, text, tokens}
+        """
+        if not hasattr(self, "_tdam") or self._tdam is None:
+            return {"error": "TDAM not configured"}
+
+        # Get full context from TDAM
+        tdam_context = self._tdam.build_context(session_id, current_task, max_tokens)
+
+        # Format as text
+        parts: list[str] = []
+
+        # Add persona if available
+        if tdam_context.get("persona"):
+            parts.append(f"## User Persona\n{tdam_context['persona']}")
+
+        # Add memories
+        memories = tdam_context.get("memories", [])
+        if memories:
+            parts.append(f"## Relevant Memories ({len(memories)})")
+            for m in memories[:5]:  # Top 5
+                parts.append(f"- {m['content'][:200]}")
+
+        # Add canvas
+        canvas = tdam_context.get("canvas", "")
+        if canvas:
+            parts.append(f"## Task State (Mermaid)\n```mermaid\n{canvas}\n```")
+
+        text = "\n\n".join(parts)
+        tokens = self.estimate_tokens(text)
+
+        return {
+            "text": text,
+            "tokens": tokens,
+            "persona": tdam_context.get("persona"),
+            "memories": memories,
+            "canvas": canvas,
+        }
+
+    def should_trigger_offload(self, current_tokens: int) -> bool:
+        """
+        Check if offload should be triggered based on context usage.
+
+        Args:
+            current_tokens: Current token count
+
+        Returns:
+            True if offload recommended
+        """
+        threshold = int(self.max_tokens * self.compression_threshold)
+        return current_tokens >= threshold
+
+    def get_symbolic_stats(self) -> dict:
+        """
+        Get statistics about symbolic memory compression.
+
+        Returns:
+            Stats dict with mermaid and tdam metrics
+        """
+        stats = self.get_compression_stats()
+
+        tdam_stats = {}
+        if hasattr(self, "_tdam") and self._tdam is not None:
+            tdam_stats = {
+                "tdam_available": self._tdam.is_available(),
+                "persona_cached": self._tdam._persona_cache is not None,
+            }
+
+        return {
+            "compression": stats,
+            "tdam": tdam_stats,
+            "context_window": {
+                "max_tokens": self.max_tokens,
+                "compression_threshold": self.compression_threshold,
+                "available": self.available_for_context,
+            },
+        }
 
 
 def create_optimizer(max_tokens: int = 100000) -> TokenOptimizer:

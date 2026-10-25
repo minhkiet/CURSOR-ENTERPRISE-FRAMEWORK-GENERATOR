@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TechHub — Cửa Hàng Laptop & PC Gaming, Linh Kiện Chính Hãng</title>
+  <meta name="description" content="TechHub chuyên laptop, PC gaming, linh kiện máy tính chính hãng: ASUS, Dell, HP, MSI, Intel, NVIDIA. Build PC theo yêu cầu, bảo hành 24 tháng, hỗ trợ trả góp 0%." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="#" class="logo">
+      <svg class="logo-mark" viewBox="0 0 40 40" fill="none">
+        <rect x="4" y="4" width="32" height="32" rx="8" fill="#dc2626"/>
+        <path d="M12 16 L20 24 L28 16" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M12 24 L20 32 L28 24" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+      </svg>
+      <span>tech<span class="logo-accent">hub</span></span>
+    </a>
+    <ul class="nav-menu">
+      <li><a href="#laptops">Laptop</a></li>
+      <li><a href="#pc">PC Gaming</a></li>
+      <li><a href="#parts">Linh kiện</a></li>
+      <li><a href="#peripherals">Phụ kiện</a></li>
+      <li><a href="#services">Dịch vụ</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="#" class="nav-ghost"><i class="ph ph-magnifying-glass"></i></a>
+      <a href="#" class="nav-ghost"><i class="ph ph-shopping-cart"></i></a>
+      <a href="#contact" class="nav-cta">
+        Build PC
+        <i class="ph ph-cpu"></i>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── HERO (Left-aligned, no overlay, diagonal cut) ─── -->
+<header class="hero">
+  <div class="hero-bg">
+    <div class="hero-pattern"></div>
+  </div>
+  <div class="container hero-layout">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <i class="ph-fill ph-lightning"></i>
+        Summer Sale: Giảm đến 30%
+      </div>
+
+      <h1 class="hero-title">
+        Laptop, PC Gaming<br/>
+        <span class="hl">chính hãng, giá tốt</span>
+      </h1>
+
+      <p class="hero-desc">
+        TechHub là đại lý ủy quyền của ASUS, Dell, MSI, HP. Build PC theo nhu cầu, bảo hành 24 tháng.
+        Hỗ trợ trả góp 0% qua thẻ tín dụng. Giao hàng miễn phí nội thành.
+      </p>
+
+      <div class="hero-cta">
+        <a href="#laptops" class="btn btn-primary btn-lg">
+          <i class="ph ph-laptop"></i>
+          Xem Laptop
+        </a>
+        <a href="#pc" class="btn btn-outline btn-lg">
+          <i class="ph-fill ph-cpu"></i>
+          Build PC
+        </a>
+      </div>
+
+      <div class="hero-trust">
+        <div class="trust-item">
+          <i class="ph-fill ph-seal-check"></i>
+          <span>Chính hãng 100%</span>
+        </div>
+        <div class="trust-item">
+          <i class="ph-fill ph-shield-check"></i>
+          <span>Bảo hành 24 tháng</span>
+        </div>
+        <div class="trust-item">
+          <i class="ph-fill ph-truck"></i>
+          <span>Giao miễn phí</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-product">
+      <div class="product-card">
+        <div class="pc-badge">
+          <i class="ph-fill ph-star"></i> Bán chạy nhất
+        </div>
+        <img src="https://picsum.photos/seed/gaming-laptop-rgb-keyboard/500/350" alt="ASUS ROG gaming laptop" loading="eager"/>
+        <div class="pc-info">
+          <h3>ASUS ROG Strix G16</h3>
+          <p>RTX 4060 | i7-13650HX | 16GB | 512GB SSD</p>
+          <div class="pc-price-row">
+            <div class="pc-price">
+              <span class="pc-price-current">29.9M</span>
+              <span class="pc-price-old">34.9M</span>
+            </div>
+            <a href="#" class="btn btn-primary">Mua ngay</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ─── CATEGORIES (icon-only strip) ─── -->
+<section class="categories">
+  <div class="container">
+    <div class="cat-strip">
+      <a href="#laptops" class="cat-item">
+        <i class="ph-fill ph-laptop"></i>
+        <span>Laptop</span>
+      </a>
+      <a href="#pc" class="cat-item">
+        <i class="ph-fill ph-desktop"></i>
+        <span>PC Gaming</span>
+      </a>
+      <a href="#parts" class="cat-item">
+        <i class="ph-fill ph-cpu"></i>
+        <span>Linh kiện</span>
+      </a>
+      <a href="#peripherals" class="cat-item">
+        <i class="ph-fill ph-keyboard"></i>
+        <span>Phụ kiện</span>
+      </a>
+      <a href="#monitors" class="cat-item">
+        <i class="ph-fill ph-monitor"></i>
+        <span>Màn hình</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── LAPTOPS (bento grid) ─── -->
+<section class="products" id="laptops">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        Laptop Gaming & Đồ họa
+      </div>
+      <h2 class="section-title">Laptop chính hãng, bảo hành 24 tháng</h2>
+    </div>
+
+    <div class="brand-tabs">
+      <button class="brand-tab active">Tất cả</button>
+      <button class="brand-tab">ASUS</button>
+      <button class="brand-tab">MSI</button>
+      <button class="brand-tab">Dell</button>
+      <button class="brand-tab">HP</button>
+      <button class="brand-tab">Lenovo</button>
+    </div>
+
+    <div class="product-bento">
+      <article class="product-card">
+        <div class="pc-badge">-14%</div>
+        <img src="https://picsum.photos/seed/asus-rog-gaming-laptop/400/280" alt="ASUS ROG Strix G16" loading="lazy"/>
+        <div class="pc-content">
+          <div class="pc-brand">ASUS</div>
+          <h3 class="pc-name">ROG Strix G16 G614JV</h3>
+          <div class="pc-specs">
+            <span><i class="ph ph-cpu"></i> i7-13650HX</span>
+            <span><i class="ph ph-memory"></i> 16GB</span>
+            <span><i class="ph ph-vibrate"></i> RTX 4060</span>
+          </div>
+          <div class="pc-price-row">
+            <div class="pc-price">
+              <span class="pc-price-current">29.9M</span>
+              <span class="pc-price-old">34.9M</span>
+            </div>
+            <button class="btn btn-sm btn-primary">
+              <i class="ph ph-shopping-cart"></i>
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <div class="pc-badge hot">Hot</div>
+        <img src="https://picsum.photos/seed/msi-gaming-laptop-rgb/400/280" alt="MSI Katana 15" loading="lazy"/>
+        <div class="pc-content">
+          <div class="pc-brand">MSI</div>
+          <h3 class="pc-name">Katana 15 B13VFK</h3>
+          <div class="pc-specs">
+            <span><i class="ph ph-cpu"></i> i7-13700H</span>
+            <span><i class="ph ph-memory"></i> 16GB</span>
+            <span><i class="ph ph-vibrate"></i> RTX 4060</span>
+          </div>
+          <div class="pc-price-row">
+            <div class="pc-price">
+              <span class="pc-price-current">28.5M</span>
+              <span class="pc-price-old">32M</span>
+            </div>
+            <button class="btn btn-sm btn-primary">
+              <i class="ph ph-shopping-cart"></i>
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <article class="product-card product-wide">
+        <div class="pc-badge">-20%</div>
+        <img src="https://picsum.photos/seed/dell-gaming-laptop-black/400/280" alt="Dell G15" loading="lazy"/>
+        <div class="pc-content">
+          <div class="pc-brand">Dell</div>
+          <h3 class="pc-name">Gaming G15 5530</h3>
+          <div class="pc-specs">
+            <span><i class="ph ph-cpu"></i> i5-13450HX</span>
+            <span><i class="ph ph-memory"></i> 8GB</span>
+            <span><i class="ph ph-vibrate"></i> RTX 3050</span>
+          </div>
+          <div class="pc-price-row">
+            <div class="pc-price">
+              <span class="pc-price-current">18.9M</span>
+              <span class="pc-price-old">23.5M</span>
+            </div>
+            <button class="btn btn-sm btn-primary">
+              <i class="ph ph-shopping-cart"></i>
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <img src="https://picsum.photos/seed/hp-omen-gaming-laptop/400/280" alt="HP Omen 16" loading="lazy"/>
+        <div class="pc-content">
+          <div class="pc-brand">HP</div>
+          <h3 class="pc-name">OMEN 16-wd0012TX</h3>
+          <div class="pc-specs">
+            <span><i class="ph ph-cpu"></i> i7-13700H</span>
+            <span><i class="ph ph-memory"></i> 16GB</span>
+            <span><i class="ph ph-vibrate"></i> RTX 4070</span>
+          </div>
+          <div class="pc-price-row">
+            <div class="pc-price">
+              <span class="pc-price-current">35.9M</span>
+            </div>
+            <button class="btn btn-sm btn-primary">
+              <i class="ph ph-shopping-cart"></i>
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <div class="pc-badge new">Mới</div>
+        <img src="https://picsum.photos/seed/lenovo-legion-gaming-laptop/400/280" alt="Lenovo Legion 5" loading="lazy"/>
+        <div class="pc-content">
+          <div class="pc-brand">Lenovo</div>
+          <h3 class="pc-name">Legion 5 15ARH7H</h3>
+          <div class="pc-specs">
+            <span><i class="ph ph-cpu"></i> Ryzen 7 6800H</span>
+            <span><i class="ph ph-memory"></i> 16GB</span>
+            <span><i class="ph ph-vibrate"></i> RTX 3060</span>
+          </div>
+          <div class="pc-price-row">
+            <div class="pc-price">
+              <span class="pc-price-current">24.9M</span>
+            </div>
+            <button class="btn btn-sm btn-primary">
+              <i class="ph ph-shopping-cart"></i>
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <div class="pc-badge">-10%</div>
+        <img src="https://picsum.photos/seed/asus-zenbook-ultra-slim/400/280" alt="ASUS ZenBook" loading="lazy"/>
+        <div class="pc-content">
+          <div class="pc-brand">ASUS</div>
+          <h3 class="pc-name">ZenBook 14 UX3402ZA</h3>
+          <div class="pc-specs">
+            <span><i class="ph ph-cpu"></i> i5-1240P</span>
+            <span><i class="ph ph-memory"></i> 16GB</span>
+            <span><i class="ph ph-hard-drive"></i> 512GB</span>
+          </div>
+          <div class="pc-price-row">
+            <div class="pc-price">
+              <span class="pc-price-current">19.5M</span>
+              <span class="pc-price-old">21.7M</span>
+            </div>
+            <button class="btn btn-sm btn-primary">
+              <i class="ph ph-shopping-cart"></i>
+            </button>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="section-cta">
+      <a href="#" class="btn btn-outline btn-lg">
+        Xem tất cả laptop
+        <i class="ph ph-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PC GAMING (asymmetric cards) ─── -->
+<section class="pc-section" id="pc">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        PC Gaming Build
+      </div>
+      <h2 class="section-title">Build PC theo yêu cầu, lắp ráp chuyên nghiệp</h2>
+      <p class="section-desc">Chọn cấu hình có sẵn hoặc build theo ngân sách của bạn.</p>
+    </div>
+
+    <div class="pc-builds">
+      <article class="build-card">
+        <div class="bc-tier">Mid-Range</div>
+        <div class="bc-price">18.9M</div>
+        <div class="bc-components">
+          <div class="bc-item">
+            <span class="bc-label">CPU</span>
+            <span class="bc-value">Intel Core i5-13400F</span>
+          </div>
+          <div class="bc-item">
+            <span class="bc-label">VGA</span>
+            <span class="bc-value">RTX 4060 8GB</span>
+          </div>
+          <div class="bc-item">
+            <span class="bc-label">RAM</span>
+            <span class="bc-value">16GB DDR5 5600</span>
+          </div>
+          <div class="bc-item">
+            <span class="bc-label">SSD</span>
+            <span class="bc-value">512GB NVMe Gen4</span>
+          </div>
+          <div class="bc-item">
+            <span class="bc-label">PSU</span>
+            <span class="bc-value">650W 80+ Bronze</span>
+          </div>
+        </div>
+        <button class="btn btn-outline btn-full">Build ngay</button>
+      </article>
+
+      <article class="build-card bc-featured">
+        <div class="bc-popular">
+          <i class="ph-fill ph-fire"></i> Phổ biến nhất
+        </div>
+        <div class="bc-tier">High-End</div>
+        <div class="bc-price">32.9M</div>
+        <div class="bc-components">
+          <div class="bc-item">
+            <span class="bc-label">CPU</span>
+            <span class="bc-value">Intel Core i7-13700K</span>
+          </div>
+          <div class="bc-item">
+            <span class="bc-label">VGA</span>
+            <span class="bc-value">RTX 4070 Ti 12GB</span>
+          </div>
+          <div class="bc-item">
+            <span class="bc-label">RAM</span>
+            <span class="bc-value">32GB DDR5 6000</span>
+          </div>
+          <div class="bc-item">
+            <span class="bc-label">SSD</span>
+            <span class="bc-value">1TB NVMe Gen4</span>
+          </div>
+          <div class="bc-item">
+            <span class="bc-label">PSU</span>
+            <span class="bc-value">850W 80+ Gold</span>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-full">Build ngay</button>
+      </article>
+
+      <article class="build-card">
+        <div class="bc-tier">Enthusiast</div>
+        <div class="bc-price">54.9M</div>
+        <div class="bc-components">
+          <div class="bc-item">
+            <span class="bc-label">CPU</span>
+            <span class="bc-value">Intel Core i9-13900K</span>
+          </div>
+          <div class="bc-item">
+            <span class="bc-label">VGA</span>
+            <span class="bc-value">RTX 4080 16GB</span>
+          </div>
+          <div class="bc-item">
+            <span class="bc-label">RAM</span>
+            <span class="bc-value">64GB DDR5 6400</span>
+          </div>
+          <div class="bc-item">
+            <span class="bc-label">SSD</span>
+            <span class="bc-value">2TB NVMe Gen5</span>
+          </div>
+          <div class="bc-item">
+            <span class="bc-label">PSU</span>
+            <span class="bc-value">1000W 80+ Platinum</span>
+          </div>
+        </div>
+        <button class="btn btn-outline btn-full">Build ngay</button>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SERVICES (2-column asymmetric) ─── -->
+<section class="services" id="services">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        Dịch vụ
+      </div>
+      <h2 class="section-title">Ngoài bán hàng, TechHub còn mang đến</h2>
+    </div>
+
+    <div class="service-grid">
+      <article class="service-card">
+        <div class="sc-icon"><i class="ph-fill ph-wrench"></i></div>
+        <h3>Build PC theo yêu cầu</h3>
+        <p>Tư vấn cấu hình phù hợp với nhu cầu và ngân sách. Lắp ráp chuyên nghiệp, tối ưu cable management.</p>
+      </article>
+
+      <article class="service-card">
+        <div class="sc-icon"><i class="ph-fill ph-shield-check"></i></div>
+        <h3>Bảo hành 24 tháng</h3>
+        <p>Tất cả sản phẩm bảo hành 24 tháng tại TechHub. Đổi trả trong 15 ngày nếu lỗi từ nhà sản xuất.</p>
+      </article>
+
+      <article class="service-card">
+        <div class="sc-icon"><i class="ph-fill ph-credit-card"></i></div>
+        <h3>Trả góp 0%</h3>
+        <p>Hỗ trợ trả góp 0% qua thẻ tín dụng các ngân hàng: Vietcombank, VietinBank, BIDV, TPBank.</p>
+      </article>
+
+      <article class="service-card">
+        <div class="sc-icon"><i class="ph-fill ph-truck"></i></div>
+        <h3>Giao hàng miễn phí</h3>
+        <p>Giao hàng miễn phí nội thành TP.HCM và Hà Nội. Các tỉnh khác: phí 30,000đ.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ─── REVIEWS ─── -->
+<section class="reviews">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        Đánh giá
+      </div>
+      <h2 class="section-title">Khách hàng nói gì về TechHub</h2>
+    </div>
+
+    <div class="review-bento">
+      <article class="review-card review-featured">
+        <div class="rc-stars"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
+        <p class="rc-quote">"Mua laptop ASUS ROG ở TechHub, giá rẻ hơn thị trường 1.5M. Máy chính hãng, kích hoạt bảo hành ASUS ngay tại cửa hàng."</p>
+        <div class="rc-author">
+          <img src="https://i.pravatar.cc/48?img=33" alt=""/>
+          <div>
+            <div class="rc-name">Hoàng Minh Tuấn</div>
+            <div class="rc-meta">Gamer · Mua laptop ASUS</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="review-card">
+        <div class="rc-stars"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
+        <p class="rc-quote">"Build PC ở TechHub, nhân viên tư vấn nhiệt tình, chọn đúng cấu hình tôi cần. Máy chạy mượt."</p>
+        <div class="rc-author">
+          <img src="https://i.pravatar.cc/48?img=56" alt=""/>
+          <div>
+            <div class="rc-name">Nguyễn Thanh Hà</div>
+            <div class="rc-meta">Designer · Build PC Gaming</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="review-card">
+        <div class="rc-stars"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
+        <p class="rc-quote">"Mua màn hình Dell 27 inch, trả góp 0% qua thẻ Vietcombank. Đợt sale 11/11 được giảm 20%."</p>
+        <div class="rc-author">
+          <img src="https://i.pravatar.cc/48?img=23" alt=""/>
+          <div>
+            <div class="rc-name">Trần Đức Anh</div>
+            <div class="rc-meta">Dev · Mua màn hình Dell</div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CONTACT ─── -->
+<section class="contact" id="contact">
+  <div class="container">
+    <div class="contact-layout">
+      <div class="contact-info">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          Liên hệ
+        </div>
+        <h2>Ghé thăm cửa hàng hoặc liên hệ tư vấn</h2>
+
+        <div class="store-list">
+          <div class="store-item">
+            <div class="si-header">
+              <i class="ph-fill ph-map-pin"></i>
+              <strong>Chi nhánh TP.HCM</strong>
+            </div>
+            <p>123 Nguyễn Trãi, Quận 1, TP.HCM</p>
+          </div>
+          <div class="store-item">
+            <div class="si-header">
+              <i class="ph-fill ph-map-pin"></i>
+              <strong>Chi nhánh Hà Nội</strong>
+            </div>
+            <p>456 Trần Hưng Đạo, Hoàn Kiếm, HN</p>
+          </div>
+          <div class="store-item">
+            <div class="si-header">
+              <i class="ph-fill ph-phone"></i>
+              <strong>Hotline</strong>
+            </div>
+            <p>1800 1234 (8:00-21:00)</p>
+          </div>
+          <div class="store-item">
+            <div class="si-header">
+              <i class="ph-fill ph-envelope"></i>
+              <strong>Email</strong>
+            </div>
+            <p>contact@techhub.vn</p>
+          </div>
+        </div>
+
+        <div class="social-links">
+          <a href="#"><i class="ph-fill ph-facebook-logo"></i></a>
+          <a href="#"><i class="ph-fill ph-instagram-logo"></i></a>
+          <a href="#"><i class="ph-fill ph-youtube-logo"></i></a>
+          <a href="#"><i class="ph-fill ph-tiktok-logo"></i></a>
+        </div>
+      </div>
+
+      <form class="contact-form">
+        <div class="form-group">
+          <label>Họ tên</label>
+          <input type="text" placeholder="Nguyễn Văn A"/>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" placeholder="email@example.com"/>
+          </div>
+          <div class="form-group">
+            <label>Số điện thoại</label>
+            <input type="tel" placeholder="0912 345 678"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Tôi quan tâm đến</label>
+          <select>
+            <option>Laptop gaming/đồ họa</option>
+            <option>PC Gaming</option>
+            <option>Build PC theo yêu cầu</option>
+            <option>Linh kiện/Phụ kiện</option>
+            <option>Tư vấn trả góp</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Ngân sách dự kiến</label>
+          <select>
+            <option>Dưới 20 triệu</option>
+            <option>20-30 triệu</option>
+            <option>30-50 triệu</option>
+            <option>50-80 triệu</option>
+            <option>Trên 80 triệu</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Ghi chú (tùy chọn)</label>
+          <textarea rows="3" placeholder="Mô tả nhu cầu của bạn..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full btn-lg">
+          <i class="ph ph-paper-plane-tilt"></i>
+          Gửi yêu cầu tư vấn
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo">
+          <svg class="logo-mark" viewBox="0 0 40 40" fill="none">
+            <rect x="4" y="4" width="32" height="32" rx="8" fill="#dc2626"/>
+            <path d="M12 16 L20 24 L28 16" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>tech<span class="logo-accent">hub</span></span>
+        </div>
+        <p>Cửa hàng laptop, PC gaming, linh kiện chính hãng. 5 năm kinh nghiệm, hàng ngàn khách hàng tin tưởng.</p>
+      </div>
+      <div>
+        <h5>Sản phẩm</h5>
+        <ul>
+          <li><a href="#">Laptop Gaming</a></li>
+          <li><a href="#">Laptop Văn phòng</a></li>
+          <li><a href="#">PC Gaming</a></li>
+          <li><a href="#">Linh kiện</a></li>
+          <li><a href="#">Phụ kiện</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Hỗ trợ</h5>
+        <ul>
+          <li><a href="#">Bảo hành</a></li>
+          <li><a href="#">Trả góp</a></li>
+          <li><a href="#">Build PC</a></li>
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Liên hệ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Thông tin</h5>
+        <ul>
+          <li><a href="#">Về TechHub</a></li>
+          <li><a href="#">Tin tức</a></li>
+          <li><a href="#">Tuyển dụng</a></li>
+          <li><a href="#">Hợp tác</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2026 TechHub Vietnam. MST: 0108246839.</div>
+      <div class="footer-legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Security</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

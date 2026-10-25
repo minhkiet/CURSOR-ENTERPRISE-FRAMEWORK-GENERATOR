@@ -78,6 +78,110 @@
   color-scheme: dark;
 }
 
+/* ─── THEME 2: INDIGO LINEAR (Deep Midnight + Electric Indigo) ────────────── */
+[data-theme="indigo"] {
+  --bg-canvas:        #070814;
+  --bg-base:          #0a0b18;
+  --bg-elevated:      #0f1124;
+  --bg-surface:       #151730;
+  --bg-raised:        #1b1e3c;
+  --bg-overlay:       rgba(10, 11, 24, 0.85);
+  --accent:           #6366f1;
+  --accent-bright:    #818cf8;
+  --accent-dim:       rgba(99, 102, 241, 0.14);
+  --accent-glow:      rgba(99, 102, 241, 0.24);
+  --accent-line:      rgba(99, 102, 241, 0.45);
+  --shadow-glow:      0 0 0 1px var(--accent-line), 0 12px 32px rgba(99, 102, 241, 0.14);
+  --gradient-hero:    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(99, 102, 241, 0.12) 0%, transparent 60%);
+  color-scheme: dark;
+}
+
+/* ─── THEME 3: CYBER AMBER (Neo Tokyo Obsidian + Amber) ───────────────────── */
+[data-theme="cyberpunk"] {
+  --bg-canvas:        #0a0a0c;
+  --bg-base:          #0e0e12;
+  --bg-elevated:      #14141a;
+  --bg-surface:       #1a1a24;
+  --bg-raised:        #232330;
+  --bg-overlay:       rgba(14, 14, 18, 0.85);
+  --accent:           #f59e0b;
+  --accent-bright:    #fbbf24;
+  --accent-dim:       rgba(245, 158, 11, 0.14);
+  --accent-glow:      rgba(245, 158, 11, 0.24);
+  --accent-line:      rgba(245, 158, 11, 0.45);
+  --shadow-glow:      0 0 0 1px var(--accent-line), 0 12px 32px rgba(245, 158, 11, 0.14);
+  --gradient-hero:    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(245, 158, 11, 0.12) 0%, transparent 60%);
+  color-scheme: dark;
+}
+
+/* ─── THEME 4: SLATE LUXURY (Gunmetal Titanium + Royal Champagne Gold) ─────── */
+[data-theme="slate"] {
+  --bg-canvas:        #070b12;
+  --bg-base:          #0b1019;
+  --bg-elevated:      #101724;
+  --bg-surface:       #161f30;
+  --bg-raised:        #1e293f;
+  --bg-overlay:       rgba(11, 16, 25, 0.85);
+  --accent:           #eab308;
+  --accent-bright:    #fde047;
+  --accent-dim:       rgba(234, 179, 8, 0.14);
+  --accent-glow:      rgba(234, 179, 8, 0.22);
+  --accent-line:      rgba(234, 179, 8, 0.45);
+  --shadow-glow:      0 0 0 1px var(--accent-line), 0 12px 32px rgba(234, 179, 8, 0.12);
+  --gradient-hero:    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(234, 179, 8, 0.1) 0%, transparent 60%);
+  color-scheme: dark;
+}
+
+/* ─── THEME 5: WARM HERITAGE (Espresso Wood + Terracotta Gold) ────────────── */
+[data-theme="heritage"] {
+  --bg-canvas:        #100a06;
+  --bg-base:          #150d08;
+  --bg-elevated:      #1c120c;
+  --bg-surface:       #241810;
+  --bg-raised:        #2d1f16;
+  --bg-overlay:       rgba(21, 13, 8, 0.88);
+  --accent:           #d97706;
+  --accent-bright:    #f59e0b;
+  --accent-dim:       rgba(217, 119, 6, 0.16);
+  --accent-glow:      rgba(217, 119, 6, 0.24);
+  --accent-line:      rgba(217, 119, 6, 0.48);
+  --shadow-glow:      0 0 0 1px var(--accent-line), 0 12px 32px rgba(217, 119, 6, 0.14);
+  --gradient-hero:    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(217, 119, 6, 0.12) 0%, transparent 60%);
+  color-scheme: dark;
+}
+
+/* ─── THEME 6: CLEAN EDITORIAL (High-contrast Paper Light) ─────────────────── */
+[data-theme="light"] {
+  --bg-canvas:        #f1f5f9;
+  --bg-base:          #ffffff;
+  --bg-elevated:      #f8fafc;
+  --bg-surface:       #ffffff;
+  --bg-raised:        #f1f5f9;
+  --bg-overlay:       rgba(255, 255, 255, 0.88);
+  --border-hairline:  rgba(0, 0, 0, 0.05);
+  --border-subtle:    rgba(0, 0, 0, 0.09);
+  --border-default:   rgba(0, 0, 0, 0.14);
+  --border-strong:    rgba(0, 0, 0, 0.22);
+  --border-focus:     rgba(5, 150, 105, 0.5);
+  --text-primary:     #0f172a;
+  --text-secondary:   #475569;
+  --text-tertiary:    #64748b;
+  --text-muted:       #94a3b8;
+  --text-faint:       #cbd5e1;
+  --accent:           #059669;
+  --accent-bright:    #10b981;
+  --accent-dim:       rgba(5, 150, 105, 0.1);
+  --accent-glow:      rgba(5, 150, 105, 0.18);
+  --accent-line:      rgba(5, 150, 105, 0.35);
+  --shadow-xs:        0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm:        0 2px 4px rgba(0, 0, 0, 0.06), 0 1px 0 rgba(0, 0, 0, 0.02) inset;
+  --shadow-md:        0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 0 rgba(0, 0, 0, 0.02) inset;
+  --shadow-lg:        0 16px 40px rgba(0, 0, 0, 0.12), 0 1px 0 rgba(0, 0, 0, 0.02) inset;
+  --shadow-glow:      0 0 0 1px var(--accent-line), 0 12px 32px rgba(5, 150, 105, 0.1);
+  --gradient-hero:    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(5, 150, 105, 0.08) 0%, transparent 60%);
+  color-scheme: light;
+}
+
 /* ─── RESET ──────────────────────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;

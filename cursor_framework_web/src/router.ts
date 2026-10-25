@@ -4,6 +4,8 @@ import TemplatesGallery from './views/TemplatesGallery.vue'
 import TemplatePreview from './views/TemplatePreview.vue'
 import LearnView from './views/LearnView.vue'
 import PromptsView from './views/PromptsView.vue'
+import InstallGuideView from './views/InstallGuideView.vue'
+import CmsDashboardView from './views/CmsDashboardView.vue'
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -24,6 +26,19 @@ const router = createRouter({
       component: TemplatePreview
     },
     {
+      path: '/cms',
+      name: 'cms-dashboard',
+      component: CmsDashboardView
+    },
+    {
+      path: '/dashboard',
+      redirect: '/cms'
+    },
+    {
+      path: '/login',
+      redirect: '/cms'
+    },
+    {
       path: '/learn',
       name: 'learn',
       component: LearnView
@@ -32,6 +47,11 @@ const router = createRouter({
       path: '/prompts',
       name: 'prompts',
       component: PromptsView
+    },
+    {
+      path: '/install',
+      name: 'install',
+      component: InstallGuideView
     }
   ],
   scrollBehavior(to, _from, savedPosition) {

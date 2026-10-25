@@ -965,3 +965,779 @@ BẮT ĐẦU: Đánh giá List Quality
         ├─► Document reason: "re-engagement failed"
         └─► Never re-add to list
 ```
+
+---
+
+## 11. marketingskills Routing Tree (sync 2026-07-15)
+
+> Mục đích: routing request → category → knowledge section → implementation. Mỗi decision dưới đây map 1 trigger phrase đến 1 knowledge file đã có sẵn (không tạo file mới — Superpowers concept-ref pattern, xem `skill-registry.mdc §8.1`).
+
+### 11.1 Routing cho Conversion Optimization
+
+```
+"Cải thiện conversion trang"
+   │
+   ├─► Page type?
+   │   ├─► Landing page → best-practice.md §2.1 + checklist.md §9.1.1
+   │   ├─► Pricing page  → best-practice.md §5.2 + architecture.md §4.1.2
+   │   ├─► Signup form   → best-practice.md §2.2 + anti-pattern.md §9.1.2
+   │   └─► Onboarding    → best-practice.md §5.1 + architecture.md §4.1.2
+   │
+   ├─► Optimization target?
+   │   ├─► Form fields    → best-practice.md §2.2 §2.3
+   │   ├─► CTA copy       → best-practice.md §2.4
+   │   ├─► Social proof   → best-practice.md §2.5
+   │   └─► Page speed     → performance rules (vercel-react-best-practices)
+   │
+   └─► A/B test setup → best-practice.md §8.1 + checklist.md §9.5.2
+
+"Optimize onboarding activation"
+   │
+   ├─► Activation event defined? 
+   │   ├─► Yes  → best-practice.md §5.1 + architecture.md §4.1.2
+   │   └─► No   → faq.md §4.2 "Định nghĩa activation event"
+   │
+   └─► Issues?
+       ├─► Drop-off at step 3+ → checklist.md §9.1.1
+       ├─► Low day-1 retention → anti-pattern.md §9.1.5
+       └─► No clear aha moment → faq.md §4.2 "Tìm aha moment"
+
+"Setup exit popup"
+   │
+   ├─► Type?
+   │   ├─► Exit-intent  → best-practice.md §2.4 + checklist.md §9.1.2
+   │   └─► Time-delayed → best-practice.md §2.4
+   │
+   └─► Targeting?
+       ├─► All visitors  → ❌ anti-pattern.md §9.1.4
+       └─► High-intent only → best-practice.md §2.4 ✓
+
+"Paywall upgrade flow"
+   │
+   ├─► Trigger?
+   │   ├─► Feature limit hit → architecture.md §4.7 + best-practice.md §5.2
+   │   └─► Trial expiration → best-practice.md §5.2
+   │
+   └─► Offer?
+       ├─► Discount  → best-practice.md §10.5 (offer stack)
+       └─► Plan switch → best-practice.md §10.4 (pricing)
+```
+
+### 11.2 Routing cho Content & Copy
+
+```
+"Viết email subject line"
+   │
+   ├─► Email type?
+   │   ├─► Newsletter  → best-practice.md §2.1 (subject A/B)
+   │   ├─► Cold email  → best-practice.md §2.5
+   │   └─► Transactional → best-practice.md §2.10
+   │
+   └─► Anti-pattern check → anti-pattern.md §9.2.1 (RE:Viagra)
+
+"Soạn cold email sequence"
+   │
+   ├─► Number of touches?
+   │   ├─► 3-5 emails over 2 weeks → best-practice.md §2.5
+   │   └─► 7+ emails / multi-channel → best-practice.md §2.5 + architecture.md §4.2.2
+   │
+   └─► Personalization depth?
+       ├─► Basic (name, company) → best-practice.md §2.5
+       └─► Trigger event → anti-pattern.md §9.2.4
+
+"Generate social post from blog"
+   │
+   ├─► Platforms?
+   │   ├─► LinkedIn / Twitter → best-practice.md §2.6 + checklist.md §9.2.4
+   │   ├─► Instagram / TikTok → best-practice.md §2.6 (image + video)
+   │   └─► Multi-platform    → architecture.md §4.2.3
+   │
+   └─► Assets?
+       ├─► Image (AI) → best-practice.md §2.7 + anti-pattern.md §9.2.6
+       ├─► Video (programmatic) → best-practice.md §2.8
+       └─► Carousel → best-practice.md §2.6
+
+"SMS marketing"
+   │
+   ├─► Compliance? → anti-pattern.md §9.2.5 + checklist.md §9.2.3
+   ├─► Frequency? → best-practice.md §2.9
+   └─► Opt-in flow? → best-practice.md §2.9 + architecture.md §4.2.2
+```
+
+### 11.3 Routing cho SEO & Discovery
+
+```
+"SEO audit"
+   │
+   ├─► Site size?
+   │   ├─► <1k pages   → best-practice.md §3.1 + architecture.md §4.3.1
+   │   └─► >1k pages   → architecture.md §4.3.1 (crawler scale)
+   │
+   └─► Issues found?
+       ├─► Indexing   → faq.md §3.1 "Tại sao page không index"
+       ├─► Schema     → architecture.md §4.3.3 + checklist.md §9.3.4
+       ├─► Cannibalization → faq.md §3.3
+       └─► Speed      → performance rules
+
+"Optimize cho AI search"
+   │
+   ├─► Engine target?
+   │   ├─► ChatGPT / Claude / Gemini → architecture.md §4.3.4 + best-practice.md §3.1
+   ├─► Perplexity → best-practice.md §3.1
+   └─► Google AI Overviews → architecture.md §4.3.3 (schema) + best-practice.md §3.1
+   │
+   └─► Has llms.txt? → best-practice.md §3.1 ✓ ; else → checklist.md §9.3.2 ✗
+
+"Build 1000 programmatic pages"
+   │
+   ├─► Data source? → best-practice.md §3.2 + architecture.md §4.3.2
+   ├─► Template strategy? → architecture.md §4.3.2
+   ├─► Quality gate? → anti-pattern.md §9.3.2 + checklist.md §9.3.3
+   └─► Volume? 
+       ├─► <1k → manageable
+       └─► >10k → architecture.md §4.3.2 + warning: anti-pattern.md §9.3.2
+
+"Compare page: [competitor] vs [us]"
+   │
+   ├─► Data gathering → best-practice.md §3.3 + architecture.md §4.9.6
+   └─► Template → best-practice.md §3.3
+
+"Schema markup issue"
+   │
+   ├─► Type?
+   │   ├─► Product / Offer → architecture.md §4.3.3 + best-practice.md §3.4
+   │   ├─► Article / FAQ   → best-practice.md §3.4
+   │   └─► LocalBusiness   → best-practice.md §3.4
+   │
+   └─► Validation → checklist.md §9.3.4 + Rich Results Test
+
+"App Store Optimization"
+   │
+   ├─► iOS / Android → best-practice.md §3.5 + checklist.md §9.3.5
+   └─► Localization → best-practice.md §3.5
+```
+
+### 11.4 Routing cho Paid & Distribution
+
+```
+"Launch Google/Meta ads"
+   │
+   ├─► Conversion tracking? → checklist.md §9.4.1 ✗ blocker
+   ├─► Audience size? → checklist.md §9.4.1 (need > 1000)
+   ├─► Creative variants? → best-practice.md §4.2 + checklist.md §9.4.1
+   └─► Campaign structure? → best-practice.md §4.1 + anti-pattern.md §9.4.1
+
+"Creative fatigue (CTR drop)"
+   │
+   ├─► Last refresh? → anti-pattern.md §9.4.2 (> 14 days = refresh)
+   └─► Build new variants → best-practice.md §4.2 + architecture.md §4.4.2
+```
+
+### 11.5 Routing cho Measurement & Testing
+
+```
+"Setup tracking"
+   │
+   ├─► Tool?
+   │   ├─► GA4 → best-practice.md §6.1 + architecture.md §4.5.1
+   │   ├─► Mixpanel / Amplitude → best-practice.md §6.1
+   │   └─► Custom (Kafka + warehouse) → architecture.md §4.5.1
+   │
+   └─► Event taxonomy → architecture.md §4.5.1 + checklist.md §9.5.1
+
+"Run A/B test"
+   │
+   ├─► Hypothesis stage → anti-pattern.md §9.5.1 (max 3/page)
+   ├─► Sample size → checklist.md §9.5.2 + decision tree
+   │   ├─► Baseline 5%, MDE +10% → ~3,800/total (typical)
+   │   └─► Use calculator: optimizely.com/sample-size
+   ├─► Duration → checklist.md §9.5.2 + decision tree
+   │   ├─► Min 1 week (capture weekday cycle)
+   │   └─► Min 2 weeks (capture seasonality)
+   └─► Stop criteria → checklist.md §9.5.2 (sample + p)
+
+"Attribution"
+   │
+   ├─► Model?
+   │   ├─► Last-touch (simple) → architecture.md §4.5.3 (default)
+   │   ├─► Data-driven (ML) → architecture.md §4.5.3 (Shapley)
+   │   └─► Need more detail → best-practice.md §6.2
+   └─► Cross-device? → architecture.md §4.5.1 (identity stitching)
+```
+
+### 11.6 Routing cho Retention
+
+```
+"High churn detected"
+   │
+   ├─► Diagnosis
+   │   ├─► Voluntary (cancel intent) → architecture.md §4.6.2 + best-practice.md §7.1
+   │   ├─► Involuntary (failed payment) → architecture.md §4.6.3 + best-practice.md §7.1
+   │   └─► Passive (low usage) → best-practice.md §7.1 + segment re-engagement
+   │
+   └─► Save offer
+       ├─► Discount → best-practice.md §10.5
+       ├─► Pause   → architecture.md §4.6.2 + checklist.md §9.6.1
+       └─► Plan downgrade → best-practice.md §10.4
+
+"Dunning system"
+   │
+   ├─► Cadence → architecture.md §4.6.3 + checklist.md §9.6.1
+   ├─► Recovery target → architecture.md §4.6.3 (40-60% in 14d)
+   └─► Anti-pattern → anti-pattern.md §9.6.1
+```
+
+### 11.7 Routing cho Growth Engineering
+
+```
+"Build free tool"
+   │
+   ├─► Tool type?
+   │   ├─► Calculator / Grader → architecture.md §4.7.1 + best-practice.md §9.2
+   │   ├─► Template / Generator → best-practice.md §9.2
+   │   └─► Embed widget → architecture.md §4.7.1
+   │
+   └─► Lead gate?
+       ├─► Yes → architecture.md §4.7.1 (ethical gate)
+       └─► No  → best-practice.md §9.2 (faster viral loop)
+
+"Setup referral program"
+   │
+   ├─► Reward type → best-practice.md §9.3 + checklist.md §9.7.2
+   ├─► Fraud guardrails → architecture.md §4.7.2 + anti-pattern.md §9.7.2
+   └─► Tier / payout → architecture.md §4.7.2 + checklist.md §9.7.2
+
+"Co-marketing"
+   │
+   ├─► ICP overlap > 30%? → anti-pattern.md §9.7.3 ✗ 
+   ├─► Joint asset plan → checklist.md §9.7.3 + architecture.md §4.7.3
+   └─► Tracking → architecture.md §4.7.3 (UTM partner slug)
+```
+
+### 11.8 Routing cho Strategy & Monetization
+
+```
+"Đặt giá sản phẩm"
+   │
+   ├─► Tiered or flat?
+   │   ├─► Tiered  → best-practice.md §10.4 + checklist.md §9.8.1
+   │   └─► Flat + usage → best-practice.md §10.4
+   │
+   └─► Optimize
+       ├─► A/B test prices → best-practice.md §10.4 + decision tree §11.5
+       └─► Annual discount → best-practice.md §10.4
+
+"Launch strategy"
+   │
+   ├─► New product? → architecture.md §4.8.3 + checklist.md §9.8.3
+   ├─► New feature? → architecture.md §4.8.3 (smaller scope)
+   └─► Waitlist? → anti-pattern.md §9.8.2 (launch without waitlist = fail)
+
+"Quarterly marketing plan"
+   │
+   ├─► Template → architecture.md §4.8.4 + best-practice.md §10.1
+   ├─► Tactic ideas → best-practice.md §10.1 (140 ideas catalog)
+   └─► Channel mix → architecture.md §4.8.4 + best-practice.md §10.1
+```
+
+### 11.9 Routing cho Sales & RevOps
+
+```
+"Setup lead scoring"
+   │
+   ├─► Inputs?
+   │   ├─► Form data only → ❌ anti-pattern.md §9.9.1
+   │   └─► Behavior + form → architecture.md §4.9.1 + best-practice.md §11.7
+   │
+   └─► Routing
+       ├─► By expertise → checklist.md §9.9.1
+       └─► By territory → architecture.md §4.9.1
+
+"Outreach campaign"
+   │
+   ├─► Sequence
+   │   ├─► 5-7 touches → architecture.md §4.9.3 + checklist.md §9.9.3
+   │   └─► Multi-channel → best-practice.md §11.2
+   │
+   └─► Quality
+       ├─► Bounce handling → checklist.md §9.9.3
+       └─► Reply handling → architecture.md §4.9.3
+
+"Customer research"
+   │
+   ├─► Recruitment → checklist.md §9.9.5 + best-practice.md §11.5
+   ├─► Interview guide → best-practice.md §11.5
+   ├─► Synthesis → architecture.md §4.9.5 + JTBD framework
+   └─► Anti-pattern → anti-pattern.md §9.9.7 (sampling bias)
+
+"PR pitch"
+   │
+   ├─► Media list → checklist.md §9.9.4 + best-practice.md §11.3
+   ├─► Pitch angle → best-practice.md §11.3 + anti-pattern.md §9.9.6
+   └─► Coverage tracking → architecture.md §4.9.4
+
+"Marketing council brainstorm"
+   │
+   ├─► Persona count → best-practice.md §11.7 (5-7)
+   ├─► Context passed → glossary.md §13 (product-marketing context) mandatory
+   └─► Output format → best-practice.md §11.7 (prioritized ideas)
+
+"Setup marketing loop (recurring agent)"
+   │
+   ├─► Type
+   │   ├─► Content   → architecture.md §4.9.8 + checklist.md §9.9.7
+   │   ├─► SEO       → architecture.md §4.9.8
+   │   ├─► Outreach  → architecture.md §4.9.8 + anti-pattern.md §9.9.9
+   │   └─► Retention → architecture.md §4.9.8
+   │
+   └─► Must have
+       ├─► Persistence → architecture.md §4.9.8
+       ├─► Halt conditions → checklist.md §9.9.7 + architecture.md §4.9.8
+       └─► Observability → architecture.md §4.9.8
+
+"Directory submission"
+   │
+   ├─► Tier selection → best-practice.md §11.4 + checklist.md §9.9.7
+   ├─► Submission plan → checklist.md §9.9.7 (1-2/week)
+   └─► Quality check → checklist.md §9.9.7 + anti-pattern.md §9.9.10
+```
+
+### 11.10 Master Decision Tree (Catch-all)
+
+```
+User request về marketing
+   │
+   ├─► Has specific category keyword? (cro/seo/ads/launch/pricing/...)
+   │   ├─► Yes → jump to relevant §11.1-§11.9
+   │   └─► No  → continue
+   │
+   ├─► Has specific skill slug? (signup-flow-cro, ab-test-setup, ...)
+   │   ├─► Yes → glossary.md §12 (v1.x rename map)
+   │   │
+   │   └─► v2.0 slug → glossary.md §11 routing table
+   │
+   ├─► Has product context loaded? (see glossary.md §13)
+   │   ├─► Yes → execute skill per §11.X
+   │   └─► No  → read .agents/product-marketing.md first
+   │           (if missing: ask 3 minimal questions, scaffold)
+   │
+   └─► Apply pre-flight blocker check (checklist.md §9.10)
+       ├─► Pass → execute
+       └─► Fail → surface blockers to user
+```
+
+---
+
+## 12. Routing Performance Notes
+
+- Mỗi routing step < 100ms (lookup section, no file creation)
+- Decision tree compiled once into Python module `cursor_framework/context_router.py` §marketing
+- Edge cases logged in `decisions/marketing/<date>.md` for monthly tuning
+
+---
+
+## 12. Security-Aware Marketing Routing Tree (sync 2026-07-15)
+
+> Bổ sung từ [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) v2.6.0. Mọi marketing task phải pass security gate trước khi execute. Routing tree này xác định security review cần thiết cho mỗi loại marketing work, dựa trên mức độ privacy/compliance exposure. Cross-reference `.cursor/knowledge/marketing/best-practice.md §10`, `.cursor/knowledge/marketing/architecture.md §5`, `.cursor/agents/security-auditor.md`.
+
+### 12.1 Pre-execution Security Gate (BẮT BUỘC)
+
+**Trước khi execute bất kỳ marketing skill nào, hỏi 5 câu security screening:**
+
+```
+Marketing task → Security gate
+   │
+   ├─► Q1: Touches user data? (PII, accounts, behavior)
+   │    ├─► Yes → apply §10 best-practice + §5 architecture
+   │    └─► No  → continue
+   │
+   ├─► Q2: Sends to audience? (email, SMS, push, ads)
+   │    ├─► Yes → apply email/SMS/ad security (§10.3, §10.5)
+   │    └─► No  → continue
+   │
+   ├─► Q3: Tracks user behavior? (analytics, pixel, session)
+   │    ├─► Yes → apply consent-aware tracking (§10.2 + §5.3)
+   │    └─► No  → continue
+   │
+   ├─► Q4: Crosses regional boundaries? (EU, CA, BR, CN, VN, ...)
+   │    ├─► Yes → apply regional compliance (§10.3 — GDPR/CCPA/LGPD/PIPL/PDPD)
+   │    └─► No  → continue
+   │
+   ├─► Q5: Uses AI / automation / external LLM?
+   │    ├─► Yes → apply AI marketing security (§10.13)
+   │    └─► No  → continue
+   │
+   └─► All 5 cleared (or mitigated) → execute
+```
+
+### 12.2 Skill-Specific Security Routing
+
+```
+"Setup tracking" / "add analytics"
+   │
+   ├─► What platform? GA4, Mixpanel, Amplitude, Segment
+   │    └─► For each: consent-aware SDK init (§5.3) + IP anonymization
+   │
+   ├─► Server-side or client-side?
+   │    ├─► Server-side → preferred (§5.8)
+   │    └─► Client-side → requires consent gate before SDK load
+   │
+   └─► Data warehouse integration?
+        └─► PII segregation (§5.11)
+
+"Build landing page"
+   │
+   ├─► Has form?
+   │    ├─► Yes → consent UI on form (anti-pattern.md §10.5.2)
+   │    │        + privacy policy link above submit (checklist.md §10.6)
+   │    └─► No  → continue
+   │
+   ├─► Has tracking pixel?
+   │    └─► Consent-mode integration required (best-practice.md §10.2)
+   │
+   └─► Targets EU/CA?
+        └─► GDPR/CCPA compliance check (checklist.md §10.4)
+
+"Write email campaign"
+   │
+   ├─► List source?
+   │    ├─► Opt-in list → proceed (verify opt-in date + method)
+   │    ├─► Purchased → REJECT (anti-pattern.md §1.1)
+   │    └─► Imported → verify consent transferability (GDPR)
+   │
+   ├─► Authentication setup?
+   │    ├─► SPF/DKIM/DMARC verified → proceed
+   │    └─► Not verified → BLOCK launch, fix auth first
+   │
+   ├─► Has unsubscribe?
+   │    ├─► One-click (RFC 8058) → proceed
+   │    └─► Multi-step → FIX (CAN-SPAM violation)
+   │
+   └─► Sender identity clear?
+        ├─► Yes → proceed
+        └─► No  → FIX (CAN-SPAM/CASL/GDPR)
+
+"Setup paid ads"
+   │
+   ├─► Has substantiated claims?
+   │    ├─► All claims verified → proceed
+   │    └─► Unverified claims → REMOVE (FTC, EU UCPD)
+   │
+   ├─► Has ad disclosure?
+   │    ├─► "Ad"/"Sponsored" prominent → proceed
+   │    └─► Hidden → FIX (FTC, EU UCPD)
+   │
+   ├─► Conversion tracking?
+   │    ├─► Server-side (CAPI) preferred → proceed
+   │    └─► Pixel only → ADD server-side for iOS 14.5+ accuracy
+   │
+   ├─► Customer data upload?
+   │    └─► Hash PII (SHA-256) before upload (best-practice.md §10.5)
+   │
+   └─► Geographic restrictions?
+        └─► EU: respect UCPD; CA: LDU flag; alcohol/gambling: certifications
+
+"Optimize signup flow"
+   │
+   ├─► Consent collection point?
+   │    ├─► Pre-checked → REJECT (GDPR Art. 7)
+   │    ├─► Unchecked with clear language → proceed
+   │    └─► No consent collection → ADD consent step
+   │
+   ├─► Data minimization?
+   │    └─► Remove non-essential fields (best-practice.md §10.6)
+   │
+   └─► Cancellation parity?
+        └─► Same friction as signup (FTC Click-to-Cancel Rule)
+
+"Setup churn prevention"
+   │
+   ├─► Save offer pre-checked?
+   │    ├─► Yes → REJECT (dark pattern, GDPR/EDPB)
+   │    └─► No  → proceed
+   │
+   ├─► Cancellation flow?
+   │    ├─► 1-click in-app → proceed
+   │    └─► Phone-only or multi-step → FIX (FTC, EU CRD)
+   │
+   ├─► Dunning emails?
+   │    └─► Respectful language (anti-pattern.md §10.10.3)
+   │
+   └─► Data deletion after cancel?
+        └─► Honor trong 30 days (GDPR Art. 17, CCPA)
+
+"Build pricing page"
+   │
+   ├─► All-in price shown early?
+   │    ├─► Yes → proceed
+   │    └─► No  → FIX (FTC, EU UCPD — drip pricing violation)
+   │
+   ├─► Hidden fees?
+   │    └─► No hidden fees → proceed
+   │
+   └─► Auto-renewal disclosed?
+        ├─► Clear trial end date → proceed
+        └─► Hidden auto-renew → FIX (FTC, Restore Online Shoppers' Confidence Act)
+
+"Customer research" / "interview customers"
+   │
+   ├─► Recording?
+   │    ├─► Written consent before recording → proceed
+   │    └─► No consent → BLOCK recording
+   │
+   ├─► Sensitive topics? (health, finance, children)
+   │    └─► Extra protections + IRB review
+   │
+   ├─► Incentive?
+   │    └─► Reasonable ($25-100/hour)
+   │
+   └─► Data handling?
+        └─► Anonymized outputs, 12-month retention (best-practice.md §10.6)
+
+"Run cold email campaign"
+   │
+   ├─► List source?
+   │    ├─► Opt-in / first-party → proceed (verify)
+   │    └─► Purchased / scraped → REJECT (CAN-SPAM, GDPR)
+   │
+   ├─► Sender authentication?
+   │    └─► SPF/DKIM/DMARC verified
+   │
+   ├─► Physical address in footer?
+   │    └─► Yes → proceed
+   │
+   └─► Unsubscribe mechanism?
+        └─► One-click (CAN-SPAM)
+
+"Launch new product / feature"
+   │
+   ├─► Collects new PII?
+   │    └─► DPIA if high-risk (GDPR Art. 35)
+   │
+   ├─► Targets minors?
+   │    └─► COPPA / GDPR-K compliance + parental consent
+   │
+   ├─► Uses AI for content?
+   │    └─► AI disclosure (FTC, EU AI Act)
+   │
+   └─► Crisis comms ready?
+        └─► Pre-approved hold statements, status page, spokesperson
+
+"Setup webhook integration"
+   │
+   ├─► Signature verification?
+   │    └─► HMAC-SHA256 (architecture.md §5.10)
+   │
+   ├─► Replay protection?
+   │    └─► Timestamp + nonce
+   │
+   ├─► Secret management?
+   │    └─► Env var, not code; 90-day rotation
+   │
+   └─► TLS enforced?
+        └─► HTTPS only, TLS 1.2+
+
+"Build AI marketing tool"
+   │
+   ├─► Public LLM used?
+   │    └─► Anonymize PII before send; enterprise tier preferred
+   │
+   ├─► Hallucination risk?
+   │    └─► Human-in-loop for facts, citations, statistics
+   │
+   ├─► Prompt injection surface?
+   │    └─► Input validation, output sanitization
+   │
+   └─► Disclosure required?
+        └─► AI-generated content labeled
+
+"Setup analytics dashboard"
+   │
+   ├─► User identifiers exposed?
+   │    └─► No raw PII; aggregate only; role-based access
+   │
+   ├─► Cross-team sharing?
+   │    └─► DPA + technical safeguards
+   │
+   └─► Retention?
+        └─► 14 months default; configurable
+
+"Use customer data for ads"
+   │
+   ├─► Consent for ad targeting?
+   │    └─► Verified per-purpose
+   │
+   ├─► PII handling?
+   │    └─► Hash before upload (SHA-256 + salt)
+   │
+   ├─► Sensitive segments?
+   │    └─► No discrimination (Civil Rights Act, EU AI Act)
+   │
+   └─► CCPA California users?
+        └─► LDU flag enabled
+
+"Public relations / press outreach"
+   │
+   ├─► Embargo respected?
+   │    └─► Verify before publishing
+   │
+   ├─► Source verification?
+   │    └─► All facts verified before publication
+   │
+   ├─► Crisis comms plan ready?
+   │    └─► Pre-approved spokesperson, hold statements
+   │
+   └─► Material non-public info?
+        └─► Reg FD compliance (public companies)
+```
+
+### 12.3 Security Severity Classification
+
+**Mỗi marketing task có security severity rating:**
+
+| Severity | Definition | Examples | Required review |
+|---|---|---|---|
+| **CRITICAL** | Direct PII handling, regulated data, vulnerable populations | Health data, children, financial, EU PII at scale | Full security review + DPO + legal |
+| **HIGH** | Behavioral tracking, paid ads with targeting, mass email | Meta CAPI setup, retargeting campaigns, life-cycle emails | Security review + checklist §11 |
+| **MEDIUM** | Public content with tracking, A/B testing, basic analytics | Landing page with form, email signup, content marketing | Checklist §11 + best-practice §10 |
+| **LOW** | Public content, no tracking, no PII | Blog post, public docs, static landing | Best-practice §10 light review |
+
+### 12.4 Routing Decision Matrix
+
+**When to invoke security-auditor vs. marketing-strategist vs. both:**
+
+| Marketing task | Primary | Secondary | Note |
+|---|---|---|---|
+| Landing page with form | ui-designer | security-auditor | Form has consent + tracking |
+| Email campaign | marketing-strategist | security-auditor | SPF/DKIM/DMARC critical |
+| Paid ads | marketing-strategist | security-auditor | CAPI, LDU, claims review |
+| Analytics setup | marketing-strategist | security-auditor | Consent-mode, IP anonymization |
+| Cookie banner | ui-designer | security-auditor | GDPR/CCPA parity |
+| Pricing page | ui-designer | security-auditor | Hidden fees + auto-renewal |
+| Cancellation flow | ui-designer | security-auditor | FTC Click-to-Cancel |
+| Customer research | doc-writer | security-auditor | Recording consent + IRB |
+| Webhook integration | backend-reviewer | security-auditor | Signed + replay protection |
+| AI marketing tool | code-reviewer | security-auditor | Prompt injection + PII |
+| App launch | deployment-engineer | security-auditor + marketing-strategist | Compliance + crisis comms |
+| Schema markup | seo-specialist | security-auditor | No PII in structured data |
+
+### 12.5 Auto-Detection Patterns (cho AI routing)
+
+**Keywords that auto-trigger security review:**
+
+```yaml
+triggers:
+  gdpr: critical
+  ccpa: critical
+  lgpd: critical
+  pipl: critical
+  consent: critical
+  cookie banner: critical
+  cookie consent: critical
+  gdpr compliance: critical
+  ccpa compliance: critical
+  privacy policy: high
+  data retention: high
+  right to deletion: high
+  right to be forgotten: high
+  data subject request: high
+  
+  email campaign: high
+  email authentication: high
+  spf: high
+  dkim: high
+  dmarc: high
+  
+  paid ads: high
+  meta pixel: high
+  meta capi: high
+  tiktok pixel: high
+  google ads: high
+  customer match: high
+  
+  conversion api: high
+  enhanced conversions: high
+  ld flag: high
+  limited data use: high
+  
+  dark pattern: critical
+  roach motel: critical
+  confirmshaming: critical
+  
+  webhook: medium
+  signature verification: medium
+  
+  analytics: medium
+  tracking: medium
+  pixel: medium
+  consent mode: medium
+  
+  ai marketing: medium
+  llm: medium
+  openai: medium
+  anthropic: medium
+  
+  auto-renewal: high
+  free trial: high
+  cancellation: high
+  click-to-cancel: high
+  drip pricing: high
+  
+  recording consent: high
+  interview consent: high
+  research ethics: high
+```
+
+### 12.6 Escalation Paths
+
+**When security review finds issues:**
+
+```
+Security issue found
+   │
+   ├─► Severity: CRITICAL
+   │    └─► BLOCK launch
+   │         ├─► Notify user: "Cannot ship, security blocker"
+   │         ├─► Recommend: invoke security-auditor agent
+   │         └─► Reference: specific anti-pattern / law
+   │
+   ├─► Severity: HIGH
+   │    └─► Recommend fix before launch
+   │         ├─► Provide: specific fix steps
+   │         ├─► Reference: best-practice §10.X
+   │         └─► Verify: after fix, re-run pre-flight
+   │
+   ├─► Severity: MEDIUM
+   │    └─► Document + recommend fix
+   │         └─► Allow launch with disclosure
+   │
+   └─► Severity: LOW
+        └─► Log + monitor
+```
+
+### 12.7 Security Review Checklist (Before Skill Execution)
+
+```
+[ ] Q1: Touches user data? → §10 best-practice + §5 architecture applied
+[ ] Q2: Sends to audience? → §10.3 / §10.5 applied
+[ ] Q3: Tracks behavior? → consent-aware SDK + IP anonymization
+[ ] Q4: Crosses regions? → GDPR / CCPA / LGPD / PIPL / PDPD check
+[ ] Q5: Uses AI? → §10.13 applied (PII to LLM, hallucination guard)
+[ ] Severity classified (CRITICAL / HIGH / MEDIUM / LOW)
+[ ] Reviewer assigned (security-auditor for HIGH+)
+[ ] Compliance documents current (privacy policy, DPA list)
+[ ] Incident response plan in place
+[ ] Audit log will capture this action
+```
+
+---
+
+## 12.8 Kết nối với file khác
+
+- **Best practice** (`best-practice.md §10`): marketing security best practices
+- **Anti-pattern** (`anti-pattern.md §10`): marketing security anti-patterns
+- **Checklist** (`checklist.md §11`): pre-launch security checklist
+- **Architecture** (`architecture.md §5`): privacy-by-design architecture
+- **FAQ** (`faq.md §10`): marketing security FAQs
+- **Glossary** (`glossary.md §14`): marketing security terms
+- **Cross-rule**: `.cursor/rules/security.mdc`, `.cursor/agents/security-auditor.md`

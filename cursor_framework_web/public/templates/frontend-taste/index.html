@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Frontend Taste & Craft — Anti-Slop Landing & 57 Gates</title>
+<meta name="description" content="Giao diện chuẩn Craft, chống AI-slop theo triết lý Linear/Apple. Tối ưu 3 Dials (Variance, Motion, Density), tuân thủ 57 slop-test gates và typography Geist." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body class="taste-theme">
+
+<!-- ─── HEADER (FULL WIDTH) ─── -->
+<header class="t-nav">
+  <div class="t-nav-inner">
+    <a href="#" class="t-logo">
+      <span class="t-mark"></span>
+      <span class="t-brand">Frontend<span class="t-hl">Taste</span></span>
+    </a>
+
+    <!-- Desktop Nav -->
+    <div class="t-menu">
+      <a href="#gates">57 Slop-Test Gates</a>
+      <a href="#bento">Asymmetric Bento</a>
+      <a href="#typography">Geist Craft</a>
+    </div>
+
+    <!-- Desktop CTAs -->
+    <div class="t-nav-cta">
+      <a href="https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR" target="_blank" rel="noopener" class="t-btn-outline">
+        <i class="ph ph-github-logo"></i>
+        <span>GitHub</span>
+      </a>
+      <a href="#dials" class="t-btn-solid">
+        <i class="ph ph-sliders"></i>
+        <span>Cân Chỉnh Dials</span>
+      </a>
+    </div>
+
+    <!-- Mobile Hamburger Button -->
+    <button class="t-mobile-toggle" id="taste-menu-toggle" aria-label="Mở menu điều hướng">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ─── MOBILE DRAWER & BACKDROP ─── -->
+<div class="t-mobile-drawer" id="taste-drawer" role="dialog" aria-modal="true" aria-label="Menu điều hướng">
+  <div class="t-drawer-header">
+    <a href="#" class="t-logo">
+      <span class="t-mark"></span>
+      <span class="t-brand">Frontend<span class="t-hl">Taste</span></span>
+    </a>
+    <button class="t-drawer-close" id="taste-drawer-close" aria-label="Đóng menu">
+      <i class="ph ph-x"></i>
+    </button>
+  </div>
+  <nav class="t-mobile-nav">
+    <a href="#dials" class="t-mobile-nav-link"><i class="ph ph-sliders"></i><span>3 Dials Controller</span></a>
+    <a href="#gates" class="t-mobile-nav-link"><i class="ph ph-shield-check"></i><span>57 Slop-Test Gates</span></a>
+    <a href="#bento" class="t-mobile-nav-link"><i class="ph ph-squares-four"></i><span>Asymmetric Bento</span></a>
+    <a href="#typography" class="t-mobile-nav-link"><i class="ph ph-text-t"></i><span>Geist Craft</span></a>
+  </nav>
+  <div class="t-drawer-actions">
+    <a href="#dials" class="t-btn-solid w-full" id="m-btn-dials">
+      <i class="ph ph-sliders"></i>
+      <span>Cân Chỉnh 3 Dials Ngay</span>
+    </a>
+  </div>
+</div>
+<div class="t-mobile-backdrop" id="taste-backdrop"></div>
+
+<!-- ─── HERO SECTION ─── -->
+<section class="t-hero">
+  <div class="t-container">
+    <div class="t-hero-tag">
+      <span class="t-pulse"></span>
+      <span>Anti-Slop Edition · Synthesizing Impeccable & Hallmark</span>
+    </div>
+
+    <h1 class="t-hero-title">
+      Xóa bỏ vệt màu AI sáo rỗng.<br/>
+      <span class="t-hero-gradient">Nâng tầm nghệ thuật Frontend Craft.</span>
+    </h1>
+
+    <p class="t-hero-sub">
+      Không gradient tím lòe loẹt ở giữa màn hình. Không 3 thẻ card giống hệt nhau.
+      Mỗi chi tiết đều được tinh chỉnh bằng 3 thước đo: Variance (Bất đối xứng), Motion (Độ nảy vật lý) và Visual Density (Mật độ thông tin).
+    </p>
+
+    <div class="t-hero-actions">
+      <a href="#dials" class="t-btn-hero">Trải nghiệm tương tác 3 Dials</a>
+      <div class="t-hero-rating">
+        <div class="t-stars"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
+        <span>Đạt giải thưởng Thiết kế & 100/100 Lighthouse</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SECTION: 3 DIALS CONTROLLER ─── -->
+<section class="t-section" id="dials">
+  <div class="t-container">
+    <div class="t-section-head">
+      <span class="t-eyebrow">INTERACTIVE CONTROLLER</span>
+      <h2 class="t-title">Bộ 3 Thước Đo Kiểm Soát Thẩm Mỹ</h2>
+      <p class="t-desc">Kéo thử thanh trượt bên dưới để cảm nhận sự thay đổi nhịp điệu của giao diện.</p>
+    </div>
+
+    <div class="dials-panel">
+      <!-- Dial 1 -->
+      <div class="dial-control">
+        <div class="dial-head">
+          <div>
+            <strong>1. VARIANCE (Độ Bất Đối Xứng)</strong>
+            <span>1 = Đối xứng tuyệt đối · 8 = Offset tinh tế · 10 = Phá cách</span>
+          </div>
+          <span class="dial-val" id="val-variance">8 / 10</span>
+        </div>
+        <input type="range" min="1" max="10" value="8" id="slider-variance" class="dial-range" />
+      </div>
+
+      <!-- Dial 2 -->
+      <div class="dial-control">
+        <div class="dial-head">
+          <div>
+            <strong>2. MOTION INTENSITY (Chuyển Động)</strong>
+            <span>1 = Tĩnh · 6 = Fluid CSS / Spring · 10 = Cinematic Physics</span>
+          </div>
+          <span class="dial-val" id="val-motion">6 / 10</span>
+        </div>
+        <input type="range" min="1" max="10" value="6" id="slider-motion" class="dial-range" />
+      </div>
+
+      <!-- Dial 3 -->
+      <div class="dial-control">
+        <div class="dial-head">
+          <div>
+            <strong>3. VISUAL DENSITY (Mật Độ Thị Giác)</strong>
+            <span>1 = Không gian triển lãm · 4 = Daily App · 10 = Cockpit Dense</span>
+          </div>
+          <span class="dial-val" id="val-density">4 / 10</span>
+        </div>
+        <input type="range" min="1" max="10" value="4" id="slider-density" class="dial-range" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SECTION: ASYMMETRIC BENTO GRID ─── -->
+<section class="t-section bg-subtle" id="bento">
+  <div class="t-container">
+    <div class="t-section-head">
+      <span class="t-eyebrow">LAYOUT DIVERSITY</span>
+      <h2 class="t-title">Bento Grid Không Đối Xứng</h2>
+      <p class="t-desc">Loại bỏ cấu trúc 3 cột truyền thống bằng bố cục lệch trục tự nhiên.</p>
+    </div>
+
+    <div class="bento-container" id="bento-box">
+      <!-- Big Feature -->
+      <div class="bento-item bento-hero">
+        <div class="bento-tag">CORE CRAFT</div>
+        <h3>Typography Hierarchy & Font Pairing</h3>
+        <p>Phối hợp hoàn hảo giữa Geist Sans (tiêu đề siêu sắc nét, tracking âm -0.03em) và Geist Mono (cho số liệu kỹ thuật, mã code và badges).</p>
+        <div class="bento-preview-type">
+          <div class="type-h1">The craft of modern engineering.</div>
+          <div class="type-meta">font-feature-settings: "cv02", "cv03", "cv04", "cv11";</div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="bento-item">
+        <div class="bento-tag">SURFACE LIGHT</div>
+        <h3>Refined Micro-Interactions</h3>
+        <p>Ánh sáng bề mặt phản chiếu theo góc nhìn tự nhiên, không dùng bóng đổ đen thô cứng.</p>
+        <div class="micro-btn-demo">
+          <button class="craft-btn">Hover to feel surface light</button>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="bento-item">
+        <div class="bento-tag">SPATIAL RHYTHM</div>
+        <h3>Nhịp Điệu Khoảng Trắng</h3>
+        <p>Khoảng cách giữa các khối luôn tuân thủ tỷ lệ vàng 8pt/16pt/24pt/32pt/48pt.</p>
+        <div class="rhythm-bars">
+          <div class="r-bar" style="width: 25%;">8px</div>
+          <div class="r-bar" style="width: 50%;">16px</div>
+          <div class="r-bar" style="width: 75%;">24px</div>
+        </div>
+      </div>
+
+      <!-- Card 4 Wide -->
+      <div class="bento-item bento-wide">
+        <div class="bento-tag">ZERO PLACEHOLDER</div>
+        <h3>100% Nội Dung & Dữ Liệu Thật</h3>
+        <p>Không dùng "Lorem Ipsum", không dùng skeleton rỗng vô tận. Mọi nhãn nút, tiêu đề và số liệu đều có chủ đích kinh doanh thực tế.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SECTION: 57 SLOP-TEST GATES ─── -->
+<section class="t-section" id="gates">
+  <div class="t-container">
+    <div class="t-section-head">
+      <span class="t-eyebrow">QUALITY ASSURANCE</span>
+      <h2 class="t-title">57 Slop-Test Gates (Hallmark Standard)</h2>
+      <p class="t-desc">Bảng kiểm định chất lượng tự động chặn mọi thói quen xấu của AI trước khi bàn giao mã nguồn.</p>
+    </div>
+
+    <div class="gates-grid">
+      <div class="gate-item">
+        <div class="gate-status"><i class="ph-fill ph-check-circle"></i></div>
+        <div class="gate-text">
+          <strong>Cấm Gradient Tím Ở Giữa Hero</strong>
+          <span>Không dùng radial-gradient tím neon làm nền che lấp nội dung chính.</span>
+        </div>
+      </div>
+
+      <div class="gate-item">
+        <div class="gate-status"><i class="ph-fill ph-check-circle"></i></div>
+        <div class="gate-text">
+          <strong>Cấm 3 Feature Cards Ngang Nhau</strong>
+          <span>Phải phân cấp thẻ chính (diện tích 60%) và thẻ phụ (40%) để tạo nhịp điệu.</span>
+        </div>
+      </div>
+
+      <div class="gate-item">
+        <div class="gate-status"><i class="ph-fill ph-check-circle"></i></div>
+        <div class="gate-text">
+          <strong>Cấm Glassmorphism Tràn Lan</strong>
+          <span>Chỉ áp dụng hiệu ứng blur ở Header và Modal popover nổi, không áp dụng lên thẻ tĩnh.</span>
+        </div>
+      </div>
+
+      <div class="gate-item">
+        <div class="gate-status"><i class="ph-fill ph-check-circle"></i></div>
+        <div class="gate-text">
+          <strong>Cấm Icon Trộn Lẫn Thư Viện</strong>
+          <span>Đồng bộ duy nhất 1 thư viện (Phosphor Icons) với stroke-width đồng nhất 1.5 - 2px.</span>
+        </div>
+      </div>
+
+      <div class="gate-item">
+        <div class="gate-status"><i class="ph-fill ph-check-circle"></i></div>
+        <div class="gate-text">
+          <strong>Tỷ Lệ Tương Phản Đạt WCAG AA</strong>
+          <span>Chữ phụ tối thiểu tương phản 4.5:1, chữ chính đạt từ 8:1 đến 12:1 trên nền tối.</span>
+        </div>
+      </div>
+
+      <div class="gate-item">
+        <div class="gate-status"><i class="ph-fill ph-check-circle"></i></div>
+        <div class="gate-text">
+          <strong>Giới Hạn Tiêu Đề Dưới 2 Dòng</strong>
+          <span>Tránh câu cú dài dòng của AI; thông điệp xúc tích, trực diện, dễ nhớ.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer class="t-footer">
+  <div class="t-container t-footer-inner">
+    <div>
+      <strong>Frontend Taste & Craft</strong> · Nutlope Hallmark Edition 2026
+    </div>
+    <div class="t-footer-links">
+      <a href="#dials">Dials</a>
+      <a href="#gates">57 Gates</a>
+      <a href="#bento">Bento Grid</a>
+      <a href="/templates">Kho Templates</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Dynamic Dial listeners
+  const sVariance = document.getElementById('slider-variance');
+  const sMotion = document.getElementById('slider-motion');
+  const sDensity = document.getElementById('slider-density');
+
+  if (sVariance) {
+    sVariance.addEventListener('input', (e) => {
+      document.getElementById('val-variance').textContent = e.target.value + ' / 10';
+    });
+  }
+
+  if (sMotion) {
+    sMotion.addEventListener('input', (e) => {
+      document.getElementById('val-motion').textContent = e.target.value + ' / 10';
+    });
+  }
+
+  if (sDensity) {
+    sDensity.addEventListener('input', (e) => {
+      document.getElementById('val-density').textContent = e.target.value + ' / 10';
+    });
+  }
+
+  // Mobile Drawer Toggle
+  const tasteToggle = document.getElementById('taste-menu-toggle');
+  const tasteClose = document.getElementById('taste-drawer-close');
+  const tasteDrawer = document.getElementById('taste-drawer');
+  const tasteBackdrop = document.getElementById('taste-backdrop');
+  const tasteMobileLinks = document.querySelectorAll('.t-mobile-nav-link, #m-btn-dials');
+
+  function openTasteDrawer() {
+    tasteDrawer.classList.add('open');
+    tasteBackdrop.classList.add('open');
+    tasteToggle.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeTasteDrawer() {
+    tasteDrawer.classList.remove('open');
+    tasteBackdrop.classList.remove('open');
+    tasteToggle.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  if (tasteToggle) tasteToggle.addEventListener('click', () => {
+    if (tasteDrawer.classList.contains('open')) closeTasteDrawer();
+    else openTasteDrawer();
+  });
+
+  if (tasteClose) tasteClose.addEventListener('click', closeTasteDrawer);
+  if (tasteBackdrop) tasteBackdrop.addEventListener('click', closeTasteDrawer);
+  tasteMobileLinks.forEach(link => link.addEventListener('click', closeTasteDrawer));
+</script>
+
+</body>
+</html>

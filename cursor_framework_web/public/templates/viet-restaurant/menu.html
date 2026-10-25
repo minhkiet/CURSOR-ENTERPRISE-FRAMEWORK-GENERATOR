@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thực Đơn Di Sản 3 Miền — Vị Xưa Quán (Michelin Selected)</title>
+  <meta name="description" content="Thực đơn di sản 120+ món ăn truyền thống 3 miền Bắc - Trung - Nam: Cơm niêu cháy giòn 2 mặt, cá bống kho tộ, bún chả than hoa, canh cua đồng. Michelin Selected." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="menu-page-body">
+
+  <!-- ─── TOP NOTICE BAR ─── -->
+  <aside class="top-bar">
+    <div class="container top-bar-inner">
+      <div class="top-left">
+        <span class="badge-status"><span class="pulse-dot"></span> Bếp Đang Phục Vụ (10:00 – 22:30)</span>
+        <span class="sep"></span>
+        <a href="tel:19008899" class="hotline-link">
+          <i class="ph-fill ph-phone-call"></i> Hotline Đặt Bàn: <strong>1900 8899</strong>
+        </a>
+      </div>
+      <div class="top-right">
+        <span class="promo-text"><i class="ph-fill ph-gift"></i> Tặng Voucher Giảm 15% cho hóa đơn đặt món trước</span>
+        <span class="sep hide-mobile"></span>
+        <a href="reservation.html" class="voucher-link hide-mobile"><i class="ph ph-calendar-check"></i> Đặt Bàn VIP</a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ─── HEADER & NAVIGATION ─── -->
+  <header class="navbar" id="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="brand-logo" aria-label="Vị Xưa Quán">
+        <div class="brand-pot-icon">
+          <svg viewBox="0 0 40 40" fill="none">
+            <circle cx="20" cy="20" r="18" fill="#451a03" stroke="#b45309" stroke-width="1.5"/>
+            <path d="M12 22C12 26 15.5 29 20 29C24.5 29 28 26 28 22H12Z" fill="#d97706"/>
+            <ellipse cx="20" cy="20" rx="9" ry="2.5" fill="#fef3c7"/>
+            <path d="M17 14C17 12 18 10 20 9C20 12 22 13 22 15" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M14 16C14 14.5 15 13 16 12" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">Vị Xưa <span class="brand-accent">Quán</span></span>
+          <span class="brand-tagline">Cơm Niêu & Ẩm Thực Cổ Truyền</span>
+        </div>
+      </a>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html" class="nav-item">Trang Chủ</a>
+        <a href="menu.html" class="nav-item active">Thực Đơn Di Sản</a>
+        <a href="reservation.html" class="nav-item">Đặt Bàn & Phòng VIP</a>
+        <a href="index.html#about" class="nav-item">Câu Chuyện Vị Xưa</a>
+        <a href="index.html#vouchers" class="nav-item">Voucher 15%</a>
+        <a href="index.html#branches" class="nav-item">Chi Nhánh</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="reservation.html" class="btn btn-primary btn-sm">
+          <i class="ph ph-calendar-check"></i> Đặt Bàn Ngay
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── MENU HERO ─── -->
+  <section class="menu-hero-section">
+    <div class="container text-center">
+      <div class="hero-award-badge" style="margin: 0 auto 16px;">
+        <i class="ph-fill ph-trophy"></i>
+        <span>Michelin Selected 2024 – 2026 • 120+ Món Ăn Di Sản</span>
+      </div>
+      <h1 class="menu-hero-title">
+        Thực Đơn Di Sản 3 Miền <br />
+        <span class="text-serif">Trọn Vẹn Tinh Hoa Mâm Cơm Việt Nam</span>
+      </h1>
+      <p class="menu-hero-desc">
+        Mỗi món ăn tại Vị Xưa là một lát cắt văn hóa ẩm thực được gìn giữ qua 3 đời: Gạo Séng Cù nương cao Mường Lò, cá bống sông Trà quánh kẹo mật mía làng Găng, cua đồng tươi giã tay đượm bùi ngọt thanh.
+      </p>
+
+      <!-- Category Filter Tabs -->
+      <div class="menu-filter-bar">
+        <button class="menu-cat-btn active" onclick="filterMenu('all', this)">
+          <i class="ph ph-squares-four"></i> Tất Cả (48 Món)
+        </button>
+        <button class="menu-cat-btn" onclick="filterMenu('mam-com', this)">
+          <i class="ph ph-cooking-pot"></i> Mâm Cơm Di Sản
+        </button>
+        <button class="menu-cat-btn" onclick="filterMenu('khai-vi', this)">
+          <i class="ph ph-salad"></i> Khai Vị & Gỏi
+        </button>
+        <button class="menu-cat-btn" onclick="filterMenu('com-nieu', this)">
+          <i class="ph ph-bowl-food"></i> Cơm Niêu & Kho Tộ
+        </button>
+        <button class="menu-cat-btn" onclick="filterMenu('hai-san', this)">
+          <i class="ph ph-fish"></i> Hải Sản Sông Đồng
+        </button>
+        <button class="menu-cat-btn" onclick="filterMenu('canh-rau', this)">
+          <i class="ph ph-plant"></i> Canh & Rau Mùa
+        </button>
+        <button class="menu-cat-btn" onclick="filterMenu('trang-mieng', this)">
+          <i class="ph ph-coffee"></i> Tráng Miệng & Trà
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── MENU ITEMS GRID ─── -->
+  <section class="menu-grid-section">
+    <div class="container">
+      <div class="menu-cards-grid" id="menuCardsGrid">
+
+        <!-- Item 1: Mâm Cơm Sum Vầy (Signature) -->
+        <article class="dish-card" data-category="mam-com">
+          <div class="dish-thumb-wrap">
+            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80" alt="Mâm Cơm Sum Vầy" loading="eager" />
+            <span class="dish-badge gold"><i class="ph-fill ph-crown"></i> Signature Michelin</span>
+          </div>
+          <div class="dish-body">
+            <div class="dish-header">
+              <h3 class="dish-name">Đại Mâm Cơm Di Sản Sum Vầy</h3>
+              <span class="dish-price">890.000 đ</span>
+            </div>
+            <p class="dish-desc">
+              Gồm 2 thố cơm niêu cháy giòn 2 mặt, cá bống sông Trà kho tộ, thịt ba chỉ cháy cạnh ram sả, canh cua đồng mồng tơi cà pháo và đĩa rau luộc chấm kho quẹt tôm thịt.
+            </p>
+            <div class="dish-meta">
+              <span class="dish-tag">Khẩu phần: 4–6 khách</span>
+              <span class="dish-tag green">100% Nguyên liệu đồng quê</span>
+            </div>
+            <button class="btn btn-add-dish" onclick="addToTray('Đại Mâm Cơm Di Sản Sum Vầy', 890000)">
+              <i class="ph-bold ph-plus"></i> Thêm Vào Mâm Cơm
+            </button>
+          </div>
+        </article>
+
+        <!-- Item 2: Cơm Niêu Cháy Giòn 2 Mặt -->
+        <article class="dish-card" data-category="com-nieu">
+          <div class="dish-thumb-wrap">
+            <img src="https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=600&q=80" alt="Cơm Niêu Cháy Giòn" loading="eager" />
+            <span class="dish-badge"><i class="ph-fill ph-fire"></i> Món Tinh Hoa</span>
+          </div>
+          <div class="dish-body">
+            <div class="dish-header">
+              <h3 class="dish-name">Cơm Niêu Đất Séng Cù Cháy 2 Mặt</h3>
+              <span class="dish-price">65.000 đ</span>
+            </div>
+            <p class="dish-desc">
+              Nấu từ gạo Séng Cù Mường Lò dẻo thơm trong niêu đất nung Bình Dương, vần than củi đượm lửa tạo lớp cháy vàng ruộm giòn tan như cốm, chấm mỡ hành và kho quẹt.
+            </p>
+            <div class="dish-meta">
+              <span class="dish-tag">Gạo tiến vua</span>
+              <span class="dish-tag gold">Cháy giòn 2 mặt</span>
+            </div>
+            <button class="btn btn-add-dish" onclick="addToTray('Cơm Niêu Đất Séng Cù', 65000)">
+              <i class="ph-bold ph-plus"></i> Thêm Vào Mâm Cơm
+            </button>
+          </div>
+        </article>
+
+        <!-- Item 3: Cá Bống Sông Trà Kho Tộ -->
+        <article class="dish-card" data-category="com-nieu">
+          <div class="dish-thumb-wrap">
+            <img src="https://images.unsplash.com/photo-1559847844-5315695dadae?auto=format&fit=crop&w=600&q=80" alt="Cá Bống Kho Tộ" loading="lazy" />
+            <span class="dish-badge orange">Đặc sản Quảng Ngãi</span>
+          </div>
+          <div class="dish-body">
+            <div class="dish-header">
+              <h3 class="dish-name">Cá Bống Sông Trà Kho Tộ Kẹo Mật</h3>
+              <span class="dish-price">185.000 đ</span>
+            </div>
+            <p class="dish-desc">
+              Cá bống cát đánh bắt tự nhiên từ sông Trà Khúc, kho tộ trong niêu đất cùng mật mía Nghệ An, ớt xiêm xanh và hạt tiêu sọ Phú Quốc thơm nồng đưa cơm.
+            </p>
+            <div class="dish-meta">
+              <span class="dish-tag">Cá tự nhiên</span>
+              <span class="dish-tag">Kho 4 tiếng</span>
+            </div>
+            <button class="btn btn-add-dish" onclick="addToTray('Cá Bống Sông Trà Kho Tộ', 185000)">
+              <i class="ph-bold ph-plus"></i> Thêm Vào Mâm Cơm
+            </button>
+          </div>
+        </article>
+
+        <!-- Item 4: Canh Cua Đồng Rau Đay Cà Pháo -->
+        <article class="dish-card" data-category="canh-rau">
+          <div class="dish-thumb-wrap">
+            <img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80" alt="Canh Cua Đồng" loading="lazy" />
+            <span class="dish-badge green">Vị Bắc Cổ Truyền</span>
+          </div>
+          <div class="dish-body">
+            <div class="dish-header">
+              <h3 class="dish-name">Canh Cua Đồng Mồng Tơi & Cà Pháo</h3>
+              <span class="dish-price">125.000 đ</span>
+            </div>
+            <p class="dish-desc">
+              Cua đồng tươi giã cối đá lấy trọn vẹn tảng gạch cua béo ngậy ngọt lịm, nấu cùng rau đay mướt hương, mồng tơi mướt non và chén cà pháo giòn rụm chấm mắm tôm nguyên chất.
+            </p>
+            <div class="dish-meta">
+              <span class="dish-tag">Cua đồng giã cối</span>
+              <span class="dish-tag">Kèm cà pháo giòn</span>
+            </div>
+            <button class="btn btn-add-dish" onclick="addToTray('Canh Cua Đồng Rau Đay Cà Pháo', 125000)">
+              <i class="ph-bold ph-plus"></i> Thêm Vào Mâm Cơm
+            </button>
+          </div>
+        </article>
+
+        <!-- Item 5: Gỏi Củ Hũ Dừa Tôm Sông -->
+        <article class="dish-card" data-category="khai-vi">
+          <div class="dish-thumb-wrap">
+            <img src="https://images.unsplash.com/photo-1546069901-d70a30b7c7e6?auto=format&fit=crop&w=600&q=80" alt="Gỏi Củ Hũ Dừa" loading="lazy" />
+            <span class="dish-badge">Đặc sản Bến Tre</span>
+          </div>
+          <div class="dish-body">
+            <div class="dish-header">
+              <h3 class="dish-name">Gỏi Củ Hũ Dừa Tôm Càng Xanh Bến Tre</h3>
+              <span class="dish-price">195.000 đ</span>
+            </div>
+            <p class="dish-desc">
+              Phần đọt non tinh túy của cây dừa giòn ngọt tự nhiên, trộn cùng tôm càng xanh sông Tiền luộc nước dừa, rau răm thơm nồng và nước mắm chua ngọt đặc chế kèm bánh phồng tôm giòn tan.
+            </p>
+            <div class="dish-meta">
+              <span class="dish-tag">Tôm càng xanh</span>
+              <span class="dish-tag">Củ hũ dừa giòn</span>
+            </div>
+            <button class="btn btn-add-dish" onclick="addToTray('Gỏi Củ Hũ Dừa Tôm Càng', 195000)">
+              <i class="ph-bold ph-plus"></i> Thêm Vào Mâm Cơm
+            </button>
+          </div>
+        </article>
+
+        <!-- Item 6: Cá Lăng Nướng Muối Ớt Rừng -->
+        <article class="dish-card" data-category="hai-san">
+          <div class="dish-thumb-wrap">
+            <img src="https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80" alt="Cá Lăng Nướng" loading="lazy" />
+            <span class="dish-badge gold">Đặc Sản Sông Đà</span>
+          </div>
+          <div class="dish-body">
+            <div class="dish-header">
+              <h3 class="dish-name">Cá Lăng Sông Đà Nướng Muối Ớt Rừng</h3>
+              <span class="dish-price">340.000 đ</span>
+            </div>
+            <p class="dish-desc">
+              Phi lê cá lăng tự nhiên chắc thịt không xương dăm, ướp muối hạt dổi rừng, tiêu rừng Tây Bắc rồi nướng trên than hoa đượm khói thơm nức, cuốn bánh tráng rau rừng chấm mắm me.
+            </p>
+            <div class="dish-meta">
+              <span class="dish-tag">Cá Lăng sông tự nhiên</span>
+              <span class="dish-tag">Hạt dổi Tây Bắc</span>
+            </div>
+            <button class="btn btn-add-dish" onclick="addToTray('Cá Lăng Nướng Muối Ớt Rừng', 340000)">
+              <i class="ph-bold ph-plus"></i> Thêm Vào Mâm Cơm
+            </button>
+          </div>
+        </article>
+
+        <!-- Item 7: Bánh Xèo Miền Tây Bông Điên Điển -->
+        <article class="dish-card" data-category="khai-vi">
+          <div class="dish-thumb-wrap">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80" alt="Bánh Xèo Miền Tây" loading="lazy" />
+            <span class="dish-badge orange">Giòn rụm chuẩn vị</span>
+          </div>
+          <div class="dish-body">
+            <div class="dish-header">
+              <h3 class="dish-name">Bánh Xèo Vỏ Giòn Bông Điên Điển</h3>
+              <span class="dish-price">145.000 đ</span>
+            </div>
+            <p class="dish-desc">
+              Vỏ bánh xay từ bột gạo mới pha nước cốt dừa béo bùi, đổ mỏng tang giòn rụm trong chảo gang, nhân tôm đất sông Tiền, thịt ba rọi và hoa điên điển mùa nước nổi.
+            </p>
+            <div class="dish-meta">
+              <span class="dish-tag">Rau rừng 12 loại</span>
+              <span class="dish-tag">Vỏ giòn không dầu</span>
+            </div>
+            <button class="btn btn-add-dish" onclick="addToTray('Bánh Xèo Bông Điên Điển', 145000)">
+              <i class="ph-bold ph-plus"></i> Thêm Vào Mâm Cơm
+            </button>
+          </div>
+        </article>
+
+        <!-- Item 8: Chè Hạt Sen Long Nhãn -->
+        <article class="dish-card" data-category="trang-mieng">
+          <div class="dish-thumb-wrap">
+            <img src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=600&q=80" alt="Chè Hạt Sen Long Nhãn" loading="lazy" />
+            <span class="dish-badge green">Tráng Miệng Cung Đình</span>
+          </div>
+          <div class="dish-body">
+            <div class="dish-header">
+              <h3 class="dish-name">Chè Hạt Sen Tươi Long Nhãn Phố Hiến</h3>
+              <span class="dish-price">55.000 đ</span>
+            </div>
+            <p class="dish-desc">
+              Hạt sen hồ Tịnh Tâm Huế bùi ngọt ninh nhừ lồng khéo léo vào từng múi long nhãn Hưng Yên mọng nước, nấu cùng đường phèn thanh mát và ướp hoa nhài thanh khiết.
+            </p>
+            <div class="dish-meta">
+              <span class="dish-tag">Sen Tịnh Tâm</span>
+              <span class="dish-tag">Đường phèn thanh</span>
+            </div>
+            <button class="btn btn-add-dish" onclick="addToTray('Chè Hạt Sen Long Nhãn', 55000)">
+              <i class="ph-bold ph-plus"></i> Thêm Vào Mâm Cơm
+            </button>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FLOATING MEAL TRAY BAR ─── -->
+  <aside class="floating-tray-bar" id="floatingTray" style="display:none">
+    <div class="container tray-inner">
+      <div class="tray-left">
+        <div class="tray-icon-box">
+          <i class="ph-fill ph-cooking-pot"></i>
+          <span class="tray-counter" id="trayCount">0</span>
+        </div>
+        <div class="tray-text">
+          <strong id="trayTitle">Mâm Cơm Của Bạn (0 món)</strong>
+          <span id="trayDesc">Ước tính đủ dùng cho bữa cơm gia đình</span>
+        </div>
+      </div>
+      <div class="tray-right">
+        <div class="tray-total">
+          <span class="tt-lbl">Tạm tính:</span>
+          <strong class="tt-val" id="trayTotal">0 đ</strong>
+        </div>
+        <button class="btn btn-primary" onclick="proceedToBookingWithMenu()">
+          <i class="ph-fill ph-calendar-check"></i> Đặt Bàn Giữ Chỗ & Món Này
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-col">
+        <div class="brand-text" style="margin-bottom:12px;">
+          <span class="brand-title" style="font-size:22px; color:var(--text-main);">Vị Xưa <span class="brand-accent">Quán</span></span>
+        </div>
+        <p style="color:var(--text-muted); font-size:14px; line-height:1.6;">
+          Gìn giữ mâm cơm di sản 3 miền đạt giải thưởng Michelin Selected 2024–2026.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4 style="color:var(--accent-bright); font-size:15px; margin-bottom:12px;">Các Trang Website</h4>
+        <ul style="list-style:none; display:flex; flex-direction:column; gap:8px; font-size:14px; color:var(--text-muted);">
+          <li><a href="index.html">Trang Chủ & Không Gian</a></li>
+          <li><a href="menu.html" style="color:var(--accent-bright); font-weight:600;">Thực Đơn Di Sản 3 Miền</a></li>
+          <li><a href="reservation.html">Đặt Bàn Trực Tuyến & Phòng VIP</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 style="color:var(--accent-bright); font-size:15px; margin-bottom:12px;">Hotline Đặt Bàn Khẩn Cấp</h4>
+        <strong style="color:var(--accent-bright); font-size:20px; font-family:var(--font-serif);">1900 8899 (24/7)</strong>
+        <p style="color:var(--text-dim); font-size:13px; margin-top:4px;">Miễn phí cước gọi toàn quốc</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+  let selectedItems = [];
+
+  function filterMenu(cat, btn) {
+    document.querySelectorAll('.menu-cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const cards = document.querySelectorAll('.dish-card');
+    cards.forEach(card => {
+      if (cat === 'all' || card.getAttribute('data-category') === cat) {
+        card.style.display = 'flex';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  function addToTray(name, price) {
+    selectedItems.push({ name, price });
+    updateTray();
+    showToast('Đã thêm "' + name + '" vào mâm cơm!');
+  }
+
+  function updateTray() {
+    const tray = document.getElementById('floatingTray');
+    const countEl = document.getElementById('trayCount');
+    const titleEl = document.getElementById('trayTitle');
+    const totalEl = document.getElementById('trayTotal');
+
+    if (selectedItems.length > 0) {
+      tray.style.display = 'block';
+      countEl.innerText = selectedItems.length;
+      titleEl.innerText = 'Mâm Cơm Của Bạn (' + selectedItems.length + ' món đã chọn)';
+      const total = selectedItems.reduce((sum, item) => sum + item.price, 0);
+      totalEl.innerText = total.toLocaleString('vi-VN') + ' đ';
+    } else {
+      tray.style.display = 'none';
+    }
+  }
+
+  function proceedToBookingWithMenu() {
+    const total = selectedItems.reduce((sum, item) => sum + item.price, 0);
+    sessionStorage.setItem('selectedDishes', JSON.stringify(selectedItems));
+    sessionStorage.setItem('dishesTotal', total);
+    window.location.href = 'reservation.html?preorder=true';
+  }
+
+  function showToast(msg) {
+    let toast = document.getElementById('dishToast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'dishToast';
+      toast.style.position = 'fixed';
+      toast.style.bottom = '90px';
+      toast.style.right = '24px';
+      toast.style.background = '#d97706';
+      toast.style.color = '#ffffff';
+      toast.style.padding = '12px 20px';
+      toast.style.borderRadius = '8px';
+      toast.style.boxShadow = '0 8px 24px rgba(0,0,0,0.5)';
+      toast.style.fontWeight = '600';
+      toast.style.fontSize = '14px';
+      toast.style.zIndex = '9999';
+      toast.style.transition = 'all 0.3s ease';
+      document.body.appendChild(toast);
+    }
+    toast.innerText = msg;
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateY(0)';
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(10px)';
+    }, 2200);
+  }
+  </script>
+</body>
+</html>

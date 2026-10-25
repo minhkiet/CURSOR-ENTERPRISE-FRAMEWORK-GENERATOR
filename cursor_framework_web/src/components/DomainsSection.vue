@@ -55,11 +55,20 @@ const domains: Domain[] = [
   {
     id: 'ai',
     title: 'AI & RAG',
-    description: 'Vector search, WeKnora, embeddings, context routing, prompt patterns.',
-    ruleCount: 3,
-    skillCount: 2,
+    description: 'Vector search, WeKnora, embeddings, context routing, prompt patterns. TDAM layered memory.',
+    ruleCount: 4,
+    skillCount: 4,
     icon: 'brain',
-    highlights: ['Hybrid retrieval', 'Context window mgmt', 'Eval frameworks']
+    highlights: ['TDAM 4-layer memory (L0–L3)', 'Hybrid retrieval', 'Context window mgmt']
+  },
+  {
+    id: 'code-intelligence',
+    title: 'Code Intelligence',
+    description: 'Knowledge graphs, dependency analysis, semantic search, code structure understanding.',
+    ruleCount: 2,
+    skillCount: 2,
+    icon: 'graph',
+    highlights: ['Code graph RAG', 'Cypher queries', 'Semantic code search']
   },
   {
     id: 'security',

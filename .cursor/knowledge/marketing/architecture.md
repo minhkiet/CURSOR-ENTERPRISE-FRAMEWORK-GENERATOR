@@ -1780,3 +1780,1055 @@ class ConsentEnforcement {
   }
 }
 ```
+
+---
+
+# 4. marketingskills Architecture Patterns (sync 2026-07-15)
+
+> System design cho 9 category từ [marketingskills](https://github.com/coreyhaines31/marketingskills). Mỗi section dưới đây map vào 1 cluster of skills, anchor vào knowledge base hiện có.
+
+## 4.1 Conversion Optimization (cro, signup, onboarding, popups, paywalls)
+
+### 4.1.1 Event Taxonomy
+```
+funnel.page_viewed          { page_id, source, variant }
+funnel.cta_clicked          { cta_id, position, copy }
+funnel.form_started         { form_id, field_count }
+funnel.form_field_completed { form_id, field_name, time_to_complete }
+funnel.form_submitted       { form_id, total_time, errors }
+funnel.signup_completed     { user_id, method, source }
+funnel.activation_achieved  { user_id, activation_event, time_to_aha }
+funnel.upgrade_offer_shown  { user_id, plan, trigger }
+funwall.upgrade_completed   { user_id, from_plan, to_plan, mrr_delta }
+```
+
+### 4.1.2 Funnel State Machine
+```
+States:  Visitor → Lead → MQL → SQL → Customer → Activated → Expanded
+         ↓        ↓       ↓      ↓       ↓            ↓
+       DROP    DROP    DROP   DROP   CHURN       EXPAND
+```
+- Each state has entry trigger + exit criteria
+- Drop-off rate per transition: < 30% healthy, > 50% = investigate
+- Time-in-state: alarm if > 2x baseline
+
+### 4.1.3 Real-time Personalization Layer
+```
+Request → Identify user (cookie/JWT) → Lookup segment (Redis)
+        → Fetch variant assignment (A/B service)
+        → Render with personalization tokens
+        → Track exposure event
+        → Cache response (30-60s, edge or Redis)
+```
+Latency budget: < 100ms added to page load.
+
+---
+
+## 4.2 Content & Copy (copywriting, copy-editing, cold-email, emails, sms, social, image, video)
+
+### 4.2.1 Content Pipeline
+```
+draft → review (peer) → legal (if regulated) → approve → schedule
+         ↓                ↓                       ↓
+       iterate          iterate               schedule to CMS
+                                                       ↓
+                                                   publish
+                                                       ↓
+                                                   measure (24h, 7d, 30d)
+                                                       ↓
+                                                   iterate or archive
+```
+
+### 4.2.2 Email Event Stream
+```
+emails:
+  - email.scheduled    { campaign_id, contact_id, send_at }
+  - email.sent         { message_id, smtp_response }
+  - email.delivered    { message_id, smtp_response }
+  - email.opened       { message_id, ua, ip, timestamp }
+  - email.clicked      { message_id, link, ua, ip, timestamp }
+  - email.bounced      { message_id, reason, type (hard/soft) }
+  - email.complained   { message_id, reason }
+  - email.unsubscribed { contact_id, source }
+```
+Deduplicate opens/clicked with 5-min window per recipient (image-cache proxy).
+
+### 4.2.3 Social Scheduling & Content Adaptation
+```
+Source asset (blog post)
+  → AI rewriter (per platform guidelines)
+  → Asset factory (image, video, carousel)
+  → Scheduler (Buffer/Hootsuite/queue)
+  → Track: impressions, engagement, clicks
+  → Repurpose top performers
+```
+
+---
+
+## 4.3 SEO & Discovery (seo-audit, ai-seo, programmatic-seo, site-architecture, competitors, schema, aso)
+
+### 4.3.1 Site Crawler Architecture
+```
+Crawler queue (priority: index, errors, recent)
+  → Fetch (respect robots.txt, rate limit)
+  → Parse HTML (extract: title, meta, h1-h6, content, links, schema)
+  → Store (pages, links, issues)
+  → Index (ElasticSearch for full-text, graph for link graph)
+  → Report (issues by type, priority, page authority)
+```
+Crawl budget: < 10 URLs/sec, < 5 min per site < 10k pages.
+
+### 4.3.2 Programmatic SEO Generation Pipeline
+```
+1. Keyword research (Ahrefs/GSC export) → CSV
+2. Template definition (1 per page type)
+3. Data hydration (CSVs → render context)
+4. Static generation (Next.js, Hugo, custom)
+5. Quality gate (uniqueness check, internal links, schema)
+6. Deploy to /[category]-for-[use-case]
+7. Submit sitemap to GSC, ping IndexNow
+```
+Scale target: 100-10,000 pages from 1 template.
+
+### 4.3.3 Schema.org Implementation
+```
+Type registry:
+  - Organization (1 per site, global)
+  - WebSite + SearchAction (homepage)
+  - Article (blog posts, news)
+  - Product + Offer (e-commerce)
+  - FAQPage (FAQ-rich snippets)
+  - SoftwareApplication (B2B SaaS)
+  - BreadcrumbList (all non-homepage)
+  - LocalBusiness (multi-location)
+```
+Validation: schema.org validator + Rich Results Test (GSC).
+
+### 4.3.4 AI Search Optimization Layer
+```
+llms.txt (root, plain markdown)
+├── Site summary (one paragraph)
+├── Key pages (10-20 most important)
+├── Product/service offerings
+├── Contact + about
+└── last-updated timestamp
+
+robots.txt: allow GPTBot, ClaudeBot, PerplexityBot, anthropic-ai, Applebot-Extended
+```
+
+---
+
+## 4.4 Paid & Distribution (ads, ad-creative)
+
+### 4.4.1 Campaign Sync Architecture
+```
+CRM/Product
+  ↓ segments (high-LTV, churned, lookalikes)
+Ad platform
+  ↓ audience sync (Facebook CAPI, Google Enhanced Conversions)
+Audience in platform
+  ↓ campaign structure
+Reporting
+  ↓ spend, CTR, CPA, ROAS back to CRM (daily)
+Attribution
+  ↓ merge ad platform data + first-party data
+Optimization
+  ↓ automated bidding rules (target CPA, target ROAS)
+```
+Latency: 24h reporting loop, 1h audience sync.
+
+### 4.4.2 Creative Iteration Pipeline
+```
+Angle matrix (3 × 3) → 9 hooks
+  → AI generation (3 variants per hook = 27 ads)
+  → Upload to ad platform
+  → Auto-test (kill bottom 3 after $50 spend)
+  → Scale winner
+  → Refresh (fatigue every 7-14 days)
+```
+
+---
+
+## 4.5 Measurement & Testing (analytics, ab-testing)
+
+### 4.5.1 Event Pipeline
+```
+SDK (web/mobile/server)
+  → Collector endpoint (validate schema)
+  → Stream processor (Kafka/Kinesis)
+  → Cold storage (S3/Parquet, 7-year retention)
+  → Hot warehouse (BigQuery/Snowflake, 90-day hot)
+  → Aggregations (sessions, conversions, attribution)
+  → Dashboards (Looker/Metabase/Superset)
+  → Alerts (PagerDuty/Slack on anomaly)
+```
+
+### 4.5.2 A/B Test Service
+```
+Experiment record: { id, hypothesis, variants[], allocation, success_metric }
+  → Assignment: hash(visitor_id + experiment_id) % 100
+  → Exposure: log when variant rendered
+  → Conversion: matched to success event
+  → Statistics: Bayesian or frequentist (sequential testing)
+  → Stop: sample size reached OR p < 0.05 + min runtime
+```
+Guardrails: max 3 concurrent tests per page, < 5% revenue impact cap.
+
+### 4.5.3 Attribution Engine
+```
+Touchpoints (chronological, deduped):
+  session_start → page_view → cta_click → form_start → conversion
+Attribution model:
+  - Last-touch (default, simple)
+  - First-touch (top-of-funnel analysis)
+  - Linear (equal weight)
+  - Time-decay (exponential, half-life 7d)
+  - Data-driven (Shapley value, ML-based)
+```
+Output: per-channel revenue contribution, ROAS by source.
+
+---
+
+## 4.6 Retention (churn-prevention)
+
+### 4.6.1 Churn Prediction Pipeline
+```
+Features (per user, daily):
+  - login_frequency (7d, 30d)
+  - feature_usage_breadth
+  - support_tickets (count, sentiment)
+  - nps_score (latest)
+  - payment_failures
+  - team_activity (B2B)
+
+Model: gradient boosting, XGBoost or LightGBM
+Output: churn_probability (0-1) per user
+Threshold: top 10% = at-risk → trigger save flow
+```
+
+### 4.6.2 Save Offer Service
+```
+Detect cancellation intent
+  → Reason: too_expensive | not_using | missing_feature | other
+  → Dynamic offer:
+      too_expensive: downgrade option OR 30% off for 3 months
+      not_using:    pause for 30/60/90 days OR 1:1 onboarding call
+      missing:      roadmap preview + workaround doc
+      other:        feedback to product team + retention call
+  → Confirm
+  → If still cancel: feedback survey, reversible for 24h
+```
+
+### 4.6.3 Dunning Service (failed payment)
+```
+Day 0:  retry payment (most issuers allow this)
+Day 3:  if failed → email (soft) with card update CTA
+Day 7:  retry + email (urgent) + in-app banner
+Day 14: retry + final email
+Day 21: pause account (read-only)
+Day 60: hard delete (with Day 55 warning)
+```
+Recovery target: 40-60% of failed payments within 14 days.
+
+---
+
+## 4.7 Growth Engineering (co-marketing, free-tools, referrals)
+
+### 4.7.1 Free Tool Architecture
+```
+Calculator / Grader / Generator
+  ├── Input: user-provided data
+  ├── Logic: scoring/calc/transform
+  ├── Output: result page (shareable URL)
+  ├── Email gate: optional, to unlock PDF/save
+  └── Embed widget: viral loop on third-party sites
+```
+Hosting: static SPA, edge-rendered for SEO. Lead capture via email gate.
+
+### 4.7.2 Referral Engine
+```
+Referral code: per user, base62 8-char unique
+  → Reward condition: referee converts to paying customer
+  → Double-sided incentive: referrer + referee both get X
+  → Anti-fraud: same IP, card, device fingerprint = block
+  → Tier system: 1-5 / 6-15 / 16+ refs → increasing reward
+  → Payout: account credit OR cashout (Stripe/Bank)
+```
+
+### 4.7.3 Co-Marketing Hub
+```
+Partner record: { name, ICP overlap, audience size, contact }
+  → Joint content: webinar, case study, podcast
+  → Cross-promo: newsletter mentions, social amplification
+  → UTM tracking: ?utm_partner={slug} for attribution
+  → Shared landing pages: /partners/[slug]
+  → Quarterly review: pipeline generated, CAC shared
+```
+
+---
+
+## 4.8 Strategy & Monetization (marketing-ideas, marketing-psychology, marketing-plan, launch, pricing, offers)
+
+### 4.8.1 Pricing Service
+```
+Plan definition: { tier_id, name, price_monthly, price_annual, features[] }
+Pricing rule:    annual = monthly * 12 * 0.83 (17% discount default)
+Tier upgrade:    auto-detect usage → show upgrade prompt
+Tier downgrade:  require reason + confirmation
+Proration:       daily basis, refund credit OR charge difference
+```
+A/B test framework: variant prices 50/50, measure conversion + LTV.
+
+### 4.8.2 Offer Composition Service
+```
+Value equation: V = (Dream × Likelihood) / (Time × Effort)
+  → Each component has adjustment controls
+  → Bonus stack: 3-5 items, each with $ value
+  → Guarantee: 30/60/lifetime
+  → Urgency: genuine deadline + count
+  → Scarcity: cohort-limited
+  → Render: pricing page, sales page, email, ad
+```
+
+### 4.8.3 Launch Service (Pre/Launch/Post)
+```
+Pre-launch (T-6w → T-0):
+  - Waitlist: lead capture, viral loop
+  - Asset backlog: 10-15 content pieces
+  - Influencer seeding
+  - PR list (50+)
+
+Launch (T+0 → T+1w):
+  - Multi-channel blast (email, social, PR)
+  - Product Hunt (Tue-Thu 12:01am PT)
+  - Onboarding surge handling (capacity)
+
+Post-launch (T+1w → T+6w):
+  - Iterate on feedback
+  - Retention focus (LTV > acquisition)
+  - Retarget launch visitors
+  - Content follow-ups
+```
+
+### 4.8.4 Marketing Plan Repository
+```
+Quarterly plan: OKR + channel mix + budget
+  → Weekly: standup (blockers, learnings)
+  → Monthly: retro + reallocation
+  → Quarterly: full retro + next-quarter planning
+Format: structured markdown in `marketing/plan/[quarter].md`
+```
+
+---
+
+## 4.9 Sales & RevOps (revops, sales-enablement, prospecting, pr, customer-research, competitor-profiling, marketing-council, marketing-loops, directory-submissions)
+
+### 4.9.1 Lead Lifecycle Service
+```
+Stages: Subscriber → Lead → MQL → SQL → Opportunity → Customer
+  → Score (explicit + implicit, see glossary §10)
+  → Route (round-robin, territory, named account)
+  → SLA: MQL→SQL within 5 days, SQL→Opp within 14 days
+  → Stage reporting (funnel + velocity)
+  → Win/loss analysis
+```
+
+### 4.9.2 Sales Enablement Repository
+```
+Stage-aware collateral (see best-practice.md §9.10.2):
+  ├── awareness/   (blogs, social, podcast)
+  ├── consider/    (case studies, comparison, ROI calc)
+  ├── decide/      (demo script, proposal template, security FAQ)
+  └── onboard/     (implementation guide, success checklist)
+Versioning: tied to product release (e.g., v3.2 collaterals)
+CMS: Notion, Confluence, or static site with auth
+```
+
+### 4.9.3 Prospecting Service
+```
+List building:
+  - Source: LinkedIn Sales Nav, Apollo, ZoomInfo, manual
+  - Enrichment: Clearbit, Hunter.io (email/phone)
+  - Verification: ZeroBounce, NeverBounce (bounce rate < 3%)
+
+Sequencer:
+  - Multi-channel (email + LinkedIn + phone)
+  - Personalization tokens (company, role, recent trigger)
+  - Send windows: Tue-Thu, 9-11am recipient local time
+  - Auto-pause on reply
+  - Reply handling: positive → notify AE; objection → tagged template
+```
+
+### 4.9.4 PR Distribution Service
+```
+Tier mapping (see best-practice.md §9.10.4)
+  - Daily: HARO response queue (auto-parse, suggest drafts)
+  - Weekly: pitch 5-10 new journalists with newsworthy angle
+  - Monthly: 1 major announcement cycle (funding, launch, milestone)
+
+Tracking: open rates (read receipts), reply rate, coverage count, sentiment
+```
+
+### 4.9.5 Customer Research Repository
+```
+Interviews: audio + transcript (auto-transcribe)
+Synthesis: JTBD statements (see best-practice.md §9.10.5)
+  → Tag by persona, stage, pain, gain
+  → Cross-reference product roadmap
+  → Quarterly synthesis report
+Storage: Dovetail, Notion, or git repo with markdown
+```
+
+### 4.9.6 Competitor Profiling Service
+```
+Monitor: pricing page, feature page, blog, changelog, social, jobs
+  → Weekly diff (crawled + compared)
+  → Alert on major changes (positioning, pricing, new feature)
+  → Quarterly: full profile update + battlecard refresh
+  → Annual: category landscape analysis
+```
+
+### 4.9.7 Marketing Council Engine (multi-persona)
+```
+Personas registry: 5-7 personas with system prompts
+Brief input: 1 marketing question
+  → Run all personas in parallel (5-7 LLM calls)
+  → Synthesize top 3 actionable angles
+  → Output: prioritized idea list + rationale
+Frequency: biweekly strategic, weekly tactical
+```
+
+### 4.9.8 Marketing Loops (recurring agent workflows)
+```
+Loop types (see best-practice.md §9.10.8):
+  - Content loop: weekly, 1 publish
+  - SEO loop: monthly, top 20 audit
+  - Outreach loop: daily, prospecting
+  - Retention loop: real-time, intervention
+
+Implementation: stateful agent (background queue)
+  - Triggers: cron, event, threshold
+  - Persistence: external DB for resumability
+  - Logging: every step + outcome
+  - Halt conditions: explicit guardrails
+  - Observability: dashboard with loop health metrics
+```
+
+### 4.9.9 Directory Submission Tracker
+```
+Directory registry: 50-100 directories tagged by tier
+  - Submission cadence: 1-2/week to avoid spam signals
+  - Status: submitted | live | rejected | needs-update
+  - Quality check: title, description, logo, screenshots, link
+  - Calendar: track submission dates for re-submission on update
+  - Cross-link: each directory link back to canonical profile
+```
+
+---
+
+## 4.10 Cross-Cutting: Product-Marketing Context
+
+> Mọi marketing skill/module PHẢI đọc `.agents/product-marketing.md` (fallback `.claude/product-marketing.md`) trước khi thực thi. Nội dung tối thiểu xem `glossary.md §13`.
+
+Service contract:
+```typescript
+interface ProductMarketingContext {
+  product: { name, category, oneLiner, differentiator };
+  audience: { primaryICP, secondaryICP, antiICP };
+  positioning: { category, mainAlternative };
+  pricing: { entryTier, mainTier, topTier, freePolicy };
+  channels: { primary, secondary, owned };
+  voice: { adjectives, bannedWords, constraints };
+}
+```
+Loading: tại workflow start, fail fast nếu file missing → hỏi user 3 câu tối thiểu.
+
+---
+
+## 4.11 Liên kết section khác
+
+| Section | File | Section number |
+|---|---|---|
+| Best practice implementation | `best-practice.md` | §9.1-§9.10 |
+| Anti-patterns | `anti-pattern.md` | §9.1-§9.10 |
+| Pre-deploy checklist | `checklist.md` | §9.1-§9.9 |
+| Decision flow (skill routing) | `decision-tree.md` | §9 |
+| FAQ by category | `faq.md` | §9.1-§9.9 |
+| Skill glossary | `glossary.md` | §9-§13 |
+
+---
+
+## 5. Privacy-by-Design & Consent Architecture (sync 2026-07-15)
+
+> Bổ sung từ [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) v2.6.0. Pattern này thiết kế privacy và consent **vào kiến trúc từ đầu**, không phải layer on top sau. Áp dụng cho mọi marketing platform, CDP, analytics stack, ad integration.
+
+### 5.1 Privacy-by-Design Principles
+
+**7 foundational principles (Cavoukian / GDPR Art. 25):**
+
+| # | Principle | Architecture implication |
+|---|-----------|--------------------------|
+| 1 | Proactive not reactive | Privacy built into design phase, not retrofitted |
+| 2 | Privacy as default | Strictest privacy settings are defaults |
+| 3 | Privacy embedded into design | Part of core architecture, not add-on |
+| 4 | Full functionality (positive-sum) | Privacy ≠ less functionality |
+| 5 | End-to-end security | Crypto + access control throughout |
+| 6 | Visibility & transparency | Audit logs, user-facing controls |
+| 7 | Respect for user privacy | User-centric, opt-in by default |
+
+### 5.2 Consent Management Architecture
+
+**Layered consent model (TCF v2.2 + custom):**
+
+```typescript
+// ✅ Architecture: layered consent
+interface ConsentState {
+  userId: string;
+  timestamp: Date;
+  ipAddress: string;          // hashed for audit
+  userAgent: string;
+  consentMethod: 'banner' | 'api' | 'imported' | 'explicit';
+
+  purposes: {
+    essential: boolean;        // always true (login, security, fraud prevention)
+    analytics: boolean;        // anonymous usage analytics
+    marketing: boolean;        // ad targeting, email marketing, SMS
+    personalization: boolean;  // recommendations, content customization
+    thirdPartySharing: boolean;// partner data sharing
+  };
+
+  vendors: Record<string, boolean>; // granular per-vendor consent
+
+  // Audit trail
+  history: ConsentEvent[];     // every change with timestamp + source
+}
+
+interface ConsentEvent {
+  timestamp: Date;
+  changeType: 'granted' | 'withdrawn' | 'modified' | 'expired';
+  changedPurposes: string[];
+  source: 'banner_ui' | 'preference_center' | 'admin' | 'api';
+  ipAddress: string;
+  userAgent: string;
+}
+```
+
+**Consent collection flow:**
+
+```
+User visits site
+   │
+   ▼
+Cookie banner (TCF v2.2 compliant)
+   │
+   ├─► Accept all    → Grant all purposes, log audit
+   ├─► Reject all    → Withdraw all (except essential), log audit
+   └─► Customize     → Granular UI per purpose, log each toggle
+   
+   ▼
+Server-side consent gate (every event/track call)
+   │
+   ├─► Read consent state from DB (cached, < 5ms)
+   ├─► Check purpose authorization
+   └─► Allow / deny tracking
+```
+
+### 5.3 Server-Side Consent Enforcement
+
+**Why server-side is non-negotiable:**
+- Client-side consent can be bypassed (devtools, MITM)
+- Ad platforms require server-side consent signals (Google Consent Mode v2, Meta LDU)
+- GDPR enforcement agencies look at server-side implementation, not just UI
+
+**Reference architecture:**
+
+```typescript
+// ✅ Server-side consent gate
+class ConsentAwareTracker {
+  async track(userId: string, event: MarketingEvent) {
+    // Step 1: Fetch consent state (cached, 5-min TTL)
+    const consent = await this.consentStore.get(userId);
+    if (!consent) return; // no consent = no track
+
+    // Step 2: Check purpose
+    const purposeMap = {
+      'page_view': 'analytics',
+      'signup_completed': 'marketing',
+      'product_viewed': 'personalization',
+      'ad_click': 'marketing',
+    };
+    const required = purposeMap[event.name];
+    if (required && !consent.purposes[required]) {
+      this.logger.debug('Event denied: no consent', { userId, event: event.name });
+      return;
+    }
+
+    // Step 3: Forward to appropriate sinks (gated)
+    if (consent.purposes.analytics) {
+      await this.analytics.track(event);
+    }
+    if (consent.purposes.marketing) {
+      await this.adPlatforms.track(event, {
+        consentSignals: this.buildAdPlatformSignals(consent),
+      });
+    }
+
+    // Step 4: Audit log
+    await this.auditLog.record({
+      userId, event: event.name, consentPurposes: consent.purposes,
+      timestamp: new Date(), outcome: 'tracked',
+    });
+  }
+
+  buildAdPlatformSignals(consent: ConsentState) {
+    return {
+      google: {
+        ad_storage: consent.purposes.marketing ? 'granted' : 'denied',
+        analytics_storage: consent.purposes.analytics ? 'granted' : 'denied',
+        ad_user_data: consent.purposes.marketing ? 'granted' : 'denied',
+        ad_personalization: consent.purposes.personalization ? 'granted' : 'denied',
+      },
+      meta: {
+        limited_data_use: !consent.purposes.marketing, // CA users LDU
+      },
+    };
+  }
+}
+```
+
+### 5.4 PII Boundary Architecture
+
+**Layered PII isolation (data clean rooms):**
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                  External (Public)                       │
+│  - Marketing pages, blog, ads                            │
+│  - Aggregate analytics only                              │
+│  - No individual-level PII shared                        │
+└─────────────────────────────────────────────────────────┘
+                          │ Boundary: auth + consent
+                          ▼
+┌─────────────────────────────────────────────────────────┐
+│                  Authenticated App                       │
+│  - User account data                                     │
+│  - User preferences                                      │
+│  - User content                                          │
+│  - Subject to consent + user controls                    │
+└─────────────────────────────────────────────────────────┘
+                          │ Boundary: anonymization + aggregation
+                          ▼
+┌─────────────────────────────────────────────────────────┐
+│                  Internal/Admin                          │
+│  - Full PII for support, ops                             │
+│  - Audit log all access                                  │
+│  - Least privilege roles                                 │
+└─────────────────────────────────────────────────────────┘
+                          │ Boundary: hashed export
+                          ▼
+┌─────────────────────────────────────────────────────────┐
+│                  Partners/Vendors                        │
+│  - Hashed identifiers (SHA-256 + salt)                   │
+│  - No raw PII                                            │
+│  - Data clean rooms for aggregate analysis               │
+│  - DPA-signed, sub-processor listed                      │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 5.5 Data Lifecycle Architecture
+
+**Retention by category:**
+
+| Data type | Retention | Justification | Deletion method |
+|---|---|---|---|
+| Auth logs | 90 days | Security incident investigation | Auto-purge |
+| Session cookies | Session end | Operational | Browser-clear |
+| Persistent cookies | 12 months max | User preference | Auto-refresh |
+| Analytics events | 14 months | GDPR guidance, business analytics | Auto-purge |
+| Marketing events | 24 months | Campaign attribution | Anonymize, then purge |
+| Customer support data | 7 years | Legal/tax obligations | Manual review |
+| Financial transactions | 7 years | Tax law | Manual review |
+| User-generated content | Until account deletion + 30 days | User content ownership | Manual + verification |
+| Marketing list data | Until unsubscribe + 90 days | Win-back opportunity | Suppress, then purge |
+| Research data (raw) | 12 months | Research ethics + GDPR | Anonymize + purge |
+| Research data (aggregate) | 24 months | Insights retention | Aggregated only |
+| Server logs | 30 days | Operational debugging | Auto-purge |
+
+**Right-to-deletion workflow:**
+
+```typescript
+// ✅ Architecture: GDPR-compliant deletion
+async function handleDeletionRequest(userId: string) {
+  // Step 1: Verify identity (auth + security questions)
+  const verified = await verifyIdentity(userId);
+
+  // Step 2: Log the request (audit trail)
+  await auditLog.record({
+    action: 'deletion_requested',
+    userId, timestamp: new Date(),
+    requestMethod: verified.method,
+  });
+
+  // Step 3: Check legal obligations (tax, fraud prevention)
+  const obligations = await checkLegalHold(userId);
+  if (obligations.hasFinancialHold) {
+    // Anonymize marketing data, retain financial for tax
+    await anonymizeMarketingData(userId);
+    await markFinancialHold(userId, obligations.holdUntil);
+  } else {
+    // Full deletion
+    await deleteAllUserData(userId);
+  }
+
+  // Step 4: Cascade to vendors (with DPA)
+  await cascadeDeletionToVendors(userId);
+
+  // Step 5: Notify user
+  await notifyDeletion(userId, {
+    retentionReason: obligations.hasFinancialHold ? 'legal_obligation' : null,
+    completionDate: obligations.completionDate,
+  });
+
+  // Step 6: Audit log completion
+  await auditLog.record({
+    action: 'deletion_completed',
+    userId, retentionReason: obligations.reason,
+  });
+}
+```
+
+### 5.6 Identity Resolution & Cross-Channel Tracking
+
+**Privacy-preserving identity graph:**
+
+```typescript
+// ✅ Architecture: hashed identity resolution
+interface IdentityGraph {
+  // Never store raw PII in identity graph
+  identities: {
+    marketingId: string;       // opaque UUID
+    emailHash?: string;        // SHA-256(email + salt)
+    phoneHash?: string;        // SHA-256(phone + salt)
+    deviceIds: string[];       // device-generated IDs
+    cookies: string[];         // 1p cookies
+  };
+
+  // Cross-channel mapping (built from explicit logins, not fingerprinting)
+  channels: {
+    web?: { firstSeen: Date; lastSeen: Date };
+    email?: { firstSeen: Date; lastSeen: Date };
+    app?: { firstSeen: Date; lastSeen: Date };
+    inStore?: { firstSeen: Date; lastSeen: Date };
+  };
+
+  // Consent state per identity (sync from consent store)
+  consent: ConsentState;
+}
+
+// Salt rotated every 90 days; old hashes purged
+// Cross-device matching: deterministic (email hash match) only
+// No probabilistic fingerprinting without explicit opt-in
+```
+
+### 5.7 Tracking Boundary Patterns
+
+**Where to track (with consent) vs. where NOT to track:**
+
+| Surface | Tracking allowed | Constraints |
+|---|---|---|
+| Public pages (homepage, blog) | Analytics only | No marketing without consent |
+| Authenticated app | All purposes (subject to consent) | Audit-logged |
+| Email (in body) | Open/click pixels require consent | Subject line + sender don't track |
+| Ads (paid) | Tracking via CAPI, hashed PII | LDU, Consent Mode signals |
+| Form submissions | Track after submission | Don't pre-fill with FB/Google click ID silently |
+| Search (internal) | Analytics (no PII) | No behavioral profiling without consent |
+| Support chat | All (consent implied for support) | Audit logged |
+| Webhooks (3p) | N/A (server-side) | Signature verified, idempotent |
+| Customer success calls | All (consent for recording) | Explicit recording consent |
+
+### 5.8 Ad Platform Integration Architecture
+
+**Server-side conversion tracking:**
+
+```
+User action (sign up, purchase)
+        │
+        ▼
+Server event (your backend)
+        │
+        ├─► Server-side GTM  → Google Ads, GA4
+        ├─► Meta CAPI         → Facebook, Instagram
+        ├─► TikTok Events API → TikTok
+        ├─► LinkedIn CAPI     → LinkedIn
+        ├─► Reddit API        → Reddit
+        └─► Microsoft CAPI    → Bing, Microsoft Advertising
+        
+All with:
+  - SHA-256 hashed email/phone (when available)
+  - Consent signals (GDPR, CCPA flags)
+  - First-party click ID (preserved)
+  - Deduplication (event_id)
+```
+
+**Consent signal passing:**
+
+```typescript
+// Example: Meta CAPI with consent
+await fetch(`https://graph.facebook.com/v18.0/${pixelId}/events`, {
+  method: 'POST',
+  body: JSON.stringify({
+    data: [{
+      event_name: 'Purchase',
+      event_time: Math.floor(Date.now() / 1000),
+      user_data: {
+        em: [sha256(email)],          // hashed
+        ph: [sha256(phone)],          // hashed
+        client_ip: anonymizedIp,      // last octet zeroed
+        client_user_agent: req.headers['user-agent'],
+      },
+      custom_data: {
+        currency: 'USD',
+        value: 99.00,
+      },
+      // GDPR consent
+      data_processing_options: ['LDU'], // California users
+      data_processing_options_country: isEU ? 1 : 0,
+      data_processing_options_state: isCalifornia ? 1000 : 0,
+    }],
+  }),
+});
+```
+
+### 5.9 Email Authentication Architecture
+
+**Sender identity + anti-spoofing:**
+
+```
+DNS:
+  marketing.example.com
+    │
+    ├─► SPF (TXT): "v=spf1 include:_spf.google.com include:sendgrid.net -all"
+    ├─► DKIM (TXT): "v=DKIM1; k=rsa; p=MIGfMA0GCSq..." (public key)
+    ├─► DMARC (TXT): "v=DMARC1; p=reject; rua=mailto:dmarc@example.com; ruf=mailto:forensic@example.com; pct=100"
+    ├─► MTA-STS (TXT): "v=STSv1; id=20240101000000Z" (at _mta-sts subdomain)
+    ├─► TLS-RPT (TXT): "v=TLSRPTv1; rua=mailto:tlsrpt@example.com" (at _smtp._tls subdomain)
+    └─► BIMI (TXT): "v=BIMI1; l=https://example.com/bimi/logo.svg; a=https://example.com/bimi/cert.pem"
+
+Application:
+  - Outbound SMTP via authenticated relay (SendGrid, AWS SES, Postmark)
+  - Inbound SMTP via trusted relay (Gmail, Outlook)
+  - TLS 1.2+ enforced (no opportunistic)
+  - SPF/DKIM/DMARC alignment enforced
+```
+
+### 5.10 Webhook Security Architecture
+
+**Signed webhook pattern:**
+
+```typescript
+// Sender side (e.g., your app)
+import crypto from 'crypto';
+
+function signWebhook(payload: string, secret: string, timestamp: number): string {
+  const signedPayload = `${timestamp}.${payload}`;
+  const signature = crypto
+    .createHmac('sha256', secret)
+    .update(signedPayload)
+    .digest('hex');
+  return `t=${timestamp},v1=${signature}`;
+}
+
+// Receiver side (e.g., customer endpoint)
+import express from 'express';
+
+app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+  const sig = req.headers['webhook-signature'];
+  const [tsPart, sigPart] = sig.split(',');
+  const timestamp = parseInt(tsPart.split('=')[1]);
+  const providedSig = sigPart.split('=')[1];
+
+  // Step 1: Check timestamp (prevent replay, 5-min window)
+  const age = Date.now() - timestamp;
+  if (age > 5 * 60 * 1000) return res.status(400).send('Stale');
+
+  // Step 2: Recompute signature
+  const expected = crypto
+    .createHmac('sha256', process.env.WEBHOOK_SECRET)
+    .update(`${timestamp}.${req.body}`)
+    .digest('hex');
+
+  // Step 3: Constant-time comparison
+  if (!crypto.timingSafeEqual(Buffer.from(providedSig), Buffer.from(expected))) {
+    auditLog.record({ event: 'webhook_invalid_signature', ip: req.ip });
+    return res.status(401).send('Invalid');
+  }
+
+  // Step 4: Idempotency check
+  const eventId = req.headers['webhook-id'];
+  if (await idempotencyStore.has(eventId)) {
+    return res.status(200).send('Duplicate (ignored)');
+  }
+
+  // Step 5: Process
+  await processWebhook(req.body);
+  await idempotencyStore.add(eventId);
+
+  auditLog.record({ event: 'webhook_processed', eventId });
+  res.status(200).send('OK');
+});
+```
+
+### 5.11 Marketing Data Warehouse Architecture
+
+**PII segregation in data warehouse:**
+
+```sql
+-- ✅ Architecture: PII in separate schema, hashed identifiers everywhere else
+
+-- Schema: pii (restricted access, audited)
+CREATE SCHEMA pii;
+CREATE TABLE pii.users (
+  user_id UUID PRIMARY KEY,
+  email_encrypted BYTEA,        -- AES-256-GCM encrypted
+  email_hash BYTEA,             -- SHA-256 + salt (for matching)
+  phone_encrypted BYTEA,
+  phone_hash BYTEA,
+  full_name_encrypted BYTEA,
+  created_at TIMESTAMPTZ,
+  -- Row-level security: only support/admin roles can read
+);
+
+-- Schema: analytics (no raw PII)
+CREATE SCHEMA analytics;
+CREATE TABLE analytics.events (
+  event_id UUID PRIMARY KEY,
+  user_id_hash BYTEA,           -- never raw user_id
+  event_name VARCHAR(100),
+  event_properties JSONB,       -- PII redacted at ingest
+  timestamp TIMESTAMPTZ,
+  session_id_hash BYTEA,
+  -- No raw PII allowed
+);
+
+-- Schema: marketing (hashed only)
+CREATE SCHEMA marketing;
+CREATE TABLE marketing.campaign_attribution (
+  user_id_hash BYTEA,
+  campaign_id UUID,
+  first_touch_at TIMESTAMPTZ,
+  last_touch_at TIMESTAMPTZ,
+  -- No raw PII
+);
+
+-- Access controls
+REVOKE ALL ON SCHEMA pii FROM PUBLIC;
+GRANT USAGE ON SCHEMA pii TO support_role, admin_role;
+GRANT SELECT ON pii.users TO support_role;
+
+REVOKE ALL ON SCHEMA analytics FROM PUBLIC;
+GRANT SELECT ON ALL TABLES IN SCHEMA analytics TO analyst_role;
+
+-- Audit logging
+CREATE TABLE audit.access_log (
+  id BIGSERIAL PRIMARY KEY,
+  user_id UUID,                  -- the querying user
+  accessed_schema VARCHAR(50),
+  accessed_table VARCHAR(100),
+  record_id UUID,
+  timestamp TIMESTAMPTZ,
+  ip_address INET,
+);
+```
+
+### 5.12 Consent Receipt & User Preference Center
+
+**User-facing preference center:**
+
+```typescript
+// Architecture: API endpoints for preference center
+GET    /api/preferences/cookie     → returns current consent state
+PATCH  /api/preferences/cookie     → update consent (with audit)
+GET    /api/preferences/email      → email subscription prefs
+PATCH  /api/preferences/email      → update email prefs
+GET    /api/preferences/notifications → push/SMS prefs
+GET    /api/account/data-export    → GDPR Art. 20 portability (JSON)
+DELETE /api/account                → GDPR Art. 17 erasure
+
+// All endpoints:
+// - Require authentication
+// - Log all access
+// - Rate-limited
+// - Honor geographic data residency requirements
+```
+
+### 5.13 Security Monitoring for Marketing Stack
+
+**Detect & alert on:**
+
+| Signal | Threshold | Action |
+|---|---|---|
+| Cookie banner reject rate spike | > 50% (up from baseline) | UX review |
+| Unsubscribe rate spike | > 1% (up from baseline) | Content review |
+| DMARC failures spike | > 0.1% | Investigate spoofing |
+| Webhook signature failures | > 0 in 1 hour | Possible attack |
+| PII in event payload (auto-detection) | any | Alert + auto-redact |
+| Consent withdrawal rate | > 5% in 24h | Investigate trust issue |
+| Ad account unauthorized access | any | Lock account, notify user |
+| Email bounce rate | > 5% | List hygiene alert |
+| Spam complaint rate | > 0.1% | List suppression |
+| Vendor DPA expiration | 30 days | Renew |
+| API key age | > 90 days | Rotation reminder |
+| Vendor SOC2 lapse | any | Vendor review |
+
+### 5.14 Compliance Documentation Architecture
+
+**Required documents (versioned, dated, accessible):**
+
+```
+/compliance/
+├── privacy-policy.md           (current + history)
+├── cookie-policy.md            (current + history)
+├── DPA-template.md             (vendor DPA template)
+├── lawful-basis-registry.md    (per GDPR Art. 30)
+├── data-retention-schedule.md  (what, why, how long)
+├── sub-processor-list.md       (current + history, customer-facing)
+├── breach-response-plan.md     (72-hour clock, escalation)
+├── DPIA-template.md            (for high-risk processing)
+├── ai-usage-policy.md          (LLM, automation)
+├── children-privacy-policy.md  (if applicable)
+└── regional-addenda/
+    ├── eu-gdpr-addendum.md
+    ├── ca-ccpa-addendum.md
+    ├── br-lgpd-addendum.md
+    ├── cn-pipl-addendum.md
+    └── vn-pdpd-addendum.md
+```
+
+### 5.15 Marketing Stack Vendor Security Review
+
+**Per-vendor assessment:**
+
+| Criterion | Required | Weight |
+|---|---|---|
+| SOC2 Type II report | Yes (or ISO 27001) | 25% |
+| GDPR compliance documented | Yes | 20% |
+| DPA available | Yes | 15% |
+| Data residency options | Preferred | 10% |
+| Sub-processor transparency | Yes | 10% |
+| Incident response SLA | Yes | 10% |
+| Encryption in transit + at rest | Yes | 5% |
+| Penetration test reports | Annual | 5% |
+
+**Score < 80%**: do not onboard without compensating controls.
+
+---
+
+## 5.16 Kết nối với file khác
+
+- **Best practice** (`best-practice.md §10`): marketing security best practices
+- **Anti-pattern** (`anti-pattern.md §10`): marketing security anti-patterns
+- **Checklist** (`checklist.md §11`): pre-launch security checklist
+- **Decision tree** (`decision-tree.md §12`): security-aware routing
+- **FAQ** (`faq.md §10`): marketing security FAQs
+- **Glossary** (`glossary.md §14`): marketing security terms
+- **Cross-rule**: `.cursor/rules/security.mdc`, `.cursor/rules/cloud-infra.mdc`

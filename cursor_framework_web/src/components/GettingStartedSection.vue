@@ -85,6 +85,23 @@ const steps: Step[] = [
           </div>
         </article>
       </div>
+
+      <div class="getting-dev-cta">
+        <div class="getting-dev-cta-text">
+          <div class="getting-dev-cta-label">Python devs</div>
+          <h3 class="getting-dev-cta-title">Cài <code>cursor_framework</code> để dùng CLI & dashboard</h3>
+          <p class="getting-dev-cta-desc">
+            Ngoài <code>.cursor/</code> rules, framework còn có Python package với 11 subcommands
+            (serve, ask, stats, graph, tdam). Cài qua pip, chạy Dashboard local ở port 8765.
+          </p>
+        </div>
+        <router-link to="/install" class="btn btn-primary getting-dev-cta-btn">
+          Install Python package
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M13 6l6 6-6 6"/>
+          </svg>
+        </router-link>
+      </div>
     </div>
   </section>
 </template>
@@ -166,9 +183,127 @@ const steps: Step[] = [
   font-family: var(--font-mono);
 }
 
+/* ─── DEV CTA (Python package) ──────────────────────────────────────── */
+.getting-dev-cta {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px;
+  align-items: center;
+  margin-top: 20px;
+  padding: 28px 32px;
+  background: linear-gradient(
+    135deg,
+    rgba(96, 165, 250, 0.06) 0%,
+    rgba(52, 211, 153, 0.04) 100%
+  );
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.getting-dev-cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 280px 180px at 0% 100%,
+    rgba(96, 165, 250, 0.08) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
+}
+
+.getting-dev-cta-text {
+  position: relative;
+  min-width: 0;
+}
+
+.getting-dev-cta-label {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-info);
+  padding: 3px 8px;
+  background: rgba(96, 165, 250, 0.08);
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  border-radius: var(--radius-sm);
+  margin-bottom: 12px;
+}
+
+.getting-dev-cta-title {
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.015em;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.getting-dev-cta-title code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  padding: 2px 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+}
+
+.getting-dev-cta-desc {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 540px;
+}
+
+.getting-dev-cta-desc code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+}
+
+.getting-dev-cta-btn {
+  position: relative;
+  padding: 12px 22px;
+  font-size: 13.5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.getting-dev-cta-btn svg {
+  width: 14px;
+  height: 14px;
+  transition: transform var(--t-fast);
+}
+
+.getting-dev-cta-btn:hover svg {
+  transform: translateX(3px);
+}
+
 @media (max-width: 768px) {
   .getting-grid {
     grid-template-columns: 1fr;
+  }
+
+  .getting-dev-cta {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 22px;
+  }
+
+  .getting-dev-cta-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 </style>

@@ -1,0 +1,15 @@
+{
+  "name": "cursor-memory-mcp",
+  "version": "1.0.0",
+  "description": "Hierarchical memory, context compaction, history summarization, and token management for Cursor Enterprise Framework.",
+  "author": { "name": "thaofvn-coca06" },
+  "homepage": "https://github.com/thaofvn-coca06/2026",
+  "keywords": ["cursor", "mcp", "memory", "context", "tokens", "compression", "history"],
+  "entry": "cursor_memory_mcp.server:run",
+  "config": {
+    "workspace_root_env": "CURSOR_WORKSPACE_ROOT",
+    "framework_mcp_path": "tools/cursor-framework-mcp",
+    "default_token_budget": 24000,
+    "disk_path": ".cache/cursor-memory-mcp.json"
+  }
+}

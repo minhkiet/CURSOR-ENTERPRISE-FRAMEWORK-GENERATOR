@@ -27,47 +27,72 @@ Cursor Enterprise Framework tích hợp **Agent Personas** từ agent-skills - c
 
 ## Slash Commands (Development Lifecycle)
 
+### Core Commands (agent-commands)
+
+| Command | Description | Key Principle |
+|---------|-------------|---------------|
+| `/spec` | Define what to build | **Spec before code** |
+| `/plan` | Plan how to build it | **Small, atomic tasks** |
+| `/build` | Build incrementally | **One slice at a time** |
+| `/build auto` | Auto-generate plan + implement | Approve once, run autonomously |
+| `/test` | Prove it works | **Tests are proof** |
+| `/review` | Review before merge | **Improve code health** |
+| `/code-simplify` | Simplify the code | Clarity over cleverness |
+| `/ship` | Ship to production | **Fan-out to personas** |
+| `/webperf` | Web performance audit | Measure before optimize |
+
+### Extended Commands (mcp-hooks-commands)
+
+| Command | Description |
+|---------|-------------|
+| `/design` | Design system components |
+| `/clone` | Clone/copy patterns |
+| `/deploy` | Deployment workflows |
+| `/doc` | Documentation generation |
+| `/fix` | Bug fixing workflow |
+| `/frontend` | Frontend specific tasks |
+| `/fullstack` | Fullstack web app development (ASP.NET Core + React/TSX) |
+| `/generate` | Code generation |
+| `/memory` | Memory management |
+| `/ocr` | OCR processing |
+| `/payment` | Payment integration |
+| `/perf` | Performance optimization |
+| `/rag` | RAG/Vector search |
+| `/refactor` | Refactoring workflows |
+| `/report` | Generate reports |
+| `/scan` | Code scanning |
+| `/scrape` | Web scraping |
+| `/security` | Security review |
+| `/rea` | REA reverse engineering (native, .NET, Electron/JS, APK, WASM) |
+| `/reverse` | Alias for `/rea` |
+| `/workflow` | Workflow automation |
+
+### Legacy Commands
+
+| Command | Description |
+|---------|-------------|
+| `/audit` | Audit codebase |
+| `/bazi` | Bazi/Tử Vi calculations |
+| `/numerology` | Numerology |
+| `/pentest` | Penetration testing |
+| `/tuvi` | Vietnamese astrology |
+
+### API Integration Commands
+
+| Command | Description |
+|---------|-------------|
+| `/zalo` | Zalo API integration — messages, profile, OA management |
+| `/telegram` | Telegram Bot API — messages, media, groups |
+| `/facebook` | Facebook Graph API — Page posts, Messenger |
+| `/google` | Google APIs — Sheets, Gmail, Calendar, Maps |
+| `/shopee` | Shopee Open Platform — products, orders, logistics |
+
 ### Define Phase
 
 | Command | Description | Key Principle |
 |---------|-------------|---------------|
 | `/spec` | Define what to build | **Spec before code** |
 | `/interview` | Clarify requirements via one-question-at-a-time | Extract what user actually wants |
-
-### Plan Phase
-
-| Command | Description | Key Principle |
-|---------|-------------|---------------|
-| `/plan` | Plan how to build it (atomic 2-5min tasks, exact file paths, verification steps) | **Small, atomic tasks** |
-
-### Build Phase
-
-| Command | Description | Key Principle |
-|---------|-------------|---------------|
-| `/build` | Build incrementally | **One slice at a time** |
-| `/build auto` | Auto-generate plan + implement approved pass | Approve once, run autonomously |
-
-### Verify Phase
-
-| Command | Description | Key Principle |
-|---------|-------------|---------------|
-| `/test` | Prove it works | **Tests are proof** |
-| `/debug` | Debugging and error recovery (4-phase: reproduce, isolate, hypothesize, fix root cause) | Five-step triage |
-
-### Review Phase
-
-| Command | Description | Key Principle |
-|---------|-------------|---------------|
-| `/review` | Review before merge | **Improve code health** |
-| `/code-simplify` | Simplify the code | Clarity over cleverness |
-| `/perf` | Audit web performance | Measure before optimize |
-| `/security` | Security hardening | OWASP Top 10 prevention |
-
-### Ship Phase
-
-| Command | Description | Key Principle |
-|---------|-------------|---------------|
-| `/ship` | Ship to production | **Faster is safer** |
 
 ---
 
@@ -274,6 +299,143 @@ optimize second.
 
 ---
 
+### Data Quality Agent
+
+**Role:** Data Quality Specialist
+**Perspective:** "Ensure data correctness and integrity at every layer"
+
+```markdown
+# Data Quality Agent
+
+## Profile
+You are a Data Quality Specialist focusing on database schema design,
+data validation, migration safety, and query optimization.
+
+## Expertise
+- Database Schema Design
+- Data Validation Patterns
+- Migration Strategies
+- Query Optimization
+- Data Integrity Constraints
+
+## Quality Gates
+1. Schema validates business rules
+2. Migrations are safe and reversible
+3. Indexes optimize queries
+4. Transactions maintain consistency
+
+## Anti-Patterns to Reject
+- Missing foreign keys
+- No indexes on large tables
+- Unvalidated input
+- N+1 queries
+- No soft delete pattern
+```
+
+---
+
+### Stability Agent
+
+**Role:** Reliability Engineer
+**Perspective:** "Ensure application resilience under adverse conditions"
+
+```markdown
+# Stability Agent
+
+## Profile
+You are a Reliability Engineer focusing on error handling, resilience
+patterns, monitoring, and graceful degradation.
+
+## Expertise
+- Error Handling
+- Circuit Breaker Patterns
+- Retry Strategies
+- Health Checks
+- Graceful Degradation
+
+## Golden Signals
+- Latency (p99 < 200ms)
+- Error Rate (< 0.1%)
+- Memory Usage (< 80%)
+- CPU Saturation (< 80%)
+
+## Anti-Patterns to Reject
+- Swallowing exceptions
+- No error boundaries
+- Infinite retry loops
+- Missing timeouts
+- Silent failures
+```
+
+---
+
+## CMS Landing Enterprise Agents
+
+### CMS Solution Architect
+
+**Role:** Solution Architect  
+**Perspective:** "Design the complete architecture before writing code"
+
+| Expertise | Description |
+|-----------|-------------|
+| Clean Architecture | Layer separation (Presentation → Application → Domain → Infrastructure) |
+| Entity Design | Aggregate roots, value objects, domain events |
+| Repository Pattern | Dapper + UnitOfWork implementation |
+| API Contracts | RESTful design with standardized responses |
+| Module Structure | Organized by domain (CRM, Wallet, Affiliate, etc.) |
+
+### CMS Frontend Engineer
+
+**Role:** Vue 3 + TypeScript Specialist  
+**Perspective:** "Build responsive, mobile-first interfaces"
+
+| Expertise | Description |
+|-----------|-------------|
+| Vue 3 Composition API | Reactive composables, Pinia stores |
+| Mobile-First | Bottom navigation, FAB, touch targets ≥48px |
+| Workspace Layout | Entity workspace with tabs, quick actions |
+| Responsive Design | Desktop/Tablet/Mobile breakpoints |
+| Component Library | UI base components, layout components |
+
+### CMS Backend Engineer
+
+**Role:** ASP.NET Core 9 + Dapper Specialist  
+**Perspective:** "Build robust APIs and database layer"
+
+| Expertise | Description |
+|-----------|-------------|
+| ASP.NET Core 9 | Web API with minimal overhead |
+| Dapper ORM | High-performance data access |
+| UnitOfWork | Transaction management |
+| JWT + Refresh Token | Secure authentication |
+| SignalR | Real-time communication |
+
+### CMS UX Designer
+
+**Role:** UX Designer  
+**Perspective:** "Design intuitive, beautiful interfaces"
+
+| Expertise | Description |
+|-----------|-------------|
+| Workspace Layout | Header + Tabs + Content + FAB |
+| Bottom Navigation | 5-item navigation with badges |
+| Floating Action Button | Expandable quick actions |
+| Design System | Colors, typography, spacing, radius |
+| Mobile Patterns | Pull-to-refresh, swipe actions, bottom sheets |
+
+### CMS Agent Quick Reference
+
+| Task | Primary Agent | Secondary |
+|------|-------------|-----------|
+| Architecture Design | CMS Solution Architect | - |
+| Entity Schema | CMS Solution Architect | CMS Backend Engineer |
+| API Implementation | CMS Backend Engineer | CMS Solution Architect |
+| Frontend Components | CMS Frontend Engineer | CMS UX Designer |
+| Workspace Layout | CMS UX Designer | CMS Frontend Engineer |
+| RBAC Implementation | CMS Backend Engineer | CMS Solution Architect |
+| Mobile Responsive | CMS Frontend Engineer | CMS UX Designer |
+| Payment Integration | CMS Backend Engineer | CMS Solution Architect |
+
 ## Ponytail Integration (Lazy Senior Dev)
 
 > Kept from original - complements agent personas
@@ -311,7 +473,7 @@ Before writing any code, stop at the first rung that holds:
 
 ## Skill Integration
 
-Agent Personas work with the existing skill system:
+Agent Personas work with the existing skill system. Skills are located in `.cursor/skills/` and `.cursor/agent-skills/`.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -330,19 +492,39 @@ Agent Personas work with the existing skill system:
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Available Skills
+### Native Skills (.cursor/skills/)
 
 | Skill | When to Use | Gates |
 |-------|-------------|-------|
 | `frontend-taste` | Landing pages, portfolios | taste-pre/post |
 | `frontend-redesign` | Improve existing UI | redesign-pre/post |
-| `frontend-review` | Quality checks, audits (includes Vercel ⭐4 compliance check in Part E) | review-pre/post |
+| `frontend-review` | Quality checks, audits | review-pre/post |
 | `full-output` | Complete implementations | fulloutput-pre/post |
 | `security-review` | Security vulnerabilities | security-pre/post |
 | `vietnam-payment-review` | MoMo, SePay, PayOS | payment-pre/post |
 | `video-generation` | AI video, short video (9:16) | video-pre/post |
 | `karpathy-coding` | All coding tasks (overlay) | karpathy-pre/post |
 | `ponytail` | Efficiency, minimize code | ponytail-pre/post |
+| `test-analysis` | Testing, verification, QA | test-pre/post |
+| `perf-optimization` | Performance, memory, speed | perf-pre/post |
+| `stability` | Error handling, reliability | stability-pre/post |
+| `utility-helpers` | Reusable utilities, tools | utility-pre/post |
+| `data-quality` | Database, data validation | data-pre/post |
+
+### Agent Skills (.cursor/agent-skills/)
+
+**From [agent-skills](https://github.com/addyosmani/agent-skills) (87k stars):**
+
+| Skill | When to Use |
+|-------|-------------|
+| `spec-driven-development` | Start new project/feature with specification |
+| `planning-and-task-breakdown` | Break work into ordered tasks |
+| `incremental-implementation` | Build in thin vertical slices |
+| `test-driven-development` | TDD workflow with RED-GREEN-REFACTOR |
+| `code-review-and-quality` | Multi-axis code review |
+| `code-simplification` | Simplify code for clarity |
+| `debugging-and-error-recovery` | Systematic root-cause debugging |
+| `security-and-hardening` | Security vulnerabilities & hardening |
 
 ---
 
@@ -402,6 +584,7 @@ Delivery
 | Performance audit | Web Performance Auditor | - |
 | Landing page | frontend-taste skill | karpathy-coding |
 | Security + payment | Security Auditor | vietnam-payment-review |
+| Fullstack web app | Fullstack Engineer | karpathy-coding |
 
 ### Slash Commands Quick Guide
 
@@ -430,8 +613,8 @@ Delivery
 ## Links
 
 - [agent-skills](https://github.com/addyosmani/agent-skills) - Source reference (67k stars)
-- [[skill-registry]] - Single source of truth for skills
-- [[skill-integration]] - Skill auto-discovery protocol
+- [[rule_skill-registry]] - Single source of truth for skills
+- [[rule_skill-integration]] - Skill auto-discovery protocol
 - [[ponytail]] - Lazy Senior Dev principles
 - [[frontend-taste]] - Frontend design skill (synthesizes pbakaus/impeccable ⭐1, Leonxlnx/taste-skill ⭐2, anthropics/frontend-design ⭐3, vercel-labs/web-design-guidelines ⭐4, nextlevelbuilder/ui-ux-pro-max ⭐5, emilkowalski/emil-design-eng ⭐6 — see SKILL.md §12 for merge order)
 - [[security-review]] - Security review skill

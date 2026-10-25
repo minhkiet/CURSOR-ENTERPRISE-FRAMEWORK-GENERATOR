@@ -1,0 +1,10 @@
+chore: add build scripts for cursor-setup-gui-wpf
+
+Add PowerShell packager (build-zip.ps1) to package .cursor contents
+into cursor-setup.zip, plus a Windows .bat wrapper (buildappsetup.bat)
+that runs the dotnet build then creates the zip in a single step.
+
+Usage:
+  .\buildappsetup.bat              Build Debug + zip
+  .\buildappsetup.bat Release      Build Release + zip
+  .\buildappsetup.bat /clean       Clean bin/obj before build

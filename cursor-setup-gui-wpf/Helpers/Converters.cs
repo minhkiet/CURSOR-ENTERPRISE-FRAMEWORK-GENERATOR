@@ -1,0 +1,119 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
+using System.Windows.Media;
+
+namespace CursorSetupWpf.Helpers
+{
+    public class IndexToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value != null && int.TryParse(value.ToString(), out int selectedIndex) &&
+                parameter != null && int.TryParse(parameter.ToString(), out int targetIndex))
+            {
+                return selectedIndex == targetIndex ? Visibility.Visible : Visibility.Collapsed;
+            }
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            => DependencyProperty.UnsetValue;
+    }
+
+    public class BoolToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool invert = parameter?.ToString() == "Invert";
+            bool boolValue = value is bool b && b;
+            if (invert) boolValue = !boolValue;
+            return boolValue ? Visibility.Visible : Visibility.Collapsed;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            => DependencyProperty.UnsetValue;
+    }
+
+    public class InverseBoolConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+            => value is bool b && !b;
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            => value is bool b && !b;
+    }
+
+    /// <summary>
+    /// Returns Emerald brush when true, Slate brush when false. Used for status badges.
+    /// </summary>
+    public class BoolToBrushConverter : IValueConverter
+    {
+        static readonly Brush TrueBrush = new SolidColorBrush(Color.FromRgb(16, 185, 129));  // Emerald-500
+        static readonly Brush FalseBrush = new SolidColorBrush(Color.FromRgb(100, 116, 139)); // Slate-500
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool b = value is bool x && x;
+            return b ? TrueBrush : FalseBrush;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            => DependencyProperty.UnsetValue;
+    }
+
+    /// <summary>
+    /// Converts log line prefixes to WPF Brushes for colored log output.
+    /// Dark slate-900 bg requires high-contrast, bright foregrounds.
+    /// </summary>
+    public class LogLevelToBrushConverter : IValueConverter
+    {
+        // Bright, high-contrast colors for dark background
+        static readonly Brush ErrorBrush   = new SolidColorBrush(Color.FromRgb(239, 68,  68 ));   // Red-500
+        static readonly Brush OkBrush       = new SolidColorBrush(Color.FromRgb(52,  211, 153));   // Emerald-400
+        static readonly Brush WarnBrush     = new SolidColorBrush(Color.FromRgb(251, 191, 36 ));   // Amber-400
+        static readonly Brush HeaderBrush   = new SolidColorBrush(Color.FromRgb(165, 180, 252));   // Indigo-300
+        static readonly Brush NormalBrush   = new SolidColorBrush(Color.FromRgb(226, 232, 240));   // Slate-200 (readable on slate-900)
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string line = value as string ?? "";
+            if (line.StartsWith("ERROR") || line.Contains("[ERROR]")) return ErrorBrush;
+            if (line.StartsWith("    FAILED") || line.StartsWith("Loi") || line.StartsWith("LOI")) return ErrorBrush;
+            if (line.StartsWith("    OK") || line.StartsWith("OK (")) return OkBrush;
+            if (line.StartsWith("[SKIP-CAT]") || line.StartsWith("[SKIP]")) return WarnBrush;
+            if (line.StartsWith("===")) return HeaderBrush;
+            if (line.StartsWith("===>")) return HeaderBrush;
+            if (line.StartsWith("[MCP]") || line.StartsWith("[BACKUP]")) return HeaderBrush;
+            return NormalBrush;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            => DependencyProperty.UnsetValue;
+    }
+
+    /// <summary>
+    /// Converts script template category string to a matching WPF brush.
+    /// web=Indigo, desktop=Cyan, deploy=Emerald, database=Amber, ai=Violet, utility=Slate.
+    /// </summary>
+    public class CategoryToColorBrushConverter : IValueConverter
+    {
+        static readonly Dictionary<string, Brush> CategoryBrushes = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["web"]      = new SolidColorBrush(Color.FromRgb( 79,  70, 229)),  // Indigo-600
+            ["desktop"]  = new SolidColorBrush(Color.FromRgb(  8, 145, 178)),  // Cyan-600
+            ["deploy"]   = new SolidColorBrush(Color.FromRgb(  5, 150, 105)),  // Emerald-600
+            ["database"] = new SolidColorBrush(Color.FromRgb(217, 119,   6)),  // Amber-600
+            ["ai"]       = new SolidColorBrush(Color.FromRgb(124,  58, 237)),  // Violet-600
+            ["utility"]  = new SolidColorBrush(Color.FromRgb( 71,  85, 105)),  // Slate-600
+        };
+        static readonly Brush DefaultBrush = new SolidColorBrush(Color.FromRgb(100, 116, 139)); // Slate-500
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string cat = value as string ?? "";
+            return CategoryBrushes.TryGetValue(cat, out var brush) ? brush : DefaultBrush;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            => DependencyProperty.UnsetValue;
+    }
+}

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuralAI — Nền Tảng AI Cho Doanh Nghiệp Việt</title>
+  <meta name="description" content="NeuralAI cung cấp giải pháp AI: chatbot thông minh, phân tích dữ liệu, nhận diện hình ảnh, xử lý ngôn ngữ tự nhiên. Tích hợp nhanh, bảo mật, hỗ trợ 24/7." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="#" class="logo">
+      <svg class="logo-mark" viewBox="0 0 40 40" fill="none">
+        <rect x="4" y="4" width="32" height="32" rx="8" fill="#1a1a2e"/>
+        <circle cx="20" cy="20" r="8" fill="#e94560"/>
+        <circle cx="20" cy="20" r="4" fill="#fff"/>
+      </svg>
+      <span>neural<span class="logo-accent">ai</span></span>
+    </a>
+    <ul class="nav-menu">
+      <li><a href="#products">Sản phẩm</a></li>
+      <li><a href="#solutions">Giải pháp</a></li>
+      <li><a href="#pricing">Bảng giá</a></li>
+      <li><a href="#docs">Tài liệu</a></li>
+      <li><a href="#contact">Liên hệ</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="#" class="nav-ghost">Đăng nhập</a>
+      <a href="#contact" class="nav-cta">
+        Dùng thử miễn phí
+        <i class="ph ph-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── HERO (Asymmetric split - no centered) ─── -->
+<header class="hero">
+  <div class="container hero-grid">
+    <div class="hero-text">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        Hơn 850 doanh nghiệp Việt đang dùng
+      </div>
+
+      <h1 class="hero-title">
+        AI sẵn sàng,<br/>
+        <span class="hl">doanh nghiệp tăng tốc</span>
+      </h1>
+
+      <p class="hero-desc">
+        NeuralAI cung cấp nền tảng AI toàn diện cho doanh nghiệp Việt: chatbot thông minh, phân tích dữ liệu,
+        nhận diện hình ảnh, xử lý ngôn ngữ tự nhiên. Tích hợp chỉ trong 24 giờ.
+      </p>
+
+      <div class="hero-cta">
+        <a href="#contact" class="btn btn-primary btn-lg">
+          Bắt đầu miễn phí
+          <i class="ph ph-arrow-right"></i>
+        </a>
+        <a href="#products" class="btn btn-ghost btn-lg">
+          Xem sản phẩm
+        </a>
+      </div>
+
+      <div class="hero-proof">
+        <div class="proof-item">
+          <span class="proof-num">850+</span>
+          <span class="proof-label">Doanh nghiệp</span>
+        </div>
+        <div class="proof-divider"></div>
+        <div class="proof-item">
+          <span class="proof-num">2.4M</span>
+          <span class="proof-label">Cuộc hội thoái/tháng</span>
+        </div>
+        <div class="proof-divider"></div>
+        <div class="proof-item">
+          <span class="proof-num">99.7%</span>
+          <span class="proof-label">Uptime</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="floating-card fc-main">
+        <div class="fc-header">
+          <div class="fc-dot red"></div>
+          <div class="fc-dot yellow"></div>
+          <div class="fc-dot green"></div>
+        </div>
+        <div class="fc-content">
+          <div class="msg msg-bot">
+            <div class="msg-avatar"><i class="ph-fill ph-robot"></i></div>
+            <div class="msg-bubble">
+              <p>Xin chào! Tôi có thể giúp gì cho bạn hôm nay?</p>
+            </div>
+          </div>
+          <div class="msg msg-user">
+            <div class="msg-bubble">
+              <p>Tư vấn gói AI phù hợp cho startup</p>
+            </div>
+          </div>
+          <div class="msg msg-bot">
+            <div class="msg-avatar"><i class="ph-fill ph-robot"></i></div>
+            <div class="msg-bubble">
+              <p>Dựa trên nhu cầu của bạn, tôi gợi ý gói Business với 5 chatbot AI và 10,000 hội thoái/tháng.</p>
+              <button class="msg-action">Xem chi tiết</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="floating-card fc-stat">
+        <i class="ph-fill ph-trend-up"></i>
+        <div class="fc-stat-content">
+          <span class="fc-stat-num">+35%</span>
+          <span class="fc-stat-label">Conversion rate</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-bg-pattern"></div>
+</header>
+
+<!-- ─── LOGOS (not "Trusted by" format) ─── -->
+<section class="logos">
+  <div class="container">
+    <p class="logos-label">Tích hợp với hệ thống doanh nghiệp Việt</p>
+    <div class="logos-track">
+      <div class="logo-item"><span>Viettel</span></div>
+      <div class="logo-item"><span>VNPay</span></div>
+      <div class="logo-item"><span>FPT Software</span></div>
+      <div class="logo-item"><span>Shopee</span></div>
+      <div class="logo-item"><span>MB Bank</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FEATURES (Bento grid - not 3 equal) ─── -->
+<section class="features" id="products">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        Sản phẩm AI
+      </div>
+      <h2 class="section-title">Giải pháp AI cho mọi ngành</h2>
+      <p class="section-desc">Từ chatbot chăm sóc khách hàng đến phân tích dữ liệu, NeuralAI cung cấp đầy đủ công cụ AI.</p>
+    </div>
+
+    <div class="bento">
+      <article class="bento-card bento-wide">
+        <div class="bc-icon"><i class="ph-fill ph-chat-circle-text"></i></div>
+        <h3>AI Chatbot</h3>
+        <p>Chatbot thông minh tích hợp GPT-4o, có thể huấn luyện trên dữ liệu riêng của doanh nghiệp. Hỗ trợ đa ngôn ngữ, đa nền tảng.</p>
+        <div class="bc-tags">
+          <span>GPT-4o</span>
+          <span>Fine-tuning</span>
+          <span>Đa ngôn ngữ</span>
+        </div>
+      </article>
+
+      <article class="bento-card">
+        <div class="bc-icon"><i class="ph-fill ph-chart-bar"></i></div>
+        <h3>Phân Tích Dữ Liệu</h3>
+        <p>AI phân tích dữ liệu kinh doanh, dự đoán xu hướng, tự động hóa báo cáo.</p>
+      </article>
+
+      <article class="bento-card">
+        <div class="bc-icon"><i class="ph-fill ph-eye"></i></div>
+        <h3>Nhận Diện Hình Ảnh</h3>
+        <p>AI nhận diện khuôn mặt, vật thể, text trong hình ảnh.</p>
+      </article>
+
+      <article class="bento-card">
+        <div class="bc-icon"><i class="ph-fill ph-translate"></i></div>
+        <h3>Xử Lý Ngôn Ngữ</h3>
+        <p>AI phân tích cảm xúc, tóm tắt văn bản, dịch thuật tự động.</p>
+      </article>
+
+      <article class="bento-card">
+        <div class="bc-icon"><i class="ph-fill ph-microphone"></i></div>
+        <h3>Chuyển Đổi Giọng Nói</h3>
+        <p>Text-to-Speech và Speech-to-Text chất lượng cao.</p>
+      </article>
+
+      <article class="bento-card bento-tall">
+        <div class="bc-icon"><i class="ph-fill ph-robot"></i></div>
+        <h3>Agent Tự Động</h3>
+        <p>AI agent có thể tự động thực hiện tác vụ: đặt lịch, gửi email, tìm kiếm thông tin.</p>
+        <div class="bc-visual">
+          <div class="agent-flow">
+            <div class="af-step"><i class="ph-fill ph-envelope"></i></div>
+            <div class="af-arrow"><i class="ph ph-arrow-right"></i></div>
+            <div class="af-step"><i class="ph-fill ph-brain"></i></div>
+            <div class="af-arrow"><i class="ph ph-arrow-right"></i></div>
+            <div class="af-step"><i class="ph-fill ph-check-circle"></i></div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SOLUTIONS (asymmetric 1+1 split) ─── -->
+<section class="solutions" id="solutions">
+  <div class="container">
+    <div class="solution-layout">
+      <div class="solution-content">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          Giải pháp theo ngành
+        </div>
+        <h2 class="section-title">AI được thiết kế cho ngành của bạn</h2>
+        <p class="solution-desc">Không phải giải pháp AI chung chung. NeuralAI hiểu đặc thù doanh nghiệp Việt.</p>
+        
+        <div class="solution-tabs">
+          <button class="sol-tab active" data-tab="ecommerce">E-commerce</button>
+          <button class="sol-tab" data-tab="finance">Tài chính</button>
+          <button class="sol-tab" data-tab="education">Giáo dục</button>
+          <button class="sol-tab" data-tab="healthcare">Y tế</button>
+        </div>
+
+        <div class="solution-pane active" data-tab="ecommerce">
+          <ul class="sc-benefits">
+            <li><i class="ph-fill ph-check-circle"></i> Chatbot tư vấn sản phẩm tự động</li>
+            <li><i class="ph-fill ph-check-circle"></i> Gợi ý sản phẩm liên quan</li>
+            <li><i class="ph-fill ph-check-circle"></i> Theo dõi đơn hàng tự động</li>
+            <li><i class="ph-fill ph-check-circle"></i> Phân tích hành vi mua sắm</li>
+          </ul>
+          <a href="#contact" class="btn btn-primary">Dùng thử miễn phí</a>
+        </div>
+      </div>
+
+      <div class="solution-visual">
+        <img src="https://picsum.photos/seed/ecommerce-ai-chatbot/600/450" alt="AI chatbot for ecommerce" loading="lazy"/>
+        <div class="sv-overlay">
+          <div class="sv-stat">
+            <span class="sv-num">+35%</span>
+            <span class="sv-label">Conversion rate</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PRICING (no ribbon, asymmetric cards) ─── -->
+<section class="pricing" id="pricing">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        Bảng giá
+      </div>
+      <h2 class="section-title">Gói dịch vụ linh hoạt</h2>
+      <p class="section-desc">Từ startup đến enterprise, có gói phù hợp với mọi quy mô.</p>
+    </div>
+
+    <div class="price-layout">
+      <article class="price-card">
+        <div class="pc-header">
+          <div class="pc-tier">Starter</div>
+          <div class="pc-price">
+            <span class="pc-amount">2.9M</span>
+            <span class="pc-period">/tháng</span>
+          </div>
+          <p class="pc-desc">Cho startup và cá nhân</p>
+        </div>
+        <ul class="pc-features">
+          <li><i class="ph ph-check"></i> 1 Chatbot AI</li>
+          <li><i class="ph ph-check"></i> 1,000 hội thoái/tháng</li>
+          <li><i class="ph ph-check"></i> 1 người dùng</li>
+          <li><i class="ph ph-check"></i> API access</li>
+        </ul>
+        <a href="#" class="btn btn-outline btn-full">Bắt đầu</a>
+      </article>
+
+      <article class="price-card pc-featured">
+        <div class="pc-header">
+          <div class="pc-tier">Business</div>
+          <div class="pc-price">
+            <span class="pc-amount">9.9M</span>
+            <span class="pc-period">/tháng</span>
+          </div>
+          <p class="pc-desc">Cho doanh nghiệp vừa</p>
+        </div>
+        <ul class="pc-features">
+          <li><i class="ph ph-check"></i> 5 Chatbot AI</li>
+          <li><i class="ph ph-check"></i> 10,000 hội thoái/tháng</li>
+          <li><i class="ph ph-check"></i> 10 người dùng</li>
+          <li><i class="ph ph-check"></i> Tất cả AI features</li>
+          <li><i class="ph ph-check"></i> Analytics dashboard</li>
+        </ul>
+        <a href="#" class="btn btn-primary btn-full">Bắt đầu</a>
+      </article>
+
+      <article class="price-card pc-wide">
+        <div class="pc-header">
+          <div class="pc-tier">Enterprise</div>
+          <p class="pc-desc">Cho tập đoàn lớn</p>
+        </div>
+        <ul class="pc-features">
+          <li><i class="ph ph-check"></i> Không giới hạn chatbot</li>
+          <li><i class="ph ph-check"></i> Không giới hạn hội thoại</li>
+          <li><i class="ph ph-check"></i> Custom model training</li>
+          <li><i class="ph ph-check"></i> SLA 99.9%</li>
+          <li><i class="ph ph-check"></i> Dedicated support</li>
+        </ul>
+        <a href="#contact" class="btn btn-outline btn-full">Liên hệ</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ─── DOCS (grid, not 4 equal cards) ─── -->
+<section class="docs" id="docs">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        Tài liệu
+      </div>
+      <h2 class="section-title">Tích hợp trong vài dòng code</h2>
+    </div>
+
+    <div class="docs-layout">
+      <article class="doc-card doc-featured">
+        <div class="dc-icon"><i class="ph-fill ph-book-open"></i></div>
+        <h4>Quickstart</h4>
+        <p>Bắt đầu với NeuralAI trong 5 phút với hướng dẫn từng bước.</p>
+        <a href="#">Đọc ngay <i class="ph ph-arrow-right"></i></a>
+      </article>
+
+      <div class="doc-sidebar">
+        <article class="doc-card">
+          <div class="dc-icon"><i class="ph-fill ph-code"></i></div>
+          <h4>API Reference</h4>
+          <p>Tài liệu đầy đủ cho tất cả endpoints.</p>
+          <a href="#">Xem docs <i class="ph ph-arrow-right"></i></a>
+        </article>
+
+        <article class="doc-card">
+          <div class="dc-icon"><i class="ph-fill ph-graduation-cap"></i></div>
+          <h4>Tutorials</h4>
+          <p>Hướng dẫn chi tiết từ cơ bản đến nâng cao.</p>
+          <a href="#">Học ngay <i class="ph ph-arrow-right"></i></a>
+        </article>
+
+        <article class="doc-card">
+          <div class="dc-icon"><i class="ph-fill ph-github-logo"></i></div>
+          <h4>SDKs</h4>
+          <p>Thư viện cho Python, JavaScript, Go, Java.</p>
+          <a href="#">GitHub <i class="ph ph-arrow-right"></i></a>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TESTIMONIALS (bento layout) ─── -->
+<section class="testimonials">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        Khách hàng
+      </div>
+      <h2 class="section-title">Doanh nghiệp Việt tin tưởng NeuralAI</h2>
+    </div>
+
+    <div class="testimonial-bento">
+      <article class="t-card t-featured">
+        <p class="t-quote">"NeuralAI chatbot giảm 70% công việc trả lời khách hàng của đội support. Khách hàng được phản hồi trong vài giây, mọi lúc."</p>
+        <div class="t-author">
+          <img src="https://i.pravatar.cc/48?img=33" alt=""/>
+          <div>
+            <div class="t-name">Trần Minh Tuấn</div>
+            <div class="t-meta">CTO · ShopDunk</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="t-card">
+        <p class="t-quote">"AI phân tích dữ liệu của NeuralAI giúp chúng tôi dự đoán xu hướng thị trường chính xác hơn."</p>
+        <div class="t-author">
+          <img src="https://i.pravatar.cc/48?img=52" alt=""/>
+          <div>
+            <div class="t-name">Nguyễn Hương Giang</div>
+            <div class="t-meta">Head of Data · VNPay</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="t-card">
+        <p class="t-quote">"Tích hợp NeuralAI vào hệ thống chỉ mất 2 ngày. Đội ngũ support 24/7 rất chuyên nghiệp."</p>
+        <div class="t-author">
+          <img src="https://i.pravatar.cc/48?img=29" alt=""/>
+          <div>
+            <div class="t-name">Lê Đình Khoa</div>
+            <div class="t-meta">Tech Lead · Lazada</div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CONTACT ─── -->
+<section class="contact" id="contact">
+  <div class="container">
+    <div class="contact-grid">
+      <div class="contact-content">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          Bắt đầu ngay
+        </div>
+        <h2>Tích hợp AI vào doanh nghiệp trong 24 giờ</h2>
+        <p>Đăng ký dùng thử miễn phí 14 ngày hoặc liên hệ để được tư vấn giải pháp phù hợp.</p>
+
+        <div class="contact-features">
+          <div class="cf-item">
+            <i class="ph-fill ph-check-circle"></i>
+            <span>Không cần credit card</span>
+          </div>
+          <div class="cf-item">
+            <i class="ph-fill ph-check-circle"></i>
+            <span>Tích hợp trong 24h</span>
+          </div>
+          <div class="cf-item">
+            <i class="ph-fill ph-check-circle"></i>
+            <span>Hỗ trợ kỹ thuật 24/7</span>
+          </div>
+        </div>
+      </div>
+
+      <form class="contact-form">
+        <div class="form-group">
+          <label>Email công ty</label>
+          <input type="email" placeholder="name@company.vn"/>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Họ tên</label>
+            <input type="text" placeholder="Nguyễn Văn A"/>
+          </div>
+          <div class="form-group">
+            <label>Số điện thoại</label>
+            <input type="tel" placeholder="0912 345 678"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Doanh nghiệp</label>
+          <input type="text" placeholder="Tên công ty của bạn"/>
+        </div>
+        <div class="form-group">
+          <label>Bạn quan tâm đến</label>
+          <select>
+            <option>AI Chatbot</option>
+            <option>Phân tích dữ liệu</option>
+            <option>Nhận diện hình ảnh</option>
+            <option>Xử lý ngôn ngữ</option>
+            <option>Tất cả</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full btn-lg">
+          Bắt đầu dùng thử miễn phí
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo">
+          <svg class="logo-mark" viewBox="0 0 40 40" fill="none">
+            <rect x="4" y="4" width="32" height="32" rx="8" fill="#1a1a2e"/>
+            <circle cx="20" cy="20" r="8" fill="#e94560"/>
+            <circle cx="20" cy="20" r="4" fill="#fff"/>
+          </svg>
+          <span>neural<span class="logo-accent">ai</span></span>
+        </div>
+        <p>Nền tảng AI cho doanh nghiệp Việt. 850+ doanh nghiệp tin tưởng.</p>
+      </div>
+      <div>
+        <h5>Sản phẩm</h5>
+        <ul>
+          <li><a href="#">AI Chatbot</a></li>
+          <li><a href="#">Phân tích dữ liệu</a></li>
+          <li><a href="#">Nhận diện hình ảnh</a></li>
+          <li><a href="#">Xử lý ngôn ngữ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Tài nguyên</h5>
+        <ul>
+          <li><a href="#">Documentation</a></li>
+          <li><a href="#">API Reference</a></li>
+          <li><a href="#">Tutorials</a></li>
+          <li><a href="#">Blog</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Công ty</h5>
+        <ul>
+          <li><a href="#">Về NeuralAI</a></li>
+          <li><a href="#">Tin tức</a></li>
+          <li><a href="#">Tuyển dụng</a></li>
+          <li><a href="#">Liên hệ</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2026 NeuralAI Vietnam JSC. MST: 0108246895.</div>
+      <div class="footer-legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Security</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

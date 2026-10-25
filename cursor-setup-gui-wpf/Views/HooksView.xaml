@@ -1,0 +1,115 @@
+<UserControl x:Class="CursorSetupWpf.Views.HooksView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{StaticResource ContentBackgroundBrush}">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="32,28">
+        <StackPanel MaxWidth="900">
+
+            <!-- Page Title: 24px, weight 600 -->
+            <TextBlock Text="{Binding HooksPageTitle}"
+                       FontFamily="{StaticResource UIFont}" FontSize="24" FontWeight="SemiBold"
+                       Foreground="{StaticResource Slate900Brush}" Margin="0,0,0,4"/>
+            <TextBlock Text="{Binding HooksPageDesc}"
+                       FontFamily="{StaticResource UIFont}" FontSize="14"
+                       Foreground="{StaticResource Neutral500Brush}" Margin="0,0,0,28"/>
+
+            <!-- Pre-scan Hook -->
+            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20">
+                <StackPanel>
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <CheckBox Grid.Column="0"
+                                  IsChecked="{Binding EnablePreScanHook, Mode=TwoWay}"
+                                  Style="{StaticResource ModernCheckBoxStyle}"
+                                  Margin="0,0,12,0"/>
+
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{Binding HooksPrescanTitle}"
+                                       FontFamily="{StaticResource UIFont}" FontSize="15" FontWeight="SemiBold"
+                                       Foreground="{StaticResource Slate900Brush}"/>
+                            <TextBlock Text="{Binding HooksPrescanDesc}"
+                                       FontFamily="{StaticResource UIFont}" FontSize="12"
+                                       Foreground="{StaticResource Slate500Brush}"
+                                       TextWrapping="Wrap" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Script box -->
+                    <StackPanel>
+                        <TextBlock Text="{Binding HooksPrescanScriptLabel}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="12"
+                                   Foreground="{StaticResource Slate500Brush}" Margin="32,0,0,6"/>
+                        <TextBox Text="{Binding PreScanScript, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Style="{StaticResource ModernTextBoxStyle}"
+                                FontFamily="{StaticResource MonoFont}"
+                                IsEnabled="{Binding EnablePreScanHook}"
+                                Opacity="{Binding EnablePreScanHook, Converter={StaticResource InverseBool}, ConverterParameter=Opacity}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Post-install Hook -->
+            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20">
+                <StackPanel>
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <CheckBox Grid.Column="0"
+                                  IsChecked="{Binding EnablePostInstallHook, Mode=TwoWay}"
+                                  Style="{StaticResource ModernCheckBoxStyle}"
+                                  Margin="0,0,12,0"/>
+
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{Binding HooksPostinstallTitle}"
+                                       FontFamily="{StaticResource UIFont}" FontSize="15" FontWeight="SemiBold"
+                                       Foreground="{StaticResource Slate900Brush}"/>
+                            <TextBlock Text="{Binding HooksPostinstallDesc}"
+                                       FontFamily="{StaticResource UIFont}" FontSize="12"
+                                       Foreground="{StaticResource Slate500Brush}"
+                                       TextWrapping="Wrap" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <StackPanel>
+                        <TextBlock Text="{Binding HooksPostinstallScriptLabel}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="12"
+                                   Foreground="{StaticResource Slate500Brush}" Margin="32,0,0,6"/>
+                        <TextBox Text="{Binding PostInstallScript, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Style="{StaticResource ModernTextBoxStyle}"
+                                FontFamily="{StaticResource MonoFont}"
+                                IsEnabled="{Binding EnablePostInstallHook}"
+                                Opacity="{Binding EnablePostInstallHook, Converter={StaticResource InverseBool}, ConverterParameter=Opacity}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Hint -->
+            <Border Background="{StaticResource Slate100Brush}" CornerRadius="12" Padding="20,16">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE946;"
+                               FontFamily="Segoe MDL2 Assets" FontSize="20"
+                               Foreground="{StaticResource Slate500Brush}"
+                               VerticalAlignment="Top" Margin="0,0,16,0"/>
+                    <StackPanel>
+                        <TextBlock Text="{Binding HooksAboutTitle}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{StaticResource Slate700Brush}" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding HooksAboutDesc}"
+                                   FontFamily="{StaticResource UIFont}" FontSize="13"
+                                   Foreground="{StaticResource Slate600Brush}"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

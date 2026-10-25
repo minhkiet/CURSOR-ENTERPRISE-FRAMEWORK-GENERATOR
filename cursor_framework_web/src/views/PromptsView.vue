@@ -18,20 +18,38 @@ const progressPct = ref<number>(0)
 const logRef = ref<HTMLElement | null>(null)
 
 const selectedCategory = ref<string>('all')
+const activeCommandFilter = ref<string>('all')
 const searchQuery = ref<string>('')
 const runnerExpanded = ref<Record<number, boolean>>({})
+const copiedPrompt = ref(false)
 
 const categories = ['Spec', 'Review', 'Build', 'Debug', 'Ship']
+
+const commandFilters = [
+  { cmd: 'all', label: 'Tất cả' },
+  { cmd: '/ui-ux', label: '/ui-ux' },
+  { cmd: '/dashboard-ui', label: '/dashboard-ui' },
+  { cmd: '/frontend-taste', label: '/frontend-taste' },
+  { cmd: '/cms-landing-enterprise', label: '/cms-landing' },
+  { cmd: '/image-workflow', label: '/image-workflow' },
+  { cmd: '/payment', label: '/payment' },
+  { cmd: '/seo-perf', label: '/seo-perf' }
+]
 
 const filteredPrompts = computed<PromptItem[]>(() => {
   return PROMPTS.filter((p) => {
     if (selectedCategory.value !== 'all' && p.category !== selectedCategory.value) return false
+    if (activeCommandFilter.value !== 'all') {
+      if (p.slashCommand !== activeCommandFilter.value) return false
+    }
     if (searchQuery.value.trim()) {
       const q = searchQuery.value.toLowerCase().trim()
       return (
         p.title.toLowerCase().includes(q) ||
         p.oneLiner.toLowerCase().includes(q) ||
-        p.prompt.toLowerCase().includes(q)
+        p.prompt.toLowerCase().includes(q) ||
+        (p.slashCommand && p.slashCommand.toLowerCase().includes(q)) ||
+        (p.tags && p.tags.some((t) => t.toLowerCase().includes(q)))
       )
     }
     return true
@@ -41,6 +59,15 @@ const filteredPrompts = computed<PromptItem[]>(() => {
 const selectedPrompt = computed<PromptItem | undefined>(() =>
   PROMPTS.find((p) => p.id === selectedPromptId.value)
 )
+
+function copyPromptText(text: string) {
+  if (!text) return
+  navigator.clipboard.writeText(text)
+  copiedPrompt.value = true
+  setTimeout(() => {
+    copiedPrompt.value = false
+  }, 2200)
+}
 
 function resolveItem(type: FrameworkItem['type'], id: string): FrameworkItem | undefined {
   return CATALOG.find((i) => i.type === type && i.id === id)
@@ -224,17 +251,44 @@ onMounted(() => {
     <!-- BUILDER + RUNNER -->
     <section class="pr-main">
       <div class="container">
+        <!-- USER GUIDE BANNER -->
+        <div class="pr-guide-banner">
+          <div class="pr-guide-icon">💡</div>
+          <div class="pr-guide-content">
+            <div class="pr-guide-title">Cẩm nang sử dụng Kho Prompts chuẩn Enterprise (Ai cũng có thể dùng được):</div>
+            <div class="pr-guide-desc">
+              Chọn mẫu prompt phù hợp bên dưới, bấm <strong>Sao chép prompt</strong> rồi dán thẳng vào hộp thoại Cursor (`Ctrl + I` hoặc `Ctrl + L`). Framework sẽ tự động kích hoạt bộ Rules, Skills và Agents tương ứng để phân tích và sinh code chuẩn mực không AI slop, có sẵn tokens và kiểm định WCAG AA.
+            </div>
+          </div>
+        </div>
+
         <div class="pr-grid">
           <!-- LEFT: TEMPLATES + PROMPT BODY -->
           <div class="pr-col pr-col-left">
             <div class="pr-panel">
               <header class="pr-panel-head">
                 <div>
-                  <h2 class="pr-panel-title">1 · Pick a template</h2>
-                  <p class="pr-panel-desc">A library of pre-wired prompts. Edit before run.</p>
+                  <h2 class="pr-panel-title">1 · Chọn mẫu prompt</h2>
+                  <p class="pr-panel-desc">Thư viện prompt chuẩn hóa kết nối sẵn Rules, Skills & Agents.</p>
                 </div>
                 <span class="pr-panel-badge">{{ filteredPrompts.length }} templates</span>
               </header>
+
+              <!-- QUICK SLASH COMMAND CHIPS -->
+              <div class="pr-cmd-row">
+                <span class="pr-cmd-label">Lệnh Slash:</span>
+                <div class="pr-cmd-chips">
+                  <button
+                    v-for="cmd in commandFilters"
+                    :key="cmd.cmd"
+                    class="pr-cmd-chip"
+                    :class="{ active: activeCommandFilter === cmd.cmd }"
+                    @click="activeCommandFilter = cmd.cmd"
+                  >
+                    {{ cmd.label }}
+                  </button>
+                </div>
+              </div>
 
               <div class="pr-filter-row">
                 <div class="pr-search">
@@ -245,7 +299,7 @@ onMounted(() => {
                   <input
                     v-model="searchQuery"
                     type="text"
-                    placeholder="Search prompts…"
+                    placeholder="Tìm kiếm prompt, lệnh slash, tags…"
                     aria-label="Search prompts"
                   />
                 </div>
@@ -255,7 +309,7 @@ onMounted(() => {
                     :class="{ active: selectedCategory === 'all' }"
                     @click="selectedCategory = 'all'"
                   >
-                    All
+                    Tất cả
                   </button>
                   <button
                     v-for="cat in categories"
@@ -278,12 +332,21 @@ onMounted(() => {
                   @click="selectPrompt(p)"
                   :disabled="isRunning"
                 >
-                  <span class="pr-template-cat">{{ p.category }}</span>
+                  <div class="pr-template-head-row">
+                    <span class="pr-template-cat">{{ p.category }}</span>
+                    <span v-if="p.slashCommand" class="pr-template-cmd">{{ p.slashCommand }}</span>
+                  </div>
                   <span class="pr-template-title">{{ p.title }}</span>
                   <span class="pr-template-oneliner">{{ p.oneLiner }}</span>
-                  <span class="pr-template-meta">
-                    {{ p.applies.length }} applies · {{ p.trace.length }} phases
-                  </span>
+                  <div class="pr-template-tags" v-if="p.tags && p.tags.length">
+                    <span v-for="tag in p.tags.slice(0, 3)" :key="tag" class="pr-tag-chip">{{ tag }}</span>
+                  </div>
+                  <div class="pr-template-meta-row">
+                    <span class="pr-template-meta">
+                      {{ p.applies.length }} applies · {{ p.trace.length }} phases
+                    </span>
+                    <span v-if="p.expectedDelta" class="pr-template-delta">{{ p.expectedDelta }}</span>
+                  </div>
                 </button>
               </div>
             </div>
@@ -291,16 +354,30 @@ onMounted(() => {
             <div class="pr-panel" v-if="selectedPrompt">
               <header class="pr-panel-head">
                 <div>
-                  <h2 class="pr-panel-title">2 · Prompt body</h2>
-                  <p class="pr-panel-desc">Edit freely. The applies below will run alongside it.</p>
+                  <h2 class="pr-panel-title">2 · Nội dung Prompt</h2>
+                  <p class="pr-panel-desc">Tự do chỉnh sửa hoặc sao chép để dán vào Cursor IDE / AI Chat.</p>
                 </div>
-                <button class="pr-mini-btn" @click="useAsBase" :disabled="isRunning">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
-                    <path d="M3 3v5h5" />
-                  </svg>
-                  Reset to template
-                </button>
+                <div class="pr-panel-head-actions">
+                  <button
+                    class="pr-mini-btn pr-copy-btn"
+                    :class="{ 'pr-btn-copied': copiedPrompt }"
+                    @click="copyPromptText(promptBody)"
+                    title="Sao chép toàn bộ prompt vào Clipboard"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span>{{ copiedPrompt ? '✓ Đã sao chép!' : 'Sao chép prompt' }}</span>
+                  </button>
+                  <button class="pr-mini-btn" @click="useAsBase" :disabled="isRunning">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+                      <path d="M3 3v5h5" />
+                    </svg>
+                    Reset
+                  </button>
+                </div>
               </header>
 
               <div class="pr-editor-wrap">
@@ -564,6 +641,46 @@ onMounted(() => {
   padding: 64px 0 100px;
 }
 
+.pr-guide-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(99, 102, 241, 0.05) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: var(--radius-lg);
+  padding: 18px 22px;
+  margin-bottom: 32px;
+}
+
+.pr-guide-icon {
+  font-size: 24px;
+  line-height: 1;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.pr-guide-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.pr-guide-title {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.pr-guide-desc {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.pr-guide-desc strong {
+  color: var(--accent);
+}
+
 .pr-grid {
   display: grid;
   grid-template-columns: 1.05fr 1fr;
@@ -695,6 +812,79 @@ onMounted(() => {
   height: 13px;
 }
 
+.pr-panel-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pr-copy-btn {
+  background: var(--accent-dim);
+  border-color: var(--accent-line);
+  color: var(--accent);
+}
+
+.pr-copy-btn:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.pr-btn-copied {
+  background: var(--color-success) !important;
+  color: #fff !important;
+  border-color: var(--color-success) !important;
+}
+
+/* COMMANDS FILTER ───────────────────────────────────────────────────────── */
+
+.pr-cmd-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.pr-cmd-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pr-cmd-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.pr-cmd-chip {
+  padding: 4px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--t-fast);
+}
+
+.pr-cmd-chip:hover {
+  color: var(--accent);
+  border-color: var(--accent-line);
+}
+
+.pr-cmd-chip.active {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
 /* FILTERS ───────────────────────────────────────────────────────────────── */
 
 .pr-filter-row {
@@ -799,11 +989,9 @@ onMounted(() => {
 }
 
 .pr-template {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-rows: auto auto auto;
-  column-gap: 12px;
-  row-gap: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   text-align: left;
   padding: 14px 16px;
   background: var(--bg-elevated);
@@ -833,10 +1021,15 @@ onMounted(() => {
   cursor: not-allowed;
 }
 
+.pr-template-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+
 .pr-template-cat {
-  grid-column: 1;
-  grid-row: 1;
-  align-self: start;
   font-family: var(--font-mono);
   font-size: 9.5px;
   font-weight: 600;
@@ -847,34 +1040,71 @@ onMounted(() => {
   border: 1px solid var(--accent-line);
   border-radius: var(--radius-sm);
   white-space: nowrap;
-  height: fit-content;
-  margin-top: 2px;
+}
+
+.pr-template-cmd {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid var(--accent);
+  padding: 2px 8px;
+  border-radius: 4px;
 }
 
 .pr-template-title {
-  grid-column: 2;
-  grid-row: 1;
   font-size: 13.5px;
   font-weight: 600;
   color: var(--text-primary);
   letter-spacing: -0.01em;
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
 .pr-template-oneliner {
-  grid-column: 1 / -1;
-  grid-row: 2;
   font-size: 12.5px;
   color: var(--text-secondary);
   line-height: 1.5;
 }
 
+.pr-template-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.pr-tag-chip {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.pr-template-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border-hairline);
+}
+
 .pr-template-meta {
-  grid-column: 1 / -1;
-  grid-row: 3;
   font-family: var(--font-mono);
   font-size: 10.5px;
   color: var(--text-muted);
+}
+
+.pr-template-delta {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--color-success);
 }
 
 /* EDITOR ────────────────────────────────────────────────────────────────── */

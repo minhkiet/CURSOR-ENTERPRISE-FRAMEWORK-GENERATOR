@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "cursor-framework": {
+      "command": "python",
+      "args": [
+        "${workspaceFolder}/mcp/framework_server.py"
+      ],
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      },
+      "description": "Cursor Framework - Context management, skill discovery, memory operations"
+    },
+    "file-ops": {
+      "command": "python",
+      "args": [
+        "${workspaceFolder}/mcp/file_server.py"
+      ],
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      },
+      "description": "File operations - Search, copy, move, delete, tree view"
+    }
+  }
+}

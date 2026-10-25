@@ -1,3 +1,10 @@
+export type TemplateSubPage = {
+  id: string
+  name: string
+  file: string
+  desc?: string
+}
+
 export type Template = {
   id: string
   slug: string
@@ -15,10 +22,161 @@ export type Template = {
   tags: string[]
   fileSize: string
   pages: number
+  pagesList?: TemplateSubPage[]
   techStack: string[]
 }
 
 export const templates: Template[] = [
+  {
+    id: 'ui-ux',
+    slug: 'ui-ux',
+    name: 'UI/UX Enterprise System',
+    category: 'Enterprise UI/UX & Design Tokens',
+    tagline: 'Hệ thống UI/UX & Design Tokens chuẩn Enterprise',
+    description:
+      'Mẫu thiết kế UI/UX theo chuẩn Evondev & Enterprise guidelines: Design tokens (Tailwind v4 / CSS variables), wireframe 3 phương án với dữ liệu thật, ma trận trạng thái (empty, loading, error, success), bảng điều khiển tương tác, hierarchy typography và form controls chống AI-slop.',
+    industry: 'UI/UX SYSTEM',
+    accent: '#3b82f6',
+    accentSecondary: '#60a5fa',
+    bgGradient: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #2563eb 100%)',
+    icon: 'layout',
+    features: [
+      'Hệ thống Design Tokens (Tailwind v4 & CSS variables)',
+      'Wireframe switch: Chuyển đổi Low-Fi sang High-Fi tương tác',
+      'Ma trận trạng thái chuẩn: Empty, Loading, Error, Active',
+      'Form controls & Table dữ liệu chống AI-slop',
+      'Audit 5 trục: Correctness, Hierarchy, A11y, Contrast, Rhythm'
+    ],
+    highlights: [
+      { label: 'Chuẩn Design', value: 'WCAG 2.1 AA' },
+      { label: 'Token Variables', value: '140+' },
+      { label: 'Khảo sát người dùng', value: '98.6%' }
+    ],
+    tags: ['UI-UX', 'Design System', 'Tokens', 'Wireframe', 'Anti-Slop', 'Enterprise'],
+    fileSize: '275 KB',
+    pages: 6,
+    techStack: ['HTML5', 'CSS Tokens', 'Vanilla JS', 'Phosphor Icons']
+  },
+  {
+    id: 'dashboard-ui',
+    slug: 'dashboard-ui',
+    name: 'Dashboard UI Pro',
+    category: 'Admin Panel & Analytics',
+    tagline: 'Bảng điều khiển & quản trị dữ liệu chuyên sâu',
+    description:
+      'Giao diện Dashboard quản trị chuyên nghiệp chuẩn SaaS. Đồng bộ 100% Phosphor Icons, bảng dữ liệu lọc đa điều kiện, biểu đồ doanh thu trực quan, thống kê KPI thời gian thực, kanban task board và zero placeholder slop.',
+    industry: 'DASHBOARD PRO',
+    accent: '#0ea5e9',
+    accentSecondary: '#38bdf8',
+    bgGradient: 'linear-gradient(135deg, #082f49 0%, #0369a1 50%, #0284c7 100%)',
+    icon: 'chart-bar',
+    features: [
+      'KPI Stat Cards với biểu đồ mini sparkline & % tăng trưởng',
+      'Data Grid phân trang, sắp xếp, lọc đa cột & batch actions',
+      'Kanban Task Board kéo thả trạng thái linh hoạt',
+      'Bộ lọc thời gian (Hôm nay, 7 ngày, Quý, Custom date range)',
+      'Hệ thống Notice, Toast, Modal và Drawer đồng bộ'
+    ],
+    highlights: [
+      { label: 'Tốc độ phản hồi', value: '< 0.4s' },
+      { label: 'Components', value: '48+' },
+      { label: 'Data density', value: 'Tối ưu Cockpit' }
+    ],
+    tags: ['Dashboard', 'Data Table', 'Kanban', 'KPI Stats', 'Phosphor', 'Analytics'],
+    fileSize: '290 KB',
+    pages: 7,
+    techStack: ['HTML5', 'CSS3 Grid/Flex', 'Vanilla JS', 'Chart.js']
+  },
+  {
+    id: 'frontend-taste',
+    slug: 'frontend-taste',
+    name: 'Frontend Taste & Craft',
+    category: 'High-End Craft & Anti-Slop',
+    tagline: 'Giao diện đỉnh cao, chống AI-slop, phong cách Linear/Apple',
+    description:
+      'Mẫu giao diện thể hiện đẳng cấp thiết kế Frontend Taste. Tuân thủ 57 slop-test gates, cân chỉnh 3 dials (Variance: 8, Motion: 6, Density: 4), typography Geist tinh xảo, nhịp điệu khoảng trắng tự nhiên, loại bỏ hoàn toàn các vệt tím AI sáo rỗng.',
+    industry: 'FRONTEND TASTE',
+    accent: '#8b5cf6',
+    accentSecondary: '#c084fc',
+    bgGradient: 'linear-gradient(135deg, #18181b 0%, #3b0764 50%, #6b21a8 100%)',
+    icon: 'sparkles',
+    features: [
+      'Triết lý 3 Dials: Variance, Motion và Visual Density',
+      '57 Slop-Test Gates: Loại bỏ 100% AI cliché và generic cards',
+      'Typography phối hợp Geist Display & Geist Mono chuẩn mực',
+      'Micro-interactions và hiệu ứng ánh sáng bề mặt tinh tế',
+      'Bố cục đa dạng: Hero lệch trục, Bento Grid tương tác, Testimonial ticker'
+    ],
+    highlights: [
+      { label: 'Slop-Test Score', value: '57/57 Passed' },
+      { label: 'Lighthouse Perf', value: '100/100' },
+      { label: 'Aesthetic Tier', value: 'Awwwards SOTD' }
+    ],
+    tags: ['Anti-Slop', 'Linear Style', 'Craft', '57 Gates', 'Micro-Motion', 'Typography'],
+    fileSize: '260 KB',
+    pages: 6,
+    techStack: ['HTML5', 'CSS3 Modern', 'Vanilla JS', 'Spring Motion']
+  },
+  {
+    id: 'cms-landing-enterprise',
+    slug: 'cms-landing-enterprise',
+    name: 'CMS Landing Enterprise v4',
+    category: 'Full SaaS CRM/CMS/Wallet/Affiliate',
+    tagline: 'Hệ thống SaaS toàn diện: CRM, Landing, Ví & Affiliate F0-F3',
+    description:
+      'Kiến trúc SaaS Enterprise v4 hoàn chỉnh: Vue 3 + ASP.NET Core 9 + Dapper. Tích hợp CRM quản lý leads, Landing Builder kéo thả, Ví điểm thưởng & Hoa hồng đa tầng F0-F3, Cổng thanh toán SePay / ZaloPay / Stripe với Webhook idempotent.',
+    industry: 'ENTERPRISE SAAS',
+    accent: '#10b981',
+    accentSecondary: '#34d399',
+    bgGradient: 'linear-gradient(135deg, #022c22 0%, #064e3b 50%, #047857 100%)',
+    icon: 'buildings',
+    features: [
+      'Module CRM Lead & Customer Workspace với Pipeline Kanban',
+      'Landing Page Builder kéo thả với kho section mẫu dựng sẵn',
+      'Ví điểm thưởng (Points Wallet) & Rút hoa hồng tự động',
+      'Động cơ Affiliate đa tầng F0 -> F3 tính toán hoa hồng realtime',
+      'Tích hợp thanh toán SePay, QR VietQR, ZaloPay, Stripe Idempotent'
+    ],
+    highlights: [
+      { label: 'Kiến trúc', value: 'Clean + Dapper' },
+      { label: 'Cổng thanh toán', value: 'SePay + VietQR' },
+      { label: 'Hoa hồng Affiliate', value: 'Đa tầng F0-F3' }
+    ],
+    tags: ['SaaS CMS', 'CRM Pipeline', 'Affiliate F0-F3', 'Wallet', 'SePay', 'Landing Builder'],
+    fileSize: '360 KB',
+    pages: 8,
+    techStack: ['Vue 3', 'ASP.NET Core 9', 'Dapper', 'SQLite/Postgres']
+  },
+  {
+    id: 'image-workflow',
+    slug: 'image-workflow',
+    name: 'Image Workflow Studio',
+    category: 'AI Image & Asset Pipeline',
+    tagline: 'Pipeline tạo ảnh AI chuẩn phong cách & bóc tách asset web',
+    description:
+      'Workflow tự động hóa hình ảnh từ Screenshot/URL sang Asset thực tế. Kết hợp Web Cloner, Image Finder (Unsplash, Pexels) và Image Generator (Google Flow, DALL-E 3, Flux). Bao gồm kho Prompt blueprints, Negative prompts và công cụ định dạng tỷ lệ 16:9, 1:1, 9:16.',
+    industry: 'IMAGE WORKFLOW',
+    accent: '#f43f5e',
+    accentSecondary: '#fb7185',
+    bgGradient: 'linear-gradient(135deg, #4c0519 0%, #881337 50%, #be123c 100%)',
+    icon: 'image',
+    features: [
+      'Phân tích asset từ Screenshot & URL (bóc tách kích thước, màu, style)',
+      'Cây quyết định Asset: Giữ URL -> Tìm Stock -> Tạo ảnh AI Custom',
+      'Kho Prompt Blueprints chuẩn studio: Ánh sáng, bối cảnh, tỷ lệ',
+      'Bộ lọc Negative Prompt chống dị tật AI, chữ méo, bố cục hỏng',
+      'Asset Manifest Generator xuất file tải về cho dự án web'
+    ],
+    highlights: [
+      { label: 'Kho Prompt Mẫu', value: '35+ Blueprints' },
+      { label: 'Tỷ lệ khung hình', value: '16:9, 1:1, 9:16' },
+      { label: 'Asset Tối ưu', value: 'WebP / AVIF' }
+    ],
+    tags: ['Image Workflow', 'AI Generator', 'Web Cloner', 'Prompt Blueprint', 'Asset Pipeline'],
+    fileSize: '280 KB',
+    pages: 6,
+    techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Canvas API']
+  },
   {
     id: 'crm',
     slug: 'crm',
@@ -47,6 +205,10 @@ export const templates: Template[] = [
     tags: ['Dashboard', 'Pipeline', 'Analytics', 'Automation'],
     fileSize: '248 KB',
     pages: 6,
+    pagesList: [
+      { id: 'index', name: 'Trang Chủ & CRM Platform', file: 'index.html', desc: 'Pipeline trực quan, quản lý lead & tự động hóa' },
+      { id: 'pricing', name: 'Bảng Giá & So Sánh Gói', file: 'pricing.html', desc: 'Ma trận gói cước Starter / Pro / Enterprise & ROI calculator' }
+    ],
     techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Chart.js']
   },
   {
@@ -77,6 +239,10 @@ export const templates: Template[] = [
     tags: ['E-commerce', 'High-converting', 'Mobile-first'],
     fileSize: '215 KB',
     pages: 5,
+    pagesList: [
+      { id: 'index', name: 'Trang Bán Hàng & Flash Sale', file: 'index.html', desc: 'Trang chi tiết tai nghe flagship AURA Pro, countdown timer & reviews' },
+      { id: 'checkout', name: 'Thanh Toán & Đặt Hàng 1-Click', file: 'checkout.html', desc: 'Quy trình checkout chuẩn Shopify Plus, coupon FLASH45 & giao hỏa tốc 2H' }
+    ],
     techStack: ['HTML5', 'CSS3', 'Vanilla JS']
   },
   {
@@ -347,6 +513,11 @@ export const templates: Template[] = [
     tags: ['Real Estate', 'Map', 'AI-match', 'Virtual Tour'],
     fileSize: '298 KB',
     pages: 7,
+    pagesList: [
+      { id: 'index', name: 'Trang Chủ & Danh Mục Dự Án', file: 'index.html', desc: '124K tin đăng, bộ lọc thông minh & bản đồ giá' },
+      { id: 'detail', name: 'Chi Tiết Biệt Thự Grand Villa', file: 'detail.html', desc: 'Thư viện ảnh 6 góc, mặt bằng 3 tầng, tính lãi vay & đặt lịch xem nhà VIP' },
+      { id: 'pricing', name: 'Bảng Giá & Sa Bàn Phân Khu', file: 'pricing.html', desc: 'Bảng giá 12 căn biệt thự view sông & chính sách ưu đãi 0%' }
+    ],
     techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Mapbox GL']
   },
   {
@@ -377,6 +548,11 @@ export const templates: Template[] = [
     tags: ['Travel', 'Tour', 'Booking', 'Southeast Asia'],
     fileSize: '262 KB',
     pages: 6,
+    pagesList: [
+      { id: 'index', name: 'Trang Chủ & Điểm Đến', file: 'index.html', desc: 'Khu nghỉ dưỡng sang trọng, tour đảo & review thực tế' },
+      { id: 'detail', name: 'Chi Tiết Oceanfront Villa', file: 'detail.html', desc: 'Biệt thự hồ bơi view biển, tiện ích thượng lưu & lịch trình 3N2Đ' },
+      { id: 'booking', name: 'Đặt Chỗ & Tour Trải Nghiệm', file: 'booking.html', desc: 'Chọn ngày nhận phòng, số lượng khách & du thuyền đưa đón' }
+    ],
     techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Mapbox GL']
   },
   {
@@ -503,28 +679,28 @@ export const templates: Template[] = [
     id: 'computech',
     slug: 'computech',
     name: 'TechHub',
-    category: 'Cong Nghe May Tinh',
-    tagline: 'Laptop, PC gaming, linh kien chinh hang',
+    category: 'Công Nghệ Máy Tính',
+    tagline: 'Laptop, PC Gaming, linh kiện chính hãng',
     description:
-      'Landing page cho cua hang may tinh. Laptop gaming, PC build, linh kien, phu kien. Phu hop cua hang laptop, gaming gear, linh kien may tinh.',
+      'Landing page cho cửa hàng công nghệ & máy tính. Laptop gaming, PC custom, linh kiện chính hãng, bảo hành 24 tháng, hỗ trợ trả góp 0% và giao hàng tốc hành.',
     industry: 'COMPUTER',
     accent: '#dc2626',
     accentSecondary: '#f59e0b',
     bgGradient: 'linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #991b1b 100%)',
     icon: 'laptop',
     features: [
-      'Laptop gaming & van phong',
-      'PC build theo yeu cau',
-      'Linh kien chinh hang',
-      'Trai nghiem thuc te',
-      'Bao hanh & tra gop'
+      'Bento grid laptop gaming & văn phòng',
+      'Cấu hình PC build theo yêu cầu realtime',
+      'Linh kiện phân phối chính hãng 100%',
+      'Bảo hành 24 tháng tận nơi',
+      'Trả góp 0% qua thẻ tín dụng'
     ],
     highlights: [
-      { label: 'San pham', value: '2,000+' },
-      { label: 'Thuong hieu', value: '50+' },
-      { label: 'Tra gop', value: '0%' }
+      { label: 'Sản phẩm', value: '2,000+' },
+      { label: 'Thương hiệu', value: '50+' },
+      { label: 'Trả góp', value: '0%' }
     ],
-    tags: ['Laptop', 'Gaming PC', 'Linh kien', 'Cong nghe'],
+    tags: ['Laptop', 'Gaming PC', 'Linh kiện', 'Công nghệ'],
     fileSize: '264 KB',
     pages: 6,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS']
@@ -533,28 +709,28 @@ export const templates: Template[] = [
     id: 'preschool',
     slug: 'preschool',
     name: 'Little Stars',
-    category: 'Giao Duc Mam Non',
-    tagline: 'Nuoi day tre trong tinh yeu',
+    category: 'Giáo Dục Mầm Non',
+    tagline: 'Nuôi dạy trẻ trong tình yêu thương & sáng tạo',
     description:
-      'Landing page cho truong mam non. Chuong trinh hoc theo doi tuong, co so vat chat hien dai, giao vien nhiet tinh. Phu hop truong mam non, nha tre, mam non chuyen biet.',
+      'Landing page cho trường mầm non chuẩn quốc tế. Phương pháp STEAM tiên tiến, cơ sở vật chất hiện đại, dinh dưỡng hữu cơ và báo cáo học tập số cho phụ huynh.',
     industry: 'EDUCATION',
     accent: '#f97316',
     accentSecondary: '#84cc16',
     bgGradient: 'linear-gradient(135deg, #7c2d12 0%, #9a3412 50%, #f97316 100%)',
     icon: 'baby',
     features: [
-      'Chuong trinh hoc theo nhom tuoi',
-      'Co so vat chat hien dai',
-      'Giao vien chuyen nghiep',
-      'Bao cao hap nhan hang ngay',
-      'An toan & giam sat 24/7'
+      'Chương trình học STEAM theo lứa tuổi',
+      'Cơ sở vật chất chuẩn quốc tế',
+      'Đội ngũ giáo viên bản ngữ & chuyên môn cao',
+      'Báo cáo sinh hoạt & dinh dưỡng hàng ngày',
+      'Camera an ninh giám sát 24/7'
     ],
     highlights: [
-      { label: 'Tre em', value: '300+' },
-      { label: 'Giao vien', value: '25' },
-      { label: 'Nam kinh nghiem', value: '15' }
+      { label: 'Học sinh', value: '300+' },
+      { label: 'Giáo viên', value: '25' },
+      { label: 'Năm kinh nghiệm', value: '15' }
     ],
-    tags: ['Mam non', 'Giao duc tre', 'Nuoi day', 'Phat trien'],
+    tags: ['Mầm non', 'STEAM', 'Giáo dục sớm', 'Trẻ em'],
     fileSize: '229 KB',
     pages: 5,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS']
@@ -562,32 +738,132 @@ export const templates: Template[] = [
   {
     id: 'church',
     slug: 'church',
-    name: 'Holy Light Parish',
-    category: 'Giao Xu Cong Giao',
-    tagline: 'Noi anh sang Chua soi vao long',
+    name: 'Thánh Quang Parish',
+    category: 'Giáo Xứ & Tôn Giáo',
+    tagline: 'Nơi ánh sáng Chúa soi rọi tâm hồn',
     description:
-      'Landing page cho giao xu Cong giao. Lich than le, thong tin bi tich, hoat dong giao xu. Phu hop giao xu, giao phan, cong dong tin nguoi.',
+      'Landing page trang nghiêm, thanh thoát cho giáo xứ Công giáo. Tra cứu lịch Thánh lễ trực tuyến, hướng dẫn bí tích, tin tức cộng đoàn và suy niệm Lời Chúa mỗi ngày.',
     industry: 'CHURCH',
     accent: '#b91c1c',
     accentSecondary: '#fcd34d',
     bgGradient: 'linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #b91c1c 100%)',
     icon: 'cross',
     features: [
-      'Lich than le chi tiet',
-      'Thong tin bi tich',
-      'Hoat dong giao xu',
-      'Doi ngu linh muc',
-      'Lien he & ban do'
+      'Lịch Thánh lễ trong tuần & Chúa Nhật chi tiết',
+      'Thủ tục chuẩn bị các Bí tích (Rửa tội, Hôn phối...)',
+      'Tin tức hoạt động & hội đoàn giáo xứ',
+      'Suy niệm Lời Chúa hàng ngày',
+      'Thư viện hình ảnh & bản đồ chỉ đường'
     ],
     highlights: [
-      { label: 'Giao dan', value: '3,000+' },
-      { label: 'Nam thanh lap', value: '1995' },
-      { label: 'Linh muc', value: '2' }
+      { label: 'Giáo dân', value: '3,000+' },
+      { label: 'Năm thành lập', value: '1995' },
+      { label: 'Linh mục', value: '2' }
     ],
-    tags: ['Cong giao', 'Giao xu', 'Than le', 'Giao dan'],
+    tags: ['Công giáo', 'Giáo xứ', 'Thánh lễ', 'Tôn giáo'],
     fileSize: '198 KB',
     pages: 4,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS']
+  },
+  {
+    id: 'insurance',
+    slug: 'insurance',
+    name: 'Aegis Bảo An',
+    category: 'Bảo Hiểm Toàn Diện',
+    tagline: 'An tâm tương lai, vững bước hiện tại',
+    description:
+      'Landing page doanh nghiệp bảo hiểm chuẩn quốc tế. Đầy đủ các dòng sản phẩm: Sức khỏe CarePlus, Nhân thọ An Thịnh, Xe cơ giới AutoCare, Du lịch quốc tế GlobeSecure & Tài sản doanh nghiệp BizShield. Tích hợp công cụ tính phí trực tuyến, tra cứu 680+ bệnh viện bảo lãnh, đánh giá khách hàng & bồi thường e-Claim 24h.',
+    industry: 'INSURANCE',
+    accent: '#0284c7',
+    accentSecondary: '#f59e0b',
+    bgGradient: 'linear-gradient(135deg, #07192f 0%, #0c3366 50%, #0369a1 100%)',
+    icon: 'shield-check',
+    features: [
+      'Công cụ ước tính phí bảo hiểm động theo độ tuổi & hạn mức',
+      'Mạng lưới 680+ bệnh viện bảo lãnh viện phí trực tiếp',
+      'Quy trình nộp hồ sơ e-Claim bồi thường trực tuyến 24h',
+      'Bảng so sánh 3 gói quyền lợi chi tiết (Cơ bản/Vàng/Kim cương)',
+      'Hệ thống thu thập yêu cầu tư vấn 1-1 chuyên sâu'
+    ],
+    highlights: [
+      { label: 'Khách hàng tin chọn', value: '4.8M+' },
+      { label: 'Chi trả bồi thường', value: '1.850 Tỷ' },
+      { label: 'Bệnh viện liên kết', value: '680+' }
+    ],
+    tags: ['Bảo Hiểm', 'Sức Khỏe', 'Nhân Thọ', 'Ô Tô', 'E-Claim', 'Tài Chính'],
+    fileSize: '312 KB',
+    pages: 6,
+    techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Phosphor Icons']
+  },
+  {
+    id: 'auto-showroom',
+    slug: 'auto-showroom',
+    name: 'AutoPrime Motors',
+    category: 'Showroom Ô Tô Đa Thương Hiệu',
+    tagline: 'Sở hữu xe mơ ước — Trải nghiệm mua sắm 5 sao',
+    description:
+      'Siêu thị ô tô phân phối đa thương hiệu chính hãng & xe lướt chuẩn 176 hạng mục: Toyota, Mercedes-Benz, BMW, Porsche, Ford, Hyundai, VinFast. Tích hợp công cụ tính chi phí lăn bánh & trả góp ngân hàng lãi suất 6.8%, lái thử tại nhà, thu cũ đổi mới Trade-in và giao xe 24h tận nơi.',
+    industry: 'AUTOMOTIVE',
+    accent: '#f59e0b',
+    accentSecondary: '#38bdf8',
+    bgGradient: 'linear-gradient(135deg, #090d16 0%, #0f172a 50%, #1e293b 100%)',
+    icon: 'car-profile',
+    features: [
+      'Bộ lọc tìm xe thông minh theo hãng, kiểu dáng, tầm giá và nhiên liệu',
+      'Công cụ dự toán chi phí lăn bánh & bảng tính trả góp ngân hàng 85%',
+      'Quy trình lái thử xe tận nhà (Home Test-Drive) miễn phí',
+      'Hệ thống thu cũ đổi mới (Trade-In) định giá minh bạch trong 15 phút',
+      'Chính sách bảo hành vàng 3 năm & cứu hộ khẩn cấp 24/7 toàn quốc'
+    ],
+    highlights: [
+      { label: 'Xe đã giao', value: '5,800+' },
+      { label: 'Hạng mục kiểm định', value: '176' },
+      { label: 'Showroom toàn quốc', value: '5' }
+    ],
+    tags: ['Ô tô', 'Showroom', 'Xe lướt', 'Xe điện', 'Trả góp', 'Lái thử'],
+    fileSize: '340 KB',
+    pages: 6,
+    pagesList: [
+      { id: 'index', name: 'Trang Chủ & Kho Xe Sẵn Có', file: 'index.html', desc: 'Siêu thị ô tô đa thương hiệu, bộ lọc thông minh & chính sách bảo hành' },
+      { id: 'car-detail', name: 'Chi Tiết Siêu Xe Taycan', file: 'car-detail.html', desc: 'Trình đổi màu 360 độ, so sánh thông số mã lực/pin & dự toán trả góp' },
+      { id: 'test-drive', name: 'Đặt Lái Thử & Dịch Vụ', file: 'test-drive.html', desc: 'Đăng ký lái thử tại nhà miễn phí, thẩm định Trade-in & bảo dưỡng chính hãng' }
+    ],
+    techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Phosphor Icons']
+  },
+  {
+    id: 'viet-restaurant',
+    slug: 'viet-restaurant',
+    name: 'Vị Xưa Quán',
+    category: 'Nhà Hàng Ẩm Thực Truyền Thống Việt',
+    tagline: 'Vị xưa tinh hoa — Trọn vẹn phong vị mâm cơm gia đình Việt',
+    description:
+      'Chuỗi nhà hàng ẩm thực di sản 3 miền Bắc - Trung - Nam đạt chứng nhận Michelin Selected. Chuyên cơm niêu cháy giòn 2 mặt, cá bống kho tộ, bún chả nướng than hoa, phở bát đá và bánh xèo miền Tây. Tích hợp hệ thống đặt bàn giữ chỗ đẹp, phòng VIP máy lạnh, E-Voucher giảm 15%-25% và chỉ dẫn đường tới 4 chi nhánh toàn quốc.',
+    industry: 'RESTAURANT',
+    accent: '#d97706',
+    accentSecondary: '#16a34a',
+    bgGradient: 'linear-gradient(135deg, #120b07 0%, #281910 50%, #451a03 100%)',
+    icon: 'bowl-food',
+    features: [
+      'Thực đơn di sản 120+ món ăn truyền thống 3 miền Bắc - Trung - Nam',
+      'Hệ thống đặt bàn trực tuyến chọn chi nhánh, phòng VIP & số lượng khách',
+      'Bộ sưu tập E-Voucher giảm 15% - 25% kèm form nhận mã SMS/Zalo tức thì',
+      'Không gian văn hóa nhà cổ Bắc Bộ, mộc mạc thư thái & âm nhạc truyền thống',
+      'Bãi đỗ xe ô tô miễn phí có bảo vệ trông giữ tại tất cả 4 chi nhánh'
+    ],
+    highlights: [
+      { label: 'Năm gia truyền', value: '38+' },
+      { label: 'Món ăn di sản', value: '120+' },
+      { label: 'Thực khách đánh giá', value: '4.9 ★' }
+    ],
+    tags: ['Nhà Hàng', 'Cơm Niêu', 'Ẩm Thực Việt', 'Michelin Selected', 'Voucher', 'Đặt Bàn'],
+    fileSize: '325 KB',
+    pages: 5,
+    pagesList: [
+      { id: 'index', name: 'Trang Chủ & Không Gian', file: 'index.html', desc: 'Câu chuyện ẩm thực di sản Michelin Selected, văn hóa nhà cổ & ưu đãi' },
+      { id: 'menu', name: 'Thực Đơn Di Sản 3 Miền', file: 'menu.html', desc: '120+ món ăn truyền thống, bộ lọc danh mục & tính tổng mâm cơm gia đình' },
+      { id: 'reservation', name: 'Đặt Bàn & Phòng VIP', file: 'reservation.html', desc: 'Chọn ngày giờ, sảnh tiệc riêng, phòng VIP Hoàng Cung kèm xác nhận tức thì' }
+    ],
+    techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Phosphor Icons']
   }
 ]
 
