@@ -25,8 +25,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
 
+      # ponytail: pytest-cov provides the `coverage` CLI used by the
+      # coverage steps below and writes .coverage / htmlcov.
       - name: Run pytest
-        run: pytest --tb=short -v
+        run: pytest --tb=short -v --cov=cursor_framework --cov-report=term-missing --cov-report=html:htmlcov
 
       - name: Coverage summary
         if: always()
@@ -58,37 +60,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
+      # ponytail: the GUI lives in cursor-setup-gui-wpf (the old
+      # cursor-setup-gui console project was removed). Build the WPF app so
+      # a broken XAML or resource file fails CI instead of the release.
       - name: Build C# GUI
-        working-directory: cursor-setup-gui
+        working-directory: cursor-setup-gui-wpf
         run: |
           dotnet --version
           dotnet build -c Release --nologo
-
-      # ponytail: smoke-test the new --silent --install-zip CLI to catch
-      # regression in the args parser or extraction path. Uses python
-      # zipfile (more reliable than PS ZipFile.CreateFromDirectory which
-      # has Windows handle-leak races). The CLI extracts to <cwd-parent>/
-      # .cursor by design — that's where projects live relative to the
-      # build output.
-      - name: Smoke test CLI silent install
-        working-directory: cursor-setup-gui
-        shell: pwsh
-        run: |
-          $work = New-Item -ItemType Directory -Path "../_smoke" -Force
-          $workDir = $work.FullName
-          New-Item -ItemType Directory -Path "$workDir/rules" -Force | Out-Null
-          Set-Content "$workDir/rules/test.mdc" -Value "# smoke-test"
-          python -c "import zipfile; zipfile.ZipFile(r'$workDir/test.zip','w').write(r'$workDir/rules/test.mdc','rules/test.mdc')"
-          $exe = "bin/Release/net8.0-windows/win-x64/cursor-setup.exe"
-          $proc = Start-Process -FilePath $exe `
-            -ArgumentList "--silent","--install-zip","test.zip" `
-            -WorkingDirectory $workDir -PassThru -Wait
-          if ($proc.ExitCode -ne 0) { throw "CLI install exited with $($proc.ExitCode)" }
-          $projectRoot = Split-Path -Parent $workDir
-          if (-not (Test-Path "$projectRoot/.cursor/rules/test.mdc")) {
-            throw "extraction failed: expected $projectRoot/.cursor/rules/test.mdc"
-          }
-          # ponytail: clean up the test artifact so it doesn't pollute the
-          # repo's real .cursor/rules/ directory on every CI run.
-          Remove-Item "$projectRoot/.cursor/rules/test.mdc" -Force
-          Write-Host "OK: CLI silent install verified"
+          $exe = "bin/Release/net8.0-windows/win-x64/VibeCodeEnterpriseFramework.exe"
+          if (-not (Test-Path $exe)) { throw "expected build output $exe" }
+          Write-Host "OK: GUI built at $exe"

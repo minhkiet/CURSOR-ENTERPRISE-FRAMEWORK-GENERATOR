@@ -45,6 +45,7 @@
 venv/
 build/
 dist/
+.coverage
 cursor_framework/__pycache__/
 cursor_framework/*.egg-info/
 cursor_framework/review/
