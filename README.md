@@ -329,7 +329,7 @@ node tools/rea/scripts/rea.mjs mcp
 ### 5. Lệnh Build Trình Cài Đặt Windows GUI
 
 ```powershell
-cd cursor-setup-gui-wpf
+cd vibe-setup-gui-wpf
 dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o ../dist
 ```
 

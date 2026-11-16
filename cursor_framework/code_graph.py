@@ -27,7 +27,7 @@ Output structure:
         "modules": [
             {
                 "name": "installer",
-                "path": "cursor-setup-gui-wpf/Services/Installer.cs",
+                "path": "vibe-setup-gui-wpf/Services/Installer.cs",
                 "type": "csharp",
                 "classes": ["Installer", "BackupService"],
                 "functions": ["Install()", "Backup()"],

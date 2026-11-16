@@ -10,7 +10,7 @@ The inspected scopes are the four paths declared in the master requirements:
 | `SCOPE-RESOURCE-HUB` | `vibe-code-framework/` | Shared canonical source |
 | `SCOPE-CORE` | `cursor_framework/` | Core project |
 | `SCOPE-WEB` | `cursor_framework_web/` | Web project |
-| `SCOPE-SETUP` | `cursor-setup-gui-wpf/` | Setup project |
+| `SCOPE-SETUP` | `vibe-setup-gui-wpf/` | Setup project |
 | Cursor boundary | `.cursor/` | Adapter/project-local boundary; migration per resource is pending |
 
 ## Applied change
@@ -22,7 +22,7 @@ The inspected scopes are the four paths declared in the master requirements:
 - `CHG-REFACTOR`: make script defaults resolve the Resource Hub root instead of
   the `08-scripts` directory.
 - `CHG-REFACTOR`: update the root `CursorSetup.sln` project reference to the
-  existing `cursor-setup-gui-wpf/CursorSetupWpf.csproj` project.
+  existing `vibe-setup-gui-wpf/CursorSetupWpf.csproj` project.
 - No root `.cursor` resource was deleted, renamed, or overwritten.
 
 ## Baseline observations

@@ -102,7 +102,7 @@
     {
       "evidenceId": "EVD-BUILD-WPF-001",
       "criterion": "BUILD-001",
-      "command": "dotnet build cursor-setup-gui-wpf\\CursorSetupWpf.sln --no-restore; dotnet build CursorSetup.sln --no-restore",
+      "command": "dotnet build vibe-setup-gui-wpf\\CursorSetupWpf.sln --no-restore; dotnet build CursorSetup.sln --no-restore",
       "status": "PASS",
       "exitCode": 0,
       "result": "both WPF solution builds succeeded with 0 warnings and 0 errors"

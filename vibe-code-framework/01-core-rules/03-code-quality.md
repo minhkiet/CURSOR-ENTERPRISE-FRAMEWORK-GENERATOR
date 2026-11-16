@@ -243,9 +243,23 @@ type UserResult =
 
 ---
 
-## 4. Testing Strategy
+## 4. Testing Strategy & TDD Discipline
 
-### 4.1 Test Pyramid
+### 4.1 Strict TDD Cycle (RED → GREEN → REFACTOR)
+
+1. **RED**: Viết unit test cho tính năng mới. Chạy test runner và xác nhận test **phải FAIL** đúng lý do dự kiến. Nếu test pass ngay khi chưa có code, test đó không hợp lệ.
+2. **GREEN**: Viết lượng code tối thiểu cần thiết để test PASS. Tuyệt đối không viết trước tính năng chưa có test (YAGNI).
+3. **REFACTOR**: Tối ưu mã nguồn, làm sạch cấu trúc nhưng đảm bảo test suite vẫn 100% xanh.
+
+### 4.2 Systematic Debugging Protocol (Evidence-First)
+
+Khi xử lý bug hoặc lỗi phát sinh:
+- **Phase 1 (Reproduce)**: Bắt buộc viết test case hoặc kịch bản lệnh tái hiện lỗi ổn định.
+- **Phase 2 (Isolate)**: Dò tìm biên dữ liệu, cô lập vị trí lỗi bằng log/trace; cấm đoán mò.
+- **Phase 3 (Hypothesize)**: Nêu rõ giả thuyết nguyên nhân gốc rễ (Root Cause Analysis).
+- **Phase 4 (Surgical Fix)**: Sửa chính xác điểm lỗi và chứng minh test tái hiện đã pass, không gây hồi quy.
+
+### 4.3 Test Pyramid
 
 ```
          ▲

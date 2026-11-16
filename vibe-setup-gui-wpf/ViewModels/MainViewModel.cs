@@ -1569,6 +1569,12 @@ namespace CursorSetupWpf.ViewModels
             ChangelogEntries.Clear();
             ChangelogEntries.Add(new ChangelogEntry
             {
+                Version = "v4.6.0",
+                Date = new DateTime(2026, 11, 16),
+                Description = "Renamed setup project to vibe-setup-gui-wpf, integrated claude-mem persistent memory MCP server & SQLite FTS5 search, synced Superpowers TDD/Systematic Debugging rules."
+            });
+            ChangelogEntries.Add(new ChangelogEntry
+            {
                 Version = "v4.5.0",
                 Date = new DateTime(2026, 10, 13),
                 Description = "Integrated REA (Reverse Engineer Anything v6.4.0) CLI & MCP, sec_reverse-engineer-anything skill, /rea & /reverse commands."

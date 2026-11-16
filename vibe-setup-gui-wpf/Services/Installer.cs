@@ -233,6 +233,18 @@ namespace CursorSetupWpf.Services
                     "rea_trace", "rea_surface"
                 }
             ),
+            // Version 4.6.0 - claude-mem persistent memory MCP Server
+            (
+                "claude-mem",
+                null,
+                null,
+                "claude-mem Persistent Memory",
+                "claude-mem persistent memory server with SQLite + FTS5 search & decisions retrieval.",
+                new[]
+                {
+                    "search_memory", "recall_decisions", "save_decision"
+                }
+            ),
         };
 
         static readonly string[] LegacyMcpKeys = { "framework", "autopilot", "memory" };
@@ -957,6 +969,23 @@ namespace CursorSetupWpf.Services
                             ["command"] = "node",
                             ["args"] = new[] { reaScript, "mcp" },
                             ["cwd"] = reaCwd,
+                            ["description"] = entry.Description,
+                        };
+                    }
+                    // claude-mem MCP - node based
+                    else if (entry.ServerKey == "claude-mem")
+                    {
+                        string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                        string memScript = Path.Combine(userProfile, ".claude", "plugins", "marketplaces", "thedotmack", "claude-mem", "dist", "mcp-server.js");
+                        string dbPath = Path.Combine(userProfile, ".claude-mem", "claude-mem.db");
+                        servers[entry.ServerKey] = new Dictionary<string, object>
+                        {
+                            ["command"] = "node",
+                            ["args"] = new[] { memScript },
+                            ["env"] = new Dictionary<string, string>
+                            {
+                                ["CLAUDE_MEM_DB_PATH"] = dbPath
+                            },
                             ["description"] = entry.Description,
                         };
                     }

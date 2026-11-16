@@ -8,7 +8,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-# RepoRoot is parent of cursor-setup-gui-wpf
+# RepoRoot is parent of vibe-setup-gui-wpf
 $RepoRoot = Split-Path -Parent $ScriptDir
 $SourceDir = Join-Path $RepoRoot ".cursor"
 $BuildDir = Join-Path $ScriptDir "bin\$Config\net8.0-windows\win-x64\publish"

@@ -11,7 +11,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-# RepoRoot is parent of cursor-setup-gui-wpf
+# RepoRoot is parent of vibe-setup-gui-wpf
 $RepoRoot = Split-Path -Parent $ScriptDir
 $ToolsDir = Join-Path $RepoRoot "tools"
 $McpTargetDir = if ([string]::IsNullOrWhiteSpace($DestinationDir)) {

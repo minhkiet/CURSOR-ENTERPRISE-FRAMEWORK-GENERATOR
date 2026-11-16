@@ -122,13 +122,13 @@ namespace CursorSetupWpf.Services
 
         /// <summary>
         /// Try to find cursor_framework relative to a known project structure.
-        /// Looks for patterns like: .../cursor_framework/ (same level as cursor-setup-gui-wpf)
+        /// Looks for patterns like: .../cursor_framework/ (same level as vibe-setup-gui-wpf)
         /// </summary>
         static string FindInProjectStructure(string baseDir)
         {
             try
             {
-                // Common patterns: project root contains both cursor_framework and cursor-setup-gui-wpf
+                // Common patterns: project root contains both cursor_framework and vibe-setup-gui-wpf
                 // e.g., D:\Projects\Cursor Framework\cursor_framework
                 var dirs = new[] {
                     Path.Combine(baseDir, "..", "cursor_framework"),

@@ -32,6 +32,8 @@ skill-name/
 | [speckit-plan](./speckit-plan/) | Spec Kit - Technical architecture blueprinting (plan.md) |
 | [speckit-tasks](./speckit-tasks/) | Spec Kit - Atomic task breakdown & verification (tasks.md) |
 | [speckit-implement](./speckit-implement/) | Spec Kit - TDD Red-Green-Refactor execution & tracking |
+| [reverse-engineer-anything](./reverse-engineer-anything/) | REA universal reverse engineering for native binaries, .NET, JS, APK, WASM |
+| [claude-mem](./claude-mem/) | Persistent memory management with SQLite + FTS5 decisions recall |
 | [create-feature](./create-feature/) | Tạo feature mới từ spec đến implementation |
 | [create-api](./create-api/) | Thiết kế và implement REST/GraphQL API |
 | [create-ui](./create-ui/) | Thiết kế và implement UI components |
@@ -41,6 +43,15 @@ skill-name/
 | [fullstack-web](./fullstack-web/) | Fullstack web app (ASP.NET + React) |
 | [security-scan](./security-scan/) | Security vulnerability scan |
 | [frontend-design](./frontend-design/) | External frontend design skill; pending owner review |
+| [browser-testing-with-devtools](./browser-testing-with-devtools/) | E2E browser testing & automated UI verification |
+| [code-simplification](./code-simplification/) | Code refactoring & YAGNI complexity reduction |
+| [context-engineering](./context-engineering/) | Context window optimization & relevance filtering |
+| [doubt-driven-development](./doubt-driven-development/) | Critical validation & edge-case stress testing |
+| [incremental-implementation](./incremental-implementation/) | Atomic, surgical code step implementation |
+| [interview-me](./interview-me/) | Interactive requirements elicitation & alignment |
+| [planning-and-task-breakdown](./planning-and-task-breakdown/) | Task planning & dependency ordering |
+| [source-driven-development](./source-driven-development/) | Codebase-grounded architecture & synthesis |
+| [testing](./testing/) | Test suite design, execution & coverage analysis |
 
 ## Ánh xạ sang Cursor
 

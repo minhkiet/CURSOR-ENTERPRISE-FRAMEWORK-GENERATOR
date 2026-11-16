@@ -189,7 +189,7 @@ def status():
         click.echo(f"  • {server['name']}: {color(server['status'], status_color)}")
     
     click.echo(f"\n{color('📁 Directory Structure:', Colors.BOLD)}")
-    dirs = [".agents", ".cursor", "cursor_framework_web", "cursor-setup-gui-wpf", "tools"]
+    dirs = [".agents", ".cursor", "cursor_framework_web", "vibe-setup-gui-wpf", "tools"]
     for d in dirs:
         path = root / d
         exists = color("✓", Colors.GREEN) if path.exists() else color("✗", Colors.RED)

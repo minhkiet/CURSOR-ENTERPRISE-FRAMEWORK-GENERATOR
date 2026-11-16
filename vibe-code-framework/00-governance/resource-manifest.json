@@ -96,7 +96,7 @@
     "SCOPE-RESOURCE-HUB": "vibe-code-framework",
     "SCOPE-CORE": "cursor_framework",
     "SCOPE-WEB": "cursor_framework_web",
-    "SCOPE-SETUP": "cursor-setup-gui-wpf",
+    "SCOPE-SETUP": "vibe-setup-gui-wpf",
     "CURSOR-ADAPTER-BOUNDARY": ".cursor"
   },
   "resources": [

@@ -6,7 +6,7 @@ REM ============================================================
 REM Purpose:
 REM   1. Check prerequisites (dotnet, scripts, MCP tools)
 REM   2. Clean bin/obj (optional via /clean)
-REM   3. Publish the cursor-setup-gui-wpf project (self-contained, single-file)
+REM   3. Publish the vibe-setup-gui-wpf project (self-contained, single-file)
 REM   4. Create cursor-setup.zip from .cursor contents and staged MCP tools
 REM   5. Verify all outputs exist
 REM
