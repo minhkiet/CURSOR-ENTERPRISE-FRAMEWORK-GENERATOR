@@ -70,3 +70,25 @@ cp -r 04-agents/*.md ~/.claude/agents/
 - Claude Code sử dụng `.md` thuần túy (không có frontmatter đặc biệt)
 - Rules được nạp từ `.claude/rules/`
 - Skills được nạp từ `.claude/skills/`
+
+---
+
+## Persistent Memory (claude-mem Integration)
+
+Adapter này tích hợp trực tiếp với engine [claude-mem](https://github.com/thedotmack/claude-mem) để duy trì trí nhớ và nén lịch sử phiên làm việc:
+
+### 1. Cài đặt plugin
+```bash
+claude plugin marketplace add thedotmack/claude-mem
+claude plugin install claude-mem
+```
+Hoặc chạy script tự động:
+```powershell
+.\install-claude-mem.ps1
+```
+
+### 2. Nguyên lý hoạt động
+- **Hooks tự động**: Tự động bắt sự kiện `SessionStart`, `PostToolUse`, và `SessionEnd`.
+- **Background Worker**: Nén dữ liệu raw tool outputs thành ~500 token semantic observations, lưu vào SQLite (`~/.claude-mem/claude-mem.db`).
+- **Dashboard xem lại**: Truy cập Web UI tại `http://localhost:37777` để duyệt memory stream.
+- **MCP Server**: Có thể chia sẻ bộ nhớ cho Cursor / Antigravity qua file `mcp/mcp_config.json`.

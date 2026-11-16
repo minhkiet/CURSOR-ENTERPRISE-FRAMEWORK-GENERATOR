@@ -27,6 +27,16 @@
         "mcp"
       ],
       "description": "REA - Reverse Engineer Anything: native binaries, Electron/JS, APK, WASM, runtime via MCP"
+    },
+    "claude-mem": {
+      "command": "node",
+      "args": [
+        "${env:USERPROFILE}/.claude/plugins/marketplaces/thedotmack/claude-mem/dist/mcp-server.js"
+      ],
+      "env": {
+        "CLAUDE_MEM_DB_PATH": "${env:USERPROFILE}/.claude-mem/claude-mem.db"
+      },
+      "description": "claude-mem persistent memory MCP server - SQLite + FTS5 search & decisions retrieval"
     }
   }
 }

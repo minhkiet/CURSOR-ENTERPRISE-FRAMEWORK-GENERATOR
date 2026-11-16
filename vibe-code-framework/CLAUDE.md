@@ -158,6 +158,16 @@ fix(payment): correct tax calculation
 | `database-migration` | Manage DB migrations |
 | `code-review` | Review with quality gates |
 | `debug-error` | Systematic debugging |
+| `claude-mem` | Long-term memory query & history recall |
+
+---
+
+## Persistent Memory (claude-mem)
+
+- **Continuous Capture**: All tool executions, tests, and architectural changes are automatically summarized and stored in `~/.claude-mem/claude-mem.db`.
+- **Session Continuity**: On `SessionStart`, relevant past decisions are auto-injected. Never repeat previously resolved debugging steps.
+- **Privacy Gate**: Wrap passwords, tokens, API keys, or private PII in `<private>...</private>` tags to exclude them from persistent memory.
+- **Memory Inspection**: Use the local Web Viewer at `http://localhost:37777` to inspect memory streams or verify decision timelines.
 
 ---
 
