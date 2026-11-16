@@ -1,7 +1,8 @@
 ---
-name: "source-command-bazi-command"
-description: "Bazi - Tính Bát Tự (Four Pillars of Destiny)"
+name: source-command-bazi-command
+description: Bazi - Tính Bát Tự (Four Pillars of Destiny)
 ---
+
 
 # source-command-bazi-command
 

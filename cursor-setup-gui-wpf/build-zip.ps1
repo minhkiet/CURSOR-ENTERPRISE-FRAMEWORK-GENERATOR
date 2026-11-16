@@ -52,6 +52,10 @@ foreach ($cat in $categories) {
     }
 }
 $stats["AGENTS.md"] = if (Test-Path (Join-Path $SourceDir "AGENTS.md")) { 1 } else { 0 }
+$stats["CLAUDE.md"] = if (Test-Path (Join-Path $SourceDir "CLAUDE.md")) { 1 } else { 0 }
+$stats["GEMINI.md"] = if (Test-Path (Join-Path $SourceDir "GEMINI.md")) { 1 } else { 0 }
+$stats["copilot-instructions.md"] = if (Test-Path (Join-Path $SourceDir "copilot-instructions.md")) { 1 } else { 0 }
+$stats[".cursorrules"] = if (Test-Path (Join-Path $SourceDir ".cursorrules")) { 1 } else { 0 }
 $stats["cursor.json"] = if (Test-Path (Join-Path $SourceDir "cursor.json")) { 1 } else { 0 }
 
 $total = ($stats.Values | Measure-Object -Sum).Sum

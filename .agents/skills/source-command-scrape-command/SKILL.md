@@ -1,7 +1,8 @@
 ---
-name: "source-command-scrape-command"
-description: "Migrated source command `scrape-command`"
+name: source-command-scrape-command
+description: Migrated source command `scrape-command`
 ---
+
 
 # source-command-scrape-command
 

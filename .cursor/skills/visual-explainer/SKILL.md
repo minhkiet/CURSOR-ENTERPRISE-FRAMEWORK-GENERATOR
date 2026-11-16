@@ -1,4 +1,9 @@
-﻿# Alias: visual-explainer
+---
+name: visual-explainer
+description: "Generate self-contained HTML visual explanations for systems, code changes, plans, data, and technical concepts. Use for diagrams, architecture overviews, diff or plan reviews, project recaps, comparison tables, slide decks, and other visual explanations."
+---
+
+# Alias: visual-explainer
 
 **DEPRECATED**: This skill has been renamed to $newName.
 

@@ -4,11 +4,12 @@ description: Expert in GraphQL API development with type-safe patterns and optim
 metadata:
   category: development
   source:
-    repository: 'https://github.com/Mindrally/skills'
+    repository: https://github.com/Mindrally/skills
     path: graphql
     license_path: LICENSE
     commit: 05a71308897983093248d719a2ffa1bca61d0768
 ---
+
 
 # GraphQL
 

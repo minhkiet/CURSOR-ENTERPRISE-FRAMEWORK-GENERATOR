@@ -1,4 +1,9 @@
-﻿# Alias: csv-wrangling
+---
+name: csv-wrangling
+description: "Standard workflow order, tool selection matrix, and composition patterns for qsv CSV data wrangling"
+---
+
+# Alias: csv-wrangling
 
 **DEPRECATED**: This skill has been renamed to $newName.
 

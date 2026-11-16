@@ -27,6 +27,11 @@ skill-name/
 
 | Skill | Mô tả |
 |-------|--------|
+| [spec-driven-development](./spec-driven-development/) | Master SDD workflow orchestrator (GitHub Spec Kit compatible) |
+| [speckit-specify](./speckit-specify/) | Spec Kit - User & functional specification authoring (spec.md) |
+| [speckit-plan](./speckit-plan/) | Spec Kit - Technical architecture blueprinting (plan.md) |
+| [speckit-tasks](./speckit-tasks/) | Spec Kit - Atomic task breakdown & verification (tasks.md) |
+| [speckit-implement](./speckit-implement/) | Spec Kit - TDD Red-Green-Refactor execution & tracking |
 | [create-feature](./create-feature/) | Tạo feature mới từ spec đến implementation |
 | [create-api](./create-api/) | Thiết kế và implement REST/GraphQL API |
 | [create-ui](./create-ui/) | Thiết kế và implement UI components |

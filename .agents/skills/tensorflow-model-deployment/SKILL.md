@@ -2,16 +2,17 @@
 name: tensorflow-model-deployment
 description: Deploy and serve TensorFlow models
 allowed-tools:
-  - Bash
-  - Read
+- Bash
+- Read
 metadata:
   category: data
   source:
-    repository: 'https://github.com/thebushidocollective/han'
+    repository: https://github.com/thebushidocollective/han
     path: plugins/specialized/tensorflow/skills/tensorflow-model-deployment
     license_path: LICENSE
     commit: 3fc9880ee2be4b1275359bed910dbd1674134448
 ---
+
 
 # TensorFlow Model Deployment
 

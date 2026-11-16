@@ -1,7 +1,8 @@
 ---
-name: "source-command-clear"
-description: "Migrated source command `clear`"
+name: source-command-clear
+description: Migrated source command `clear`
 ---
+
 
 # source-command-clear
 

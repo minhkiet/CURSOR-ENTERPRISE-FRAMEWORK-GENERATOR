@@ -1,4 +1,9 @@
-﻿# Alias: adbc
+---
+name: adbc
+description: "Connect to and work with databases using Arrow Database Connectivity (ADBC). Use whenever the user needs to use a database."
+---
+
+# Alias: adbc
 
 **DEPRECATED**: This skill has been renamed to $newName.
 

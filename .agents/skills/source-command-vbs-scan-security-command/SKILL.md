@@ -1,7 +1,9 @@
 ---
-name: "source-command-vbs-scan-security-command"
-description: "vbsec Security Scanner - Quét lỗ hổng bảo mật 21 rule cross-language với L1-L4 data flow analysis, optional --sca (OSV.dev CVE) và --auto-fix"
+name: source-command-vbs-scan-security-command
+description: vbsec Security Scanner - Quét lỗ hổng bảo mật 21 rule cross-language
+  với L1-L4 data flow analysis, optional --sca (OSV.dev CVE) và --auto-fix
 ---
+
 
 # source-command-vbs-scan-security-command
 

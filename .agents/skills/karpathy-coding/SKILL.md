@@ -1,4 +1,9 @@
-﻿# Alias: karpathy-coding
+---
+name: karpathy-coding
+description: "Karpathy Coding - Think Before Code. Minimal overlay skill cho mọi task. 5 phút review trước/sau code."
+---
+
+# Alias: karpathy-coding
 
 **DEPRECATED**: This skill has been renamed to $newName.
 

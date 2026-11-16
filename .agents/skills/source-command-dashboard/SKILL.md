@@ -1,7 +1,8 @@
 ---
-name: "source-command-dashboard"
-description: "Migrated source command `dashboard`"
+name: source-command-dashboard
+description: Migrated source command `dashboard`
 ---
+
 
 # source-command-dashboard
 

@@ -1,7 +1,8 @@
 ---
-name: "source-command-memory-command"
-description: "Memory - Quản lý memory system (build, query, update memory)"
+name: source-command-memory-command
+description: Memory - Quản lý memory system (build, query, update memory)
 ---
+
 
 # source-command-memory-command
 

@@ -1,3 +1,8 @@
+---
+name: social_telegram
+description: "Telegram Bot Integration Skill skill"
+---
+
 # Telegram Bot Integration Skill
 
 **Version:** 1.0.0  

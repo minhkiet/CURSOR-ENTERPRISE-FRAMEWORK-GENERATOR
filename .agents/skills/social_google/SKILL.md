@@ -1,3 +1,8 @@
+---
+name: social_google
+description: "Google APIs Integration Skill skill"
+---
+
 # Google APIs Integration Skill
 
 **Version:** 1.0.0  

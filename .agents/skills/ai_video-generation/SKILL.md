@@ -1,13 +1,30 @@
-﻿---
-description: AI Video Generation Skill - Auto-generate short videos (9:16) from URLs or text using HyperFrames rendering, OmniVoice TTS, and FFmpeg. Integrated from AI-auto-generate-video (huytranvan2010).
+---
+description: AI Video Generation Skill - Auto-generate short videos (9:16) from URLs
+  or text using HyperFrames rendering, OmniVoice TTS, and FFmpeg. Integrated from
+  AI-auto-generate-video (huytranvan2010).
 created: 2026-07-01
 version: 1.0.0
 updated: 2026-07-01
-tags: [video, hyperframes, omnivoice, tts, short-video, tiktok, youtube-shorts, vietnamese, ffmpeg]
+tags:
+- video
+- hyperframes
+- omnivoice
+- tts
+- short-video
+- tiktok
+- youtube-shorts
+- vietnamese
+- ffmpeg
 source: https://github.com/huytranvan2010/AI-auto-generate-video (118 stars, MIT License)
 see_also: .cursor/rules/ref_frontend-frameworks.mdc (template system)
-dependencies: [node>=22, ffmpeg, chromium, omnivoice-server]
+dependencies:
+- node>=22
+- ffmpeg
+- chromium
+- omnivoice-server
+name: ai_video-generation
 ---
+
 
 # AI Video Generation Skill
 

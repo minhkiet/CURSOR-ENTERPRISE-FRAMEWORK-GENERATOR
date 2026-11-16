@@ -1,3 +1,8 @@
+---
+name: source-command-facebook-command
+description: "Facebook Graph API Integration Skill skill"
+---
+
 # Facebook Graph API Integration Skill
 
 > **Version:** 1.0.0  

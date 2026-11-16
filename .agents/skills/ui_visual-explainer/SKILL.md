@@ -1,7 +1,20 @@
 ---
-description: Generate self-contained HTML visual explanations for systems, code changes, plans, data, and technical concepts. Use for diagrams, architecture overviews, diff or plan reviews, project recaps, comparison tables, slide decks, and other visual explanations.
-tags: [visual, diagram, architecture, review, slides, html, mermaid, presentation]
+description: Generate self-contained HTML visual explanations for systems, code changes,
+  plans, data, and technical concepts. Use for diagrams, architecture overviews, diff
+  or plan reviews, project recaps, comparison tables, slide decks, and other visual
+  explanations.
+tags:
+- visual
+- diagram
+- architecture
+- review
+- slides
+- html
+- mermaid
+- presentation
+name: ui_visual-explainer
 ---
+
 
 # Visual Explainer Skill
 

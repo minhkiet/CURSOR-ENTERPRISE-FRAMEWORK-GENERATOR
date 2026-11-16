@@ -1,7 +1,8 @@
 ---
-name: "source-command-build-command"
-description: "Build Feature - Xây dựng feature mới từ requirement đến implementation"
+name: source-command-build-command
+description: Build Feature - Xây dựng feature mới từ requirement đến implementation
 ---
+
 
 # source-command-build-command
 

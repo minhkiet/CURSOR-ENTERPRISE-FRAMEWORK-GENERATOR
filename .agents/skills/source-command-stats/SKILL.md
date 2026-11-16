@@ -1,7 +1,8 @@
 ---
-name: "source-command-stats"
-description: "Migrated source command `stats`"
+name: source-command-stats
+description: Migrated source command `stats`
 ---
+
 
 # source-command-stats
 

@@ -1,7 +1,8 @@
 ---
-name: "source-command-skills"
-description: "Migrated source command `skills`"
+name: source-command-skills
+description: Migrated source command `skills`
 ---
+
 
 # source-command-skills
 

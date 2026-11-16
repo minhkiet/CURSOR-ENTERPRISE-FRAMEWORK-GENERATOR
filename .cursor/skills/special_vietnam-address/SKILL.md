@@ -1,9 +1,23 @@
 ---
-description: Skill chuyên về xử lý địa chỉ Việt Nam - autocomplete, validation, phân tích địa chỉ, tích hợp với vietnamese-provinces-database. Kích hoạt khi cần làm việc với địa chỉ, tỉnh/thành phố, quận/huyện, phường/xã tại Việt Nam.
+description: Skill chuyên về xử lý địa chỉ Việt Nam - autocomplete, validation, phân
+  tích địa chỉ, tích hợp với vietnamese-provinces-database. Kích hoạt khi cần làm
+  việc với địa chỉ, tỉnh/thành phố, quận/huyện, phường/xã tại Việt Nam.
 created: 2026-06-26
 version: 1.0.0
-tags: [vietnam, address, province, district, ward, autocomplete, validation, location, geocoding, form]
+tags:
+- vietnam
+- address
+- province
+- district
+- ward
+- autocomplete
+- validation
+- location
+- geocoding
+- form
+name: special_vietnam-address
 ---
+
 
 # Vietnamese Address Skill
 

@@ -1,7 +1,9 @@
 ---
-name: "source-command-bazi"
-description: "Bazi / 四柱 — tính tứ trụ deterministic bằng calculator vendored, đọc references theo câu hỏi, trả lời có trích dẫn và phản chứng"
+name: source-command-bazi
+description: Bazi / 四柱 — tính tứ trụ deterministic bằng calculator vendored, đọc references
+  theo câu hỏi, trả lời có trích dẫn và phản chứng
 ---
+
 
 # source-command-bazi
 

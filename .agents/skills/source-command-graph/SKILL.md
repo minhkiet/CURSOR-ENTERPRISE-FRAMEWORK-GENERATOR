@@ -1,7 +1,8 @@
 ---
-name: "source-command-graph"
-description: "Migrated source command `graph`"
+name: source-command-graph
+description: Migrated source command `graph`
 ---
+
 
 # source-command-graph
 

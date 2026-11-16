@@ -1,4 +1,9 @@
-﻿# Alias: skill-installer
+---
+name: skill-installer
+description: "Alias: skill-installer skill"
+---
+
+# Alias: skill-installer
 
 **DEPRECATED**: This skill has been renamed to $newName.
 

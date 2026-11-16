@@ -1,7 +1,8 @@
 ---
-name: "source-command-adr-command"
-description: "ADR - Tạo Architecture Decision Record"
+name: source-command-adr-command
+description: ADR - Tạo Architecture Decision Record
 ---
+
 
 # source-command-adr-command
 

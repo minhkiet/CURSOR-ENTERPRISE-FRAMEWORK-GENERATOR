@@ -1,4 +1,9 @@
-﻿# Alias: karpathy-coding
+---
+name: karpathy-coding
+description: "Universal coding discipline overlay for all vibe coding agents (Cursor IDE, Codex, Claude Code, Grok). Think first, minimal code, surgical changes."
+---
+
+# Alias: karpathy-coding
 
 **DEPRECATED**: This skill has been renamed to $newName.
 

@@ -1,7 +1,10 @@
 ---
 name: image-generator
-description: Tạo ảnh và video theo yêu cầu bằng AI (DALL-E, Google Flow, Midjourney, Stable Diffusion, Flux). Keywords: tạo ảnh, generate image, AI art, create image, drawing, illustration, tạo video, generate video, AI video.
+description: 'Tạo ảnh và video theo yêu cầu bằng AI (DALL-E, Google Flow, Midjourney,
+  Stable Diffusion, Flux). Keywords: tạo ảnh, generate image, AI art, create image,
+  drawing, illustration, tạo video, generate video, AI video.'
 ---
+
 
 # Image Generator Skill
 

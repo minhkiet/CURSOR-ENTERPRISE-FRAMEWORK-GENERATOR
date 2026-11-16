@@ -1,7 +1,9 @@
 ---
-name: "source-command-cms-command"
-description: "CMS Landing Enterprise v4 - Build complete SaaS CRM/CMS/Landing/Wallet/Affiliate system"
+name: source-command-cms-command
+description: CMS Landing Enterprise v4 - Build complete SaaS CRM/CMS/Landing/Wallet/Affiliate
+  system
 ---
+
 
 # source-command-cms-command
 

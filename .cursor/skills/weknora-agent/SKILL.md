@@ -1,4 +1,9 @@
-﻿# Alias: weknora-agent
+---
+name: weknora-agent
+description: "WeKnora Agent Skill - ReAct autonomous reasoning agent với multi-step planning, tool calling, web search, và MCP tools integration"
+---
+
+# Alias: weknora-agent
 
 **DEPRECATED**: This skill has been renamed to $newName.
 

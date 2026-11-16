@@ -1,7 +1,11 @@
-﻿---
-name: full-output
-description: Enforces complete, unabridged code generation. Overrides truncation behavior, bans placeholder patterns, handles token-limit splits cleanly. Applies before and after every code generation task. No TODO comments, no "continue later", no skeleton code.
 ---
+name: full-output
+description: Enforces complete, unabridged code generation. Overrides truncation behavior,
+  bans placeholder patterns, handles token-limit splits cleanly. Applies before and
+  after every code generation task. No TODO comments, no "continue later", no skeleton
+  code.
+---
+
 
 # Full Output Enforcement Skill
 

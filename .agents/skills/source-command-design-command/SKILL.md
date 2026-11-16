@@ -1,7 +1,8 @@
 ---
-name: "source-command-design-command"
-description: "Migrated source command `design-command`"
+name: source-command-design-command
+description: Migrated source command `design-command`
 ---
+
 
 # source-command-design-command
 

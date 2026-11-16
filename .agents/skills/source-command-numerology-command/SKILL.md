@@ -1,7 +1,8 @@
 ---
-name: "source-command-numerology-command"
-description: "Numerology - Thần Số Học (Numerology)"
+name: source-command-numerology-command
+description: Numerology - Thần Số Học (Numerology)
 ---
+
 
 # source-command-numerology-command
 

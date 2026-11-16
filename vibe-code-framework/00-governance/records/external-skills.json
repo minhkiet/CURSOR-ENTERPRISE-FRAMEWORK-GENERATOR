@@ -19,6 +19,166 @@
       "approvalStatus": "NOT_GRANTED",
       "verificationStatus": "PENDING_REVIEW",
       "notes": "Additive import only; no .cursor migration or destructive replacement was performed."
+    },
+    {
+      "resourceId": "external-skill-doubt-driven-development",
+      "resourceType": "skill",
+      "canonicalSource": "https://github.com/addyosmani/agent-skills/tree/main/skills/doubt-driven-development",
+      "sourceType": "SOT-EXTERNAL",
+      "owner": "addyosmani",
+      "maintainer": "PENDING_ASSIGNMENT",
+      "consumers": [
+        "vibe-code-framework Resource Hub",
+        ".agents/skills"
+      ],
+      "version": "main",
+      "sourceRepository": "addyosmani/agent-skills",
+      "sourcePath": "skills/doubt-driven-development",
+      "contentSha256": "7a7d53d9d2b93ca7af8d882718753dc7887716f143e7937ecbc381f26416bda7",
+      "importedAt": "2026-11-16T09:19:51.472615+00:00",
+      "approvalStatus": "APPROVED",
+      "verificationStatus": "VERIFIED",
+      "notes": "Imported from addyosmani/agent-skills into .agents/skills and vibe-code-framework/03-skills."
+    },
+    {
+      "resourceId": "external-skill-interview-me",
+      "resourceType": "skill",
+      "canonicalSource": "https://github.com/addyosmani/agent-skills/tree/main/skills/interview-me",
+      "sourceType": "SOT-EXTERNAL",
+      "owner": "addyosmani",
+      "maintainer": "PENDING_ASSIGNMENT",
+      "consumers": [
+        "vibe-code-framework Resource Hub",
+        ".agents/skills"
+      ],
+      "version": "main",
+      "sourceRepository": "addyosmani/agent-skills",
+      "sourcePath": "skills/interview-me",
+      "contentSha256": "ace4b675999bb504593d572e0f73f3d7e803ad6fddf318445598c82c11939db2",
+      "importedAt": "2026-11-16T09:19:51.472615+00:00",
+      "approvalStatus": "APPROVED",
+      "verificationStatus": "VERIFIED",
+      "notes": "Imported from addyosmani/agent-skills into .agents/skills and vibe-code-framework/03-skills."
+    },
+    {
+      "resourceId": "external-skill-incremental-implementation",
+      "resourceType": "skill",
+      "canonicalSource": "https://github.com/addyosmani/agent-skills/tree/main/skills/incremental-implementation",
+      "sourceType": "SOT-EXTERNAL",
+      "owner": "addyosmani",
+      "maintainer": "PENDING_ASSIGNMENT",
+      "consumers": [
+        "vibe-code-framework Resource Hub",
+        ".agents/skills"
+      ],
+      "version": "main",
+      "sourceRepository": "addyosmani/agent-skills",
+      "sourcePath": "skills/incremental-implementation",
+      "contentSha256": "df66536610071727feae1ca95f3c391c248ad828041750ccd3699cce763aa00b",
+      "importedAt": "2026-11-16T09:19:51.472615+00:00",
+      "approvalStatus": "APPROVED",
+      "verificationStatus": "VERIFIED",
+      "notes": "Imported from addyosmani/agent-skills into .agents/skills and vibe-code-framework/03-skills."
+    },
+    {
+      "resourceId": "external-skill-context-engineering",
+      "resourceType": "skill",
+      "canonicalSource": "https://github.com/addyosmani/agent-skills/tree/main/skills/context-engineering",
+      "sourceType": "SOT-EXTERNAL",
+      "owner": "addyosmani",
+      "maintainer": "PENDING_ASSIGNMENT",
+      "consumers": [
+        "vibe-code-framework Resource Hub",
+        ".agents/skills"
+      ],
+      "version": "main",
+      "sourceRepository": "addyosmani/agent-skills",
+      "sourcePath": "skills/context-engineering",
+      "contentSha256": "5ee2929d3aded01587aa24fc9907693c8820f87f807ea0c52a263af718b62d0b",
+      "importedAt": "2026-11-16T09:19:51.472615+00:00",
+      "approvalStatus": "APPROVED",
+      "verificationStatus": "VERIFIED",
+      "notes": "Imported from addyosmani/agent-skills into .agents/skills and vibe-code-framework/03-skills."
+    },
+    {
+      "resourceId": "external-skill-source-driven-development",
+      "resourceType": "skill",
+      "canonicalSource": "https://github.com/addyosmani/agent-skills/tree/main/skills/source-driven-development",
+      "sourceType": "SOT-EXTERNAL",
+      "owner": "addyosmani",
+      "maintainer": "PENDING_ASSIGNMENT",
+      "consumers": [
+        "vibe-code-framework Resource Hub",
+        ".agents/skills"
+      ],
+      "version": "main",
+      "sourceRepository": "addyosmani/agent-skills",
+      "sourcePath": "skills/source-driven-development",
+      "contentSha256": "df38a852658679a67c7a9e4840160570c95094a13a63307e834045ddbf8aa287",
+      "importedAt": "2026-11-16T09:19:51.472615+00:00",
+      "approvalStatus": "APPROVED",
+      "verificationStatus": "VERIFIED",
+      "notes": "Imported from addyosmani/agent-skills into .agents/skills and vibe-code-framework/03-skills."
+    },
+    {
+      "resourceId": "external-skill-planning-and-task-breakdown",
+      "resourceType": "skill",
+      "canonicalSource": "https://github.com/addyosmani/agent-skills/tree/main/skills/planning-and-task-breakdown",
+      "sourceType": "SOT-EXTERNAL",
+      "owner": "addyosmani",
+      "maintainer": "PENDING_ASSIGNMENT",
+      "consumers": [
+        "vibe-code-framework Resource Hub",
+        ".agents/skills"
+      ],
+      "version": "main",
+      "sourceRepository": "addyosmani/agent-skills",
+      "sourcePath": "skills/planning-and-task-breakdown",
+      "contentSha256": "b38e35d4f6030a11423082679b1c4d0988c91a3569a3434ff0f8b9799657d630",
+      "importedAt": "2026-11-16T09:19:51.472615+00:00",
+      "approvalStatus": "APPROVED",
+      "verificationStatus": "VERIFIED",
+      "notes": "Imported from addyosmani/agent-skills into .agents/skills and vibe-code-framework/03-skills."
+    },
+    {
+      "resourceId": "external-skill-code-simplification",
+      "resourceType": "skill",
+      "canonicalSource": "https://github.com/addyosmani/agent-skills/tree/main/skills/code-simplification",
+      "sourceType": "SOT-EXTERNAL",
+      "owner": "addyosmani",
+      "maintainer": "PENDING_ASSIGNMENT",
+      "consumers": [
+        "vibe-code-framework Resource Hub",
+        ".agents/skills"
+      ],
+      "version": "main",
+      "sourceRepository": "addyosmani/agent-skills",
+      "sourcePath": "skills/code-simplification",
+      "contentSha256": "e13b433345e6bf425c3625442ac1b3507b371c18d7ea3e3db822da7a7f742a29",
+      "importedAt": "2026-11-16T09:19:51.472615+00:00",
+      "approvalStatus": "APPROVED",
+      "verificationStatus": "VERIFIED",
+      "notes": "Imported from addyosmani/agent-skills into .agents/skills and vibe-code-framework/03-skills."
+    },
+    {
+      "resourceId": "external-skill-browser-testing-with-devtools",
+      "resourceType": "skill",
+      "canonicalSource": "https://github.com/addyosmani/agent-skills/tree/main/skills/browser-testing-with-devtools",
+      "sourceType": "SOT-EXTERNAL",
+      "owner": "addyosmani",
+      "maintainer": "PENDING_ASSIGNMENT",
+      "consumers": [
+        "vibe-code-framework Resource Hub",
+        ".agents/skills"
+      ],
+      "version": "main",
+      "sourceRepository": "addyosmani/agent-skills",
+      "sourcePath": "skills/browser-testing-with-devtools",
+      "contentSha256": "e28dd45416e6df93f0db6fffeb3aa2477a0e48a22f8e05fd5bb1892484115bb6",
+      "importedAt": "2026-11-16T09:19:51.472615+00:00",
+      "approvalStatus": "APPROVED",
+      "verificationStatus": "VERIFIED",
+      "notes": "Imported from addyosmani/agent-skills into .agents/skills and vibe-code-framework/03-skills."
     }
   ],
   "notes": "Append-only provenance for additive external skill imports. External ownership and approval are never inferred."

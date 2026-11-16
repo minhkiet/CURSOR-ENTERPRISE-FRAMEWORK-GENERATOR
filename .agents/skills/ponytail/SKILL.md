@@ -1,21 +1,18 @@
-﻿# Alias: ponytail
+---
+name: ponytail
+description: "Ponytail 5 - Lazy Senior Dev Mode. Minimum code, maximum effect. The smallest change that fully solves the task with YAGNI optimization."
+---
 
-**DEPRECATED**: This skill has been renamed to $newName.
+# Alias: ponytail
 
-For backward compatibility, this alias redirects to the new skill.
+**Redirect**: This skill is mapped to `code_ponytail`.
 
-## Migration
-
-Update your code to use:
+For consistency across the Codex Enterprise Framework:
 `
-.cursor/skills/code_ponytail/SKILL.md
+.agents/skills/code_ponytail/SKILL.md
 `
 
 ## Auto-Redirect
 
 This alias is maintained for backward compatibility.
-The skill-registry will automatically redirect to the new name.
-
----
-Auto-generated alias file
-Last updated: 2026-08-03
+The skill-registry automatically resolves `ponytail` to `code_ponytail`.

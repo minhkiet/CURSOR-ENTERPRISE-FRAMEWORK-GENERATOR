@@ -1,18 +1,18 @@
 ---
 name: mcp-builder
-description: >-
-  Guide for creating high-quality MCP (Model Context Protocol) servers that
-  enable LLMs to interact with external services through well-designed tools.
-  Use when building MCP servers to integrate external APIs or services, whether
-  in Python (FastMCP) or Node/TypeScript (MCP SDK).
+description: Guide for creating high-quality MCP (Model Context Protocol) servers
+  that enable LLMs to interact with external services through well-designed tools.
+  Use when building MCP servers to integrate external APIs or services, whether in
+  Python (FastMCP) or Node/TypeScript (MCP SDK).
 metadata:
   category: development
   source:
-    repository: 'https://github.com/ComposioHQ/awesome-claude-skills'
+    repository: https://github.com/ComposioHQ/awesome-claude-skills
     path: mcp-builder
     license_path: mcp-builder/LICENSE.txt
     commit: 92568c1edaff1bde5371154f036d959346c145a8
 ---
+
 
 # MCP Server Development Guide
 

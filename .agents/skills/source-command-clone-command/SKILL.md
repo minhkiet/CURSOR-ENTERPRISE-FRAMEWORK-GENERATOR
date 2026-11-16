@@ -1,7 +1,8 @@
 ---
-name: "source-command-clone-command"
-description: "Migrated source command `clone-command`"
+name: source-command-clone-command
+description: Migrated source command `clone-command`
 ---
+
 
 # source-command-clone-command
 

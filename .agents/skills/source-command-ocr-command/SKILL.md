@@ -1,7 +1,8 @@
 ---
-name: "source-command-ocr-command"
-description: "Migrated source command `ocr-command`"
+name: source-command-ocr-command
+description: Migrated source command `ocr-command`
 ---
+
 
 # source-command-ocr-command
 

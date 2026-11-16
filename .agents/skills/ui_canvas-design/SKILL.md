@@ -1,18 +1,18 @@
 ---
 name: canvas-design
-description: >-
-  Create beautiful visual art in .png and .pdf documents using design
-  philosophy. You should use this skill when the user asks to create a poster,
-  piece of art, design, or other static piece. Create original visual designs,
-  never copying existing artists' work to avoid copyright violations.
+description: Create beautiful visual art in .png and .pdf documents using design philosophy.
+  You should use this skill when the user asks to create a poster, piece of art, design,
+  or other static piece. Create original visual designs, never copying existing artists'
+  work to avoid copyright violations.
 metadata:
   category: creative-media
   source:
-    repository: 'https://github.com/ComposioHQ/awesome-claude-skills'
+    repository: https://github.com/ComposioHQ/awesome-claude-skills
     path: canvas-design
     license_path: canvas-design/LICENSE.txt
     commit: 92568c1edaff1bde5371154f036d959346c145a8
 ---
+
 
 These are instructions for creating design philosophies - aesthetic movements that are then EXPRESSED VISUALLY. Output only .md files, .pdf files, and .png files.
 

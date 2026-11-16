@@ -1,7 +1,10 @@
 ---
-name: "source-command-rea"
-description: "REA (Reverse Engineer Anything) — Reverse engineer native binaries, .NET assemblies, Electron/JS apps, Android APKs, WASM, EVM bytecode, and network/runtime behavior with REA MCP and CLI"
+name: source-command-rea
+description: REA (Reverse Engineer Anything) — Reverse engineer native binaries, .NET
+  assemblies, Electron/JS apps, Android APKs, WASM, EVM bytecode, and network/runtime
+  behavior with REA MCP and CLI
 ---
+
 
 # source-command-rea
 

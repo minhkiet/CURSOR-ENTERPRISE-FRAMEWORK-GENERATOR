@@ -1,3 +1,8 @@
+---
+name: debug-error
+description: "Debug và fix errors, exceptions, bugs với root cause analysis (RCA) và regression test."
+---
+
 # Debug Error Skill
 
 > **Version:** 1.0.0 | **Category:** Development | **Triggers:** debug, fix bug, error, lỗi, troubleshoot

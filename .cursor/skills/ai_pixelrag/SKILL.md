@@ -1,9 +1,27 @@
 ---
-description: PixelRAG skill cho Visual Retrieval-Augmented Generation - đọc tài liệu bằng hình ảnh (PDF, website, bảng biểu, sơ đồ). Cải thiện độ chính xác retrieval 18.1% so với Text RAG truyền thống. Tích hợp pixelshot CLI, Qwen3-VL-Embedding, và FAISS index.
+description: PixelRAG skill cho Visual Retrieval-Augmented Generation - đọc tài liệu
+  bằng hình ảnh (PDF, website, bảng biểu, sơ đồ). Cải thiện độ chính xác retrieval
+  18.1% so với Text RAG truyền thống. Tích hợp pixelshot CLI, Qwen3-VL-Embedding,
+  và FAISS index.
 created: 2026-06-26
 version: 1.0.0
-tags: [pixelrag, visual-rag, screenshot, document, pdf, vision, multimodal, embedding, faiss, retrieval, tables, charts, diagrams]
+tags:
+- pixelrag
+- visual-rag
+- screenshot
+- document
+- pdf
+- vision
+- multimodal
+- embedding
+- faiss
+- retrieval
+- tables
+- charts
+- diagrams
+name: ai_pixelrag
 ---
+
 
 # PixelRAG - Visual Retrieval-Augmented Generation Skill
 

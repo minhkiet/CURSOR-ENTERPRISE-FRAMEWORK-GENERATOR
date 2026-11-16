@@ -1,11 +1,13 @@
 ---
-name: "cms-landing-enterprise"
-description: "CMS Landing Enterprise v4 - Full SaaS CRM/CMS/Landing/Wallet/Affiliate system. Generate complete production-ready code from spec."
+name: cms-landing-enterprise
+description: CMS Landing Enterprise v4 - Full SaaS CRM/CMS/Landing/Wallet/Affiliate
+  system. Generate complete production-ready code from spec.
 version: 4.0.0
-author: "OpenAI"
+author: OpenAI
 created: 2026-09-29
 updated: 2026-09-29
 ---
+
 
 # CMS Landing Enterprise v4 Skill
 

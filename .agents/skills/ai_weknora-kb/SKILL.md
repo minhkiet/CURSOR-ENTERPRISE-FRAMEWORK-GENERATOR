@@ -1,9 +1,24 @@
 ---
-description: WeKnora Knowledge Base Skill - RAG implementation, document Q&A, FAQ system, enterprise wiki, hybrid search với Vector + BM25 + GraphRAG + Knowledge Graph
+description: WeKnora Knowledge Base Skill - RAG implementation, document Q&A, FAQ
+  system, enterprise wiki, hybrid search với Vector + BM25 + GraphRAG + Knowledge
+  Graph
 created: 2026-06-26
 version: 1.0.0
-tags: [weknora, rag, knowledge-base, hybrid-search, vector-search, bm25, graphrag, knowledge-graph, document-qa, faq, wiki]
+tags:
+- weknora
+- rag
+- knowledge-base
+- hybrid-search
+- vector-search
+- bm25
+- graphrag
+- knowledge-graph
+- document-qa
+- faq
+- wiki
+name: ai_weknora-kb
 ---
+
 
 # WeKnora KB Skill
 

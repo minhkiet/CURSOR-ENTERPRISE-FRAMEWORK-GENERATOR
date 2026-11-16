@@ -1,7 +1,8 @@
 ---
-name: "source-command-refactor-command"
-description: "Refactor - Refactor code với design patterns và best practices"
+name: source-command-refactor-command
+description: Refactor - Refactor code với design patterns và best practices
 ---
+
 
 # source-command-refactor-command
 

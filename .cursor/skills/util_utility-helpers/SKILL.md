@@ -1,30 +1,45 @@
 ---
-description: Utility helpers skill covering common utilities, synchronization tools, code generators, and helper functions. Provides reusable components for common development tasks.
+description: Utility helpers skill covering common utilities, synchronization tools,
+  code generators, and helper functions. Provides reusable components for common development
+  tasks.
 version: 1.0.0
 created: 2026-08-03
-tags: [utility, helpers, tools, sync, generator, common, reusable]
+tags:
+- utility
+- helpers
+- tools
+- sync
+- generator
+- common
+- reusable
 role: overlay
-domains: [utility, tools, frontend, backend]
+domains:
+- utility
+- tools
+- frontend
+- backend
 confidence:
-  base: 0.60
-  threshold: 0.50
+  base: 0.6
+  threshold: 0.5
   auto_select: false
 triggers:
-  - "utility"
-  - "helper"
-  - "tool"
-  - "common"
-  - "reusable"
-  - "generator"
-  - "sync"
-  - "formatter"
-  - "validator"
-  - "converter"
-  - "parser"
-  - "util"
-  - "tiện ích"
-  - "công cụ"
+- utility
+- helper
+- tool
+- common
+- reusable
+- generator
+- sync
+- formatter
+- validator
+- converter
+- parser
+- util
+- tiện ích
+- công cụ
+name: util_utility-helpers
 ---
+
 
 # Utility Helpers Skill
 

@@ -458,11 +458,18 @@ class ECCIntegration:
         return Path(path)
 
     def _ensure_git_repo(self) -> Optional[Path]:
-        """Ensure ECC repository is cloned."""
+        """Ensure ECC repository is cloned or located in vendor."""
         if self._repo_path and self._repo_path.exists():
             return self._repo_path
             
-        # Check for existing clone
+        # Check workspace vendor first
+        for vendor_candidate in ["vendor/ECC", "vendor/ecc"]:
+            candidate = self.workspace_path / vendor_candidate
+            if candidate.exists() and (candidate / "package.json").exists():
+                self._repo_path = candidate
+                return candidate
+
+        # Check for existing clone in cache
         default_clone = self.cache_path / "ecc"
         if default_clone.exists():
             self._repo_path = default_clone
@@ -657,14 +664,17 @@ class ECCIntegration:
             for agent_file in agents_dir.glob("*.md"):
                 components["agents"].append(self._read_component(agent_file, "agent"))
                 
-        # Discover skills
-        skills_dir = ecc_path / ".agents" / "skills"
-        if skills_dir.exists():
-            for skill_dir in skills_dir.iterdir():
-                if skill_dir.is_dir():
-                    skill_md = skill_dir / "SKILL.md"
-                    if skill_md.exists():
-                        components["skills"].append(self._read_component(skill_md, "skill"))
+        # Discover skills (check skills/ first, then .agents/skills)
+        seen_skills = set()
+        for skills_rel in ["skills", ".agents/skills"]:
+            skills_dir = ecc_path / skills_rel
+            if skills_dir.exists():
+                for skill_dir in skills_dir.iterdir():
+                    if skill_dir.is_dir() and skill_dir.name not in seen_skills:
+                        skill_md = skill_dir / "SKILL.md"
+                        if skill_md.exists():
+                            seen_skills.add(skill_dir.name)
+                            components["skills"].append(self._read_component(skill_md, "skill"))
                         
         # Discover rules
         rules_dir = ecc_path / "rules"
@@ -682,7 +692,12 @@ class ECCIntegration:
         # Discover hooks
         hooks_dir = ecc_path / "hooks"
         if hooks_dir.exists():
-            for hook_file in hooks_dir.rglob("*.js"):
+            for hook_file in hooks_dir.glob("*.json"):
+                if hook_file.is_file():
+                    components["hooks"].append(self._read_component(hook_file, "hook"))
+        scripts_hooks_dir = ecc_path / "scripts" / "hooks"
+        if scripts_hooks_dir.exists():
+            for hook_file in scripts_hooks_dir.glob("*.js"):
                 if hook_file.is_file():
                     components["hooks"].append(self._read_component(hook_file, "hook"))
                     
@@ -699,21 +714,37 @@ class ECCIntegration:
         """Read a component file and extract metadata."""
         content = file_path.read_text(encoding="utf-8", errors="ignore")
         
-        name = file_path.stem
+        name = file_path.parent.name if component_type == "skill" and file_path.name == "SKILL.md" else file_path.stem
         description = ""
         tags = []
         dependencies = []
         
         # Try to extract frontmatter or first description
         lines = content.split("\n")
-        for line in lines[:20]:  # Check first 20 lines
-            line = line.strip()
-            if line.startswith("# ") and not description:
-                description = line[2:].strip()
-            elif any(line.startswith(f"{tag}:") for tag in ["tags", "keywords"]):
-                tags_str = line.split(":", 1)[1].strip()
-                tags = [t.strip() for t in tags_str.replace("[", "").replace("]", "").split(",")]
-                
+        if lines and lines[0].strip() == "---":
+            for line in lines[1:]:
+                line_str = line.strip()
+                if line_str == "---":
+                    break
+                if line_str.startswith("name:") and not name:
+                    extracted_name = line_str.split(":", 1)[1].strip().strip('"').strip("'")
+                    if extracted_name:
+                        name = extracted_name
+                elif line_str.startswith("description:") and not description:
+                    extracted_desc = line_str.split(":", 1)[1].strip().strip('"').strip("'")
+                    if extracted_desc:
+                        description = extracted_desc
+                elif any(line_str.startswith(f"{tag}:") for tag in ["tags", "keywords"]):
+                    tags_str = line_str.split(":", 1)[1].strip()
+                    tags = [t.strip() for t in tags_str.replace("[", "").replace("]", "").split(",") if t.strip()]
+
+        if not description:
+            for line in lines[:25]:
+                line = line.strip()
+                if line.startswith("# ") and not description:
+                    description = line[2:].strip()
+                    break
+
         return ECCComponent(
             name=name,
             type=component_type,
@@ -918,15 +949,18 @@ class ECCIntegration:
                             
             # Install skills
             if profile_config.get("skills", True):
-                src_skills = ecc_path / ".agents" / "skills"
                 dst_skills = install_path / "skills"
-                if src_skills.exists():
-                    dst_skills.mkdir(parents=True, exist_ok=True)
-                    for skill_dir in src_skills.iterdir():
-                        if skill_dir.is_dir():
-                            dest = dst_skills / skill_dir.name
-                            shutil.copytree(skill_dir, dest, dirs_exist_ok=True)
-                            installed.append(f"skill:{skill_dir.name}")
+                dst_skills.mkdir(parents=True, exist_ok=True)
+                installed_skills = set()
+                for skills_rel in ["skills", ".agents/skills"]:
+                    src_skills = ecc_path / skills_rel
+                    if src_skills.exists():
+                        for skill_dir in src_skills.iterdir():
+                            if skill_dir.is_dir() and skill_dir.name not in installed_skills:
+                                dest = dst_skills / skill_dir.name
+                                shutil.copytree(skill_dir, dest, dirs_exist_ok=True)
+                                installed_skills.add(skill_dir.name)
+                                installed.append(f"skill:{skill_dir.name}")
                             
             # Install commands
             if profile_config.get("commands", True):
@@ -1206,6 +1240,233 @@ class ECCIntegration:
                 "git_available": status.git_available,
                 "node_version": self.get_node_version(),
             },
+        }
+
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # Porting & Extraction
+    # ─────────────────────────────────────────────────────────────────────────
+
+    def port_agents(
+        self,
+        target_dir: Optional[str] = None,
+        filter_names: Optional[list[str]] = None,
+        overwrite: bool = False,
+        model_override: Optional[str] = "inherit",
+    ) -> dict[str, Any]:
+        """
+        Port/extract ECC agents into project agents directory.
+        
+        Args:
+            target_dir: Target directory (default: .agents/agents)
+            filter_names: Optional list of agent names to include
+            overwrite: Whether to overwrite existing agents
+            model_override: Override model in frontmatter (default: inherit)
+            
+        Returns:
+            dict with ported, skipped, and error details
+        """
+        repo_path = self._ensure_git_repo()
+        if not repo_path or not repo_path.exists():
+            return {"success": False, "error": "ECC repository not found."}
+            
+        src_agents_dir = repo_path / "agents"
+        if not src_agents_dir.exists():
+            return {"success": False, "error": f"Agents dir not found: {src_agents_dir}"}
+            
+        dst_dir = Path(target_dir) if target_dir else self.workspace_path / ".agents" / "agents"
+        dst_dir.mkdir(parents=True, exist_ok=True)
+        
+        ported = []
+        skipped = []
+        
+        for agent_file in sorted(src_agents_dir.glob("*.md")):
+            agent_name = agent_file.stem
+            if filter_names and agent_name not in filter_names:
+                continue
+                
+            dest_file = dst_dir / agent_file.name
+            if dest_file.exists() and not overwrite:
+                skipped.append(agent_name)
+                continue
+                
+            content = agent_file.read_text(encoding="utf-8", errors="ignore")
+            if model_override:
+                lines = content.splitlines()
+                if lines and lines[0].strip() == "---":
+                    new_lines = []
+                    in_fm = True
+                    for i, line in enumerate(lines):
+                        if i > 0 and line.strip() == "---":
+                            in_fm = False
+                        if in_fm and line.startswith("model:"):
+                            new_lines.append(f"model: {model_override}")
+                        else:
+                            new_lines.append(line)
+                    content = "\n".join(new_lines) + "\n"
+                    
+            dest_file.write_text(content, encoding="utf-8")
+            ported.append(agent_name)
+            
+        return {
+            "success": True,
+            "target_dir": str(dst_dir),
+            "ported_count": len(ported),
+            "skipped_count": len(skipped),
+            "ported": ported,
+            "skipped": skipped,
+        }
+
+    def port_skills(
+        self,
+        target_dir: Optional[str] = None,
+        filter_names: Optional[list[str]] = None,
+        overwrite: bool = False,
+    ) -> dict[str, Any]:
+        """
+        Port/extract ECC skills into project skills directory.
+        
+        Args:
+            target_dir: Target directory (default: .agents/skills)
+            filter_names: Optional list of skill names to include
+            overwrite: Whether to overwrite existing skills
+            
+        Returns:
+            dict with ported, skipped, and error details
+        """
+        repo_path = self._ensure_git_repo()
+        if not repo_path or not repo_path.exists():
+            return {"success": False, "error": "ECC repository not found."}
+            
+        dst_dir = Path(target_dir) if target_dir else self.workspace_path / ".agents" / "skills"
+        dst_dir.mkdir(parents=True, exist_ok=True)
+        
+        ported = []
+        skipped = []
+        
+        seen = set()
+        for skills_rel in ["skills", ".agents/skills"]:
+            src_skills_dir = repo_path / skills_rel
+            if not src_skills_dir.exists():
+                continue
+                
+            for skill_dir in sorted(src_skills_dir.iterdir(), key=lambda p: p.name):
+                if not skill_dir.is_dir() or skill_dir.name in seen:
+                    continue
+                seen.add(skill_dir.name)
+                
+                skill_name = skill_dir.name
+                if filter_names and skill_name not in filter_names:
+                    continue
+                    
+                dest_skill = dst_dir / skill_name
+                if dest_skill.exists() and not overwrite:
+                    skipped.append(skill_name)
+                    continue
+                    
+                shutil.copytree(skill_dir, dest_skill, dirs_exist_ok=True)
+                ported.append(skill_name)
+                
+        return {
+            "success": True,
+            "target_dir": str(dst_dir),
+            "ported_count": len(ported),
+            "skipped_count": len(skipped),
+            "ported": ported,
+            "skipped": skipped,
+        }
+
+    def port_hooks(
+        self,
+        target_dir: Optional[str] = None,
+        overwrite: bool = False,
+    ) -> dict[str, Any]:
+        """
+        Port/extract ECC safety and lifecycle hooks into project hooks directory.
+        
+        Args:
+            target_dir: Target directory (default: hooks/ecc_hooks)
+            overwrite: Whether to overwrite existing files
+            
+        Returns:
+            dict with ported files and summary
+        """
+        repo_path = self._ensure_git_repo()
+        if not repo_path or not repo_path.exists():
+            return {"success": False, "error": "ECC repository not found."}
+            
+        dst_dir = Path(target_dir) if target_dir else self.workspace_path / "hooks" / "ecc_hooks"
+        dst_dir.mkdir(parents=True, exist_ok=True)
+        
+        ported = []
+        skipped = []
+        
+        # 1. Copy hooks JSON manifests
+        hooks_manifest_dir = repo_path / "hooks"
+        if hooks_manifest_dir.exists():
+            for manifest_file in sorted(hooks_manifest_dir.glob("*.json")):
+                dest = dst_dir / manifest_file.name
+                if dest.exists() and not overwrite:
+                    skipped.append(manifest_file.name)
+                else:
+                    shutil.copy2(manifest_file, dest)
+                    ported.append(manifest_file.name)
+                    
+        # 2. Copy scripts/hooks
+        scripts_hooks_dir = repo_path / "scripts" / "hooks"
+        scripts_dst = dst_dir / "scripts"
+        if scripts_hooks_dir.exists():
+            scripts_dst.mkdir(parents=True, exist_ok=True)
+            for item in sorted(scripts_hooks_dir.rglob("*")):
+                if item.is_file():
+                    rel = item.relative_to(scripts_hooks_dir)
+                    dest = scripts_dst / rel
+                    if dest.exists() and not overwrite:
+                        skipped.append(f"scripts/{rel.as_posix()}")
+                    else:
+                        dest.parent.mkdir(parents=True, exist_ok=True)
+                        shutil.copy2(item, dest)
+                        ported.append(f"scripts/{rel.as_posix()}")
+                        
+        # 3. Create or update README in target
+        readme_path = dst_dir / "README.md"
+        if not readme_path.exists() or overwrite:
+            readme_path.write_text(
+                "# ECC Safety & Lifecycle Hooks\n\n"
+                "Ported from affaan-m/ECC into Cursor Enterprise Framework.\n\n"
+                "## Contents\n"
+                "- `hooks.json`: Claude Code & generic harness PreToolUse/PostToolUse hooks configuration.\n"
+                "- `codex-hooks.json`: OpenAI Codex hook definitions.\n"
+                "- `scripts/`: GateGuard runtime, fact verification, commit quality checks, and context monitors.\n",
+                encoding="utf-8"
+            )
+            ported.append("README.md")
+            
+        return {
+            "success": True,
+            "target_dir": str(dst_dir),
+            "ported_count": len(ported),
+            "skipped_count": len(skipped),
+            "ported": ported,
+            "skipped": skipped,
+        }
+
+    def port_all(
+        self,
+        target_agents: Optional[str] = None,
+        target_skills: Optional[str] = None,
+        target_hooks: Optional[str] = None,
+        overwrite: bool = False,
+    ) -> dict[str, Any]:
+        """Port all agents, skills, and hooks from ECC."""
+        agents_res = self.port_agents(target_dir=target_agents, overwrite=overwrite)
+        skills_res = self.port_skills(target_dir=target_skills, overwrite=overwrite)
+        hooks_res = self.port_hooks(target_dir=target_hooks, overwrite=overwrite)
+        return {
+            "success": bool(agents_res.get("success") and skills_res.get("success") and hooks_res.get("success")),
+            "agents": agents_res,
+            "skills": skills_res,
+            "hooks": hooks_res,
         }
 
 

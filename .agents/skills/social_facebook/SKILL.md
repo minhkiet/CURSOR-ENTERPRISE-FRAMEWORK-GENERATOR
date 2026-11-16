@@ -1,3 +1,8 @@
+---
+name: social_facebook
+description: "Facebook Graph API Integration Skill skill"
+---
+
 # Facebook Graph API Integration Skill
 
 **Version:** 1.0.0  

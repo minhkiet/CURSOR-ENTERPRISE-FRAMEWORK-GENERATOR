@@ -1,39 +1,56 @@
 ---
-description: Data quality and database skill covering data validation, integrity, database schema design, migrations, and query optimization. Ensures data correctness and reliability.
+description: Data quality and database skill covering data validation, integrity,
+  database schema design, migrations, and query optimization. Ensures data correctness
+  and reliability.
 version: 1.0.0
 created: 2026-08-03
-tags: [data, database, validation, integrity, schema, migration, query, sql, nosql]
+tags:
+- data
+- database
+- validation
+- integrity
+- schema
+- migration
+- query
+- sql
+- nosql
 role: mandatory
-domains: [data, database, backend, infrastructure]
+domains:
+- data
+- database
+- backend
+- infrastructure
 confidence:
   base: 0.75
   threshold: 0.75
   auto_select: true
 triggers:
-  - "data"
-  - "database"
-  - "schema"
-  - "migration"
-  - "validation"
-  - "integrity"
-  - "sql"
-  - "query"
-  - "orm"
-  - "prisma"
-  - "drizzle"
-  - "supabase"
-  - "postgresql"
-  - "mysql"
-  - "mongodb"
-  - "redis"
-  - "index"
-  - "foreign key"
-  - "relationship"
-  - "transaction"
-  - "dữ liệu"
-  - "cơ sở dữ liệu"
-  - "xác thực"
+- data
+- database
+- schema
+- migration
+- validation
+- integrity
+- sql
+- query
+- orm
+- prisma
+- drizzle
+- supabase
+- postgresql
+- mysql
+- mongodb
+- redis
+- index
+- foreign key
+- relationship
+- transaction
+- dữ liệu
+- cơ sở dữ liệu
+- xác thực
+name: db_data-quality
 ---
+
 
 # Data Quality & Database Skill
 

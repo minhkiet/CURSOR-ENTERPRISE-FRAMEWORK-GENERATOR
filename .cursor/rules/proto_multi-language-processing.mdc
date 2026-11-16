@@ -1,4 +1,4 @@
-﻿---
+---
 description: Multi-Language Processing - Translation Layer cho Vietnamese, Chinese, Japanese, Korean, Arabic. Chuyển đổi request từ any language sang English để xử lý nhất quán.
 created: 2026-06-26
 version: 2.0.0

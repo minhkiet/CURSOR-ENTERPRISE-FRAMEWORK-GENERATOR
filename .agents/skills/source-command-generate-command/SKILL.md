@@ -1,7 +1,8 @@
 ---
-name: "source-command-generate-command"
-description: "Generate - Generate code (PDF, API, migration, boilerplate)"
+name: source-command-generate-command
+description: Generate - Generate code (PDF, API, migration, boilerplate)
 ---
+
 
 # source-command-generate-command
 

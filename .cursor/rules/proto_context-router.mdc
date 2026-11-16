@@ -1,4 +1,4 @@
-﻿---
+---
 description: Nguyên tắc Context Router - định tuyến context thông minh đến handlers phù hợp. Tích hợp Antigravity-style request inference và token optimization.
 created: 2026-06-23
 version: 1.1.0

@@ -1,10 +1,27 @@
 ---
-description: Universal coding discipline overlay for all vibe coding agents (Cursor IDE, Codex, Claude Code, Grok). Think first, minimal code, surgical changes.
+description: Universal coding discipline overlay for all vibe coding agents (Cursor
+  IDE, Codex, Claude Code, Grok). Think first, minimal code, surgical changes.
 version: 3.0.0
-tags: [karpathy, coding-discipline, think-first, minimal, goal-driven, surgical, verification, cross-agent, universal]
+tags:
+- karpathy
+- coding-discipline
+- think-first
+- minimal
+- goal-driven
+- surgical
+- verification
+- cross-agent
+- universal
 source: andrej-karpathy-skills (186k stars)
-compatible_agents: [cursor, codex, claude-code, grok, universal]
+compatible_agents:
+- cursor
+- codex
+- claude-code
+- grok
+- universal
+name: code_karpathy
 ---
+
 
 # Vibe Coding Discipline
 

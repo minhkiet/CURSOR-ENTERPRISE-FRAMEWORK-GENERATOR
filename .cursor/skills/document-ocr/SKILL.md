@@ -1,4 +1,9 @@
-﻿# Alias: document-ocr
+---
+name: document-ocr
+description: "Alias: document-ocr skill"
+---
+
+# Alias: document-ocr
 
 **DEPRECATED**: This skill has been renamed to $newName.
 

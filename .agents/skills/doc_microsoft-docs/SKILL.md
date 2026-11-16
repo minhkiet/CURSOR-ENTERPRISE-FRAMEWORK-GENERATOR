@@ -1,19 +1,18 @@
 ---
 name: microsoft-docs
-description: >-
-  This skill should be used to retrieve and cite current official Microsoft
-  documentation for Azure, .NET, Microsoft 365, Windows, or Power Platform
-  concepts, tutorials, configuration, limits, and quotas. It should defer
-  implementation work to a product-specific skill and code/API examples to
-  microsoft-code-reference.
+description: This skill should be used to retrieve and cite current official Microsoft
+  documentation for Azure, .NET, Microsoft 365, Windows, or Power Platform concepts,
+  tutorials, configuration, limits, and quotas. It should defer implementation work
+  to a product-specific skill and code/API examples to microsoft-code-reference.
 metadata:
   category: search
   source:
-    repository: 'https://github.com/MicrosoftDocs/mcp'
+    repository: https://github.com/MicrosoftDocs/mcp
     path: skills/microsoft-docs
     license_path: LICENSE
     commit: caa3d670bf2814171dba4f7346ece5080964021e
 ---
+
 
 # Microsoft Docs
 

@@ -1,4 +1,4 @@
-﻿---
+---
 description: Hướng dẫn skill auto-discovery và execution cho Cursor Enterprise Framework. Định tuyến tự động đến skills phù hợp với pre-review và post-review gates. Mọi task phải pass qua cả hai gates trước khi deliver.
 created: 2026-06-23
 version: 1.3.0

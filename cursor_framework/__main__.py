@@ -246,6 +246,73 @@ def _build_parser() -> argparse.ArgumentParser:
     pf_parser.add_argument("--workspace", default=None, help="Target workspace path")
     pf_parser.add_argument("--url", default=None, help="Redis connection URL for health checks")
 
+    # ecc: Everything Claude Code / Enhanced Coding Copilot integration
+    ecc_parser = sub.add_parser(
+        "ecc",
+        help="ECC integration (manage, port, inspect 70+ agents, 300+ skills, safety hooks)",
+        parents=[_common_flags()],
+    )
+    ecc_parser.add_argument(
+        "action",
+        nargs="?",
+        default="status",
+        choices=["status", "list", "import", "harness"],
+        help="ECC action: status, list, import, harness",
+    )
+    ecc_parser.add_argument(
+        "--target",
+        default="all",
+        choices=["all", "agents", "skills", "hooks"],
+        help="Target component category for list or import",
+    )
+    ecc_parser.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="Overwrite existing files during import",
+    )
+    ecc_parser.add_argument(
+        "--harness-name",
+        default="cursor",
+        help="Target harness for installation (e.g. cursor, claude, codex)",
+    )
+    ecc_parser.add_argument(
+        "--profile",
+        default="core",
+        choices=["minimal", "core", "full"],
+        help="Profile for harness installation",
+    )
+
+    # spec: Spec Kit / Spec-Driven Development CLI
+    spec_parser = sub.add_parser(
+        "spec",
+        help="Spec Kit / Spec-Driven Development (init, list, status, validate, constitution)",
+        parents=[_common_flags()],
+    )
+    spec_parser.add_argument(
+        "action",
+        nargs="?",
+        default="list",
+        choices=["init", "list", "status", "validate", "constitution"],
+        help="Spec Kit action: init, list, status, validate, constitution (default: list)",
+    )
+    spec_parser.add_argument(
+        "feature",
+        nargs="?",
+        default=None,
+        help="Target feature name (required for init, status, validate)",
+    )
+    spec_parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Force overwrite existing spec or constitution files",
+    )
+    spec_parser.add_argument(
+        "--json",
+        action="store_true",
+        dest="as_json",
+        help="Output raw JSON",
+    )
+
     return parser
 
 
@@ -793,6 +860,157 @@ def _prefect(args: argparse.Namespace) -> int:
     return 0
 
 
+def _ecc(args: argparse.Namespace) -> int:
+    from .ecc_integration import ECCIntegration, HarnessType, InstallProfile
+
+    ecc = ECCIntegration()
+    action = args.action
+
+    if action == "status":
+        status = ecc.get_status()
+        summary = ecc.get_component_summary()
+        out = {
+            "installed": status.installed,
+            "version": status.version,
+            "repository_path": status.repository_path,
+            "available_components": summary,
+            "git_available": status.git_available,
+            "node_available": status.npm_available,
+        }
+        print(json.dumps(out, indent=2))
+        return 0
+
+    elif action == "list":
+        comps = ecc.discover_components()
+        target = args.target
+        if target == "all":
+            summary = {k: len(v) for k, v in comps.items()}
+            print(json.dumps(summary, indent=2))
+        else:
+            items = comps.get(target, [])
+            out = [{"name": c.name, "description": c.description, "path": c.path} for c in items]
+            print(json.dumps(out, indent=2))
+        return 0
+
+    elif action == "import":
+        target = args.target
+        if target == "all":
+            res = ecc.port_all(overwrite=args.overwrite)
+        elif target == "agents":
+            res = ecc.port_agents(overwrite=args.overwrite)
+        elif target == "skills":
+            res = ecc.port_skills(overwrite=args.overwrite)
+        elif target == "hooks":
+            res = ecc.port_hooks(overwrite=args.overwrite)
+        else:
+            res = {"error": f"Unknown target: {target}"}
+        print(json.dumps(res, indent=2, default=str))
+        return 0
+
+    elif action == "harness":
+        try:
+            h_type = HarnessType(args.harness_name.lower())
+            p_type = InstallProfile(args.profile.lower())
+            res = ecc.install_harness(h_type, profile=p_type)
+            print(json.dumps(res, indent=2, default=str))
+        except Exception as e:
+            print(json.dumps({"error": str(e)}, indent=2))
+            return 1
+        return 0
+
+    return 0
+
+
+def _spec(args: argparse.Namespace) -> int:
+    from .spec_kit import SpecKitManager
+
+    mgr = SpecKitManager(args.root.replace(".cursor", "") if args.root != ".cursor" else None)
+    action = args.action
+
+    if action == "constitution":
+        path = mgr.init_constitution(force=args.force)
+        if args.as_json:
+            print(json.dumps({"constitution": str(path), "created": True}, indent=2))
+        else:
+            print(f"Project constitution initialized at: {path}")
+        return 0
+
+    if action == "init":
+        if not args.feature:
+            print("Error: feature name required for 'spec init <feature-name>'", file=sys.stderr)
+            return 1
+        try:
+            files = mgr.init_feature(args.feature, force=args.force)
+            if args.as_json:
+                res = {k: str(v) for k, v in files.items()}
+                print(json.dumps({"feature": args.feature, "files": res}, indent=2))
+            else:
+                print(f"Feature '{args.feature}' scaffolded successfully:")
+                for k, v in files.items():
+                    print(f"  - {k.capitalize()}: {v}")
+        except FileExistsError as e:
+            print(f"Error: {e}. Pass --force to overwrite.", file=sys.stderr)
+            return 1
+        return 0
+
+    if action == "list":
+        features = mgr.list_features()
+        if args.as_json:
+            print(json.dumps({"features": features, "count": len(features)}, indent=2))
+        else:
+            if not features:
+                print("No feature specs found in .specify/specs/.")
+                print("Create one using: python -m cursor_framework spec init <feature-name>")
+            else:
+                print(f"Registered Feature Specs ({len(features)}):")
+                for f in features:
+                    st = mgr.get_feature_status(f)
+                    print(f"  • {f:<24} [{st['progress_percent']}% - {st['completed_tasks']}/{st['total_tasks']} tasks]")
+        return 0
+
+    if action == "status":
+        if not args.feature:
+            print("Error: feature name required for 'spec status <feature-name>'", file=sys.stderr)
+            return 1
+        st = mgr.get_feature_status(args.feature)
+        if args.as_json:
+            print(json.dumps(st, indent=2))
+        else:
+            print(f"Status for Feature '{args.feature}':")
+            print(f"  Directory:     {st['directory']}")
+            print(f"  Spec file:     {'✓' if st['has_spec'] else '✗'}")
+            print(f"  Plan file:     {'✓' if st['has_plan'] else '✗'}")
+            print(f"  Tasks file:    {'✓' if st['has_tasks'] else '✗'}")
+            print(f"  Checklist:     {'✓' if st['has_checklist'] else '✗'}")
+            print(f"  Progress:      {st['completed_tasks']}/{st['total_tasks']} tasks ({st['progress_percent']}%)")
+            print(f"  Complete:      {'Yes' if st['is_complete'] else 'In Progress'}")
+        return 0
+
+    if action == "validate":
+        if not args.feature:
+            print("Error: feature name required for 'spec validate <feature-name>'", file=sys.stderr)
+            return 1
+        val = mgr.validate_feature(args.feature)
+        if args.as_json:
+            print(json.dumps(val, indent=2))
+        else:
+            status_text = "PASS" if val["valid"] else "FAIL"
+            print(f"Validation for '{args.feature}': {status_text}")
+            if val["errors"]:
+                print("Errors:")
+                for err in val["errors"]:
+                    print(f"  ✗ {err}")
+            if val["warnings"]:
+                print("Warnings:")
+                for w in val["warnings"]:
+                    print(f"  ⚠ {w}")
+            if val["valid"] and not val["warnings"]:
+                print("  ✓ All CEF Quality Gates satisfied!")
+        return 0 if val["valid"] else 1
+
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     # When invoked as `python -m cursor_framework tdam <subcmd> ...`,
     # the TDAM CLI parses its own subcommand via sys.argv.
@@ -823,6 +1041,8 @@ def main(argv: list[str] | None = None) -> int:
         "vibe": _vibe,
         "redis": _redis,
         "prefect": _prefect,
+        "ecc": _ecc,
+        "spec": _spec,
     }
 
     return dispatch[args.cmd](args)

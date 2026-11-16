@@ -1,7 +1,10 @@
 ---
 name: full-site-clone
-description: Clone toàn bộ website bao gồm tất cả pages, routes, URLs. Kết hợp site-crawler, route-discovery, và web-cloner. Keywords: clone full site, clone all pages, complete site clone, full website clone.
+description: 'Clone toàn bộ website bao gồm tất cả pages, routes, URLs. Kết hợp site-crawler,
+  route-discovery, và web-cloner. Keywords: clone full site, clone all pages, complete
+  site clone, full website clone.'
 ---
+
 
 # Full Site Clone Workflow
 

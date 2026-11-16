@@ -1,3 +1,8 @@
+---
+name: ui-ux-pro-max
+description: "UI/UX Pro Max skill"
+---
+
 # UI/UX Pro Max
 
 > **Source:** [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) (117k stars)

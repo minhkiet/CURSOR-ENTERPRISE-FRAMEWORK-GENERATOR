@@ -1,7 +1,11 @@
 ---
 name: simple-english
-description: "Transforms complex technical content into clear, accessible Simple English following Wikipedia's Simple English guidelines. Use when writing for non-native speakers, accessibility, children's education, or when users ask to simplify technical jargon, explain concepts simply, or rewrite documentation in plain language."
+description: Transforms complex technical content into clear, accessible Simple English
+  following Wikipedia's Simple English guidelines. Use when writing for non-native
+  speakers, accessibility, children's education, or when users ask to simplify technical
+  jargon, explain concepts simply, or rewrite documentation in plain language.
 ---
+
 
 # Simple English Writer
 

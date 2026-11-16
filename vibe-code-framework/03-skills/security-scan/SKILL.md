@@ -1,3 +1,8 @@
+---
+name: security-scan
+description: "Scan và phát hiện security vulnerabilities (OWASP Top 10, auth, input validation)."
+---
+
 # Security Scan Skill
 
 > **Version:** 1.0.0 | **Category:** Security | **Triggers:** security scan, vulnerability scan, OWASP, pentest

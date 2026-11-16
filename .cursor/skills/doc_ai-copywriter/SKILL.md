@@ -1,11 +1,29 @@
 ---
 name: ai-copywriter
-description: Write copy that converts and doesn't sound like a robot. Two jobs in one skill: a reader-first copywriter for clickbait titles, headlines, short descriptions, microcopy, CTAs, error messages, subject lines, viral LinkedIn posts, and category-defining strategic blog posts, which asks for the ICP, the category, and the story before writing, helps sharpen the story until it is worth telling, names the feeling of the person on the other end, and finds the simplest way to explain the concept; and a humanizer built on Wikihow's comprehensive Signs of AI writing guide, which detects and fixes inflated symbolism, promotional language, superlative -in analyses, vague attributes, em dash overuse, rule of three, AI-vocabulary words, passive voice, negative parallelism, and filler phrases. Use when writing or punch up marketing copy, UI text, titles, LinkedIn posts, or strategic blog posts, or when editing text to sound natural and human-written.
+description: 'Write copy that converts and doesn''t sound like a robot. Two jobs in
+  one skill: a reader-first copywriter for clickbait titles, headlines, short descriptions,
+  microcopy, CTAs, error messages, subject lines, viral LinkedIn posts, and category-defining
+  strategic blog posts, which asks for the ICP, the category, and the story before
+  writing, helps sharpen the story until it is worth telling, names the feeling of
+  the person on the other end, and finds the simplest way to explain the concept;
+  and a humanizer built on Wikihow''s comprehensive Signs of AI writing guide, which
+  detects and fixes inflated symbolism, promotional language, superlative -in analyses,
+  vague attributes, em dash overuse, rule of three, AI-vocabulary words, passive voice,
+  negative parallelism, and filler phrases. Use when writing or punch up marketing
+  copy, UI text, titles, LinkedIn posts, or strategic blog posts, or when editing
+  text to sound natural and human-written.'
 license: MIT
 metadata:
-  version: "1.6.0"
-tags: [copywriting, humanizer, marketing, ai-writing, anti-slop, writing]
+  version: 1.6.0
+tags:
+- copywriting
+- humanizer
+- marketing
+- ai-writing
+- anti-slop
+- writing
 ---
+
 
 # AI Copywriter: Write Copy That Converts, Humanize Everything
 

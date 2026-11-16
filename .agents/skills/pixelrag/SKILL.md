@@ -1,4 +1,9 @@
-﻿# Alias: pixelrag
+---
+name: pixelrag
+description: "PixelRAG skill cho Visual Retrieval-Augmented Generation - đọc tài liệu bằng hình ảnh (PDF, website, bảng biểu, sơ đồ). Cải thiện độ chính xác retrieval 18.1% so với Text RAG truyền thống. Tích hợp pixelshot CLI, Qwen3-VL-Embedding, và FAISS index."
+---
+
+# Alias: pixelrag
 
 **DEPRECATED**: This skill has been renamed to $newName.
 

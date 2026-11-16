@@ -1,9 +1,19 @@
 ---
-description: Karpathy Coding - Think Before Code. Minimal overlay skill cho mọi task. 5 phút review trước/sau code.
+description: Karpathy Coding - Think Before Code. Minimal overlay skill cho mọi task.
+  5 phút review trước/sau code.
 version: 2.0.0
-tags: [karpathy, coding-discipline, think-first, minimal, goal-driven, surgical, verification]
+tags:
+- karpathy
+- coding-discipline
+- think-first
+- minimal
+- goal-driven
+- surgical
+- verification
 source: andrej-karpathy-skills (186k stars)
+name: code_karpathy
 ---
+
 
 # Karpathy Coding Discipline
 

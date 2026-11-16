@@ -1,16 +1,16 @@
 ---
 name: skill-share
-description: >-
-  A skill that creates new agent skills and automatically shares them on Slack
-  using Rube for seamless team collaboration and skill discovery.
+description: A skill that creates new agent skills and automatically shares them on
+  Slack using Rube for seamless team collaboration and skill discovery.
 license: Complete terms in LICENSE.txt
 metadata:
   category: development
   source:
-    repository: 'https://github.com/ComposioHQ/awesome-claude-skills'
+    repository: https://github.com/ComposioHQ/awesome-claude-skills
     path: skill-share
     commit: 92568c1edaff1bde5371154f036d959346c145a8
 ---
+
 
 ## When to use this skill
 

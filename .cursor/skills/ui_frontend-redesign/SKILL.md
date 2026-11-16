@@ -1,7 +1,11 @@
-﻿---
-name: frontend-redesign
-description: Upgrades existing websites and apps to premium quality. Audits current design, identifies generic AI patterns, and applies high-end design standards without breaking functionality. Includes mandatory pre-redesign audit and post-redesign validation. Works with any CSS framework or vanilla CSS.
 ---
+name: frontend-redesign
+description: Upgrades existing websites and apps to premium quality. Audits current
+  design, identifies generic AI patterns, and applies high-end design standards without
+  breaking functionality. Includes mandatory pre-redesign audit and post-redesign
+  validation. Works with any CSS framework or vanilla CSS.
+---
+
 
 # Frontend Redesign Skill
 

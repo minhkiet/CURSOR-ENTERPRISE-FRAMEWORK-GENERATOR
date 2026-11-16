@@ -1,7 +1,8 @@
 ---
-name: "source-command-warm"
-description: "Migrated source command `warm`"
+name: source-command-warm
+description: Migrated source command `warm`
 ---
+
 
 # source-command-warm
 

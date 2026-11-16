@@ -1,17 +1,17 @@
 ---
 name: mysql-patterns
-description: >-
-  MySQL and MariaDB schema, query, indexing, transaction, replication, and
-  connection-pool patterns for production backends.
+description: MySQL and MariaDB schema, query, indexing, transaction, replication,
+  and connection-pool patterns for production backends.
 metadata:
   origin: ECC
   category: data
   source:
-    repository: 'https://github.com/affaan-m/ECC'
+    repository: https://github.com/affaan-m/ECC
     path: skills/mysql-patterns
     license_path: LICENSE
     commit: 71d22d0a77b7e0684f4e51cba03749b788993cdb
 ---
+
 
 # MySQL Patterns
 

@@ -1429,6 +1429,9 @@ namespace CursorSetupWpf.ViewModels
                 var (hooksOk, hooksMsg) = await _installer.SyncHooksConfigAsync(InstallPath, agent);
                 LogLines.Add(hooksOk ? "[HOOKS] " + hooksMsg : "[HOOKS] WARN: " + hooksMsg);
 
+                var (rulesOk, rulesMsg) = await _installer.SyncRulesConfigAsync(InstallPath, agent);
+                LogLines.Add(rulesOk ? "[RULES] " + rulesMsg : "[RULES] WARN: " + rulesMsg);
+
                 _toast.Success(LocalizationService.T("mcp.title"),
                     LocalizationService.T("mcp.sync_success", McpCatalog.Count));
                 LogLines.Add("[MCP] " + message);
@@ -1891,6 +1894,7 @@ namespace CursorSetupWpf.ViewModels
                     SkillsPath = config.SkillsPath,
                     InstallUrl = config.InstallUrl,
                     SupportsMcp = config.SupportsMcp,
+                    SupportsRules = config.SupportsRules,
                 });
             }
 
@@ -2030,25 +2034,35 @@ namespace CursorSetupWpf.ViewModels
 
         async Task SyncSelectedMcpAsync()
         {
-            var selected = AvailableAgents.Where(a => a.IsSelected && a.SupportsMcp).ToList();
+            var selected = AvailableAgents.Where(a => a.IsSelected).ToList();
             if (selected.Count == 0)
             {
-                _toast.Warning(McpTitle, "No selected agent has MCP support.");
+                _toast.Warning(AgentTitle, "No agent selected.");
                 return;
             }
 
             var failures = new List<string>();
             foreach (var agent in selected)
             {
-                var result = await _installer.SyncMcpConfigAsync(InstallPath, agent.Agent);
-                LogLines.Add($"[MCP] {agent.DisplayName}: {result.Message}");
-                if (!result.Success) failures.Add(agent.DisplayName);
+                if (agent.SupportsMcp)
+                {
+                    var result = await _installer.SyncMcpConfigAsync(InstallPath, agent.Agent);
+                    LogLines.Add($"[MCP] {agent.DisplayName}: {result.Message}");
+                    if (!result.Success) failures.Add($"{agent.DisplayName} (MCP)");
+                }
+
+                if (agent.SupportsRules)
+                {
+                    var rulesResult = await _installer.SyncRulesConfigAsync(InstallPath, agent.Agent);
+                    LogLines.Add($"[RULES] {agent.DisplayName}: {rulesResult.Message}");
+                    if (!rulesResult.Success) failures.Add($"{agent.DisplayName} (Rules)");
+                }
             }
             CheckMcpStatus();
             if (failures.Count == 0)
-                _toast.Success(McpTitle, $"MCP synchronized for {selected.Count} selected agent(s).");
+                _toast.Success(AgentTitle, $"Synchronized MCP & Rules for {selected.Count} selected agent(s).");
             else
-                _toast.Warning(McpTitle, $"MCP sync blocked/failed for: {string.Join(", ", failures)}");
+                _toast.Warning(AgentTitle, $"Sync completed with issues: {string.Join(", ", failures)}");
         }
 
         void OpenAgentFolder(object? param)
@@ -2268,6 +2282,7 @@ namespace CursorSetupWpf.ViewModels
         public string SkillsPath { get; init; } = "";
         public string InstallUrl { get; init; } = "";
         public bool SupportsMcp { get; init; }
+        public bool SupportsRules { get; init; }
         bool _isSelected;
         public bool IsSelected { get => _isSelected; set => Set(ref _isSelected, value); }
         bool _isInstalled;
@@ -2276,9 +2291,14 @@ namespace CursorSetupWpf.ViewModels
         public string InstallPath { get => _installPath; set => Set(ref _installPath, value); }
         public string StatusLabel => IsInstalled ? LocalizationService.T("agent.installed") : LocalizationService.T("agent.not_installed");
         public Brush StatusBrush => IsInstalled ? new SolidColorBrush(Color.FromRgb(5, 150, 105)) : new SolidColorBrush(Color.FromRgb(100, 116, 139));
-        public string SupportSummary => SupportsMcp
-            ? LocalizationService.T("agent.mcp_supported")
-            : LocalizationService.T("agent.mcp_unavailable");
+        public string SupportSummary =>
+            (SupportsMcp, SupportsRules) switch
+            {
+                (true, true) => $"{LocalizationService.T("agent.mcp_supported")} · Rules",
+                (true, false) => LocalizationService.T("agent.mcp_supported"),
+                (false, true) => "Rules supported",
+                _ => LocalizationService.T("agent.mcp_unavailable"),
+            };
     }
 
     /// <summary>

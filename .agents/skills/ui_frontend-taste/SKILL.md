@@ -1,9 +1,17 @@
-﻿---
-name: frontend-taste
-description: Anti-slop frontend skill for landing pages, portfolios, and redesigns. Reads the brief, infers the design direction, sets three dials (VARIANCE/MOTION/DENSITY), and ships interfaces that do not look templated. Includes mandatory pre-review and post-review checkpoints before and after code generation. Synthesizes pbakaus/impeccable, Leonxlnx/taste-skill, anthropics/frontend-design, vercel-labs/web-design-guidelines, nextlevelbuilder/ui-ux-pro-max, emilkowalski/emil-design-eng, and Nutlope/hallmark (9.3k stars) into a single coherent playbook. See §12 for attribution and conflict-resolution rules.
-version: 1.8.0
-updated: 2026-07-16
 ---
+name: ui_frontend-taste
+description: Anti-slop frontend skill for landing pages, portfolios, and redesigns.
+  Reads the brief, infers the design direction and business kind taxonomy, sets three dials (VARIANCE/MOTION/DENSITY),
+  and builds professional websites at the level of figma.com and x.ai. Enforces tasteskill 2.5.1 9 House Rules,
+  the 6 Nevers, real photographs/icons, screen budgeting, and automated verification gates. Synthesizes pbakaus/impeccable,
+  Leonxlnx/taste-skill (v2.5.1), anthropics/frontend-design, vercel-labs/web-design-guidelines,
+  nextlevelbuilder/ui-ux-pro-max, emilkowalski/emil-design-eng, and Nutlope/hallmark
+  (9.3k stars) into a single coherent playbook. See §12 for attribution and conflict-resolution
+  rules.
+version: 2.5.1
+updated: 2026-11-16
+---
+
 
 # Taste Frontend Skill (Anti-Slop Edition)
 
@@ -12,11 +20,39 @@ updated: 2026-07-16
 
 ---
 
+## 0.0 THE NINE HOUSE RULES (Tasteskill 2.5 - Non-Negotiable)
+
+> These nine rules win over everything else in this skill. `figma.com` and `x.ai` are the bar (`references/layout-v4.md`).
+
+1. **No caption or description under any image, render or visual.** Licence credits go in one footer line (`references/photos.md`).
+2. **Every visual renders, never an empty ground,** at 1440, 1024, 768 and 390. A refused WebGL effect displays its still fallback (`references/backgrounds.md`).
+3. **One section per screen:** The hero alone on the first screen, every section exactly one or two screens tall at 1440x900, no second section heading peeking in. The one exception is a live `photo-chapters` section (three or four screens), set by the moment (`references/layout-v4.md`, `references/sections.md`).
+4. **Equal left and right content edges:** Every block aligns to `.wrap` boundaries or grid columns. No lateral wobble, no sideways overflow, no one-sided bleed.
+5. **Hover micro-animations:** A linked card lifts 2px, a photo zooms 1.02-1.03 inside its frame, buttons step on hover and press on click, underlines draw, card loops cycle in 2.5-4 s, repeat and restart on hover. No tilt, carousels or timed tabs. Every hero enters once on load (`data-enter`), and every page carries one dealt moment (two on a long page; `references/motion.md`, `references/moments.md`).
+6. **More and better real photographs where they fit:** Real photography leads. If client has no photos, supply curated licensed stand-ins via `scripts/photos.mjs search`. Better backgrounds, better heroes, layouts, and fonts.
+7. **Real full-colour icons:** Real product and platform icons, never drawn replicas (`scripts/icons.mjs`, `references/icons.md`). Small diagram visuals in cards (hub with branches, parallel lanes, pulsing lines; `references/diagrams.md`).
+8. **Award-site scenes and creative moments:** Shader effects and WebGL scenes ONLY where the trade has a technical subject (software, tech, AI, developer tools, gaming, fintech, hardware); NEVER on a local cafe, bakery, guesthouse or shop (those get authentic photography; `references/effects-usage.md`).
+9. **Addresses and Privacy:** Street and district only (no fake house number, postcode or coordinates; no fake VAT or registration numbers; no phone in real format; dummy contacts on `.example`).
+
+---
+
 ## 0. REVIEW GATE: PRE-CODE AUDIT (Mandatory)
 
 **Before writing any code, run the pre-review audit. Nothing ships past this gate without passing.**
 
-### 0.A Brief Inference
+### 0.A Brief Inference & Business Kind Taxonomy
+
+Write the kind on the plan's first line and declare it on the page: the page type on `<html data-type="..." data-enter>` and `<meta name="page-type" content="...">`, and `<meta name="site-kind" content="...">` (a place adds `<meta name="page-kind" content="place">`).
+
+| Brief / Business Kind | page type | site-kind | Visual Budget & Rules (`references/sections.md`) |
+|---|---|---|---|
+| **software** (App, SaaS, AI, dev tools, fintech, studio selling software) | `software` | `software` | UI as live HTML (`app-frame`), code diffs, pulsing diagrams, max 1 shader effect/ground, 1-2 dealt moments, max 4 WebGL contexts. 60-80 words/screen. |
+| **gaming** (A game, game studio) | `software` | `gaming` | Game title in `h1`, launch line, world as full-bleed key art. Never an effect in place of the world. |
+| **tech** (Hardware, robotics, drone, keyboard) | `product` | `tech` | Product photographs, workbench context, parts close-up. Render/CAD only if 3D requested. |
+| **product** (Physical brand/goods: chair, bike, coffee) | `product` | `other` | Product big where whole in max 3 sections, different photo each section, swatch changes picture. |
+| **service** (Clinic, law firm, agency, creative trade) | `service` | `other` | Photographs of people, rooms, work; real tool icons; 1 still diagram max; flat grounds. |
+| **place** (Cafe, bakery, restaurant, hotel, florist, local shop) | `place` | `other` | 12-20 photographs lead; flat grounds; visit block on screen 2; phone action bar; zero shaders/effects/loops. |
+
 1. **Page kind** - landing (SaaS / consumer / agency / event), portfolio (dev / designer / creative studio), redesign (preserve vs overhaul), editorial / blog.
 2. **Vibe words** - "minimalist", "calm", "Linear-style", "Awwwards", "brutalist", "premium consumer", "Apple-y", "playful", "serious B2B", "editorial", "agency-y", "glassy", "dark tech".
 3. **Reference signals** - URLs linked, screenshots pasted, products named, brands competing with.
@@ -42,6 +78,14 @@ Explicitly reject these defaults before proceeding:
 - Inter + slate-900 / infinite-loop micro-animations everywhere
 If any of these appear in the draft plan, eliminate them.
 
+### 0.D.1 The Six Nevers (Tasteskill 2.5 Strict Bans)
+- **Never a card, row or tile that fades in on scroll;** no fade-in on every section; no parallax on text; no scroll-jacking; no random blinking.
+- **Never stock photographs passed off as the client's product, people or place** (stand-ins must be listed in report as stand-ins); never a product page that does not show the product.
+- **Never a drawn look-alike of a real logo;** never invented reviews, quotes, customers or metrics.
+- **Never violet or lavender in the page's own design:** accent, ground, gradient, effect colour or tint (no AI purple!). Third-party logos keep their native colors (`references/icons.md`).
+- **Never copying a reference site's code, copy, pictures or signature effect.**
+- **Never deleting or editing kit files (`assets/`, `scripts/`) to clear a check.** Fix the page to satisfy the check.
+
 ### 0.E Design System Check (Pre-Code)
 Does the brief match an official design system? If so, use the official package.
 
@@ -63,6 +107,9 @@ Does the brief match an official design system? If so, use the official package.
 ### 0.F Pre-Code Review Checklist (PASS GATE)
 Before touching code, verify ALL of:
 
+- [ ] 9 House Rules active and prioritized (Section 0.0)
+- [ ] Business Kind declared in `<html data-type="..." data-enter>` and `<meta name="page-type">` (Section 0.A)
+- [ ] The Six Nevers respected (Section 0.D.1)
 - [ ] Design read declared (Section 0.B)
 - [ ] No AI-default patterns in draft plan (0.D checked)
 - [ ] Design system selected if applicable (0.E)
@@ -160,13 +207,29 @@ Before importing ANY 3rd-party library, check `package.json`. If missing, output
 - **NO DUPLICATE CTA INTENT:** "Get in touch" + "Contact us" + "Let's talk" = same intent. Pick ONE label
 - **FORM CONTRAST CHECK:** All inputs, placeholders, focus rings, labels pass WCAG AA
 
-### 3.5 Content
-- **NO generic names** (John Doe, Sarah Chan, Jack Su)
-- **NO fake round numbers** (99.99%, 50%, 1234567). Use organic messy data (47.2%, 31)
-- **NO startup-slop names** (Acme, Nexus, SmartFlow)
-- **NO filler verbs** (Elevate, Seamless, Unleash, Next-Gen, Game-changer)
-- **COPY SELF-AUDIT:** Every visible string re-read for grammar, unclear referents, AI-hallucination, fake precision
-- **Quotes max 3 lines.** Attribution: name + role (+ company). Use typographic quotes (" "), not ASCII
+### 3.5 Content & Copy Voice (Tasteskill 2.5 / Impeccable)
+
+#### The Fact Sheet (Pre-Copy Protocol)
+Before writing copy, extract facts from the brief (`references/copy-voice.md`, `references/copy.md`):
+- **What it is:** One plain sentence, no adjectives (feeds `h1` and sub-line).
+- **For whom, and not for whom:** Target user + who should look elsewhere (feeds sub-line & FAQ).
+- **What they do today instead:** The actual competitor/manual process (feeds comparison/pain line).
+
+#### Copy Directives & Banned Slop Words
+- **Headings name things:** Buttons get a verb and an object ("Start building", "Download CLI"), max 2 hero actions.
+- **Strictly banned AI slop words:**
+  `elevate`, `seamless`, `redefine`, `revolutionize`, `empower`, `robust`, `bespoke`, `supercharge`, `dive into`, `unleash`, `delve`, `game-changer`, `synergy`.
+- **Fact consistency:** One fact, one wording across the entire page (`scripts/copy-lint.mjs`).
+- **NO generic names** (John Doe, Sarah Chan, Jack Su).
+- **NO fake round numbers** (99.99%, 50%, 1234567). Use organic messy data (47.2%, 31).
+- **NO startup-slop names** (Acme, Nexus, SmartFlow).
+- **NO filler verbs** (Elevate, Seamless, Unleash, Next-Gen, Game-changer).
+- **COPY SELF-AUDIT:** Every visible string re-read for grammar, unclear referents, AI-hallucination, fake precision.
+- **Quotes max 3 lines.** Attribution: name + role (+ company). Use typographic quotes (" "), not ASCII.
+- Real text only (no lorem ipsum, ever).
+- No em-dashes (`—`) in copy anywhere.
+- Tone: human, direct, zero buzzwords.
+- Microcopy: informative, not cute ("Saving..." not "Working our magic!").
 
 ### 3.6 Images
 - **Priority 1:** Image-generation tool (use it to create section assets at correct aspect ratio)
@@ -444,6 +507,18 @@ Never spam `z-50` or `z-10`. Use z-index strictly for: sticky nav, modals, overl
 - [ ] One design system per project (no Material + shadcn mixed)?
 - [ ] No arbitrary z-index spam?
 - [ ] Grain/noise only on fixed `pointer-events-none` layers?
+
+### 6.I Tasteskill 2.5 Automated Verification Scripts
+Run the automated verification suite before final delivery:
+- [ ] Viewports verified at 1440, 1024, 768, 390, and 320 (`references/layout-v4.md`).
+- [ ] Consistency check passes:
+  `node .agents/skills/ui_frontend-taste/scripts/consistency.mjs <file.html>`
+- [ ] Copy lint passes (zero slop words, valid actions, proper facts):
+  `node .agents/skills/ui_frontend-taste/scripts/copy-lint.mjs <file.html>`
+- [ ] Performance gate passes:
+  `node .agents/skills/ui_frontend-taste/scripts/perf.mjs <file.html>`
+- [ ] Finish gate check passes:
+  `node .agents/skills/ui_frontend-taste/scripts/gate.mjs`
 
 ---
 
@@ -970,7 +1045,7 @@ Note: this priority order is **embedded as reference only**. The active rules li
 | # | Skill | Source | Stars | Merged into |
 |---|-------|--------|-------|-------------|
 | ⭐1 | impeccable | github.com/pbakaus/impeccable | 39k | §9 (philosophy + anti-slop catalog) + §2 (anti-cream) |
-| ⭐2 | taste-skill | github.com/Leonxlnx/taste-skill | — | §0-§4 (original source of dials, GSAP skeletons, em-dash ban) |
+| ⭐2 | taste-skill v2.5.1 | github.com/Leonxlnx/taste-skill | 12k | §0.0 (9 House Rules), §0.A (Business Taxonomy), §0.D.1 (6 Nevers), §1-§4 (Dials & GSAP), §3.5 (Copy Voice), §6.I (Gate Scripts) |
 | ⭐3 | frontend-design | github.com/anthropics/skills | 147k | §9 (two-pass build, signature element, critique) |
 | ⭐4 | web-design-guidelines | github.com/vercel-labs/agent-skills | 25k | §11.C (runtime audit pointer; not embedded — stays fresh) |
 | ⭐5 | ui-ux-pro-max | github.com/nextlevelbuilder/ui-ux-pro-max-skill | 95k | §11 (database pointer, priority table) |
@@ -1019,7 +1094,7 @@ The single-source-of-truth pattern — this file — means one rule per concern,
 These are **not installed** by default. Install via `npx skills add` only when the use case demands live data:
 
 - `npx skills add https://github.com/pbakaus/impeccable --skill impeccable` — only if you want the full commands menu (`craft`, `shape`, `audit`, `polish`, ...) and the bundled detector hooks
-- `npx skills add https://github.com/Leonxlnx/taste-skill --skill design-taste-frontend-v1` — only if you want the v1 baseline for diff comparison
+- `Leonxlnx/taste-skill` v2.5.1 assets are now **fully vendored locally** in `.agents/skills/ui_frontend-taste/` (`references/`, `library/`, `scripts/`, `assets/`). You have immediate access to all 22 reference guides and 12 CLI checker tools without external dependencies.
 - `npx skills add vercel-labs/agent-skills --skill web-design-guidelines` — only if you want CI/PR-check integration for the Vercel rules
 - `uipro init --ai cursor` (from `ui-ux-pro-max-cli`) — only if you need on-demand palette/style/font queries during a build
 

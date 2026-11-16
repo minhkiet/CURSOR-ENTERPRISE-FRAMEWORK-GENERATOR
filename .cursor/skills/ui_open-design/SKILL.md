@@ -1,3 +1,8 @@
+---
+name: ui_open-design
+description: "Open Design Integration skill"
+---
+
 # Open Design Integration
 
 ## Mục tiêu

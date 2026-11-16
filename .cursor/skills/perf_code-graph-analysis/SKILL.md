@@ -1,3 +1,8 @@
+---
+name: perf_code-graph-analysis
+description: "Code Graph Analysis Skill skill"
+---
+
 # Code Graph Analysis Skill
 
 **Version:** 1.0.0  

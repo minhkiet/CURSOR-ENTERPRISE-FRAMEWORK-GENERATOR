@@ -1,9 +1,19 @@
 ---
-description: Vibe Coding - Unified overlay skill kết hợp Think First (karpathy) + Minimize Code (ponytail). Luôn chạy với mọi task.
+description: Vibe Coding - Unified overlay skill kết hợp Think First (karpathy) +
+  Minimize Code (ponytail). Luôn chạy với mọi task.
 version: 1.0.0
-tags: [vibe-coding, efficient, think-first, minimize, yagni, surgical, goal-driven]
+tags:
+- vibe-coding
+- efficient
+- think-first
+- minimize
+- yagni
+- surgical
+- goal-driven
 source: andrej-karpathy-skills + DietrichGebert/ponytail
+name: code_vibe-coding
 ---
+
 
 # Vibe Coding - Think First, Code Minimum
 

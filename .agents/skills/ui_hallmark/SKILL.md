@@ -1,7 +1,11 @@
 ---
 name: hallmark
-description: "Design taste skill for anti-slop UI. Based on Nutlope/hallmark (9.3k stars), detects AI slop aesthetics and builds distinctive, professional interfaces. Use when building landing pages, portfolios, marketing sites, or any design-intensive UI work. Identifies 57 slop-test gates to ensure work is original and tasteful."
+description: Design taste skill for anti-slop UI. Based on Nutlope/hallmark (9.3k
+  stars), detects AI slop aesthetics and builds distinctive, professional interfaces.
+  Use when building landing pages, portfolios, marketing sites, or any design-intensive
+  UI work. Identifies 57 slop-test gates to ensure work is original and tasteful.
 ---
+
 
 # Hallmark: Anti-Slop Design Taste
 

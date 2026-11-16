@@ -1,4 +1,9 @@
-﻿# Alias: video-generation
+---
+name: video-generation
+description: "AI Video Generation Skill - Auto-generate short videos (9:16) from URLs or text using HyperFrames rendering, OmniVoice TTS, and FFmpeg. Integrated from AI-auto-generate-video (huytranvan2010)."
+---
+
+# Alias: video-generation
 
 **DEPRECATED**: This skill has been renamed to $newName.
 

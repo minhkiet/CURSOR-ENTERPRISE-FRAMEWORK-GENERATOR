@@ -1,3 +1,8 @@
+---
+name: util_skill-installer
+description: "Skill Dependency Auto-Installer skill"
+---
+
 # Skill Dependency Auto-Installer
 
 ## Mục tiêu

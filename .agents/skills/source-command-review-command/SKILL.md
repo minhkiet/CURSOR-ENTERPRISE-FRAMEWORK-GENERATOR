@@ -1,7 +1,8 @@
 ---
-name: "source-command-review-command"
-description: "Review Code - Review code quality, correctness, performance"
+name: source-command-review-command
+description: Review Code - Review code quality, correctness, performance
 ---
+
 
 # source-command-review-command
 

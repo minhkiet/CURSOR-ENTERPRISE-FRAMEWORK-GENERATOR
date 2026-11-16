@@ -1,4 +1,9 @@
-﻿# Alias: open-design
+---
+name: open-design
+description: "Alias: open-design skill"
+---
+
+# Alias: open-design
 
 **DEPRECATED**: This skill has been renamed to $newName.
 

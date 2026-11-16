@@ -1,7 +1,11 @@
-﻿---
-name: frontend-review
-description: Comprehensive frontend code review skill with mandatory pre-review scope analysis and post-review quality gates. Reviews for correctness, design quality, accessibility, performance, and taste. Use before and after every frontend implementation task.
 ---
+name: frontend-review
+description: Comprehensive frontend code review skill with mandatory pre-review scope
+  analysis and post-review quality gates. Reviews for correctness, design quality,
+  accessibility, performance, and taste. Use before and after every frontend implementation
+  task.
+---
+
 
 # Frontend Code Review Skill
 

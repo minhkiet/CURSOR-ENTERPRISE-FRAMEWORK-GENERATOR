@@ -272,6 +272,7 @@ namespace CursorSetupWpf.Services
                 {
                     ["skills"] = new[] { ".codex/skills", ".agents/skills" },
                     ["agents"] = new[] { ".codex/agents", ".agents/agents" },
+                    ["rules"] = new[] { ".codex/rules", ".cursor/rules" },
                 },
                 GatePrefix = "CX",
                 EnvVars = new[] { "CODEX_ENABLED", "ORIGIN_HOST" },
@@ -446,6 +447,11 @@ namespace CursorSetupWpf.Services
                 GlobalRoot = ".github",
                 GatePrefix = "CP",
                 EnvVars = new[] { "GITHUB_TOKEN" },
+                CategoryTargets = new()
+                {
+                    ["rules"] = new[] { ".github/instructions" },
+                    ["skills"] = new[] { ".github/instructions" },
+                },
                 InstallUrl = "https://github.com/features/copilot",
                 SupportsMcp = false,
                 SupportsRules = true,
@@ -484,7 +490,7 @@ namespace CursorSetupWpf.Services
                 GlobalRoot = ".gemini/antigravity",
                 CategoryTargets = new()
                 {
-                    ["rules"] = new[] { ".gemini/rules" },
+                    ["rules"] = new[] { ".gemini/rules", ".agents/rules" },
                     ["skills"] = new[] { ".agents/skills" },
                     ["agents"] = new[] { ".agents/agents" },
                     ["commands"] = new[] { ".gemini/commands" },
@@ -520,6 +526,10 @@ namespace CursorSetupWpf.Services
             ProgressChanged?.Invoke(88, "Registering Cursor hooks...");
             var (hooksOk, hooksMsg) = await SyncHooksConfigAsync(installPath);
             LogAppended?.Invoke(hooksOk ? $"[HOOKS] {hooksMsg}" : $"[HOOKS] WARN: {hooksMsg}");
+
+            ProgressChanged?.Invoke(90, "Registering agent rules and instructions...");
+            var (rulesOk, rulesMsg) = await SyncRulesConfigAsync(installPath, TargetAgent.Cursor);
+            LogAppended?.Invoke(rulesOk ? $"[RULES] {rulesMsg}" : $"[RULES] WARN: {rulesMsg}");
 
             ProgressChanged?.Invoke(92, "Running post-install scripts...");
             await RunPostInstallScriptsAsync(installPath, config);
@@ -1363,6 +1373,411 @@ namespace CursorSetupWpf.Services
             });
         }
 
+        // ===================== Rules Sync =====================
+
+        /// <summary>
+        /// Synchronize and register framework rules and instructions for the specified target agent.
+        /// Configures global agent instruction files (e.g. settings.json userRules, .cursorrules,
+        /// AGENTS.md, CLAUDE.md, GEMINI.md, copilot-instructions.md) and workspace rule files.
+        /// </summary>
+        public async Task<(bool Success, string Message)> SyncRulesConfigAsync(string? installPath = null, TargetAgent agent = TargetAgent.Cursor)
+        {
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                    string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                    if (string.IsNullOrEmpty(appData))
+                        appData = Path.Combine(home, ".config");
+
+                    string resolvedInstall = string.IsNullOrWhiteSpace(installPath)
+                        ? GetAgentRoot(agent, home)
+                        : GetAgentRoot(agent, installPath);
+
+                    int syncedFiles = 0;
+
+                    switch (agent)
+                    {
+                        case TargetAgent.Cursor:
+                        {
+                            // 1. Cursor Global User Rules in %APPDATA%\Cursor\User\settings.json
+                            try
+                            {
+                                string cursorUserDir = Path.Combine(appData, "Cursor", "User");
+                                Directory.CreateDirectory(cursorUserDir);
+                                string settingsPath = Path.Combine(cursorUserDir, "settings.json");
+
+                                var settings = new Dictionary<string, object>();
+                                if (File.Exists(settingsPath))
+                                {
+                                    try
+                                    {
+                                        using var doc = JsonDocument.Parse(File.ReadAllText(settingsPath));
+                                        settings = JsonSerializer.Deserialize<Dictionary<string, object>>(doc.RootElement.GetRawText())
+                                                   ?? new Dictionary<string, object>();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        LogAppended?.Invoke($"[RULES] settings.json parse note: {ex.Message}");
+                                    }
+                                }
+
+                                string coreUserRules = GetDefaultUserRules(agent);
+                                if (settings.TryGetValue("cursor.general.userRules", out var existingObj) && existingObj != null)
+                                {
+                                    string existingStr = existingObj.ToString() ?? "";
+                                    if (!existingStr.Contains("VibeCode Enterprise Framework", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        settings["cursor.general.userRules"] = coreUserRules + "\n\n" + existingStr;
+                                    }
+                                }
+                                else
+                                {
+                                    settings["cursor.general.userRules"] = coreUserRules;
+                                }
+
+                                var opts = new JsonSerializerOptions { WriteIndented = true };
+                                File.WriteAllText(settingsPath, JsonSerializer.Serialize(settings, opts));
+                                LogAppended?.Invoke($"[RULES] updated Cursor settings.json userRules: {settingsPath}");
+                                syncedFiles++;
+                            }
+                            catch (Exception ex)
+                            {
+                                LogAppended?.Invoke($"[RULES] cursor userRules sync note: {ex.Message}");
+                            }
+
+                            // 2. Write ~/.cursorrules
+                            string userCursorRules = Path.Combine(home, ".cursorrules");
+                            string rulesContent = GetAgentInstructionsContent(agent, resolvedInstall);
+                            File.WriteAllText(userCursorRules, rulesContent);
+                            LogAppended?.Invoke($"[RULES] synced global .cursorrules: {userCursorRules}");
+                            syncedFiles++;
+
+                            // 3. Write workspace rules if installPath is specified
+                            if (!string.IsNullOrWhiteSpace(installPath) && Directory.Exists(installPath))
+                            {
+                                try
+                                {
+                                    string localCursorRules = Path.Combine(installPath, ".cursorrules");
+                                    File.WriteAllText(localCursorRules, rulesContent);
+
+                                    string localAgents = Path.Combine(installPath, "AGENTS.md");
+                                    File.WriteAllText(localAgents, rulesContent);
+
+                                    syncedFiles += 2;
+                                }
+                                catch (Exception ex)
+                                {
+                                    LogAppended?.Invoke($"[RULES] workspace rules write note: {ex.Message}");
+                                }
+                            }
+                            break;
+                        }
+
+                        case TargetAgent.Codex:
+                        {
+                            string codexDir = Path.Combine(home, ".codex");
+                            Directory.CreateDirectory(codexDir);
+                            string codexAgents = Path.Combine(codexDir, "AGENTS.md");
+                            string codexContent = GetAgentInstructionsContent(agent, resolvedInstall);
+                            File.WriteAllText(codexAgents, codexContent);
+                            LogAppended?.Invoke($"[RULES] synced Codex AGENTS.md: {codexAgents}");
+                            syncedFiles++;
+
+                            if (!string.IsNullOrWhiteSpace(installPath) && Directory.Exists(installPath))
+                            {
+                                string localAgents = Path.Combine(installPath, "AGENTS.md");
+                                File.WriteAllText(localAgents, codexContent);
+                                syncedFiles++;
+                            }
+                            break;
+                        }
+
+                        case TargetAgent.ClaudeCode:
+                        {
+                            string claudeDir = Path.Combine(home, ".claude");
+                            Directory.CreateDirectory(claudeDir);
+                            string claudeMd = Path.Combine(claudeDir, "CLAUDE.md");
+                            string claudeContent = GetAgentInstructionsContent(agent, resolvedInstall);
+                            File.WriteAllText(claudeMd, claudeContent);
+
+                            string userClaudeMd = Path.Combine(home, "CLAUDE.md");
+                            if (!File.Exists(userClaudeMd))
+                                File.WriteAllText(userClaudeMd, claudeContent);
+
+                            LogAppended?.Invoke($"[RULES] synced Claude Code CLAUDE.md: {claudeMd}");
+                            syncedFiles += 2;
+
+                            if (!string.IsNullOrWhiteSpace(installPath) && Directory.Exists(installPath))
+                            {
+                                string localClaude = Path.Combine(installPath, "CLAUDE.md");
+                                File.WriteAllText(localClaude, claudeContent);
+                                syncedFiles++;
+                            }
+                            break;
+                        }
+
+                        case TargetAgent.Antigravity:
+                        case TargetAgent.GeminiCLI:
+                        {
+                            string agDir = Path.Combine(home, ".gemini", "antigravity");
+                            Directory.CreateDirectory(agDir);
+                            string geminiContent = GetAgentInstructionsContent(TargetAgent.Antigravity, resolvedInstall);
+                            string agentsContent = GetAgentInstructionsContent(TargetAgent.Codex, resolvedInstall);
+
+                            File.WriteAllText(Path.Combine(agDir, "GEMINI.md"), geminiContent);
+                            File.WriteAllText(Path.Combine(agDir, "AGENTS.md"), agentsContent);
+                            File.WriteAllText(Path.Combine(home, ".gemini", "GEMINI.md"), geminiContent);
+                            LogAppended?.Invoke($"[RULES] synced Antigravity GEMINI.md & AGENTS.md");
+                            syncedFiles += 3;
+
+                            if (!string.IsNullOrWhiteSpace(installPath) && Directory.Exists(installPath))
+                            {
+                                File.WriteAllText(Path.Combine(installPath, "GEMINI.md"), geminiContent);
+                                File.WriteAllText(Path.Combine(installPath, "AGENTS.md"), agentsContent);
+                                syncedFiles += 2;
+                            }
+                            break;
+                        }
+
+                        case TargetAgent.Windsurf:
+                        {
+                            string windsurfMemDir = Path.Combine(home, ".codeium", "windsurf", "memories");
+                            Directory.CreateDirectory(windsurfMemDir);
+                            string content = GetAgentInstructionsContent(agent, resolvedInstall);
+                            File.WriteAllText(Path.Combine(windsurfMemDir, "global_rules.md"), content);
+                            File.WriteAllText(Path.Combine(home, ".windsurfrules"), content);
+                            LogAppended?.Invoke($"[RULES] synced Windsurf global rules & .windsurfrules");
+                            syncedFiles += 2;
+
+                            if (!string.IsNullOrWhiteSpace(installPath) && Directory.Exists(installPath))
+                            {
+                                File.WriteAllText(Path.Combine(installPath, ".windsurfrules"), content);
+                                syncedFiles++;
+                            }
+                            break;
+                        }
+
+                        case TargetAgent.Copilot:
+                        {
+                            string githubDir = Path.Combine(home, ".github");
+                            Directory.CreateDirectory(githubDir);
+                            string content = GetAgentInstructionsContent(agent, resolvedInstall);
+                            string copilotFile = Path.Combine(githubDir, "copilot-instructions.md");
+                            File.WriteAllText(copilotFile, content);
+                            LogAppended?.Invoke($"[RULES] synced Copilot instructions: {copilotFile}");
+                            syncedFiles++;
+
+                            if (!string.IsNullOrWhiteSpace(installPath) && Directory.Exists(installPath))
+                            {
+                                string localGithub = Path.Combine(installPath, ".github");
+                                Directory.CreateDirectory(localGithub);
+                                File.WriteAllText(Path.Combine(localGithub, "copilot-instructions.md"), content);
+                                syncedFiles++;
+                            }
+                            break;
+                        }
+
+                        case TargetAgent.Cline:
+                        {
+                            string content = GetAgentInstructionsContent(agent, resolvedInstall);
+                            string clineDir = Path.Combine(home, ".cline");
+                            Directory.CreateDirectory(clineDir);
+                            File.WriteAllText(Path.Combine(home, ".clinerules"), content);
+                            File.WriteAllText(Path.Combine(clineDir, "CLAUDE.md"), content);
+                            syncedFiles += 2;
+
+                            if (!string.IsNullOrWhiteSpace(installPath) && Directory.Exists(installPath))
+                            {
+                                File.WriteAllText(Path.Combine(installPath, ".clinerules"), content);
+                                syncedFiles++;
+                            }
+                            break;
+                        }
+
+                        default:
+                        {
+                            // Generic rule sync for other agents (Roo, Continue, Aider, Zed, Grok, KimiCode)
+                            string content = GetAgentInstructionsContent(agent, resolvedInstall);
+                            string agentRoot = GetAgentRoot(agent, home);
+                            Directory.CreateDirectory(agentRoot);
+                            File.WriteAllText(Path.Combine(agentRoot, "AGENTS.md"), content);
+                            syncedFiles++;
+
+                            if (!string.IsNullOrWhiteSpace(installPath) && Directory.Exists(installPath))
+                            {
+                                File.WriteAllText(Path.Combine(installPath, "AGENTS.md"), content);
+                                syncedFiles++;
+                            }
+                            break;
+                        }
+                    }
+
+                    return (true, $"Synchronized {syncedFiles} rule/instruction file(s) for {agent}");
+                }
+                catch (Exception ex)
+                {
+                    LogAppended?.Invoke($"[RULES] sync failed for {agent}: {ex.Message}");
+                    return (false, ex.Message);
+                }
+            });
+        }
+
+        static string GetDefaultUserRules(TargetAgent agent)
+        {
+            return @"# VibeCode Enterprise Framework — Core Engineering Rules
+
+## 1. Universal Quality Gates (K.1 - K.7)
+- [K.1] Pre-Flight Thinking: Analyze requirements, dependencies, and state assumptions before writing code.
+- [K.2] Simplicity Guard (YAGNI): Avoid speculative complexity. Simplest path first.
+- [K.3] Surgical Changes: Touch only targeted files; preserve existing formatting, comments, and docstrings.
+- [K.4] Zero Skeleton Code: Implement complete, runnable solutions. Never leave placeholder TODOs.
+- [K.5] Traceability: Every added line must directly trace to user requirements.
+- [K.6] Verification: Validate syntax, run automated unit tests, and verify edge cases before declaring task done.
+- [K.7] Security Gates: Zero hardcoded secrets, parameterized queries, validate all inputs, least privilege.
+
+## 2. Framework Guidelines & Personas
+- Solution Architect: Clean architecture, DDD, modular design, separation of concerns.
+- Code Reviewer: Correctness, design, security, performance, readability.
+- Security Auditor: OWASP Top 10, secrets hygiene, input sanitization.
+- Consult project rules in .cursor/rules/*.mdc, .cursorrules, and MCP tools (cursor-framework, cursor-autopilot, cursor-memory).";
+        }
+
+        static string GetAgentInstructionsContent(TargetAgent agent, string? searchRoot = null)
+        {
+            string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+            // Candidate search locations in priority order
+            var searchPaths = new List<string>();
+            if (!string.IsNullOrWhiteSpace(searchRoot))
+                searchPaths.Add(searchRoot);
+            searchPaths.Add(Path.Combine(home, ".cursor"));
+            searchPaths.Add(AppDomain.CurrentDomain.BaseDirectory);
+
+            string targetFileName = agent switch
+            {
+                TargetAgent.Codex => "AGENTS.md",
+                TargetAgent.ClaudeCode => "CLAUDE.md",
+                TargetAgent.Antigravity => "GEMINI.md",
+                TargetAgent.GeminiCLI => "GEMINI.md",
+                TargetAgent.Copilot => "copilot-instructions.md",
+                _ => "AGENTS.md",
+            };
+
+            foreach (var dir in searchPaths)
+            {
+                if (string.IsNullOrWhiteSpace(dir)) continue;
+                string candidate = Path.Combine(dir, targetFileName);
+                if (File.Exists(candidate) && new FileInfo(candidate).Length > 100)
+                {
+                    try { return File.ReadAllText(candidate); } catch { }
+                }
+
+                // Also check AGENTS.md fallback
+                string agentsFallback = Path.Combine(dir, "AGENTS.md");
+                if (File.Exists(agentsFallback) && new FileInfo(agentsFallback).Length > 100)
+                {
+                    try { return File.ReadAllText(agentsFallback); } catch { }
+                }
+            }
+
+            // High-fidelity fallback content if no external file is found
+            return agent switch
+            {
+                TargetAgent.ClaudeCode => @"# CLAUDE.md — Claude Code Format
+
+> **Version:** 1.0.0 | **Tool:** Claude Code
+
+# Vibe Code Framework
+
+> Cross-Platform AI Coding Framework
+
+## Core Principles
+
+### YAGNI — You Aren't Gonna Need It
+Don't write code for features that aren't needed yet.
+1. Does this need to be built at all? → no: skip it
+2. Already in codebase? → reuse it
+3. Stdlib has it? → use it
+4. One line? → one line
+5. Only then: minimum that works
+
+### KISS — Keep It Simple, Stupid
+- Simplest solution is usually best
+- Each function/class does one thing
+- Don't premature optimize
+- Readable > clever
+
+### DRY — Don't Repeat Yourself
+- Extract repeated logic to functions
+- Shared types across layers
+- Common utilities for helpers
+
+## Security Rules
+- No hardcoded secrets
+- All user input validated
+- Parameterized SQL queries
+- Passwords hashed (bcrypt/argon2)
+- Rate limiting enabled
+
+## Development Lifecycle
+DEFINE → PLAN → BUILD → TEST → REVIEW → SHIP",
+
+                TargetAgent.Antigravity or TargetAgent.GeminiCLI => @"# GEMINI.md — Google Antigravity Format
+
+> **Version:** 1.0.0 | **Tool:** Google Antigravity (Gemini)
+
+# Vibe Code Framework — Antigravity Instructions
+
+## Core Principles
+
+### YAGNI — You Aren't Gonna Need It
+1. Có cần xây không? → không: skip (YAGNI)
+2. Đã có trong codebase? → reuse, đừng viết lại
+3. Stdlib có không? → dùng nó
+4. Một dòng? → một dòng
+5. Chỉ khi đó: tối thiểu nhất
+
+### KISS & DRY
+- Đơn giản nhất là tốt nhất
+- Một hàm một việc
+- Logic lặp lại → Extract thành hàm/module
+
+## Security Checklist
+- No hardcoded secrets
+- All input validated
+- Parameterized SQL queries
+- Rate limiting enabled",
+
+                TargetAgent.Copilot => @"# GitHub Copilot Instructions
+
+> **Tool:** GitHub Copilot | **Version:** 1.0.0
+
+# Vibe Code Framework — Copilot Instructions
+
+## Core Principles
+- YAGNI: Don't write code for features that aren't needed yet.
+- KISS: Keep solutions simple and functions focused (< 30 lines).
+- DRY: Extract repeated logic and common utilities.
+- Clean Architecture: Outer layers depend on inner layers; domain remains pure.
+- Security: No hardcoded secrets, validate all inputs, parameterized SQL.",
+
+                _ => @"# Vibe Code Framework — Enterprise Engineering Rules
+
+> **Version:** 1.0.0 | **Generated by:** VibeCode Enterprise
+
+## 1. Universal Quality Gates
+- [K.1] Pre-Flight Thinking: State assumptions and requirements before coding.
+- [K.2] Simplicity Guard: YAGNI first. Simplest workable implementation.
+- [K.3] Surgical Changes: Modify only targeted files; preserve formatting and docstrings.
+- [K.4] Zero Skeleton Code: Write complete, runnable code without TODO placeholders.
+- [K.5] Traceability: Every added line must trace to user requirements.
+- [K.6] Verification: Validate syntax and run automated unit tests.
+- [K.7] Security Gates: Validate all inputs, sanitize outputs, use parameterized queries.",
+            };
+        }
+
         // ─── Cross-Agent Installation Methods ────────────────────────────────
 
         /// <summary>
@@ -1449,6 +1864,14 @@ namespace CursorSetupWpf.Services
                 ProgressChanged?.Invoke(88, "Syncing hooks...");
                 var (hooksOk, hooksMsg) = await SyncHooksConfigAsync(installPath, agentConfig.Agent);
                 LogAppended?.Invoke(hooksOk ? $"[HOOKS] {hooksMsg}" : $"[HOOKS] WARN: {hooksMsg}");
+
+                // Sync rules for agents that support rules
+                if (agentConfig.SupportsRules)
+                {
+                    ProgressChanged?.Invoke(92, $"Syncing rules for {agentConfig.Name}...");
+                    var (rulesOk, rulesMsg) = await SyncRulesConfigAsync(installPath, agentConfig.Agent);
+                    LogAppended?.Invoke(rulesOk ? $"[RULES] {rulesMsg}" : $"[RULES] WARN: {rulesMsg}");
+                }
 
                 // Write agent manifest
                 var manifestPath = Path.Combine(installPath, "agent-manifest.json");

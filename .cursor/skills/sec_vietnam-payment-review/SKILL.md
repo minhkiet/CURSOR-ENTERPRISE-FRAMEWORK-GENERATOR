@@ -1,29 +1,35 @@
-﻿---
-description: Review skill cho Vietnamese online payment integrations (MoMo, SePay, PayOS, ZaloPay, VNPay, VietQR). Đánh giá API integration, webhook handling, security, compliance, và best practices cho thanh toán nội địa Việt Nam.
-purpose: Cung cấp comprehensive review framework cho các payment provider phổ biến tại Việt Nam. Evaluate API integration patterns, webhook security, signature validation, payment flow, error handling, và reconciliation logic.
+---
+description: Review skill cho Vietnamese online payment integrations (MoMo, SePay,
+  PayOS, ZaloPay, VNPay, VietQR). Đánh giá API integration, webhook handling, security,
+  compliance, và best practices cho thanh toán nội địa Việt Nam.
+purpose: Cung cấp comprehensive review framework cho các payment provider phổ biến
+  tại Việt Nam. Evaluate API integration patterns, webhook security, signature validation,
+  payment flow, error handling, và reconciliation logic.
 input:
-  - Payment integration code (MoMo, SePay, PayOS, ZaloPay, VNPay, VietQR)
-  - Webhook handler implementation
-  - API configuration and credentials
-  - Payment flow frontend/backend code
+- Payment integration code (MoMo, SePay, PayOS, ZaloPay, VNPay, VietQR)
+- Webhook handler implementation
+- API configuration and credentials
+- Payment flow frontend/backend code
 output:
-  - Integration review report
-  - Security assessment
-  - Compliance checklist
-  - Recommendations
+- Integration review report
+- Security assessment
+- Compliance checklist
+- Recommendations
 version: 1.0.0
 tags:
-  - payment
-  - vietnam
-  - momo
-  - sepay
-  - payos
-  - zalo-pay
-  - vnpay
-  - vietqr
-  - online-payment
-  - webhook
+- payment
+- vietnam
+- momo
+- sepay
+- payos
+- zalo-pay
+- vnpay
+- vietqr
+- online-payment
+- webhook
+name: sec_vietnam-payment-review
 ---
+
 
 # Vietnam Payment Review
 

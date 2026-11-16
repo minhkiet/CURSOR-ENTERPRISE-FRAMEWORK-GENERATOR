@@ -1,13 +1,15 @@
 ---
 name: image-workflow
-description: Workflow kết hợp image-finder + image-generator + web-cloner. Tìm/tạo ảnh phù hợp cho website clone.
+description: Workflow kết hợp image-finder + image-generator + web-cloner. Tìm/tạo
+  ảnh phù hợp cho website clone.
 triggers:
-  - "tìm ảnh"
-  - "tạo ảnh"
-  - "generate image"
-  - "clone website"
-  - "clone with images"
+- tìm ảnh
+- tạo ảnh
+- generate image
+- clone website
+- clone with images
 ---
+
 
 # Image Workflow - Kết hợp Image Finder + Generator + Web Cloner
 

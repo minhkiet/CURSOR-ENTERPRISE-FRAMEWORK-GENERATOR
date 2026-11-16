@@ -1,3 +1,8 @@
+---
+name: testing
+description: "Triển khai comprehensive testing strategy bao gồm Unit tests, Integration tests, và E2E tests."
+---
+
 # Testing Skill
 
 > **Version:** 1.0.0 | **Category:** Quality | **Triggers:** test, testing, unit test, integration test, tdd

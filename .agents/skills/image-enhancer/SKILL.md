@@ -1,17 +1,17 @@
 ---
 name: image-enhancer
-description: >-
-  Improves the quality of images, especially screenshots, by enhancing
-  resolution, sharpness, and clarity. Perfect for preparing images for
-  presentations, documentation, or social media posts.
+description: Improves the quality of images, especially screenshots, by enhancing
+  resolution, sharpness, and clarity. Perfect for preparing images for presentations,
+  documentation, or social media posts.
 metadata:
   category: creative-media
   source:
-    repository: 'https://github.com/ComposioHQ/awesome-claude-skills'
+    repository: https://github.com/ComposioHQ/awesome-claude-skills
     path: image-enhancer
     commit: 92568c1edaff1bde5371154f036d959346c145a8
 license: NOASSERTION
 ---
+
 
 # Image Enhancer
 

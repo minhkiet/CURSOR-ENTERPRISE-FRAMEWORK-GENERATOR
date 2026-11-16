@@ -1,3 +1,8 @@
+---
+name: fullstack-web
+description: "Xây dựng full-stack web application hoàn chỉnh với ASP.NET Core backend + React/TypeScript frontend."
+---
+
 # Fullstack Web Skill
 
 > **Version:** 1.0.0 | **Category:** Development | **Triggers:** fullstack, web app, frontend backend, api frontend

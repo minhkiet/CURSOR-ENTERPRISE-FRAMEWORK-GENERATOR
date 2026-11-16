@@ -1,7 +1,10 @@
 ---
 name: dashboard-ui
-description: "Dashboard & Form UI optimization skill. Professional component design với synchronized icons, consistent images, clear colors. Không AI-slop, không generic. Tối ưu cho dashboard, admin panel, forms, inputs, pickers, buttons, labels, notices."
+description: Dashboard & Form UI optimization skill. Professional component design
+  với synchronized icons, consistent images, clear colors. Không AI-slop, không generic.
+  Tối ưu cho dashboard, admin panel, forms, inputs, pickers, buttons, labels, notices.
 ---
+
 
 # Dashboard UI Optimization Skill
 

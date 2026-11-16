@@ -1,7 +1,8 @@
 ---
-name: "source-command-index"
-description: "Migrated source command `index`"
+name: source-command-index
+description: Migrated source command `index`
 ---
+
 
 # source-command-index
 

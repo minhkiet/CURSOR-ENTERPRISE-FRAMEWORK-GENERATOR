@@ -1,4 +1,4 @@
-﻿---
+---
 description: Vibe Code Execution Protocol, Pre/Post Execution Validation, Auth & Payment Handling - workflow execution với pre-review và post-review gates, retry logic với fallback strategies.
 created: 2026-06-26
 version: 2.0.0

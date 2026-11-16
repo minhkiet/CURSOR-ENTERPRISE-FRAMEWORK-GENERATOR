@@ -1,17 +1,17 @@
 ---
 name: webapp-testing
-description: >-
-  Toolkit for interacting with and testing local web applications using
-  Playwright. Supports verifying frontend functionality, debugging UI behavior,
-  capturing browser screenshots, and viewing browser logs.
+description: Toolkit for interacting with and testing local web applications using
+  Playwright. Supports verifying frontend functionality, debugging UI behavior, capturing
+  browser screenshots, and viewing browser logs.
 metadata:
   category: development
   source:
-    repository: 'https://github.com/ComposioHQ/awesome-claude-skills'
+    repository: https://github.com/ComposioHQ/awesome-claude-skills
     path: webapp-testing
     license_path: webapp-testing/LICENSE.txt
     commit: 92568c1edaff1bde5371154f036d959346c145a8
 ---
+
 
 # Web Application Testing
 

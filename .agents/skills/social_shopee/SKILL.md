@@ -1,3 +1,8 @@
+---
+name: social_shopee
+description: "Shopee API Integration Skill skill"
+---
+
 # Shopee API Integration Skill
 
 **Version:** 1.0.0  

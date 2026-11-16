@@ -1,7 +1,10 @@
 ---
 name: landing-page-pro
-description: "Professional Landing Page Skill cho SaaS, Products, E-commerce. Sections: Hero, Features, Products, Pricing, Blog, Contact, Auth. 3D effects, smooth animations, SEO content, image generation integration. Anti-AI-slop, distinctive design."
+description: 'Professional Landing Page Skill cho SaaS, Products, E-commerce. Sections:
+  Hero, Features, Products, Pricing, Blog, Contact, Auth. 3D effects, smooth animations,
+  SEO content, image generation integration. Anti-AI-slop, distinctive design.'
 ---
+
 
 # Landing Page Pro Skill
 

@@ -1,7 +1,8 @@
 ---
-name: "source-command-test-command"
-description: "Test - Chiến lược và implementation testing"
+name: source-command-test-command
+description: Test - Chiến lược và implementation testing
 ---
+
 
 # source-command-test-command
 

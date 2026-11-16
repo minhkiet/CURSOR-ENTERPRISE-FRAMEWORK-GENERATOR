@@ -1,7 +1,10 @@
 ---
 name: route-discovery
-description: Phát hiện routes cho SPA (React, Vue, Next.js) và SSR applications. Tìm dynamic routes, API endpoints, và nested routes. Keywords: discover routes, SPA routes, dynamic routes, API endpoints, next.js routes, react router.
+description: 'Phát hiện routes cho SPA (React, Vue, Next.js) và SSR applications.
+  Tìm dynamic routes, API endpoints, và nested routes. Keywords: discover routes,
+  SPA routes, dynamic routes, API endpoints, next.js routes, react router.'
 ---
+
 
 # Route Discovery Skill
 

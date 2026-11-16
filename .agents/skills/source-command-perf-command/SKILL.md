@@ -1,7 +1,8 @@
 ---
-name: "source-command-perf-command"
-description: "Perf - Performance audit và optimization"
+name: source-command-perf-command
+description: Perf - Performance audit và optimization
 ---
+
 
 # source-command-perf-command
 

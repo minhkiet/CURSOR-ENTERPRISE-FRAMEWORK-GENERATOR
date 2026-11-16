@@ -1,3 +1,8 @@
+---
+name: create-feature
+description: "Xây dựng feature mới hoàn chỉnh từ requirement đến implementation, test và verification."
+---
+
 # Create Feature Skill
 
 > **Version:** 1.0.0 | **Category:** Development | **Triggers:** tạo feature, implement feature, add new feature, build feature

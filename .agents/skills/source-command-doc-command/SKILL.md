@@ -1,7 +1,8 @@
 ---
-name: "source-command-doc-command"
-description: "Doc - Tạo tài liệu (README, API docs, inline docs)"
+name: source-command-doc-command
+description: Doc - Tạo tài liệu (README, API docs, inline docs)
 ---
+
 
 # source-command-doc-command
 

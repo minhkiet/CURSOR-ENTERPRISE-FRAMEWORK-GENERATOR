@@ -1,18 +1,18 @@
 ---
 name: youtube-downloader
-description: >-
-  Download YouTube videos with customizable quality and format options. Use this
-  skill when the user asks to download, save, or grab YouTube videos. Supports
-  various quality settings (best, 1080p, 720p, 480p, 360p), multiple formats
-  (mp4, webm, mkv), and audio-only downloads as MP3.
+description: Download YouTube videos with customizable quality and format options.
+  Use this skill when the user asks to download, save, or grab YouTube videos. Supports
+  various quality settings (best, 1080p, 720p, 480p, 360p), multiple formats (mp4,
+  webm, mkv), and audio-only downloads as MP3.
 metadata:
   category: creative-media
   source:
-    repository: 'https://github.com/ComposioHQ/awesome-claude-skills'
+    repository: https://github.com/ComposioHQ/awesome-claude-skills
     path: video-downloader
     commit: 92568c1edaff1bde5371154f036d959346c145a8
 license: NOASSERTION
 ---
+
 
 # YouTube Video Downloader
 

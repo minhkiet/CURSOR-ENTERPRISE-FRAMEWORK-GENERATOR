@@ -1,4 +1,9 @@
-﻿# Alias: frontend-review
+---
+name: frontend-review
+description: "Comprehensive frontend code review skill with mandatory pre-review scope analysis and post-review quality gates. Reviews for correctness, design quality, accessibility, performance, and taste. Use before and after every frontend implementation task."
+---
+
+# Alias: frontend-review
 
 **DEPRECATED**: This skill has been renamed to $newName.
 

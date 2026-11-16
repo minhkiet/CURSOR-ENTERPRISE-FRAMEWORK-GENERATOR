@@ -1,4 +1,9 @@
-﻿# Alias: mysql-patterns
+---
+name: mysql-patterns
+description: "MySQL and MariaDB schema, query, indexing, transaction, replication, and connection-pool patterns for production backends."
+---
+
+# Alias: mysql-patterns
 
 **DEPRECATED**: This skill has been renamed to $newName.
 

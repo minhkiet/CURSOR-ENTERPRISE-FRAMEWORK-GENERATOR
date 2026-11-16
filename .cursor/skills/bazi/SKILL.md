@@ -1,17 +1,15 @@
 ---
 name: bazi
-description: >
- 确定性四柱八字排盘 + 证据优先的传统命理分析。Bằng cách chạy `python
- tools/bazi-plugin/scripts/calculate_bazi.py` (vendored lunar_python 1.4.8)
- để có calendar-derived facts (四柱、十神、藏干、大运、流年、干支关系) rồi
- load theo nhu cầu từ `tools/bazi-plugin/references/` để suy luận có nguồn gốc.
- Use this skill whenever user asks for 八字、四柱、命盘、算命、排盘、批命、
- 流年、大运、事业财运、婚姻子女、健康倾向、Bazi、Four Pillars、fortune
- telling, hoặc cung cấp ngày giờ sinh yêu cầu phân tích. Triggers (zh):
- 算八字、看八字、批八字、排八字、四柱、命盘、算命、命理、运势、大运、流年.
- Triggers (vi/en): bazi, bazi analysis, four pillars, birth chart, fortune.
- Even when user only mentions "算命"/"八字" without explicit skill ask, use this.
+description: '确定性四柱八字排盘 + 证据优先的传统命理分析。Bằng cách chạy `python tools/bazi-plugin/scripts/calculate_bazi.py`
+  (vendored lunar_python 1.4.8) để có calendar-derived facts (四柱、十神、藏干、大运、流年、干支关系)
+  rồi load theo nhu cầu từ `tools/bazi-plugin/references/` để suy luận có nguồn gốc.
+  Use this skill whenever user asks for 八字、四柱、命盘、算命、排盘、批命、 流年、大运、事业财运、婚姻子女、健康倾向、Bazi、Four
+  Pillars、fortune telling, hoặc cung cấp ngày giờ sinh yêu cầu phân tích. Triggers
+  (zh): 算八字、看八字、批八字、排八字、四柱、命盘、算命、命理、运势、大运、流年. Triggers (vi/en): bazi, bazi analysis,
+  four pillars, birth chart, fortune. Even when user only mentions "算命"/"八字" without
+  explicit skill ask, use this.'
 ---
+
 
 # Bazi (八字) — Framework Bridge
 

@@ -1,20 +1,20 @@
 ---
 name: data-distributed-storage
-description: >-
-  Use this skill when designing distributed storage for HDFS, S3, ADLS, GCS,
-  MinIO, NFS, or any distributed file system for data workloads. This skill
-  enforces: storage backend selection, data durability and replication, file
-  format selection, partitioning and compression, lifecycle policies, storage
-  tiering, and cost optimization. Do NOT use for: database storage engines,
-  local filesystem tuning, or content delivery networks.
+description: 'Use this skill when designing distributed storage for HDFS, S3, ADLS,
+  GCS, MinIO, NFS, or any distributed file system for data workloads. This skill enforces:
+  storage backend selection, data durability and replication, file format selection,
+  partitioning and compression, lifecycle policies, storage tiering, and cost optimization.
+  Do NOT use for: database storage engines, local filesystem tuning, or content delivery
+  networks.'
 metadata:
   category: data
   source:
-    repository: 'https://github.com/j4flmao/agent-skills'
+    repository: https://github.com/j4flmao/agent-skills
     path: skills/data/distributed-storage
     license_path: LICENSE
     commit: 1c9c7df11952848cba8599d37a49ce8b646795d2
 ---
+
 
 # Distributed Storage
 

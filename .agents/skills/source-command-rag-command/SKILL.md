@@ -1,7 +1,8 @@
 ---
-name: "source-command-rag-command"
-description: "RAG - Xây dựng RAG system với embedding và retrieval"
+name: source-command-rag-command
+description: RAG - Xây dựng RAG system với embedding và retrieval
 ---
+
 
 # source-command-rag-command
 

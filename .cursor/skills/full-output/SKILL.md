@@ -1,4 +1,9 @@
-﻿# Alias: full-output
+---
+name: full-output
+description: "Enforces complete, unabridged code generation. Overrides truncation behavior, bans placeholder patterns, handles token-limit splits cleanly. Applies before and after every code generation task. No TODO comments, no \"continue later\", no skeleton code."
+---
+
+# Alias: full-output
 
 **DEPRECATED**: This skill has been renamed to $newName.
 

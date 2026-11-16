@@ -1,7 +1,9 @@
 ---
-name: "source-command-fullstack-command"
-description: "Fullstack Web Development Command - Xây dựng, chỉnh sửa, debug web app end-to-end với ASP.NET Core Web API + React TypeScript"
+name: source-command-fullstack-command
+description: Fullstack Web Development Command - Xây dựng, chỉnh sửa, debug web app
+  end-to-end với ASP.NET Core Web API + React TypeScript
 ---
+
 
 # source-command-fullstack-command
 

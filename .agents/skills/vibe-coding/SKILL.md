@@ -1,4 +1,9 @@
-﻿# Alias: vibe-coding
+---
+name: vibe-coding
+description: "Vibe Coding - Unified overlay skill kết hợp Think First (karpathy) + Minimize Code (ponytail). Luôn chạy với mọi task."
+---
+
+# Alias: vibe-coding
 
 **DEPRECATED**: This skill has been renamed to $newName.
 

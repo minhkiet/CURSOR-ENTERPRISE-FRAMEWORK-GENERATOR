@@ -1,7 +1,16 @@
 ---
 name: hackingtool
-description: Pentesting and OSINT bridge to AKCodez/hackingtool-plugin (183 tools from Z4nzu/hackingtool). Use when the user asks to recon a target, scan a network, enumerate subdomains, investigate a username or email, test a web app, check for leaked secrets, do authorized pentest, red-team, OSINT, or any task matching `pentest`, `osint`, `recon`, `nmap`, `nuclei`, `sherlock`, `amass`, `subfinder`, `httpx`, `maigret`, `holehe`, `trufflehog`, `sqlmap`, `impacket`, `netexec`, `hashcat`, `aircrack`. Wraps the upstream wrappers with framework gates (karpathy-pre, sec-pre, sec-post). Always requires explicit authorization before running any active scan or attack tool.
+description: Pentesting and OSINT bridge to AKCodez/hackingtool-plugin (183 tools
+  from Z4nzu/hackingtool). Use when the user asks to recon a target, scan a network,
+  enumerate subdomains, investigate a username or email, test a web app, check for
+  leaked secrets, do authorized pentest, red-team, OSINT, or any task matching `pentest`,
+  `osint`, `recon`, `nmap`, `nuclei`, `sherlock`, `amass`, `subfinder`, `httpx`, `maigret`,
+  `holehe`, `trufflehog`, `sqlmap`, `impacket`, `netexec`, `hashcat`, `aircrack`.
+  Wraps the upstream wrappers with framework gates (karpathy-pre, sec-pre, sec-post).
+  Always requires explicit authorization before running any active scan or attack
+  tool.
 ---
+
 
 # Pentest / OSINT — Framework Bridge
 

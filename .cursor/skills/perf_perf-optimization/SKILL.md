@@ -1,41 +1,56 @@
 ---
-description: Performance optimization skill covering memory optimization, speed enhancement, token reduction, and caching strategies. Ensures applications run efficiently and cost-effectively.
+description: Performance optimization skill covering memory optimization, speed enhancement,
+  token reduction, and caching strategies. Ensures applications run efficiently and
+  cost-effectively.
 version: 1.0.0
 created: 2026-08-03
-tags: [performance, optimization, memory, speed, token, caching, profiling]
+tags:
+- performance
+- optimization
+- memory
+- speed
+- token
+- caching
+- profiling
 role: mandatory
-domains: [performance, frontend, backend, infrastructure]
+domains:
+- performance
+- frontend
+- backend
+- infrastructure
 confidence:
   base: 0.75
   threshold: 0.75
   auto_select: true
 triggers:
-  - "performance"
-  - "optimize"
-  - "memory"
-  - "speed"
-  - "fast"
-  - "slow"
-  - "token"
-  - "cost"
-  - "cache"
-  - "profiling"
-  - "benchmark"
-  - "lazy"
-  - "memo"
-  - "debounce"
-  - "throttle"
-  - "bundle"
-  - "size"
-  - "load time"
-  - "render"
-  - "fps"
-  - "latency"
-  - "tối ưu"
-  - "hiệu năng"
-  - "bộ nhớ"
-  - "tốc độ"
+- performance
+- optimize
+- memory
+- speed
+- fast
+- slow
+- token
+- cost
+- cache
+- profiling
+- benchmark
+- lazy
+- memo
+- debounce
+- throttle
+- bundle
+- size
+- load time
+- render
+- fps
+- latency
+- tối ưu
+- hiệu năng
+- bộ nhớ
+- tốc độ
+name: perf_perf-optimization
 ---
+
 
 # Performance Optimization Skill
 

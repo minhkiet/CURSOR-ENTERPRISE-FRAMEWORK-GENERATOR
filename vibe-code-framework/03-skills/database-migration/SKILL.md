@@ -1,3 +1,8 @@
+---
+name: database-migration
+description: "Quản lý database schema changes, migrations, rollback và data integrity."
+---
+
 # Database Migration Skill
 
 > **Version:** 1.0.0 | **Category:** Database | **Triggers:** database migration, create table, alter schema, migrate

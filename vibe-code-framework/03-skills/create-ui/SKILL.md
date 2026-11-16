@@ -1,3 +1,8 @@
+---
+name: create-ui
+description: "Xây dựng responsive, accessible, themeable UI components và pages."
+---
+
 # Create UI Skill
 
 > **Version:** 1.0.0 | **Category:** Development | **Triggers:** tạo ui, create ui, build component, thiết kế giao diện

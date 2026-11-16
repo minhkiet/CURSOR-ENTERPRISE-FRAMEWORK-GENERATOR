@@ -1,18 +1,18 @@
 ---
 name: theme-factory
-description: >-
-  Toolkit for styling artifacts with a theme. These artifacts can be slides,
-  docs, reportings, HTML landing pages, etc. There are 10 pre-set themes with
-  colors/fonts that you can apply to any artifact that has been creating, or can
-  generate a new theme on-the-fly.
+description: Toolkit for styling artifacts with a theme. These artifacts can be slides,
+  docs, reportings, HTML landing pages, etc. There are 10 pre-set themes with colors/fonts
+  that you can apply to any artifact that has been creating, or can generate a new
+  theme on-the-fly.
 metadata:
   category: creative-media
   source:
-    repository: 'https://github.com/ComposioHQ/awesome-claude-skills'
+    repository: https://github.com/ComposioHQ/awesome-claude-skills
     path: theme-factory
     license_path: theme-factory/LICENSE.txt
     commit: 92568c1edaff1bde5371154f036d959346c145a8
 ---
+
 
 
 # Theme Factory Skill

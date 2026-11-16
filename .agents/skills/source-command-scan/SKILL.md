@@ -1,7 +1,8 @@
 ---
-name: "source-command-scan"
-description: "Migrated source command `scan`"
+name: source-command-scan
+description: Migrated source command `scan`
 ---
+
 
 # source-command-scan
 

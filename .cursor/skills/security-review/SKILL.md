@@ -1,4 +1,9 @@
-﻿# Alias: security-review
+---
+name: security-review
+description: "Comprehensive security review skill for code analysis, vulnerability detection, and penetration testing. Covers OWASP Top 10, LLM/AI Security (ASI Top 10), supply chain security, API security, and reverse-engineering workflows. Use when reviewing code for security vulnerabilities, when user mentions security, vulnerability, penetration test, OWASP, XSS, SQL injection, or when handling sensitive integrations."
+---
+
+# Alias: security-review
 
 **DEPRECATED**: This skill has been renamed to $newName.
 

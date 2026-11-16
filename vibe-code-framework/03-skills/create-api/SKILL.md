@@ -1,3 +1,8 @@
+---
+name: create-api
+description: "Xây dựng RESTful API chuẩn production với validation, authentication, documentation và error handling."
+---
+
 # Create API Skill
 
 > **Version:** 1.0.0 | **Category:** Development | **Triggers:** tạo api, create api, build api, implement endpoint

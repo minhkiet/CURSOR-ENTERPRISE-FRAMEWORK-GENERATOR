@@ -1,36 +1,51 @@
 ---
-description: Stability and reliability skill covering error handling, resilience patterns, monitoring, and graceful degradation. Ensures applications remain operational under adverse conditions.
+description: Stability and reliability skill covering error handling, resilience patterns,
+  monitoring, and graceful degradation. Ensures applications remain operational under
+  adverse conditions.
 version: 1.0.0
 created: 2026-08-03
-tags: [stability, reliability, error-handling, resilience, monitoring, graceful-degradation, fault-tolerance]
+tags:
+- stability
+- reliability
+- error-handling
+- resilience
+- monitoring
+- graceful-degradation
+- fault-tolerance
 role: mandatory
-domains: [stability, backend, infrastructure, operations]
+domains:
+- stability
+- backend
+- infrastructure
+- operations
 confidence:
   base: 0.75
   threshold: 0.75
   auto_select: true
 triggers:
-  - "stability"
-  - "reliability"
-  - "error"
-  - "handle error"
-  - "exception"
-  - "crash"
-  - "fail"
-  - "resilience"
-  - "retry"
-  - "fallback"
-  - "circuit breaker"
-  - "timeout"
-  - "retry"
-  - "health check"
-  - "monitor"
-  - "alert"
-  - "lỗi"
-  - "xử lý lỗi"
-  - "ổn định"
-  - "tin cậy"
+- stability
+- reliability
+- error
+- handle error
+- exception
+- crash
+- fail
+- resilience
+- retry
+- fallback
+- circuit breaker
+- timeout
+- retry
+- health check
+- monitor
+- alert
+- lỗi
+- xử lý lỗi
+- ổn định
+- tin cậy
+name: util_stability
 ---
+
 
 # Stability & Reliability Skill
 

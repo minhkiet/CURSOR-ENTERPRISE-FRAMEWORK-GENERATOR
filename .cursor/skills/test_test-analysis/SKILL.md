@@ -1,43 +1,58 @@
 ---
-description: Comprehensive test analysis skill covering functional, UI, integration, and e2e testing. Ensures code correctness through systematic test design and verification.
+description: Comprehensive test analysis skill covering functional, UI, integration,
+  and e2e testing. Ensures code correctness through systematic test design and verification.
 version: 1.0.0
 created: 2026-08-03
-tags: [testing, quality, functional, UI-test, integration, e2e, verification, QA]
+tags:
+- testing
+- quality
+- functional
+- UI-test
+- integration
+- e2e
+- verification
+- QA
 role: mandatory
-domains: [testing, quality, frontend, backend]
+domains:
+- testing
+- quality
+- frontend
+- backend
 confidence:
-  base: 0.80
-  threshold: 0.80
+  base: 0.8
+  threshold: 0.8
   auto_select: true
 triggers:
-  - "test"
-  - "testing"
-  - "unit test"
-  - "integration test"
-  - "e2e test"
-  - "end to end"
-  - "ui test"
-  - "component test"
-  - "functional test"
-  - "verify"
-  - "assertion"
-  - "test case"
-  - "test coverage"
-  - "regression"
-  - "mock"
-  - "fixture"
-  - "spy"
-  - "stub"
-  - "tdd"
-  - "bdd"
-  - "vitest"
-  - "jest"
-  - "playwright"
-  - "cypress"
-  - "selenium"
-  - "kiểm thử"
-  - "đảm bảo chất lượng"
+- test
+- testing
+- unit test
+- integration test
+- e2e test
+- end to end
+- ui test
+- component test
+- functional test
+- verify
+- assertion
+- test case
+- test coverage
+- regression
+- mock
+- fixture
+- spy
+- stub
+- tdd
+- bdd
+- vitest
+- jest
+- playwright
+- cypress
+- selenium
+- kiểm thử
+- đảm bảo chất lượng
+name: test_test-analysis
 ---
+
 
 # Test Analysis Skill - Comprehensive Testing Guide
 

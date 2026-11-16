@@ -1,7 +1,8 @@
 ---
-name: "source-command-reverse"
-description: "REA Reverse Engineering Command - Alias for /rea"
+name: source-command-reverse
+description: REA Reverse Engineering Command - Alias for /rea
 ---
+
 
 # source-command-reverse
 

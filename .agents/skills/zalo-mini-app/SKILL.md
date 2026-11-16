@@ -1,7 +1,15 @@
 ---
 name: zalo-mini-app
-description: Build Zalo Mini Apps - lightweight web apps running inside Zalo super-app. This skill provides ZaUI components (Button, Input, Modal, Tabs, Avatar, etc.), JavaScript APIs (authorize, getUserInfo, getPhoneNumber, getLocation, Storage, Camera), Checkout SDK for payments, design guidelines, and development tools. Also includes ZCA-JS for unofficial personal Zalo account automation (chatbots, message listeners). Use when building Mini Apps, using ZaUI components, calling Zalo APIs, integrating payments, converting web apps to Mini Apps, Zalo chatbots for personal accounts, or following Zalo design standards.
+description: Build Zalo Mini Apps - lightweight web apps running inside Zalo super-app.
+  This skill provides ZaUI components (Button, Input, Modal, Tabs, Avatar, etc.),
+  JavaScript APIs (authorize, getUserInfo, getPhoneNumber, getLocation, Storage, Camera),
+  Checkout SDK for payments, design guidelines, and development tools. Also includes
+  ZCA-JS for unofficial personal Zalo account automation (chatbots, message listeners).
+  Use when building Mini Apps, using ZaUI components, calling Zalo APIs, integrating
+  payments, converting web apps to Mini Apps, Zalo chatbots for personal accounts,
+  or following Zalo design standards.
 ---
+
 
 # Zalo Mini App Development
 

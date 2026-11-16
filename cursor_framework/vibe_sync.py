@@ -314,6 +314,7 @@ class VibeSyncEngine:
             lines.extend([
                 "- Work natively with `.cursor/rules/*.mdc` for domain-specific architecture guidelines.",
                 "- Use `python -m cursor_framework ask` or `cursor-warm` to keep context index fresh.",
+                "- Use `python -m cursor_framework spec` for Spec-Driven Development workflows.",
                 "- Keep `.cursorrules` concise to prevent context window saturation.",
             ])
         elif tool == VibeTool.WINDSURF:
@@ -329,6 +330,7 @@ class VibeSyncEngine:
                 "  * Run tests: `python -m unittest discover -v`",
                 "  * Fast install: `uv pip install -e \".[all]\"`",
                 "  * Framework CLI: `uv run cursor-framework --help`",
+                "  * Spec-Driven Development: `python -m cursor_framework spec init <feature>`",
             ])
         elif tool == VibeTool.ANTIGRAVITY:
             lines.extend([

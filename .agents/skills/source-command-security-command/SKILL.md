@@ -1,7 +1,8 @@
 ---
-name: "source-command-security-command"
-description: "Security - Security review (OWASP, vulnerabilities, authentication, authorization)"
+name: source-command-security-command
+description: Security - Security review (OWASP, vulnerabilities, authentication, authorization)
 ---
+
 
 # source-command-security-command
 

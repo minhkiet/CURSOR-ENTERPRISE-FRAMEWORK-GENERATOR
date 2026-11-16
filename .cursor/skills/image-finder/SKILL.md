@@ -1,7 +1,10 @@
 ---
 name: image-finder
-description: Tìm ảnh stock miễn phí và tạo ảnh/video bằng AI (Google Flow, Unsplash, Pexels, Pravatar). Keywords: tìm ảnh, stock image, free image, find image, tạo ảnh AI, generate image, Google Flow, video AI.
+description: 'Tìm ảnh stock miễn phí và tạo ảnh/video bằng AI (Google Flow, Unsplash,
+  Pexels, Pravatar). Keywords: tìm ảnh, stock image, free image, find image, tạo ảnh
+  AI, generate image, Google Flow, video AI.'
 ---
+
 
 # Image Finder Skill
 

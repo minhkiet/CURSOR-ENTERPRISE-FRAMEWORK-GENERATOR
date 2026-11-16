@@ -1,3 +1,8 @@
+---
+name: source-command-google-command
+description: "Google API Integration Skill skill"
+---
+
 # Google API Integration Skill
 
 > **Version:** 1.0.0  

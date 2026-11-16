@@ -1,5 +1,5 @@
-﻿---
-description: Karpathy Behavioral Guidelines - Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution. Auto-applied to all coding tasks.
+---
+description: Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria.
 alwaysApply: true
 source: https://github.com/multica-ai/andrej-karpathy-skills (186k stars)
 integrated_with: karpathy-coding skill (`.cursor/skills/code_karpathy/SKILL.md`)
@@ -7,10 +7,15 @@ integrated_with: karpathy-coding skill (`.cursor/skills/code_karpathy/SKILL.md`)
 
 # Karpathy Behavioral Guidelines
 
-> Integrated with [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) (186k stars)
+> Derived from [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876) on LLM coding pitfalls.
+> Integrated with [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills).
 > Complement: See `.cursor/skills/code_karpathy/SKILL.md` for full overlay skill with pre/post gates.
 
+**Key Insight:** *"LLMs are exceptionally good at looping until they meet specific goals... Don't tell it what to do, give it success criteria and watch it go."*
+
 **Tradeoff:** Bias toward caution over speed. For trivial tasks, use judgment.
+
+---
 
 ## 1. Think Before Coding
 
@@ -33,6 +38,7 @@ Before implementing:
 - If you write 200 lines and it could be 50, rewrite it.
 
 Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+*Good code solves today's problem simply, not tomorrow's problem prematurely.*
 
 ## 3. Surgical Changes
 
@@ -70,15 +76,26 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ---
 
+## Anti-Patterns & Concrete Timing
+
+| Principle | Anti-Pattern | Correct Action |
+|-----------|--------------|----------------|
+| **Think Before Coding** | Silently assumes file format, fields, or scope | List assumptions explicitly, ask before implementing |
+| **Simplicity First** | Strategy pattern / generic abstractions for single use | Single simple function until multi-type complexity is actually needed |
+| **Surgical Changes** | Reformats quotes, adds types to untouched code while fixing a bug | Only change lines that directly fix the reported issue |
+| **Goal-Driven** | "I will review and fix the code" without repro | Write test reproducing bug X → make it pass → verify regression suite |
+
+---
+
 ## Indicators (When to Strengthen)
 
 | Signal | Action |
 |--------|--------|
-| "just do it" / "simple" / "minimal" | Prioritize simplicity |
+| "just do it" / "simple" / "minimal" | Prioritize simplicity, avoid speculative abstractions |
 | Unclear request | Ask before assuming |
 | 200+ lines proposed | Check if can be 50 |
 | Adjacent code "improved" | Roll back, stay surgical |
-| Multiple interpretations | Present options, don't pick |
+| Multiple interpretations | Present options, don't pick silently |
 | "I assumed..." later | Should have asked first |
 
 ---
@@ -86,8 +103,8 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 ## Success Metrics
 
 These guidelines are working if:
-- Fewer unnecessary changes in diffs
-- Fewer rewrites due to overcomplication
-- Clarifying questions come BEFORE implementation
-- Simplicity maintained across all outputs
-- Surgical changes only
+- **Fewer unnecessary changes in diffs** — Only requested changes appear
+- **Fewer rewrites due to overcomplication** — Code is simple the first time
+- **Clarifying questions come BEFORE implementation** — Not after mistakes
+- **Clean, minimal PRs / diffs** — No drive-by refactoring or "improvements"
+- **Tests reproduction precedes bug fixes** — Zero guesswork debugging

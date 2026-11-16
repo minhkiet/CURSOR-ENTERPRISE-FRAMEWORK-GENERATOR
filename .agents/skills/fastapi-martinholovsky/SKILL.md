@@ -1,7 +1,6 @@
 ---
 name: fastapi-martinholovsky
-description: >-
-  REST API and WebSocket development with FastAPI emphasizing security,
+description: REST API and WebSocket development with FastAPI emphasizing security,
   performance, and async patterns
 metadata:
   upstream:
@@ -9,11 +8,12 @@ metadata:
     risk_level: HIGH
   category: development
   source:
-    repository: 'https://github.com/martinholovsky/claude-skills-generator'
+    repository: https://github.com/martinholovsky/claude-skills-generator
     path: skills/fastapi
     license_path: LICENSE
     commit: 1086ef25672acba2916220c6ce032a612cd9dc98
 ---
+
 
 # FastAPI Development Skill
 

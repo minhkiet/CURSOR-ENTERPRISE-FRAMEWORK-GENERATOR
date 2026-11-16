@@ -1,3 +1,8 @@
+---
+name: util_document-ocr
+description: "Document OCR Skill - Text Extraction from Images skill"
+---
+
 # Document OCR Skill - Text Extraction from Images
 
 ## Mục tiêu

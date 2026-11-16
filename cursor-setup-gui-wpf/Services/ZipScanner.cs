@@ -108,6 +108,10 @@ namespace CursorSetupWpf.Services
 
         static string FindSampleEntry(ZipArchive archive, string topCategory, string item)
         {
+            // Direct file entry check (e.g. rules/*.mdc or flat category files)
+            string directPath = topCategory + "/" + item;
+            if (archive.GetEntry(directPath) != null) return directPath;
+
             string prefix = topCategory + "/" + item + "/";
             string[] preferredNames;
             if (string.Equals(topCategory, "skills", StringComparison.OrdinalIgnoreCase))

@@ -1,7 +1,8 @@
 ---
-name: "source-command-fix-command"
-description: "Fix Bug - Sửa lỗi bug với root cause analysis"
+name: source-command-fix-command
+description: Fix Bug - Sửa lỗi bug với root cause analysis
 ---
+
 
 # source-command-fix-command
 

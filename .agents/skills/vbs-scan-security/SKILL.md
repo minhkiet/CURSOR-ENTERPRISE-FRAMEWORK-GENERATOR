@@ -1,8 +1,13 @@
 ---
 name: vbs-scan-security
-description: Use when scanning code for security vulnerabilities. Use when user says "scan security", "kiểm tra bảo mật", "security audit", "review security", or invokes `/vbs-scan-security`. Auto-delegates to sub-agents for large scans (>20 main-language files OR >30 total OR >14 days). Outputs bilingual reports (vi/en). Optional `--auto-fix` (agentic patch + verify loop) and `--sca` (live CVE lookup via OSV.dev).
+description: Use when scanning code for security vulnerabilities. Use when user says
+  "scan security", "kiểm tra bảo mật", "security audit", "review security", or invokes
+  `/vbs-scan-security`. Auto-delegates to sub-agents for large scans (>20 main-language
+  files OR >30 total OR >14 days). Outputs bilingual reports (vi/en). Optional `--auto-fix`
+  (agentic patch + verify loop) and `--sca` (live CVE lookup via OSV.dev).
 userInvocable: true
 ---
+
 
 # vbsec — Security Scanner cho Vibe Coders
 

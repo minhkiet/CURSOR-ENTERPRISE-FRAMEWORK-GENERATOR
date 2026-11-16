@@ -1,9 +1,22 @@
 ---
-description: WeKnora Agent Skill - ReAct autonomous reasoning agent với multi-step planning, tool calling, web search, và MCP tools integration
+description: WeKnora Agent Skill - ReAct autonomous reasoning agent với multi-step
+  planning, tool calling, web search, và MCP tools integration
 created: 2026-06-26
 version: 1.0.0
-tags: [weknora, react-agent, autonomous, reasoning, agent, tool-calling, web-search, mcp, multi-step, workflow]
+tags:
+- weknora
+- react-agent
+- autonomous
+- reasoning
+- agent
+- tool-calling
+- web-search
+- mcp
+- multi-step
+- workflow
+name: ai_weknora-agent
 ---
+
 
 # WeKnora Agent Skill
 

@@ -1,3 +1,8 @@
+---
+name: social_zalo
+description: "Zalo API Integration Skill skill"
+---
+
 # Zalo API Integration Skill
 
 **Version:** 1.0.0  

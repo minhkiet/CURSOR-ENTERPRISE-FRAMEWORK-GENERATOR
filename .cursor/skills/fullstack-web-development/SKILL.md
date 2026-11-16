@@ -1,19 +1,25 @@
 ---
 name: fullstack-web-development
-description: Build, modify, debug fullstack web apps using ASP.NET Core Web API, React + TypeScript + TSX, existing project database, REST API, and JWT authentication. Enforces end-to-end data flow (React UI -> API Service -> Controller -> Service -> Data Access -> DB -> Response -> State -> UI), 30 strict engineering rules, 17-point verification checklist, token efficiency, anti-patterns, and zero-breaking-changes safety.
+description: Build, modify, debug fullstack web apps using ASP.NET Core Web API, React
+  + TypeScript + TSX, existing project database, REST API, and JWT authentication.
+  Enforces end-to-end data flow (React UI -> API Service -> Controller -> Service
+  -> Data Access -> DB -> Response -> State -> UI), 30 strict engineering rules, 17-point
+  verification checklist, token efficiency, anti-patterns, and zero-breaking-changes
+  safety.
 triggers:
-  - fullstack
-  - fullstack web
-  - asp.net core react
-  - dotnet react
-  - react typescript dotnet
-  - build fullstack
-  - web api react
-  - fullstack-web-development
-  - /fullstack
+- fullstack
+- fullstack web
+- asp.net core react
+- dotnet react
+- react typescript dotnet
+- build fullstack
+- web api react
+- fullstack-web-development
+- /fullstack
 category: Development
 version: 1.0.0
 ---
+
 
 # FULLSTACK WEB DEVELOPMENT SKILL
 

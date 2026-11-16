@@ -1,11 +1,21 @@
 # REA: Reverse Engineer Anything — Upstream Sync
 
-This folder contains the complete, verified vendor drop of [morluto/rea](https://github.com/morluto/rea) (v6.4.0).
-It provides a unified CLI and Model Context Protocol (MCP) server for reverse engineering across native binaries, managed .NET assemblies, JavaScript/Electron applications, Android APKs, WebAssembly, EVM bytecode, Go binaries, and runtime process observation.
+This folder tracks the upstream synchronization with [morluto/rea](https://github.com/morluto/rea) (v6.9.0, skill version 62).
+It provides a unified CLI and Model Context Protocol (MCP) server for reverse engineering across native binaries, managed .NET assemblies, JavaScript/Electron applications, Android APKs, WebAssembly, EVM bytecode, Go binaries, agent environment generation (AgentEnv), and runtime process observation.
 
 The Cursor Enterprise Framework bridge skills live in:
+- `.cursor/skills/reverse-engineer-anything/`
 - `.cursor/skills/sec_reverse-engineer-anything/`
+- `.cursor/skills/rea-analysis-optimization/`
+- `.cursor/skills/rea-ci-tests-audit/`
+- `.cursor/skills/rea-tool-design/`
+- `.cursor/skills/rea-changelog-update/`
 - `.agents/skills/reverse-engineer-anything/`
+- `.agents/skills/sec_reverse-engineer-anything/`
+- `.agents/skills/rea-analysis-optimization/`
+- `.agents/skills/rea-ci-tests-audit/`
+- `.agents/skills/rea-tool-design/`
+- `.agents/skills/rea-changelog-update/`
 
 The slash command lives in:
 - `.cursor/commands/rea.md`

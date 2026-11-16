@@ -1,3 +1,8 @@
+---
+name: code-review
+description: "Review code theo quality gates: Correctness, Design, Security, Performance, Maintainability."
+---
+
 # Code Review Skill
 
 > **Version:** 1.0.0 | **Category:** Quality | **Triggers:** review, code review, check, audit

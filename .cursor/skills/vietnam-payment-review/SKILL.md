@@ -1,4 +1,9 @@
-﻿# Alias: vietnam-payment-review
+---
+name: vietnam-payment-review
+description: "Review skill cho Vietnamese online payment integrations (MoMo, SePay, PayOS, ZaloPay, VNPay, VietQR). Đánh giá API integration, webhook handling, security, compliance, và best practices cho thanh toán nội địa Việt Nam."
+---
+
+# Alias: vietnam-payment-review
 
 **DEPRECATED**: This skill has been renamed to $newName.
 

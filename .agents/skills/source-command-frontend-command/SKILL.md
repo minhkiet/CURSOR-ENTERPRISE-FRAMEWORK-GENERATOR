@@ -1,7 +1,8 @@
 ---
-name: "source-command-frontend-command"
-description: "Frontend - Frontend tasks (build landing, redesign, review, full-output)"
+name: source-command-frontend-command
+description: Frontend - Frontend tasks (build landing, redesign, review, full-output)
 ---
+
 
 # source-command-frontend-command
 

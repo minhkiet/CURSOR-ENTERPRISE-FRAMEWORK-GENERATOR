@@ -1,4 +1,9 @@
-﻿# Alias: frontend-redesign
+---
+name: frontend-redesign
+description: "Upgrades existing websites and apps to premium quality. Audits current design, identifies generic AI patterns, and applies high-end design standards without breaking functionality. Includes mandatory pre-redesign audit and post-redesign validation. Works with any CSS framework or vanilla CSS."
+---
+
+# Alias: frontend-redesign
 
 **DEPRECATED**: This skill has been renamed to $newName.
 

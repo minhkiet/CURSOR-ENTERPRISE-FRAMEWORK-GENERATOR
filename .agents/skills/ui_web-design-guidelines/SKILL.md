@@ -1,8 +1,7 @@
 ---
 name: web-design-guidelines
-description: >-
-  Review UI code for Web Interface Guidelines compliance. Use when asked to
-  "review my UI", "check accessibility", "audit design", "review UX", or "check
+description: Review UI code for Web Interface Guidelines compliance. Use when asked
+  to "review my UI", "check accessibility", "audit design", "review UX", or "check
   my site against best practices".
 metadata:
   author: vercel
@@ -10,11 +9,12 @@ metadata:
   argument-hint: <file-or-pattern>
   category: development
   source:
-    repository: 'https://github.com/vercel-labs/agent-skills'
+    repository: https://github.com/vercel-labs/agent-skills
     path: skills/web-design-guidelines
     commit: f8a72b9603728bb92a217a879b7e62e43ad76c81
 license: MIT
 ---
+
 
 # Web Interface Guidelines
 

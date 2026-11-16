@@ -1,4 +1,9 @@
-﻿# Alias: landing-page-pro
+---
+name: landing-page-pro
+description: "Professional Landing Page Skill cho SaaS, Products, E-commerce. Sections: Hero, Features, Products, Pricing, Blog, Contact, Auth. 3D effects, smooth animations, SEO content, image generation integration. Anti-AI-slop, distinctive design."
+---
+
+# Alias: landing-page-pro
 
 **DEPRECATED**: This skill has been renamed to $newName.
 

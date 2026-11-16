@@ -1,7 +1,8 @@
 ---
-name: "source-command-deploy-command"
-description: "Deploy - Deployment workflow từ build đến production"
+name: source-command-deploy-command
+description: Deploy - Deployment workflow từ build đến production
 ---
+
 
 # source-command-deploy-command
 

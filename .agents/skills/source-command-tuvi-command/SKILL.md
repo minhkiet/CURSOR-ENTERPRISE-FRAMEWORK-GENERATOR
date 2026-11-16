@@ -1,7 +1,8 @@
 ---
-name: "source-command-tuvi-command"
-description: "Tuvi - Tính Tử Vi (Vietnamese Astrology)"
+name: source-command-tuvi-command
+description: Tuvi - Tính Tử Vi (Vietnamese Astrology)
 ---
+
 
 # source-command-tuvi-command
 
