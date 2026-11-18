@@ -1,4 +1,4 @@
----
+﻿---
 description: Review skill cho Vietnamese online payment integrations (MoMo, SePay,
   PayOS, ZaloPay, VNPay, VietQR). Đánh giá API integration, webhook handling, security,
   compliance, và best practices cho thanh toán nội địa Việt Nam.
@@ -62,6 +62,7 @@ Vietnam Payment Review là skill chuyên biệt để review các payment integr
 | MoMo | E-Wallet, QR | REST JSON | Có | QR Code, App Deep Link | IPN webhook, HMAC-SHA256 |
 | SePay | Banking | REST JSON | Có | Banking Transfer (webhook) | VietQR-based, webhook push, atomic UPDATE idempotency |
 | PayOS | Payment Gateway | REST JSON | Có | QR Code, ATM/Card | Checksum, webhook |
+| Pay2S | Banking Transfer / Lookup | REST JSON | Có | Banking Transfer (webhook), Recipient Name | Bearer token, Retry 5x, Rate limit 10/min |
 | ZaloPay | E-Wallet, Gateway | REST JSON | Có | QR, App, Card | MAC validation |
 | VNPay | Payment Gateway | REST POST Form | Có | QR, ATM, Card, E-Wallet | SHA256 hash, IPN |
 | VietQR | QR Payment | REST JSON | Có | QR Code (NAPAS) | VietQR/NAPAS standard |
@@ -95,6 +96,44 @@ Vietnam Payment Review là skill chuyên biệt để review các payment integr
 - [ ] Sandbox endpoint: `https://test-payment.momo.vn`
 
 ### SePay
+
+#### Quy Trình Tích Hợp AI Agent Chuẩn SePay (7-Step Lifecycle & 4 Personas)
+> Tham chiếu: https://sepay.vn/agents và bộ kỹ năng [sepay](../sepay/SKILL.md)
+
+##### 1. Phân định Vai trò (Personas)
+- **Lập trình viên (Developer):** Tích hợp end-to-end qua 7 bước kỹ thuật chuẩn bên dưới.
+- **Vibe Coder (Non-technical):** Giao tiếp bằng ngôn ngữ đời thường (tham khảo 
+eferences/plain-language.md), AI tự động dựng sandbox, viết code, chạy test và giải thích trực quan; người dùng chỉ duyệt.
+- **Chủ doanh nghiệp:** Tra cứu doanh thu và đối soát dòng tiền thực (tham khảo 
+eferences/revenue-rules.md, 
+eferences/revenue-report.md).
+- **Kế toán:** Bóc tách dữ liệu thanh toán đối ứng với hóa đơn điện tử e-Invoice (tham khảo 
+eferences/accounting.md, 
+eferences/invoice-reconciliation.md).
+
+##### 2. Quy Trình 7 Bước Tích Hợp Cho Lập Trình Viên (The 7-Step Flow)
+- [ ] **Bước 1 (Skills):** Nạp bộ kỹ năng SePay (.cursor/skills/sepay/SKILL.md hoặc .agents/skills/sepay/SKILL.md).
+- [ ] **Bước 2 (CLI & Đăng nhập):** Cài đặt SePay CLI (
+pm install -g sepay-cli hoặc script https://get.sepay.vn/sepay-cli-install.sh) và đăng nhập sepay login (hoặc dùng 	ools/api_integrations/sepay_integration.py).
+- [ ] **Bước 3 (Sandbox & Webhook thử):** Dựng môi trường test và proxy webhook về máy phát triển:
+  `ash
+  sepay sandbox init --with-webhook-listen --yes
+  `
+- [ ] **Bước 4 (Viết code tích hợp):**
+  - Xác thực webhook header Authorization: Apikey <SEPAY_API_KEY> (hoặc Bearer token).
+  - Chống xử lý trùng (Idempotency) với UNIQUE(transaction_id) + INSERT IGNORE.
+  - Sinh mã thanh toán ngẫu nhiên (Cryptographically random in2hex(random_bytes(6))), không dùng auto-increment ID.
+  - Atomic update trong cơ sở dữ liệu (UPDATE orders SET status = 'paid' WHERE code = ? AND status = 'pending' AND amount <= ?).
+  - Xử lý thiếu/thừa tiền và đối soát giao dịch.
+- [ ] **Bước 5 (Chạy thử & Giả lập):** Giả lập giao dịch và kiểm tra webhook trả lời HTTP 200:
+  `ash
+  sepay webhook test --forward localhost:3000 --amount 50000 --order DH1001
+  `
+- [ ] **Bước 6 (Đưa vào bán hàng - Production):** Đăng ký webhook chính thức sau khi người dùng phê duyệt:
+  `ash
+  sepay webhook create --env production --url https://shop.vn/api/sepay/webhook
+  `
+- [ ] **Bước 7 (Theo dõi hằng ngày qua SePay MCP):** Giám sát lỗi webhook, đối soát doanh thu hằng ngày qua SePay MCP (my.sepay.vn/mcp/apps).
 
 #### Core Configuration
 - [ ] API key stored in env (`SEPAY_API_KEY`), never in code
@@ -220,17 +259,50 @@ if ($body['transferType'] === 'in' && !empty($body['code'])) {
 echo json_encode(['success' => true]);
 ```
 
-### PayOS
+### PayOS (PayOS Open Banking Gateway API v2)
+> Tham chiếu: https://payos.vn/docs/api và bộ kỹ năng chuyên biệt [payos](../payos/SKILL.md)
 
-- [ ] Client ID and API Key stored in env
-- [ ] Checksum calculated with HMAC-SHA256
-- [ ] Webhook signature verified using `signature` field
-- [ ] Order ID uniqueness enforced
-- [ ] `amount` and `description` sent correctly
-- [ ] Cancel URL and return URL configured
-- [ ] `transactionStatus` checked before fulfilling
-- [ ] Sandbox: `https://api-sandbox.payos.vn`
-- [ ] Production: `https://api.payos.vn`
+#### 1. Cấu hình bảo mật (Credentials)
+- [ ] `PAYOS_CLIENT_ID`, `PAYOS_API_KEY`, `PAYOS_CHECKSUM_KEY` lưu an toàn trong file `.env` (không bao giờ lộ ở frontend)
+- [ ] Endpoint API Merchant: `https://api-merchant.payos.vn`
+- [ ] Request Header bắt buộc: `x-client-id: <CLIENT_ID>`, `x-api-key: <API_KEY>`, `Content-Type: application/json`
+
+#### 2. Tạo link thanh toán (`POST /v2/payment-requests`)
+- [ ] `orderCode` bắt buộc là số nguyên dương (`integer`), tối đa 16 chữ số (≤ 9,007,199,254,740,991); không dùng chuỗi ký tự hay dấu -
+- [ ] `amount` là số nguyên VND (không có số thập phân)
+- [ ] `description` tối đa 25 ký tự, không dấu / ASCII
+- [ ] `returnUrl` và `cancelUrl` được cấu hình chính xác
+- [ ] `signature` tính bằng HMAC-SHA256 với `PAYOS_CHECKSUM_KEY` trên chuỗi 5 tham số sắp xếp A-Z:
+  `amount=$amount&cancelUrl=$cancelUrl&description=$description&orderCode=$orderCode&returnUrl=$returnUrl`
+
+#### 3. Xác thực Webhook (Webhook Checksum Verification)
+- [ ] Bóc tách trường `data` và `signature` từ payload webhook
+- [ ] Sắp xếp tất cả keys trong `data` theo thứ tự alphabet (A-Z)
+- [ ] Nối chuỗi `key1=value1&key2=value2...` và băm HMAC-SHA256 với `PAYOS_CHECKSUM_KEY`
+- [ ] So sánh an toàn `hash_equals` / `compare_digest` giữa chữ ký vừa tính và `signature` nhận được
+- [ ] Trả lời HTTP 200 `{"success": true}` ngay lập tức sau khi xác thực thành công
+
+#### 4. Idempotency & Database
+- [ ] `orderCode` được đánh chỉ mục `UNIQUE` trong cơ sở dữ liệu
+- [ ] Sử dụng Atomic UPDATE: `UPDATE orders SET status = 'paid', paid_at = NOW() WHERE order_code = ? AND status = 'pending' AND amount <= ?`
+- [ ] Lưu nhật ký giao dịch vào bảng `payos_webhook_logs` với `reference` (mã giao dịch ngân hàng) duy nhất
+
+### Pay2S (Pay2S Banking Webhook & Recipient Name API)
+> Tham chiếu: https://docs.pay2s.vn/partner/webhook.html, https://docs.pay2s.vn/get-recipient-name/tai-lieu-ky-thuat.html và bộ kỹ năng chuyên biệt [pay2s](../pay2s/SKILL.md)
+
+#### 1. Webhook Biến Động Số Dư Ngân Hàng
+- [ ] Xác thực Header: Kiểm tra `Authorization: Bearer <PAY2S_WEBHOOK_TOKEN>`
+- [ ] Bóc tách danh sách giao dịch từ `transactions: [...]`
+- [ ] Lọc loại giao dịch `transferType === "IN"` cho tiền vào
+- [ ] Chống trùng (Idempotency): Đặt khóa duy nhất `UNIQUE(id)` hoặc `transactionNumber` trong cơ sở dữ liệu
+- [ ] Bắt buộc phản hồi HTTP 200 với body JSON: `{"success": true}`
+- [ ] Tuân thủ cơ chế Retry: Xử lý nhanh không quá 2 giây, đẩy việc nặng ra hàng đợi để không kích hoạt 5 lần retry của Pay2S
+
+#### 2. API Tra Cứu Tên Chủ Tài Khoản Ngân Hàng (`get-recipient-name`)
+- [ ] Endpoint: `POST https://api.pay2s.vn/userapi/get-recipient-name`
+- [ ] Header xác thực: `pay2s-token: <BASE64_SECRET_KEY>`
+- [ ] Body gửi lên: `{"accountNumber": "...", "bankCode": "..."}`
+- [ ] Lưu ý Rate Limit: Giới hạn tối đa 10 requests / phút; bắt buộc triển khai cache (Redis/DB) cho các tài khoản tra cứu lặp lại
 
 ### ZaloPay
 
@@ -398,9 +470,47 @@ await momo.createPayment({ amount: order.amount }); // Verified server amount
 - [ ] CSRF protection on payment-related forms
 - [ ] Input validation on all payment callback fields
 
-## Multi-Provider Pattern
+## Multi-Provider Pattern & Quota Aggregator
 
-For applications supporting multiple providers, use the adapter pattern:
+Khi hệ thống tích hợp cùng lúc nhiều cổng thanh toán (SePay, PayOS, Pay2S), bắt buộc áp dụng kiến trúc **Payment Aggregator & Multi-Account Quota Routing**:
+
+```
+[Khách hàng tạo đơn]
+         │
+         ▼
+[Payment Aggregator Router]
+         │
+         ├─── (1) Kiểm tra Priority 1 (SePay) ───[Còn hạn mức?]──▶ [Tạo VietQR SePay]
+         │                                            │ (Hết hạn mức)
+         ├─── (2) Chuyển tiếp Priority 2 (PayOS) ─[Còn hạn mức?]──▶ [Tạo link PayOS v2]
+         │                                            │ (Hết hạn mức)
+         ├─── (3) Chuyển tiếp Priority 3 (Pay2S) ─[Còn hạn mức?]──▶ [Tạo VietQR Pay2S]
+         │                                            │ (Hết hạn mức tất cả)
+         └─── (4) MANUAL FALLBACK ────────────────────┴──────────▶ [Chuyển khoản thủ công]
+                                                                    ├── Cung cấp STK doanh nghiệp
+                                                                    ├── Cung cấp Zalo/Hotline hỗ trợ
+                                                                    └── Upload ảnh biên lai xác thực
+```
+
+### 1. Quản lý hạn mức tài khoản (Account Quotas)
+- Quản lý độc lập từng tài khoản theo provider:
+  - `daily_tx_limit`: Số lượng giao dịch tối đa trong ngày (tránh vượt gói/phí API hoặc giới hạn ngân hàng).
+  - `daily_amount_limit`: Tổng hạn mức tiền trong ngày (VND).
+  - `min_amount_per_tx` / `max_amount_per_tx`: Hạn mức tối thiểu và tối đa cho từng lệnh thanh toán.
+- Reset tự động hàng ngày (`check_reset`) khi chuyển sang ngày mới.
+
+### 2. Tự động chuyển cổng (Auto-Failover)
+- Sắp xếp tài khoản theo mức độ ưu tiên (`priority`: 1 -> 2 -> 3).
+- Khi tài khoản cấp 1 (ví dụ SePay) chạm trần hạn mức hoặc không khả dụng, hệ thống tự động định tuyến không gián đoạn sang tài khoản cấp 2 (PayOS), rồi cấp 3 (Pay2S).
+
+### 3. Fallback xác thực thủ công & Bằng chứng thanh toán bằng hình ảnh
+- Khi **TẤT CẢ** các phương thức tự động đều chạm ngưỡng hạn mức trong ngày:
+  - Hệ thống tự động chuyển đơn hàng sang trạng thái `ALL_QUOTA_EXCEEDED_FALLBACK_MANUAL`.
+  - Hiển thị thông tin chuyển khoản ngân hàng trực tiếp của doanh nghiệp với cú pháp `XACNHAN DH<ORDER_ID>`.
+  - Cung cấp kênh liên hệ hỗ trợ tức thì: Hotline, Zalo OA, Telegram.
+  - Cho phép người dùng đính kèm hình ảnh biên lai / sao kê chuyển khoản (`.jpg`, `.jpeg`, `.png`, `.webp`, `.pdf`).
+  - Giao diện Admin/Dashboard cho phép nhân viên đối soát duyệt (`approve`) hoặc từ chối (`reject`) kèm ghi chú.
+- Công cụ tham chiếu: [payment_aggregator.py](../../tools/api_integrations/payment_aggregator.py).
 
 ```typescript
 interface PaymentProvider {
@@ -464,6 +574,7 @@ class PaymentService {
 - [ ] MoMo: partnerCode, accessKey, secretKey not in code; QR format correct
 - [ ] **SePay**: cryptographically random payment codes; atomic UPDATE with `amount <= ?` in WHERE; `INSERT IGNORE` for idempotent webhooks; HMAC-SHA256 enabled in production
 - [ ] PayOS: checksum validation with checksumKey implemented
+- [ ] Pay2S: Bearer token validation on webhook, return `{"success": true}` HTTP 200, base64 encoded token on get-recipient-name API, rate limit cache (10 req/min)
 - [ ] ZaloPay: appTransId uniqueness guaranteed
 - [ ] VNPay: return URL and IPN URL configured correctly
 - [ ] VietQR: bank account validation, VietQR format compliance

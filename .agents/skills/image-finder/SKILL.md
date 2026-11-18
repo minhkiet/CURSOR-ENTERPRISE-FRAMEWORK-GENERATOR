@@ -21,6 +21,7 @@ Tìm và tải ảnh stock miễn phí cho website clone và web design.
 
 | Nguồn | Loại | URL Pattern | Lưu ý |
 |--------|------|-------------|--------|
+| **Pinterest** | Photos / Ideas / UI / Mockups | `i.pinimg.com/originals/` | **Miễn phí** qua Pinterest MCP (search, board, pin details, download) |
 | **Google Flow** | Image + Video (4s) | `labs.google/fx/tools/flow` | **Miễn phí** - AI tạo ảnh/video |
 | **Unsplash** | Photos | `images.unsplash.com/photo-{ID}` | Free, no attribution |
 | **Pexels** | Photos + Videos | `images.pexels.com/photos/` | Free commercial use |
@@ -75,6 +76,33 @@ npx playwright screenshot \
 ---
 
 ## Cách tìm ảnh
+
+### 0. Pinterest (MCP Server & Python API - Miễn phí, không cần API key)
+
+Sử dụng Pinterest MCP Server (`mcp/pinterest_server.py`) hoặc `ImageSearchSkill` để tìm kiếm và trích xuất ảnh chất lượng cao gốc (`orig`, `736x`, `474x`, `236x`):
+
+```python
+# Qua PinterestClient (Zero external dependencies)
+from mcp.pinterest_server import PinterestClient
+
+client = PinterestClient()
+
+# 1. Tìm kiếm ảnh
+pins = client.search_pins("luxury modern villa architecture", limit=10)
+for p in pins:
+    print(p["title"], p["orig_image_url"])
+
+# 2. Tải ảnh trực tiếp an toàn về máy
+client.download_image(pins[0]["orig_image_url"], "assets/hero.jpg")
+```
+
+**Các công cụ MCP Pinterest:**
+- `search_pins`: Tìm ảnh Pinterest theo từ khóa (kèm đầy đủ resolutions).
+- `get_board_pins`: Duyệt toàn bộ ảnh từ Board công khai (`username`, `board`).
+- `get_user_pins`: Lấy ảnh gần đây của người dùng.
+- `get_pin_details`: Chi tiết Pin và ảnh gốc từ Pin ID hoặc URL (hỗ trợ cả `pin.it`).
+- `extract_from_url`: Tự động nhận diện và trích xuất từ bất kỳ liên kết Pinterest nào.
+- `download_images`: Tải hàng loạt ảnh an toàn (SSRF & path-traversal guards).
 
 ### 1. Unsplash
 

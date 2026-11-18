@@ -37,6 +37,16 @@
         "CLAUDE_MEM_DB_PATH": "${env:USERPROFILE}/.claude-mem/claude-mem.db"
       },
       "description": "claude-mem persistent memory MCP server - SQLite + FTS5 search & decisions retrieval"
+    },
+    "pinterest": {
+      "command": "python",
+      "args": [
+        "${workspaceFolder}/mcp/pinterest_server.py"
+      ],
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      },
+      "description": "Pinterest MCP Server - Search, browse, extract, and download high-resolution images from Pinterest"
     }
   }
 }

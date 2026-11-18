@@ -66,6 +66,9 @@ These skills require no modification across agents:
 | ponytail | ✅ | ✅ | - | - |
 | frontend-redesign | ✅ | ✅ | - | - |
 | vietnam-payment-review | ✅ | ✅ | - | - |
+| sepay | ✅ | ✅ | - | - |
+| payos | ✅ | ✅ | - | - |
+| pay2s | ✅ | ✅ | - | - |
 | claude-specific | - | - | ✅ | - |
 | grok-specific | - | - | - | ✅ |
 

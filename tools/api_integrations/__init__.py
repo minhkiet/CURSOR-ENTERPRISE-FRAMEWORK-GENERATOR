@@ -42,6 +42,17 @@ from .telegram_integration import TelegramBot, TelegramConfig
 from .facebook_integration import FacebookClient, FacebookConfig
 from .google_integration import GoogleClient, GoogleConfig
 from .shopee_integration import ShopeeClient, ShopeeConfig
+from .sepay_integration import SePayClient, SePayConfig
+from .payos_integration import PayOSClient, PayOSConfig
+from .pay2s_integration import Pay2SClient, Pay2SConfig
+from .payment_aggregator import (
+    PaymentAggregator,
+    AccountQuota,
+    PaymentRoutingResult,
+    ManualReceiptSubmission,
+    RoutingStatus,
+    ManualPaymentStatus,
+)
 
 __all__ = [
     "ZaloClient",
@@ -54,4 +65,17 @@ __all__ = [
     "GoogleConfig",
     "ShopeeClient",
     "ShopeeConfig",
+    "SePayClient",
+    "SePayConfig",
+    "PayOSClient",
+    "PayOSConfig",
+    "Pay2SClient",
+    "Pay2SConfig",
+    "PaymentAggregator",
+    "AccountQuota",
+    "PaymentRoutingResult",
+    "ManualReceiptSubmission",
+    "RoutingStatus",
+    "ManualPaymentStatus",
 ]
+

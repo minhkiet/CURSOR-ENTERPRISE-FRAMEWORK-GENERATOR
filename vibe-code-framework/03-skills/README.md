@@ -52,6 +52,9 @@ skill-name/
 | [planning-and-task-breakdown](./planning-and-task-breakdown/) | Task planning & dependency ordering |
 | [source-driven-development](./source-driven-development/) | Codebase-grounded architecture & synthesis |
 | [testing](./testing/) | Test suite design, execution & coverage analysis |
+| [sepay](./sepay/) | SePay Vietnam Payments (Bank Transfer, Webhook, VietQR, VA, e-Invoice, Gateway, CLI/MCP) |
+| [payos](./payos/) | PayOS Open Banking Gateway API v2 (VietQR, Payment Links, Webhook Checksum HMAC-SHA256) |
+| [pay2s](./pay2s/) | Pay2S Vietnam Bank Webhook & Recipient Name Lookup (Bearer Token Auth, Tra cứu chủ tài khoản) |
 
 ## Ánh xạ sang Cursor
 

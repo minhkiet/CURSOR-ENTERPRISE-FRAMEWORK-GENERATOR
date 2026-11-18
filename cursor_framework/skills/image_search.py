@@ -33,9 +33,22 @@ from .image_providers import (
     ImageOrientation,
     ImageLicense,
 )
-from .image_providers.pexels_provider import PexelsProvider
-from .image_providers.unsplash_provider import UnsplashProvider
-from .image_providers.pixabay_provider import PixabayProvider
+try:
+    from .image_providers.pexels_provider import PexelsProvider
+except ImportError:
+    PexelsProvider = None
+
+try:
+    from .image_providers.unsplash_provider import UnsplashProvider
+except ImportError:
+    UnsplashProvider = None
+
+try:
+    from .image_providers.pixabay_provider import PixabayProvider
+except ImportError:
+    PixabayProvider = None
+
+from .image_providers.pinterest_provider import PinterestProvider
 
 
 @dataclass
@@ -132,17 +145,25 @@ class ImageSearchSkill:
         # Initialize providers
         self.providers: list[ImageProvider] = []
         
-        unsplash = UnsplashProvider(unsplash_key)
-        if unsplash.is_available():
-            self.providers.append(unsplash)
+        if UnsplashProvider is not None:
+            unsplash = UnsplashProvider(unsplash_key)
+            if unsplash.is_available():
+                self.providers.append(unsplash)
         
-        pexels = PexelsProvider(pexels_key)
-        if pexels.is_available():
-            self.providers.append(pexels)
+        if PexelsProvider is not None:
+            pexels = PexelsProvider(pexels_key)
+            if pexels.is_available():
+                self.providers.append(pexels)
         
-        pixabay = PixabayProvider(pixabay_key)
-        if pixabay.is_available():
-            self.providers.append(pixabay)
+        if PixabayProvider is not None:
+            pixabay = PixabayProvider(pixabay_key)
+            if pixabay.is_available():
+                self.providers.append(pixabay)
+        
+        if PinterestProvider is not None:
+            pinterest = PinterestProvider()
+            if pinterest.is_available():
+                self.providers.append(pinterest)
         
         # Sort by priority (lower = tried first)
         self.providers.sort(key=lambda p: p.priority)

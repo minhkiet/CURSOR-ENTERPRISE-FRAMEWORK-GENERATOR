@@ -239,10 +239,54 @@ class SkillRegistry:
                 pre_review_sections=["payment-pre"],
                 post_review_sections=["payment-post"],
                 trigger_keywords=[
-                    "momo", "sepay", "ayos", "vietqr", "zalo pay", "zalo", "payos",
+                    "momo", "sepay", "ayos", "vietqr", "zalo pay", "zalo", "payos", "pay2s",
                     "vnpay", "vietnam payment", "payment integration", "thanh toan"
                 ],
                 dependencies=["security-review"],
+            ),
+            SkillMetadata(
+                name="sepay",
+                version="1.0.3",
+                description="SePay (Vietnam payments): integration, Webhook, VietQR, VA, e-Invoice, Payment Gateway, and CLI/MCP",
+                tags=["payment", "vietnam", "sepay", "vietqr", "webhook", "gateway"],
+                path=".cursor/skills/sepay/SKILL.md",
+                pre_review_sections=["payment-pre"],
+                post_review_sections=["payment-post"],
+                trigger_keywords=[
+                    "sepay", "thanh toan sepay", "vietqr sepay", "webhook sepay",
+                    "sepay api", "sepay cli", "va sepay", "bankhub", "cổng thanh toán sepay",
+                    "/sepay"
+                ],
+                dependencies=["vietnam-payment-review", "security-review"],
+            ),
+            SkillMetadata(
+                name="payos",
+                version="1.0.0",
+                description="PayOS (Vietnam Open Banking & VietQR Gateway): API v2, payment links, webhook checksum verification",
+                tags=["payment", "vietnam", "payos", "vietqr", "webhook", "gateway"],
+                path=".cursor/skills/payos/SKILL.md",
+                pre_review_sections=["payment-pre"],
+                post_review_sections=["payment-post"],
+                trigger_keywords=[
+                    "payos", "thanh toan payos", "vietqr payos", "webhook payos",
+                    "payos api", "checksum key payos", "cổng thanh toán payos",
+                    "/payos"
+                ],
+                dependencies=["vietnam-payment-review", "security-review"],
+            ),
+            SkillMetadata(
+                name="pay2s",
+                version="1.0.0",
+                description="Pay2S (Vietnam Bank Webhook & Recipient Name Lookup): Bearer webhook verification, get-recipient-name API",
+                tags=["payment", "vietnam", "pay2s", "webhook", "recipient-name"],
+                path=".cursor/skills/pay2s/SKILL.md",
+                pre_review_sections=["payment-pre"],
+                post_review_sections=["payment-post"],
+                trigger_keywords=[
+                    "pay2s", "thanh toan pay2s", "webhook pay2s", "get-recipient-name",
+                    "tra cứu tên tài khoản pay2s", "pay2s api", "/pay2s"
+                ],
+                dependencies=["vietnam-payment-review", "security-review"],
             ),
             # Marketing umbrella — single entry representing 47 marketingskills
             # concept-refs (sync 2026-07-15 with coreyhaines31/marketingskills,
@@ -916,6 +960,21 @@ class SkillDiscovery:
             "secondary": ["security-review"],
             "gates": ["payment-pre", "payment-post", "security-pre", "security-post"],
         },
+        "sepay_task": {
+            "primary": "sepay",
+            "secondary": ["vietnam-payment-review", "security-review"],
+            "gates": ["payment-pre", "payment-post", "security-pre", "security-post"],
+        },
+        "payos_task": {
+            "primary": "payos",
+            "secondary": ["vietnam-payment-review", "security-review"],
+            "gates": ["payment-pre", "payment-post", "security-pre", "security-post"],
+        },
+        "pay2s_task": {
+            "primary": "pay2s",
+            "secondary": ["vietnam-payment-review", "security-review"],
+            "gates": ["payment-pre", "payment-post", "security-pre", "security-post"],
+        },
         "security_task": {
             "primary": "security-review",
             "secondary": [],
@@ -1050,7 +1109,13 @@ class SkillDiscovery:
             return "landing_page"
         elif any(kw in request_lower for kw in ["redesign", "upgrade", "improve"]):
             return "redesign"
-        elif any(kw in request_lower for kw in ["momo", "sepay", "payment", "vietqr"]):
+        elif any(kw in request_lower for kw in ["sepay", "/sepay"]):
+            return "sepay_task"
+        elif any(kw in request_lower for kw in ["payos", "/payos"]):
+            return "payos_task"
+        elif any(kw in request_lower for kw in ["pay2s", "/pay2s"]):
+            return "pay2s_task"
+        elif any(kw in request_lower for kw in ["momo", "payment", "vietqr"]):
             return "payment_task"
         elif any(kw in request_lower for kw in ["security", "vulnerability"]):
             return "security_task"
@@ -1191,6 +1256,9 @@ class CrossAgentSkillDiscovery:
             "ponytail",
             "frontend-redesign",
             "vietnam-payment-review",
+            "sepay",
+            "payos",
+            "pay2s",
             "vietnam-address",
             "bazi",
             "document-ocr",
@@ -1207,6 +1275,9 @@ class CrossAgentSkillDiscovery:
             "ponytail",
             "frontend-redesign",
             "vietnam-payment-review",
+            "sepay",
+            "payos",
+            "pay2s",
             "reverse-engineer-anything",
         ],
         "claude-code": [

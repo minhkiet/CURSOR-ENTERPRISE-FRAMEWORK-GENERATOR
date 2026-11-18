@@ -26,10 +26,12 @@ try:
     from google.auth.transport.requests import Request
     from google.oauth2.credentials import Credentials
     from google_auth_oauthlib.flow import InstalledAppFlow
+    _HAS_GOOGLE = True
 except ImportError:
-    print("ERROR: Google libraries required.")
-    print("Install with: pip install google-api-python-client google-auth google-auth-oauthlib")
-    sys.exit(1)
+    Request = None
+    Credentials = None
+    InstalledAppFlow = None
+    _HAS_GOOGLE = False
 
 
 @dataclass
@@ -59,6 +61,8 @@ class GoogleClient:
     
     def _authenticate(self):
         """Authenticate with Google."""
+        if not _HAS_GOOGLE:
+            raise ImportError("Google libraries required. Install with: pip install google-api-python-client google-auth google-auth-oauthlib")
         if os.path.exists(self.token_path):
             self.creds = Credentials.from_authorized_user_file(self.token_path, self.config.scopes.get("gmail", []))
         
