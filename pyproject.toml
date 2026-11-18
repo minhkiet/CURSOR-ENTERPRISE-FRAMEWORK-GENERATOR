@@ -32,3 +32,22 @@ include = ["cursor_framework*"]
 
 [tool.setuptools.package-data]
 cursor_framework = ["*.md"]
+
+[tool.pytest.ini_options]
+# vendor/ holds third-party trees (ECC, mcp-chrome) with their own dependency
+# sets. Their tests import packages this project does not depend on, so
+# collecting them fails at import time and aborts the whole run. Restrict
+# collection to the directories this project owns.
+testpaths = ["tests", "cursor_framework/tests", "tools"]
+norecursedirs = [
+    "vendor",
+    "node_modules",
+    "build",
+    "dist",
+    "*.egg",
+    ".*",
+    "_darcs",
+    "CVS",
+    "venv",
+    "{arch}",
+]

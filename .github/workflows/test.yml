@@ -60,11 +60,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
-      # ponytail: the GUI lives in cursor-setup-gui-wpf (the old
-      # cursor-setup-gui console project was removed). Build the WPF app so
+      # ponytail: the GUI lives in vibe-setup-gui-wpf (the old
+      # cursor-setup-gui-wpf console project was removed). Build the WPF app so
       # a broken XAML or resource file fails CI instead of the release.
       - name: Build C# GUI
-        working-directory: cursor-setup-gui-wpf
+        working-directory: vibe-setup-gui-wpf
         run: |
           dotnet --version
           dotnet build -c Release --nologo
