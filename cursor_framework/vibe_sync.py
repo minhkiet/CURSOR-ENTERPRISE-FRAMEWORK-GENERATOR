@@ -56,6 +56,23 @@ class ToolSpec:
     gate_prefix: str
     env_vars: list[str] = field(default_factory=list)
     dir_markers: list[str] = field(default_factory=list)
+    plugins_dir: Optional[str] = None
+    global_plugins_dir: Optional[str] = None
+    supports_vscode_plugins: bool = False
+
+
+_VSCODE_MANIFEST_KEYS = frozenset({"activationEvents", "main", "contributes"})
+
+
+def _detect_plugin_format(manifest_path: Path) -> str:
+    """Classify a plugin bundle from its manifest, without loading its code."""
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return "generic"
+    if isinstance(manifest, dict) and _VSCODE_MANIFEST_KEYS.intersection(manifest):
+        return "vscode"
+    return "generic"
 
 
 TOOL_SPECS: dict[VibeTool, ToolSpec] = {
@@ -68,6 +85,9 @@ TOOL_SPECS: dict[VibeTool, ToolSpec] = {
         gate_prefix="K",
         env_vars=["CURSOR_IDE", "CURSOR_PROJECT"],
         dir_markers=[".cursor"],
+        plugins_dir=".cursor/plugins",
+        global_plugins_dir=".cursor/extensions",
+        supports_vscode_plugins=True,
     ),
     VibeTool.WINDSURF: ToolSpec(
         tool=VibeTool.WINDSURF,
@@ -78,6 +98,9 @@ TOOL_SPECS: dict[VibeTool, ToolSpec] = {
         gate_prefix="W",
         env_vars=["WINDSURF_IDE", "WINDSURF_WORKSPACE_ROOT", "CODEIUM_API_KEY"],
         dir_markers=[".windsurf"],
+        plugins_dir=".windsurf/plugins",
+        global_plugins_dir=".windsurf/extensions",
+        supports_vscode_plugins=True,
     ),
     VibeTool.CLAUDE_CODE: ToolSpec(
         tool=VibeTool.CLAUDE_CODE,
@@ -88,6 +111,8 @@ TOOL_SPECS: dict[VibeTool, ToolSpec] = {
         gate_prefix="C",
         env_vars=["CLAUDE_IDE", "CLAUDE_API_KEY", "CLAUDE_PROJECT_DIR"],
         dir_markers=[".claude"],
+        plugins_dir=".claude/plugins",
+        global_plugins_dir=".claude/plugins",
     ),
     VibeTool.ANTIGRAVITY: ToolSpec(
         tool=VibeTool.ANTIGRAVITY,
@@ -98,6 +123,8 @@ TOOL_SPECS: dict[VibeTool, ToolSpec] = {
         gate_prefix="AG",
         env_vars=["ANTIGRAVITY_APP_DATA", "ANTIGRAVITY_WORKSPACE_ROOT", "ANTIGRAVITY_CLI", "GEMINI_CLI"],
         dir_markers=[".gemini", ".agents"],
+        plugins_dir=".agents/plugins",
+        global_plugins_dir=".gemini/antigravity/plugins",
     ),
     VibeTool.CLINE: ToolSpec(
         tool=VibeTool.CLINE,
@@ -108,6 +135,8 @@ TOOL_SPECS: dict[VibeTool, ToolSpec] = {
         gate_prefix="CL",
         env_vars=["CLINE_ACTIVE", "CLINE_VERSION"],
         dir_markers=[".cline"],
+        plugins_dir=".cline/plugins",
+        global_plugins_dir=".cline/plugins",
     ),
     VibeTool.ROO_CODE: ToolSpec(
         tool=VibeTool.ROO_CODE,
@@ -118,6 +147,8 @@ TOOL_SPECS: dict[VibeTool, ToolSpec] = {
         gate_prefix="R",
         env_vars=["ROO_ACTIVE", "ROO_CODE_VERSION"],
         dir_markers=[".roo"],
+        plugins_dir=".roo/plugins",
+        global_plugins_dir=".roo/plugins",
     ),
     VibeTool.COPILOT: ToolSpec(
         tool=VibeTool.COPILOT,
@@ -128,6 +159,8 @@ TOOL_SPECS: dict[VibeTool, ToolSpec] = {
         gate_prefix="CP",
         env_vars=["COPILOT_AGENT", "GITHUB_COPILOT"],
         dir_markers=[".github"],
+        plugins_dir=".github/plugins",
+        global_plugins_dir=".github/plugins",
     ),
     VibeTool.AIDER: ToolSpec(
         tool=VibeTool.AIDER,
@@ -138,6 +171,8 @@ TOOL_SPECS: dict[VibeTool, ToolSpec] = {
         gate_prefix="AI",
         env_vars=["AIDER_ENV"],
         dir_markers=[".aider.conf.yml"],
+        plugins_dir=None,
+        global_plugins_dir=None,
     ),
     VibeTool.CODEX: ToolSpec(
         tool=VibeTool.CODEX,
@@ -148,6 +183,8 @@ TOOL_SPECS: dict[VibeTool, ToolSpec] = {
         gate_prefix="CX",
         env_vars=["CODEX_ENABLED", "ORIGIN_HOST", "CODEX_WORKSPACE_ROOT"],
         dir_markers=[".codex"],
+        plugins_dir=".codex/plugins",
+        global_plugins_dir=".codex/plugins",
     ),
 }
 
@@ -222,6 +259,21 @@ class VibeDetector:
             if result.detected:
                 active.append(result.tool)
         return active
+
+    def detect_runtime_tools(self) -> list[VibeTool]:
+        """Return tools with a runtime signal, not merely an adapter folder.
+
+        Adapter folders such as ``.cursor/`` or ``.claude/`` also exist in
+        framework repositories that merely ship sync payloads. Only explicit
+        environment markers and native primary configs identify a live tool.
+        """
+        runtime: list[VibeTool] = []
+        for tool, spec in TOOL_SPECS.items():
+            env_active = any(os.getenv(var) for var in spec.env_vars)
+            config_active = (self.workspace_root / spec.primary_config).exists()
+            if env_active or config_active:
+                runtime.append(tool)
+        return runtime
 
     def detect_tool(self, tool: VibeTool) -> ToolDetectionResult:
         """Inspect workspace and environment for a specific tool."""
@@ -452,6 +504,7 @@ class VibeSyncEngine:
         force: bool,
     ) -> str:
         """Write content to file or simulate action."""
+        existed = file_path.exists()
         if file_path.exists():
             existing = file_path.read_text(encoding="utf-8", errors="replace")
             if existing.strip() == content.strip():
@@ -459,16 +512,113 @@ class VibeSyncEngine:
             if dry_run:
                 return "would_update"
             if not force:
-                # Append a clear separator if preserving existing custom instructions
-                # But for our managed files, we write atomically
-                pass
+                # Never destroy workspace-specific instructions. The caller
+                # reports this as "skipped"; --force is the explicit opt-in.
+                return "skipped"
 
         if dry_run:
             return "would_create"
 
         file_path.parent.mkdir(parents=True, exist_ok=True)
         file_path.write_text(content, encoding="utf-8")
-        return "updated" if file_path.exists() else "created"
+        return "updated" if existed else "created"
+
+    def install_plugins(
+        self,
+        tools: Optional[list[VibeTool]] = None,
+        source_dir: Optional[Path | str] = None,
+        global_install: bool = False,
+        force: bool = False,
+        dry_run: bool = False,
+    ) -> dict[str, Any]:
+        """
+        Deploy framework plugins into the specified vibe coding tools.
+        Copies plugins from source_dir (default: workspace/plugins) to tool plugin directories.
+        """
+        import shutil
+
+        src = Path(source_dir or (self.workspace_root / "plugins")).resolve()
+        if not src.exists():
+            return {
+                "success": False,
+                "error": f"Source plugins directory not found: {src}",
+                "dry_run": dry_run,
+                "results": {},
+            }
+
+        plugin_dirs = [d for d in src.iterdir() if d.is_dir() and (d / "manifest.json").exists()]
+        if not plugin_dirs:
+            return {
+                "success": False,
+                "error": f"No valid plugins with manifest.json found in {src}",
+                "dry_run": dry_run,
+                "results": {},
+            }
+
+        if tools is None:
+            detected = self.detector.detect_runtime_tools()
+            tools = detected if detected else [VibeTool.CURSOR, VibeTool.WINDSURF]
+
+        user_home = Path.home()
+        results: dict[str, Any] = {}
+
+        for tool in tools:
+            spec = TOOL_SPECS[tool]
+            target_sub = spec.global_plugins_dir if global_install else spec.plugins_dir
+            if not target_sub:
+                results[tool.value] = {"status": "skipped", "reason": "No plugin directory defined for this tool"}
+                continue
+
+            compatible_plugins: list[Path] = []
+            incompatible_plugins: list[dict[str, str]] = []
+            for plugin_dir in plugin_dirs:
+                if _detect_plugin_format(plugin_dir / "manifest.json") == "vscode" and not spec.supports_vscode_plugins:
+                    incompatible_plugins.append({
+                        "plugin": plugin_dir.name,
+                        "status": "skipped",
+                        "reason": "VS Code-style extension bundle is not loaded by this runtime",
+                    })
+                else:
+                    compatible_plugins.append(plugin_dir)
+
+            if not compatible_plugins and incompatible_plugins:
+                results[tool.value] = {
+                    "status": "skipped",
+                    "reason": f"{spec.display_name} does not load VS Code-style extension bundles",
+                    "display_name": spec.display_name,
+                    "dry_run": dry_run,
+                    "plugins": incompatible_plugins,
+                }
+                continue
+
+            target_base = (user_home / target_sub) if global_install else (self.workspace_root / target_sub)
+            if not dry_run:
+                target_base.mkdir(parents=True, exist_ok=True)
+
+            installed_for_tool = []
+            for p in compatible_plugins:
+                dest = target_base / p.name
+                already_exists = dest.exists()
+                if already_exists and not force:
+                    installed_for_tool.append({"plugin": p.name, "status": "exists", "path": str(dest)})
+                    continue
+                if dry_run:
+                    status = "would_overwrite" if already_exists else "would_install"
+                    installed_for_tool.append({"plugin": p.name, "status": status, "path": str(dest)})
+                    continue
+                shutil.copytree(p, dest, dirs_exist_ok=True)
+                installed_for_tool.append({"plugin": p.name, "status": "installed", "path": str(dest)})
+            installed_for_tool.extend(incompatible_plugins)
+
+            results[tool.value] = {
+                "display_name": spec.display_name,
+                "target_directory": str(target_base),
+                "is_global": global_install,
+                "dry_run": dry_run,
+                "plugins": installed_for_tool,
+            }
+
+        return {"success": True, "source": str(src), "dry_run": dry_run, "results": results}
 
 
 def get_vibe_summary(workspace_root: str | Path | None = None) -> dict[str, Any]:

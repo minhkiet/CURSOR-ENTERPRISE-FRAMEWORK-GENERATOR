@@ -218,10 +218,13 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Multi-tool vibe coding engine (detect, sync, status for Cursor, Windsurf, Claude Code, Antigravity, etc.)",
         parents=[_common_flags()],
     )
-    vibe.add_argument("action", nargs="?", default="status", choices=["detect", "sync", "status"], help="Action to execute")
+    vibe.add_argument("action", nargs="?", default="status", choices=["detect", "sync", "status", "install-plugins", "plugins"], help="Action to execute")
     vibe.add_argument("--tool", default="all", help="Target tool (cursor, windsurf, claude-code, antigravity, cline, roo, copilot, aider, codex, or all)")
     vibe.add_argument("--dry-run", action="store_true", help="Simulate sync without writing files")
     vibe.add_argument("--force", action="store_true", help="Overwrite existing configuration files")
+    vibe.add_argument("--global", action="store_true", dest="global_install", help="Install plugins globally to user home instead of workspace")
+    vibe.add_argument("--plugins-dir", default=None, help="Custom source plugins directory")
+    vibe.add_argument("--json", action="store_true", dest="as_json", help="Output raw JSON")
     vibe.add_argument("--workspace", default=None, help="Target workspace path (default: cwd)")
 
     # redis: Redis Observability and memory management
@@ -764,6 +767,55 @@ def _vibe(args: argparse.Namespace) -> int:
             for err in report.errors:
                 print(f"  ! {err}", file=sys.stderr)
             return 1
+        return 0
+
+    if action in ("install-plugins", "plugins"):
+        engine = VibeSyncEngine(workspace)
+        tool_arg = getattr(args, "tool", "all")
+        if tool_arg == "all":
+            target_tools = None
+        else:
+            try:
+                target_tools = [VibeTool(tool_arg)]
+            except ValueError:
+                print(f"Unknown tool '{tool_arg}'. Valid choices: {[t.value for t in VibeTool]}", file=sys.stderr)
+                return 1
+
+        global_install = getattr(args, "global_install", False)
+        force = getattr(args, "force", False)
+        plugins_dir = getattr(args, "plugins_dir", None)
+        dry_run = getattr(args, "dry_run", False)
+
+        res = engine.install_plugins(
+            tools=target_tools,
+            source_dir=plugins_dir,
+            global_install=global_install,
+            force=force,
+            dry_run=dry_run,
+        )
+        as_json = getattr(args, "as_json", False)
+        if not res.get("success"):
+            if as_json:
+                print(json.dumps(res, indent=2, default=str))
+            else:
+                print(f"Error: {res.get('error')}", file=sys.stderr)
+            return 1
+        if as_json:
+            print(json.dumps(res, indent=2, default=str))
+        else:
+            mode = "DRY RUN" if dry_run else "EXECUTED"
+            print(f"Vibe Coding Plugins Installation Summary ({mode}):")
+            print(f"  Source: {res['source']}")
+            for tool_name, t_res in res["results"].items():
+                print(f"\n  [{tool_name.upper()}] - {t_res.get('display_name', tool_name)}")
+                if t_res.get("status") == "skipped":
+                    print(f"    - Skipped: {t_res.get('reason')}")
+                    continue
+                print(f"    Target: {t_res['target_directory']}")
+                for p in t_res.get("plugins", []):
+                    status = p["status"]
+                    icon = "✓" if status in ("installed", "would_install", "would_overwrite") else "·"
+                    print(f"    {icon} {p['plugin']}: {status}")
         return 0
 
     return 0

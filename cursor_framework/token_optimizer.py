@@ -40,6 +40,8 @@ from .tdam_integration import OffloadStrategy
 
 logger = logging.getLogger(__name__)
 
+BLOCK_SEPARATOR = "\n\n---\n\n"
+
 
 class TokenBudget:
     """Manages token budgets for different operations."""
@@ -128,6 +130,7 @@ class CompressionStrategy(Enum):
     STRUCTURAL = "structural"  # Compress structure, keep data
     TEMPORAL = "temporal"  # Summarize based on recency
     SEMANTIC_WITH_SUMMARY = "semantic_with_summary"  # Semantic + generate summary
+    BLOCK_AWARE = "block_aware"  # Keep whole context blocks in original order
 
 
 @dataclass
@@ -320,7 +323,25 @@ class TokenOptimizer:
             return self._temporal_compress(text, target_tokens)
         elif strategy == CompressionStrategy.SEMANTIC_WITH_SUMMARY:
             return self._semantic_with_summary(text, target_tokens)
+        elif strategy == CompressionStrategy.BLOCK_AWARE:
+            return self._block_aware_compress(text, target_tokens)
         return text
+
+    def _block_aware_compress(self, text: str, target_tokens: int) -> str:
+        """Keep whole blocks; never emit headings or code fences as fragments."""
+        blocks = [block for block in text.split(BLOCK_SEPARATOR) if block.strip()]
+        separator_tokens = self.estimate_tokens(BLOCK_SEPARATOR)
+        selected: list[str] = []
+        current_tokens = 0
+
+        for block in blocks:
+            block_tokens = self.estimate_tokens(block)
+            added_tokens = block_tokens + (separator_tokens if selected else 0)
+            if current_tokens + added_tokens <= target_tokens:
+                selected.append(block)
+                current_tokens += added_tokens
+
+        return BLOCK_SEPARATOR.join(selected)
 
     def _semantic_compress(self, text: str, target_tokens: int) -> str:
         """Semantic compression - keep meaning, remove redundancy."""

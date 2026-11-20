@@ -1,0 +1,7 @@
+{
+  "name": "enterprise-spec-kit",
+  "version": "1.0.0",
+  "description": "Spec-Driven Development (SDD) orchestrator enforcing 7-phase specification lifecycle before implementation",
+  "author": "Cursor Enterprise Framework Team",
+  "keywords": ["spec-driven-development", "sdd", "planning", "constitution", "tasks"]
+}

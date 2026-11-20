@@ -834,6 +834,19 @@ if exist "%BUILD_IDX%" (
     echo   build-index.ps1 not found, skipping index build
 )
 
+:: 9d. Install Vibe Coding Plugins
+set "INSTALL_PLUGINS=%SOURCE_DIR%plugins\install-plugins.ps1"
+if exist "%INSTALL_PLUGINS%" (
+    echo   Installing Vibe Coding plugins across tools...
+    powershell -ExecutionPolicy Bypass -File "%INSTALL_PLUGINS%" -Tool All >nul 2>&1
+    if !errorlevel! equ 0 (
+        echo   Vibe Coding plugins: OK
+        set /a BUILD_SUCCESS+=1
+    ) else (
+        echo   Vibe Coding plugins: SKIPPED ^(optional^)
+    )
+)
+
 goto :done
 
 :: ----------------------------------------------------------

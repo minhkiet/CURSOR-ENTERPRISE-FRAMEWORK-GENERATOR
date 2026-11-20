@@ -1,0 +1,57 @@
+{
+  "name": "cursor-framework-status-line",
+  "version": "1.0.0",
+  "description": "Real-time status bar monitor for Cursor Enterprise Framework",
+  "author": "Cursor Enterprise Framework",
+  "activationEvents": [
+    "onStartupFinished",
+    "onCommand:cursor-framework.status-line.refresh",
+    "onCommand:cursor-framework.status-line.menu",
+    "onCommand:cursor-framework.status-line.toggle"
+  ],
+  "main": "index.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "cursor-framework.status-line.refresh",
+        "title": "Cursor Framework: Refresh Status Bar",
+        "category": "Cursor Framework"
+      },
+      {
+        "command": "cursor-framework.status-line.menu",
+        "title": "Cursor Framework: Open Status Menu",
+        "category": "Cursor Framework"
+      },
+      {
+        "command": "cursor-framework.status-line.toggle",
+        "title": "Cursor Framework: Toggle Status Bar Item",
+        "category": "Cursor Framework"
+      }
+    ],
+    "configuration": {
+      "title": "Cursor Framework Status Line",
+      "properties": {
+        "cursorFramework.statusLine.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to display the framework status bar item."
+        },
+        "cursorFramework.statusLine.refreshInterval": {
+          "type": "number",
+          "default": 30000,
+          "description": "Auto-refresh interval in milliseconds (default 30s)."
+        },
+        "cursorFramework.statusLine.showTokens": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show memory token count in the status bar."
+        },
+        "cursorFramework.statusLine.showSkills": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show active skills count in the status bar."
+        }
+      }
+    }
+  }
+}

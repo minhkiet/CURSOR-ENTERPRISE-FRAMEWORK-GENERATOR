@@ -163,6 +163,31 @@ python -m cursor_framework vibe sync --tool claude-code --force
 python -m cursor_framework vibe sync --tool windsurf --force
 ```
 
+Existing configuration files are never overwritten by `vibe sync` unless
+`--force` is supplied. Without force, the report marks them as `skipped`;
+with `--dry-run`, it reports `would_create` or `would_update` and writes
+nothing. Use `--json` with `vibe install-plugins` for machine-readable output;
+failures still return exit code `1`.
+
+### Plugin Installation (safe by default)
+
+```bash
+# Preview only: no directories are created and nothing is copied
+python -m cursor_framework vibe install-plugins --dry-run
+
+# JSON report for CI/automation
+python -m cursor_framework vibe install-plugins --json
+
+# Overwrite plugin directories that already exist
+python -m cursor_framework vibe install-plugins --force
+```
+
+The bundled plugins use the VS Code extension format (`main`,
+`activationEvents`, `contributes`). They are installed only for editor runtimes
+with an extension host (Cursor, Windsurf). Agent runtimes such as Claude Code,
+Codex, Cline, and Roo Code are skipped with an explicit reason instead of
+receiving bundles they cannot load.
+
 ---
 
 ## Redis Observability & Distributed Memory

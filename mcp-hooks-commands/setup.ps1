@@ -1,4 +1,4 @@
-# Quick Setup Script for All Utilities
+﻿# Quick Setup Script for All Utilities
 # Installs MCP servers, plugins, hooks, and commands
 
 param(
@@ -8,7 +8,8 @@ param(
     [switch]$Hooks,
     [switch]$Commands,
     [switch]$Scripts,
-    [switch]$Uninstall
+    [switch]$Uninstall,
+    [string]$Tool = 'All'
 )
 
 $ErrorActionPreference = "Stop"
@@ -87,33 +88,27 @@ if ($All -or $Mcp) {
 # Plugins Setup
 # ============================================================================
 if ($All -or $Plugins) {
-    Write-Header "Setting up Cursor Plugins"
+    Write-Header "Setting up Vibe Coding Plugins for: $Tool"
     
-    $pluginsSource = Join-Path $SETUP_DIR "plugins"
-    $cursorPlugins = if ($env:APPDATA) { Join-Path $env:APPDATA ".cursor\extensions" } else { "$env:USERPROFILE\.cursor\extensions" }
-    
-    if ($Uninstall) {
-        $pluginName = "cursor-framework-quick-actions"
-        $pluginPath = Join-Path $cursorPlugins $pluginName
-        if (Test-Path $pluginPath) {
-            Remove-Item $pluginPath -Recurse -Force
-            Write-Success "Removed plugin: $pluginName"
+    $installPluginsScript = Join-Path $ProjectRoot "plugins\install-plugins.ps1"
+    if (Test-Path $installPluginsScript) {
+        if ($Uninstall) {
+            Write-Warning "Uninstalling plugins..."
+            # Clean up target directories
+            $cursorPlugins = if ($env:APPDATA) { Join-Path $env:APPDATA ".cursor\extensions" } else { "$env:USERPROFILE\.cursor\extensions" }
+            $pluginDirs = @("quick-actions", "status-line", "automation", "context-monitor", "spec-kit", "hackingtool")
+            foreach ($p in $pluginDirs) {
+                $pPath = Join-Path $cursorPlugins "cursor-framework-$p"
+                if (Test-Path $pPath) {
+                    Remove-Item $pPath -Recurse -Force
+                    Write-Success "Removed: $pPath"
+                }
+            }
+        } else {
+            & $installPluginsScript -Tool $Tool -Force
         }
     } else {
-        if (Test-Path $pluginsSource) {
-            # Create plugin directory
-            if (-not (Test-Path $cursorPlugins)) {
-                New-Item -ItemType Directory -Path $cursorPlugins -Force | Out-Null
-            }
-            
-            $pluginDest = Join-Path $cursorPlugins "cursor-framework-quick-actions"
-            Copy-Item $pluginsSource $pluginDest -Recurse -Force
-            Write-Success "Plugin installed to: $pluginDest"
-            
-            Write-Host ""
-            Write-Host "Plugin 'cursor-framework-quick-actions' installed!" -ForegroundColor Green
-            Write-Host "Restart Cursor to activate the plugin." -ForegroundColor Yellow
-        }
+        Write-Error "Plugins installer script not found at: $installPluginsScript"
     }
 }
 

@@ -1,0 +1,64 @@
+{
+  "name": "cursor-framework-automation",
+  "version": "1.0.0",
+  "description": "Automated workflows, background auto-indexing, git hooks, and TDD quality gates",
+  "author": "Cursor Enterprise Framework",
+  "activationEvents": [
+    "onStartupFinished",
+    "onCommand:cursor-framework.automation.installHooks",
+    "onCommand:cursor-framework.automation.verifyGates",
+    "onCommand:cursor-framework.automation.runTdd",
+    "onCommand:cursor-framework.automation.toggleAutoWarm",
+    "onCommand:cursor-framework.automation.syncAllAgents"
+  ],
+  "main": "index.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "cursor-framework.automation.installHooks",
+        "title": "Cursor Framework: Install Git Quality Hooks",
+        "category": "Cursor Framework"
+      },
+      {
+        "command": "cursor-framework.automation.verifyGates",
+        "title": "Cursor Framework: Verify Quality Gates",
+        "category": "Cursor Framework"
+      },
+      {
+        "command": "cursor-framework.automation.runTdd",
+        "title": "Cursor Framework: Run TDD Test Suite",
+        "category": "Cursor Framework"
+      },
+      {
+        "command": "cursor-framework.automation.toggleAutoWarm",
+        "title": "Cursor Framework: Toggle Auto-Warm on Save",
+        "category": "Cursor Framework"
+      },
+      {
+        "command": "cursor-framework.automation.syncAllAgents",
+        "title": "Cursor Framework: Sync Cross-Agent Ecosystems",
+        "category": "Cursor Framework"
+      }
+    ],
+    "configuration": {
+      "title": "Cursor Framework Automation",
+      "properties": {
+        "cursorFramework.automation.autoWarmOnSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically warm and re-index cache when skill or rule files are saved."
+        },
+        "cursorFramework.automation.debounceMs": {
+          "type": "number",
+          "default": 1500,
+          "description": "Debounce delay in ms before triggering auto-warm on file changes."
+        },
+        "cursorFramework.automation.enforceTdd": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enforce automated test passing before allowing commits."
+        }
+      }
+    }
+  }
+}

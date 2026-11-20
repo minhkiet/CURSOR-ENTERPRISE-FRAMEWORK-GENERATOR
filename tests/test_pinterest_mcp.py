@@ -18,7 +18,11 @@ from mcp.pinterest_server import (
     get_pin_details,
     extract_from_url,
     download_images,
+    search_videos,
+    get_pin_video,
+    download_video,
     ALLOWED_IMAGE_HOSTS,
+    ALLOWED_VIDEO_HOSTS,
 )
 
 
@@ -58,6 +62,43 @@ class TestPinterestClient(unittest.TestCase):
             with self.assertRaises(ValueError) as ctx:
                 self.client.download_image("https://malicious-site.com/image.jpg", out_path)
             self.assertIn("Untrusted image domain", str(ctx.exception))
+
+    def test_download_video_domain_guard(self):
+        # Untrusted domain must raise ValueError
+        with tempfile.TemporaryDirectory() as tmpdir:
+            out_path = Path(tmpdir) / "hack.mp4"
+            with self.assertRaises(ValueError) as ctx:
+                self.client.download_video("https://malicious-site.com/video.mp4", out_path)
+            self.assertIn("Untrusted video domain", str(ctx.exception))
+
+    def test_extract_video_info_formats(self):
+        mock_item = {
+            "videos": {
+                "video_list": {
+                    "V_EXP3": {
+                        "url": "https://v1.pinimg.com/videos/mc/expMp4/abc_t1.mp4",
+                        "width": 720,
+                        "height": 1280,
+                        "duration": 15000,
+                        "thumbnail": "https://i.pinimg.com/thumb.jpg",
+                    },
+                    "V_HLSV4": {
+                        "url": "https://v1.pinimg.com/videos/mc/hls/abc.m3u8",
+                        "width": 720,
+                        "height": 1280,
+                        "duration": 15000,
+                        "thumbnail": "https://i.pinimg.com/thumb.jpg",
+                    }
+                }
+            }
+        }
+        vinfo = self.client._extract_video_info(mock_item)
+        self.assertIsNotNone(vinfo)
+        self.assertTrue(vinfo["has_video"])
+        self.assertEqual(vinfo["duration_seconds"], 15.0)
+        self.assertIn("V_EXP3", vinfo["formats"])
+        self.assertTrue(vinfo["best_video_url"].endswith(".mp4"))
+
 
 
 class TestPinterestMcpTools(unittest.TestCase):
@@ -108,6 +149,54 @@ class TestPinterestMcpTools(unittest.TestCase):
             saved_file = Path(res["downloaded"][0]["path"])
             self.assertTrue(saved_file.exists())
             self.assertGreater(saved_file.stat().st_size, 1000)
+
+    def test_search_videos_tool(self):
+        res_str = search_videos(query="motion graphic", limit=2)
+        res = json.loads(res_str)
+        self.assertEqual(res["status"], "success")
+        self.assertEqual(res["query"], "motion graphic")
+        self.assertGreaterEqual(len(res["videos"]), 1)
+        first_video = res["videos"][0]
+        self.assertIn("video", first_video)
+        self.assertTrue(first_video["video"]["has_video"])
+        self.assertTrue(first_video["video"]["best_video_url"].startswith("http"))
+
+    def test_get_pin_video_non_video_pin(self):
+        # Existing test pin is an image pin
+        res_str = get_pin_video("424605071146368277")
+        res = json.loads(res_str)
+        self.assertEqual(res["status"], "not_found")
+        self.assertIn("does not contain video streams", res["message"])
+
+
+    def test_download_video_guard_tool(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            res_str = download_video("https://untrusted-domain.com/vid.mp4", output_folder=tmpdir)
+            res = json.loads(res_str)
+            self.assertEqual(res["status"], "error")
+            self.assertIn("Untrusted video domain", res["message"])
+
+    def test_download_video_mocked(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            out_file = os.path.join(tmpdir, "video.mp4")
+            fake_bytes = b"\x00\x00\x00 ftypiso6" + b"A" * 1024
+            mock_resp = MagicMock()
+            mock_resp.headers = {"Content-Length": str(len(fake_bytes))}
+            mock_resp.read.side_effect = [fake_bytes, b""]
+            mock_resp.__enter__.return_value = mock_resp
+
+            with patch("urllib.request.urlopen", return_value=mock_resp):
+                res_str = download_video(
+                    "https://v1.pinimg.com/videos/mc/test.mp4",
+                    output_folder=tmpdir,
+                    filename="video.mp4"
+                )
+                res = json.loads(res_str)
+                self.assertEqual(res["status"], "success")
+                self.assertEqual(res["downloaded"]["size_bytes"], len(fake_bytes))
+                self.assertTrue(os.path.exists(out_file))
+                self.assertEqual(os.path.getsize(out_file), len(fake_bytes))
+
 
 
 if __name__ == "__main__":

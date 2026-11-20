@@ -1,0 +1,69 @@
+{
+  "name": "cursor-enterprise-framework-plugins",
+  "version": "1.2.1",
+  "description": "Official plugin collection for Cursor Enterprise Framework",
+  "author": "Cursor Enterprise Framework Team",
+  "homepage": "https://github.com/cursor-enterprise/framework",
+  "plugins": [
+    {
+      "id": "cursor-framework-quick-actions",
+      "name": "Quick Actions",
+      "path": "quick-actions",
+      "entry": "quick-actions/index.js",
+      "manifest": "quick-actions/manifest.json",
+      "description": "Quick access to framework CLI commands: warm cache, show stats, scan, index, clear cache, and code graph.",
+      "category": "Productivity",
+      "enabled": true
+    },
+    {
+      "id": "cursor-framework-status-line",
+      "name": "Status Line",
+      "path": "status-line",
+      "entry": "status-line/index.js",
+      "manifest": "status-line/manifest.json",
+      "description": "Real-time status bar monitor displaying cache warmth, active skills, rules count, and token usage.",
+      "category": "Monitoring",
+      "enabled": true
+    },
+    {
+      "id": "cursor-framework-automation",
+      "name": "Automation & Hooks",
+      "path": "automation",
+      "entry": "automation/index.js",
+      "manifest": "automation/manifest.json",
+      "description": "Automated background indexing on file save, git hooks installer, TDD quality gate validator, and sync triggers.",
+      "category": "Automation",
+      "enabled": true
+    },
+    {
+      "id": "cursor-framework-context-monitor",
+      "name": "Context Monitor",
+      "path": "context-monitor",
+      "entry": "context-monitor/index.js",
+      "manifest": "context-monitor/manifest.json",
+      "description": "Token budget analyzer, session memory inspector, and context routing visualization.",
+      "category": "Performance",
+      "enabled": true
+    },
+    {
+      "id": "cursor-framework-spec-kit",
+      "name": "Spec Kit (SDD)",
+      "path": "spec-kit",
+      "entry": "spec-kit/index.js",
+      "manifest": "spec-kit/manifest.json",
+      "description": "Spec-Driven Development assistant for authoring specs, blueprints, atomic tasks, and running TDD checks.",
+      "category": "Development",
+      "enabled": true
+    },
+    {
+      "id": "cursor-framework-hackingtool",
+      "name": "Security & Pentest Suite",
+      "path": "hackingtool",
+      "entry": "hackingtool/index.js",
+      "manifest": "hackingtool/manifest.json",
+      "description": "183+ pentesting and OSINT tools integration for automated security recon and vulnerability audit.",
+      "category": "Security",
+      "enabled": true
+    }
+  ]
+}

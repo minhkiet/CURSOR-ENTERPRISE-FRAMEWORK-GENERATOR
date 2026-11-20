@@ -1,0 +1,7 @@
+{
+  "name": "security-compliance",
+  "version": "1.0.0",
+  "description": "Security auditing, secret prevention, OWASP compliance, and payment gateway safety guard",
+  "author": "Cursor Enterprise Framework Team",
+  "keywords": ["security", "owasp", "pentest", "compliance", "payment-security"]
+}

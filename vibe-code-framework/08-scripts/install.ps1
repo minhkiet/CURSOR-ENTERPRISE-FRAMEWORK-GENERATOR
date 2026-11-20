@@ -1,4 +1,4 @@
-# Install Script for Windows
+﻿# Install Script for Windows
 
 <#
 .SYNOPSIS
@@ -30,7 +30,7 @@
 
 param(
     [Parameter(Mandatory=$false)]
-    [ValidateSet('Cursor', 'ClaudeCode', 'Codex', 'Copilot', 'Windsurf', 'Antigravity', 'All')]
+    [ValidateSet('Cursor', 'ClaudeCode', 'Codex', 'Copilot', 'Windsurf', 'Antigravity', 'Cline', 'RooCode', 'All')]
     [string]$Tool = 'All',
     
     [Parameter(Mandatory=$false)]
@@ -43,7 +43,10 @@ param(
     [string]$SourcePath = (Split-Path $PSScriptRoot -Parent),
 
     [Parameter(Mandatory=$false)]
-    [string]$ManifestPath = ''
+    [string]$ManifestPath = '',
+
+    [Parameter(Mandatory=$false)]
+    [switch]$IncludePlugins = $true
 )
 
 if ([string]::IsNullOrWhiteSpace($ManifestPath)) {
@@ -152,6 +155,20 @@ $InstallConfigs = @{
         )
         Files = @("GEMINI.md")
         Description = "Google Antigravity"
+    }
+    Cline = @{
+        Directories = @(
+            @{ Source = "07-adapters\cursor\rules"; Target = ".cline\rules" }
+        )
+        Files = @("AGENTS.md")
+        Description = "Cline"
+    }
+    RooCode = @{
+        Directories = @(
+            @{ Source = "07-adapters\cursor\rules"; Target = ".roo\rules" }
+        )
+        Files = @("AGENTS.md")
+        Description = "Roo Code"
     }
 }
 
@@ -262,6 +279,14 @@ if ($Tool -eq "All") {
     }
 } else {
     Install-Tool -ToolName $Tool
+}
+
+if ($IncludePlugins) {
+    $pluginsScript = Join-Path (Split-Path $SourcePath -Parent) "plugins\install-plugins.ps1"
+    if (Test-Path $pluginsScript) {
+        Write-Info "Installing Vibe Code plugins into target..."
+        & $pluginsScript -Tool $Tool -TargetPath $TargetPath -Force
+    }
 }
 
 Write-Host ""

@@ -26,13 +26,14 @@ Usage:
 from __future__ import annotations
 
 import logging
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional
 
 from .indexer import Indexer
 from .skill_discovery import SkillDiscovery, get_shared_registry
-from .token_optimizer import CompressionStrategy, TokenOptimizer
+from .token_optimizer import BLOCK_SEPARATOR, CompressionStrategy, TokenOptimizer
 
 if TYPE_CHECKING:
     from .tdam_integration import TDAMIntegration, MemoryLayer, MemoryItem
@@ -83,6 +84,14 @@ class ContextBuilder:
             self._index = idx
         return self._index
 
+    @staticmethod
+    def _included_skills(text: str, candidates: list[str]) -> list[str]:
+        """Return candidate skills whose full block survived compression."""
+        if not text:
+            return []
+        found = {name.strip() for name in re.findall(r"^## Skill: (.+)$", text, re.MULTILINE)}
+        return [name for name in candidates if name in found]
+
     def build(self, request: str, max_skills: int = 5) -> ContextResult:
         """
         Detect skills, load them, compress to fit budget.
@@ -119,7 +128,7 @@ class ContextBuilder:
             blocks.append(f"## Skill: {name}\n\n{content}")
             skills_used.append(name)
 
-        joined = "\n\n---\n\n".join(blocks)
+        joined = BLOCK_SEPARATOR.join(blocks)
         raw_tokens = self.optimizer.estimate_tokens(joined)
 
         available = self.optimizer.budget.available_for_context
@@ -131,27 +140,25 @@ class ContextBuilder:
             budget = int(self.optimizer.max_tokens * self.optimizer.compression_threshold)
         else:
             budget = int(available * self.optimizer.compression_threshold)
-        if raw_tokens <= budget:
-            return ContextResult(
-                text=joined,
-                tokens=raw_tokens,
-                skill_count=len(skills_used),
-                truncated=False,
-                skills_used=skills_used,
-                skipped=skipped,
+        truncated = raw_tokens > budget
+        if truncated:
+            text = self.optimizer.compress(
+                joined,
+                target_tokens=budget,
+                strategy=CompressionStrategy.BLOCK_AWARE,
             )
+            included = self._included_skills(text, skills_used)
+            skipped.extend(name for name in skills_used if name not in included)
+        else:
+            text = joined
+            included = list(skills_used)
 
-        compressed = self.optimizer.compress(
-            joined,
-            target_tokens=budget,
-            strategy=CompressionStrategy.SEMANTIC_WITH_SUMMARY,
-        )
         return ContextResult(
-            text=compressed,
-            tokens=self.optimizer.estimate_tokens(compressed),
-            skill_count=len(skills_used),
-            truncated=True,
-            skills_used=skills_used,
+            text=text,
+            tokens=self.optimizer.estimate_tokens(text),
+            skill_count=len(included),
+            truncated=truncated,
+            skills_used=included,
             skipped=skipped,
         )
 
@@ -245,7 +252,7 @@ class ContextBuilder:
                     blocks.append(f"## Memory: {item.content[:150]}...")
 
         # 4. Join and compress
-        joined = "\n\n---\n\n".join(blocks)
+        joined = BLOCK_SEPARATOR.join(blocks)
         raw_tokens = self.optimizer.estimate_tokens(joined)
 
         available = self.optimizer.budget.available_for_context
@@ -256,15 +263,26 @@ class ContextBuilder:
 
         truncated = raw_tokens > budget
         if truncated:
-            joined = self.optimizer.compress(
+            text = self.optimizer.compress(
                 joined,
                 target_tokens=budget,
-                strategy=CompressionStrategy.SEMANTIC_WITH_SUMMARY,
+                strategy=CompressionStrategy.BLOCK_AWARE,
             )
+            included = self._included_skills(text, skills_used)
+            skipped.extend(name for name in skills_used if name not in included)
+            skills_used = included
+            memories = [
+                item for item in memories
+                if f"## Memory: {item['content'][:150]}" in text
+            ]
+            if persona and "## User Persona" not in text:
+                persona = None
+        else:
+            text = joined
 
         return ContextResult(
-            text=joined,
-            tokens=self.optimizer.estimate_tokens(joined),
+            text=text,
+            tokens=self.optimizer.estimate_tokens(text),
             skill_count=len(skills_used),
             truncated=truncated,
             skills_used=skills_used,
