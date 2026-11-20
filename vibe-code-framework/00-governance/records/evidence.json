@@ -97,7 +97,7 @@
       "command": "npm run build",
       "status": "PASS",
       "exitCode": 0,
-      "result": "cursor_framework_web production build completed with vue-tsc and Vite; 107 modules transformed"
+      "result": "vibe_framework_web production build completed with vue-tsc and Vite; 107 modules transformed"
     },
     {
       "evidenceId": "EVD-BUILD-WPF-001",

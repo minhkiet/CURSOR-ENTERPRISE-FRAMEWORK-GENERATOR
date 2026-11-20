@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Latest Release](https://img.shields.io/badge/release-v1.3.0-blue)](https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/releases)
 [![Vibe Code](https://img.shields.io/badge/Vibe_Code-Universal_Support-10b981)](vibe-code-framework/)
-[![Templates](https://img.shields.io/badge/Templates-22_Production_Ready-f59e0b)](cursor_framework_web/public/templates/)
+[![Templates](https://img.shields.io/badge/Templates-22_Production_Ready-f59e0b)](vibe_framework_web/public/templates/)
 [![Themes](https://img.shields.io/badge/Themes-6_Aesthetics-6366f1)](#themes--uiux-system)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
 
@@ -32,15 +32,15 @@ Instead of starting every coding session from zero and falling into generic "AI 
 |---|--:|---|
 | **Rules** (`.mdc`) | 43 rule files | `.cursor/rules/` |
 | **Skills** | 50 specialized skills | `.cursor/skills/` & `.agents/skills/` |
-| **Templates** | 22 production-ready web apps | `cursor_framework_web/public/templates/` |
+| **Templates** | 22 production-ready web apps | `vibe_framework_web/public/templates/` |
 | **Vibe Code Tools** | 10+ popular IDEs & CLIs supported | `vibe-code-framework/07-adapters/` |
-| **Themes** | 6 custom visual themes | `cursor_framework_web/src/styles/main.css` |
+| **Themes** | 6 custom visual themes | `vibe_framework_web/src/styles/main.css` |
 | **Agent Personas** | 18 specialized roles | `.cursor/AGENTS.md` |
 | **ECC Integration** | 68 agents, 292 skills, 94 commands | [ECC v2.2.2](https://github.com/affaan-m/ECC) |
 | **REA Integration** | Universal reverse engineering & decompilation | [morluto/rea v6.4.0](https://github.com/morluto/rea) |
 | **VBS Security Scanner** | 21 cross-language vulnerability rules + SCA | `.cursor/skills/sec_reverse-engineer-anything/` |
 | **Python Library** | 14 modules + 6 utility suites | `cursor_framework/` |
-| **Web Dashboard & CMS** | Vue 3 + Vite 6 + TypeScript + CMS Auth Gate | `cursor_framework_web/` |
+| **Web Dashboard & CMS** | Vue 3 + Vite 6 + TypeScript + CMS Auth Gate | `vibe_framework_web/` |
 | **Windows GUI Installer** | `cursor-setup.exe` (~162 MB), `cursor-setup.zip` (~22 MB) | `dist/` |
 
 ---
@@ -181,7 +181,7 @@ Khi mở Composer (`Ctrl+I`) hoặc Chat (`Ctrl+L`) trong Cursor / Windsurf / Cl
 
 ## 22 Production-Ready Templates Catalog
 
-Toàn bộ **22 templates** nằm tại thư mục [`cursor_framework_web/public/templates/`](file:///d:/PROJECTS/CURSORS/CURSOR%20ENTERPRISE%20FRAMEWORK%20GENERATOR/cursor_framework_web/public/templates/). Tất cả đều là **zero-dependency static code** (HTML5 + CSS3 + Vanilla JS), mở lên là chạy ngay trong trình duyệt hoặc iframe, không phụ thuộc server nặng nề:
+Toàn bộ **22 templates** nằm tại thư mục [`vibe_framework_web/public/templates/`](file:///d:/PROJECTS/CURSORS/CURSOR%20ENTERPRISE%20FRAMEWORK%20GENERATOR/vibe_framework_web/public/templates/). Tất cả đều là **zero-dependency static code** (HTML5 + CSS3 + Vanilla JS), mở lên là chạy ngay trong trình duyệt hoặc iframe, không phụ thuộc server nặng nề:
 
 | STT | Slug / Thư mục | Tên Mẫu Template | Ngành Nghề | Tính Năng Nổi Bật Thực Tế | Phong Cách Giao Diện |
 |---|---|---|---|---|---|
@@ -263,7 +263,7 @@ Sử dụng công cụ /reverse-engineer-anything để kiểm tra file nhị ph
 
 ```bash
 # Di chuyển vào thư mục web dashboard
-cd cursor_framework_web
+cd vibe_framework_web
 
 # Cài đặt thư viện Node
 npm install

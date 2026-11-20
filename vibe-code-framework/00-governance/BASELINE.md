@@ -9,7 +9,7 @@ The inspected scopes are the four paths declared in the master requirements:
 |---|---|---|
 | `SCOPE-RESOURCE-HUB` | `vibe-code-framework/` | Shared canonical source |
 | `SCOPE-CORE` | `cursor_framework/` | Core project |
-| `SCOPE-WEB` | `cursor_framework_web/` | Web project |
+| `SCOPE-WEB` | `vibe_framework_web/` | Web project |
 | `SCOPE-SETUP` | `vibe-setup-gui-wpf/` | Setup project |
 | Cursor boundary | `.cursor/` | Adapter/project-local boundary; migration per resource is pending |
 
@@ -57,7 +57,7 @@ the entire ecosystem was accepted.
 | `EVD-VERIFY-001` | `HUB-001`, `REF-001` | `vibe-code-framework/08-scripts/validate.ps1` | `PASS`, exit code `0`, framework valid |
 | `EVD-VERIFY-002` | `SOT-005`, `SOT-009` | `vibe-code-framework/08-scripts/inventory.ps1` | `PASS`, 1,211 `.cursor` files classified; 910 remain `UNKNOWN_RESOURCE` |
 | `EVD-VERIFY-003` | `ADAPTER-001`, `SOT-006` | Sync Cursor rules to an isolated temporary target | `PASS`, 5 `.mdc` rules created; existing targets are protected by default |
-| `EVD-VERIFY-004` | `BUILD-001` | `npm run build` in `cursor_framework_web/` | `PASS`, Vite production build exit code `0` |
+| `EVD-VERIFY-004` | `BUILD-001` | `npm run build` in `vibe_framework_web/` | `PASS`, Vite production build exit code `0` |
 | `EVD-VERIFY-005` | `BUILD-001` | `dotnet build CursorSetup.sln --no-restore -v:minimal` | `PASS`, 0 warnings and 0 errors after solution reference correction |
 | `EVD-VERIFY-006` | `TEST-001` | Bundled Python 3.12.14 venv: `python -m pytest -q` | `PASS`, 136 passed and 5 subtests passed; the system `python` command remains a Windows Store shim |
 | `EVD-VERIFY-007` | `APPROVAL-001`, `SOT-008`, `SAFE-001` | `preflight.ps1 -PythonPath <approved interpreter>` | `BLOCKED`, runtime passes; 910 unknown resources, conflict approval, real approval, and rollback verification remain outstanding |
@@ -70,7 +70,7 @@ the entire ecosystem was accepted.
 | `EVD-ADAPTER-SMOKE-002` | `ADAPTER-001` | Cursor skills sync to an isolated temporary target | `PASS`, 10 skills synced including `frontend-design`; host `.cursor` untouched |
 | `EVD-ROLLBACK-TARGET-001` | `COND-ROLLBACK-001` | Snapshot, intentional drift detection, target-only restore, and SHA-256 verification | `PASS`, whole `.cursor` target rejected; isolated target restored and verified |
 | `EVD-ADAPTER-SMOKE-003` | `ADAPTER-001` | Cursor skills sync to an isolated temporary target after external import | `PASS`, 10 skills synced including `frontend-design`; exit code `0` |
-| `EVD-BUILD-WEB-001` | `BUILD-001` | `npm run build` in `cursor_framework_web/` | `PASS`, Vue typecheck and Vite production build completed |
+| `EVD-BUILD-WEB-001` | `BUILD-001` | `npm run build` in `vibe_framework_web/` | `PASS`, Vue typecheck and Vite production build completed |
 | `EVD-BUILD-WPF-001` | `BUILD-001` | Build both WPF solutions with `dotnet build --no-restore` | `PASS`, both builds completed with 0 warnings and 0 errors |
 | `EVD-OPERATIONAL-PREFLIGHT-001` | `RUN-001` | `preflight.ps1 -OperationalOnly` | `PASS`, safe operational path is ready; `migrationAllowed=false`, whole-ecosystem verdict remains `BLOCKED` |
 | `EVD-ADAPTER-SMOKE-004` | `ADAPTER-001` | Explicit `TargetPath` sync/install smoke and omitted-target safety checks | `PASS`, explicit targets work; omitted target is rejected with exit code `1` |

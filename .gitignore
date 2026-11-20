@@ -54,10 +54,10 @@ cursor_framework/utils/__pycache__/
 **/__pycache__/
 *.pyc
 *.egg-info/
-cursor_framework_web/dist/
-cursor_framework_web/node_modules/
-cursor_framework_web/scripts/
-cursor_framework_web/*.tsbuildinfo
+vibe_framework_web/dist/
+vibe_framework_web/node_modules/
+vibe_framework_web/scripts/
+vibe_framework_web/*.tsbuildinfo
 *.tsbuildinfo
 
 # --- .NET build artifacts ---
