@@ -235,7 +235,7 @@ const template = computed(() => templates.find((t) => t.slug === props.slug))
       </svg>
 
       <!-- ═══════════════════════════════════════════════════════════════════ -->
-      <!-- 0C. FRONTEND-TASTE: ANTI-SLOP CRAFT & 57 GATES                     -->
+      <!-- 0C. FRONTEND-TASTE: ANTI-SLOP CRAFT & HALLMARK V2 FLOOR/REFLEX/FINISH -->
       <!-- ═══════════════════════════════════════════════════════════════════ -->
       <svg
         v-else-if="slug === 'frontend-taste'"
@@ -271,7 +271,7 @@ const template = computed(() => templates.find((t) => t.slug === props.slug))
         <rect x="0" y="22" width="400" height="24" fill="#0d0a17" opacity="0.9" />
         <text x="20" y="37" fill="#ffffff" font-size="9" font-weight="700">TASTE FRONTEND</text>
         <text x="130" y="36.5" fill="#a1a1aa" font-size="7">3 Dials</text>
-        <text x="175" y="36.5" fill="#a1a1aa" font-size="7">57 Slop Gates</text>
+        <text x="175" y="36.5" fill="#a1a1aa" font-size="7">Hallmark v2 Gates</text>
         <text x="245" y="36.5" fill="#a1a1aa" font-size="7">Geist Craft</text>
         <rect x="315" y="27" width="70" height="14" rx="7" fill="#8b5cf6" />
         <text x="323" y="37" fill="#ffffff" font-size="6.5" font-weight="700">NO AI SLOP</text>
@@ -280,7 +280,7 @@ const template = computed(() => templates.find((t) => t.slug === props.slug))
         <g class="float-slow">
           <rect x="20" y="56" width="120" height="14" rx="7" fill="#271447" stroke="#8b5cf6" stroke-width="0.8" />
           <circle cx="28" cy="63" r="2.5" fill="#a855f7" class="pulse-dot" />
-          <text x="36" y="66" fill="#e9d5ff" font-size="6.5" font-weight="700">57 SLOP-TEST GATES</text>
+          <text x="36" y="66" fill="#e9d5ff" font-size="6.5" font-weight="700">HALLMARK V2.0 GATES</text>
 
           <text x="20" y="90" fill="#ffffff" font-size="15" font-weight="800">Giao Diện Đỉnh Cao.</text>
           <text x="20" y="108" fill="#c084fc" font-size="15" font-weight="800">Không Vết AI Slop.</text>
@@ -290,7 +290,7 @@ const template = computed(() => templates.find((t) => t.slug === props.slug))
           <rect x="20" y="134" width="85" height="20" rx="5" fill="#8b5cf6" />
           <text x="30" y="147" fill="#ffffff" font-size="7.5" font-weight="700">Khám Phá Gu Thiết Kế</text>
           <rect x="112" y="134" width="65" height="20" rx="5" fill="#181329" stroke="#3e256b" stroke-width="0.8" />
-          <text x="122" y="147" fill="#d8b4fe" font-size="7.5">Audit 57 Gates</text>
+          <text x="122" y="147" fill="#d8b4fe" font-size="7.5">Audit Hallmark v2</text>
         </g>
 
         <!-- 3 Dials Visual Widget (Right) -->
@@ -320,7 +320,7 @@ const template = computed(() => templates.find((t) => t.slug === props.slug))
         <text x="240" y="180" fill="#f3e8ff" font-size="7" font-weight="700">Bento Grid Lệch Trục</text>
         <text x="240" y="192" fill="#a78bfa" font-size="6">Không thẻ 3 cột generic · Khoảng trắng chuẩn</text>
         <rect x="240" y="198" width="55" height="10" rx="3" fill="#8b5cf6" />
-        <text x="246" y="206" fill="#ffffff" font-size="5.5" font-weight="700">PASSED: 57/57</text>
+        <text x="246" y="206" fill="#ffffff" font-size="5.5" font-weight="700">FLOOR 0 FAIL</text>
 
         <!-- Floating Badge -->
         <g class="float-fast">

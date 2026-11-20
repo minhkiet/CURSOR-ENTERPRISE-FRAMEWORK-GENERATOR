@@ -5,7 +5,7 @@ description: "WeKnora Knowledge Base Skill - RAG implementation, document Q&A, F
 
 # Alias: weknora-kb
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `ai_weknora-kb`.
 
 For backward compatibility, this alias redirects to the new skill.
 

@@ -63,11 +63,6 @@ Copy any desired plugin directory (or all) to your Cursor extensions/plugins dir
 - **macOS**: `~/.cursor/plugins/`
 - **Linux**: `~/.cursor/plugins/`
 
-Or use the setup script:
-```powershell
-.\mcp-hooks-commands\setup.ps1 -Plugins
-```
-
 ### Python CLI (dry-run first)
 
 ```bash

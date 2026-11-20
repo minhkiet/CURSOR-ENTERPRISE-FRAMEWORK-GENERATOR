@@ -5,7 +5,7 @@ description: "Plan and review MySQL/InnoDB schema, indexing, query tuning, trans
 
 # Alias: mysql
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `db_mysql`.
 
 For backward compatibility, this alias redirects to the new skill.
 

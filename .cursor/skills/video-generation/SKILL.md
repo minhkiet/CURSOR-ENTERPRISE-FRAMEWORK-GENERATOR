@@ -5,7 +5,7 @@ description: "AI Video Generation Skill - Auto-generate short videos (9:16) from
 
 # Alias: video-generation
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `ai_video-generation`.
 
 For backward compatibility, this alias redirects to the new skill.
 

@@ -7471,10 +7471,10 @@
         "path": "skills\\hallmark",
         "category": "skills",
         "kind": "directory",
-        "description": "Design taste skill for anti-slop UI. Based on Nutlope/hallmark (9.3k stars), detects AI slop aesthetics and builds distinctive, professional interfaces. Use when building landing pages, portfolios, ma",
+        "description": "Backward-compatible alias for Hallmark v2.0.0 anti-slop design skill. Redirects to ui_hallmark.",
         "version": "",
         "tags": [],
-        "size_bytes": 795
+        "size_bytes": 576
       },
       {
         "name": "image-enhancer",
@@ -8096,10 +8096,10 @@
         "path": "skills\\ui_hallmark",
         "category": "skills",
         "kind": "directory",
-        "description": "Design taste skill for anti-slop UI. Based on Nutlope/hallmark (9.3k",
-        "version": "",
+        "description": "Design skill for websites and new pages that look designed, not generated. Use when the user asks to build or design something new, or names Hallmark.",
+        "version": "2.0.0",
         "tags": [],
-        "size_bytes": 7230
+        "size_bytes": 18239
       },
       {
         "name": "ui_landing-page-pro",

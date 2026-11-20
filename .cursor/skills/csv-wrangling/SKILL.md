@@ -5,7 +5,7 @@ description: "Standard workflow order, tool selection matrix, and composition pa
 
 # Alias: csv-wrangling
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `util_csv-wrangling`.
 
 For backward compatibility, this alias redirects to the new skill.
 

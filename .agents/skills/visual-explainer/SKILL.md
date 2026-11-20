@@ -5,7 +5,7 @@ description: "Generate self-contained HTML visual explanations for systems, code
 
 # Alias: visual-explainer
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `ui_visual-explainer`.
 
 For backward compatibility, this alias redirects to the new skill.
 

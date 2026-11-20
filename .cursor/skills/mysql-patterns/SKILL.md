@@ -5,7 +5,7 @@ description: "MySQL and MariaDB schema, query, indexing, transaction, replicatio
 
 # Alias: mysql-patterns
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `db_mysql-patterns`.
 
 For backward compatibility, this alias redirects to the new skill.
 

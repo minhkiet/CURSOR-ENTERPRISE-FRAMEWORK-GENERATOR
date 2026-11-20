@@ -438,8 +438,8 @@
     },
     "hallmark": {
       "name": "Hallmark - Anti-Slop Design",
-      "description": "Anti-slop design taste skill. 57 slop-test gates for detecting AI-generated UI. Based on Nutlope/hallmark (9.3k stars).",
-      "version": "1.0.0",
+      "description": "Hallmark v2.0.0 anti-slop design skill. Floor/reflex/finish gates with sloplint --render sweep. Based on Nutlope/hallmark.",
+      "version": "2.0.0",
       "keywords": {
         "en": ["anti-slop", "design taste", "not AI-looking", "distinctive design", "typography", "color"],
         "vi": ["chống slop", "thị hiếu thiết kế", "không nhìn như AI"]

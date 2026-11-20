@@ -5,7 +5,7 @@ description: "Redis observability guidance — which metrics to monitor (memory,
 
 # Alias: redis-observability
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `db_redis-observability`.
 
 For backward compatibility, this alias redirects to the new skill.
 

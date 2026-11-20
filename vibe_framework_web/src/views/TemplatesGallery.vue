@@ -128,7 +128,7 @@ onUnmounted(() => {
             <span class="gallery-title-accent">Chuẩn Craft, Không Thuần AI.</span>
           </h1>
           <p class="gallery-subtitle">
-            Bao gồm 5 bộ chuyên sâu: <strong>UI/UX Enterprise</strong>, <strong>Dashboard UI Pro</strong>, <strong>Frontend Taste (57 Gates)</strong>, <strong>CMS SaaS v4</strong> và <strong>Image Workflow Studio</strong>. Mỗi template đều có thể tự động cuộn lướt xem giao diện thực tế.
+            Bao gồm 5 bộ chuyên sâu: <strong>UI/UX Enterprise</strong>, <strong>Dashboard UI Pro</strong>, <strong>Frontend Taste (Hallmark v2)</strong>, <strong>CMS SaaS v4</strong> và <strong>Image Workflow Studio</strong>. Mỗi template đều có thể tự động cuộn lướt xem giao diện thực tế.
           </p>
 
           <div class="gallery-hero-actions">

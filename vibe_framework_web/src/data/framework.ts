@@ -1400,7 +1400,7 @@ export const AGENTS: FrameworkItem[] = [
     title: 'UI/Design Specialist',
     subtitle: 'Visual design, animation, anti-slop principles',
     description:
-      'Creates visually stunning, professional interfaces with anti-slop design principles. Focuses on aesthetics, animations, typography, and user experience. 57 slop-detection gates.',
+      'Creates visually stunning, professional interfaces with anti-slop design principles. Focuses on aesthetics, animations, typography, and user experience. Hallmark v2.0.0 floor/reflex/finish gates.',
     category: 'Design',
     tags: ['design', 'UI', 'UX', 'aesthetic', 'animation', 'typography'],
     role: 'primary',
@@ -1410,7 +1410,7 @@ export const AGENTS: FrameworkItem[] = [
       'Visual hierarchy and component design',
       'Animation and motion patterns',
       'Typography excellence and spacing',
-      '57 anti-slop detection gates'
+      'Hallmark v2.0.0 floor/reflex/finish gates'
     ],
     alignsWith: ['.cursor/rules/ref_ui-visual-design.mdc', '.cursor/skills/ui_hallmark/SKILL.md']
   },

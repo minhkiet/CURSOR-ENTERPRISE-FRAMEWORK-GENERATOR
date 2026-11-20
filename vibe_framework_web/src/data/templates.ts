@@ -94,7 +94,7 @@ export const templates: Template[] = [
     category: 'High-End Craft & Anti-Slop',
     tagline: 'Giao diện đỉnh cao, chống AI-slop, phong cách Linear/Apple',
     description:
-      'Mẫu giao diện thể hiện đẳng cấp thiết kế Frontend Taste. Tuân thủ 57 slop-test gates, cân chỉnh 3 dials (Variance: 8, Motion: 6, Density: 4), typography Geist tinh xảo, nhịp điệu khoảng trắng tự nhiên, loại bỏ hoàn toàn các vệt tím AI sáo rỗng.',
+      'Mẫu giao diện thể hiện đẳng cấp thiết kế Frontend Taste. Tuân thủ Hallmark v2.0.0 (floor/reflex/finish), cân chỉnh 3 dials (Variance: 8, Motion: 6, Density: 4), typography Geist tinh xảo, nhịp điệu khoảng trắng tự nhiên, loại bỏ hoàn toàn các vệt tím AI sáo rỗng.',
     industry: 'FRONTEND TASTE',
     accent: '#8b5cf6',
     accentSecondary: '#c084fc',
@@ -102,17 +102,17 @@ export const templates: Template[] = [
     icon: 'sparkles',
     features: [
       'Triết lý 3 Dials: Variance, Motion và Visual Density',
-      '57 Slop-Test Gates: Loại bỏ 100% AI cliché và generic cards',
+      'Hallmark v2.0.0: Floor/Reflex/Finish chống AI cliché và generic cards',
       'Typography phối hợp Geist Display & Geist Mono chuẩn mực',
       'Micro-interactions và hiệu ứng ánh sáng bề mặt tinh tế',
       'Bố cục đa dạng: Hero lệch trục, Bento Grid tương tác, Testimonial ticker'
     ],
     highlights: [
-      { label: 'Slop-Test Score', value: '57/57 Passed' },
+      { label: 'Hallmark Sweep', value: 'Floor 0 FAIL' },
       { label: 'Lighthouse Perf', value: '100/100' },
       { label: 'Aesthetic Tier', value: 'Awwwards SOTD' }
     ],
-    tags: ['Anti-Slop', 'Linear Style', 'Craft', '57 Gates', 'Micro-Motion', 'Typography'],
+    tags: ['Anti-Slop', 'Linear Style', 'Craft', 'Hallmark v2', 'Micro-Motion', 'Typography'],
     fileSize: '260 KB',
     pages: 6,
     techStack: ['HTML5', 'CSS3 Modern', 'Vanilla JS', 'Spring Motion']

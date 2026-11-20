@@ -5,7 +5,7 @@ description: "Alias: open-design skill"
 
 # Alias: open-design
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `ui_open-design`.
 
 For backward compatibility, this alias redirects to the new skill.
 

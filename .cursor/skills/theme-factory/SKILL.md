@@ -5,7 +5,7 @@ description: "Toolkit for styling artifacts with a theme. These artifacts can be
 
 # Alias: theme-factory
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `ui_theme-factory`.
 
 For backward compatibility, this alias redirects to the new skill.
 

@@ -159,7 +159,7 @@ Industry-specific anti-patterns are included in design system output:
 | Skill | Path | Description |
 |-------|------|-------------|
 | `frontend-taste` | `skills/ui_frontend-taste/` | Anti-slop frontend (pre/post gates) |
-| `hallmark` | `skills/ui_hallmark/` | 57 slop-test gates |
+| `hallmark` | `skills/ui_hallmark/` | Hallmark v2.0.0 floor/reflex/finish gates |
 | `dashboard-ui` | `skills/ui_dashboard-ui/` | Dashboard components |
 | `frontend-redesign` | `skills/ui_frontend-redesign/` | Redesign existing UI |
 

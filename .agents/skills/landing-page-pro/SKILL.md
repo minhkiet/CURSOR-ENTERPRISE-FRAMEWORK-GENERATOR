@@ -5,7 +5,7 @@ description: "Professional Landing Page Skill cho SaaS, Products, E-commerce. Se
 
 # Alias: landing-page-pro
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `ui_landing-page-pro`.
 
 For backward compatibility, this alias redirects to the new skill.
 

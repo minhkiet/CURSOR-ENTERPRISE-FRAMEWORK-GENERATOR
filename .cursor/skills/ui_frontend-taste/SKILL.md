@@ -5,8 +5,8 @@ description: Anti-slop frontend skill for landing pages, portfolios, and redesig
   and ships interfaces that do not look templated. Includes mandatory pre-review and
   post-review checkpoints before and after code generation. Synthesizes pbakaus/impeccable,
   Leonxlnx/taste-skill, anthropics/frontend-design, vercel-labs/web-design-guidelines,
-  nextlevelbuilder/ui-ux-pro-max, emilkowalski/emil-design-eng, and Nutlope/hallmark
-  (9.3k stars) into a single coherent playbook. See §12 for attribution and conflict-resolution
+  nextlevelbuilder/ui-ux-pro-max, emilkowalski/emil-design-eng, and Nutlope/hallmark v2.0.0
+  into a single coherent playbook. See §12 for attribution and conflict-resolution
   rules.
 version: 1.8.0
 updated: 2026-07-16
@@ -526,12 +526,12 @@ npm install motion gsap
 
 ## 9. DESIGN-LEAD PHILOSOPHY (Two-Pass Build + Hallmark)
 
-> Synthesized from `anthropics/frontend-design` (⭐3), `pbakaus/impeccable` (⭐1), and `Nutlope/hallmark` (⭐9.3k).
+> Synthesized from `anthropics/frontend-design` (⭐3), `pbakaus/impeccable` (⭐1), and `Nutlope/hallmark` (v2.0.0).
 > This is the *frame of mind* behind every section above. Apply it whenever §0.B produces a non-trivial design read.
 
-### 9.A Hallmark Integration (v1.8.0)
+### 9.A Hallmark Integration (v2.0.0)
 
-**Hallmark** (9.3k stars) picks a macrostructure, applies one of 20 themes, runs 57 slop-test gates. Two pages for different briefs feel like different sites.
+**Hallmark v2.0.0** deals a direction, binds every output to a Floor, and sweeps with `sloplint --render`; Reflex gates are waivable on the record and Finish checks are craft detail. Load `ui_hallmark/SKILL.md` as the authoritative flow. The v1.8 theme/verb material below is retained for older templates.
 
 #### 9.A.1 Hallmark Themes (20 Catalog + Custom)
 
@@ -563,7 +563,7 @@ Select theme based on brand brief:
 1. Analyze brief for brand signals
 2. Match to closest catalog theme OR trigger Custom
 3. Derive all design tokens from selected theme
-4. Run 57 slop-test gates (§9.F)
+4. Run the Hallmark v2 sweep: `sloplint --render` + judged gates
 5. Self-critique before code (§9.H)
 ```
 
@@ -584,7 +584,7 @@ When no catalog theme fits:
 2. Bespoke palette: 4-5 hex values
 3. Custom type pairing
 4. Unique layout macrostructure
-5. Same 57 slop-test gates apply
+5. Same Hallmark v2 Floor/Reflex/Finish gates apply
 6. Document as "Custom" for future reference
 ```
 
@@ -687,9 +687,9 @@ If someone could look at the interface and say "AI made that" without doubt, it 
 - **First-order check:** if a viewer could guess the theme + palette from the *category alone* (e.g. "AI workflow tool", "fintech app"), it is the first training-data reflex. Rework the scene sentence and color strategy until the answer is not obvious from the domain.
 - **Second-order check:** if the viewer could guess the aesthetic family from category-plus-anti-references (e.g. "fintech that's not navy-and-gold → terminal-native dark mode"), it is the trap one tier deeper. Rework until both answers are not obvious.
 
-### 9.M Hallmark 57 Slop-Test Gates (Automated Anti-Slop Protocol)
+### 9.M Hallmark Gate Reference (Legacy v1.8 — use ui_hallmark v2.0.0)
 
-> Integrated from `Nutlope/hallmark` (9.3k stars). Hallmark runs 57 automated gates before emitting. These are mapped to framework rules.
+> Legacy reference only. Hallmark v2.0.0 uses Floor/Reflex/Finish gates and `sloplint --render`; load `skills/ui_hallmark/SKILL.md` for the authoritative flow. The v1.8 gate list below is kept for older templates.
 
 #### Color Defaults Gates (12 gates)
 | Gate | Check | Fail if... | Rule mapping |
@@ -791,7 +791,7 @@ SLOP TEST EXECUTION
         └── If any fail: fix or remove animation
 ```
 
-**Pass threshold:** 57/57 gates must pass. Any failure = reject and rebuild.
+**Authoritative check:** `node skills/ui_hallmark/scripts/sloplint.mjs <output> --render` must report Floor 0 FAIL; fix or waive Reflex with a reason, and answer every Finish item.
 
 ---
 
@@ -983,7 +983,7 @@ Note: this priority order is **embedded as reference only**. The active rules li
 | ⭐4 | web-design-guidelines | github.com/vercel-labs/agent-skills | 25k | §11.C (runtime audit pointer; not embedded — stays fresh) |
 | ⭐5 | ui-ux-pro-max | github.com/nextlevelbuilder/ui-ux-pro-max-skill | 95k | §11 (database pointer, priority table) |
 | ⭐6 | emil-design-eng | github.com/emilkowalski/skill | 2k | §10 (animation decision framework + polish layer) |
-| ⭐7 | hallmark | github.com/Nutlope/hallmark | 9.3k | §9.A (4 verbs, 20 themes, 57 slop-test gates) |
+| ⭐7 | hallmark | github.com/Nutlope/hallmark | v2.0.0 | §9.A (floor/reflex/finish, sloplint sweep) |
 
 ### 12.B Merge order
 
@@ -1044,4 +1044,4 @@ In all four cases, the merge into this file is **complete enough that you do not
 - [[../skills/full-output]] - Full Output Skill
 - [[../rules/ui-visual-design]] - Workspace Visual Design Principles
 
-**Synthesized from:** [pbakaus/impeccable](https://github.com/pbakaus/impeccable) ⭐1 · [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) ⭐2 · [anthropics/frontend-design](https://github.com/anthropics/skills) ⭐3 · [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) ⭐4 · [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) ⭐5 · [emilkowalski/skill](https://github.com/emilkowalski/skill) ⭐6 · [Nutlope/hallmark](https://github.com/Nutlope/hallmark) ⭐9.3k. See §12 for merge order and conflict resolution.
+**Synthesized from:** [pbakaus/impeccable](https://github.com/pbakaus/impeccable) ⭐1 · [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) ⭐2 · [anthropics/frontend-design](https://github.com/anthropics/skills) ⭐3 · [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) ⭐4 · [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) ⭐5 · [emilkowalski/skill](https://github.com/emilkowalski/skill) ⭐6 · [Nutlope/hallmark](https://github.com/Nutlope/hallmark) v2.0.0. See §12 for merge order and conflict resolution.

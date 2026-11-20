@@ -954,7 +954,7 @@ async function handleCopy(code: string, key: string) {
                   <div class="ins-guide-wf-num">03</div>
                   <div class="ins-guide-wf-title">Thẩm Định & Tự Cuộn</div>
                   <p class="ins-guide-wf-desc">
-                    Mã nguồn sinh ra đã được thẩm định qua 57 cổng Hallmark chống AI slop. Bật tính năng <strong>⚡ Tự Cuộn (Auto-Scroll)</strong> để xem trang web chuyển động tự nhiên như đang được lướt thực tế.
+                    Mã nguồn sinh ra đã được thẩm định theo Hallmark v2.0.0 (floor/reflex/finish) chống AI slop. Bật tính năng <strong>⚡ Tự Cuộn (Auto-Scroll)</strong> để xem trang web chuyển động tự nhiên như đang được lướt thực tế.
                   </p>
                   <div class="ins-guide-wf-tip">🎯 Kết quả: Sản phẩm mang chất thủ công (Crafted Feel), sẵn sàng bàn giao khách hàng.</div>
                 </div>
@@ -1027,13 +1027,13 @@ async function handleCopy(code: string, key: string) {
                       </button>
                     </div>
                     <div class="ins-guide-cmd-code">/frontend-taste</div>
-                    <div class="ins-guide-cmd-name">57 Hallmark Gates & Triệt Tiêu AI Slop</div>
+                    <div class="ins-guide-cmd-name">Hallmark v2.0.0 & Triệt Tiêu AI Slop</div>
                     <p class="ins-guide-cmd-detail">
                       Quét và loại bỏ hoàn toàn viền tím neon vô nghĩa và thẻ 3 cột sao chép. Thiết lập 3 thanh trượt Craft Dials: Variance 75% (layout bất đối xứng Bento Grid), Motion Gentle 300ms, Density Compact phong cách Linear.
                     </p>
                     <div class="ins-guide-cmd-example">
                       <span class="ex-label">Ví dụ prompt:</span>
-                      <code>/frontend-taste Tinh chỉnh landing page theo chuẩn 57 Hallmark Gates, đổi bố cục 3 cột thành Bento grid và chỉnh 3 dial.</code>
+                      <code>/frontend-taste Tinh chỉnh landing page theo chuẩn Hallmark v2.0.0, đổi bố cục 3 cột thành Bento grid và chỉnh 3 dial.</code>
                     </div>
                   </div>
 
@@ -1125,7 +1125,7 @@ async function handleCopy(code: string, key: string) {
                       <tr>
                         <td class="td-crit">Quy Trình Kiểm Duyệt</td>
                         <td class="td-bad">Sinh mã một lần không kiểm thử, dễ phát sinh lỗi vỡ layout trên mobile và thiếu tính bảo mật.</td>
-                        <td class="td-good">Hệ thống Dual-Gate: Pre-Review thẩm định phạm vi &amp; Post-Review kiểm tra 57 cổng Hallmark nghiêm ngặt.</td>
+                        <td class="td-good">Hệ thống Dual-Gate: Pre-Review thẩm định phạm vi &amp; Post-Review chạy sweep sloplint --render và judged gates Hallmark.</td>
                       </tr>
                     </tbody>
                   </table>

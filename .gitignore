@@ -65,21 +65,6 @@ cursor-setup-gui/bin/
 cursor-setup-gui/obj/
 cursor-setup-gui-publish/
 
-# --- Node.js / Next.js demo build artifacts ---
-demos/*/node_modules/
-demos/*/.next/
-demos/*/.turbo/
-demos/*/out/
-demos/*/dist/
-
-# --- Vendored third-party (submodules) ---
-vendor/*/node_modules/
-vendor/*/dist/
-vendor/*/.next/
-vendor/*/.turbo/
-vendor/*/out/
-vendor/*/build/
-
 # --- Installer / release artifacts ---
 cursor-setup.exe
 cursor-setup-py.exe
@@ -139,7 +124,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
-/demos/fitness/node_modules
 /cursor-setup-gui-wpf/bin
 /cursor-setup-gui-wpf/obj
 /vibe-setup-gui-wpf/bin

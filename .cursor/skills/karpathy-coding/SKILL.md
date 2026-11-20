@@ -5,7 +5,7 @@ description: "Universal coding discipline overlay for all vibe coding agents (Cu
 
 # Alias: karpathy-coding
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `code_karpathy`.
 
 For backward compatibility, this alias redirects to the new skill.
 

@@ -5,7 +5,7 @@ description: "Review skill cho Vietnamese online payment integrations (MoMo, SeP
 
 # Alias: vietnam-payment-review
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `sec_vietnam-payment-review`.
 
 For backward compatibility, this alias redirects to the new skill.
 

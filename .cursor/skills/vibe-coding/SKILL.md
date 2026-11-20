@@ -5,7 +5,7 @@ description: "Vibe Coding - Unified overlay skill kết hợp Think First (karpa
 
 # Alias: vibe-coding
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `code_vibe-coding`.
 
 For backward compatibility, this alias redirects to the new skill.
 

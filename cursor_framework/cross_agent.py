@@ -302,7 +302,7 @@ ALL_SKILLS: dict[str, SkillDefinition] = {
     "hallmark": SkillDefinition(
         name="hallmark",
         category="Frontend",
-        description="Anti-slop design taste - 57 slop-test gates",
+        description="Hallmark v2.0.0 anti-slop design skill - floor, reflex and finish gates",
         tags=["design", "taste", "anti-slop"],
         triggers=["design", "taste", "anti-slop"],
         pre_gates=["U.1", "U.2", "U.3", "U.4"],

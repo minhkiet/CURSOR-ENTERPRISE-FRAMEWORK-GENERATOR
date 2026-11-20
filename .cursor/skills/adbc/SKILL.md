@@ -5,7 +5,7 @@ description: "Connect to and work with databases using Arrow Database Connectivi
 
 # Alias: adbc
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `db_adbc`.
 
 For backward compatibility, this alias redirects to the new skill.
 

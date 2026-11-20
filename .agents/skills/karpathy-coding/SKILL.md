@@ -5,7 +5,7 @@ description: "Karpathy Coding - Think Before Code. Minimal overlay skill cho má»
 
 # Alias: karpathy-coding
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `code_karpathy`.
 
 For backward compatibility, this alias redirects to the new skill.
 

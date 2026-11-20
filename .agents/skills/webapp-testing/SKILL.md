@@ -5,7 +5,7 @@ description: "Toolkit for interacting with and testing local web applications us
 
 # Alias: webapp-testing
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `util_webapp-testing`.
 
 For backward compatibility, this alias redirects to the new skill.
 

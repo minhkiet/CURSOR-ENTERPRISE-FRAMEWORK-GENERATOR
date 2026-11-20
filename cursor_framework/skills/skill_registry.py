@@ -366,8 +366,8 @@ class CrossAgentSkillRegistry:
                 "post_gates": ["U.5", "U.6", "U.7", "§X"],
             },
             "hallmark": {
-                "version": "1.0.0",
-                "description": "Anti-slop design taste - 57 slop-test gates",
+                "version": "2.0.0",
+                "description": "Hallmark v2.0.0 anti-slop design skill - floor, reflex and finish gates",
                 "tags": ["design", "taste", "anti-slop", "hallmark"],
                 "triggers": ["design", "taste", "anti-slop"],
                 "pre_gates": ["U.1", "U.2", "U.3", "U.4"],

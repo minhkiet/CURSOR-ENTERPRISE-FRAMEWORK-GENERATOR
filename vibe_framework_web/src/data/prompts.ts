@@ -691,11 +691,11 @@ export const PROMPTS: PromptItem[] = [
   {
     id: 'prompt-frontend-taste',
     category: 'Review',
-    title: 'Frontend Taste — 57 Hallmark Anti-Slop Gates & Craft Dials',
-    oneLiner: 'Quét và loại bỏ triệt để 57 bẫy AI-slop (glow tím lòe loẹt, 3 cột sao chép). Tinh chỉnh 3 dial: Variance, Motion, Density.',
+    title: 'Frontend Taste — Hallmark v2.0.0 Anti-Slop & Craft Dials',
+    oneLiner: 'Quét và loại bỏ triệt để reflex AI-slop (glow tím lòe loẹt, 3 cột sao chép). Tinh chỉnh 3 dial: Variance, Motion, Density.',
     slashCommand: '/frontend-taste',
     tags: ['Anti-Slop', 'Taste', 'Hallmark', 'Bento Grid', 'Micro-Interactions'],
-    prompt: `/frontend-taste Quét và tái cấu trúc giao diện theo chuẩn 57 Hallmark Anti-Slop Gates:
+    prompt: `/frontend-taste Quét và tái cấu trúc giao diện theo chuẩn Hallmark v2.0.0 (Floor/Reflex/Finish):
 1. Triệt tiêu hoàn toàn hiệu ứng purple gradient blur vô nghĩa và typography font sao chép thô sơ.
 2. Phá vỡ bố cục 3 cột đối xứng nhàm chán bằng cấu trúc Bento Grid bất đối xứng giàu tính nhịp điệu.
 3. Thiết lập 3 thanh trượt điều hướng Craft Dials: Variance 75% (độ đa dạng layout), Motion Gentle 300ms (chuyển động tinh tế), Density Compact (mật độ thông tin cao phong cách Linear / Stripe).
@@ -703,14 +703,14 @@ export const PROMPTS: PromptItem[] = [
     applies: [
       { type: 'skill', id: 'frontend-taste', reason: 'Bộ quy chuẩn thẩm mỹ hàng đầu chống giao diện generic AI.' },
       { type: 'skill', id: 'frontend-redesign', reason: 'Tái thiết kế layout theo tư duy thiết kế đương đại.' },
-      { type: 'skill', id: 'frontend-review', reason: 'Thực thi kiểm tra 57 gates nghiêm ngặt.' },
+      { type: 'skill', id: 'frontend-review', reason: 'Thực thi sweep sloplint --render và judged gates.' },
       { type: 'rule', id: 'karpathy-guidelines', reason: 'Tối giản hiệu ứng thừa, tôn vinh nội dung thực tế.' }
     ],
-    expectedDelta: '57/57 Cổng Hallmark Đạt Chuẩn · Cảm giác thủ công đẳng cấp',
+    expectedDelta: 'Hallmark v2.0.0 · Floor 0 FAIL · Cảm giác thủ công đẳng cấp',
     trace: [
       {
         phase: 'plan',
-        label: 'Quét 57 Bẫy Thẩm Mỹ AI (Slop Audit)',
+        label: 'Quét Floor/Reflex Hallmark (Slop Audit)',
         by: 'frontend-taste',
         bullets: [
           'Phát hiện và đánh dấu các thẻ purple glow không phục vụ mục đích ngữ nghĩa',
@@ -740,10 +740,10 @@ export const PROMPTS: PromptItem[] = [
       },
       {
         phase: 'post-review',
-        label: 'Xác Thực 57 Cổng Kiểm Tra Sau Tinh Chỉnh',
+        label: 'Xác Thực Sweep Hallmark Sau Tinh Chỉnh',
         by: 'frontend-review',
         bullets: [
-          '0/57 lỗi AI-slop tồn dư (Đạt chứng nhận Craft Standard)',
+          'Floor 0 FAIL, Reflex đã xử lý/waive (đạt Craft Standard)',
           'Độ phản hồi của giao diện trên mobile đạt 60fps mượt mà'
         ]
       },

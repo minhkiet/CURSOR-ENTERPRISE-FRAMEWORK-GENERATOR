@@ -5,7 +5,7 @@ description: "Comprehensive frontend code review skill with mandatory pre-review
 
 # Alias: frontend-review
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `ui_frontend-review`.
 
 For backward compatibility, this alias redirects to the new skill.
 

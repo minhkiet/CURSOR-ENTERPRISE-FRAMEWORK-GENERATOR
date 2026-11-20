@@ -5,7 +5,7 @@ description: "Create beautiful visual art in .png and .pdf documents using desig
 
 # Alias: canvas-design
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `ui_canvas-design`.
 
 For backward compatibility, this alias redirects to the new skill.
 

@@ -662,7 +662,7 @@
 | `full-site-clone` | `skills\full-site-clone` | Clone toàn bộ website bao gồm tất cả pages, routes, URLs. Kết hợp site-crawler, |
 | `fullstack-web-development` | `skills\fullstack-web-development` | Build, modify, debug fullstack web apps using ASP.NET Core Web API, React |
 | `graphql` | `skills\graphql` | Expert in GraphQL API development with type-safe patterns and optimization |
-| `hallmark` | `skills\hallmark` | Design taste skill for anti-slop UI. Based on Nutlope/hallmark (9.3k stars), detects AI slop aesthetics and builds disti |
+| `hallmark` | `skills\hallmark` | Backward-compatible alias for Hallmark v2.0.0 anti-slop design skill. Redirects to ui_hallmark. |
 | `image-enhancer` | `skills\image-enhancer` | Improves the quality of images, especially screenshots, by enhancing |
 | `image-finder` | `skills\image-finder` | Tìm ảnh stock miễn phí và tạo ảnh/video bằng AI (Google Flow, Unsplash, |
 | `image-generator` | `skills\image-generator` | Tạo ảnh và video theo yêu cầu bằng AI (DALL-E, Google Flow, Midjourney, |
@@ -720,7 +720,7 @@
 | `ui_frontend-redesign` | `skills\ui_frontend-redesign` | Upgrades existing websites and apps to premium quality. Audits current |
 | `ui_frontend-review` | `skills\ui_frontend-review` | Comprehensive frontend code review skill with mandatory pre-review scope |
 | `ui_frontend-taste` | `skills\ui_frontend-taste` | Anti-slop frontend skill for landing pages, portfolios, and redesigns. |
-| `ui_hallmark` | `skills\ui_hallmark` | Design taste skill for anti-slop UI. Based on Nutlope/hallmark (9.3k |
+| `ui_hallmark` | `skills\ui_hallmark` | Design skill for websites and new pages that look designed, not generated. Use when the user asks to build or design something new. |
 | `ui_landing-page-pro` | `skills\ui_landing-page-pro` | Professional Landing Page Skill cho SaaS, Products, E-commerce. Sections: |
 | `ui_open-design` | `skills\ui_open-design` | Open Design Integration skill |
 | `ui_theme-factory` | `skills\ui_theme-factory` | Toolkit for styling artifacts with a theme. These artifacts can be slides, |

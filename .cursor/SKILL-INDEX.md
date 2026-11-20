@@ -140,7 +140,7 @@
 | Skill | Path | Description |
 |-------|------|-------------|
 | `frontend-taste` | `skills/frontend-taste/` | Anti-slop frontend cho landing/portfolio (6 pre + 8 post gates) |
-| `hallmark` | `skills/hallmark/` | Anti-slop design taste (57 slop-test gates) |
+| `hallmark` | `skills/hallmark/` | Hallmark v2.0.0 anti-slop design (floor/reflex/finish gates) |
 | `frontend-redesign` | `skills/frontend-redesign/` | Redesign existing UI |
 | `dashboard-ui` | `skills/dashboard-ui/` | Dashboard/Admin components (inputs, tables, forms, pickers) |
 | `ui-designer` | `agents/ui-designer.md` | Design systems, layouts, typography |
@@ -298,7 +298,7 @@
 
 | Rule | Path | Description |
 |------|------|-------------|
-| `hallmark` | `skills/hallmark/` | Copy gates (10 rules) |
+| `hallmark` | `skills/hallmark/` | Hallmark v2.0.0 floor/reflex/finish gates + sloplint sweep |
 
 ---
 
@@ -834,7 +834,7 @@ web-cloner + site-crawler + route-discovery + full-site-clone + image-workflow
 1. evondev-ui-ux (app UI - dashboard, danh sách, bảng, form)
 2. ui-ux-pro-max (design system generator - 117k stars)
 3. frontend-taste (anti-slop frontend)
-4. hallmark (57 slop-test gates)
+4. hallmark v2.0.0 (floor/reflex/finish gates)
 5. dashboard-ui (components)
 6. ai-copywriter (human copy)
 7. simple-english (clarity)

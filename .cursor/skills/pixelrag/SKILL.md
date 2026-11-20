@@ -5,7 +5,7 @@ description: "PixelRAG skill cho Visual Retrieval-Augmented Generation - đọc 
 
 # Alias: pixelrag
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `ai_pixelrag`.
 
 For backward compatibility, this alias redirects to the new skill.
 

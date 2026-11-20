@@ -5,7 +5,7 @@ description: "Comprehensive security review skill for code analysis, vulnerabili
 
 # Alias: security-review
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `sec_security-review`.
 
 For backward compatibility, this alias redirects to the new skill.
 

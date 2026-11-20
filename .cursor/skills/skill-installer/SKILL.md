@@ -5,7 +5,7 @@ description: "Alias: skill-installer skill"
 
 # Alias: skill-installer
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `util_skill-installer`.
 
 For backward compatibility, this alias redirects to the new skill.
 

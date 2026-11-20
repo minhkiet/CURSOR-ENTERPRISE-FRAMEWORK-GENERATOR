@@ -5,7 +5,7 @@ description: "Enforces complete, unabridged code generation. Overrides truncatio
 
 # Alias: full-output
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `code_full-output`.
 
 For backward compatibility, this alias redirects to the new skill.
 

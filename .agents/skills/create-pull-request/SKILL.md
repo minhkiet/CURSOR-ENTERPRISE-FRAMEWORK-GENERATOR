@@ -5,7 +5,7 @@ description: "Create a GitHub pull request following project conventions. Use wh
 
 # Alias: create-pull-request
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `util_create-pull-request`.
 
 For backward compatibility, this alias redirects to the new skill.
 

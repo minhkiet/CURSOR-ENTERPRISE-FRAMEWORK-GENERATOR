@@ -5,7 +5,7 @@ description: "Upgrades existing websites and apps to premium quality. Audits cur
 
 # Alias: frontend-redesign
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `ui_frontend-redesign`.
 
 For backward compatibility, this alias redirects to the new skill.
 

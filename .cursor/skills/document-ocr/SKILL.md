@@ -5,7 +5,7 @@ description: "Alias: document-ocr skill"
 
 # Alias: document-ocr
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `util_document-ocr`.
 
 For backward compatibility, this alias redirects to the new skill.
 

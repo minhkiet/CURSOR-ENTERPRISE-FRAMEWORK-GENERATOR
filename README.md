@@ -41,7 +41,7 @@ Instead of starting every coding session from zero and falling into generic "AI 
 | **VBS Security Scanner** | 21 cross-language vulnerability rules + SCA | `.cursor/skills/sec_reverse-engineer-anything/` |
 | **Python Library** | 14 modules + 6 utility suites | `cursor_framework/` |
 | **Web Dashboard & CMS** | Vue 3 + Vite 6 + TypeScript + CMS Auth Gate | `vibe_framework_web/` |
-| **Windows GUI Installer** | `cursor-setup.exe` (~162 MB), `cursor-setup.zip` (~22 MB) | `dist/` |
+| **Windows GUI Installer** | `cursor-setup.exe` (~162 MB), `cursor-setup.zip` (~22 MB) | generated in `dist/` by build scripts |
 
 ---
 
@@ -338,7 +338,7 @@ dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true 
 ## Themes & UI/UX System
 
 Để đảm bảo giao diện **"Không thuần AI, nhìn wow"**, toàn bộ hệ thống áp dụng triết lý thiết kế từ:
-- **`frontend-taste` & `hallmark`**: 57 cổng kiểm định slop-test (loại bỏ gradient tím/hồng vô nghĩa, tránh layout 3 card cân xứng sáo rỗng, không dùng ảnh stock AI chung chung).
+- **`frontend-taste` & `hallmark`**: Hallmark v2.0.0 với hệ thống floor/reflex/finish gates (loại bỏ gradient tím/hồng vô nghĩa, tránh layout 3 card cân xứng sáo rỗng, không dùng ảnh stock AI chung chung).
 - **`evondev-ui-ux`**: Chuẩn khoảng cách 8px scale, nhịp thở typography tương phản cao, chuyển động vi mô tự nhiên `cubic-bezier(0.16, 1, 0.3, 1)`.
 
 ### 6 Theme Giao Diện Tích Hợp Sẵn

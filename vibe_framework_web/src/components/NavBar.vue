@@ -28,7 +28,7 @@ const navLinks = [
 const quickCommands = [
   { cmd: '/ui-ux', title: 'UI/UX System', desc: 'Design Tokens & Wireframe' },
   { cmd: '/dashboard-ui', title: 'Dashboard Pro', desc: 'Cockpit Analytics & Table' },
-  { cmd: '/frontend-taste', title: 'Frontend Taste', desc: 'Anti-Slop 57 Gates' },
+  { cmd: '/frontend-taste', title: 'Frontend Taste', desc: 'Anti-Slop Hallmark v2' },
   { cmd: '/cms-landing-enterprise', title: 'CMS Enterprise', desc: 'Full SaaS v4 & Ví' },
   { cmd: '/image-workflow', title: 'Image Workflow', desc: 'AI Asset Studio & Cloner' }
 ] as const

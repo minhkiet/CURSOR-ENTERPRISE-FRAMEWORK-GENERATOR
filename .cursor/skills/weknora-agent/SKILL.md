@@ -5,7 +5,7 @@ description: "WeKnora Agent Skill - ReAct autonomous reasoning agent với multi
 
 # Alias: weknora-agent
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `ai_weknora-agent`.
 
 For backward compatibility, this alias redirects to the new skill.
 

@@ -458,16 +458,9 @@ class ECCIntegration:
         return Path(path)
 
     def _ensure_git_repo(self) -> Optional[Path]:
-        """Ensure ECC repository is cloned or located in vendor."""
+        """Ensure ECC repository is cloned or located in cache."""
         if self._repo_path and self._repo_path.exists():
             return self._repo_path
-            
-        # Check workspace vendor first
-        for vendor_candidate in ["vendor/ECC", "vendor/ecc"]:
-            candidate = self.workspace_path / vendor_candidate
-            if candidate.exists() and (candidate / "package.json").exists():
-                self._repo_path = candidate
-                return candidate
 
         # Check for existing clone in cache
         default_clone = self.cache_path / "ecc"

@@ -5,7 +5,7 @@ description: "Dashboard & Form UI optimization skill. Professional component des
 
 # Alias: dashboard-ui
 
-**DEPRECATED**: This skill has been renamed to $newName.
+**DEPRECATED**: This skill has been renamed to `ui_dashboard-ui`.
 
 For backward compatibility, this alias redirects to the new skill.
 
