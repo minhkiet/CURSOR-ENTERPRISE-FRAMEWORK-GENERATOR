@@ -1,7 +1,7 @@
 {
   "name": "open-design-integration",
   "version": "1.0.0",
-  "description": "Open Design integration for Cursor Enterprise Framework",
+  "description": "Open Design integration for Vibe Enterprise Framework",
   "scripts": {
     "install-mcp": "od mcp install cursor",
     "setup": "od mcp install cursor && echo 'Open Design MCP installed successfully'",

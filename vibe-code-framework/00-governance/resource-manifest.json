@@ -94,7 +94,7 @@
   },
   "scopeBoundaries": {
     "SCOPE-RESOURCE-HUB": "vibe-code-framework",
-    "SCOPE-CORE": "cursor_framework",
+    "SCOPE-CORE": "vibe_framework",
     "SCOPE-WEB": "vibe_framework_web",
     "SCOPE-SETUP": "vibe-setup-gui-wpf",
     "CURSOR-ADAPTER-BOUNDARY": ".cursor"

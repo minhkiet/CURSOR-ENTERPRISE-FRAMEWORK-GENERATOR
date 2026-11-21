@@ -2,7 +2,7 @@
 description: Prompt chuan de thiet ke DDD - bounded contexts, aggregates, events
 trigger: ddd design, domain driven design
 category: Architecture
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

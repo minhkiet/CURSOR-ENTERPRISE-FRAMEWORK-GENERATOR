@@ -2,7 +2,7 @@
 description: Prompt chuan de audit hieu nang - database, API, frontend
 trigger: performance audit, toi uu hieu nang
 category: Performance
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

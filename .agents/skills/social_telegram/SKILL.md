@@ -6,12 +6,12 @@ description: "Telegram Bot Integration Skill skill"
 # Telegram Bot Integration Skill
 
 **Version:** 1.0.0  
-**Author:** Cursor Enterprise Framework  
+**Author:** Vibe Enterprise Framework
 **Triggers:** telegram, telegram bot, telegram api, telegram integration
 
 ## Overview
 
-This skill provides Telegram Bot API integration for Cursor Enterprise Framework. It enables building chatbots, automating messaging, managing groups, and more.
+This skill provides Telegram Bot API integration for Vibe Enterprise Framework. It enables building chatbots, automating messaging, managing groups, and more.
 
 ## Capabilities
 

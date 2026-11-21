@@ -2,7 +2,7 @@
 
 ## Tổng quan
 
-Document này cung cấp 10+ best practices cho việc sử dụng Kubernetes trong Cursor Enterprise Framework, kèm theo code examples cụ thể cho từng practice.
+Document này cung cấp 10+ best practices cho việc sử dụng Kubernetes trong Vibe Enterprise Framework, kèm theo code examples cụ thể cho từng practice.
 
 ## Practice 1: Always Set Resource Requests và Limits
 

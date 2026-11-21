@@ -11,8 +11,8 @@ from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
-from cursor_framework.__main__ import main
-from cursor_framework.vibe_sync import TOOL_SPECS, VibeSyncEngine, VibeTool
+from vibe_framework.__main__ import main
+from vibe_framework.vibe_sync import DEFAULT_PLUGIN_TOOLS, TOOL_SPECS, VibeSyncEngine, VibeTool
 
 
 class VibeSyncSafetyTests(unittest.TestCase):
@@ -61,7 +61,7 @@ class VibeSyncSafetyTests(unittest.TestCase):
 
         report = self.engine.sync(tools=[VibeTool.CURSOR], force=True)
 
-        self.assertIn("Codex Enterprise Framework", config.read_text(encoding="utf-8"))
+        self.assertIn("Vibe Enterprise Framework", config.read_text(encoding="utf-8"))
         self.assertEqual(report.files_modified[0].action, "updated")
 
     def test_new_config_reports_created(self) -> None:
@@ -117,13 +117,14 @@ class VibeSyncSafetyTests(unittest.TestCase):
 
         self.assertEqual(active, [])
 
-    def test_default_plugin_targets_are_editor_runtimes_only(self) -> None:
+    def test_default_plugin_targets_cover_supported_runtimes(self) -> None:
         source = self._make_plugin_source()
 
         with patch.dict(os.environ, self._clear_runtime_signals()):
             result = self.engine.install_plugins(source_dir=source, dry_run=True)
 
-        self.assertEqual(set(result["results"]), {"cursor", "windsurf"})
+        expected = {tool.value for tool in DEFAULT_PLUGIN_TOOLS}
+        self.assertEqual(set(result["results"]), expected)
 
     def test_cli_json_reports_failure_with_nonzero_exit(self) -> None:
         stdout = io.StringIO()

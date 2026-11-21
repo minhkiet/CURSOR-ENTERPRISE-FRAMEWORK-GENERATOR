@@ -1,5 +1,5 @@
 /**
- * Cursor Framework Spec Kit Plugin
+ * Vibe Framework Spec Kit Plugin
  * 
  * Provides interactive Spec-Driven Development (SDD) tooling:
  * Init, List, Status, Validate, and Constitution.
@@ -35,7 +35,7 @@ async function showInDocument(title, content, language = 'markdown') {
 
 function activate(context) {
     // Init Feature Spec
-    const initCmd = vscode.commands.registerCommand('cursor-framework.spec-kit.init', async () => {
+    const initCmd = vscode.commands.registerCommand('vibe-framework.spec-kit.init', async () => {
         const featureName = await vscode.window.showInputBox({
             prompt: 'Enter feature name (kebab-case)',
             placeHolder: 'e.g. payment-flow, user-auth, oauth-provider'
@@ -44,7 +44,7 @@ function activate(context) {
         if (!featureName) return;
 
         try {
-            const out = await execPython(['-m', 'cursor_framework', 'spec', 'init', featureName]);
+            const out = await execPython(['-m', 'vibe_framework', 'spec', 'init', featureName]);
             vscode.window.showInformationMessage(`Specification initialized for: ${featureName}`);
             await showInDocument(`Spec - ${featureName}`, out);
         } catch (err) {
@@ -53,9 +53,9 @@ function activate(context) {
     });
 
     // List All Specs
-    const listCmd = vscode.commands.registerCommand('cursor-framework.spec-kit.list', async () => {
+    const listCmd = vscode.commands.registerCommand('vibe-framework.spec-kit.list', async () => {
         try {
-            const out = await execPython(['-m', 'cursor_framework', 'spec', 'list']);
+            const out = await execPython(['-m', 'vibe_framework', 'spec', 'list']);
             await showInDocument('All Specifications', out);
         } catch (err) {
             vscode.window.showErrorMessage(`Listing specs failed: ${err.message}`);
@@ -63,14 +63,14 @@ function activate(context) {
     });
 
     // Feature Spec Status
-    const statusCmd = vscode.commands.registerCommand('cursor-framework.spec-kit.status', async () => {
+    const statusCmd = vscode.commands.registerCommand('vibe-framework.spec-kit.status', async () => {
         const featureName = await vscode.window.showInputBox({
             prompt: 'Enter feature name to check status',
             placeHolder: 'Leave blank to inspect global status'
         });
 
         try {
-            const args = ['-m', 'cursor_framework', 'spec', 'status'];
+            const args = ['-m', 'vibe_framework', 'spec', 'status'];
             if (featureName) args.push(featureName);
             const out = await execPython(args);
             await showInDocument('Spec Status', out);
@@ -80,7 +80,7 @@ function activate(context) {
     });
 
     // Validate Spec
-    const validateCmd = vscode.commands.registerCommand('cursor-framework.spec-kit.validate', async () => {
+    const validateCmd = vscode.commands.registerCommand('vibe-framework.spec-kit.validate', async () => {
         const featureName = await vscode.window.showInputBox({
             prompt: 'Enter feature name to validate against Constitution',
             placeHolder: 'e.g. core-auth'
@@ -89,7 +89,7 @@ function activate(context) {
         if (!featureName) return;
 
         try {
-            const out = await execPython(['-m', 'cursor_framework', 'spec', 'validate', featureName]);
+            const out = await execPython(['-m', 'vibe_framework', 'spec', 'validate', featureName]);
             vscode.window.showInformationMessage(`Validation complete for ${featureName}!`);
             await showInDocument(`Validation - ${featureName}`, out);
         } catch (err) {
@@ -98,9 +98,9 @@ function activate(context) {
     });
 
     // View Constitution
-    const constitutionCmd = vscode.commands.registerCommand('cursor-framework.spec-kit.constitution', async () => {
+    const constitutionCmd = vscode.commands.registerCommand('vibe-framework.spec-kit.constitution', async () => {
         try {
-            const out = await execPython(['-m', 'cursor_framework', 'spec', 'constitution']);
+            const out = await execPython(['-m', 'vibe_framework', 'spec', 'constitution']);
             await showInDocument('Project Constitution', out);
         } catch (err) {
             vscode.window.showErrorMessage(`Failed to load constitution: ${err.message}`);

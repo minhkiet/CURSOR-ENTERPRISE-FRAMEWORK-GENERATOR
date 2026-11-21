@@ -312,7 +312,7 @@ bot.send_message(chat_id, """
 """, parse_mode="HTML")
 ```
 
-## Integration with Cursor Framework
+## Integration with Vibe Framework
 
 ### Slash Command
 

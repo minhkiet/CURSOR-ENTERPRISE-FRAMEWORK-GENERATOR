@@ -62,7 +62,7 @@ namespace CursorSetupWpf.Services
                 GetGitSetupTemplate(),
                 GetPythonVenvTemplate(),
                 GetNodeSetupTemplate(),
-                GetCursorFrameworkSetupTemplate(),
+                GetVibeFrameworkSetupTemplate(),
             };
         }
 
@@ -934,7 +934,7 @@ namespace CursorSetupWpf.Services
                 new() {
                     Id = "mcp-restart", Title = "Restart Cursor", IsSelected = true,
                     Lines = new List<ScriptLine> {
-                        new() { Command = "echo", Args = "Restart Cursor IDE to activate MCP servers", Comment = "Reminder" }
+                        new() { Command = "echo", Args = "Restart your Vibe tool to activate MCP servers", Comment = "Reminder" }
                     }
                 },
             }
@@ -1063,12 +1063,12 @@ namespace CursorSetupWpf.Services
             }
         };
 
-        static ScriptTemplate GetCursorFrameworkSetupTemplate() => new()
+        static ScriptTemplate GetVibeFrameworkSetupTemplate() => new()
         {
-            Id = "cursor-framework",
-            Name = "Cursor Framework Setup",
-            FileName = "setup-cursor-framework.bat",
-            Description = "Install the full VibeCode Enterprise Framework into the current project.",
+            Id = "vibe-framework",
+            Name = "Vibe Framework Setup",
+            FileName = "setup-vibe-framework.bat",
+            Description = "Install the full Vibe Enterprise Framework into the current project.",
             Category = "utility",
             Icon = "\uE912",
             Blocks = new List<ScriptBlock>
@@ -1084,7 +1084,7 @@ namespace CursorSetupWpf.Services
                 new() {
                     Id = "cf-install-pip", Title = "Install Python packages", IsSelected = true,
                     Lines = new List<ScriptLine> {
-                        new() { Command = "pip install", Args = "cursor-framework cursor-autopilot cursor-memory", Comment = "Install core framework packages" },
+                        new() { Command = "pip install", Args = "vibe-framework cursor-autopilot cursor-memory", Comment = "Install core framework packages" },
                         new() { Command = "pip install", Args = "lunar-python rich click", Comment = "Install framework dependencies" }
                     }
                 },
@@ -1099,13 +1099,13 @@ namespace CursorSetupWpf.Services
                 new() {
                     Id = "cf-copy-scripts", Title = "Copy framework scripts", IsSelected = true,
                     Lines = new List<ScriptLine> {
-                        new() { Command = "xcopy", Args = "cursor-framework\\scripts\\*.ps1 .\\scripts\\ /S /Y", Comment = "Copy PowerShell scripts" }
+                        new() { Command = "xcopy", Args = "vibe-framework\\scripts\\*.ps1 .\\scripts\\ /S /Y", Comment = "Copy PowerShell scripts" }
                     }
                 },
                 new() {
                     Id = "cf-index", Title = "Build framework index", IsSelected = true,
                     Lines = new List<ScriptLine> {
-                        new() { Command = "python -m cursor_framework index", Comment = "Build INDEX.json and dependencies" }
+                        new() { Command = "python -m vibe_framework index", Comment = "Build INDEX.json and dependencies" }
                     }
                 },
             }

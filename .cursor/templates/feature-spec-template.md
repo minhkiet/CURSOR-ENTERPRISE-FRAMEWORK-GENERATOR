@@ -1,7 +1,7 @@
 ﻿---
 title: Template spec cho feature - requirements, design,验收
 description: Template spec cho feature - requirements, design,验收
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

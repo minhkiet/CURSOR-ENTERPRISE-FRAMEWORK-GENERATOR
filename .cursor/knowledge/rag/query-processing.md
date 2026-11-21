@@ -4,7 +4,7 @@ description: "Hướng dẫn về query processing: query rewriting, query expan
 tags: ["query-processing", "hyde", "query-expansion", "query-rewriting", "retrieval"]
 created: "2026-06-23"
 version: "1.0.0"
-framework: "Cursor Enterprise Framework"
+framework: "Vibe Enterprise Framework"
 ---
 
 # Query Processing
@@ -1440,4 +1440,4 @@ class QueryProcessingMonitor:
 2. **Query Expansion**: https://en.wikipedia.org/wiki/Query_expansion
 3. **RRF Fusion**: https://plg.uwaterloo.ca/~gvcormac/cormacksigir09-rrf.pdf
 4. **Query Rewriting**: https://blog.research.google/2022/10/using-large-language-models-to.html
-5. **Cursor Enterprise Framework - RAG Rules**: `.cursor/rules/rag.mdc`
+5. **Vibe Enterprise Framework - RAG Rules**: `.cursor/rules/rag.mdc`

@@ -4,7 +4,7 @@ description: "Hướng dẫn về các chiến lược chunking cho RAG: fixed-s
 tags: ["chunking", "rag", "text-splitting", "retrieval", "embedding"]
 created: "2026-06-23"
 version: "1.0.0"
-framework: "Cursor Enterprise Framework"
+framework: "Vibe Enterprise Framework"
 ---
 
 # Chunking Strategies
@@ -1525,4 +1525,4 @@ chunks = processor.process_stream(
 2. **Chunking Best Practices**: https://docs.llamaindex.ai/en/latest/core_modules/data_modules/indexing/metadata_extraction.html
 3. **NLTK Documentation**: https://www.nltk.org/
 4. **tiktoken**: https://github.com/openai/tiktoken
-5. **Cursor Enterprise Framework - RAG Rules**: `.cursor/rules/rag.mdc`
+5. **Vibe Enterprise Framework - RAG Rules**: `.cursor/rules/rag.mdc`

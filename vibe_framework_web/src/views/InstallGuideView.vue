@@ -75,8 +75,8 @@ const methods: InstallMethod[] = [
         tip: 'Quá trình thường mất 10-30 giây tùy tốc độ ổ đĩa.'
       },
       {
-        title: 'Restart Cursor IDE',
-        detail: 'Đóng hoàn toàn Cursor (File → Exit) rồi mở lại. Cursor sẽ tự động load các rule và skill mới từ .cursor/.'
+        title: 'Restart your Vibe tool',
+        detail: 'Đóng hoàn toàn Vibe tool rồi mở lại. Tool sẽ tự động load các rule và skill mới từ thư mục cấu hình tương ứng.'
       }
     ],
     verify: [
@@ -131,8 +131,8 @@ const methods: InstallMethod[] = [
         tip: 'Nếu PowerShell báo lỗi "running scripts is disabled", chạy lệnh này một lần rồi thử lại: Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned'
       },
       {
-        title: 'Restart Cursor IDE',
-        detail: 'Đóng và mở lại Cursor để nó nạp các rule và skill mới.'
+        title: 'Restart your Vibe tool',
+        detail: 'Đóng và mở lại Vibe tool để nó nạp các rule và skill mới.'
       }
     ],
     verify: [
@@ -163,7 +163,7 @@ const methods: InstallMethod[] = [
     key: 'python',
     badge: 'For devs',
     badgeTone: 'info',
-    title: 'Python package (cursor_framework)',
+    title: 'Python package (vibe_framework)',
     oneLiner: 'Cài pip package, chạy Dashboard, scan & index. Cho dev muốn inspect / customize',
     forWho: 'Dev Python, muốn dùng CLI, dashboard, indexer, hoặc TDAM.',
     duration: '~4 phút',
@@ -178,51 +178,51 @@ const methods: InstallMethod[] = [
       },
       {
         title: 'Clone repo và cài dependencies',
-        detail: 'Khác với cài Cursor IDE: lần này bạn clone repo để lấy Python package ở source. Sau đó cài requirements. Tất cả subcommands CLI dùng được ngay.',
-        code: 'git clone https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR.git\ncd CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR\npip install -r cursor_framework/requirements.txt',
+        detail: 'Khác với cài GUI: lần này bạn clone repo để lấy Python package ở source. Sau đó cài requirements. Tất cả subcommands CLI dùng được ngay.',
+        code: 'git clone https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR.git\ncd CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR\npip install -r vibe_framework/requirements.txt',
         codeLabel: 'Terminal',
         tip: 'Repo đặt ở đâu cũng được — không bắt buộc phải là C:\\.cursor. Đây là tool cho dev, không phải rules cho IDE.'
       },
       {
         title: 'Cài đặt package ở chế độ editable',
-        detail: 'Editable mode (-e) giúp bạn sửa source code trong cursor_framework/ mà không cần reinstall. Phù hợp khi bạn muốn customize framework.',
-        code: 'pip install -e ./cursor_framework',
+        detail: 'Editable mode (-e) giúp bạn sửa source code trong vibe_framework/ mà không cần reinstall. Phù hợp khi bạn muốn customize framework.',
+        code: 'pip install -e ./vibe_framework',
         codeLabel: 'Terminal'
       },
       {
         title: 'Verify CLI hoạt động',
-        detail: 'Sau khi cài, lệnh cursor-framework và python -m cursor_framework đều khả dụng. Version phải khớp với __version__ trong package.',
-        code: 'cursor-framework --version\n# hoặc\npython -m cursor_framework --version\n# Vibe Framework 1.3.0',
+        detail: 'Sau khi cài, lệnh vibe-framework và python -m vibe_framework đều khả dụng. Version phải khớp với __version__ trong package.',
+        code: 'vibe-framework --version\n# hoặc\npython -m vibe_framework --version\n# Vibe Framework 1.3.0',
         codeLabel: 'Verify'
       },
       {
         title: 'Khởi động Dashboard',
         detail: 'Chạy serve trong thư mục repo vừa clone. Server stdlib không cần thư viện ngoài. Mở trình duyệt theo URL in trên terminal.',
-        code: 'python -m cursor_framework serve --root .cursor --port 8765',
+        code: 'python -m vibe_framework serve --root .cursor --port 8765',
         codeLabel: 'CLI',
         tip: 'Mặc định bind 127.0.0.1 (localhost). Đổi sang --host 0.0.0.0 để truy cập từ máy khác. Production: đặt --auth-token để bảo vệ /api/*.'
       },
       {
         title: 'Thử một số lệnh CLI',
-        detail: 'cursor_framework CLI có 11 subcommands. Phổ biến nhất: warm (preload cache), stats (xem số liệu), scan (INDEX khô), ask (one-shot Workflow).',
-        code: 'python -m cursor_framework --help\npython -m cursor_framework stats\npython -m cursor_framework ask "summarize the framework"',
+        detail: 'vibe_framework CLI có 11 subcommands. Phổ biến nhất: warm (preload cache), stats (xem số liệu), scan (INDEX khô), ask (one-shot Workflow).',
+        code: 'python -m vibe_framework --help\npython -m vibe_framework stats\npython -m vibe_framework ask "summarize the framework"',
         codeLabel: 'Khám phá'
       },
       {
-        title: 'Restart Cursor IDE để reload rules',
-        detail: 'Package Python là dev tool riêng. Nó KHÔNG tự động cài rules .cursor/ vào Cursor IDE. Nếu bạn muốn dùng rules trong IDE, làm theo 1 trong 3 cách ở tab đầu (GUI / PowerShell / manual).'
+        title: 'Restart Vibe tool để reload rules',
+        detail: 'Package Python là dev tool riêng. Nó KHÔNG tự động cài rules vào Vibe tool. Nếu bạn muốn dùng rules trong tool, làm theo 1 trong 3 cách ở tab đầu (GUI / PowerShell / manual).'
       }
     ],
     verify: [
-      { ok: true, label: 'cursor-framework --version in đúng số version', hint: 'Hiện tại là 1.3.0' },
-      { ok: true, label: 'python -m cursor_framework --help liệt kê 11 subcommands', hint: 'serve, ask, warm, stats, scan, index, graph, clear-cache, serve-graph, tdam' },
-      { ok: true, label: 'python -m cursor_framework serve mở được dashboard', hint: 'Truy cập http://127.0.0.1:8765' },
-      { ok: true, label: 'python -m cursor_framework stats in JSON số liệu', hint: 'Phải có keys: assets, memory, cache' }
+      { ok: true, label: 'vibe-framework --version in đúng số version', hint: 'Hiện tại là 1.3.0' },
+      { ok: true, label: 'python -m vibe_framework --help liệt kê 11 subcommands', hint: 'serve, ask, warm, stats, scan, index, graph, clear-cache, serve-graph, tdam' },
+      { ok: true, label: 'python -m vibe_framework serve mở được dashboard', hint: 'Truy cập http://127.0.0.1:8765' },
+      { ok: true, label: 'python -m vibe_framework stats in JSON số liệu', hint: 'Phải có keys: assets, memory, cache' }
     ],
     troubleshooting: [
       {
-        problem: 'ModuleNotFoundError: No module named \'cursor_framework\'',
-        solution: 'Bạn quên bước pip install -e ./cursor_framework. Hoặc venv đang không active. Kiểm tra: which python và which pip phải cùng venv.'
+        problem: 'ModuleNotFoundError: No module named \'vibe_framework\'',
+        solution: 'Bạn quên bước pip install -e ./vibe_framework. Hoặc venv đang không active. Kiểm tra: which python và which pip phải cùng venv.'
       },
       {
         problem: 'pydantic VersionConflict hoặc ImportError pydantic',
@@ -242,7 +242,7 @@ const methods: InstallMethod[] = [
       },
       {
         problem: 'Sau khi sửa source code, CLI vẫn chạy code cũ',
-        solution: 'Editable mode tự reload khi import. Nếu không: pip install -e ./cursor_framework --force-reinstall --no-deps.'
+        solution: 'Editable mode tự reload khi import. Nếu không: pip install -e ./vibe_framework --force-reinstall --no-deps.'
       }
     ]
   },
@@ -289,8 +289,8 @@ const methods: InstallMethod[] = [
         codeLabel: 'Verify'
       },
       {
-        title: 'Restart Cursor IDE',
-        detail: 'Đóng và mở lại Cursor. Các rule và skill sẽ xuất hiện ngay.'
+        title: 'Restart your Vibe tool',
+        detail: 'Đóng và mở lại Vibe tool. Các rule và skill sẽ xuất hiện ngay.'
       }
     ],
     verify: [
@@ -383,8 +383,8 @@ const methods: InstallMethod[] = [
 
 const faqs: FaqItem[] = [
   {
-    q: 'Framework có tương thích với Cursor IDE miễn phí không?',
-    a: 'Có. Framework chỉ cần Cursor đọc được thư mục .cursor/ ở user-level. Mọi gói Cursor (Free, Pro, Business) đều dùng được. Tương tự với Claude Code, Windsurf, Cline, Roo Code, Vibe Code.'
+    q: 'Framework có dùng được với các Vibe tool miễn phí không?',
+    a: 'Có. Framework chỉ cần Vibe tool đọc được thư mục cấu hình tương ứng (.cursor/, .codex/, .claude/...). Mọi gói Cursor (Free, Pro, Business) đều dùng được, tương tự Claude Code, Codex, Windsurf, Cline, Roo Code.'
   },
   {
     q: 'Cài framework có làm chậm máy không?',
@@ -392,7 +392,7 @@ const faqs: FaqItem[] = [
   },
   {
     q: 'Có cần cài Python hay Node.js để dùng framework không?',
-    a: 'Không. Framework là tập rules và skills cho AI agent, không phải phần mềm chạy trên máy bạn. Chỉ cần Cursor IDE đọc file là đủ. Repo Python (cursor_framework) chỉ dùng nếu bạn muốn customize framework.'
+    a: 'Không. Framework là tập rules và skills cho AI agent, không phải phần mềm chạy trên máy bạn. Chỉ cần Vibe tool đọc file là đủ. Repo Python (vibe_framework) chỉ dùng nếu bạn muốn customize framework.'
   },
   {
     q: 'Làm sao để gỡ cài đặt?',
@@ -613,8 +613,8 @@ async function handleCopy(code: string, key: string) {
                 <div>
                   <h2 class="ins-section-title">Tổng quan</h2>
                   <p class="ins-section-sub">
-                    Bạn sẽ cài framework Cursor Enterprise vào thư mục <code>~/.cursor/</code>.
-                    Framework chỉ là tập file văn bản (rules, skills, agents) mà Cursor IDE
+                    Bạn sẽ cài framework vào thư mục cấu hình của Vibe tool (ví dụ <code>~/.cursor/</code>).
+                    Framework chỉ là tập file văn bản (rules, skills, agents) mà Vibe tool
                     tự động đọc. Không cần Python, Node, hay service nào chạy nền.
                   </p>
                 </div>
@@ -649,10 +649,10 @@ async function handleCopy(code: string, key: string) {
                   <div class="ins-callout-title">Bạn là dev Python? Bạn cần thêm bước này.</div>
                   <p class="ins-callout-text">
                     Framework có 2 phần: <strong>rules/skills</strong> (file văn bản, đọc bằng Cursor)
-                    và <strong>Python package <code>cursor_framework</code></strong> (CLI &
+                    và <strong>Python package <code>vibe_framework</code></strong> (CLI &
                     dashboard cho dev muốn build / scan / index). 3 cách cài bên dưới (GUI / PowerShell
                     / manual) chỉ cài phần rules. Để cài thêm Python package, chuyển sang tab
-                    <strong>Python package (cursor_framework)</strong> ở mục 02.
+                    <strong>Python package (vibe_framework)</strong> ở mục 02.
                   </p>
                 </div>
               </div>
@@ -944,9 +944,9 @@ async function handleCopy(code: string, key: string) {
 
                 <div class="ins-guide-wf-card">
                   <div class="ins-guide-wf-num">02</div>
-                  <div class="ins-guide-wf-title">Kích Hoạt Trong Cursor</div>
+                  <div class="ins-guide-wf-title">Kích Hoạt Trong Vibe Tool</div>
                   <p class="ins-guide-wf-desc">
-                    Mở Cursor IDE, nhấn <code>Ctrl + I</code> (Composer) hoặc <code>Ctrl + L</code> (Chat). Gõ lệnh slash (ví dụ: <code>/ui-ux</code>, <code>/frontend-taste</code>) và dán yêu cầu cụ thể của bạn.
+                    Mở Vibe tool của bạn (Cursor: <code>Ctrl + I</code> / <code>Ctrl + L</code>). Gõ lệnh slash (ví dụ: <code>/ui-ux</code>, <code>/frontend-taste</code>) và dán yêu cầu cụ thể của bạn.
                   </p>
                   <div class="ins-guide-wf-tip">Mẹo: AI sẽ tự nạp bộ Rules & Skills tương ứng mà bạn không cần cấu hình thêm.</div>
                 </div>
@@ -1181,7 +1181,7 @@ async function handleCopy(code: string, key: string) {
                     </svg>
                   </div>
                   <div class="ins-prereq-body">
-                    <div class="ins-prereq-title">Cursor IDE (bất kỳ gói nào)</div>
+                    <div class="ins-prereq-title">Vibe tool (bất kỳ gói nào)</div>
                     <p class="ins-prereq-desc">Free, Pro, Business đều được. Tương tự: Claude Code, Windsurf, Cline, Roo Code, Vibe Code.</p>
                   </div>
                 </div>

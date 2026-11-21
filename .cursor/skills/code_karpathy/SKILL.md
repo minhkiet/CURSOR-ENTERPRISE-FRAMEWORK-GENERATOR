@@ -27,7 +27,7 @@ name: code_karpathy
 
 > **Universal Overlay Skill** - Runs with every coding agent. Never skip.
 > 
-> Supports: Cursor IDE, Codex (cursor.com), Claude Code (@cursor/codex), Grok (x.com/grok)
+> Supports: Cursor IDE, OpenAI Codex, Claude Code, Grok, and other vibe tools
 
 ## Quick Card
 
@@ -330,12 +330,12 @@ def detect_agent():
 - **Limitations:** None significant
 - **Best practices:** Use `.cursor/rules/` for persistent guidance
 
-### Codex (cursor.com)
+### OpenAI Codex
 - **Strengths:** Cloud-based, repository awareness
 - **Limitations:** MCP tools may differ from local
 - **Best practices:** Export `ORIGIN_HOST` for repo context
 
-### Claude Code (@cursor/codex)
+### Claude Code
 - **Strengths:** Anthropic reasoning, long context
 - **Limitations:** Different tool naming conventions
 - **Best practices:** Use `--dangerously-skip-permissions` sparingly

@@ -84,7 +84,7 @@ Use this skill when you need to:
 
 ### Python API
 ```python
-from cursor_framework.integrations.code_graph_rag import CodeGraphRAG
+from vibe_framework.integrations.code_graph_rag import CodeGraphRAG
 
 rag = CodeGraphRAG(project_root=".")
 await rag.index()
@@ -99,7 +99,7 @@ results = await rag.query("How is auth implemented?")
 
 ## Alternative
 
-For simple dependency graphs without external services, use `cursor_framework.code_graph.CodeGraph` which provides basic file dependency tracking.
+For simple dependency graphs without external services, use `vibe_framework.code_graph.CodeGraph` which provides basic file dependency tracking.
 
 ## Post-Gates
 

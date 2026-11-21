@@ -14,7 +14,7 @@ description: Pentesting and OSINT bridge to AKCodez/hackingtool-plugin (183 tool
 
 # Pentest / OSINT — Framework Bridge
 
-This skill **wraps** [AKCodez/hackingtool-plugin](https://github.com/AKCodez/hackingtool-plugin) (183+ tools from Z4nzu/hackingtool) and adds the Codex Enterprise Framework gates. The upstream Python wrappers (`ht_env.py`, `ht_preflight.py`, `ht_search.py`, `ht_run.py`, `ht_index.py`) live in this repo at `tools/hackingtool-plugin/scripts/` and are **kept verbatim** — see `tools/hackingtool-plugin/SYNC.md`.
+This skill **wraps** [AKCodez/hackingtool-plugin](https://github.com/AKCodez/hackingtool-plugin) (183+ tools from Z4nzu/hackingtool) and adds the Vibe Enterprise Framework gates. The upstream Python wrappers (`ht_env.py`, `ht_preflight.py`, `ht_search.py`, `ht_run.py`, `ht_index.py`) live in this repo at `tools/hackingtool-plugin/scripts/` and are **kept verbatim** — see `tools/hackingtool-plugin/SYNC.md`.
 
 > **The skill is a thin router. The actual execution logic is in the upstream scripts. Read them once, trust them, call them.**
 

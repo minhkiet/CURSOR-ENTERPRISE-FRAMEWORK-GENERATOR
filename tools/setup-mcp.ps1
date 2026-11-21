@@ -1,4 +1,4 @@
-# Cursor Enterprise Framework - MCP Setup Script
+# Vibe Enterprise Framework - MCP Setup Script
 # Auto-generated: 2026-08-09
 # Run this script to set up all MCP servers
 
@@ -100,7 +100,7 @@ function Update-McpSettings($mcpConfigPath) {
 Write-Host @"
 
 ╔══════════════════════════════════════════════════════════════════╗
-║     Cursor Enterprise Framework - MCP Setup                     ║
+║     Vibe Enterprise Framework - MCP Setup                     ║
 ║     Version 1.0.0 | Framework 3.1.0                            ║
 ╚══════════════════════════════════════════════════════════════════╝
 
@@ -178,7 +178,7 @@ Write-Host @"
 ╔══════════════════════════════════════════════════════════════════╗
 ║                      MCP Stack Summary                          ║
 ╠══════════════════════════════════════════════════════════════════╣
-║  1. cursor-framework    : Rules, Skills, Agents Registry       ║
+║  1. vibe-framework    : Rules, Skills, Agents Registry       ║
 ║     Tools: get_rule, get_skill, get_agent, analyze_task,        ║
 ║            load_skill_bundle, get_essential_skills, clear_cache, ║
 ║            get_framework_status, optimize_framework              ║

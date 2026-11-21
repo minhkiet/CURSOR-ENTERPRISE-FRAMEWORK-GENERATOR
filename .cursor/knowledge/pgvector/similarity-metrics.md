@@ -4,7 +4,7 @@ description: "Hướng dẫn về các metrics đo lường similarity trong pgv
 tags: ["similarity", "cosine", "l2", "inner-product", "pgvector", "distance-metrics"]
 created: "2026-06-23"
 version: "1.0.0"
-framework: "Cursor Enterprise Framework"
+framework: "Vibe Enterprise Framework"
 ---
 
 # Similarity Metrics in pgvector
@@ -852,4 +852,4 @@ $$ LANGUAGE plpgsql;
 3. **Euclidean Distance**: https://en.wikipedia.org/wiki/Euclidean_distance
 4. **Inner Product**: https://en.wikipedia.org/wiki/Inner_product_space
 5. **Embedding Normalization**: https://txt.cohere.com/sentence-embeddings/
-6. **Cursor Enterprise Framework - Database Rules**: `.cursor/rules/pgvector.mdc`
+6. **Vibe Enterprise Framework - Database Rules**: `.cursor/rules/pgvector.mdc`

@@ -2,7 +2,7 @@
 description: Prompt chuan de review CRM SaaS - multi-tenant, RLS, billing
 trigger: crm saas, customer management
 category: SaaS
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

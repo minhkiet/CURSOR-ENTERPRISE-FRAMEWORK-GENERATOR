@@ -1,4 +1,4 @@
-# Cursor Framework Status Line Plugin
+# Vibe Framework Status Line Plugin
 
 Real-time telemetry and health monitoring in the Cursor IDE status bar.
 
@@ -9,7 +9,7 @@ Real-time telemetry and health monitoring in the Cursor IDE status bar.
 - **Auto-Refresh**: Configurable background polling and auto-update on file save.
 
 ## Settings
-- `cursorFramework.statusLine.enabled`: Toggle status bar visibility (default: `true`).
-- `cursorFramework.statusLine.refreshInterval`: Auto-refresh interval in ms (default: `30000`).
-- `cursorFramework.statusLine.showTokens`: Display memory token usage.
-- `cursorFramework.statusLine.showSkills`: Display skills count.
+- `vibeFramework.statusLine.enabled`: Toggle status bar visibility (default: `true`).
+- `vibeFramework.statusLine.refreshInterval`: Auto-refresh interval in ms (default: `30000`).
+- `vibeFramework.statusLine.showTokens`: Display memory token usage.
+- `vibeFramework.statusLine.showSkills`: Display skills count.

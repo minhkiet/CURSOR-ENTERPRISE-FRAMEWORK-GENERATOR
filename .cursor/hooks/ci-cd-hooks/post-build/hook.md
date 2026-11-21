@@ -1,7 +1,7 @@
 ---
 description: Post-Build Hook - Verify artifacts sau khi build
 trigger: sau build, post-build, build complete
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

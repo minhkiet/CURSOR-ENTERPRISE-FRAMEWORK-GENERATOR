@@ -2,7 +2,7 @@
 description: Prompt chuan de audit queue - Redis, RabbitMQ, consumer patterns
 trigger: queue, message broker, audit
 category: Database
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

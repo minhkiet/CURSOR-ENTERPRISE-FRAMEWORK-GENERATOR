@@ -82,7 +82,7 @@ def create_server(workspace_root: str | None = None, token_budget: int = 24_000)
     context = ContextManager(loader, memory, history, compressor)
     memory.load_from_disk()
 
-    mcp = FastMCP("cursor-memory-mcp", instructions=f"Token-aware hierarchical memory for Cursor Enterprise Framework. Workspace root: {root}")
+    mcp = FastMCP("cursor-memory-mcp", instructions=f"Token-aware hierarchical memory for Vibe Enterprise Framework. Workspace root: {root}")
 
     @mcp.tool()
     def store_memory(content: str, tier: str = "short", kind: str = "fact", project: str = "default", session: str = "default", tags: list[str] | None = None) -> str:

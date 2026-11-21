@@ -1,10 +1,10 @@
 {
   "name": "hackingtool-marketplace",
   "owner": {
-    "name": "Cursor Enterprise Framework"
+    "name": "Vibe Enterprise Framework"
   },
   "metadata": {
-    "description": "Local marketplace hosting the AKCodez/hackingtool-plugin (183+ pentest & OSINT tools) inside the Cursor Enterprise Framework Generator.",
+    "description": "Local marketplace hosting the AKCodez/hackingtool-plugin (183+ pentest & OSINT tools) inside the Vibe Enterprise Framework Generator.",
     "version": "0.2.0"
   },
   "plugins": [

@@ -2,7 +2,7 @@
 description: Prompt chuan de toi uu PDF - rendering, size, cross-browser
 trigger: pdf, tao pdf, generate pdf
 category: Generation
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

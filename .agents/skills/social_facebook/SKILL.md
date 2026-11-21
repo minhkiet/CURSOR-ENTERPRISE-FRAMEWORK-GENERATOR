@@ -6,12 +6,12 @@ description: "Facebook Graph API Integration Skill skill"
 # Facebook Graph API Integration Skill
 
 **Version:** 1.0.0  
-**Author:** Cursor Enterprise Framework  
+**Author:** Vibe Enterprise Framework
 **Triggers:** facebook, facebook api, facebook graph, facebook integration, meta
 
 ## Overview
 
-This skill provides Facebook Graph API integration for Cursor Enterprise Framework. It enables page management, post creation, Messenger bot functionality, and analytics.
+This skill provides Facebook Graph API integration for Vibe Enterprise Framework. It enables page management, post creation, Messenger bot functionality, and analytics.
 
 ## Capabilities
 

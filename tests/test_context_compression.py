@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from cursor_framework.context_builder import ContextBuilder
+from vibe_framework.context_builder import ContextBuilder
 
 
 def _skill_text(name: str) -> str:

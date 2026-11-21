@@ -359,7 +359,7 @@ onUnmounted(() => {
             <div class="section-label">Tự Động Hóa Với Cursor</div>
             <h2 class="cta-title">Cần xây dựng website chuyên nghiệp riêng?</h2>
             <p class="cta-desc">
-              Sử dụng các lệnh <code>/ui-ux</code>, <code>/dashboard-ui</code>, <code>/frontend-taste</code>, <code>/cms-landing-enterprise</code> hoặc <code>/image-workflow</code> trong Cursor IDE để khởi tạo giao diện theo contract có sẵn.
+              Sử dụng các lệnh <code>/ui-ux</code>, <code>/dashboard-ui</code>, <code>/frontend-taste</code>, <code>/cms-landing-enterprise</code> hoặc <code>/image-workflow</code> trong Vibe tool của bạn để khởi tạo giao diện theo contract có sẵn.
             </p>
           </div>
           <router-link to="/prompts" class="btn btn-primary">

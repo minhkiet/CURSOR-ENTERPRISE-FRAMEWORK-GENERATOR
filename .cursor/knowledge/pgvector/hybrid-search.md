@@ -4,7 +4,7 @@ description: "Hướng dẫn về hybrid search kết hợp vector similarity se
 tags: ["hybrid-search", "pgvector", "vector-search", "rrf", "reciprocal-rank-fusion"]
 created: "2026-06-23"
 version: "1.0.0"
-framework: "Cursor Enterprise Framework"
+framework: "Vibe Enterprise Framework"
 ---
 
 # Hybrid Search - Vector + SQL Filters
@@ -899,4 +899,4 @@ $$ LANGUAGE plpgsql;
 2. **Reciprocal Rank Fusion**: https://plg.uwaterloo.ca/~gvcormac/cormacksigir09-rrf.pdf
 3. **Hybrid Search Patterns**: https://www.pg屋子里.com/blog/hybrid-search-with-pgvector
 4. **PostgreSQL JSONB**: https://www.postgresql.org/docs/current/functions-json.html
-5. **Cursor Enterprise Framework - Database Rules**: `.cursor/rules/pgvector.mdc`
+5. **Vibe Enterprise Framework - Database Rules**: `.cursor/rules/pgvector.mdc`

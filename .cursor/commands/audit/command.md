@@ -2,7 +2,7 @@
 description: Audit - Security, Performance, Architecture, Database audit
 trigger: audit, security audit, performance audit, architecture audit, database audit, kiểm toán
 category: Quality
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

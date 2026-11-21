@@ -4,7 +4,7 @@
   "lastUpdated": "2026-06-26",
   "metadata": {
     "sourceProject": "CURSOR ENTERPRISE FRAMEWORK GENERATOR",
-    "author": "Cursor Enterprise Framework"
+    "author": "Vibe Enterprise Framework"
   },
   "source": {
     "root": "${SCRIPT_DIR}/../../",

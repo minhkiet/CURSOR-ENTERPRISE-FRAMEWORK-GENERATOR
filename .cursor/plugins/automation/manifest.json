@@ -1,59 +1,59 @@
 {
-  "name": "cursor-framework-automation",
+  "name": "vibe-framework-automation",
   "version": "1.0.0",
   "description": "Automated workflows, background auto-indexing, git hooks, and TDD quality gates",
-  "author": "Cursor Enterprise Framework",
+  "author": "Vibe Enterprise Framework",
   "activationEvents": [
     "onStartupFinished",
-    "onCommand:cursor-framework.automation.installHooks",
-    "onCommand:cursor-framework.automation.verifyGates",
-    "onCommand:cursor-framework.automation.runTdd",
-    "onCommand:cursor-framework.automation.toggleAutoWarm",
-    "onCommand:cursor-framework.automation.syncAllAgents"
+    "onCommand:vibe-framework.automation.installHooks",
+    "onCommand:vibe-framework.automation.verifyGates",
+    "onCommand:vibe-framework.automation.runTdd",
+    "onCommand:vibe-framework.automation.toggleAutoWarm",
+    "onCommand:vibe-framework.automation.syncAllAgents"
   ],
   "main": "index.js",
   "contributes": {
     "commands": [
       {
-        "command": "cursor-framework.automation.installHooks",
-        "title": "Cursor Framework: Install Git Quality Hooks",
-        "category": "Cursor Framework"
+        "command": "vibe-framework.automation.installHooks",
+        "title": "Vibe Framework: Install Git Quality Hooks",
+        "category": "Vibe Framework"
       },
       {
-        "command": "cursor-framework.automation.verifyGates",
-        "title": "Cursor Framework: Verify Quality Gates",
-        "category": "Cursor Framework"
+        "command": "vibe-framework.automation.verifyGates",
+        "title": "Vibe Framework: Verify Quality Gates",
+        "category": "Vibe Framework"
       },
       {
-        "command": "cursor-framework.automation.runTdd",
-        "title": "Cursor Framework: Run TDD Test Suite",
-        "category": "Cursor Framework"
+        "command": "vibe-framework.automation.runTdd",
+        "title": "Vibe Framework: Run TDD Test Suite",
+        "category": "Vibe Framework"
       },
       {
-        "command": "cursor-framework.automation.toggleAutoWarm",
-        "title": "Cursor Framework: Toggle Auto-Warm on Save",
-        "category": "Cursor Framework"
+        "command": "vibe-framework.automation.toggleAutoWarm",
+        "title": "Vibe Framework: Toggle Auto-Warm on Save",
+        "category": "Vibe Framework"
       },
       {
-        "command": "cursor-framework.automation.syncAllAgents",
-        "title": "Cursor Framework: Sync Cross-Agent Ecosystems",
-        "category": "Cursor Framework"
+        "command": "vibe-framework.automation.syncAllAgents",
+        "title": "Vibe Framework: Sync Cross-Agent Ecosystems",
+        "category": "Vibe Framework"
       }
     ],
     "configuration": {
-      "title": "Cursor Framework Automation",
+      "title": "Vibe Framework Automation",
       "properties": {
-        "cursorFramework.automation.autoWarmOnSave": {
+        "vibeFramework.automation.autoWarmOnSave": {
           "type": "boolean",
           "default": true,
           "description": "Automatically warm and re-index cache when skill or rule files are saved."
         },
-        "cursorFramework.automation.debounceMs": {
+        "vibeFramework.automation.debounceMs": {
           "type": "number",
           "default": 1500,
           "description": "Debounce delay in ms before triggering auto-warm on file changes."
         },
-        "cursorFramework.automation.enforceTdd": {
+        "vibeFramework.automation.enforceTdd": {
           "type": "boolean",
           "default": true,
           "description": "Enforce automated test passing before allowing commits."

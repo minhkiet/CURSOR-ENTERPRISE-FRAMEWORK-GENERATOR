@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace CursorSetupWpf.Services
 {
     /// <summary>
-    /// Launches cursor_framework CLI commands and optionally opens URLs.
+    /// Launches vibe_framework CLI commands and optionally opens URLs.
     /// Supports: serve, serve-graph, serve-api, scan, index, warm, stats, graph, dump-graph
     /// </summary>
     public class FrameworkRunner
@@ -96,7 +96,7 @@ namespace CursorSetupWpf.Services
         }
 
         /// <summary>
-        /// Walk up from a starting directory until we find cursor_framework.
+        /// Walk up from a starting directory until we find vibe_framework.
         /// </summary>
         static string ScanUpwardsForFramework(string startDir)
         {
@@ -106,7 +106,7 @@ namespace CursorSetupWpf.Services
                 var root = Path.GetPathRoot(dir);
                 while (dir != null && !dir.Equals(root, StringComparison.OrdinalIgnoreCase))
                 {
-                    var candidate = Path.Combine(dir, "cursor_framework");
+                    var candidate = Path.Combine(dir, "vibe_framework");
                     if (Directory.Exists(candidate) &&
                         (File.Exists(Path.Combine(candidate, "__init__.py")) ||
                          File.Exists(Path.Combine(candidate, "__main__.py"))))
@@ -121,21 +121,21 @@ namespace CursorSetupWpf.Services
         }
 
         /// <summary>
-        /// Try to find cursor_framework relative to a known project structure.
-        /// Looks for patterns like: .../cursor_framework/ (same level as vibe-setup-gui-wpf)
+        /// Try to find vibe_framework relative to a known project structure.
+        /// Looks for patterns like: .../vibe_framework/ (same level as vibe-setup-gui-wpf)
         /// </summary>
         static string FindInProjectStructure(string baseDir)
         {
             try
             {
-                // Common patterns: project root contains both cursor_framework and vibe-setup-gui-wpf
-                // e.g., D:\Projects\Cursor Framework\cursor_framework
+                // Common patterns: project root contains both vibe_framework and vibe-setup-gui-wpf
+                // e.g., D:\Projects\Vibe Framework\vibe_framework
                 var dirs = new[] {
-                    Path.Combine(baseDir, "..", "cursor_framework"),
-                    Path.Combine(baseDir, "..", "..", "cursor_framework"),
-                    Path.Combine(baseDir, "..", "..", "..", "cursor_framework"),
-                    Path.Combine(baseDir, "..", "Cursor Enterprise Framework Generator", "cursor_framework"),
-                    Path.Combine(baseDir, "..", "..", "Cursor Enterprise Framework Generator", "cursor_framework"),
+                    Path.Combine(baseDir, "..", "vibe_framework"),
+                    Path.Combine(baseDir, "..", "..", "vibe_framework"),
+                    Path.Combine(baseDir, "..", "..", "..", "vibe_framework"),
+                    Path.Combine(baseDir, "..", "Vibe Enterprise Framework Generator", "vibe_framework"),
+                    Path.Combine(baseDir, "..", "..", "Vibe Enterprise Framework Generator", "vibe_framework"),
                 };
 
                 foreach (var d in dirs)
@@ -154,10 +154,10 @@ namespace CursorSetupWpf.Services
         }
 
         /// <summary>
-        /// Find cursor_framework module path by scanning common locations.
-        /// Order: installPath/cursor_framework → installPath/../cursor_framework →
-        /// ~/.cursor/cursor_framework → AppContext.BaseDirectory/../cursor_framework
-        /// → AppContext.BaseDirectory/../../cursor_framework → current directory
+        /// Find vibe_framework module path by scanning common locations.
+        /// Order: installPath/vibe_framework → installPath/../vibe_framework →
+        /// ~/.cursor/vibe_framework → AppContext.BaseDirectory/../vibe_framework
+        /// → AppContext.BaseDirectory/../../vibe_framework → current directory
         /// </summary>
         static string FindFrameworkModulePath(string installPath)
         {
@@ -168,26 +168,26 @@ namespace CursorSetupWpf.Services
             var tryPaths = new List<string>
             {
                 // Relative to install path
-                Path.Combine(installPath, "cursor_framework"),
-                Path.Combine(installParent ?? "", "cursor_framework"),
+                Path.Combine(installPath, "vibe_framework"),
+                Path.Combine(installParent ?? "", "vibe_framework"),
                 // User profile default locations
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                    ".cursor", "cursor_framework"),
+                    ".cursor", "vibe_framework"),
                 // Relative to AppContext.BaseDirectory (for development builds)
-                Path.Combine(AppContext.BaseDirectory, "cursor_framework"),
-                Path.Combine(AppContext.BaseDirectory, "..", "cursor_framework"),
-                Path.Combine(AppContext.BaseDirectory, "..", "..", "cursor_framework"),
-                Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "cursor_framework"),
-                Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "cursor_framework"),
-                Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "cursor_framework"),
-                Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "..", "cursor_framework"),
+                Path.Combine(AppContext.BaseDirectory, "vibe_framework"),
+                Path.Combine(AppContext.BaseDirectory, "..", "vibe_framework"),
+                Path.Combine(AppContext.BaseDirectory, "..", "..", "vibe_framework"),
+                Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "vibe_framework"),
+                Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "vibe_framework"),
+                Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "vibe_framework"),
+                Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "..", "vibe_framework"),
                 // Current directory and parent directories (for when running from project root)
                 Environment.CurrentDirectory,
-                Path.Combine(Environment.CurrentDirectory, "cursor_framework"),
+                Path.Combine(Environment.CurrentDirectory, "vibe_framework"),
                 Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..")),
-                Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..", "cursor_framework")),
+                Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..", "vibe_framework")),
                 Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..", "..")),
-                Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..", "..", "cursor_framework")),
+                Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..", "..", "vibe_framework")),
             };
 
             foreach (var p in tryPaths)
@@ -219,7 +219,7 @@ namespace CursorSetupWpf.Services
         }
 
         /// <summary>
-        /// Run a cursor_framework command asynchronously with streaming output.
+        /// Run a vibe_framework command asynchronously with streaming output.
         /// timeoutSec: seconds until timeout (0 = no timeout, for server commands).
         /// </summary>
         public async Task RunCommandAsync(string command, string installPath, int timeoutSec = 60)
@@ -246,8 +246,8 @@ namespace CursorSetupWpf.Services
 
                 if (string.IsNullOrEmpty(modulePath))
                 {
-                    LogAppended?.Invoke("[FRAMEWORK] cursor_framework not found!");
-                    OutputReceived?.Invoke($"ERROR: cursor_framework module not found.\nInstall path: {installPath}");
+                    LogAppended?.Invoke("[FRAMEWORK] vibe_framework not found!");
+                    OutputReceived?.Invoke($"ERROR: vibe_framework module not found.\nInstall path: {installPath}");
                     return;
                 }
 
@@ -257,7 +257,7 @@ namespace CursorSetupWpf.Services
                 var psi = new ProcessStartInfo
                 {
                     FileName = python,
-                    Arguments = $"-m cursor_framework {command} --root \"{installPath}\"",
+                    Arguments = $"-m vibe_framework {command} --root \"{installPath}\"",
                     WorkingDirectory = workingDir,
                     UseShellExecute = false,
                     CreateNoWindow = true,
@@ -267,7 +267,7 @@ namespace CursorSetupWpf.Services
                     StandardErrorEncoding = Encoding.UTF8,
                 };
 
-                // Set PYTHONPATH so Python can locate cursor_framework
+                // Set PYTHONPATH so Python can locate vibe_framework
                 var env = psi.Environment;
                 env["PYTHONIOENCODING"] = "utf-8";
                 env["PYTHONUTF8"] = "1";
@@ -281,7 +281,7 @@ namespace CursorSetupWpf.Services
                 }
 
                 LogAppended?.Invoke($"[FRAMEWORK] Starting: {command}");
-                LogAppended?.Invoke($"         {python} -m cursor_framework {command} --root \"{installPath}\"");
+                LogAppended?.Invoke($"         {python} -m vibe_framework {command} --root \"{installPath}\"");
                 LogAppended?.Invoke($"         PYTHONPATH={env["PYTHONPATH"]}");
                 LogAppended?.Invoke($"         CWD={workingDir}");
 

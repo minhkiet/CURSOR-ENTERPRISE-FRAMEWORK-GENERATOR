@@ -1,5 +1,5 @@
 /**
- * Cursor Framework Automation Plugin
+ * Vibe Framework Automation Plugin
  * 
  * Provides automated background indexing, Git hooks management, TDD runner,
  * and cross-agent synchronization.
@@ -18,12 +18,12 @@ function getWorkspaceRoot() {
 }
 
 function getConfig(key, defaultValue = null) {
-    return vscode.workspace.getConfiguration('cursorFramework').get(key, defaultValue);
+    return vscode.workspace.getConfiguration('vibeFramework').get(key, defaultValue);
 }
 
 function log(msg) {
     if (!outputChannel) {
-        outputChannel = vscode.window.createOutputChannel('Cursor Framework Automation');
+        outputChannel = vscode.window.createOutputChannel('Vibe Framework Automation');
     }
     const timestamp = new Date().toLocaleTimeString();
     outputChannel.appendLine(`[${timestamp}] ${msg}`);
@@ -59,7 +59,7 @@ function scheduleAutoWarm() {
 
         log('Auto-warm triggered by workspace file modification.');
         try {
-            await execPython(['-m', 'cursor_framework', 'warm', '--root', `"${frameworkRoot}"`]);
+            await execPython(['-m', 'vibe_framework', 'warm', '--root', `"${frameworkRoot}"`]);
             log('Background re-indexing & cache warm completed.');
         } catch (err) {
             log(`Auto-warm failed: ${err.message}`);
@@ -111,11 +111,11 @@ async function verifyGates() {
         const frameworkRoot = path.join(workspaceRoot, rootPath);
 
         log('1. Scanning skills and rules consistency...');
-        const scanOut = await execPython(['-m', 'cursor_framework', 'scan', '--root', `"${frameworkRoot}"`]);
+        const scanOut = await execPython(['-m', 'vibe_framework', 'scan', '--root', `"${frameworkRoot}"`]);
         log(`Scan result: ${scanOut.slice(0, 150)}...`);
 
         log('2. Running automated test suite...');
-        const testOut = await execPython(['-m', 'unittest', 'discover', '-s', 'cursor_framework/tests', '-v']);
+        const testOut = await execPython(['-m', 'unittest', 'discover', '-s', 'vibe_framework/tests', '-v']);
         log(testOut);
 
         vscode.window.showInformationMessage('All Quality Gates passed successfully! (100% Green)');
@@ -129,7 +129,7 @@ async function runTdd() {
     log('Executing TDD Test Runner...');
     outputChannel.show(true);
     try {
-        const result = await execPython(['-m', 'unittest', 'discover', '-s', 'cursor_framework/tests', '-v']);
+        const result = await execPython(['-m', 'unittest', 'discover', '-s', 'vibe_framework/tests', '-v']);
         log(result);
         vscode.window.showInformationMessage('TDD Test suite execution completed.');
     } catch (err) {
@@ -141,9 +141,9 @@ async function runTdd() {
 async function syncAllAgents() {
     log('Syncing cross-agent configurations...');
     try {
-        const vibeOut = await execPython(['-m', 'cursor_framework', 'vibe', 'sync']);
+        const vibeOut = await execPython(['-m', 'vibe_framework', 'vibe', 'sync']);
         log(`Vibe sync: ${vibeOut}`);
-        const crossOut = await execPython(['-m', 'cursor_framework', 'cross-agent', 'export', '--all']).catch(() => 'Cross-agent sync completed.');
+        const crossOut = await execPython(['-m', 'vibe_framework', 'cross-agent', 'export', '--all']).catch(() => 'Cross-agent sync completed.');
         log(`Cross-agent export: ${crossOut}`);
         vscode.window.showInformationMessage('Cross-agent ecosystem (.cursor, .agents, .gemini, .codex) fully synchronized!');
     } catch (err) {
@@ -153,28 +153,28 @@ async function syncAllAgents() {
 }
 
 function activate(context) {
-    outputChannel = vscode.window.createOutputChannel('Cursor Framework Automation');
+    outputChannel = vscode.window.createOutputChannel('Vibe Framework Automation');
 
-    const installHooksCmd = vscode.commands.registerCommand('cursor-framework.automation.installHooks', installHooks);
-    const verifyGatesCmd = vscode.commands.registerCommand('cursor-framework.automation.verifyGates', verifyGates);
-    const runTddCmd = vscode.commands.registerCommand('cursor-framework.automation.runTdd', runTdd);
-    const syncCmd = vscode.commands.registerCommand('cursor-framework.automation.syncAllAgents', syncAllAgents);
-    const toggleAutoWarmCmd = vscode.commands.registerCommand('cursor-framework.automation.toggleAutoWarm', () => {
+    const installHooksCmd = vscode.commands.registerCommand('vibe-framework.automation.installHooks', installHooks);
+    const verifyGatesCmd = vscode.commands.registerCommand('vibe-framework.automation.verifyGates', verifyGates);
+    const runTddCmd = vscode.commands.registerCommand('vibe-framework.automation.runTdd', runTdd);
+    const syncCmd = vscode.commands.registerCommand('vibe-framework.automation.syncAllAgents', syncAllAgents);
+    const toggleAutoWarmCmd = vscode.commands.registerCommand('vibe-framework.automation.toggleAutoWarm', () => {
         const cur = getConfig('automation.autoWarmOnSave', true);
-        vscode.workspace.getConfiguration('cursorFramework').update('automation.autoWarmOnSave', !cur, vscode.ConfigurationTarget.Global);
+        vscode.workspace.getConfiguration('vibeFramework').update('automation.autoWarmOnSave', !cur, vscode.ConfigurationTarget.Global);
         vscode.window.showInformationMessage(`Auto-warm on save is now: ${!cur ? 'ENABLED' : 'DISABLED'}`);
     });
 
     context.subscriptions.push(installHooksCmd, verifyGatesCmd, runTddCmd, syncCmd, toggleAutoWarmCmd, outputChannel);
 
-    // Watch for changes in .cursor, .agents, cursor_framework
-    const fsw = vscode.workspace.createFileSystemWatcher('**/{.cursor,.agents,cursor_framework}/**/*.{json,md,py,toml}');
+    // Watch for changes in .cursor, .agents, vibe_framework
+    const fsw = vscode.workspace.createFileSystemWatcher('**/{.cursor,.agents,vibe_framework}/**/*.{json,md,py,toml}');
     fsw.onDidChange(scheduleAutoWarm);
     fsw.onDidCreate(scheduleAutoWarm);
     fsw.onDidDelete(scheduleAutoWarm);
     context.subscriptions.push(fsw);
 
-    log('Cursor Framework Automation Plugin activated successfully.');
+    log('Vibe Framework Automation Plugin activated successfully.');
 }
 
 function deactivate() {

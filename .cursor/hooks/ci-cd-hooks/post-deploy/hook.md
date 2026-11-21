@@ -1,7 +1,7 @@
 ---
 description: Post-Deploy Hook - Health check và notify sau deploy
 trigger: sau deploy, post-deploy, deployment complete
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

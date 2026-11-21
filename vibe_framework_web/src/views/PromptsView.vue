@@ -355,7 +355,7 @@ onMounted(() => {
               <header class="pr-panel-head">
                 <div>
                   <h2 class="pr-panel-title">2 · Nội dung Prompt</h2>
-                  <p class="pr-panel-desc">Tự do chỉnh sửa hoặc sao chép để dán vào Cursor IDE / AI Chat.</p>
+                  <p class="pr-panel-desc">Tự do chỉnh sửa hoặc sao chép để dán vào Vibe tool / AI Chat.</p>
                 </div>
                 <div class="pr-panel-head-actions">
                   <button

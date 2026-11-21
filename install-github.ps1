@@ -1,5 +1,5 @@
 # ============================================================
-# Cursor Enterprise Framework - GitHub Installer (PowerShell)
+# Vibe Enterprise Framework - GitHub Installer (PowerShell)
 # ============================================================
 # Supports:
 #   - Git clone (full history or shallow)
@@ -36,7 +36,7 @@ function Write-Err { param($msg) Write-Host "  [ERROR] $msg" -ForegroundColor Re
 # Banner
 Write-Host ""
 Write-Host "============================================================" -ForegroundColor Cyan
-Write-Host "  Cursor Enterprise Framework v4.2.0 - GitHub Installer" -ForegroundColor Cyan
+Write-Host "  Vibe Enterprise Framework v4.2.0 - GitHub Installer" -ForegroundColor Cyan
 Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host ""
 

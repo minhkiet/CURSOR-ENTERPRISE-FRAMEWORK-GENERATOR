@@ -4,7 +4,7 @@ description: "Hướng dẫn về đánh giá và benchmark các ANN (Approximat
 tags: ["ann", "evaluation", "benchmark", "recall", "qps", "pgvector", "performance"]
 created: "2026-06-23"
 version: "1.0.0"
-framework: "Cursor Enterprise Framework"
+framework: "Vibe Enterprise Framework"
 ---
 
 # ANN Evaluation - Benchmarking Vector Indexes
@@ -914,4 +914,4 @@ $$ LANGUAGE plpgsql;
 2. **HNSW Paper**: https://arxiv.org/abs/1603.09320
 3. **Recall Metrics**: https://en.wikipedia.org/wiki/Nearest_neighbor_search#Metrics
 4. **ANN Benchmarking**: https://github.com/erikbern/ann-benchmarks
-5. **Cursor Enterprise Framework - Performance Rules**: `.cursor/rules/performance.mdc`
+5. **Vibe Enterprise Framework - Performance Rules**: `.cursor/rules/performance.mdc`

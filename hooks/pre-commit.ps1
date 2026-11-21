@@ -1,4 +1,4 @@
-# Pre-Commit Hook for Cursor Framework (Windows PowerShell)
+# Pre-Commit Hook for Vibe Framework (Windows PowerShell)
 # Automatically warms cache and validates skills before commit
 
 param(
@@ -8,7 +8,7 @@ param(
 
 $ErrorActionPreference = "Continue"
 
-Write-Host "[Cursor Framework] Running pre-commit checks..." -ForegroundColor Yellow
+Write-Host "[Vibe Framework] Running pre-commit checks..." -ForegroundColor Yellow
 
 $FRAMEWORK_ROOT = if ($env:FRAMEWORK_ROOT) { $env:FRAMEWORK_ROOT } else { ".cursor" }
 $MEMORY_PATH = if ($env:MEMORY_PATH) { $env:MEMORY_PATH } else { ".cache/memory.json" }
@@ -29,18 +29,18 @@ if (-not $pythonCmd) {
 # Function to run framework command
 function Run-Framework {
     param([string]$Command, [string]$Root = $FRAMEWORK_ROOT)
-    & $pythonCmd -m cursor_framework $Command --root $Root 2>$null
+    & $pythonCmd -m vibe_framework $Command --root $Root 2>$null
 }
 
-# Check if cursor_framework module is available
+# Check if vibe_framework module is available
 $hasFramework = $false
 try {
-    $null = & $pythonCmd -c "import cursor_framework" 2>$null
+    $null = & $pythonCmd -c "import vibe_framework" 2>$null
     $hasFramework = $LASTEXITCODE -eq 0
 } catch {}
 
 if (-not $hasFramework) {
-    Write-Host "cursor_framework not installed. Skipping framework checks." -ForegroundColor Yellow
+    Write-Host "vibe_framework not installed. Skipping framework checks." -ForegroundColor Yellow
     exit 0
 }
 
@@ -94,7 +94,7 @@ if (Test-Path $indexPath) {
         Write-Host "INDEX.json is valid JSON" -ForegroundColor Green
     } catch {
         Write-Host "INDEX.json is malformed" -ForegroundColor Red
-        Write-Host "Consider running: python -m cursor_framework index" -ForegroundColor Yellow
+        Write-Host "Consider running: python -m vibe_framework index" -ForegroundColor Yellow
     }
 }
 
@@ -113,5 +113,5 @@ if ($missing -eq 0) {
     Write-Host "All required directories present" -ForegroundColor Green
 }
 
-Write-Host "[Cursor Framework] Pre-commit checks completed!" -ForegroundColor Yellow
+Write-Host "[Vibe Framework] Pre-commit checks completed!" -ForegroundColor Yellow
 exit 0

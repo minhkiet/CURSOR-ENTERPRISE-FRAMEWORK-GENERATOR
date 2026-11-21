@@ -4,14 +4,14 @@ from collections import deque
 from pathlib import Path
 import tempfile
 
-from cursor_framework.memory_manager import MemoryManager, MemoryTier
-from cursor_framework.memory_store import MemoryStore
-from cursor_framework.skill_discovery import (
+from vibe_framework.memory_manager import MemoryManager, MemoryTier
+from vibe_framework.memory_store import MemoryStore
+from vibe_framework.skill_discovery import (
     SkillDiscovery,
     SkillRegistry,
     get_shared_registry,
 )
-from cursor_framework.token_optimizer import TokenOptimizer
+from vibe_framework.token_optimizer import TokenOptimizer
 
 
 def test_save_if_dirty_skips_write(tmp_path: Path):

@@ -2,7 +2,7 @@
 
 ## Tổng quan
 
-Document này cung cấp 10+ best practices cho việc sử dụng AWS trong Cursor Enterprise Framework, kèm theo code examples cụ thể cho từng practice.
+Document này cung cấp 10+ best practices cho việc sử dụng AWS trong Vibe Enterprise Framework, kèm theo code examples cụ thể cho từng practice.
 
 ## Practice 1: Use IAM Roles Thay vì Access Keys
 

@@ -1,4 +1,4 @@
-# Codex Enterprise Framework — Codex Instructions
+# Vibe Enterprise Framework — Codex Instructions
 
 > Production-grade coding discipline, quality gates, and surgical implementation rules.
 > Harmonized with Superpowers methodology (TDD, Systematic Debugging, Multi-Agent Verification).
@@ -39,8 +39,8 @@
 ## 4. Verification Commands
 ```bash
 # Run Python test suite
-python -m unittest discover -s cursor_framework/tests -v
+python -m unittest discover -s vibe_framework/tests -v
 
 # Fast package execution via uv
-uv run cursor-framework stats
+uv run vibe-framework stats
 ```

@@ -2,7 +2,7 @@
 description: Refactor - Refactor code với design patterns và best practices
 trigger: refactor, tái cấu trúc, code refactor, improve code, clean code, restructure
 category: Refactoring
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

@@ -2,7 +2,7 @@
 description: Frontend - Frontend tasks (build landing, redesign, review, full-output)
 trigger: frontend, build frontend, create frontend, landing page, redesign, frontend review, ui build
 category: Frontend
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

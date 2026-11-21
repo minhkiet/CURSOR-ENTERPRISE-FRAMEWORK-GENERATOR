@@ -1,4 +1,4 @@
-# Cursor Framework Plugins
+# Vibe Framework Plugins
 
 This directory contains plugin integrations for Cursor IDE, Claude Code, and Agent ecosystems to enhance productivity, code quality, and telemetry.
 
@@ -67,13 +67,13 @@ Copy any desired plugin directory (or all) to your Cursor extensions/plugins dir
 
 ```bash
 # Preview only — creates no directories and copies no files
-python -m cursor_framework vibe install-plugins --dry-run
+python -m vibe_framework vibe install-plugins --dry-run
 
 # Machine-readable report for CI (errors still exit with code 1)
-python -m cursor_framework vibe install-plugins --json
+python -m vibe_framework vibe install-plugins --json
 
 # Explicit overwrite when a plugin directory already exists
-python -m cursor_framework vibe install-plugins --force
+python -m vibe_framework vibe install-plugins --force
 ```
 
 `install-plugins` uses runtime detection when `--tool` is omitted. If no

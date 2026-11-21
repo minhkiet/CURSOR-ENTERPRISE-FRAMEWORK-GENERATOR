@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 :: ============================================================
-:: Cursor Enterprise Framework Generator - Cross-Project Setup
+:: Vibe Enterprise Framework Generator - Cross-Project Setup
 :: Framework Version: 4.2.0
 :: ============================================================
 :: Installs skills, rules, memory, knowledge, prompts, workflows,
@@ -24,7 +24,7 @@ set "USER_WORKFLOWS=%USERPROFILE%\.cursor\workflows"
 set "USER_TEMPLATES=%USERPROFILE%\.cursor\templates"
 
 :: GitHub installation settings
-set "GITHUB_INSTALL_DIR=%TEMP%\cursor-framework-github"
+set "GITHUB_INSTALL_DIR=%TEMP%\vibe-framework-github"
 set "GITHUB_REPO=https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR"
 set "GITHUB_BRANCH=main"
 
@@ -135,7 +135,7 @@ if exist "%PICKER_TEMP%" del /f /q "%PICKER_TEMP%" >nul 2>&1
 powershell -ExecutionPolicy Bypass -NoProfile -Command "
 Add-Type -AssemblyName System.Windows.Forms
 $d = New-Object System.Windows.Forms.FolderBrowserDialog
-$d.Description = 'Select installation folder for Cursor Enterprise Framework'
+$d.Description = 'Select installation folder for Vibe Enterprise Framework'
 $d.UseDescriptionForTitle = $true
 $d.ShowNewFolderButton = $true
 $d.SelectedPath = [Environment]::GetFolderPath('UserProfile')
@@ -230,7 +230,7 @@ if exist "%GITHUB_INSTALL_DIR%" (
 mkdir "%GITHUB_INSTALL_DIR%" 2>nul
 
 :: Download ZIP file
-set "ZIP_FILE=%TEMP%\cursor-framework.zip"
+set "ZIP_FILE=%TEMP%\vibe-framework.zip"
 if exist "!ZIP_FILE!" del /f /q "!ZIP_FILE!" 2>nul
 
 echo   Downloading...
@@ -279,7 +279,7 @@ if !errorlevel! neq 0 (
 )
 
 :: Create a temporary clone to check
-set "CHECK_DIR=%TEMP%\cursor-framework-check"
+set "CHECK_DIR=%TEMP%\vibe-framework-check"
 if exist "!CHECK_DIR!" rmdir /s /q "!CHECK_DIR!" 2>nul
 mkdir "!CHECK_DIR!" 2>nul
 
@@ -306,7 +306,7 @@ if "%SOURCE_DIR:~-1%"=="\" set "SOURCE_DIR=%SOURCE_DIR:~0,-1%"
 
 echo.
 echo ============================================================
-echo   Cursor Enterprise Framework v4.2.0 - Cross-Project Setup
+echo   Vibe Enterprise Framework v4.2.0 - Cross-Project Setup
 echo ============================================================
 echo.
 echo   Source:        %SOURCE_DIR%

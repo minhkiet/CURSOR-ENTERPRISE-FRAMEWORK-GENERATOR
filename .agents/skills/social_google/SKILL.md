@@ -6,12 +6,12 @@ description: "Google APIs Integration Skill skill"
 # Google APIs Integration Skill
 
 **Version:** 1.0.0  
-**Author:** Cursor Enterprise Framework  
+**Author:** Vibe Enterprise Framework
 **Triggers:** google, google api, google drive, gmail, google calendar, google sheets
 
 ## Overview
 
-This skill provides Google APIs integration for Cursor Enterprise Framework. It supports Gmail, Google Drive, Google Calendar, and more.
+This skill provides Google APIs integration for Vibe Enterprise Framework. It supports Gmail, Google Drive, Google Calendar, and more.
 
 ## Capabilities
 

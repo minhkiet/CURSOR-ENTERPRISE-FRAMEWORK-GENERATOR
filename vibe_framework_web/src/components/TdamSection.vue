@@ -25,7 +25,7 @@ const commands: TdamCommand[] = [
   {
     cmd: 'status',
     desc: 'Kết nối TDAM, layer health, token stats',
-    example: 'python -m cursor_framework tdam status',
+    example: 'python -m vibe_framework tdam status',
     output: [
       '● TDAM Status',
       '├─ Connection:   ● Connected',
@@ -41,7 +41,7 @@ const commands: TdamCommand[] = [
   {
     cmd: 'recall',
     desc: 'Tra cứu memory theo query, lọc theo layer',
-    example: 'python -m cursor_framework tdam recall "user prefers Vietnamese" --layer L1,L3',
+    example: 'python -m vibe_framework tdam recall "user prefers Vietnamese" --layer L1,L3',
     output: [
       '● Recall — Top 3 memories',
       '│',
@@ -53,7 +53,7 @@ const commands: TdamCommand[] = [
   {
     cmd: 'compact',
     desc: 'Nén conversation qua Mermaid Canvas (symbolic memory)',
-    example: 'python -m cursor_framework tdam compact --session <sid> --ratio 0.7',
+    example: 'python -m vibe_framework tdam compact --session <sid> --ratio 0.7',
     output: [
       '● Offload Compact',
       '├─ Original tokens:    28,492',
@@ -66,7 +66,7 @@ const commands: TdamCommand[] = [
   {
     cmd: 'persona',
     desc: 'Xem / cập nhật long-term user persona',
-    example: 'python -m cursor_framework tdam persona --show',
+    example: 'python -m vibe_framework tdam persona --show',
     output: [
       '● User Persona (L3)',
       '├─ locale:         vi-VN',
@@ -117,7 +117,7 @@ const layers = [
         <h2 class="section-title">Bộ nhớ dài hạn cho agent, token có kiểm soát.</h2>
         <p class="section-desc">
           <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory" target="_blank" rel="noopener" class="ext-link">TencentCloud/TencentDB-Agent-Memory</a>
-          được tích hợp vào <code class="inline-code">cursor_framework</code> theo hướng local-first. Bộ nhớ L0→L3
+          được tích hợp vào <code class="inline-code">vibe_framework</code> theo hướng local-first. Bộ nhớ L0→L3
           và nén Mermaid Canvas giúp giữ ngữ cảnh dài hạn mà vẫn kiểm soát được chi phí token.
         </p>
       </div>
@@ -145,7 +145,7 @@ const layers = [
           <span class="tdam-dot tdam-dot-red"></span>
           <span class="tdam-dot tdam-dot-yellow"></span>
           <span class="tdam-dot tdam-dot-green"></span>
-          <span class="tdam-terminal-name">cursor_framework · TDAM CLI</span>
+          <span class="tdam-terminal-name">vibe_framework · TDAM CLI</span>
           <span class="tdam-terminal-tag">v1.3.0</span>
         </header>
 

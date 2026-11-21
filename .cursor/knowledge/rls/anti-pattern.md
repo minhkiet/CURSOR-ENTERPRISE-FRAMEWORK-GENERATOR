@@ -748,5 +748,5 @@ GRANT SELECT ON products TO authenticated;
 - [Supabase RLS Guidelines](https://supabase.com/docs/guides/auth/row-level-security)
 - [OWASP Authentication Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)
 - [PostgreSQL pg_policies](https://www.postgresql.org/docs/current/view-pg-policies.html)
-- [Cursor Enterprise Framework Security Rules](../rules/security.md)
-- [Cursor Enterprise Framework Multi-Tenant Rules](../rules/multi-tenant.md)
+- [Vibe Enterprise Framework Security Rules](../rules/security.md)
+- [Vibe Enterprise Framework Multi-Tenant Rules](../rules/multi-tenant.md)

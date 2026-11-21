@@ -1,4 +1,4 @@
-# Hooks Installer for Cursor Framework
+# Hooks Installer for Vibe Framework
 # Installs git hooks for automatic framework operations
 
 param(
@@ -14,7 +14,7 @@ $HOOKS_DIR = ".git\hooks"
 $SCRIPT_DIR = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Cyan
-Write-Host "  Cursor Framework Hooks Installer" -ForegroundColor Cyan
+Write-Host "  Vibe Framework Hooks Installer" -ForegroundColor Cyan
 Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Cyan
 Write-Host ""
 
@@ -38,7 +38,7 @@ if ($Uninstall) {
             # PowerShell - check for marker
             if (Test-Path $hookPath) {
                 $content = Get-Content $hookPath -Raw -ErrorAction SilentlyContinue
-                if ($content -match "Cursor Framework") {
+                if ($content -match "Vibe Framework") {
                     Remove-Item $hookPath -Force
                     Write-Host "Removed: $hook" -ForegroundColor Green
                 }
@@ -83,7 +83,7 @@ foreach ($hook in $Hooks) {
     } else {
         # Windows PowerShell - create wrapper
         $wrapperContent = @"
-# Cursor Framework Hook: $hook
+# Vibe Framework Hook: $hook
 # Generated at $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
 
 # Run PowerShell hook
@@ -97,7 +97,7 @@ exit `$LASTEXITCODE
         if ($hook -eq "pre-commit" -and (Test-Path "$SCRIPT_DIR\pre-commit")) {
             $wrapperContent = @"
 #!/bin/bash
-# Cursor Framework Hook: $hook
+# Vibe Framework Hook: $hook
 # Generated at $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
 
 # Run shell script if bash is available

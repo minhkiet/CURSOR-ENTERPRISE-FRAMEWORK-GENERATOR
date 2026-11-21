@@ -2,7 +2,7 @@
 description: Tuvi - Tính Tử Vi (Vietnamese Astrology)
 trigger: tuvi, tử vi, vietnamese astrology, lá số tử vi, sao chiếu, cung mệnh
 category: Domain
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

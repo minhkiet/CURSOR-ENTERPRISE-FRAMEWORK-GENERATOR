@@ -1,117 +1,117 @@
 {
-  "name": "cursor-framework-quick-actions",
+  "name": "vibe-framework-quick-actions",
   "version": "1.0.0",
-  "description": "Quick actions for Cursor Framework operations",
-  "author": "Cursor Enterprise Framework",
+  "description": "Quick actions for Vibe Framework operations",
+  "author": "Vibe Enterprise Framework",
   "activationEvents": [
-    "onCommand:cursor-framework.warm",
-    "onCommand:cursor-framework.stats",
-    "onCommand:cursor-framework.clear-cache",
-    "onCommand:cursor-framework.scan",
-    "onCommand:cursor-framework.dashboard",
-    "onCommand:cursor-framework.dump-context"
+    "onCommand:vibe-framework.warm",
+    "onCommand:vibe-framework.stats",
+    "onCommand:vibe-framework.clear-cache",
+    "onCommand:vibe-framework.scan",
+    "onCommand:vibe-framework.dashboard",
+    "onCommand:vibe-framework.dump-context"
   ],
   "main": "index.js",
   "contributes": {
     "commands": [
       {
-        "command": "cursor-framework.warm",
-        "title": "Cursor Framework: Warm Cache",
-        "category": "Cursor Framework",
+        "command": "vibe-framework.warm",
+        "title": "Vibe Framework: Warm Cache",
+        "category": "Vibe Framework",
         "description": "Warm up framework cache (scan + persist)"
       },
       {
-        "command": "cursor-framework.stats",
-        "title": "Cursor Framework: Show Stats",
-        "category": "Cursor Framework",
+        "command": "vibe-framework.stats",
+        "title": "Vibe Framework: Show Stats",
+        "category": "Vibe Framework",
         "description": "Show framework statistics"
       },
       {
-        "command": "cursor-framework.clear-cache",
-        "title": "Cursor Framework: Clear Cache",
-        "category": "Cursor Framework",
+        "command": "vibe-framework.clear-cache",
+        "title": "Vibe Framework: Clear Cache",
+        "category": "Vibe Framework",
         "description": "Clear framework cache"
       },
       {
-        "command": "cursor-framework.scan",
-        "title": "Cursor Framework: Scan Skills",
-        "category": "Cursor Framework",
+        "command": "vibe-framework.scan",
+        "title": "Vibe Framework: Scan Skills",
+        "category": "Vibe Framework",
         "description": "Scan .cursor directory for skills and rules"
       },
       {
-        "command": "cursor-framework.dashboard",
-        "title": "Cursor Framework: Open Dashboard",
-        "category": "Cursor Framework",
+        "command": "vibe-framework.dashboard",
+        "title": "Vibe Framework: Open Dashboard",
+        "category": "Vibe Framework",
         "description": "Open framework dashboard in browser"
       },
       {
-        "command": "cursor-framework.dump-context",
-        "title": "Cursor Framework: Dump Context",
-        "category": "Cursor Framework",
+        "command": "vibe-framework.dump-context",
+        "title": "Vibe Framework: Dump Context",
+        "category": "Vibe Framework",
         "description": "Dump current session context to file"
       },
       {
-        "command": "cursor-framework.graph",
-        "title": "Cursor Framework: View Skill Graph",
-        "category": "Cursor Framework",
+        "command": "vibe-framework.graph",
+        "title": "Vibe Framework: View Skill Graph",
+        "category": "Vibe Framework",
         "description": "Open skill dependency graph visualization"
       },
       {
-        "command": "cursor-framework.index",
-        "title": "Cursor Framework: Rebuild Index",
-        "category": "Cursor Framework",
+        "command": "vibe-framework.index",
+        "title": "Vibe Framework: Rebuild Index",
+        "category": "Vibe Framework",
         "description": "Rebuild skill index (INDEX.json + INDEX.md)"
       },
       {
-        "command": "cursor-framework.find-skills",
-        "title": "Cursor Framework: Find Skills",
-        "category": "Cursor Framework",
+        "command": "vibe-framework.find-skills",
+        "title": "Vibe Framework: Find Skills",
+        "category": "Vibe Framework",
         "description": "Find skills matching a query"
       },
       {
-        "command": "cursor-framework.code-graph",
-        "title": "Cursor Framework: Code Graph",
-        "category": "Cursor Framework",
+        "command": "vibe-framework.code-graph",
+        "title": "Vibe Framework: Code Graph",
+        "category": "Vibe Framework",
         "description": "Scan and view project code graph"
       }
     ],
     "menus": {
       "commandPalette": [
         {
-          "command": "cursor-framework.warm",
+          "command": "vibe-framework.warm",
           "when": "workspaceFolderExists"
         },
         {
-          "command": "cursor-framework.stats",
+          "command": "vibe-framework.stats",
           "when": "workspaceFolderExists"
         }
       ],
       "editor/context": [
         {
-          "command": "cursor-framework.dump-context",
+          "command": "vibe-framework.dump-context",
           "when": "editorTextFocus"
         }
       ]
     },
     "configuration": {
-      "title": "Cursor Framework",
+      "title": "Vibe Framework",
       "properties": {
-        "cursorFramework.rootPath": {
+        "vibeFramework.rootPath": {
           "type": "string",
           "default": ".cursor",
           "description": "Path to .cursor directory"
         },
-        "cursorFramework.memoryPath": {
+        "vibeFramework.memoryPath": {
           "type": "string",
           "default": ".cache/memory.json",
           "description": "Path to memory cache file"
         },
-        "cursorFramework.dashboardPort": {
+        "vibeFramework.dashboardPort": {
           "type": "number",
           "default": 8765,
           "description": "Port for dashboard server"
         },
-        "cursorFramework.autoWarm": {
+        "vibeFramework.autoWarm": {
           "type": "boolean",
           "default": false,
           "description": "Automatically warm cache on startup"
@@ -120,13 +120,13 @@
     },
     "keybindings": [
       {
-        "command": "cursor-framework.stats",
+        "command": "vibe-framework.stats",
         "key": "ctrl+shift+f1",
         "mac": "cmd+shift+f1",
         "when": "workspaceFolderExists"
       },
       {
-        "command": "cursor-framework.warm",
+        "command": "vibe-framework.warm",
         "key": "ctrl+shift+f2",
         "mac": "cmd+shift+f2",
         "when": "workspaceFolderExists"

@@ -137,7 +137,7 @@ class GitHubSkillImporter:
             url,
             headers={
                 "Accept": "application/vnd.github+json",
-                "User-Agent": "cursor-enterprise-framework-skill-importer/1.0",
+                "User-Agent": "vibe-framework-skill-importer/1.0",
             },
         )
         github_token = os.environ.get("GITHUB_TOKEN")
@@ -438,12 +438,12 @@ class SkillInstaller:
                 "repo": "mcp-servers/shopee-mcp",
                 "path": "skills/shopee-api"
             },
-            # Cursor Framework
-            "cursor-framework": {
-                "name": "Cursor Framework",
-                "description": "Cursor Enterprise Framework - rules, skills, agents registry",
+            # Vibe Framework
+            "vibe-framework": {
+                "name": "Vibe Framework",
+                "description": "Vibe Enterprise Framework - rules, skills, agents registry",
                 "repo": "thaofvn-coca06/2026",
-                "path": "cursor_framework"
+                "path": "vibe_framework"
             },
         }
     
@@ -544,7 +544,7 @@ See official documentation at: https://github.com/{info['repo']}
         # Create LICENSE
         license_content = f"""MIT License
 
-Copyright (c) 2026 Cursor Enterprise Framework
+Copyright (c) 2026 Vibe Enterprise Framework
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -609,7 +609,7 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Skill Installer for Cursor Enterprise Framework"
+        description="Skill Installer for Vibe Enterprise Framework"
     )
     
     sub = parser.add_subparsers(dest="cmd", help="Commands")

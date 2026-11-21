@@ -1,10 +1,10 @@
-﻿# Cursor Enterprise Framework V4 - Project Overview
+﻿# Vibe Enterprise Framework V4 - Project Overview
 
 ## Version
 4.0.0 - 2026-06-23
 
 ## Giới thiệu
-Cursor Enterprise Framework là framework hoàn chỉnh dành cho AI coding agents, được thiết kế để tối ưu hóa hiệu suất làm việc của AI agents trên nhiều IDE.
+Vibe Enterprise Framework là framework hoàn chỉnh dành cho AI coding agents, được thiết kế để tối ưu hóa hiệu suất làm việc của AI agents trên nhiều IDE.
 
 ## Compatibility Matrix
 

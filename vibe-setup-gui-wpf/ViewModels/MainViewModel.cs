@@ -427,10 +427,10 @@ namespace CursorSetupWpf.ViewModels
         bool _enablePostInstallHook = true;
         public bool EnablePostInstallHook { get => _enablePostInstallHook; set => Set(ref _enablePostInstallHook, value); }
 
-        string _preScanScript = "-m cursor_framework.indexer --validate";
+        string _preScanScript = "-m vibe_framework.indexer --validate";
         public string PreScanScript { get => _preScanScript; set => Set(ref _preScanScript, value); }
 
-        string _postInstallScript = "-m cursor_framework.indexer";
+        string _postInstallScript = "-m vibe_framework.indexer";
         public string PostInstallScript { get => _postInstallScript; set => Set(ref _postInstallScript, value); }
 
         // Progress / Status

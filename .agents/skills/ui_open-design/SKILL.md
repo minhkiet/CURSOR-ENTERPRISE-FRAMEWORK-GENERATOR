@@ -7,7 +7,7 @@ description: Integrate Open Design MCP for UI generation, design systems, protot
 
 ## Mục tiêu
 
-Tích hợp Open Design (nexu-io/open-design) vào Codex Enterprise Framework để:
+Tích hợp Open Design (nexu-io/open-design) vào Vibe Enterprise Framework để:
 - Sử dụng 100+ skills và 150 design systems có sẵn
 - Tự động hóa thiết kế UI chuyên nghiệp không thuần AI
 - Kết nối với các coding agent qua MCP server

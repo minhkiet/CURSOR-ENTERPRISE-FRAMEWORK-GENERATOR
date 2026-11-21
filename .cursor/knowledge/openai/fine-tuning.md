@@ -1951,4 +1951,4 @@ main().catch(console.error);
 
 ---
 
-**Tài liệu này là một phần của Cursor Enterprise Framework Generator.**
+**Tài liệu này là một phần của Vibe Enterprise Framework Generator.**

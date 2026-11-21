@@ -99,7 +99,7 @@ if (Test-Path $OutputZip) {
 }
 if (Test-Path $TempZip) { Remove-Item $TempZip -Force }
 
-# Stage .cursor/ + cursor_framework/ into a temp dir so the zip contains
+# Stage .cursor/ + vibe_framework/ into a temp dir so the zip contains
 # both the framework rules/skills/agents AND the Python package that the
 # WPF GUI's FrameworkRunner expects to find.
 $StagingDir = Join-Path $env:TEMP "cursor-setup-staging-$([System.Guid]::NewGuid().ToString('N'))"
@@ -150,20 +150,20 @@ try {
         }
     }
 
-    # Bundle Python package so `python -m cursor_framework` works after install.
-    $pkgSrc = Join-Path $RepoRoot "cursor_framework"
+    # Bundle Python package so `python -m vibe_framework` works after install.
+    $pkgSrc = Join-Path $RepoRoot "vibe_framework"
     if (Test-Path $pkgSrc) {
-        $pkgDest = Join-Path $StagingDir "cursor_framework"
+        $pkgDest = Join-Path $StagingDir "vibe_framework"
         Copy-Item -Path $pkgSrc -Destination $pkgDest -Recurse -Force
         # Strip dev artifacts that bloat the zip and serve no runtime purpose.
         Get-ChildItem -Path $pkgDest -Force |
-            Where-Object { $_.Name -in @("__pycache__", "build", "review", "tests", ".cache", "cursor_framework.egg-info") } |
+            Where-Object { $_.Name -in @("__pycache__", "build", "review", "tests", ".cache", "vibe_framework.egg-info") } |
             ForEach-Object { Remove-Item -Path $_.FullName -Recurse -Force -ErrorAction SilentlyContinue }
         Get-ChildItem -Path $pkgDest -Recurse -Directory -Force -Filter "__pycache__" |
             ForEach-Object { Remove-Item -Path $_.FullName -Recurse -Force -ErrorAction SilentlyContinue }
-        Write-Host "  [OK] Bundled cursor_framework Python package" -ForegroundColor Green
+        Write-Host "  [OK] Bundled vibe_framework Python package" -ForegroundColor Green
     } else {
-        Write-Host "  [WARN] cursor_framework package not found at $pkgSrc" -ForegroundColor Yellow
+        Write-Host "  [WARN] vibe_framework package not found at $pkgSrc" -ForegroundColor Yellow
     }
 
     # Also ship requirements.txt + pyproject.toml at zip root for editable installs.
@@ -207,7 +207,7 @@ Write-Host "  Directories: $dirs"
 Write-Host "  Files: $files"
 
 # Check expected categories
-$expectedDirs = @("agents", "commands", "hooks", "knowledge", "memory", "mcp", "prompts", "references", "rules", "scripts", "skills", "templates", "workflows", "cursor_framework")
+$expectedDirs = @("agents", "commands", "hooks", "knowledge", "memory", "mcp", "prompts", "references", "rules", "scripts", "skills", "templates", "workflows", "vibe_framework")
 $missingDirs = @()
 foreach ($d in $expectedDirs) {
     if (-not (Test-Path (Join-Path $verifyDir $d))) {

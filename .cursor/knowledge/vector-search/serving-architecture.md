@@ -4,7 +4,7 @@ description: "Hướng dẫn về vector database deployment: index serving, col
 tags: ["serving", "deployment", "architecture", "scaling", "caching", "horizontal-scaling"]
 created: "2026-06-23"
 version: "1.0.0"
-framework: "Cursor Enterprise Framework"
+framework: "Vibe Enterprise Framework"
 ---
 
 # Serving Architecture
@@ -1395,4 +1395,4 @@ class VectorSearchMonitoring:
 1. **Vector Database Architecture**: https://docs.pinecone.io/docs/architecture
 2. **Kubernetes Vector Search**: https://kubernetes.io/docs/tutorials/
 3. **Monitoring Best Practices**: https://prometheus.io/docs/practices/
-4. **Cursor Enterprise Framework - Vector Search Rules**: `.cursor/rules/vector-search.mdc`
+4. **Vibe Enterprise Framework - Vector Search Rules**: `.cursor/rules/vector-search.mdc`

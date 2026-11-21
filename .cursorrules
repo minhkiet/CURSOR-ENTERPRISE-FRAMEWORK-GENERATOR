@@ -1,4 +1,4 @@
-# Codex Enterprise Framework — Cursor IDE Instructions
+# Vibe Enterprise Framework — Cursor IDE Instructions
 
 > Production-grade coding discipline, quality gates, and surgical implementation rules.
 
@@ -21,14 +21,14 @@
 
 ## 3. Tool-Specific Runtime Guidelines
 - Work natively with `.cursor/rules/*.mdc` for domain-specific architecture guidelines.
-- Use `python -m cursor_framework ask` or `cursor-warm` to keep context index fresh.
+- Use `python -m vibe_framework ask` or `vibe-warm` to keep context index fresh.
 - Keep `.cursorrules` concise to prevent context window saturation.
 
 ## 4. Verification Commands
 ```bash
 # Run Python test suite
-python -m unittest discover -s cursor_framework/tests -v
+python -m unittest discover -s vibe_framework/tests -v
 
 # Fast package execution via uv
-uv run cursor-framework stats
+uv run vibe-framework stats
 ```

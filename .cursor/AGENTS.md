@@ -1,4 +1,4 @@
-# Cursor Enterprise Framework - Agent Personas & Lifecycle Protocol
+# Vibe Enterprise Framework - Agent Personas & Lifecycle Protocol
 
 > Based on [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) (67k stars) and [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) (186k stars)
 
@@ -6,7 +6,7 @@
 
 ## Tổng quan
 
-Cursor Enterprise Framework tích hợp **Agent Personas** từ agent-skills - các specialist personas cho targeted reviews, cùng với **Slash Commands** cho development lifecycle.
+Vibe Enterprise Framework tích hợp **Agent Personas** từ agent-skills - các specialist personas cho targeted reviews, cùng với **Slash Commands** cho development lifecycle.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐

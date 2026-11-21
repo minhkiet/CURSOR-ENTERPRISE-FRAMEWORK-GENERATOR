@@ -816,4 +816,4 @@ SELECT * FROM performance_schema.memory_summary_by_account_by_event_name;
 
 *Document version: 1.0.0*
 *Last updated: 2026-06-23*
-*Framework: Cursor Enterprise Framework*
+*Framework: Vibe Enterprise Framework*

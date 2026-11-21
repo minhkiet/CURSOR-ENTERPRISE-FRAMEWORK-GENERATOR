@@ -1,10 +1,10 @@
-"""Tests for cursor_framework.watcher."""
+"""Tests for vibe_framework.watcher."""
 from __future__ import annotations
 
 import time
 from pathlib import Path
 
-from cursor_framework.watcher import Watcher
+from vibe_framework.watcher import Watcher
 
 
 def test_detects_file_creation(sandbox_writable: Path):

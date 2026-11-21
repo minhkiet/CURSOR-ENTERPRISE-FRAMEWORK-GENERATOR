@@ -1,12 +1,12 @@
 {
-  "name": "cursor-enterprise-framework-plugins",
+  "name": "vibe-enterprise-framework-plugins",
   "version": "1.2.1",
-  "description": "Official plugin collection for Cursor Enterprise Framework",
-  "author": "Cursor Enterprise Framework Team",
-  "homepage": "https://github.com/cursor-enterprise/framework",
+  "description": "Official plugin collection for Vibe Enterprise Framework",
+  "author": "Vibe Enterprise Framework Team",
+  "homepage": "https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR",
   "plugins": [
     {
-      "id": "cursor-framework-quick-actions",
+      "id": "vibe-framework-quick-actions",
       "name": "Quick Actions",
       "path": "quick-actions",
       "entry": "quick-actions/index.js",
@@ -16,7 +16,7 @@
       "enabled": true
     },
     {
-      "id": "cursor-framework-status-line",
+      "id": "vibe-framework-status-line",
       "name": "Status Line",
       "path": "status-line",
       "entry": "status-line/index.js",
@@ -26,7 +26,7 @@
       "enabled": true
     },
     {
-      "id": "cursor-framework-automation",
+      "id": "vibe-framework-automation",
       "name": "Automation & Hooks",
       "path": "automation",
       "entry": "automation/index.js",
@@ -36,7 +36,7 @@
       "enabled": true
     },
     {
-      "id": "cursor-framework-context-monitor",
+      "id": "vibe-framework-context-monitor",
       "name": "Context Monitor",
       "path": "context-monitor",
       "entry": "context-monitor/index.js",
@@ -46,7 +46,7 @@
       "enabled": true
     },
     {
-      "id": "cursor-framework-spec-kit",
+      "id": "vibe-framework-spec-kit",
       "name": "Spec Kit (SDD)",
       "path": "spec-kit",
       "entry": "spec-kit/index.js",
@@ -56,7 +56,7 @@
       "enabled": true
     },
     {
-      "id": "cursor-framework-hackingtool",
+      "id": "vibe-framework-hackingtool",
       "name": "Security & Pentest Suite",
       "path": "hackingtool",
       "entry": "hackingtool/index.js",

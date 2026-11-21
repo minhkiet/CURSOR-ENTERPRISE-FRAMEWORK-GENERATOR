@@ -1,5 +1,5 @@
 ﻿# ==============================================================================
-# Cursor Enterprise Framework - Multi-Tool Vibe Coding Plugin Installer
+# Vibe Enterprise Framework - Multi-Tool Vibe Coding Plugin Installer
 # ==============================================================================
 # Supports: Cursor, Windsurf, Claude Code, Google Antigravity, Cline, Roo Code, Codex, Copilot
 # Usage examples:
@@ -62,7 +62,7 @@ $availablePlugins = Get-ChildItem -Path $PluginsDir -Directory | Where-Object {
 }
 
 if ($List) {
-    Write-Header "Available Cursor Enterprise Framework Plugins"
+    Write-Header "Available Vibe Enterprise Framework Plugins"
     Write-Host "Found $($availablePlugins.Count) plugins in: $PluginsDir" -ForegroundColor White
     Write-Host ""
     foreach ($p in $availablePlugins) {

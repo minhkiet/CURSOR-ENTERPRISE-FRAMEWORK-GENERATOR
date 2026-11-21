@@ -1,7 +1,7 @@
 ---
 description: Pre-Deploy Hook - Final checks trước khi deploy
 trigger: trước deploy, pre-deploy, deployment check
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

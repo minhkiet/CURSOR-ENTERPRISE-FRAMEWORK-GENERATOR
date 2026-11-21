@@ -2,7 +2,7 @@
 description: Review Code - Review code quality, correctness, performance
 trigger: review code, code review, review, kiểm tra code, review pr, pull request review
 category: Quality
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

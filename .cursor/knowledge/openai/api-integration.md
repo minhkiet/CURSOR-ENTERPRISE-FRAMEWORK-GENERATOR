@@ -1895,4 +1895,4 @@ async function main() {
 
 ---
 
-**Tài liệu này là một phần của Cursor Enterprise Framework Generator. Để cập nhật mới nhất, vui lòng truy cập repository hoặc liên hệ team development.**
+**Tài liệu này là một phần của Vibe Enterprise Framework Generator. Để cập nhật mới nhất, vui lòng truy cập repository hoặc liên hệ team development.**

@@ -1,4 +1,4 @@
-# Setup and Sanity Check for REA in Cursor Enterprise Framework
+# Setup and Sanity Check for REA in Vibe Enterprise Framework
 param(
     [switch]$Rebuild
 )

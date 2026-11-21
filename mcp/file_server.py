@@ -1,7 +1,7 @@
 """
 File Operations MCP Server
 
-MCP server wrapping cursor_framework file utilities for Cursor IDE.
+MCP server wrapping vibe_framework file utilities for Cursor IDE.
 Provides tools for file operations, search, and path handling.
 
 Usage:
@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-# Add paths to sys.path so cursor_framework and local modules are always importable
+# Add paths to sys.path so vibe_framework and local modules are always importable
 _repo_root = Path(__file__).resolve().parent.parent
 if str(_repo_root) not in sys.path:
     sys.path.insert(0, str(_repo_root))
@@ -34,13 +34,13 @@ except Exception:
         try:
             from mcp_runtime import UniversalMcpServer as FastMCP
         except ImportError:
-            from cursor_framework.mcp_runtime import UniversalMcpServer as FastMCP
+            from vibe_framework.mcp_runtime import UniversalMcpServer as FastMCP
 
 mcp = FastMCP("file-ops")
 HAS_FASTMCP = True
 
-# Import utilities from cursor_framework
-from cursor_framework.utils.file_utils import (
+# Import utilities from vibe_framework
+from vibe_framework.utils.file_utils import (
     ensure_dir,
     get_relative_path,
     find_files,

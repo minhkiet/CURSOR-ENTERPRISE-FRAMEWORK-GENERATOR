@@ -4,7 +4,7 @@ from __future__ import annotations
 import time
 from pathlib import Path
 
-from cursor_framework.workflow import Workflow
+from vibe_framework.workflow import Workflow
 
 
 def test_auto_watch_off_by_default(sandbox_cursor: Path, memory_path: Path):

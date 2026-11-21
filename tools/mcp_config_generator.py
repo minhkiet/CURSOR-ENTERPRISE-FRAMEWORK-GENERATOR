@@ -117,7 +117,7 @@ class McpConfigGenerator:
         return None
 
     def _add_cursor_framework(self):
-        """Add Cursor Framework MCP servers with multi-platform environment variables."""
+        """Add Vibe Framework MCP servers with multi-platform environment variables."""
         workspace = self._to_target_path(self.workspace_root)
         env_vars = {
             "CURSOR_WORKSPACE_ROOT": workspace,
@@ -132,15 +132,15 @@ class McpConfigGenerator:
             "CURSOR_FRAMEWORK_CACHE_TTL_MINUTES": "30",
         }
         
-        # cursor-framework
+        # vibe-framework
         framework_dir = self._find_package_dir("cursor-framework-mcp")
         if framework_dir:
-            self.config.mcpServers["cursor-framework"] = McpServer(
+            self.config.mcpServers["vibe-framework"] = McpServer(
                 command=self.python_cmd,
                 args=["-m", "cursor_framework_mcp.server"],
                 cwd=self._to_target_path(framework_dir),
                 env=env_vars,
-                description="Cursor Enterprise Framework - Rules, Skills, Agents registry"
+                description="Vibe Enterprise Framework - Rules, Skills, Agents registry"
             ).to_dict()
         
         # cursor-autopilot
@@ -357,7 +357,7 @@ def main():
     if args.list:
         print("=== Available MCP Servers ===")
         print("Built-in:")
-        print("  cursor-framework  - Cursor Enterprise Framework registry")
+        print("  vibe-framework  - Vibe Enterprise Framework registry")
         print("  cursor-autopilot - Auto-execution engine")
         print("  cursor-memory    - Memory and context management")
         print("\nExternal (--add flag):")

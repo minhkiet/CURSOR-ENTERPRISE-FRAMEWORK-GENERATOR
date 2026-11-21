@@ -1,7 +1,7 @@
 ---
 description: Pre-Push Hook - Run tests và security scan trước khi push
 trigger: git push, trước push
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

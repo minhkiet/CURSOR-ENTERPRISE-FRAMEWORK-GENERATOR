@@ -2,7 +2,7 @@
 description: Prompt chuan de review NestJS - modules, DI, decorators
 trigger: nestjs, review nestjs
 category: Framework
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

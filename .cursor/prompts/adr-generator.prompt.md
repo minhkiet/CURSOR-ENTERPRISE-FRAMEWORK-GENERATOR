@@ -2,7 +2,7 @@
 description: Prompt chuan de tao ADR - Architecture Decision Record
 trigger: adr, architecture decision
 category: Memory
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

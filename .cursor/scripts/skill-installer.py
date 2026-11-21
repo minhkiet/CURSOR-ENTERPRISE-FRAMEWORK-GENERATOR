@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Skill Dependency Auto-Installer
-Part of Cursor Enterprise Framework
+Part of Vibe Enterprise Framework
 
 Automatically installs dependencies when skills are triggered.
 Checks requirements before running skill tasks.

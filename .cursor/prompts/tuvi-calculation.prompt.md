@@ -2,7 +2,7 @@
 description: Prompt chuan de tinh Tu Vi - la so, sao chieu, van trinh
 trigger: tuvi, tu vi, vietnamese astrology
 category: Domain
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

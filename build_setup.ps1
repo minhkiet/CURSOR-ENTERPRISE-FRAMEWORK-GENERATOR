@@ -1,4 +1,4 @@
-# Cursor Enterprise Framework - Build Setup Script
+# Vibe Enterprise Framework - Build Setup Script
 # Builds cursor-setup.exe with .cursor packaged as ZIP sidecar
 
 $ErrorActionPreference = 'Stop'

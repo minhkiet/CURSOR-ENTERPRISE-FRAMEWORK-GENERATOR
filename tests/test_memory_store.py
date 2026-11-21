@@ -1,12 +1,12 @@
-"""Tests for cursor_framework.memory_store."""
+"""Tests for vibe_framework.memory_store."""
 from __future__ import annotations
 
 from pathlib import Path
 
 import pytest
 
-from cursor_framework.memory_manager import MemoryManager, MemoryTier
-from cursor_framework.memory_store import MemoryStore
+from vibe_framework.memory_manager import MemoryManager, MemoryTier
+from vibe_framework.memory_store import MemoryStore
 
 
 def test_round_trip_preserves_values(tmp_path: Path):

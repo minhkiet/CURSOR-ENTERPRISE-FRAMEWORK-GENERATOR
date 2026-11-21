@@ -1,7 +1,7 @@
 /**
- * Cursor Framework Status Line Plugin
+ * Vibe Framework Status Line Plugin
  * 
- * Provides real-time status bar telemetry for Cursor Enterprise Framework.
+ * Provides real-time status bar telemetry for Vibe Enterprise Framework.
  */
 
 const { exec } = require('child_process');
@@ -16,7 +16,7 @@ function getWorkspaceRoot() {
 }
 
 function getConfig(key, defaultValue = null) {
-    return vscode.workspace.getConfiguration('cursorFramework').get(key, defaultValue);
+    return vscode.workspace.getConfiguration('vibeFramework').get(key, defaultValue);
 }
 
 async function execPython(args = []) {
@@ -51,7 +51,7 @@ async function updateStatusBar() {
     const showSkills = getConfig('statusLine.showSkills', true);
 
     try {
-        const rawOutput = await execPython(['-m', 'cursor_framework', 'stats', '--root', `"${frameworkRoot}"`]);
+        const rawOutput = await execPython(['-m', 'vibe_framework', 'stats', '--root', `"${frameworkRoot}"`]);
         let parsed = null;
         try {
             parsed = JSON.parse(rawOutput);
@@ -76,7 +76,7 @@ async function updateStatusBar() {
         }
 
         statusBarItem.text = details.length > 0 ? `${label}: Ready (${details.join(' | ')})` : `${label}: Ready`;
-        statusBarItem.tooltip = `Cursor Enterprise Framework\nStatus: Warm & Operational\nSkills: ${skillsCount}\nRules: ${rulesCount}\nClick for Quick Menu`;
+        statusBarItem.tooltip = `Vibe Enterprise Framework\nStatus: Warm & Operational\nSkills: ${skillsCount}\nRules: ${rulesCount}\nClick for Quick Menu`;
         statusBarItem.backgroundColor = undefined;
         statusBarItem.show();
     } catch (err) {
@@ -103,7 +103,7 @@ async function showQuickMenu() {
     ];
 
     const selected = await vscode.window.showQuickPick(items, {
-        placeHolder: 'Select Cursor Enterprise Framework Action'
+        placeHolder: 'Select Vibe Enterprise Framework Action'
     });
 
     if (!selected) return;
@@ -111,32 +111,32 @@ async function showQuickMenu() {
     try {
         switch (selected.action) {
             case 'warm':
-                await execPython(['-m', 'cursor_framework', 'warm', '--root', `"${frameworkRoot}"`]);
+                await execPython(['-m', 'vibe_framework', 'warm', '--root', `"${frameworkRoot}"`]);
                 vscode.window.showInformationMessage('Framework cache warmed successfully!');
                 await updateStatusBar();
                 break;
             case 'index':
-                await execPython(['-m', 'cursor_framework', 'index', '--root', `"${frameworkRoot}"`]);
+                await execPython(['-m', 'vibe_framework', 'index', '--root', `"${frameworkRoot}"`]);
                 vscode.window.showInformationMessage('Framework index rebuilt!');
                 await updateStatusBar();
                 break;
             case 'dashboard':
-                vscode.commands.executeCommand('cursor-framework.dashboard');
+                vscode.commands.executeCommand('vibe-framework.dashboard');
                 break;
             case 'vibe':
-                const vibeOut = await execPython(['-m', 'cursor_framework', 'vibe', 'sync']);
+                const vibeOut = await execPython(['-m', 'vibe_framework', 'vibe', 'sync']);
                 vscode.window.showInformationMessage(`Vibe Sync complete! ${vibeOut.slice(0, 80)}...`);
                 break;
             case 'spec':
-                const specOut = await execPython(['-m', 'cursor_framework', 'spec', 'status']);
+                const specOut = await execPython(['-m', 'vibe_framework', 'spec', 'status']);
                 const doc = await vscode.workspace.openTextDocument({ content: specOut, language: 'text' });
                 await vscode.window.showTextDocument(doc);
                 break;
             case 'graph':
-                vscode.commands.executeCommand('cursor-framework.graph');
+                vscode.commands.executeCommand('vibe-framework.graph');
                 break;
             case 'clear':
-                vscode.commands.executeCommand('cursor-framework.clear-cache');
+                vscode.commands.executeCommand('vibe-framework.clear-cache');
                 await updateStatusBar();
                 break;
         }
@@ -147,21 +147,21 @@ async function showQuickMenu() {
 
 function activate(context) {
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-    statusBarItem.command = 'cursor-framework.status-line.menu';
+    statusBarItem.command = 'vibe-framework.status-line.menu';
     context.subscriptions.push(statusBarItem);
 
-    const refreshCmd = vscode.commands.registerCommand('cursor-framework.status-line.refresh', async () => {
+    const refreshCmd = vscode.commands.registerCommand('vibe-framework.status-line.refresh', async () => {
         await updateStatusBar();
-        vscode.window.showInformationMessage('Cursor Framework status refreshed.');
+        vscode.window.showInformationMessage('Vibe Framework status refreshed.');
     });
 
-    const menuCmd = vscode.commands.registerCommand('cursor-framework.status-line.menu', async () => {
+    const menuCmd = vscode.commands.registerCommand('vibe-framework.status-line.menu', async () => {
         await showQuickMenu();
     });
 
-    const toggleCmd = vscode.commands.registerCommand('cursor-framework.status-line.toggle', () => {
+    const toggleCmd = vscode.commands.registerCommand('vibe-framework.status-line.toggle', () => {
         const current = getConfig('statusLine.enabled', true);
-        vscode.workspace.getConfiguration('cursorFramework').update('statusLine.enabled', !current, vscode.ConfigurationTarget.Global);
+        vscode.workspace.getConfiguration('vibeFramework').update('statusLine.enabled', !current, vscode.ConfigurationTarget.Global);
         if (current) {
             statusBarItem.hide();
         } else {
@@ -183,7 +183,7 @@ function activate(context) {
     // Refresh on save for relevant files
     const watcher = vscode.workspace.onDidSaveTextDocument(doc => {
         const p = doc.fileName.replace(/\\/g, '/');
-        if (p.includes('/.cursor/') || p.includes('/.agents/') || p.includes('/cursor_framework/')) {
+        if (p.includes('/.cursor/') || p.includes('/.agents/') || p.includes('/vibe_framework/')) {
             updateStatusBar();
         }
     });

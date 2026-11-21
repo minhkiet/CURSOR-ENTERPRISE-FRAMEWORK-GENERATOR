@@ -2,7 +2,7 @@
 
 ## Tổng quan
 
-Document này cung cấp checklist toàn diện cho việc đánh giá và kiểm tra Cloudflare deployments trong Cursor Enterprise Framework.
+Document này cung cấp checklist toàn diện cho việc đánh giá và kiểm tra Cloudflare deployments trong Vibe Enterprise Framework.
 
 ## 1. Domain Configuration Checklist
 

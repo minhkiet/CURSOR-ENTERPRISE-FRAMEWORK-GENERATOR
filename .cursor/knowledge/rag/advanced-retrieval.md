@@ -4,7 +4,7 @@ description: "Hướng dẫn về advanced retrieval patterns: parent document r
 tags: ["advanced-retrieval", "parent-document", "sentence-window", "auto-merging", "knowledge-graph"]
 created: "2026-06-23"
 version: "1.0.0"
-framework: "Cursor Enterprise Framework"
+framework: "Vibe Enterprise Framework"
 ---
 
 # Advanced Retrieval
@@ -1529,4 +1529,4 @@ class AdvancedRetrievalEvaluator:
 2. **Sentence Window Retrieval**: https://python.langchain.com/docs/modules/data_connection/retrievers/sentence_window
 3. **Auto-Merging Retriever**: https://python.langchain.com/docs/modules/data_connection/retrievers/auto_merging_retriever
 4. **Knowledge Graph RAG**: https://python.langchain.com/docs/modules/data_connection/retrievers/kg_retriever
-5. **Cursor Enterprise Framework - RAG Rules**: `.cursor/rules/rag.mdc`
+5. **Vibe Enterprise Framework - RAG Rules**: `.cursor/rules/rag.mdc`

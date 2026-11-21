@@ -2,7 +2,7 @@
 description: Deploy - Deployment workflow từ build đến production
 trigger: deploy, deployment, triển khai, release, production deploy, staging deploy
 category: DevOps
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

@@ -2,7 +2,7 @@
 description: Prompt chuan de toi uu frontend - bundle, images, core web vitals
 trigger: frontend optimization, toi uu ui
 category: Performance
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

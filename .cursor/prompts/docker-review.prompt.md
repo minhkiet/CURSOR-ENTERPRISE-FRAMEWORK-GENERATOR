@@ -2,7 +2,7 @@
 description: Prompt chuan de review Docker - Dockerfile, compose, best practices
 trigger: docker, container
 category: Infrastructure
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

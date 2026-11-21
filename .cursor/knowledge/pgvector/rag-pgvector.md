@@ -4,7 +4,7 @@ description: "Hướng dẫn triển khai RAG (Retrieval Augmented Generation) v
 tags: ["rag", "pgvector", "retrieval", "llm", "embedding", "chunking"]
 created: "2026-06-23"
 version: "1.0.0"
-framework: "Cursor Enterprise Framework"
+framework: "Vibe Enterprise Framework"
 ---
 
 # RAG with pgvector
@@ -1028,5 +1028,5 @@ $$ LANGUAGE plpgsql;
 1. **pgvector RAG**: https://github.com/pgvector/pgvector#rag
 2. **RAG Architecture**: https://arxiv.org/abs/2005.11401
 3. **Chunking Strategies**: https://python.langchain.com/docs/modules/data_connection/document_transformers/
-4. **Cursor Enterprise Framework - RAG Rules**: `.cursor/rules/rag.mdc`
+4. **Vibe Enterprise Framework - RAG Rules**: `.cursor/rules/rag.mdc`
 5. **Embedding Models**: OpenAI, Cohere, HuggingFace documentation

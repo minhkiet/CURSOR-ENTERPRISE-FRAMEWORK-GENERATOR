@@ -7,7 +7,7 @@ description: "Ponytail 5 - Lazy Senior Dev Mode. Minimum code, maximum effect. T
 
 **Redirect**: This skill is mapped to `code_ponytail`.
 
-For consistency across the Codex Enterprise Framework:
+For consistency across the Vibe Enterprise Framework:
 `
 .agents/skills/code_ponytail/SKILL.md
 `

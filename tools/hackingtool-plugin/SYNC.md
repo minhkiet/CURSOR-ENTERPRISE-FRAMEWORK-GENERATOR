@@ -2,7 +2,7 @@
 
 This folder is a **vendor drop** of [AKCodez/hackingtool-plugin](https://github.com/AKCodez/hackingtool-plugin) (commit-pinned to `main`). The upstream scripts are stored **verbatim** under `scripts/` and the upstream skill is stored **verbatim** under `skills/pentest/`.
 
-The Cursor Enterprise Framework bridge lives in `.cursor/skills/sec_hackingtool/` and adds framework gates — it does NOT modify anything here.
+The Vibe Enterprise Framework bridge lives in `.cursor/skills/sec_hackingtool/` and adds framework gates — it does NOT modify anything here.
 
 ---
 

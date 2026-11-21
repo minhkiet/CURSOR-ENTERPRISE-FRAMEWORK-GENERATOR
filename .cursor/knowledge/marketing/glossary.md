@@ -223,7 +223,7 @@ Từ điển thuật ngữ này cung cấp nền tảng kiến thức vững ch�
 
 ---
 
-## 11. Framework Mapping — marketingskills → Cursor Enterprise Framework
+## 11. Framework Mapping — marketingskills → Vibe Enterprise Framework
 
 > Mục đích: cho phép Agent truy ngược từ trigger keyword → file knowledge nào cần load, không cần tạo `SKILL.md` mới.
 
@@ -250,7 +250,7 @@ prospecting, pr              → knowledge/marketing/best-practice.md §11
 marketing-plan, ideas        → knowledge/marketing/architecture.md §11
 ```
 
-**Routing rule:** khi gặp bất kỳ keyword trên, `cursor_framework/context_router.py` + `skill-registry.mdc §2.1` PHẢI load `knowledge/marketing/<file>.md` thay vì tạo SKILL.md mới (theo Superpowers concept-ref pattern — `skill-registry.mdc §8.1`).
+**Routing rule:** khi gặp bất kỳ keyword trên, `vibe_framework/context_router.py` + `skill-registry.mdc §2.1` PHẢI load `knowledge/marketing/<file>.md` thay vì tạo SKILL.md mới (theo Superpowers concept-ref pattern — `skill-registry.mdc §8.1`).
 
 ---
 

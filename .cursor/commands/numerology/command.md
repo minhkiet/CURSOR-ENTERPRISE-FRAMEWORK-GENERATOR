@@ -2,7 +2,7 @@
 description: Numerology - Thần Số Học (Numerology)
 trigger: numerology, thần số học, số chủ đạo, life path, destiny number, soul urge
 category: Domain
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

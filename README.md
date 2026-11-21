@@ -1,4 +1,4 @@
-# Cursor Enterprise Framework Generator
+# Vibe Enterprise Framework Generator
 
 > A universal framework for AI coding agents & Vibe Coding tools — built around **Memory First**, **Retrieval First**, **Token Optimization**, **Knowledge Reuse**, and **Anti-AI-Slop Aesthetics**.
 
@@ -13,7 +13,7 @@
 
 ## What is it?
 
-**Cursor Enterprise Framework (CEF)** is a production-grade configuration and tooling suite that turns any AI coding agent — **Cursor**, **Windsurf**, **Claude Code**, **GitHub Copilot**, **Roo Code**, **Cline**, **Google Antigravity**, **Trae**, **Devin / OpenHands**, **Aider**, or **Bolt.new / v0** — into a context-aware, token-efficient, memory-backed senior full-stack engineer.
+**Vibe Enterprise Framework (CEF)** is a production-grade configuration and tooling suite that turns any AI coding agent — **Cursor**, **Windsurf**, **Claude Code**, **GitHub Copilot**, **Roo Code**, **Cline**, **Google Antigravity**, **Trae**, **Devin / OpenHands**, **Aider**, or **Bolt.new / v0** — into a context-aware, token-efficient, memory-backed senior full-stack engineer.
 
 Instead of starting every coding session from zero and falling into generic "AI slop", the framework:
 
@@ -39,7 +39,7 @@ Instead of starting every coding session from zero and falling into generic "AI 
 | **ECC Integration** | 68 agents, 292 skills, 94 commands | [ECC v2.2.2](https://github.com/affaan-m/ECC) |
 | **REA Integration** | Universal reverse engineering & decompilation | [morluto/rea v6.4.0](https://github.com/morluto/rea) |
 | **VBS Security Scanner** | 21 cross-language vulnerability rules + SCA | `.cursor/skills/sec_reverse-engineer-anything/` |
-| **Python Library** | 14 modules + 6 utility suites | `cursor_framework/` |
+| **Python Library** | 14 modules + 6 utility suites | `vibe_framework/` |
 | **Web Dashboard & CMS** | Vue 3 + Vite 6 + TypeScript + CMS Auth Gate | `vibe_framework_web/` |
 | **Windows GUI Installer** | `cursor-setup.exe` (~162 MB), `cursor-setup.zip` (~22 MB) | generated in `dist/` by build scripts |
 
@@ -91,7 +91,7 @@ Bạn có thể lựa chọn 1 trong các phương thức cài đặt thuận ti
    - `cursor-setup.zip` (Bộ payload framework ~22 MB)
 2. Đặt cả 2 file vào cùng một thư mục.
 3. Chạy `cursor-setup.exe`, chọn đường dẫn đích (mặc định `%USERPROFILE%\.cursor`).
-4. Bấm **Install** và đợi 15 giây. Khởi động lại Cursor IDE / Windsurf.
+4. Bấm **Install** và đợi 15 giây. Khởi động lại Vibe tool bạn dùng (Cursor, Windsurf, Claude Code, Codex...).
 
 ### Cách 2: PowerShell One-Liner (Windows Tự Động 100%)
 
@@ -134,14 +134,14 @@ cd "CURSOR ENTERPRISE FRAMEWORK GENERATOR"
 .\setup.bat --gui-picker       # Bật hộp thoại chọn thư mục
 ```
 
-### Cách 6: Cài đặt Thư Viện Python `cursor_framework`
+### Cách 6: Cài đặt Thư Viện Python `vibe_framework`
 
 ```bash
 cd "CURSOR ENTERPRISE FRAMEWORK GENERATOR"
 pip install -e ".[all]"
 ```
 
-*(Lưu ý: Không dùng `pip install cursor-framework` trên PyPI vì đó là package cũ của bên thứ 3. Luôn cài đặt từ mã nguồn repo này).*
+*(Lưu ý: Không dùng `pip install vibe-framework` trên PyPI vì đó là package cũ của bên thứ 3. Luôn cài đặt từ mã nguồn repo này).*
 
 ---
 
@@ -304,10 +304,10 @@ npm run preview
 pip install -e ".[all]"
 
 # Khởi chạy Dashboard HTTP local
-python -c "from cursor_framework import Dashboard, Workflow; dash = Dashboard(root='.cursor', workflow=Workflow(root='.cursor')); dash.serve(port=8765)"
+python -c "from vibe_framework import Dashboard, Workflow; dash = Dashboard(root='.cursor', workflow=Workflow(root='.cursor')); dash.serve(port=8765)"
 
 # Tạo lại chỉ mục INDEX.json và INDEX.md
-python -m cursor_framework.indexer .cursor
+python -m vibe_framework.indexer .cursor
 
 # Chạy toàn bộ test suites (136+ unit tests)
 pytest

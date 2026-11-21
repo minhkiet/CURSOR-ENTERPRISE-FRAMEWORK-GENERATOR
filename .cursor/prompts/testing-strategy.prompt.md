@@ -2,7 +2,7 @@
 description: Prompt chuan de thiet ke chien luoc testing - unit, integration, e2e
 trigger: test strategy, chien luoc test
 category: Testing
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

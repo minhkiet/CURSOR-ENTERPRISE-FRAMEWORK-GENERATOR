@@ -1,5 +1,5 @@
 @echo off
-REM Cursor Framework - Quick Utils Batch File
+REM Vibe Framework - Quick Utils Batch File
 REM Usage: framework.bat <command>
 
 setlocal enabledelayedexpansion
@@ -26,31 +26,31 @@ goto help
 
 :warm
 echo Warming framework cache...
-%PYTHON% -m cursor_framework warm --root %FRAMEWORK_ROOT%
+%PYTHON% -m vibe_framework warm --root %FRAMEWORK_ROOT%
 goto end
 
 :stats
 echo Fetching framework statistics...
-%PYTHON% -m cursor_framework stats --root %FRAMEWORK_ROOT%
+%PYTHON% -m vibe_framework stats --root %FRAMEWORK_ROOT%
 goto end
 
 :scan
 echo Scanning .cursor/ directory...
-%PYTHON% -m cursor_framework scan --root %FRAMEWORK_ROOT%
+%PYTHON% -m vibe_framework scan --root %FRAMEWORK_ROOT%
 goto end
 
 :index
 echo Rebuilding framework index...
-%PYTHON% -m cursor_framework index --root %FRAMEWORK_ROOT%
+%PYTHON% -m vibe_framework index --root %FRAMEWORK_ROOT%
 goto end
 
 :clear
 echo Clearing framework cache...
 if "%~2"=="-f" (
-    %PYTHON% -m cursor_framework clear-cache --root %FRAMEWORK_ROOT% --force
+    %PYTHON% -m vibe_framework clear-cache --root %FRAMEWORK_ROOT% --force
 ) else (
     echo Dry-run mode. Use 'framework.bat clear -f' to actually delete.
-    %PYTHON% -m cursor_framework clear-cache --root %FRAMEWORK_ROOT%
+    %PYTHON% -m vibe_framework clear-cache --root %FRAMEWORK_ROOT%
 )
 goto end
 
@@ -58,20 +58,20 @@ goto end
 echo Starting dashboard server on port 8765...
 echo Open http://localhost:8765 in your browser.
 start http://localhost:8765
-%PYTHON% -m cursor_framework serve --root %FRAMEWORK_ROOT% --port 8765
+%PYTHON% -m vibe_framework serve --root %FRAMEWORK_ROOT% --port 8765
 goto end
 
 :graph
 echo Starting graph server on port 8766...
 echo Open http://localhost:8766 in your browser.
 start http://localhost:8766
-%PYTHON% -m cursor_framework serve-graph --root %FRAMEWORK_ROOT% --port 8766
+%PYTHON% -m vibe_framework serve-graph --root %FRAMEWORK_ROOT% --port 8766
 goto end
 
 :help
 echo.
 echo ================================================
-echo   Cursor Framework - Quick Utils
+echo   Vibe Framework - Quick Utils
 echo ================================================
 echo.
 echo Available commands:

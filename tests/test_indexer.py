@@ -1,11 +1,11 @@
-"""Tests for cursor_framework.indexer."""
+"""Tests for vibe_framework.indexer."""
 from __future__ import annotations
 
 from pathlib import Path
 
 import pytest
 
-from cursor_framework.indexer import AssetEntry, Indexer
+from vibe_framework.indexer import AssetEntry, Indexer
 
 
 def test_scan_returns_categories(sandbox_cursor: Path):

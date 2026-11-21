@@ -3,7 +3,7 @@
 This folder tracks the upstream synchronization with [morluto/rea](https://github.com/morluto/rea) (v6.9.0, skill version 62).
 It provides a unified CLI and Model Context Protocol (MCP) server for reverse engineering across native binaries, managed .NET assemblies, JavaScript/Electron applications, Android APKs, WebAssembly, EVM bytecode, Go binaries, agent environment generation (AgentEnv), and runtime process observation.
 
-The Cursor Enterprise Framework bridge skills live in:
+The Vibe Enterprise Framework bridge skills live in:
 - `.cursor/skills/reverse-engineer-anything/`
 - `.cursor/skills/sec_reverse-engineer-anything/`
 - `.cursor/skills/rea-analysis-optimization/`
@@ -49,7 +49,7 @@ Or via npx:
 npx -y rea-agents mcp
 ```
 
-### Config in Cursor Enterprise Framework (`mcp/mcp_config.json`):
+### Config in Vibe Enterprise Framework (`mcp/mcp_config.json`):
 ```json
 {
   "mcpServers": {

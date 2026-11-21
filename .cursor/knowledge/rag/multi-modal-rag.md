@@ -4,7 +4,7 @@ description: "Hướng dẫn về multi-modal RAG: image RAG, table RAG, PDF lay
 tags: ["multimodal", "image-rag", "table-rag", "pdf", "layout-aware", "vision"]
 created: "2026-06-23"
 version: "1.0.0"
-framework: "Cursor Enterprise Framework"
+framework: "Vibe Enterprise Framework"
 ---
 
 # Multi-modal RAG
@@ -1512,4 +1512,4 @@ class MultiModalQueryInterface:
 2. **GPT-4V**: https://openai.com/research/gpt-4v
 3. **LayoutLM**: https://arxiv.org/abs/1912.13318
 4. **Table Transformer**: https://arxiv.org/abs/2110.00061
-5. **Cursor Enterprise Framework - RAG Rules**: `.cursor/rules/rag.mdc`
+5. **Vibe Enterprise Framework - RAG Rules**: `.cursor/rules/rag.mdc`

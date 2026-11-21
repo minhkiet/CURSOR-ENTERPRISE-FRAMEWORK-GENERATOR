@@ -3299,7 +3299,7 @@
           "\"performance\"",
           "\"security\"",
           "\"best-practices\"",
-          "\"cursor-enterprise-framework\""
+          "\"vibe-framework\""
         ],
         "size_bytes": 38683
       },
@@ -3320,7 +3320,7 @@
           "\"jsPDF\"",
           "\"questpdf\"",
           "\"ironpdf\"",
-          "\"cursor-enterprise-framework\""
+          "\"vibe-framework\""
         ],
         "size_bytes": 40449
       },
@@ -3337,7 +3337,7 @@
           "\"performance\"",
           "\"optimization\"",
           "\"accessibility\"",
-          "\"cursor-enterprise-framework\""
+          "\"vibe-framework\""
         ],
         "size_bytes": 39969
       },
@@ -3354,7 +3354,7 @@
           "\"deployment\"",
           "\"production\"",
           "\"quality-assurance\"",
-          "\"cursor-enterprise-framework\""
+          "\"vibe-framework\""
         ],
         "size_bytes": 23529
       },
@@ -3370,7 +3370,7 @@
           "\"decision-tree\"",
           "\"architecture\"",
           "\"technology-selection\"",
-          "\"cursor-enterprise-framework\""
+          "\"vibe-framework\""
         ],
         "size_bytes": 30460
       },
@@ -3386,7 +3386,7 @@
           "\"faq\"",
           "\"troubleshooting\"",
           "\"questions\"",
-          "\"cursor-enterprise-framework\""
+          "\"vibe-framework\""
         ],
         "size_bytes": 39958
       },
@@ -3403,7 +3403,7 @@
           "\"terminology\"",
           "\"pdf-a\"",
           "\"pdf-ua\"",
-          "\"cursor-enterprise-framework\""
+          "\"vibe-framework\""
         ],
         "size_bytes": 26553
       },
@@ -5702,7 +5702,7 @@
         "path": "rules\\llm-providers.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "LLM Providers - hợp nhất từ OpenAI, Gemini, Claude trong Cursor Enterprise Framework",
+        "description": "LLM Providers - hợp nhất từ OpenAI, Gemini, Claude trong Vibe Enterprise Framework",
         "version": "1.0.0",
         "tags": [
           "llm",
@@ -5766,7 +5766,7 @@
         "path": "rules\\meta_billing.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "Nguyên tắc và best practices cho Billing Implementation trong Cursor Enterprise Framework",
+        "description": "Nguyên tắc và best practices cho Billing Implementation trong Vibe Enterprise Framework",
         "version": "1.0.0",
         "tags": [
           "billing",
@@ -5825,7 +5825,7 @@
         "path": "rules\\meta_cloud-providers.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "Cloud Providers - hợp nhất từ AWS, Azure, GCP trong Cursor Enterprise Framework",
+        "description": "Cloud Providers - hợp nhất từ AWS, Azure, GCP trong Vibe Enterprise Framework",
         "version": "1.0.0",
         "tags": [
           "cloud",
@@ -5842,7 +5842,7 @@
         "path": "rules\\meta_cloudflare.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "Cloudflare & CDN - hợp nhất từ cloudflare.mdc và cdn.mdc. Nguyên tắc và best practices cho Cloudflare edge platform và CDN content delivery trong Cursor Enterprise Framework",
+        "description": "Cloudflare & CDN - hợp nhất từ cloudflare.mdc và cdn.mdc. Nguyên tắc và best practices cho Cloudflare edge platform và CDN content delivery trong Vibe Enterprise Framework",
         "version": "1.1.0",
         "tags": [
           "cloudflare",
@@ -5863,7 +5863,7 @@
         "path": "rules\\meta_coding-standards.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "Tiêu chuẩn viết code thống nhất cho Cursor Enterprise Framework",
+        "description": "Tiêu chuẩn viết code thống nhất cho Vibe Enterprise Framework",
         "version": "1.0.0",
         "tags": [
           "coding",
@@ -5879,7 +5879,7 @@
         "path": "rules\\meta_container-orchestration.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "Container Orchestration - hợp nhất từ Docker và Kubernetes trong Cursor Enterprise Framework",
+        "description": "Container Orchestration - hợp nhất từ Docker và Kubernetes trong Vibe Enterprise Framework",
         "version": "1.0.0",
         "tags": [
           "docker",
@@ -5919,7 +5919,7 @@
         "path": "rules\\meta_crm-saas.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "Nguyên tắc và best practices cho CRM SaaS Implementation trong Cursor Enterprise Framework",
+        "description": "Nguyên tắc và best practices cho CRM SaaS Implementation trong Vibe Enterprise Framework",
         "version": "1.0.0",
         "tags": [
           "crm",
@@ -5956,7 +5956,7 @@
         "path": "rules\\meta_multi-tenant.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "Nguyên tắc và best practices cho Multi-Tenant Architecture trong Cursor Enterprise Framework",
+        "description": "Nguyên tắc và best practices cho Multi-Tenant Architecture trong Vibe Enterprise Framework",
         "version": "1.0.0",
         "tags": [
           "multi-tenant",
@@ -5993,7 +5993,7 @@
         "path": "rules\\meta_operations.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "Operations - hợp nhất từ Alerting và Incident Response trong Cursor Enterprise Framework",
+        "description": "Operations - hợp nhất từ Alerting và Incident Response trong Vibe Enterprise Framework",
         "version": "1.0.0",
         "tags": [
           "operations",
@@ -6051,7 +6051,7 @@
         "path": "rules\\meta_security.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "Security - hợp nhất từ security.mdc, web-security.mdc, secrets-management.mdc. Nguyên tắc và best practices cho bảo mật trong Cursor Enterprise Framework",
+        "description": "Security - hợp nhất từ security.mdc, web-security.mdc, secrets-management.mdc. Nguyên tắc và best practices cho bảo mật trong Vibe Enterprise Framework",
         "version": "1.1.0",
         "tags": [
           "security",
@@ -6237,7 +6237,7 @@
         "path": "rules\\ref_api-patterns.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "API Patterns - hợp nhất từ GraphQL, API Gateway, Service Mesh, REST API trong Cursor Enterprise Framework",
+        "description": "API Patterns - hợp nhất từ GraphQL, API Gateway, Service Mesh, REST API trong Vibe Enterprise Framework",
         "version": "2.0.0",
         "tags": [
           "api",
@@ -6255,7 +6255,7 @@
         "path": "rules\\ref_architecture-patterns.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "Architecture Patterns - hợp nhất từ Clean Architecture, Hexagonal Architecture (Ports & Adapters), CQRS Pattern, Event Sourcing, và Domain-Driven Design trong Cursor Enterprise Framework",
+        "description": "Architecture Patterns - hợp nhất từ Clean Architecture, Hexagonal Architecture (Ports & Adapters), CQRS Pattern, Event Sourcing, và Domain-Driven Design trong Vibe Enterprise Framework",
         "version": "2.0.0",
         "tags": [
           "architecture",
@@ -6274,7 +6274,7 @@
         "path": "rules\\ref_backend-frameworks.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "Backend Frameworks - hợp nhất từ NestJS, Laravel, ASP.NET Core trong Cursor Enterprise Framework",
+        "description": "Backend Frameworks - hợp nhất từ NestJS, Laravel, ASP.NET Core trong Vibe Enterprise Framework",
         "version": "1.0.0",
         "tags": [
           "backend",
@@ -6311,7 +6311,7 @@
         "path": "rules\\ref_frontend-frameworks.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "Frontend Frameworks - hợp nhất từ Next.js, Nuxt.js, Vue.js, Frontend Architecture trong Cursor Enterprise Framework",
+        "description": "Frontend Frameworks - hợp nhất từ Next.js, Nuxt.js, Vue.js, Frontend Architecture trong Vibe Enterprise Framework",
         "version": "1.0.0",
         "tags": [
           "frontend",
@@ -6411,7 +6411,7 @@
         "path": "rules\\rule_skill-integration.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "Hướng dẫn skill auto-discovery và execution cho Cursor Enterprise Framework. Định tuyến tự động đến skills phù hợp với pre-review và post-review gates. Mọi task phải pass qua cả hai gates trước khi de",
+        "description": "Hướng dẫn skill auto-discovery và execution cho Vibe Enterprise Framework. Định tuyến tự động đến skills phù hợp với pre-review và post-review gates. Mọi task phải pass qua cả hai gates trước khi de",
         "version": "1.3.0",
         "tags": [
           "skill",
@@ -6530,7 +6530,7 @@
         "path": "rules\\supabase.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "Nguyên tắc và best practices cho Supabase trong Cursor Enterprise Framework",
+        "description": "Nguyên tắc và best practices cho Supabase trong Vibe Enterprise Framework",
         "version": "1.0.0",
         "tags": [
           "supabase",
@@ -6546,7 +6546,7 @@
         "path": "rules\\ui-visual-design.mdc",
         "category": "rules",
         "kind": "file",
-        "description": "Nguyên tắc và best practices cho UI/Visual Design trong Cursor Enterprise Framework - hướng dẫn tạo giao diện đẹp mắt, chuyên nghiệp như các theme thương mại cao cấp. Tích hợp Hallmark anti-slop desig",
+        "description": "Nguyên tắc và best practices cho UI/Visual Design trong Vibe Enterprise Framework - hướng dẫn tạo giao diện đẹp mắt, chuyên nghiệp như các theme thương mại cao cấp. Tích hợp Hallmark anti-slop desig",
         "version": "1.1.0",
         "tags": [
           "ui",

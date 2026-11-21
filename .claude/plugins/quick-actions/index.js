@@ -1,5 +1,5 @@
 /**
- * Cursor Framework Quick Actions Plugin
+ * Vibe Framework Quick Actions Plugin
  * 
  * Provides quick access to common framework operations.
  */
@@ -31,7 +31,7 @@ async function execPython(script, args = []) {
  * Get configuration value.
  */
 function getConfig(key, defaultValue = null) {
-    return vscode.workspace.getConfiguration('cursorFramework').get(key, defaultValue);
+    return vscode.workspace.getConfiguration('vibeFramework').get(key, defaultValue);
 }
 
 /**
@@ -73,12 +73,12 @@ async function activate(context) {
     const frameworkRoot = path.join(workspaceRoot, rootPath);
 
     // Warm Cache Command
-    const warmCmd = vscode.commands.registerCommand('cursor-framework.warm', async () => {
+    const warmCmd = vscode.commands.registerCommand('vibe-framework.warm', async () => {
         try {
-            const { Workflow } = await import(path.join(workspaceRoot, 'cursor_framework', 'workflow.js')).catch(() => null);
+            const { Workflow } = await import(path.join(workspaceRoot, 'vibe_framework', 'workflow.js')).catch(() => null);
             
             // Fallback to CLI
-            const output = await execPython('-m', ['cursor_framework', 'warm', '--root', frameworkRoot]);
+            const output = await execPython('-m', ['vibe_framework', 'warm', '--root', frameworkRoot]);
             vscode.window.showInformationMessage('Framework cache warmed!');
             await showInDocument('Warm Cache Result', formatJson(output));
         } catch (error) {
@@ -87,9 +87,9 @@ async function activate(context) {
     });
 
     // Stats Command
-    const statsCmd = vscode.commands.registerCommand('cursor-framework.stats', async () => {
+    const statsCmd = vscode.commands.registerCommand('vibe-framework.stats', async () => {
         try {
-            const output = await execPython('-m', ['cursor_framework', 'stats', '--root', frameworkRoot]);
+            const output = await execPython('-m', ['vibe_framework', 'stats', '--root', frameworkRoot]);
             await showInDocument('Framework Stats', formatJson(output));
         } catch (error) {
             vscode.window.showErrorMessage(`Stats failed: ${error.message}`);
@@ -97,7 +97,7 @@ async function activate(context) {
     });
 
     // Clear Cache Command
-    const clearCmd = vscode.commands.registerCommand('cursor-framework.clear-cache', async () => {
+    const clearCmd = vscode.commands.registerCommand('vibe-framework.clear-cache', async () => {
         const choice = await vscode.window.showWarningMessage(
             'Clear framework cache? This will remove memory and index files.',
             'Clear', 'Cancel'
@@ -105,7 +105,7 @@ async function activate(context) {
         
         if (choice === 'Clear') {
             try {
-                const output = await execPython('-m', ['cursor_framework', 'clear-cache', '--root', frameworkRoot, '--force']);
+                const output = await execPython('-m', ['vibe_framework', 'clear-cache', '--root', frameworkRoot, '--force']);
                 vscode.window.showInformationMessage('Cache cleared!');
                 await showInDocument('Clear Cache Result', formatJson(output));
             } catch (error) {
@@ -115,9 +115,9 @@ async function activate(context) {
     });
 
     // Scan Command
-    const scanCmd = vscode.commands.registerCommand('cursor-framework.scan', async () => {
+    const scanCmd = vscode.commands.registerCommand('vibe-framework.scan', async () => {
         try {
-            const output = await execPython('-m', ['cursor_framework', 'scan', '--root', frameworkRoot]);
+            const output = await execPython('-m', ['vibe_framework', 'scan', '--root', frameworkRoot]);
             await showInDocument('Scan Result', formatJson(output));
         } catch (error) {
             vscode.window.showErrorMessage(`Scan failed: ${error.message}`);
@@ -125,7 +125,7 @@ async function activate(context) {
     });
 
     // Dashboard Command
-    const dashboardCmd = vscode.commands.registerCommand('cursor-framework.dashboard', async () => {
+    const dashboardCmd = vscode.commands.registerCommand('vibe-framework.dashboard', async () => {
         const port = getConfig('dashboardPort', 8765);
         const uri = vscode.Uri.parse(`http://localhost:${port}`);
         await vscode.env.openExternal(uri);
@@ -133,9 +133,9 @@ async function activate(context) {
     });
 
     // Dump Context Command
-    const dumpCmd = vscode.commands.registerCommand('cursor-framework.dump-context', async () => {
+    const dumpCmd = vscode.commands.registerCommand('vibe-framework.dump-context', async () => {
         try {
-            const output = await execPython('-m', ['cursor_framework', 'context', '--root', frameworkRoot]);
+            const output = await execPython('-m', ['vibe_framework', 'context', '--root', frameworkRoot]);
             await showInDocument('Context Dump', output);
         } catch (error) {
             vscode.window.showErrorMessage(`Dump failed: ${error.message}`);
@@ -143,7 +143,7 @@ async function activate(context) {
     });
 
     // Graph Command
-    const graphCmd = vscode.commands.registerCommand('cursor-framework.graph', async () => {
+    const graphCmd = vscode.commands.registerCommand('vibe-framework.graph', async () => {
         const port = 8766;
         const uri = vscode.Uri.parse(`http://localhost:${port}`);
         await vscode.env.openExternal(uri);
@@ -151,9 +151,9 @@ async function activate(context) {
     });
 
     // Index Command
-    const indexCmd = vscode.commands.registerCommand('cursor-framework.index', async () => {
+    const indexCmd = vscode.commands.registerCommand('vibe-framework.index', async () => {
         try {
-            const output = await execPython('-m', ['cursor_framework', 'index', '--root', frameworkRoot]);
+            const output = await execPython('-m', ['vibe_framework', 'index', '--root', frameworkRoot]);
             vscode.window.showInformationMessage('Index rebuilt!');
             await showInDocument('Index Result', formatJson(output));
         } catch (error) {
@@ -162,7 +162,7 @@ async function activate(context) {
     });
 
     // Find Skills Command
-    const findSkillsCmd = vscode.commands.registerCommand('cursor-framework.find-skills', async () => {
+    const findSkillsCmd = vscode.commands.registerCommand('vibe-framework.find-skills', async () => {
         const query = await vscode.window.showInputBox({
             prompt: 'Enter skill search query',
             placeHolder: 'e.g., "frontend", "security", "database"'
@@ -171,7 +171,7 @@ async function activate(context) {
         if (query) {
             try {
                 // Use workflow ask to find relevant skills
-                const wf = await import(path.join(workspaceRoot, 'cursor_framework', 'workflow.js')).catch(() => null);
+                const wf = await import(path.join(workspaceRoot, 'vibe_framework', 'workflow.js')).catch(() => null);
                 if (wf) {
                     const result = wf.Workflow.ask(query);
                     await showInDocument('Skills Discovery', result.context.text);
@@ -183,9 +183,9 @@ async function activate(context) {
     });
 
     // Code Graph Command
-    const codeGraphCmd = vscode.commands.registerCommand('cursor-framework.code-graph', async () => {
+    const codeGraphCmd = vscode.commands.registerCommand('vibe-framework.code-graph', async () => {
         try {
-            const output = await execPython('-m', ['cursor_framework', 'dump-graph', '--root', workspaceRoot]);
+            const output = await execPython('-m', ['vibe_framework', 'dump-graph', '--root', workspaceRoot]);
             await showInDocument('Code Graph', formatJson(output));
         } catch (error) {
             vscode.window.showErrorMessage(`Code graph failed: ${error.message}`);

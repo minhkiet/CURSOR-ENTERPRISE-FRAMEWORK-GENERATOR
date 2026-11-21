@@ -2,7 +2,7 @@
 description: Prompt chuan de setup multi-tenant - RLS, tenant isolation
 trigger: multi-tenant, tenant isolation
 category: SaaS
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

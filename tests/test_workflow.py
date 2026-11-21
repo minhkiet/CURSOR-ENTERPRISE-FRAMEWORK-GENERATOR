@@ -1,9 +1,9 @@
-"""Tests for cursor_framework.workflow."""
+"""Tests for vibe_framework.workflow."""
 from __future__ import annotations
 
 from pathlib import Path
 
-from cursor_framework.workflow import Workflow
+from vibe_framework.workflow import Workflow
 
 
 def test_first_ask_misses_cache(sandbox_cursor: Path, memory_path: Path):
@@ -96,7 +96,7 @@ def test_latency_ms_recorded_on_hit_and_miss(sandbox_cursor: Path, memory_path: 
 def test_latency_ms_default_zero_on_construction():
     """Default value is 0.0 so callers iterating WorkflowResult without
     timing data still get a sane number."""
-    from cursor_framework.workflow import WorkflowResult
+    from vibe_framework.workflow import WorkflowResult
     r = WorkflowResult(context=None, from_cache=False,
                        memory_hits=0, memory_misses=0, asset_count=0)
     assert r.latency_ms == 0.0

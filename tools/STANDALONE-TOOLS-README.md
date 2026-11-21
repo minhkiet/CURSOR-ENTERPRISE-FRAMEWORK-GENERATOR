@@ -1,15 +1,15 @@
-# Cursor Framework Standalone Tools
+# Vibe Framework Standalone Tools
 
 This directory contains standalone Python tools that can run independently from any project directory.
 
 ## Tools
 
-### cursor_framework_cli.py
-Standalone CLI tool that wraps `cursor_framework` module.
+### vibe_framework_cli.py
+Standalone CLI tool that wraps `vibe_framework` module.
 ```
-python cursor_framework_cli.py serve --port 8765
-python cursor_framework_cli.py index --root .
-python cursor_framework_cli.py scan --root .
+python vibe_framework_cli.py serve --port 8765
+python vibe_framework_cli.py index --root .
+python vibe_framework_cli.py scan --root .
 ```
 
 ### mcp_config_generator.py
@@ -43,7 +43,7 @@ Each tool can be run independently:
 
 ```bash
 # CLI tool
-python tools/cursor_framework_cli.py --help
+python tools/vibe_framework_cli.py --help
 
 # Generate MCP config
 python tools/mcp_config_generator.py --workspace /path/to/project

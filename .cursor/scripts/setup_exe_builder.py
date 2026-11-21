@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Cursor Enterprise Framework - Local Setup Installer
+Vibe Enterprise Framework - Local Setup Installer
 ====================================================
 Creates a standalone .exe to install .cursor to any project.
 
@@ -66,7 +66,7 @@ def create_installer_script():
     
     installer_code = '''#!/usr/bin/env python3
 """
-Cursor Enterprise Framework - Standalone Installer
+Vibe Enterprise Framework - Standalone Installer
 ==================================================
 This script is compiled into a standalone .exe
 """

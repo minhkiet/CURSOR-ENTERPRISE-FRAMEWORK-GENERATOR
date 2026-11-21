@@ -1,42 +1,42 @@
 {
-  "name": "cursor-framework-spec-kit",
+  "name": "vibe-framework-spec-kit",
   "version": "1.0.0",
-  "description": "Spec-Driven Development (SDD) workbench for Cursor Enterprise Framework",
-  "author": "Cursor Enterprise Framework",
+  "description": "Spec-Driven Development (SDD) workbench for Vibe Enterprise Framework",
+  "author": "Vibe Enterprise Framework",
   "activationEvents": [
-    "onCommand:cursor-framework.spec-kit.init",
-    "onCommand:cursor-framework.spec-kit.list",
-    "onCommand:cursor-framework.spec-kit.status",
-    "onCommand:cursor-framework.spec-kit.validate",
-    "onCommand:cursor-framework.spec-kit.constitution"
+    "onCommand:vibe-framework.spec-kit.init",
+    "onCommand:vibe-framework.spec-kit.list",
+    "onCommand:vibe-framework.spec-kit.status",
+    "onCommand:vibe-framework.spec-kit.validate",
+    "onCommand:vibe-framework.spec-kit.constitution"
   ],
   "main": "index.js",
   "contributes": {
     "commands": [
       {
-        "command": "cursor-framework.spec-kit.init",
-        "title": "Cursor Framework: New Feature Specification (SDD)",
-        "category": "Cursor Framework"
+        "command": "vibe-framework.spec-kit.init",
+        "title": "Vibe Framework: New Feature Specification (SDD)",
+        "category": "Vibe Framework"
       },
       {
-        "command": "cursor-framework.spec-kit.list",
-        "title": "Cursor Framework: List All Specifications",
-        "category": "Cursor Framework"
+        "command": "vibe-framework.spec-kit.list",
+        "title": "Vibe Framework: List All Specifications",
+        "category": "Vibe Framework"
       },
       {
-        "command": "cursor-framework.spec-kit.status",
-        "title": "Cursor Framework: Feature Spec Status",
-        "category": "Cursor Framework"
+        "command": "vibe-framework.spec-kit.status",
+        "title": "Vibe Framework: Feature Spec Status",
+        "category": "Vibe Framework"
       },
       {
-        "command": "cursor-framework.spec-kit.validate",
-        "title": "Cursor Framework: Validate Specification",
-        "category": "Cursor Framework"
+        "command": "vibe-framework.spec-kit.validate",
+        "title": "Vibe Framework: Validate Specification",
+        "category": "Vibe Framework"
       },
       {
-        "command": "cursor-framework.spec-kit.constitution",
-        "title": "Cursor Framework: View Project Constitution",
-        "category": "Cursor Framework"
+        "command": "vibe-framework.spec-kit.constitution",
+        "title": "Vibe Framework: View Project Constitution",
+        "category": "Vibe Framework"
       }
     ]
   }

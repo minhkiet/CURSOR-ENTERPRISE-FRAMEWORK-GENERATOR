@@ -2,7 +2,7 @@
 
 ## Tổng quan
 
-Document này cung cấp 10 câu hỏi thường gặp và câu trả lời chi tiết về Kubernetes trong Cursor Enterprise Framework.
+Document này cung cấp 10 câu hỏi thường gặp và câu trả lời chi tiết về Kubernetes trong Vibe Enterprise Framework.
 
 ## Câu hỏi 1: Làm thế nào để handle graceful shutdown trong Kubernetes?
 

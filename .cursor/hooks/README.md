@@ -1,4 +1,4 @@
-# Cursor Enterprise Framework - Hooks
+# Vibe Enterprise Framework - Hooks
 # Tự động trigger khi xảy ra sự kiện trong Git, CI/CD, hoặc development workflow
 
 ## Giới thiệu

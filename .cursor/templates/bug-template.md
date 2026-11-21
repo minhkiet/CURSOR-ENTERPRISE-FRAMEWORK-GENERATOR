@@ -1,7 +1,7 @@
 ﻿---
 title: Template bao cao bug - steps, environment, expected
 description: Template bao cao bug - steps, environment, expected
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

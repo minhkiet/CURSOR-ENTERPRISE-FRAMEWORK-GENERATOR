@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "cursor-framework": {
+    "vibe-framework": {
       "command": "C:\\Python312\\python.exe",
       "args": ["-m", "cursor_framework_mcp.server"],
       "cwd": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\tools\\cursor-framework-mcp",
@@ -12,7 +12,7 @@
         "CURSOR_FRAMEWORK_CACHE_MAX_AGENTS": "10",
         "CURSOR_FRAMEWORK_CACHE_TTL_MINUTES": "30"
       },
-      "description": "Cursor Enterprise Framework - Rules, Skills, Agents registry with auto-discovery and caching"
+      "description": "Vibe Enterprise Framework - Rules, Skills, Agents registry with auto-discovery and caching"
     },
     "cursor-autopilot": {
       "command": "C:\\Python312\\python.exe",
@@ -23,7 +23,7 @@
         "WORKSPACE_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR",
         "CURSOR_FRAMEWORK_ROOT": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\tools\\cursor-framework-mcp"
       },
-      "description": "Auto-execution engine for Cursor Enterprise Framework - runs workflows, gates, and suggestions"
+      "description": "Auto-execution engine for Vibe Enterprise Framework - runs workflows, gates, and suggestions"
     },
     "cursor-memory": {
       "command": "C:\\Python312\\python.exe",
@@ -43,6 +43,6 @@
     "version": "1.0.0",
     "framework_version": "3.1.0",
     "total_tools": 26,
-    "description": "Cursor Enterprise Framework MCP stack - framework registry + autopilot + memory management"
+    "description": "Vibe Enterprise Framework MCP stack - framework registry + autopilot + memory management"
   }
 }

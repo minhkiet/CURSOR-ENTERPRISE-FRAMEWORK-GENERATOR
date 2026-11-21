@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace CursorSetupWpf.Services
 {
     /// <summary>
-    /// Runs cursor_framework CLI commands for a specific project workspace.
+    /// Runs vibe_framework CLI commands for a specific project workspace.
     /// Allows selecting a project folder and executing framework tools on it.
     /// </summary>
     public class ProjectRunner
@@ -106,18 +106,18 @@ namespace CursorSetupWpf.Services
         }
 
         /// <summary>
-        /// Find cursor_framework module path.
+        /// Find vibe_framework module path.
         /// </summary>
         static string FindFrameworkModulePath(string installPath)
         {
             var tryPaths = new List<string>
             {
-                Path.Combine(installPath, "cursor_framework"),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".cursor", "cursor_framework"),
-                Path.Combine(AppContext.BaseDirectory, "cursor_framework"),
-                Path.Combine(AppContext.BaseDirectory, "..", "cursor_framework"),
-                Path.Combine(AppContext.BaseDirectory, "..", "..", "cursor_framework"),
-                Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "cursor_framework"),
+                Path.Combine(installPath, "vibe_framework"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".cursor", "vibe_framework"),
+                Path.Combine(AppContext.BaseDirectory, "vibe_framework"),
+                Path.Combine(AppContext.BaseDirectory, "..", "vibe_framework"),
+                Path.Combine(AppContext.BaseDirectory, "..", "..", "vibe_framework"),
+                Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "vibe_framework"),
             };
 
             foreach (var p in tryPaths)
@@ -169,7 +169,7 @@ namespace CursorSetupWpf.Services
         }
 
         /// <summary>
-        /// Run a cursor_framework command asynchronously with streaming output.
+        /// Run a vibe_framework command asynchronously with streaming output.
         /// </summary>
         public async Task RunCommandAsync(string command, string? projectPath = null, int timeoutSec = 60)
         {
@@ -196,8 +196,8 @@ namespace CursorSetupWpf.Services
 
                 if (string.IsNullOrEmpty(modulePath))
                 {
-                    LogAppended?.Invoke("[PROJECT RUNNER] cursor_framework not found!");
-                    OutputReceived?.Invoke($"ERROR: cursor_framework module not found.\nTarget path: {targetPath}");
+                    LogAppended?.Invoke("[PROJECT RUNNER] vibe_framework not found!");
+                    OutputReceived?.Invoke($"ERROR: vibe_framework module not found.\nTarget path: {targetPath}");
                     return;
                 }
 
@@ -206,7 +206,7 @@ namespace CursorSetupWpf.Services
                 var psi = new ProcessStartInfo
                 {
                     FileName = python,
-                    Arguments = $"-m cursor_framework {command} --root \"{targetPath}\"",
+                    Arguments = $"-m vibe_framework {command} --root \"{targetPath}\"",
                     WorkingDirectory = workingDir,
                     UseShellExecute = false,
                     CreateNoWindow = true,
@@ -229,7 +229,7 @@ namespace CursorSetupWpf.Services
                 }
 
                 LogAppended?.Invoke($"[PROJECT RUNNER] Running: {command} on {targetPath}");
-                LogAppended?.Invoke($"         {python} -m cursor_framework {command} --root \"{targetPath}\"");
+                LogAppended?.Invoke($"         {python} -m vibe_framework {command} --root \"{targetPath}\"");
 
                 _currentProcess = new Process { StartInfo = psi, EnableRaisingEvents = true };
                 _currentProcess.OutputDataReceived += (_, e) =>
@@ -314,7 +314,7 @@ namespace CursorSetupWpf.Services
 
                 if (string.IsNullOrEmpty(modulePath))
                 {
-                    LogAppended?.Invoke("[PROJECT RUNNER] cursor_framework not found!");
+                    LogAppended?.Invoke("[PROJECT RUNNER] vibe_framework not found!");
                     return;
                 }
 
@@ -323,7 +323,7 @@ namespace CursorSetupWpf.Services
                 var psi = new ProcessStartInfo
                 {
                     FileName = python,
-                    Arguments = $"-m cursor_framework ask \"{request}\" --root \"{targetPath}\" --max-tokens {maxTokens}",
+                    Arguments = $"-m vibe_framework ask \"{request}\" --root \"{targetPath}\" --max-tokens {maxTokens}",
                     WorkingDirectory = workingDir,
                     UseShellExecute = false,
                     CreateNoWindow = true,

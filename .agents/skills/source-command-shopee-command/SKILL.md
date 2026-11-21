@@ -457,7 +457,7 @@ def generate_signature(path, partner_key, timestamp):
     ).hexdigest()
 ```
 
-## Integration with Cursor Framework
+## Integration with Vibe Framework
 
 ### Slash Commands
 

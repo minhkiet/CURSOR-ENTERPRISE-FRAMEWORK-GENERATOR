@@ -4,7 +4,7 @@ description: "So sánh chi tiết các vector databases: Pinecone, Weaviate, Qdr
 tags: ["vector-db", "pinecone", "weaviate", "qdrant", "chroma", "pgvector", "comparison"]
 created: "2026-06-23"
 version: "1.0.0"
-framework: "Cursor Enterprise Framework"
+framework: "Vibe Enterprise Framework"
 ---
 
 # Vector Database Comparison
@@ -837,4 +837,4 @@ class VectorDBCostOptimizer:
 4. **Chroma Documentation**: https://docs.trychroma.com/
 5. **pgvector**: https://github.com/pgvector/pgvector
 6. **Vector DB Benchmarks**: https://ann-benchmarks.com/
-7. **Cursor Enterprise Framework - RAG Rules**: `.cursor/rules/vector-search.mdc`
+7. **Vibe Enterprise Framework - RAG Rules**: `.cursor/rules/vector-search.mdc`

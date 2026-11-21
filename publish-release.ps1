@@ -1,7 +1,7 @@
 #requires -Version 5.1
 <#
 .SYNOPSIS
-    Builds and publishes Cursor Enterprise Framework v5.0.0 to GitHub releases.
+    Builds and publishes Vibe Enterprise Framework v5.0.0 to GitHub releases.
 
 .DESCRIPTION
     - Authenticates via gh CLI if not already logged in

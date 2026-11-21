@@ -1,4 +1,4 @@
-# Cursor Framework Security & Pentest Plugin (Hackingtool Suite)
+# Vibe Framework Security & Pentest Plugin (Hackingtool Suite)
 
 Integrates 183+ OSINT & Pentesting tools into Cursor IDE, Claude Code, and Antigravity.
 

@@ -28,15 +28,15 @@ const steps: Step[] = [
     number: '01',
     title: 'Clone the framework',
     description: 'Get the monorepo with all rules, skills, and agents preconfigured.',
-    command: 'git clone https://github.com/your-org/cursor-enterprise-framework.git',
+    command: 'git clone https://github.com/your-org/vibe-framework.git',
     detail: 'Takes 12 seconds. Includes 39 rules, 17 skills, 8 agents.'
   },
   {
     number: '02',
-    title: 'Open in Cursor',
-    description: 'Cursor auto-loads the .cursor/ directory and indexes the rules.',
-    command: 'cursor ./cursor-enterprise-framework',
-    detail: 'No CLI to learn. Indexes 272 files on first open.'
+    title: 'Open in your Vibe tool',
+    description: 'Cursor, Claude Code, Codex, Windsurf and Cline read the same repo-local instructions.',
+    command: 'cd ./vibe-framework',
+    detail: 'No CLI to learn. Skills and rules load from plain files.'
   },
   {
     number: '03',
@@ -63,7 +63,7 @@ const steps: Step[] = [
         <h2 class="section-title">From clone to first task in 4 steps.</h2>
         <p class="section-desc">
           No proprietary CLI. No vendor lock-in. The framework lives in your repo as plain files.
-          Cursor reads them natively.
+          Any supported Vibe tool reads them natively.
         </p>
       </div>
 
@@ -89,9 +89,9 @@ const steps: Step[] = [
       <div class="getting-dev-cta">
         <div class="getting-dev-cta-text">
           <div class="getting-dev-cta-label">Python devs</div>
-          <h3 class="getting-dev-cta-title">Cài <code>cursor_framework</code> để dùng CLI & dashboard</h3>
+          <h3 class="getting-dev-cta-title">Cài <code>vibe_framework</code> để dùng CLI & dashboard</h3>
           <p class="getting-dev-cta-desc">
-            Ngoài <code>.cursor/</code> rules, framework còn có Python package với 11 subcommands
+            Ngoài rules/skills cho từng tool, framework còn có Python package với 11 subcommands
             (serve, ask, stats, graph, tdam). Cài qua pip, chạy Dashboard local ở port 8765.
           </p>
         </div>

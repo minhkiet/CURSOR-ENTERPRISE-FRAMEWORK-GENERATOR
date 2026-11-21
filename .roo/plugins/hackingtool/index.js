@@ -1,5 +1,5 @@
 /**
- * Cursor Framework Security & Pentest Plugin (Hackingtool Bridge)
+ * Vibe Framework Security & Pentest Plugin (Hackingtool Bridge)
  * 
  * Exposes 183+ pentesting and OSINT tools to Cursor IDE, delegating
  * to tools/hackingtool-plugin scripts.
@@ -19,7 +19,7 @@ async function showInDocument(title, content, language = 'markdown') {
 }
 
 function activate(context) {
-    const listToolsCmd = vscode.commands.registerCommand('cursor-framework.hackingtool.listTools', async () => {
+    const listToolsCmd = vscode.commands.registerCommand('vibe-framework.hackingtool.listTools', async () => {
         const doc = [
             '# Available Security & OSINT Tools (183+ Available)',
             '',
@@ -45,7 +45,7 @@ function activate(context) {
         await showInDocument('Security Tools Suite', doc);
     });
 
-    const reconCmd = vscode.commands.registerCommand('cursor-framework.hackingtool.recon', async () => {
+    const reconCmd = vscode.commands.registerCommand('vibe-framework.hackingtool.recon', async () => {
         const target = await vscode.window.showInputBox({
             prompt: 'Enter domain or handle for passive OSINT reconnaissance',
             placeHolder: 'e.g. example.com or target_username'
@@ -56,7 +56,7 @@ function activate(context) {
         }
     });
 
-    const portScanCmd = vscode.commands.registerCommand('cursor-framework.hackingtool.portScan', async () => {
+    const portScanCmd = vscode.commands.registerCommand('vibe-framework.hackingtool.portScan', async () => {
         const host = await vscode.window.showInputBox({
             prompt: 'Enter IP address or hostname to probe',
             placeHolder: 'e.g. 127.0.0.1 or testphp.vulnweb.com'
@@ -67,7 +67,7 @@ function activate(context) {
         }
     });
 
-    const vulnScanCmd = vscode.commands.registerCommand('cursor-framework.hackingtool.vulnScan', async () => {
+    const vulnScanCmd = vscode.commands.registerCommand('vibe-framework.hackingtool.vulnScan', async () => {
         const url = await vscode.window.showInputBox({
             prompt: 'Enter target URL for Nuclei vulnerability scan',
             placeHolder: 'https://staging.example.com'

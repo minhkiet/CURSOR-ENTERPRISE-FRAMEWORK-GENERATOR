@@ -2,7 +2,7 @@
 description: Workflow - Execute standard workflows
 trigger: workflow, quy trình, execute workflow, standard workflow, process
 category: Workflow
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

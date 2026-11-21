@@ -1,14 +1,14 @@
 # ============================================================
 # FRAMEWORK PACKAGER SCRIPT
 # ============================================================
-# Purpose: Package Cursor Enterprise Framework into ZIP
+# Purpose: Package Vibe Enterprise Framework into ZIP
 # Language: PowerShell
 # Created: 2026-06-23
 # ============================================================
 
 param(
     [string]$SourcePath = ".cursor",
-    [string]$OutputPath = "cursor-enterprise-framework-v4.1.zip",
+    [string]$OutputPath = "vibe-framework-v4.1.zip",
     [string]$FrameworkVersion = "4.1.0",
     [switch]$IncludeScripts,
     [switch]$Verify
@@ -121,7 +121,7 @@ function Get-FrameworkStats {
     return $stats
 }
 
-Write-Log "Cursor Enterprise Framework Packager v$FrameworkVersion"
+Write-Log "Vibe Enterprise Framework Packager v$FrameworkVersion"
 Write-Log "=========================================="
 
 # Verify framework
@@ -166,7 +166,7 @@ Write-Log "  Total lines: $($dirStats.lines)"
 # Create ZIP
 Write-Log "Creating ZIP archive..."
 $tempDir = $env:TEMP
-$tempZip = Join-Path $tempDir "cursor-framework-temp.zip"
+$tempZip = Join-Path $tempDir "vibe-framework-temp.zip"
 
 if (Test-Path $OutputPath) {
     Remove-Item $OutputPath -Force

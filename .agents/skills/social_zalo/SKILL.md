@@ -6,12 +6,12 @@ description: "Zalo API Integration Skill skill"
 # Zalo API Integration Skill
 
 **Version:** 1.0.0  
-**Author:** Cursor Enterprise Framework  
+**Author:** Vibe Enterprise Framework
 **Triggers:** zalo, zalo api, zalo integration, zalo messaging
 
 ## Overview
 
-This skill provides Zalo API integration for Cursor Enterprise Framework. It enables sending messages, managing Official Accounts (OA), accessing user profiles, and more.
+This skill provides Zalo API integration for Vibe Enterprise Framework. It enables sending messages, managing Official Accounts (OA), accessing user profiles, and more.
 
 ## Capabilities
 

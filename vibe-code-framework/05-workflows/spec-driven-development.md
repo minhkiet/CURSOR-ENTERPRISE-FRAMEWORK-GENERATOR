@@ -1,6 +1,6 @@
 # Spec-Driven Development (SDD) Workflow
 
-> **Version:** 1.0.0 | **Framework:** Cursor Enterprise Framework & GitHub Spec Kit Compatible  
+> **Version:** 1.0.0 | **Framework:** Vibe Enterprise Framework & GitHub Spec Kit Compatible
 > **Core Principle:** Specification Before Implementation | Test-Driven Discipline
 
 ---
@@ -38,14 +38,14 @@ Chuẩn hóa toàn diện quy trình phát triển phần mềm bằng AI theo p
 ### Bước 1: Khởi tạo Constitution (`.specify/constitution.md`)
 - Chạy lệnh khởi tạo:
   ```bash
-  python -m cursor_framework spec constitution
+  python -m vibe_framework spec constitution
   ```
 - Định hình các nguyên tắc bất biến: phiên bản runtime, tiêu chuẩn zero unvetted dependencies, quy định TDD bắt buộc.
 
 ### Bước 2: Khởi tạo gói Spec cho Feature
 - Tạo khung thư mục đặc tả:
   ```bash
-  python -m cursor_framework spec init <feature-name>
+  python -m vibe_framework spec init <feature-name>
   ```
 - Cấu trúc sinh ra tại `.specify/specs/<feature-name>/`:
   - `spec.md`: Đặc tả nghiệp vụ (User stories, BDD Scenarios, In/Out Scope).
@@ -92,11 +92,11 @@ Chuẩn hóa toàn diện quy trình phát triển phần mềm bằng AI theo p
 - Sau mỗi task hoàn thành, cập nhật `[x]` trong `tasks.md`.
 - Theo dõi tiến độ bất kỳ lúc nào:
   ```bash
-  python -m cursor_framework spec status <feature-name>
+  python -m vibe_framework spec status <feature-name>
   ```
 - Kiểm tra toàn diện chất lượng trước khi đóng task:
   ```bash
-  python -m cursor_framework spec validate <feature-name>
+  python -m vibe_framework spec validate <feature-name>
   ```
 
 ---

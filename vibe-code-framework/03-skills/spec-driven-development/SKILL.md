@@ -5,7 +5,7 @@ description: "Master Spec-Driven Development (SDD) orchestrator inspired by GitH
 
 # Spec-Driven Development (SDD) Skill
 
-> **Version:** 1.0.0 | **Framework:** Cursor Enterprise Framework & GitHub Spec Kit Compatible  
+> **Version:** 1.0.0 | **Framework:** Vibe Enterprise Framework & GitHub Spec Kit Compatible
 > **Core Philosophy:** Intent & Specifications before Implementation | Test-Driven Discipline
 
 ---
@@ -77,14 +77,14 @@ Every feature lives under `.specify/specs/<feature-name>/`:
 
 ```bash
 # Initialize a new feature spec bundle:
-python -m cursor_framework spec init <feature-name>
+python -m vibe_framework spec init <feature-name>
 
 # List all specs and progress:
-python -m cursor_framework spec list
+python -m vibe_framework spec list
 
 # Check status & progress of a feature:
-python -m cursor_framework spec status <feature-name>
+python -m vibe_framework spec status <feature-name>
 
 # Validate against quality gates:
-python -m cursor_framework spec validate <feature-name>
+python -m vibe_framework spec validate <feature-name>
 ```

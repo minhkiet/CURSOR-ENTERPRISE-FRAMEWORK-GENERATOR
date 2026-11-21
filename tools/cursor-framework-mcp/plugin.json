@@ -1,7 +1,7 @@
 {
   "name": "cursor-framework-mcp",
   "version": "1.0.0",
-  "description": "Cursor Enterprise Framework MCP server. Lazy-loads and caches rules, skills, and agents with LRU eviction, token budgeting, and auto-detection of the right skill for a free-form task.",
+  "description": "Vibe Enterprise Framework MCP server. Lazy-loads and caches rules, skills, and agents with LRU eviction, token budgeting, and auto-detection of the right skill for a free-form task.",
   "author": {
     "name": "thaofvn-coca06"
   },

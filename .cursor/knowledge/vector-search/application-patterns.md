@@ -4,7 +4,7 @@ description: "Hướng dẫn về các application patterns với vector search:
 tags: ["application", "patterns", "recommendation", "semantic-search", "anomaly-detection", "deduplication", "classification"]
 created: "2026-06-23"
 version: "1.0.0"
-framework: "Cursor Enterprise Framework"
+framework: "Vibe Enterprise Framework"
 ---
 
 # Application Patterns
@@ -1843,4 +1843,4 @@ class ProductionSemanticSearch:
 1. **Recommendation Systems**: https://developers.google.com/machine-learning/recommendation
 2. **Vector Search Applications**: https://github.com/facebookresearch/faiss/wiki/Application-examples
 3. **Anomaly Detection**: https://scikit-learn.org/stable/modules/outlier_detection.html
-4. **Cursor Enterprise Framework - Vector Search Rules**: `.cursor/rules/vector-search.mdc`
+4. **Vibe Enterprise Framework - Vector Search Rules**: `.cursor/rules/vector-search.mdc`

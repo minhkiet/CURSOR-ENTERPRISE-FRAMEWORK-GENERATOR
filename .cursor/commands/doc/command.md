@@ -2,7 +2,7 @@
 description: Doc - Tạo tài liệu (README, API docs, inline docs)
 trigger: doc, document, tài liệu, documentation, generate doc, tạo doc, write doc, api doc
 category: Documentation
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

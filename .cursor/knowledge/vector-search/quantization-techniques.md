@@ -4,7 +4,7 @@ description: "Hướng dẫn về quantization: scalar quantization, product qua
 tags: ["quantization", "compression", "product-quantization", "binary-quantization", "vector-search"]
 created: "2026-06-23"
 version: "1.0.0"
-framework: "Cursor Enterprise Framework"
+framework: "Vibe Enterprise Framework"
 ---
 
 # Quantization Techniques
@@ -1109,4 +1109,4 @@ class TieredQuantizedIndex:
 
 1. **Product Quantization Paper**: https://arxiv.org/abs/1510.00149
 2. **Optimized Product Quantization**: https://arxiv.org/abs/1310.1534
-3. **Cursor Enterprise Framework - Vector Search Rules**: `.cursor/rules/vector-search.mdc`
+3. **Vibe Enterprise Framework - Vector Search Rules**: `.cursor/rules/vector-search.mdc`

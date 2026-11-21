@@ -4,7 +4,7 @@ description: "Hướng dẫn triển khai pgvector trong production: connection 
 tags: ["production", "pgvector", "deployment", "monitoring", "backup", "connection-pooling"]
 created: "2026-06-23"
 version: "1.0.0"
-framework: "Cursor Enterprise Framework"
+framework: "Vibe Enterprise Framework"
 ---
 
 # pgvector Production Deployment
@@ -971,4 +971,4 @@ $$ LANGUAGE plpgsql;
 2. **PgBouncer**: https://www.pgbouncer.org/
 3. **PostgreSQL Monitoring**: https://www.postgresql.org/docs/current/monitoring.html
 4. **PgCron**: https://docs.vaultdb.com/pg_cron/
-5. **Cursor Enterprise Framework - Deployment Rules**: `.cursor/rules/deployment.mdc`
+5. **Vibe Enterprise Framework - Deployment Rules**: `.cursor/rules/deployment.mdc`

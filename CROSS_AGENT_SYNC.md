@@ -2,7 +2,7 @@
 
 > **Version 1.0.0** | Multi-Agent Framework Compatibility
 
-This document describes the cross-agent synchronization protocol for vibe coding agents using the Cursor Enterprise Framework.
+This document describes the cross-agent synchronization protocol for vibe coding agents using the Vibe Enterprise Framework.
 
 ---
 
@@ -14,7 +14,7 @@ The framework supports four vibe coding agents with unified skill and rule manag
 |-------|-----------|-------------|----------|
 | Cursor IDE | `cursor` | `K` | Local IDE |
 | Codex | `codex` | `CX` | Cloud (origin.cursor.com) |
-| Claude Code | `claude-code` | `C` | @cursor/codex |
+| Claude Code | `claude-code` | `C` | Anthropic |
 | Grok | `grok` | `G` | x.com/grok |
 
 ---
@@ -37,7 +37,7 @@ else:
     return "unknown"  # Falls back to Cursor
 ```
 
-**Implementation:** `cursor_framework/agent_integration.py` → `AgentDetector.detect()`
+**Implementation:** `vibe_framework/agent_integration.py` → `AgentDetector.detect()`
 
 ---
 
@@ -177,7 +177,7 @@ Priority order (highest first):
 ### Export Manifest
 
 ```python
-from cursor_framework.skills.skill_registry import create_cross_agent_registry
+from vibe_framework.skills.skill_registry import create_cross_agent_registry
 
 registry = create_cross_agent_registry()
 
@@ -198,28 +198,28 @@ registry.export_manifest(manifest, format="json", output_path="manifest.json")
 
 ```bash
 # Cursor IDE (default)
-python -m cursor_framework install --agent cursor
+python -m vibe_framework install --agent cursor
 
 # Codex
-python -m cursor_framework install --agent codex
+python -m vibe_framework install --agent codex
 
 # Claude Code
-python -m cursor_framework install --agent claude-code
+python -m vibe_framework install --agent claude-code
 
 # Grok
-python -m cursor_framework install --agent grok
+python -m vibe_framework install --agent grok
 ```
 
 ### All Agents
 
 ```bash
-python -m cursor_framework install --all-agents
+python -m vibe_framework install --all-agents
 ```
 
 ### Python API
 
 ```python
-from cursor_framework.skills.skill_registry import create_cross_agent_registry
+from vibe_framework.skills.skill_registry import create_cross_agent_registry
 
 registry = create_cross_agent_registry()
 
@@ -261,8 +261,8 @@ for manifest, score in results:
 
 ## References
 
-- [Cursor Enterprise Framework README](cursor_framework/README.md)
-- [Agent Integration Module](cursor_framework/agent_integration.py)
-- [Skill Discovery Module](cursor_framework/skill_discovery.py)
-- [Cross-Agent Skill Registry](cursor_framework/skills/skill_registry.py)
+- [Vibe Enterprise Framework README](vibe_framework/README.md)
+- [Agent Integration Module](vibe_framework/agent_integration.py)
+- [Skill Discovery Module](vibe_framework/skill_discovery.py)
+- [Cross-Agent Skill Registry](vibe_framework/skills/skill_registry.py)
 - [karpathy-coding Skill](.cursor/skills/code_karpathy/SKILL.md)

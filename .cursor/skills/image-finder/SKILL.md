@@ -13,7 +13,7 @@ Tìm và tải ảnh stock miễn phí cho website clone và web design. Hỗ tr
 ## Quick Start - API Usage
 
 ```python
-from cursor_framework.skills.image_search import ImageSearchSkill
+from vibe_framework.skills.image_search import ImageSearchSkill
 
 # Initialize (uses API keys from env or parameters)
 skill = ImageSearchSkill(
@@ -70,7 +70,7 @@ for img in result.images:
 ## Image Presentation Effects
 
 ```python
-from cursor_framework.skills.image_presentation import (
+from vibe_framework.skills.image_presentation import (
     ImagePresentationSkill,
     RevealEffect,
     RevealAnimation,

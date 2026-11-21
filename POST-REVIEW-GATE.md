@@ -382,6 +382,6 @@ Trigger `/review` với persona marketing (nếu có), nếu không thì self-ch
 
 ---
 
-**Signed off (Market Pro 2026 Redesign)**: 2026-07-05 · Redesign Market Pro 2026 · Cursor Enterprise Framework Generator
+**Signed off (Market Pro 2026 Redesign)**: 2026-07-05 · Redesign Market Pro 2026 · Vibe Enterprise Framework Generator
 
 **Marketing gates added (sync 2026-07-15)**: §11 above · Applies to all marketing-domain tasks · See skill-registry.mdc §9

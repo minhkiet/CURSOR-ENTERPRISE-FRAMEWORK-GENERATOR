@@ -2,7 +2,7 @@
 # CURSOR ENTERPRISE FRAMEWORK - LOCAL SETUP SCRIPT
 # =============================================================================
 # Purpose: Install .cursor configuration from this project to other projects
-# Author: Cursor Enterprise Framework Generator
+# Author: Vibe Enterprise Framework Generator
 # Version: 1.0.0
 # Date: 2026-06-26
 # =============================================================================

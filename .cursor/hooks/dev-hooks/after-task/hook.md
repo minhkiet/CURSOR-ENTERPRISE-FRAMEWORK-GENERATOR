@@ -1,7 +1,7 @@
 ---
 description: After-Task Hook - Update memory va summarize sau khi hoan thanh task
 trigger: sau task, after task, ket thuc task
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

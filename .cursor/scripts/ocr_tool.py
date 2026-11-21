@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 OCR Utility Script for Document Scanner Integration
-Part of Cursor Enterprise Framework
+Part of Vibe Enterprise Framework
 
 Usage:
     python ocr_tool.py <image_path> [options]
@@ -262,7 +262,7 @@ def extract_text_from_document(
 
 def main():
     parser = argparse.ArgumentParser(
-        description='OCR Text Extraction Tool for Cursor Enterprise Framework',
+        description='OCR Text Extraction Tool for Vibe Enterprise Framework',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

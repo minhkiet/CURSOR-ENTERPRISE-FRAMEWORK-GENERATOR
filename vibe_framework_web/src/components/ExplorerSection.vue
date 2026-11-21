@@ -16,7 +16,7 @@ interface FileNode {
 
 const fileTree: FileNode[] = [
   {
-    name: 'cursor-framework',
+    name: 'vibe-framework',
     path: '/',
     type: 'folder',
     kind: 'package',
@@ -103,7 +103,7 @@ const getFileIcon = (kind: string) => {
           </div>
           <div class="explorer-path">
             <span class="path-icon">◇</span>
-            <span class="path-text">cursor-framework</span>
+            <span class="path-text">vibe-framework</span>
           </div>
           <div class="explorer-meta">main</div>
         </div>
@@ -114,7 +114,7 @@ const getFileIcon = (kind: string) => {
               <div class="sidebar-label">Workspace</div>
               <div class="sidebar-item active">
                 <span class="sidebar-icon">◇</span>
-                <span class="sidebar-name">cursor-framework</span>
+                <span class="sidebar-name">vibe-framework</span>
               </div>
             </div>
             <div class="sidebar-section">
@@ -144,7 +144,7 @@ const getFileIcon = (kind: string) => {
 
           <div class="explorer-main">
             <div class="explorer-breadcrumb">
-              <span>cursor-framework</span>
+              <span>vibe-framework</span>
               <span class="bc-sep">/</span>
               <span class="bc-current">.cursor</span>
             </div>

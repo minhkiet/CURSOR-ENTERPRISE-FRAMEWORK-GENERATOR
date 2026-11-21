@@ -2,7 +2,7 @@
 description: Bazi / 四柱 — tính tứ trụ deterministic bằng calculator vendored, đọc references theo câu hỏi, trả lời có trích dẫn và phản chứng
 trigger: bazi, 八字, 四柱, 命盘, 算命, 排盘, 批命, 流年, 大运, 命理, 运势, tử vi trung hoa, four pillars, fortune telling, birth chart, tứ trụ
 category: Knowledge
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

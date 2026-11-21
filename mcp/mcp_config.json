@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "cursor-framework": {
+    "vibe-framework": {
       "command": "python",
       "args": [
         "${workspaceFolder}/mcp/framework_server.py"
@@ -8,7 +8,7 @@
       "env": {
         "PYTHONPATH": "${workspaceFolder}"
       },
-      "description": "Cursor Framework - Context management, skill discovery, memory operations"
+      "description": "Vibe Framework - Context management, skill discovery, memory operations"
     },
     "file-ops": {
       "command": "python",

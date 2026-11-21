@@ -4,7 +4,7 @@ description: "Hướng dẫn chi tiết về các phương pháp indexing vector
 tags: ["pgvector", "indexing", "hnsw", "ivfflat", "postgresql", "vector-search"]
 created: "2026-06-23"
 version: "1.0.0"
-framework: "Cursor Enterprise Framework"
+framework: "Vibe Enterprise Framework"
 ---
 
 # Vector Indexing - ivfflat vs HNSW
@@ -542,4 +542,4 @@ END $$;
 2. **HNSW Paper**: "Efficient and robust approximate nearest neighbor search using Hierarchical Navigable Small World graphs" - Yu A. Malkov, D A. Yashunin
 3. **IVFFlat Implementation**: PostgreSQL Documentation - GIN Indexes
 4. **Product Quantization**: "Product Quantization for Nearest Neighbor Search" - Jegou et al.
-5. **Cursor Enterprise Framework - Database Rules**: `.cursor/rules/pgvector.mdc`
+5. **Vibe Enterprise Framework - Database Rules**: `.cursor/rules/pgvector.mdc`

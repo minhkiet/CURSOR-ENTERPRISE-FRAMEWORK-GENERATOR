@@ -13,7 +13,7 @@ framework: "cursor-enterprise-framework"
 
 Kubernetes (thường gọi tắt là K8s) là một container orchestration platform mã nguồn mở được phát triển bởi Google, cho phép deploy, scale, và manage các containerized applications một cách tự động. Kiến trúc Kubernetes được thiết kế theo mô hình master-worker, trong đó Control Plane chịu trách nhiệm quản lý và điều phối toàn bộ cluster, còn Worker Nodes thực hiện công việc chạy các workloads.
 
-Mục đích chính của tài liệu này là cung cấp kiến thức toàn diện về kiến trúc Kubernetes trong Cursor Enterprise Framework, bao gồm các thành phần cốt lõi, cách chúng tương tác với nhau, và các best practices để thiết kế một production-ready Kubernetes cluster. Tài liệu này phù hợp cho các developers, DevOps engineers, và system architects đang làm việc với Kubernetes trong môi trường enterprise.
+Mục đích chính của tài liệu này là cung cấp kiến thức toàn diện về kiến trúc Kubernetes trong Vibe Enterprise Framework, bao gồm các thành phần cốt lõi, cách chúng tương tác với nhau, và các best practices để thiết kế một production-ready Kubernetes cluster. Tài liệu này phù hợp cho các developers, DevOps engineers, và system architects đang làm việc với Kubernetes trong môi trường enterprise.
 
 ## Kiến trúc tổng quan (High-Level Architecture)
 

@@ -2,7 +2,7 @@
 description: Prompt chuan de audit bao mat - OWASP, vulnerabilities, auth
 trigger: security audit, vulnerability, bao mat
 category: Security
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

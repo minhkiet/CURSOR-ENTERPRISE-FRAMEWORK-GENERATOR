@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "cursor-framework": {
+    "vibe-framework": {
       "command": "C:\\Python312\\python.exe",
       "args": [
         "-m",
@@ -19,7 +19,7 @@
         "CURSOR_FRAMEWORK_CACHE_MAX_AGENTS": "10",
         "CURSOR_FRAMEWORK_CACHE_TTL_MINUTES": "30"
       },
-      "description": "Cursor Enterprise Framework - Rules, Skills, Agents registry"
+      "description": "Vibe Enterprise Framework - Rules, Skills, Agents registry"
     },
     "cursor-autopilot": {
       "command": "C:\\Python312\\python.exe",

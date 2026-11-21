@@ -1,4 +1,4 @@
-"""Cursor Enterprise Framework memory MCP package."""
+"""Vibe Enterprise Framework memory MCP package."""
 
 from __future__ import annotations
 

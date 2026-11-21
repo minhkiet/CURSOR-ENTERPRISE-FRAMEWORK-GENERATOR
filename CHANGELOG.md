@@ -1,4 +1,4 @@
-# Cursor Enterprise Framework - Changelog
+# Vibe Enterprise Framework - Changelog
 
 > **Version:** 4.5.0 | **Date:** 2026-10-13
 
@@ -63,7 +63,7 @@ npx ecc-universal@2.2.2 install --guided
 #### New Module
 
 ```python
-from cursor_framework import (
+from vibe_framework import (
     ECCIntegration,
     HarnessType,
     InstallProfile
@@ -105,13 +105,13 @@ Thêm 2 MCP server mới:
 
 ### 3. Standalone CLI Tool
 
-`cursor_framework_cli.py` - CLI tool độc lập có thể chạy bất cứ đâu:
+`vibe_framework_cli.py` - CLI tool độc lập có thể chạy bất cứ đâu:
 
 ```bash
-python tools/cursor_framework_cli.py status
-python tools/cursor_framework_cli.py skills list
-python tools/cursor_framework_cli.py mcp status
-python tools/cursor_framework_cli.py api list
+python tools/vibe_framework_cli.py status
+python tools/vibe_framework_cli.py skills list
+python tools/vibe_framework_cli.py mcp status
+python tools/vibe_framework_cli.py api list
 ```
 
 ### 4. Enhanced Stats
@@ -146,7 +146,7 @@ irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENER
 ```json
 {
   "mcpServers": {
-    "cursor-framework": {
+    "vibe-framework": {
       "command": "python",
       "args": ["-m", "cursor_framework_mcp.server"],
       "cwd": "${CURSOR_PROJECT}/tools/cursor-framework-mcp"
@@ -248,16 +248,16 @@ orders = client.get_orders(create_time_from=1704067200, create_time_to=170674560
 
 ```bash
 # Status
-python tools/cursor_framework_cli.py status
+python tools/vibe_framework_cli.py status
 
 # Skills
-python tools/cursor_framework_cli.py skills list
+python tools/vibe_framework_cli.py skills list
 
 # MCP
-python tools/cursor_framework_cli.py mcp status
+python tools/vibe_framework_cli.py mcp status
 
 # API Integrations
-python tools/cursor_framework_cli.py api list
+python tools/vibe_framework_cli.py api list
 ```
 
 ### Browser MCP Setup

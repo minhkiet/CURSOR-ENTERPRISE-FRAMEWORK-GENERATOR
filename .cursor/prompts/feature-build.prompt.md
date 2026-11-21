@@ -2,14 +2,14 @@
 description: Prompt chuan de xay dung feature moi - tu yeu cau den implementation
 trigger: build feature, tao feature, feature moi
 category: Development
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 
 # Prompt: Feature Build - Xây dựng Feature
 
 ## Mô tả
-Prompt template chuẩn để xây dựng feature mới trong Cursor Enterprise Framework.
+Prompt template chuẩn để xây dựng feature mới trong Vibe Enterprise Framework.
 
 ## Trigger Keywords
 - "tạo feature"

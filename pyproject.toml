@@ -3,13 +3,13 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cursor-framework"
+name = "vibe-framework"
 version = "1.2.1"
-description = "Cursor Enterprise Framework - Python Library + CLI"
+description = "Vibe Enterprise Framework - Python Library + CLI"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-authors = [{ name = "Cursor Enterprise Framework" }]
+authors = [{ name = "Vibe Enterprise Framework" }]
 # Ponytail: zero mandatory runtime deps. Core stays stdlib-only.
 # pydantic is opt-in for users who want typed ContextResult models.
 dependencies = []
@@ -22,21 +22,24 @@ dev = ["requests>=2.31.0", "python-dotenv>=1.0.0", "build>=1.0", "pytest>=7.0", 
 all = ["requests>=2.31.0", "python-dotenv>=1.0.0", "pydantic>=2.0.0"]
 
 [project.scripts]
-cursor-framework = "cursor_framework.__main__:main"
+vibe-framework = "vibe_framework.__main__:main"
+vibe-tools = "vibe_framework.__main__:main"
+vibe-warm = "vibe_framework.__main__:warm"
+vibe-dashboard = "vibe_framework.__main__:serve"
 
 [tool.setuptools]
 zip-safe = true
 
 [tool.setuptools.packages.find]
-include = ["cursor_framework*"]
+include = ["vibe_framework*"]
 
 [tool.setuptools.package-data]
-cursor_framework = ["*.md"]
+vibe_framework = ["*.md"]
 
 [tool.pytest.ini_options]
 # Restrict collection to the directories this project owns; third-party
 # dependency tests are not part of this package.
-testpaths = ["tests", "cursor_framework/tests", "tools"]
+testpaths = ["tests", "vibe_framework/tests", "tools"]
 norecursedirs = [
     "node_modules",
     "build",

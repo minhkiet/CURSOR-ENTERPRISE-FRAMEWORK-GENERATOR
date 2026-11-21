@@ -2,7 +2,7 @@
 description: Payment - Review payment integration Việt Nam (MoMo, SePay, PayOS, ZaloPay, VNPay, VietQR)
 trigger: payment, thanh toán, momo, sepay, payos, zalo pay, vnpay, vietqr, payment integration, webhook
 category: Domain
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

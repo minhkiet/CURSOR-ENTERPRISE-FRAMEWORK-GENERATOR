@@ -423,7 +423,7 @@ client.batch_update_values(
 )
 ```
 
-## Integration with Cursor Framework
+## Integration with Vibe Framework
 
 ### Slash Commands
 

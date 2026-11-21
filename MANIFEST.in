@@ -1,8 +1,8 @@
 include README.md
 include LICENSE
 include pyproject.toml
-recursive-include cursor_framework *.md
-recursive-include cursor_framework *.pyi
+recursive-include vibe_framework *.md
+recursive-include vibe_framework *.pyi
 recursive-exclude * __pycache__
 recursive-exclude * *.pyc
 recursive-exclude * *.pyo

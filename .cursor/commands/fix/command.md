@@ -2,7 +2,7 @@
 description: Fix Bug - Sửa lỗi bug với root cause analysis
 trigger: fix bug, sửa lỗi, fix error, fix issue, bug fix, lỗi, error
 category: Development
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

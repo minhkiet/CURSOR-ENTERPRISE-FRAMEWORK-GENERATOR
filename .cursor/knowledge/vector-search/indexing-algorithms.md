@@ -4,7 +4,7 @@ description: "Hướng dẫn về các thuật toán indexing: HNSW, IVF, PQ, Sc
 tags: ["indexing", "algorithms", "hnsw", "ivf", "pq", "scaNN", "diskann", "ann"]
 created: "2026-06-23"
 version: "1.0.0"
-framework: "Cursor Enterprise Framework"
+framework: "Vibe Enterprise Framework"
 ---
 
 # Indexing Algorithms
@@ -1084,4 +1084,4 @@ class HybridIVFHNSWIndex:
 4. **ScaNN Paper**: https://arxiv.org/abs/1908.10396
 5. **DiskANN Paper**: https://arxiv.org/abs/1907.06147
 6. **ANN Benchmarks**: https://ann-benchmarks.com/
-7. **Cursor Enterprise Framework - Vector Search Rules**: `.cursor/rules/vector-search.mdc`
+7. **Vibe Enterprise Framework - Vector Search Rules**: `.cursor/rules/vector-search.mdc`

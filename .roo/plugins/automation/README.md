@@ -1,6 +1,6 @@
-# Cursor Framework Automation & Hooks Plugin
+# Vibe Framework Automation & Hooks Plugin
 
-Automates background indexing, file watching, Git quality hooks, and TDD execution for Cursor Enterprise Framework.
+Automates background indexing, file watching, Git quality hooks, and TDD execution for Vibe Enterprise Framework.
 
 ## Features
 - **Background Auto-Warming**: Automatically runs debounced index rebuilds when skills, rules, or framework files change.
@@ -10,6 +10,6 @@ Automates background indexing, file watching, Git quality hooks, and TDD executi
 - **Multi-Agent Sync**: Keeps `.cursor`, `.agents`, `.gemini`, and `.codex` in continuous harmony.
 
 ## Settings
-- `cursorFramework.automation.autoWarmOnSave`: Enable automatic cache warm on file changes (default: `true`).
-- `cursorFramework.automation.debounceMs`: Debounce delay in ms before triggering auto-warm (default: `1500`).
-- `cursorFramework.automation.enforceTdd`: Enforce passing unit tests before commit (default: `true`).
+- `vibeFramework.automation.autoWarmOnSave`: Enable automatic cache warm on file changes (default: `true`).
+- `vibeFramework.automation.debounceMs`: Debounce delay in ms before triggering auto-warm (default: `1500`).
+- `vibeFramework.automation.enforceTdd`: Enforce passing unit tests before commit (default: `true`).

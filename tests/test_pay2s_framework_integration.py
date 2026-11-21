@@ -1,11 +1,11 @@
 """
-Tests for Pay2S integration into Cursor Enterprise Framework Generator.
+Tests for Pay2S integration into Vibe Enterprise Framework Generator.
 """
 
 import base64
 import pathlib
 import unittest
-from cursor_framework.skill_discovery import (
+from vibe_framework.skill_discovery import (
     SkillDiscovery,
     SkillRegistry,
     CrossAgentSkillDiscovery

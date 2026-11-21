@@ -2,7 +2,7 @@
 description: REA Reverse Engineering Command - Alias for /rea
 trigger: reverse, decompile, disasm, binary-analysis, reverse-engineer
 category: Security
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

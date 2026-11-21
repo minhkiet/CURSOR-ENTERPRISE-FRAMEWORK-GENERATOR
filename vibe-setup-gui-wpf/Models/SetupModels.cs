@@ -85,8 +85,8 @@ namespace CursorSetupWpf.Models
         public bool PackageFramework { get; set; }
         public bool EnablePreScanHook { get; set; } = true;
         public bool EnablePostInstallHook { get; set; } = true;
-        public string PreScanScript { get; set; } = "-m cursor_framework.indexer --validate";
-        public string PostInstallScript { get; set; } = "-m cursor_framework.indexer";
+        public string PreScanScript { get; set; } = "-m vibe_framework.indexer --validate";
+        public string PostInstallScript { get; set; } = "-m vibe_framework.indexer";
     }
 
     public class CategorySelection
@@ -224,10 +224,10 @@ namespace CursorSetupWpf.Models
         {
             new McpServerStatus
             {
-                Name = "cursor-framework",
-                DisplayName = "Cursor Framework",
+                Name = "vibe-framework",
+                DisplayName = "Vibe Framework",
                 Description = "Rules, skills, agents registry with LRU caching",
-                ServerKey = "cursor-framework",
+                ServerKey = "vibe-framework",
                 Command = "python",
                 Args = "-m cursor_framework_mcp.server",
                 Cwd = "${CURSOR_PROJECT}/tools/cursor-framework-mcp",

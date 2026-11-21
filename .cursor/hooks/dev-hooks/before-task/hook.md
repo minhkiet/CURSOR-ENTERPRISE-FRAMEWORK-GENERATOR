@@ -1,7 +1,7 @@
 ---
 description: Before-Task Hook - Load context va check memory truoc khi lam task
 trigger: truoc task, before task, bat dau task
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

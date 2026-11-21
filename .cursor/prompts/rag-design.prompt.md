@@ -2,7 +2,7 @@
 description: Prompt chuan de thiet ke RAG - chunking, embedding, retrieval
 trigger: rag, vector search, retrieval
 category: AI
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

@@ -4,7 +4,7 @@ description: "Hướng dẫn xây dựng embedding pipeline: model selection, ba
 tags: ["embedding", "pipeline", "batch-processing", "async", "llm", "model-selection"]
 created: "2026-06-23"
 version: "1.0.0"
-framework: "Cursor Enterprise Framework"
+framework: "Vibe Enterprise Framework"
 ---
 
 # Embedding Pipeline
@@ -1553,4 +1553,4 @@ class MultiModalEmbeddingPipeline:
 2. **Cohere Embeddings**: https://docs.cohere.com/docsembeddings
 3. **Sentence Transformers**: https://www.sbert.net/
 4. **Batch Processing Best Practices**: https://docs.python.org/3/library/asyncio.html
-5. **Cursor Enterprise Framework - RAG Rules**: `.cursor/rules/rag.mdc`
+5. **Vibe Enterprise Framework - RAG Rules**: `.cursor/rules/rag.mdc`

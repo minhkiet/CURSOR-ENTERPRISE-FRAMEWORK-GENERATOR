@@ -1,4 +1,4 @@
-# Cursor Enterprise Framework - Skill Index
+# Vibe Enterprise Framework - Skill Index
 
 > **Phiên bản:** 4.5.0 | **Cập nhật:** 2026-10-13
 > **Total Skills:** 120+ | **Rules:** 45 | **Agents:** 23 | **Commands:** 47 | **MCP Servers:** 6
@@ -641,7 +641,7 @@
 
 | Server | Tools | Description |
 |--------|-------|-------------|
-| `cursor-framework` | 9 | Rules, Skills, Agents Registry with LRU caching |
+| `vibe-framework` | 9 | Rules, Skills, Agents Registry with LRU caching |
 | `cursor-autopilot` | 8 | Workflow automation, gates, suggestions |
 | `cursor-memory` | 9 | Token-aware hierarchical memory management |
 | `vercel` | 5 | Vercel deployment integration |
@@ -652,7 +652,7 @@
 ```json
 {
   "mcpServers": {
-    "cursor-framework": {
+    "vibe-framework": {
       "command": "python",
       "args": ["-m", "cursor_framework_mcp.server"],
       "cwd": "${CURSOR_PROJECT}/tools/cursor-framework-mcp"
@@ -708,7 +708,7 @@
 
 | Tool | Path | Description |
 |------|------|-------------|
-| `cursor_framework_cli` | `tools/cursor_framework_cli.py` | Standalone CLI tool for framework operations |
+| `cursor_framework_cli` | `tools/vibe_framework_cli.py` | Standalone CLI tool for framework operations |
 
 ### 10.5 API Integration Tools
 

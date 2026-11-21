@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "name": "Cursor Enterprise Framework",
+  "name": "Vibe Enterprise Framework",
   "description": "Enterprise development framework with skills, rules, and knowledge bases",
   "rules": {
     "root": ".cursorrules",

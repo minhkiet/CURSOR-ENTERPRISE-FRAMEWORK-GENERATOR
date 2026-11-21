@@ -1,4 +1,4 @@
-"""Tests for cursor_framework.dashboard."""
+"""Tests for vibe_framework.dashboard."""
 from __future__ import annotations
 
 import json
@@ -12,8 +12,8 @@ from pathlib import Path
 
 import pytest
 
-from cursor_framework.dashboard import Dashboard
-from cursor_framework.indexer import Indexer
+from vibe_framework.dashboard import Dashboard
+from vibe_framework.indexer import Indexer
 
 
 def _free_port() -> int:
@@ -60,7 +60,7 @@ def test_serves_html(sandbox_cursor: Path, memory_path: Path):
 
     with urllib.request.urlopen(f"http://127.0.0.1:{port}/") as r:
         html = r.read().decode("utf-8")
-    assert "Cursor Framework Dashboard" in html
+    assert "Vibe Framework Dashboard" in html
 
 
 def test_api_stats(sandbox_cursor: Path, memory_path: Path):

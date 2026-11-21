@@ -1,9 +1,9 @@
-"""Tests for cursor_framework.context_builder."""
+"""Tests for vibe_framework.context_builder."""
 from __future__ import annotations
 
 from pathlib import Path
 
-from cursor_framework.context_builder import ContextBuilder
+from vibe_framework.context_builder import ContextBuilder
 
 
 def test_build_returns_context_result(sandbox_cursor: Path):

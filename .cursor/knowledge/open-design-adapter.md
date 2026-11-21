@@ -2,7 +2,7 @@
 
 ## Tổng quan
 
-Adapter này kết nối Cursor Enterprise Framework với Open Design design systems, cho phép sử dụng 150+ brand-grade DESIGN.md files trong workflow.
+Adapter này kết nối Vibe Enterprise Framework với Open Design design systems, cho phép sử dụng 150+ brand-grade DESIGN.md files trong workflow.
 
 ## Cài đặt
 

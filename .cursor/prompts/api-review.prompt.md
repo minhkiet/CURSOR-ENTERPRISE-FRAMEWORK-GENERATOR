@@ -2,7 +2,7 @@
 description: Prompt chuan de review API - REST, GraphQL, contracts, versioning
 trigger: api review, review endpoint
 category: Architecture
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

@@ -57,7 +57,7 @@ except Exception:
         try:
             from mcp_runtime import UniversalMcpServer as FastMCP
         except ImportError:
-            from cursor_framework.mcp_runtime import UniversalMcpServer as FastMCP
+            from vibe_framework.mcp_runtime import UniversalMcpServer as FastMCP
 
 mcp = FastMCP("pinterest")
 

@@ -16,9 +16,9 @@ namespace CursorSetupWpf.Services
     /// </summary>
     public enum TargetAgent
     {
-        Cursor,      // Cursor IDE - primary target
-        Codex,       // Codex (cursor.com / origin.cursor.com)
-        ClaudeCode,  // Claude Code (@cursor/codex)
+        Cursor,      // Cursor IDE
+        Codex,       // OpenAI Codex
+        ClaudeCode,  // Claude Code (Anthropic)
         Grok,        // Grok (x.com/grok)
         Windsurf,    // WindSurf IDE
         Continue,    // Continue.dev
@@ -158,7 +158,7 @@ namespace CursorSetupWpf.Services
         )[] McpCatalog =
         {
             (
-                "cursor-framework",
+                "vibe-framework",
                 "cursor-framework-mcp",
                 "cursor_framework_mcp.server",
                 "Framework MCP",
@@ -274,7 +274,7 @@ namespace CursorSetupWpf.Services
             new AgentInstallConfig
             {
                 Agent = TargetAgent.Codex,
-                Name = "Codex (cursor.com)",
+                Name = "OpenAI Codex",
                 SkillsPath = ".codex/skills",
                 RulesPath = ".codex/rules",
                 AgentsPath = ".codex/agents",
@@ -287,17 +287,17 @@ namespace CursorSetupWpf.Services
                     ["rules"] = new[] { ".codex/rules", ".cursor/rules" },
                 },
                 GatePrefix = "CX",
-                EnvVars = new[] { "CODEX_ENABLED", "ORIGIN_HOST" },
-                InstallUrl = "https://origin.cursor.com",
+                EnvVars = new[] { "CODEX_ENABLED", "ORIGIN_HOST", "CODEX_WORKSPACE_ROOT" },
+                InstallUrl = "https://openai.com/codex/",
                 SupportsMcp = true,
                 SupportsRules = true,
-                Description = "Cloud-powered coding agent from Cursor",
+                Description = "OpenAI's repository-aware coding agent",
                 Icon = "\uE8B7",
             },
             new AgentInstallConfig
             {
                 Agent = TargetAgent.ClaudeCode,
-                Name = "Claude Code (@cursor/codex)",
+                Name = "Claude Code",
                 SkillsPath = ".claude/skills",
                 RulesPath = ".claude/rules",
                 AgentsPath = ".claude/agents",
@@ -593,7 +593,7 @@ namespace CursorSetupWpf.Services
             var targets = new List<string>();
             if (!isCategory)
             {
-                // Root-level archive entries (AGENTS.md, cursor.json, cursor_framework\...)
+                // Root-level archive entries (AGENTS.md, cursor.json, vibe_framework\...)
                 targets.Add(Path.Combine(installBase, config.GlobalRoot));
                 return targets;
             }
@@ -759,7 +759,7 @@ namespace CursorSetupWpf.Services
             try
             {
                 string cmd = string.IsNullOrWhiteSpace(config.PostInstallScript)
-                    ? "-m cursor_framework.indexer"
+                    ? "-m vibe_framework.indexer"
                     : config.PostInstallScript;
                 LogAppended?.Invoke($"[hook] post-install: {cmd}");
                 int code = await RunProcessAsync("python", $"{cmd} \"{installDir}\"", installDir, 60);
@@ -1670,7 +1670,7 @@ namespace CursorSetupWpf.Services
 - Solution Architect: Clean architecture, DDD, modular design, separation of concerns.
 - Code Reviewer: Correctness, design, security, performance, readability.
 - Security Auditor: OWASP Top 10, secrets hygiene, input sanitization.
-- Consult project rules in .cursor/rules/*.mdc, .cursorrules, and MCP tools (cursor-framework, cursor-autopilot, cursor-memory).";
+- Consult project rules in .cursor/rules/*.mdc, .cursorrules, and MCP tools (vibe-framework, cursor-autopilot, cursor-memory).";
         }
 
         static string GetAgentInstructionsContent(TargetAgent agent, string? searchRoot = null)

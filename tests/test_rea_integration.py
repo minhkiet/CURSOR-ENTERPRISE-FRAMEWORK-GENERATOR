@@ -8,8 +8,8 @@ repo_root = Path(__file__).resolve().parent.parent
 if str(repo_root) not in sys.path:
     sys.path.insert(0, str(repo_root))
 
-from cursor_framework.cross_agent import ALL_SKILLS, UNIVERSAL_SKILLS, SkillDefinition
-from cursor_framework.skill_discovery import CrossAgentSkillDiscovery, SkillDiscovery
+from vibe_framework.cross_agent import ALL_SKILLS, UNIVERSAL_SKILLS, SkillDefinition
+from vibe_framework.skill_discovery import CrossAgentSkillDiscovery, SkillDiscovery
 from tools.mcp_config_generator import McpConfigGenerator
 
 

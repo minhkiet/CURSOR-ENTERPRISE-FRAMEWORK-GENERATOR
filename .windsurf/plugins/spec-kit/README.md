@@ -1,4 +1,4 @@
-# Cursor Framework Spec Kit Plugin
+# Vibe Framework Spec Kit Plugin
 
 Enforces Spec-Driven Development (SDD) following the 7-phase lifecycle (Constitution -> Specify -> Clarify -> Plan -> Checklist -> Tasks -> Implement).
 

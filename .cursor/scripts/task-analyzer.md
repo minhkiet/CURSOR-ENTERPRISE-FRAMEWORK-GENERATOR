@@ -1,5 +1,5 @@
 # Task Analyzer & Synchronized Context System
-## Cursor Enterprise Framework - Task Orchestration Engine
+## Vibe Enterprise Framework - Task Orchestration Engine
 
 ---
 
@@ -1659,7 +1659,7 @@ function Write-Error { param($M) Write-Host "[ERROR] $M" -ForegroundColor Red }
 if ($Request -eq "" -and -not $Analyze) {
     Write-Host @"
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║                TASK ANALYZER - Cursor Enterprise Framework                   ║
+║                TASK ANALYZER - Vibe Enterprise Framework                   ║
 ╠══════════════════════════════════════════════════════════════════════════════╣
 ║                                                                              ║
 ║  Usage:                                                                      ║

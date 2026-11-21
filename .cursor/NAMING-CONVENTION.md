@@ -1,4 +1,4 @@
-﻿# Cursor Enterprise Framework - Naming Convention v2
+﻿# Vibe Enterprise Framework - Naming Convention v2
 
 > **Version:** 2.0.0  
 > **Created:** 2026-08-03  

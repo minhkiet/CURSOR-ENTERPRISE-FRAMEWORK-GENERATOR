@@ -2,7 +2,7 @@
 description: Memory - Quản lý memory system (build, query, update memory)
 trigger: memory, quản lý memory, build memory, update memory, memory system, session summary
 category: Memory
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

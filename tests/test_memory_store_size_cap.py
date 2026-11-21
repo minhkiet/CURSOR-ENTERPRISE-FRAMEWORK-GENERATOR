@@ -4,8 +4,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from cursor_framework.memory_manager import MemoryManager
-from cursor_framework.memory_store import MemoryStore
+from vibe_framework.memory_manager import MemoryManager
+from vibe_framework.memory_store import MemoryStore
 
 
 def test_load_skips_oversized_file(tmp_path: Path):

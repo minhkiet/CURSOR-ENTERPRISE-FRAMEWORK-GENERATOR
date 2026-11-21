@@ -1,7 +1,7 @@
 ---
 description: Pre-Commit Hook - Lint, format, type check trước khi commit
 trigger: git commit, trước commit
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

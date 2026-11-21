@@ -1,4 +1,4 @@
-# Cursor Enterprise Framework - MCP Integration Guide
+# Vibe Enterprise Framework - MCP Integration Guide
 
 > **Version:** 1.0.0 | **Framework:** 3.1.0 | **Created:** 2026-08-09
 
@@ -19,7 +19,7 @@ tools/
 
 ## MCP Servers
 
-### 1. cursor-framework (Core Registry)
+### 1. vibe-framework (Core Registry)
 
 **Path:** `tools/cursor-framework-mcp/`
 

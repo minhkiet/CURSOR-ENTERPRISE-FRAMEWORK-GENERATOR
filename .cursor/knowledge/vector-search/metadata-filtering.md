@@ -4,7 +4,7 @@ description: "Hướng dẫn về metadata filtering: pre-filtering vs post-filt
 tags: ["metadata-filtering", "pre-filtering", "post-filtering", "hybrid-filtering", "vector-search"]
 created: "2026-06-23"
 version: "1.0.0"
-framework: "Cursor Enterprise Framework"
+framework: "Vibe Enterprise Framework"
 ---
 
 # Metadata Filtering
@@ -1153,4 +1153,4 @@ class FilterABTester:
 1. **PostgreSQL Indexes**: https://www.postgresql.org/docs/current/indexes.html
 2. **Vector Filtering**: https://docs.pinecone.io/docs/metadata-filtering
 3. **Qdrant Filtering**: https://qdrant.tech/documentation/concepts/filtering/
-4. **Cursor Enterprise Framework - Vector Search Rules**: `.cursor/rules/vector-search.mdc`
+4. **Vibe Enterprise Framework - Vector Search Rules**: `.cursor/rules/vector-search.mdc`

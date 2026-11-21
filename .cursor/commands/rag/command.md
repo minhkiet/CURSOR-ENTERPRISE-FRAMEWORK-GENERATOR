@@ -2,7 +2,7 @@
 description: RAG - Xây dựng RAG system với embedding và retrieval
 trigger: rag, rag system, xây dựng rag, build rag, retrieval augmented generation, vector search
 category: AI
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

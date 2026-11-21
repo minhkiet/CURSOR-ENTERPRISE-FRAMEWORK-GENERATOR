@@ -161,7 +161,7 @@ def send_with_retry(client, uid, message, max_retries=3):
     raise Exception("Max retries exceeded")
 ```
 
-## Integration with Cursor Framework
+## Integration with Vibe Framework
 
 ### Slash Command
 

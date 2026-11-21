@@ -1,14 +1,14 @@
-# ============================================================
-# Cursor Enterprise Framework - .gitignore
-# Generated for workspace: D:\PROJECTS\CURSORS\CURSOR ENTERPRISE FRAMEWORK GENERATOR
-# ============================================================
+  ============================================================
+  Vibe Enterprise Framework - .gitignore
+  Generated for workspace: D:\PROJECTS\CURSORS\CURSOR ENTERPRISE FRAMEWORK GENERATOR
+  ============================================================
 
-# --- Git internals ---
+  --- Git internals ---
 .git/
 .git/cursor/
 .git/filter-repo/
 
-# --- Cursor IDE artifacts ---
+  --- Cursor IDE artifacts ---
 !.cursor/AGENTS.md
 !.cursor/cursor.json
 !.cursor/INDEX.md
@@ -40,17 +40,17 @@
 .cursor/scripts/project-index-builder/
 .cursor/scripts/weknora/
 
-# --- Python build / package artifacts ---
+  --- Python build / package artifacts ---
 .venv/
 venv/
 build/
 dist/
 .coverage
-cursor_framework/__pycache__/
-cursor_framework/*.egg-info/
-cursor_framework/review/
-cursor_framework/tests/
-cursor_framework/utils/__pycache__/
+vibe_framework/__pycache__/
+vibe_framework/*.egg-info/
+vibe_framework/review/
+vibe_framework/tests/
+vibe_framework/utils/__pycache__/
 **/__pycache__/
 *.pyc
 *.egg-info/
@@ -60,12 +60,12 @@ vibe_framework_web/scripts/
 vibe_framework_web/*.tsbuildinfo
 *.tsbuildinfo
 
-# --- .NET build artifacts ---
+  --- .NET build artifacts ---
 cursor-setup-gui/bin/
 cursor-setup-gui/obj/
 cursor-setup-gui-publish/
 
-# --- Installer / release artifacts ---
+  --- Installer / release artifacts ---
 cursor-setup.exe
 cursor-setup-py.exe
 cursor-setup-gui.exe
@@ -74,35 +74,35 @@ cursor-setup.spec
 cursor-setup.zip
 cursor-setup-gui-publish/
 
-# --- Build scripts (generated / CI output) ---
+  --- Build scripts (generated / CI output) ---
 build_setup.bat
 build_setup.ps1
 publish-release.ps1
 
-# --- Screenshots (dev artifacts) ---
+  --- Screenshots (dev artifacts) ---
 screenshots/page-*.png
 screenshots/learn-*.png
 screenshots/modal-*.png
 screenshots/nav-*.png
 screenshots/prompts*.png
 
-# --- Dist / release output ---
+  --- Dist / release output ---
 dist/
 cursor-setup-gui-publish/
 
-# --- Test artifacts ---
+  --- Test artifacts ---
 test-cases/*.pdf
 test-cases/batcuclinhso.pdf
 
-# --- Local automation profiles / temp ---
+  --- Local automation profiles / temp ---
 .cache/
 
-# --- Cursor IDE settings (local-only) ---
+  --- Cursor IDE settings (local-only) ---
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# --- OS artifacts ---
+  --- OS artifacts ---
 .DS_Store
 .DS_Store?
 ._*
@@ -112,7 +112,7 @@ ehthumbs.db
 Thumbs.db
 ~$*
 
-# --- Editor artifacts ---
+  --- Editor artifacts ---
 *.swp
 *.swo
 *~
@@ -121,7 +121,7 @@ Thumbs.db
 .vs/
 *.sublime-*
 
-# --- Log files ---
+  --- Log files ---
 *.log
 npm-debug.log*
 yarn-debug.log*

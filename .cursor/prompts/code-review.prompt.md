@@ -2,7 +2,7 @@
 description: Prompt chuan de review code - kiem tra quality va correctness
 trigger: review code, code review
 category: Quality
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

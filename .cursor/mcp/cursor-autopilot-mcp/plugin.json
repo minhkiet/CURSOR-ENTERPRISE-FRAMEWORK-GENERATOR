@@ -1,7 +1,7 @@
 {
   "name": "cursor-autopilot-mcp",
   "version": "1.0.0",
-  "description": "Automatic task analysis and workflow orchestration for Cursor Enterprise Framework.",
+  "description": "Automatic task analysis and workflow orchestration for Vibe Enterprise Framework.",
   "author": { "name": "thaofvn-coca06" },
   "homepage": "https://github.com/thaofvn-coca06/2026",
   "keywords": ["cursor", "mcp", "autopilot", "workflow", "skills", "agents", "quality-gates"],

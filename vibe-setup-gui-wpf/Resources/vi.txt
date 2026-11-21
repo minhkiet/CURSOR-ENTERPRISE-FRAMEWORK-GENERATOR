@@ -27,7 +27,7 @@ tab.framework=Công cụ Framework
 tab.project_runner=Project Runner
 tab.script_generator=Tạo Script
 
-hooks.desc=Tích hợp tùy chọn với thư viện Python cursor_framework. Hook chạy dưới dạng tiến trình nền, không chặn quá trình cài đặt. Bỏ chọn checkbox để tắt hook.
+hooks.desc=Tích hợp tùy chọn với thư viện Python vibe_framework. Hook chạy dưới dạng tiến trình nền, không chặn quá trình cài đặt. Bỏ chọn checkbox để tắt hook.
 hooks.prescan_label=Pre-scan: kiểm tra ZIP trước khi giải nén
 hooks.prescan_script_label=Đối số Python (truyền vào `python`):
 hooks.postinstall_label=Post-install: tạo INDEX.json cho Dashboard / Workflow
@@ -62,7 +62,7 @@ guide.step2_item6=knowledge: Cơ sở tri thức và tài liệu
 
 # GuideView - Step 3
 guide.step3_title=Cấu hình tùy chọn nâng cao
-guide.step3_desc=Tab Nâng cao chứa các tài nguyên tùy chọn. Tab Hooks cho phép bật/tắt tích hợp Python framework (cursor_framework) - bỏ chọn nếu không cần.
+guide.step3_desc=Tab Nâng cao chứa các tài nguyên tùy chọn. Tab Hooks cho phép bật/tắt tích hợp Python framework (vibe_framework) - bỏ chọn nếu không cần.
 
 # GuideView - Step 4
 guide.step4_title=Kiểm tra lại các tùy chọn
@@ -70,11 +70,11 @@ guide.step4_desc=Đọc kỹ các tùy chọn đã chọn. Nhấn 'Chọn tất 
 
 # GuideView - Step 5
 guide.step5_title=Nhấn Install để bắt đầu cài đặt
-guide.step5_desc=Quá trình cài đặt sẽ hiển thị log chi tiết. Sau khi hoàn tất, khởi động lại Cursor IDE để tải các thành phần mới.
+guide.step5_desc=Quá trình cài đặt sẽ hiển thị log chi tiết. Sau khi hoàn tất, khởi động lại Vibe tool bạn dùng để tải các thành phần mới.
 
 # GuideView - About Section
 guide.about_title=Về VibeCode Enterprise Framework
-guide.about_intro=VibeCode Enterprise Framework là bộ công cụ phát triển AI-augmented cho Cursor IDE. Bao gồm:
+guide.about_intro=VibeCode Enterprise Framework là bộ công cụ phát triển AI-augmented cho các Vibe tool (Cursor, Claude Code, Codex, Windsurf, Cline). Bao gồm:
 guide.architecture_title=Kiến trúc & Thiết kế
 guide.architecture_desc=Clean Architecture, Hexagonal Architecture, CQRS, Event Sourcing, Domain-Driven Design
 guide.ai_agent_title=AI Agent Skills
@@ -91,10 +91,10 @@ guide.step2_desc=Chọn rules, skills, agents và commands muốn sử dụng. C
 guide.step3=Bước 3: Nâng cao
 guide.step3_desc=Cấu hình knowledge bases, references, workflows và các tài nguyên tùy chọn khác.
 guide.step4=Bước 4: Hooks
-guide.step4_desc=Cấu hình pre-scan và post-install hooks để tích hợp sâu hơn với cursor_framework.
+guide.step4_desc=Cấu hình pre-scan và post-install hooks để tích hợp sâu hơn với vibe_framework.
 guide.step5=Bước 5: Hoàn tất
 guide.step5_desc=Nhấn "Cài đặt" để bắt đầu. Quá trình sẽ tự động giải nén, sao chép và chạy các bước build sau cài đặt.
-guide.tip=Mẹo: Sau khi cài xong, hãy khởi động lại Cursor IDE để tải các thành phần mới.
+guide.tip=Mẹo: Sau khi cài xong, hãy khởi động lại Vibe tool bạn dùng để tải các thành phần mới.
 
 install.location=Vị trí cài đặt
 install.location_hint=Chọn nơi sẽ cài đặt VibeCode Enterprise Framework
@@ -145,7 +145,7 @@ log.finalizing=Đang hoàn tất...
 log.complete=Cài đặt xong!
 log.complete_header=Cài đặt hoàn tất!
 log.installed_to=Đã cài vào: {0}
-log.restart_cursor=Hãy khởi động lại Cursor IDE để tải các thành phần mới.
+log.restart_cursor=Hãy khởi động lại Vibe tool bạn dùng để tải các thành phần mới.
 log.post_install=Đang chạy các bước build sau cài đặt...
 log.hook_post_install=Đang tạo INDEX.json...
 log.post_step===> {0}
@@ -168,7 +168,7 @@ msgbox.dir_error_title=Lỗi
 msgbox.dir_error_msg=Không thể tạo thư mục: {0}
 msgbox.install_failed=Cài đặt thất bại: {0}
 msgbox.complete_title=Cài đặt hoàn tất
-msgbox.complete_msg=Đã cài đặt VibeCode Enterprise Framework thành công!\n\nVị trí: {0}\n\nHãy khởi động lại Cursor IDE.
+msgbox.complete_msg=Đã cài đặt VibeCode Enterprise Framework thành công!\n\nVị trí: {0}\n\nHãy khởi động lại Vibe tool bạn dùng.
 
 btn.cancel=Hủy
 btn.start=Khởi động
@@ -237,7 +237,7 @@ advanced.backup=Sao lưu trước khi cài
 advanced.backup_desc=Tạo bản sao lưu trước khi ghi đè
 
 hooks.title=Cấu hình Hooks
-hooks.desc=Tích hợp Python với cursor_framework
+hooks.desc=Tích hợp Python với vibe_framework
 hooks.enable=Kích hoạt hooks
 hooks.prescan=Pre-scan hook
 hooks.postinstall=Post-install hook
@@ -324,7 +324,7 @@ settings.path_required=Vui lòng chọn thư mục
 
 # Framework Tools tab
 framework.title=Công cụ Framework
-framework.subtitle=Khởi chạy các thành phần cursor_framework trực tiếp.
+framework.subtitle=Khởi chạy các thành phần vibe_framework trực tiếp.
 framework.dashboard=Dashboard Server
 framework.dashboard_desc=Khởi server Dashboard HTTP trên port 8765
 framework.graph_viz=Đồ thị Skills
@@ -351,15 +351,15 @@ framework.running=Đang chạy...
 framework.started=Đã khởi động: {0}
 framework.stopped=Đã dừng: {0}
 framework.failed=Thất bại (exit {0})
-framework.not_found=cursor_framework không tìm thấy trong thư mục cài đặt
+framework.not_found=vibe_framework không tìm thấy trong thư mục cài đặt
 framework.open_browser=Mở trình duyệt
 framework.cancel=Hủy lệnh
 framework.running_note=Đang chạy command khác - vui lòng đợi hoặc nhấn Hủy
 framework.dashboard_title=Dashboard Servers
 framework.build_title=Công cụ Build & Index
 framework.graph_title=Công cụ Graph & Session
-framework.about_title=Về cursor_framework
-framework.about_desc=cursor_framework là Python CLI đi kèm VibeCode Enterprise Framework, cung cấp các commands để quản lý skills, agents, memory và workflow. Framework này được viết bằng Python thuần, không phụ thuộc third-party libraries.
+framework.about_title=Về vibe_framework
+framework.about_desc=vibe_framework là Python CLI đi kèm VibeCode Enterprise Framework, cung cấp các commands để quản lý skills, agents, memory và workflow. Framework này được viết bằng Python thuần, không phụ thuộc third-party libraries.
 framework.about_commands=Commands:
 framework.about_command_list=serve, serve-graph, serve-api, scan, index, warm, stats, graph, dump-graph, session-stats, session-clear
 mcp.discovered_tools=Công cụ đã phát hiện
@@ -373,12 +373,12 @@ backup.snapshots_label=Snapshots
 
 # HooksView localization
 hooks.page_title=Hooks
-hooks.page_desc=Tích hợp tùy chọn với thư viện Python cursor_framework. Hooks chạy ngầm, không chặn cài đặt.
+hooks.page_desc=Tích hợp tùy chọn với thư viện Python vibe_framework. Hooks chạy ngầm, không chặn cài đặt.
 hooks.prescan_title=Pre-scan: Kiểm tra ZIP trước khi giải nén
-hooks.prescan_desc=Chạy `python -m cursor_framework.indexer --validate` để xác thực archive trước khi extract.
+hooks.prescan_desc=Chạy `python -m vibe_framework.indexer --validate` để xác thực archive trước khi extract.
 hooks.prescan_script_label=Đối số Python (truyền cho `python`):
 hooks.postinstall_title=Post-install: Ghi INDEX.json cho Dashboard
-hooks.postinstall_desc=Chạy `python -m cursor_framework.indexer` sau khi cài đặt để tạo INDEX.json cho Dashboard và Workflow.
+hooks.postinstall_desc=Chạy `python -m vibe_framework.indexer` sau khi cài đặt để tạo INDEX.json cho Dashboard và Workflow.
 hooks.postinstall_script_label=Đối số Python (truyền cho `python`):
 hooks.about_title=Về Hooks
 hooks.about_desc=Bỏ chọn checkbox để bỏ qua hook. Sửa script để thay đổi command mặc định. Cả hai hooks đều an toàn — nếu Python không tìm thấy hoặc script lỗi, trình cài đặt vẫn tiếp tục bình thường.
@@ -458,7 +458,7 @@ guide.install.step2.desc=Chọn các thành phần framework muốn cài. Tất 
 guide.install.step2.component1=Rules (39 quy tắc phát triển và tiêu chuẩn)
 guide.install.step2.component2=Skills (50+ kỹ năng chuyên biệt cho AI agent)
 guide.install.step2.component3=Agents (18 agent personas và prompts)
-guide.install.step2.component4=Commands (28 lệnh tắt cho Cursor IDE)
+guide.install.step2.component4=Commands (28 lệnh tắt cho Vibe tool)
 guide.install.step2.component5=Hooks (Python integration scripts)
 guide.install.step2.component6=Knowledge (329 knowledge bases và references)
 guide.install.step2.tip=Mẹo: Bỏ chọn các thành phần không cần thiết để giảm kích thước cài đặt.
@@ -472,7 +472,7 @@ guide.install.step3.option4=Memory - Workspace memory system
 guide.install.step3.option5=Scripts - Utility scripts và tools
 
 guide.install.step4.title=Bước 4: Cấu hình Hooks (Tùy chọn)
-guide.install.step4.desc=Hooks tích hợp với thư viện Python cursor_framework để tự động hóa nâng cao.
+guide.install.step4.desc=Hooks tích hợp với thư viện Python vibe_framework để tự động hóa nâng cao.
 guide.install.step4.prescan=Pre-scan Hook: Kiểm tra ZIP archive trước khi giải nén
 guide.install.step4.postinstall=Post-install Hook: Tạo INDEX.json cho Dashboard
 guide.install.step4.disable=Tắt hooks bằng cách bỏ chọn - cài đặt sẽ tiếp tục bình thường
@@ -481,7 +481,7 @@ guide.install.step5.title=Bước 5: Cài đặt
 guide.install.step5.desc=Xem lại các lựa chọn và nhấn Cài đặt để bắt đầu.
 guide.install.step5.review=Xem lại các thành phần đã chọn trong thanh trạng thái
 guide.install.step5.logs=Nhật ký cài đặt sẽ hiển thị theo thời gian thực
-guide.install.step5.complete=Khởi động lại Cursor IDE sau khi cài đặt hoàn tất
+guide.install.step5.complete=Khởi động lại Vibe tool sau khi cài đặt hoàn tất
 
 # Features Overview - Tổng quan tính năng
 guide.features.title=Tính năng của Framework
@@ -506,7 +506,7 @@ guide.features.knowledge.desc=Tài liệu mở rộng, references và hướng d
 guide.usage.title=Cách sử dụng
 guide.usage.subtitle=Bắt đầu sau khi cài đặt
 
-guide.usage.restart.title=1. Khởi động lại Cursor IDE
+guide.usage.restart.title=1. Khởi động lại Vibe tool
 guide.usage.restart.desc=Đóng và mở lại Cursor để tải các thành phần framework mới.
 
 guide.usage.slash.title=2. Sử dụng Slash Commands
@@ -523,7 +523,7 @@ guide.trouble.title=Xử lý sự cố
 guide.trouble.subtitle=Các vấn đề thường gặp và giải pháp
 
 guide.trouble.issue1=Hỏi: Thành phần không tải sau khi cài đặt?
-guide.trouble.solve1=Khởi động lại Cursor IDE. Nếu vẫn không hoạt động, kiểm tra thư mục .cursor có trong thư mục home không.
+guide.trouble.solve1=Khởi động lại Vibe tool. Nếu vẫn không hoạt động, kiểm tra thư mục cấu hình tương ứng (.cursor/.codex/.claude) trong thư mục home.
 
 guide.trouble.issue2=Hỏi: Cài đặt thất bại với lỗi quyền?
 guide.trouble.solve2=Chạy trình cài đặt với quyền Administrator, hoặc cài vào thư mục user.

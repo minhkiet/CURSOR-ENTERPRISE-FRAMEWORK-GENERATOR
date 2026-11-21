@@ -578,5 +578,5 @@ AND prokind = 'f';
 - [PostgreSQL Row Level Security Documentation](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)
 - [Supabase RLS Guidelines](https://supabase.com/docs/guides/auth/row-level-security)
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
-- [Cursor Enterprise Framework Security Rules](../rules/security.md)
-- [Cursor Enterprise Framework Deployment Rules](../rules/deployment.md)
+- [Vibe Enterprise Framework Security Rules](../rules/security.md)
+- [Vibe Enterprise Framework Deployment Rules](../rules/deployment.md)

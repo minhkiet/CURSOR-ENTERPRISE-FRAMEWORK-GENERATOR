@@ -1,14 +1,14 @@
 ﻿---
-title: Huong dan bat dau voi Cursor Enterprise Framework
-description: Huong dan bat dau voi Cursor Enterprise Framework
-framework: Cursor Enterprise Framework V4
+title: Huong dan bat dau voi Vibe Enterprise Framework
+description: Huong dan bat dau voi Vibe Enterprise Framework
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 
-# Cursor Enterprise Framework V4
+# Vibe Enterprise Framework V4
 
 ## Giới thiệu
-Cursor Enterprise Framework là bộ framework cấp Enterprise dành cho AI coding agents, được xây dựng trên 4 nguyên tắc: Memory First, Retrieval First, Token Optimization First, Knowledge Reuse First.
+Vibe Enterprise Framework là bộ framework cấp Enterprise dành cho AI coding agents, được xây dựng trên 4 nguyên tắc: Memory First, Retrieval First, Token Optimization First, Knowledge Reuse First.
 
 ## Compatibility
 - Cursor (Primary)

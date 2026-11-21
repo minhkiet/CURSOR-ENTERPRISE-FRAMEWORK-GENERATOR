@@ -20,7 +20,7 @@ class TestTDAMConfig:
 
     def test_default_config(self):
         """Test default configuration values."""
-        from cursor_framework import TDAMConfig
+        from vibe_framework import TDAMConfig
 
         config = TDAMConfig()
         assert config.endpoint == "http://127.0.0.1:8420"
@@ -30,7 +30,7 @@ class TestTDAMConfig:
 
     def test_config_from_env(self):
         """Test loading config from environment variables."""
-        from cursor_framework import TDAMConfig
+        from vibe_framework import TDAMConfig
 
         with patch.dict(
             "os.environ",
@@ -54,7 +54,7 @@ class TestTDAMClient:
 
     def test_client_init(self):
         """Test client initialization."""
-        from cursor_framework import TDAMClient, TDAMConfig
+        from vibe_framework import TDAMClient, TDAMConfig
 
         config = TDAMConfig(endpoint="http://test:8420")
         client = TDAMClient(config)
@@ -63,7 +63,7 @@ class TestTDAMClient:
 
     def test_is_connected_false_when_no_client(self):
         """Test connection check returns False when not connected."""
-        from cursor_framework import TDAMClient, TDAMConfig
+        from vibe_framework import TDAMClient, TDAMConfig
 
         config = TDAMConfig()
         client = TDAMClient(config)
@@ -74,7 +74,7 @@ class TestTDAMClient:
 
     def test_add_conversation_without_client(self):
         """Test add_conversation returns error dict when no client."""
-        from cursor_framework import TDAMClient, TDAMConfig, ConversationTurn
+        from vibe_framework import TDAMClient, TDAMConfig, ConversationTurn
 
         client = TDAMClient(TDAMConfig())
         messages = [
@@ -92,7 +92,7 @@ class TestTDAMIntegration:
 
     def test_integration_init(self):
         """Test integration initialization."""
-        from cursor_framework import TDAMIntegration, TDAMConfig
+        from vibe_framework import TDAMIntegration, TDAMConfig
 
         config = TDAMConfig(endpoint="http://test:8420")
         tdam = TDAMIntegration(config)
@@ -103,7 +103,7 @@ class TestTDAMIntegration:
 
     def test_integration_from_env(self):
         """Test creating integration from environment."""
-        from cursor_framework import TDAMIntegration
+        from vibe_framework import TDAMIntegration
 
         with patch.dict(
             "os.environ",
@@ -115,7 +115,7 @@ class TestTDAMIntegration:
 
     def test_is_available_returns_false_when_not_connected(self):
         """Test is_available returns False when gateway not reachable."""
-        from cursor_framework import TDAMIntegration
+        from vibe_framework import TDAMIntegration
 
         tdam = TDAMIntegration()
 
@@ -124,7 +124,7 @@ class TestTDAMIntegration:
 
     def test_capture_conversation(self):
         """Test capturing conversation."""
-        from cursor_framework import TDAMIntegration, ConversationTurn
+        from vibe_framework import TDAMIntegration, ConversationTurn
 
         tdam = TDAMIntegration()
 
@@ -143,7 +143,7 @@ class TestTDAMIntegration:
 
     def test_capture_tool_call(self):
         """Test capturing tool call (fire-and-forget)."""
-        from cursor_framework import TDAMIntegration
+        from vibe_framework import TDAMIntegration
 
         tdam = TDAMIntegration()
 
@@ -166,7 +166,7 @@ class TestTDAMIntegration:
 
     def test_recall(self):
         """Test recalling memories."""
-        from cursor_framework import TDAMIntegration, MemoryLayer, MemoryItem
+        from vibe_framework import TDAMIntegration, MemoryLayer, MemoryItem
 
         tdam = TDAMIntegration()
 
@@ -194,7 +194,7 @@ class TestTDAMIntegration:
 
     def test_get_persona_caching(self):
         """Test persona caching."""
-        from cursor_framework import TDAMIntegration
+        from vibe_framework import TDAMIntegration
 
         tdam = TDAMIntegration()
         assert tdam._persona_cache is None
@@ -213,7 +213,7 @@ class TestTDAMIntegration:
 
     def test_update_persona(self):
         """Test updating persona."""
-        from cursor_framework import TDAMIntegration
+        from vibe_framework import TDAMIntegration
 
         tdam = TDAMIntegration()
 
@@ -227,7 +227,7 @@ class TestTDAMIntegration:
 
     def test_compact_context(self):
         """Test context compaction."""
-        from cursor_framework import TDAMIntegration, ConversationTurn, OffloadResult
+        from vibe_framework import TDAMIntegration, ConversationTurn, OffloadResult
 
         tdam = TDAMIntegration()
 
@@ -262,7 +262,7 @@ class TestMemoryManagerTDAM:
 
     def test_set_tdam_integration(self):
         """Test attaching TDAM to MemoryManager."""
-        from cursor_framework import MemoryManager, TDAMIntegration
+        from vibe_framework import MemoryManager, TDAMIntegration
 
         manager = MemoryManager()
         tdam = TDAMIntegration()
@@ -273,7 +273,7 @@ class TestMemoryManagerTDAM:
 
     def test_sync_to_tdam(self):
         """Test syncing hot tier to TDAM."""
-        from cursor_framework import MemoryManager, TDAMIntegration, MemoryTier
+        from vibe_framework import MemoryManager, TDAMIntegration, MemoryTier
 
         manager = MemoryManager()
         tdam = TDAMIntegration()
@@ -293,7 +293,7 @@ class TestMemoryManagerTDAM:
 
     def test_recall_from_tdam(self):
         """Test recalling from TDAM."""
-        from cursor_framework import MemoryManager, TDAMIntegration, MemoryLayer, MemoryItem
+        from vibe_framework import MemoryManager, TDAMIntegration, MemoryLayer, MemoryItem
 
         manager = MemoryManager()
         tdam = TDAMIntegration()
@@ -316,7 +316,7 @@ class TestMemoryManagerTDAM:
 
     def test_get_persona_from_tdam(self):
         """Test getting persona from TDAM."""
-        from cursor_framework import MemoryManager, TDAMIntegration
+        from vibe_framework import MemoryManager, TDAMIntegration
 
         manager = MemoryManager()
         tdam = TDAMIntegration()
@@ -329,7 +329,7 @@ class TestMemoryManagerTDAM:
 
     def test_compact_context_to_tdam(self):
         """Test compacting context via TDAM."""
-        from cursor_framework import (
+        from vibe_framework import (
             MemoryManager,
             TDAMIntegration,
             ConversationTurn,
@@ -358,7 +358,7 @@ class TestMemoryManagerTDAM:
 
     def test_get_tdam_stats(self):
         """Test getting combined stats."""
-        from cursor_framework import MemoryManager, TDAMIntegration
+        from vibe_framework import MemoryManager, TDAMIntegration
 
         manager = MemoryManager()
         tdam = TDAMIntegration()
@@ -377,7 +377,7 @@ class TestTokenOptimizerTDAM:
 
     def test_set_tdam(self):
         """Test attaching TDAM to TokenOptimizer."""
-        from cursor_framework import TokenOptimizer, TDAMIntegration
+        from vibe_framework import TokenOptimizer, TDAMIntegration
 
         optimizer = TokenOptimizer()
         tdam = TDAMIntegration()
@@ -388,7 +388,7 @@ class TestTokenOptimizerTDAM:
 
     def test_compact_with_mermaid(self):
         """Test Mermaid-based compression."""
-        from cursor_framework import TokenOptimizer, TDAMIntegration, OffloadResult
+        from vibe_framework import TokenOptimizer, TDAMIntegration, OffloadResult
 
         optimizer = TokenOptimizer()
         tdam = TDAMIntegration()
@@ -415,7 +415,7 @@ class TestTokenOptimizerTDAM:
 
     def test_compact_with_mermaid_fallback(self):
         """Test fallback when TDAM not configured."""
-        from cursor_framework import TokenOptimizer
+        from vibe_framework import TokenOptimizer
 
         optimizer = TokenOptimizer()
         # Don't set TDAM
@@ -429,7 +429,7 @@ class TestTokenOptimizerTDAM:
 
     def test_build_mermaid_context(self):
         """Test building context with Mermaid."""
-        from cursor_framework import TokenOptimizer, TDAMIntegration
+        from vibe_framework import TokenOptimizer, TDAMIntegration
 
         optimizer = TokenOptimizer()
         tdam = TDAMIntegration()
@@ -453,7 +453,7 @@ class TestTokenOptimizerTDAM:
 
     def test_should_trigger_offload(self):
         """Test offload threshold detection."""
-        from cursor_framework import TokenOptimizer
+        from vibe_framework import TokenOptimizer
 
         optimizer = TokenOptimizer(max_tokens=100000, compression_threshold=0.7)
 
@@ -467,7 +467,7 @@ class TestContextBuilderTDAM:
 
     def test_set_tdam(self):
         """Test attaching TDAM to ContextBuilder."""
-        from cursor_framework import ContextBuilder, TDAMIntegration
+        from vibe_framework import ContextBuilder, TDAMIntegration
 
         cb = ContextBuilder()
         tdam = TDAMIntegration()
@@ -478,7 +478,7 @@ class TestContextBuilderTDAM:
 
     def test_build_with_memory(self):
         """Test building context with memory integration."""
-        from cursor_framework import ContextBuilder, TDAMIntegration, MemoryItem, MemoryLayer
+        from vibe_framework import ContextBuilder, TDAMIntegration, MemoryItem, MemoryLayer
 
         cb = ContextBuilder()
         tdam = TDAMIntegration()
@@ -508,7 +508,7 @@ class TestContextBuilderTDAM:
 
     def test_recall_memories(self):
         """Test recalling memories without full build."""
-        from cursor_framework import ContextBuilder, TDAMIntegration, MemoryItem, MemoryLayer
+        from vibe_framework import ContextBuilder, TDAMIntegration, MemoryItem, MemoryLayer
 
         cb = ContextBuilder()
         tdam = TDAMIntegration()
@@ -531,7 +531,7 @@ class TestContextBuilderTDAM:
 
     def test_recall_memories_without_tdam(self):
         """Test recall returns empty when TDAM not configured."""
-        from cursor_framework import ContextBuilder
+        from vibe_framework import ContextBuilder
 
         cb = ContextBuilder()
         # Don't set TDAM
@@ -545,7 +545,7 @@ class TestIntegrationScenarios:
 
     def test_full_memory_flow(self):
         """Test complete memory flow: capture -> extract -> recall."""
-        from cursor_framework import TDAMIntegration, MemoryLayer, ConversationTurn, MemoryItem
+        from vibe_framework import TDAMIntegration, MemoryLayer, ConversationTurn, MemoryItem
 
         tdam = TDAMIntegration()
 
@@ -583,7 +583,7 @@ class TestIntegrationScenarios:
 
     def test_compact_and_resume(self):
         """Test context compaction and resumption."""
-        from cursor_framework import TDAMIntegration, ConversationTurn, OffloadResult
+        from vibe_framework import TDAMIntegration, ConversationTurn, OffloadResult
 
         tdam = TDAMIntegration()
 
@@ -616,7 +616,7 @@ class TestIntegrationScenarios:
 
     def test_persona_update_cycle(self):
         """Test persona creation and update."""
-        from cursor_framework import TDAMIntegration
+        from vibe_framework import TDAMIntegration
 
         tdam = TDAMIntegration()
 

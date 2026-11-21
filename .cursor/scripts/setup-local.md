@@ -1,4 +1,4 @@
-# Cursor Enterprise Framework - Local Setup
+# Vibe Enterprise Framework - Local Setup
 
 Script để cài đặt `.cursor` từ project này sang các project khác trong máy.
 

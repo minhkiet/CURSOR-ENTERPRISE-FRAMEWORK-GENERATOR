@@ -28,7 +28,7 @@ jobs:
       # ponytail: pytest-cov provides the `coverage` CLI used by the
       # coverage steps below and writes .coverage / htmlcov.
       - name: Run pytest
-        run: pytest --tb=short -v --cov=cursor_framework --cov-report=term-missing --cov-report=html:htmlcov
+        run: pytest --tb=short -v --cov=vibe_framework --cov-report=term-missing --cov-report=html:htmlcov
 
       - name: Coverage summary
         if: always()

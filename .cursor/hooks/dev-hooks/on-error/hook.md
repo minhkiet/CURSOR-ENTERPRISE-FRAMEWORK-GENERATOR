@@ -1,7 +1,7 @@
 ---
 description: On-Error Hook - Analyze error và suggest fix khi có error
 trigger: khi có error, on error, lỗi xảy ra
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

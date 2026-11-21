@@ -1,35 +1,35 @@
 {
-  "name": "cursor-framework-hackingtool",
+  "name": "vibe-framework-hackingtool",
   "version": "0.2.0",
   "description": "183+ pentesting and OSINT tools (nmap, nuclei, amass, subfinder, httpx, sherlock, sqlmap) wired into Cursor IDE & Claude Code",
-  "author": "Cursor Enterprise Framework & ARIACODEZ",
+  "author": "Vibe Enterprise Framework & ARIACODEZ",
   "activationEvents": [
-    "onCommand:cursor-framework.hackingtool.recon",
-    "onCommand:cursor-framework.hackingtool.portScan",
-    "onCommand:cursor-framework.hackingtool.vulnScan",
-    "onCommand:cursor-framework.hackingtool.listTools"
+    "onCommand:vibe-framework.hackingtool.recon",
+    "onCommand:vibe-framework.hackingtool.portScan",
+    "onCommand:vibe-framework.hackingtool.vulnScan",
+    "onCommand:vibe-framework.hackingtool.listTools"
   ],
   "main": "index.js",
   "contributes": {
     "commands": [
       {
-        "command": "cursor-framework.hackingtool.recon",
-        "title": "Cursor Framework Security: OSINT Recon",
+        "command": "vibe-framework.hackingtool.recon",
+        "title": "Vibe Framework Security: OSINT Recon",
         "category": "Security"
       },
       {
-        "command": "cursor-framework.hackingtool.portScan",
-        "title": "Cursor Framework Security: Target Port Scan",
+        "command": "vibe-framework.hackingtool.portScan",
+        "title": "Vibe Framework Security: Target Port Scan",
         "category": "Security"
       },
       {
-        "command": "cursor-framework.hackingtool.vulnScan",
-        "title": "Cursor Framework Security: Vulnerability Scan",
+        "command": "vibe-framework.hackingtool.vulnScan",
+        "title": "Vibe Framework Security: Vulnerability Scan",
         "category": "Security"
       },
       {
-        "command": "cursor-framework.hackingtool.listTools",
-        "title": "Cursor Framework Security: List Available Tools",
+        "command": "vibe-framework.hackingtool.listTools",
+        "title": "Vibe Framework Security: List Available Tools",
         "category": "Security"
       }
     ]

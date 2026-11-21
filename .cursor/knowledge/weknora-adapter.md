@@ -1,6 +1,6 @@
 # WeKnora Knowledge Adapter
 
-This adapter allows Cursor Enterprise Framework to connect with WeKnora for knowledge-based operations.
+This adapter allows Vibe Enterprise Framework to connect with WeKnora for knowledge-based operations.
 
 ## Overview
 

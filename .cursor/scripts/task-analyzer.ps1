@@ -1,4 +1,4 @@
-# Task Analyzer - Cursor Enterprise Framework
+# Task Analyzer - Vibe Enterprise Framework
 # Version: 1.0.0
 
 param(
@@ -347,7 +347,7 @@ if ($CheckContext) { Show-Context; exit 0 }
 
 if ($Request -eq "") {
     Write-Host ""
-    Write-Host "Task Analyzer - Cursor Enterprise Framework v1.0.0" -ForegroundColor Magenta
+    Write-Host "Task Analyzer - Vibe Enterprise Framework v1.0.0" -ForegroundColor Magenta
     Write-Host ""
     Write-Host "Usage:" -ForegroundColor Yellow
     Write-Host '  .\.cursor\scripts\task-analyzer.ps1 -Request "your request"'

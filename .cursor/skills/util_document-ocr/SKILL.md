@@ -7,7 +7,7 @@ description: "Document OCR Skill - Text Extraction from Images skill"
 
 ## Mục tiêu
 
-Tích hợp OCR (Optical Character Recognition) vào Cursor Enterprise Framework để:
+Tích hợp OCR (Optical Character Recognition) vào Vibe Enterprise Framework để:
 - Tự động đọc text từ ảnh, file scanned, PDF
 - Tăng khả năng đọc hiểu khi vibe coding
 - Hỗ trợ nhiều ngôn ngữ (Vietnamese, English, Chinese, etc.)

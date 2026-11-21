@@ -2,7 +2,7 @@
 description: Fullstack Web Development Command - Xây dựng, chỉnh sửa, debug web app end-to-end với ASP.NET Core Web API + React TypeScript
 trigger: fullstack, /fullstack, fullstack web, dotnet react, aspnet react
 category: Development
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

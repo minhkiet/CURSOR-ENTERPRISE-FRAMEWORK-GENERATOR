@@ -1,5 +1,5 @@
 /**
- * Cursor Framework Context Monitor Plugin
+ * Vibe Framework Context Monitor Plugin
  * 
  * Provides session memory analysis, prompt inspection, token budget advisor,
  * and Redis observability.
@@ -14,7 +14,7 @@ function getWorkspaceRoot() {
 }
 
 function getConfig(key, defaultValue = null) {
-    return vscode.workspace.getConfiguration('cursorFramework').get(key, defaultValue);
+    return vscode.workspace.getConfiguration('vibeFramework').get(key, defaultValue);
 }
 
 async function execPython(args = []) {
@@ -52,9 +52,9 @@ async function activate(context) {
     const frameworkRoot = path.join(workspaceRoot, rootPath);
 
     // Session Stats
-    const statsCmd = vscode.commands.registerCommand('cursor-framework.context-monitor.stats', async () => {
+    const statsCmd = vscode.commands.registerCommand('vibe-framework.context-monitor.stats', async () => {
         try {
-            const out = await execPython(['-m', 'cursor_framework', 'session-stats']);
+            const out = await execPython(['-m', 'vibe_framework', 'session-stats']);
             await showInDocument('Session Memory Stats', formatJson(out));
         } catch (err) {
             vscode.window.showErrorMessage(`Session stats failed: ${err.message}`);
@@ -62,12 +62,12 @@ async function activate(context) {
     });
 
     // Inspect Prompt Context
-    const inspectPromptCmd = vscode.commands.registerCommand('cursor-framework.context-monitor.inspectPrompt', async () => {
+    const inspectPromptCmd = vscode.commands.registerCommand('vibe-framework.context-monitor.inspectPrompt', async () => {
         const editor = vscode.window.activeTextEditor;
         const targetPath = editor ? editor.document.fileName : workspaceRoot;
 
         try {
-            const out = await execPython(['-m', 'cursor_framework', 'context', '--root', `"${frameworkRoot}"`]);
+            const out = await execPython(['-m', 'vibe_framework', 'context', '--root', `"${frameworkRoot}"`]);
             await showInDocument('Context Prompt Preview', out, 'markdown');
         } catch (err) {
             vscode.window.showErrorMessage(`Context preview failed: ${err.message}`);
@@ -75,10 +75,10 @@ async function activate(context) {
     });
 
     // Token Budget Advisor
-    const tokenBudgetCmd = vscode.commands.registerCommand('cursor-framework.context-monitor.tokenBudget', async () => {
+    const tokenBudgetCmd = vscode.commands.registerCommand('vibe-framework.context-monitor.tokenBudget', async () => {
         const maxTokens = getConfig('contextMonitor.maxTokens', 4000);
         try {
-            const statsRaw = await execPython(['-m', 'cursor_framework', 'stats', '--root', `"${frameworkRoot}"`]);
+            const statsRaw = await execPython(['-m', 'vibe_framework', 'stats', '--root', `"${frameworkRoot}"`]);
             let parsed = {};
             try { parsed = JSON.parse(statsRaw); } catch {}
 
@@ -105,9 +105,9 @@ async function activate(context) {
     });
 
     // Redis Observability
-    const redisStatsCmd = vscode.commands.registerCommand('cursor-framework.context-monitor.redisStats', async () => {
+    const redisStatsCmd = vscode.commands.registerCommand('vibe-framework.context-monitor.redisStats', async () => {
         try {
-            const out = await execPython(['-m', 'cursor_framework', 'redis', 'stats']).catch(e => `Redis is offline or standalone fallback is active: ${e.message}`);
+            const out = await execPython(['-m', 'vibe_framework', 'redis', 'stats']).catch(e => `Redis is offline or standalone fallback is active: ${e.message}`);
             await showInDocument('Redis Observability', formatJson(out));
         } catch (err) {
             vscode.window.showErrorMessage(`Redis stats failed: ${err.message}`);
@@ -115,11 +115,11 @@ async function activate(context) {
     });
 
     // Clear Session Memory
-    const clearSessionCmd = vscode.commands.registerCommand('cursor-framework.context-monitor.clearSession', async () => {
+    const clearSessionCmd = vscode.commands.registerCommand('vibe-framework.context-monitor.clearSession', async () => {
         const confirm = await vscode.window.showWarningMessage('Reset active session memory?', 'Reset', 'Cancel');
         if (confirm === 'Reset') {
             try {
-                await execPython(['-m', 'cursor_framework', 'session-clear']);
+                await execPython(['-m', 'vibe_framework', 'session-clear']);
                 vscode.window.showInformationMessage('Session memory reset successfully.');
             } catch (err) {
                 vscode.window.showErrorMessage(`Reset failed: ${err.message}`);

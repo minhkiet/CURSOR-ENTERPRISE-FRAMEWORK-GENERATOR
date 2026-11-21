@@ -1,4 +1,4 @@
-# Cursor Framework Context Monitor Plugin
+# Vibe Framework Context Monitor Plugin
 
 Inspects active conversation context, token consumption, memory stores, and cache hit metrics.
 
@@ -10,4 +10,4 @@ Inspects active conversation context, token consumption, memory stores, and cach
 - **Session Memory Reset**: One-click wipe of temporary conversational memory.
 
 ## Settings
-- `cursorFramework.contextMonitor.maxTokens`: Maximum token ceiling before warning (default: `4000`).
+- `vibeFramework.contextMonitor.maxTokens`: Maximum token ceiling before warning (default: `4000`).

@@ -2,7 +2,7 @@
 
 ## Tổng quan
 
-Document này cung cấp checklist toàn diện cho việc đánh giá và kiểm tra Docker deployments trong Cursor Enterprise Framework.
+Document này cung cấp checklist toàn diện cho việc đánh giá và kiểm tra Docker deployments trong Vibe Enterprise Framework.
 
 ## 1. Image Building Checklist
 

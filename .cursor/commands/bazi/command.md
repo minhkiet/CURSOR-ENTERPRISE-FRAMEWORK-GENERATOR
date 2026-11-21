@@ -2,7 +2,7 @@
 description: Bazi - Tính Bát Tự (Four Pillars of Destiny)
 trigger: bazi, bát tự, four pillars, lá số, tử vi bát tự, destiny calculation
 category: Domain
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

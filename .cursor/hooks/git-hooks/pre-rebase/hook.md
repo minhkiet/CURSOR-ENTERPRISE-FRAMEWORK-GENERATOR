@@ -1,7 +1,7 @@
 ---
 description: Pre-Rebase Hook - Check conflicts truoc khi rebase
 trigger: git rebase, truoc rebase
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

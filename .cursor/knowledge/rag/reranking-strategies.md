@@ -4,7 +4,7 @@ description: "Hướng dẫn về các chiến lược reranking: cross-encoder,
 tags: ["reranking", "cross-encoder", "bi-encoder", "llm", "search", "rank-fusion"]
 created: "2026-06-23"
 version: "1.0.0"
-framework: "Cursor Enterprise Framework"
+framework: "Vibe Enterprise Framework"
 ---
 
 # Reranking Strategies
@@ -1312,4 +1312,4 @@ class RerankingEvaluator:
 2. **ColBERT**: https://arxiv.org/abs/2004.12832
 3. **RRF**: https://plg.uwaterloo.ca/~gvcormac/cormacksigir09-rrf.pdf
 4. **NDCG**: https://en.wikipedia.org/wiki/Discounted_cumulative_gain
-5. **Cursor Enterprise Framework - RAG Rules**: `.cursor/rules/rag.mdc`
+5. **Vibe Enterprise Framework - RAG Rules**: `.cursor/rules/rag.mdc`

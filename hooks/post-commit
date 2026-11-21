@@ -1,5 +1,5 @@
 #!/bin/bash
-# Post-commit hook for Cursor Framework
+# Post-commit hook for Vibe Framework
 # Automatically updates framework stats and memory after commits
 
 # Colors for output
@@ -7,7 +7,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-echo -e "${YELLOW}[Cursor Framework]${NC} Running post-commit tasks..."
+echo -e "${YELLOW}[Vibe Framework]${NC} Running post-commit tasks..."
 
 FRAMEWORK_ROOT="${FRAMEWORK_ROOT:-.cursor}"
 MEMORY_PATH="${MEMORY_PATH:-.cache/memory.json}"
@@ -17,11 +17,11 @@ command -v python3 &> /dev/null && PYTHON_CMD="python3"
 
 # Function to run framework command
 run_framework() {
-    $PYTHON_CMD -m cursor_framework "$@" --root "$FRAMEWORK_ROOT" 2>/dev/null
+    $PYTHON_CMD -m vibe_framework "$@" --root "$FRAMEWORK_ROOT" 2>/dev/null
 }
 
-# Check if cursor_framework module is available
-if ! $PYTHON_CMD -c "import cursor_framework" 2>/dev/null; then
+# Check if vibe_framework module is available
+if ! $PYTHON_CMD -c "import vibe_framework" 2>/dev/null; then
     exit 0
 fi
 
@@ -36,9 +36,9 @@ if [ -d "$FRAMEWORK_ROOT" ]; then
     
     # Persist session memory asynchronously
     if command -v nohup &> /dev/null; then
-        nohup $PYTHON_CMD -m cursor_framework warm --root "$FRAMEWORK_ROOT" > /dev/null 2>&1 &
+        nohup $PYTHON_CMD -m vibe_framework warm --root "$FRAMEWORK_ROOT" > /dev/null 2>&1 &
     fi
 fi
 
-echo -e "${YELLOW}[Cursor Framework]${NC} Post-commit tasks completed!"
+echo -e "${YELLOW}[Vibe Framework]${NC} Post-commit tasks completed!"
 exit 0

@@ -1,7 +1,7 @@
 ---
 description: Commit-Msg Hook - Validate commit message format
 trigger: git commit message, sau khi viết commit message
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

@@ -1,4 +1,4 @@
-"""Cursor Enterprise Framework autopilot MCP package."""
+"""Vibe Enterprise Framework autopilot MCP package."""
 
 from __future__ import annotations
 

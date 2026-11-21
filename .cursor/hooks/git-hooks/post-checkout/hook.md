@@ -1,7 +1,7 @@
 ---
 description: Post-Checkout Hook - Update workspace context sau checkout
 trigger: git checkout (sau khi checkout thanh cong)
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

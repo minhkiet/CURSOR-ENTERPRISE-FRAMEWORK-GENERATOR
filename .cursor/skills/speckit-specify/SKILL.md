@@ -16,7 +16,7 @@ Author a crystal-clear feature specification (`spec.md`) that documents *what* n
 
 ## 2. Specification Protocol
 When invoked or requested to specify a feature:
-1. **Locate or Scaffold Spec**: Verify `.specify/specs/<feature-name>/spec.md` exists (or create via `python -m cursor_framework spec init <feature-name>`).
+1. **Locate or Scaffold Spec**: Verify `.specify/specs/<feature-name>/spec.md` exists (or create via `python -m vibe_framework spec init <feature-name>`).
 2. **Problem Statement**: Articulate the exact user pain point or developer requirement.
 3. **Scope Guard**:
    - **In Scope**: Explicit bulleted list of deliverables.

@@ -2,7 +2,7 @@
 description: ADR - Tạo Architecture Decision Record
 trigger: adr, architecture decision, tạo adr, architecture record, decision record
 category: Architecture
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

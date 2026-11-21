@@ -1,7 +1,7 @@
 ---
 description: On-Failure Hook - Analyze error và suggest fix khi CI/CD fail
 trigger: CI/CD failure, build fail, deploy fail, test fail
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

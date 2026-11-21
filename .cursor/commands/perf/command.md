@@ -2,7 +2,7 @@
 description: Perf - Performance audit và optimization
 trigger: perf, performance, tối ưu hiệu suất, performance audit, optimization, slow, latency
 category: Performance
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

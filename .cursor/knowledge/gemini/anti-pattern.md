@@ -13,7 +13,7 @@ framework: "cursor-enterprise-framework"
 
 Google Gemini API là một công cụ mạnh mẽ cho việc xây dựng các ứng dụng AI đa phương thức (multimodal). Tuy nhiên, nhiều developers mắc phải những anti-patterns phổ biến dẫn đến hiệu suất kém, chi phí cao, và trải nghiệm người dùng không tốt. Tài liệu này tổng hợp các anti-patterns phổ biến nhất và cách tránh chúng.
 
-Trong quá trình tích hợp Gemini vào Cursor Enterprise Framework, chúng tôi đã quan sát được nhiều patterns không hiệu quả từ các dự án thực tế. Những anti-patterns này không chỉ ảnh hưởng đến hiệu suất mà còn có thể gây ra các vấn đề về bảo mật, chi phí, và khả năng mở rộng.
+Trong quá trình tích hợp Gemini vào Vibe Enterprise Framework, chúng tôi đã quan sát được nhiều patterns không hiệu quả từ các dự án thực tế. Những anti-patterns này không chỉ ảnh hưởng đến hiệu suất mà còn có thể gây ra các vấn đề về bảo mật, chi phí, và khả năng mở rộng.
 
 Việc hiểu rõ các anti-patterns này là bước đầu tiên để xây dựng một hệ thống Gemini production-ready. Mỗi anti-pattern được phân tích theo cấu trúc: Mô tả vấn đề, Tại sao nó xảy ra, Hậu quả tiềm tàng, và Cách khắc phục.
 

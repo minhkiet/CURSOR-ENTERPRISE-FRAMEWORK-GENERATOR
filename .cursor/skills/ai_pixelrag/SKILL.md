@@ -327,7 +327,7 @@ Text RAG: May misread column alignment
 PixelRAG: Reads table as image → correct answer
 ```
 
-## Integration với Cursor Enterprise Framework
+## Integration với Vibe Enterprise Framework
 
 PixelRAG hoạt động tốt với:
 

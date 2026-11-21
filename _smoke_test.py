@@ -1,4 +1,4 @@
-"""Smoke test for all cursor_framework subcommands.
+"""Smoke test for all vibe_framework subcommands.
 
 Run from project root: python _smoke_test.py
 """
@@ -34,7 +34,7 @@ def main() -> int:
         t0 = time.perf_counter()
         try:
             r = subprocess.run(
-                [sys.executable, "-m", "cursor_framework", *args],
+                [sys.executable, "-m", "vibe_framework", *args],
                 cwd=str(ROOT),
                 capture_output=True,
                 text=True,

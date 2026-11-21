@@ -1331,7 +1331,7 @@ User request về marketing
 ## 12. Routing Performance Notes
 
 - Mỗi routing step < 100ms (lookup section, no file creation)
-- Decision tree compiled once into Python module `cursor_framework/context_router.py` §marketing
+- Decision tree compiled once into Python module `vibe_framework/context_router.py` §marketing
 - Edge cases logged in `decisions/marketing/<date>.md` for monthly tuning
 
 ---

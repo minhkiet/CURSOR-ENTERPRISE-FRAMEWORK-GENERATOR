@@ -2,7 +2,7 @@
 description: Prompt chuan de deployment - staging, production, rollback
 trigger: deployment, deploy, trien khai
 category: DevOps
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

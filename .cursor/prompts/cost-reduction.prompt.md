@@ -2,7 +2,7 @@
 description: Prompt chuan de giam chi phi - cloud, database, infrastructure
 trigger: cost reduction, giam chi phi
 category: Optimization
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

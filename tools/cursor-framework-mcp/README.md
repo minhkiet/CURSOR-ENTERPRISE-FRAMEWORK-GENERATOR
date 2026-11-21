@@ -1,9 +1,9 @@
-# Cursor Enterprise Framework MCP Server
+# Vibe Enterprise Framework MCP Server
 
 > Version: 1.0.0 · Updated: 2026-08-09
-> Companion to [Cursor Enterprise Framework](https://github.com/thaofvn-coca06/2026)
+> Companion to [Vibe Enterprise Framework](https://github.com/thaofvn-coca06/2026)
 
-A FastMCP server that exposes the **Cursor Enterprise Framework** as MCP tools. It loads `.cursor/rules/*.mdc`, `.cursor/skills/*/SKILL.md`, `.cursor/agents/*.md`, and `.cursor/AGENTS.md` on-demand with an LRU cache, auto-detects the right skill/rule/agent for a task, and tracks token + memory budgets.
+A FastMCP server that exposes the **Vibe Enterprise Framework** as MCP tools. It loads `.cursor/rules/*.mdc`, `.cursor/skills/*/SKILL.md`, `.cursor/agents/*.md`, and `.cursor/AGENTS.md` on-demand with an LRU cache, auto-detects the right skill/rule/agent for a task, and tracks token + memory budgets.
 
 ## Why
 
@@ -54,7 +54,7 @@ Add to your MCP settings (`~/.cursor/mcp.json` or workspace `.cursor/mcp.json`):
 ```json
 {
   "mcpServers": {
-    "cursor-framework": {
+    "vibe-framework": {
       "command": "python",
       "args": ["-m", "cursor_framework_mcp.server"],
       "cwd": "D:\\PROJECTS\\CURSORS\\CURSOR ENTERPRISE FRAMEWORK GENERATOR\\tools\\cursor-framework-mcp",

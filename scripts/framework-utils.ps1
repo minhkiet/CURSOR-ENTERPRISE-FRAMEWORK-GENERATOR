@@ -1,4 +1,4 @@
-# Framework Utils - PowerShell Utilities for Cursor Framework
+# Framework Utils - PowerShell Utilities for Vibe Framework
 # Quick access to common framework operations
 
 param(
@@ -44,7 +44,7 @@ function Invoke-Framework {
         return $null
     }
     
-    $output = & $python -m cursor_framework $Cmd --root $FRAMEWORK_ROOT 2>&1
+    $output = & $python -m vibe_framework $Cmd --root $FRAMEWORK_ROOT 2>&1
     if (-not $Silent) {
         if ($LASTEXITCODE -eq 0) {
             return $output
@@ -59,7 +59,7 @@ function Invoke-Framework {
 # Header
 Write-Host ""
 Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Magenta
-Write-Host "  Cursor Framework Utilities" -ForegroundColor Magenta
+Write-Host "  Vibe Framework Utilities" -ForegroundColor Magenta
 Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Magenta
 Write-Host ""
 
@@ -166,7 +166,7 @@ switch ($Command) {
         $python = Test-Python
         $job = Start-Job -ScriptBlock {
             param($py, $p, $root)
-            & $py -m cursor_framework serve --port $p --root $root
+            & $py -m vibe_framework serve --port $p --root $root
         } -ArgumentList $python.Source, $Port, $FRAMEWORK_ROOT
         
         # Wait a moment for server to start
@@ -190,7 +190,7 @@ switch ($Command) {
         $python = Test-Python
         $job = Start-Job -ScriptBlock {
             param($py, $p, $root)
-            & $py -m cursor_framework serve-graph --port $p --root $root
+            & $py -m vibe_framework serve-graph --port $p --root $root
         } -ArgumentList $python.Source, $graphPort, $FRAMEWORK_ROOT
         
         Start-Sleep -Seconds 2

@@ -4,7 +4,7 @@ description: "Hướng dẫn chi tiết về cách lưu trữ vectors trong Post
 tags: ["pgvector", "storage", "schema", "dimensions", "postgresql", "vector-embedding"]
 created: "2026-06-23"
 version: "1.0.0"
-framework: "Cursor Enterprise Framework"
+framework: "Vibe Enterprise Framework"
 ---
 
 # Embedding Storage in PostgreSQL
@@ -709,4 +709,4 @@ $$ LANGUAGE plpgsql;
 2. **PostgreSQL TOAST**: https://www.postgresql.org/docs/current/storage-toast.html
 3. **pg_embedding GitHub**: https://github.com/embulk/pg_embedding
 4. **Embedding Model Documentation**: OpenAI, Cohere, HuggingFace
-5. **Cursor Enterprise Framework - Database Rules**: `.cursor/rules/database.mdc`
+5. **Vibe Enterprise Framework - Database Rules**: `.cursor/rules/database.mdc`

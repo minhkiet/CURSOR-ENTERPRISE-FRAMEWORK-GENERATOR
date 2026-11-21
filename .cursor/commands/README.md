@@ -1,7 +1,7 @@
 # Cursor Commands Registry
 
 > Last updated: 2026-06-29  
-> Framework: Cursor Enterprise Framework V5 (agent-skills integrated)
+> Framework: Vibe Enterprise Framework V5 (agent-skills integrated)
 
 ## Giới thiệu
 

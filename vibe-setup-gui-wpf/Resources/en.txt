@@ -27,7 +27,7 @@ tab.framework=Tools
 tab.project_runner=Project Runner
 tab.script_generator=Script Generator
 
-hooks.desc=Optional integration with the cursor_framework Python library. Hooks run as background subprocess and never block installation. Disable any hook to skip it.
+hooks.desc=Optional integration with the vibe_framework Python library. Hooks run as background subprocess and never block installation. Disable any hook to skip it.
 hooks.prescan_label=Pre-scan: validate ZIP before extraction
 hooks.prescan_script_label=Python arguments (passed to `python`):
 hooks.postinstall_label=Post-install: write INDEX.json for Dashboard / Workflow
@@ -56,13 +56,13 @@ guide.step2_desc=Go to the Components tab to select:
 guide.step2_item1=rules: development rules and guidelines
 guide.step2_item2=skills: specialized skills for AI agents
 guide.step2_item3=agents: Prompts for Claude, GPT, Gemini
-guide.step2_item4=commands: Shortcut commands for Cursor IDE
+guide.step2_item4=commands: Shortcut commands for your Vibe tool
 guide.step2_item5=hooks: Integration scripts for automation
 guide.step2_item6=knowledge: Knowledge bases and documentation
 
 # GuideView - Step 3
 guide.step3_title=Configure advanced options
-guide.step3_desc=The Advanced tab contains optional resources. The Hooks tab allows enabling/disabling Python framework (cursor_framework) integration - uncheck if not needed.
+guide.step3_desc=The Advanced tab contains optional resources. The Hooks tab allows enabling/disabling Python framework (vibe_framework) integration - uncheck if not needed.
 
 # GuideView - Step 4
 guide.step4_title=Review your selections
@@ -70,11 +70,11 @@ guide.step4_desc=Read carefully the selected options. Press 'Select all' / 'Dese
 
 # GuideView - Step 5
 guide.step5_title=Press Install to begin installation
-guide.step5_desc=The installation process will display detailed logs. After completion, restart Cursor IDE to load the new components.
+guide.step5_desc=The installation process will display detailed logs. After completion, restart your Vibe tool to load the new components.
 
 # GuideView - About Section
 guide.about_title=About VibeCode Enterprise Framework
-guide.about_intro=VibeCode Enterprise Framework is an AI-augmented development toolkit for Cursor IDE. It includes:
+guide.about_intro=VibeCode Enterprise Framework is an AI-augmented development toolkit for Vibe tools (Cursor, Claude Code, Codex, Windsurf, Cline). It includes:
 guide.architecture_title=Architecture & Design
 guide.architecture_desc=Clean Architecture, Hexagonal Architecture, CQRS, Event Sourcing, Domain-Driven Design
 guide.ai_agent_title=AI Agent Skills
@@ -91,10 +91,10 @@ guide.step2_desc=Choose rules, skills, agents and commands you want to use. You 
 guide.step3=Step 3: Advanced
 guide.step3_desc=Configure knowledge bases, references, workflows and other optional resources.
 guide.step4=Step 4: Hooks
-guide.step4_desc=Configure pre-scan and post-install hooks for deeper integration with cursor_framework.
+guide.step4_desc=Configure pre-scan and post-install hooks for deeper integration with vibe_framework.
 guide.step5=Step 5: Complete
 guide.step5_desc=Click "Install" to begin. The process will automatically extract, copy files and run post-install build steps.
-guide.tip=Tip: After installation, restart Cursor IDE to load the new components.
+guide.tip=Tip: After installation, restart your Vibe tool to load the new components.
 
 # Expanded Guide Content (English)
 guide.expanded.title=Complete Installation Guide
@@ -122,7 +122,7 @@ guide.install.step2.desc=Select which framework components to install. All items
 guide.install.step2.component1=Rules (39 development guidelines and standards)
 guide.install.step2.component2=Skills (50+ specialized AI agent skills)
 guide.install.step2.component3=Agents (18 agent personas and prompts)
-guide.install.step2.component4=Commands (28 slash commands for Cursor IDE)
+guide.install.step2.component4=Commands (28 slash commands for your Vibe tool)
 guide.install.step2.component5=Hooks (Python integration scripts)
 guide.install.step2.component6=Knowledge (329 knowledge bases and references)
 guide.install.step2.tip=Tip: Uncheck components you don't need to reduce installation size.
@@ -136,7 +136,7 @@ guide.install.step3.option4=Memory - Workspace memory system
 guide.install.step3.option5=Scripts - Utility scripts and tools
 
 guide.install.step4.title=Step 4: Configure Hooks (Optional)
-guide.install.step4.desc=Hooks integrate with cursor_framework Python library for advanced automation.
+guide.install.step4.desc=Hooks integrate with vibe_framework Python library for advanced automation.
 guide.install.step4.prescan=Pre-scan Hook: Validate ZIP archive before extraction
 guide.install.step4.postinstall=Post-install Hook: Generate INDEX.json for Dashboard
 guide.install.step4.disable=Disable hooks by unchecking - installation will continue normally
@@ -145,7 +145,7 @@ guide.install.step5.title=Step 5: Install
 guide.install.step5.desc=Review your selections and click Install to begin.
 guide.install.step5.review=Review selected components in the status bar
 guide.install.step5.logs=Installation logs will display in real-time
-guide.install.step5.complete=Restart Cursor IDE after installation completes
+guide.install.step5.complete=Restart your Vibe tool after installation completes
 
 # Features Overview
 guide.features.title=Framework Features
@@ -170,7 +170,7 @@ guide.features.knowledge.desc=Extensive documentation, references, and guides fo
 guide.usage.title=How to Use
 guide.usage.subtitle=Getting started after installation
 
-guide.usage.restart.title=1. Restart Cursor IDE
+guide.usage.restart.title=1. Restart your Vibe tool
 guide.usage.restart.desc=Close and reopen Cursor to load the new framework components.
 
 guide.usage.slash.title=2. Use Slash Commands
@@ -187,7 +187,7 @@ guide.trouble.title=Troubleshooting
 guide.trouble.subtitle=Common issues and solutions
 
 guide.trouble.issue1=Q: Components not loading after install?
-guide.trouble.solve1=Restart Cursor IDE. If still not working, check if .cursor folder exists in your home directory.
+guide.trouble.solve1=Restart your Vibe tool. If still not working, check the matching config folder (.cursor/.codex/.claude) in your home directory.
 
 guide.trouble.issue2=Q: Installation failed with permission error?
 guide.trouble.solve2=Run the installer as Administrator, or install to user folder instead.
@@ -255,7 +255,7 @@ log.finalizing=Finalizing...
 log.complete=Installation complete!
 log.complete_header=Installation completed successfully!
 log.installed_to=Installed to: {0}
-log.restart_cursor=Please restart Cursor IDE to load the new components.
+log.restart_cursor=Please restart your Vibe tool to load the new components.
 log.post_install=Running post-install build steps...
 log.hook_post_install=Generating INDEX.json...
 log.post_step===> {0}
@@ -278,7 +278,7 @@ msgbox.dir_error_title=Error
 msgbox.dir_error_msg=Could not create directory: {0}
 msgbox.install_failed=Installation failed: {0}
 msgbox.complete_title=Installation Complete
-msgbox.complete_msg=VibeCode Enterprise Framework installed successfully!\n\nLocation: {0}\n\nPlease restart Cursor IDE.
+msgbox.complete_msg=VibeCode Enterprise Framework installed successfully!\n\nLocation: {0}\n\nPlease restart your Vibe tool.
 
 btn.cancel=Cancel
 btn.start=Start
@@ -347,7 +347,7 @@ advanced.backup=Backup before install
 advanced.backup_desc=Create backup before overwrite
 
 hooks.title=Hooks Configuration
-hooks.desc=Python integration with cursor_framework
+hooks.desc=Python integration with vibe_framework
 hooks.enable=Enable hooks
 hooks.prescan=Pre-scan hook
 hooks.postinstall=Post-install hook
@@ -434,7 +434,7 @@ settings.path_required=Please choose a folder
 
 # Framework Tools tab
 framework.title=Framework Tools
-framework.subtitle=Launch cursor_framework components directly.
+framework.subtitle=Launch vibe_framework components directly.
 framework.dashboard=Dashboard Server
 framework.dashboard_desc=Start Dashboard HTTP server on port 8765
 framework.graph_viz=Skills Graph
@@ -461,15 +461,15 @@ framework.running=Running...
 framework.started=Started: {0}
 framework.stopped=Stopped: {0}
 framework.failed=Failed (exit {0})
-framework.not_found=cursor_framework not found in install directory
+framework.not_found=vibe_framework not found in install directory
 framework.open_browser=Open browser
 framework.cancel=Cancel command
 framework.running_note=Another command is running - please wait or press Cancel
 framework.dashboard_title=Dashboard Servers
 framework.build_title=Build & Index Tools
 framework.graph_title=Graph & Session Tools
-framework.about_title=About cursor_framework
-framework.about_desc=cursor_framework is a Python CLI bundled with VibeCode Enterprise Framework, providing commands to manage skills, agents, memory and workflow. This framework is written in pure Python with no third-party dependencies.
+framework.about_title=About vibe_framework
+framework.about_desc=vibe_framework is a Python CLI bundled with VibeCode Enterprise Framework, providing commands to manage skills, agents, memory and workflow. This framework is written in pure Python with no third-party dependencies.
 framework.about_commands=Commands:
 framework.about_command_list=serve, serve-graph, serve-api, scan, index, warm, stats, graph, dump-graph, session-stats, session-clear
 mcp.discovered_tools=Discovered Tools
@@ -483,12 +483,12 @@ backup.snapshots_label=Snapshots
 
 # HooksView localization
 hooks.page_title=Hooks
-hooks.page_desc=Optional integration with the Python cursor_framework library. Hooks run in the background, do not block installation.
+hooks.page_desc=Optional integration with the Python vibe_framework library. Hooks run in the background, do not block installation.
 hooks.prescan_title=Pre-scan: Check ZIP before extraction
-hooks.prescan_desc=Run `python -m cursor_framework.indexer --validate` to validate the archive before extract.
+hooks.prescan_desc=Run `python -m vibe_framework.indexer --validate` to validate the archive before extract.
 hooks.prescan_script_label=Python arguments (passed to `python`):
 hooks.postinstall_title=Post-install: Generate INDEX.json for Dashboard
-hooks.postinstall_desc=Run `python -m cursor_framework.indexer` after installation to generate INDEX.json for Dashboard and Workflow modules.
+hooks.postinstall_desc=Run `python -m vibe_framework.indexer` after installation to generate INDEX.json for Dashboard and Workflow modules.
 hooks.postinstall_script_label=Python arguments (passed to `python`):
 hooks.about_title=About Hooks
 hooks.about_desc=Uncheck the checkbox to skip a hook. Edit the script to change the default command. Both hooks are safe — if Python is not found or the script errors, the installer continues normally.

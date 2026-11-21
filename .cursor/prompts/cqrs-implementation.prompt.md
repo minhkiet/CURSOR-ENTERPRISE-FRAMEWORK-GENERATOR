@@ -2,7 +2,7 @@
 description: Prompt chuan de implement CQRS - commands, queries, event bus, projection
 trigger: cqrs, command query segregation, cqrs implementation
 category: Architecture
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

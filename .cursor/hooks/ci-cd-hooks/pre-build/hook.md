@@ -1,7 +1,7 @@
 ---
 description: Pre-Build Hook - Verify dependencies trước khi build
 trigger: trước build, pre-build, CI build
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

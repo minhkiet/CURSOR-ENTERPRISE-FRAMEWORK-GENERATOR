@@ -2,7 +2,7 @@
 description: Generate - Generate code (PDF, API, migration, boilerplate)
 trigger: generate, tạo code, generate code, tạo api, generate api, migration, boilerplate, scaffold
 category: Generation
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

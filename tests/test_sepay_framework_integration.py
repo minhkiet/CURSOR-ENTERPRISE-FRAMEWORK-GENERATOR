@@ -1,9 +1,9 @@
 """
-Tests for SePay integration into Cursor Enterprise Framework Generator.
+Tests for SePay integration into Vibe Enterprise Framework Generator.
 """
 
 import unittest
-from cursor_framework.skill_discovery import (
+from vibe_framework.skill_discovery import (
     SkillDiscovery,
     SkillRegistry,
     CrossAgentSkillDiscovery

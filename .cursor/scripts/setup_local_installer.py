@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Cursor Enterprise Framework - Standalone Installer
+Vibe Enterprise Framework - Standalone Installer
 ==================================================
 This script is compiled into a standalone .exe
 """

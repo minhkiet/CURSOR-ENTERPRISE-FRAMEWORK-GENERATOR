@@ -1,4 +1,4 @@
-# Cursor Enterprise Framework - Auto Index
+# Vibe Enterprise Framework - Auto Index
 
 > Auto-generated: 2026-11-16T17:08:10
 > Root: `D:\PROJECTS\CURSORS\CURSOR ENTERPRISE FRAMEWORK GENERATOR\.cursor`
@@ -523,22 +523,22 @@
 | `databases.mdc` | `rules\databases.mdc` | Databases - hợp nhất từ Database Overview, PostgreSQL, MySQL, SQL Server, bao gồm Row Level Security |
 | `git-workflow.mdc` | `rules\git-workflow.mdc` | Git workflow (commit, branch, PR conventions) |
 | `karpathy-guidelines.mdc` | `rules\karpathy-guidelines.mdc` | Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid ov |
-| `llm-providers.mdc` | `rules\llm-providers.mdc` | LLM Providers - hợp nhất từ OpenAI, Gemini, Claude trong Cursor Enterprise Framework |
+| `llm-providers.mdc` | `rules\llm-providers.mdc` | LLM Providers - hợp nhất từ OpenAI, Gemini, Claude trong Vibe Enterprise Framework |
 | `meta_ai-knowledge.mdc` | `rules\meta_ai-knowledge.mdc` | AI Knowledge Stack - hợp nhất từ RAG, Vector Search, WeKnora, pgvector và PDF Engine cho document processing |
 | `meta_auth.mdc` | `rules\meta_auth.mdc` | Authentication & Authorization - hợp nhất từ authentication.mdc và authorization.mdc |
-| `meta_billing.mdc` | `rules\meta_billing.mdc` | Nguyên tắc và best practices cho Billing Implementation trong Cursor Enterprise Framework |
+| `meta_billing.mdc` | `rules\meta_billing.mdc` | Nguyên tắc và best practices cho Billing Implementation trong Vibe Enterprise Framework |
 | `meta_chatbot-development.mdc` | `rules\meta_chatbot-development.mdc` | ChatbotX Development Patterns - Omnichannel Chatbot Marketing Platform. Tích hợp feature scaffold, Drizzle ORM, BullMQ w |
 | `meta_cloud-infra.mdc` | `rules\meta_cloud-infra.mdc` | Cloud Infrastructure Architecture - hợp nhất từ Cloud Architecture và Infrastructure Architecture |
-| `meta_cloud-providers.mdc` | `rules\meta_cloud-providers.mdc` | Cloud Providers - hợp nhất từ AWS, Azure, GCP trong Cursor Enterprise Framework |
+| `meta_cloud-providers.mdc` | `rules\meta_cloud-providers.mdc` | Cloud Providers - hợp nhất từ AWS, Azure, GCP trong Vibe Enterprise Framework |
 | `meta_cloudflare.mdc` | `rules\meta_cloudflare.mdc` | Cloudflare & CDN - hợp nhất từ cloudflare.mdc và cdn.mdc. Nguyên tắc và best practices cho Cloudflare edge platform và C |
-| `meta_coding-standards.mdc` | `rules\meta_coding-standards.mdc` | Tiêu chuẩn viết code thống nhất cho Cursor Enterprise Framework |
-| `meta_container-orchestration.mdc` | `rules\meta_container-orchestration.mdc` | Container Orchestration - hợp nhất từ Docker và Kubernetes trong Cursor Enterprise Framework |
+| `meta_coding-standards.mdc` | `rules\meta_coding-standards.mdc` | Tiêu chuẩn viết code thống nhất cho Vibe Enterprise Framework |
+| `meta_container-orchestration.mdc` | `rules\meta_container-orchestration.mdc` | Container Orchestration - hợp nhất từ Docker và Kubernetes trong Vibe Enterprise Framework |
 | `meta_cost-optimization.mdc` | `rules\meta_cost-optimization.mdc` | Cost & Token Optimization - hợp nhất từ cost-optimization.mdc và token-optimization.mdc |
-| `meta_crm-saas.mdc` | `rules\meta_crm-saas.mdc` | Nguyên tắc và best practices cho CRM SaaS Implementation trong Cursor Enterprise Framework |
+| `meta_crm-saas.mdc` | `rules\meta_crm-saas.mdc` | Nguyên tắc và best practices cho CRM SaaS Implementation trong Vibe Enterprise Framework |
 | `meta_deployment.mdc` | `rules\meta_deployment.mdc` | Deployment & CI/CD - hợp nhất từ deployment.mdc và ci-cd.mdc |
-| `meta_multi-tenant.mdc` | `rules\meta_multi-tenant.mdc` | Nguyên tắc và best practices cho Multi-Tenant Architecture trong Cursor Enterprise Framework |
+| `meta_multi-tenant.mdc` | `rules\meta_multi-tenant.mdc` | Nguyên tắc và best practices cho Multi-Tenant Architecture trong Vibe Enterprise Framework |
 | `meta_observability.mdc` | `rules\meta_observability.mdc` | Observability - hợp nhất từ observability, monitoring, logging. Bao gồm metrics, logs, traces, health checks, alerting,  |
-| `meta_operations.mdc` | `rules\meta_operations.mdc` | Operations - hợp nhất từ Alerting và Incident Response trong Cursor Enterprise Framework |
+| `meta_operations.mdc` | `rules\meta_operations.mdc` | Operations - hợp nhất từ Alerting và Incident Response trong Vibe Enterprise Framework |
 | `meta_performance.mdc` | `rules\meta_performance.mdc` | Performance & Rate Limiting - hợp nhất từ performance.mdc và rate-limiting.mdc |
 | `meta_redis.mdc` | `rules\meta_redis.mdc` | Redis Cache & Caching Strategy - hợp nhất từ redis.mdc và caching-strategy.mdc |
 | `meta_security.mdc` | `rules\meta_security.mdc` | Security - hợp nhất từ security.mdc, web-security.mdc, secrets-management.mdc. Nguyên tắc và best practices cho bảo mật  |
@@ -551,26 +551,26 @@
 | `proto_memory-first.mdc` | `rules\proto_memory-first.mdc` | Nguyên tắc Memory First - ưu tiên context từ memory trước mọi truy vấn |
 | `proto_multi-language-processing.mdc` | `rules\proto_multi-language-processing.mdc` | Multi-Language Processing - Translation Layer cho Vietnamese, Chinese, Japanese, Korean, Arabic. Chuyển đổi request từ a |
 | `proto_multi-language-vibe-code.mdc` | `rules\proto_multi-language-vibe-code.mdc` | Multi-Language Request Processing - Redirect to new modular files |
-| `ref_api-patterns.mdc` | `rules\ref_api-patterns.mdc` | API Patterns - hợp nhất từ GraphQL, API Gateway, Service Mesh, REST API trong Cursor Enterprise Framework |
+| `ref_api-patterns.mdc` | `rules\ref_api-patterns.mdc` | API Patterns - hợp nhất từ GraphQL, API Gateway, Service Mesh, REST API trong Vibe Enterprise Framework |
 | `ref_architecture-patterns.mdc` | `rules\ref_architecture-patterns.mdc` | Architecture Patterns - hợp nhất từ Clean Architecture, Hexagonal Architecture (Ports & Adapters), CQRS Pattern, Event S |
-| `ref_backend-frameworks.mdc` | `rules\ref_backend-frameworks.mdc` | Backend Frameworks - hợp nhất từ NestJS, Laravel, ASP.NET Core trong Cursor Enterprise Framework |
+| `ref_backend-frameworks.mdc` | `rules\ref_backend-frameworks.mdc` | Backend Frameworks - hợp nhất từ NestJS, Laravel, ASP.NET Core trong Vibe Enterprise Framework |
 | `ref_enterprise-patterns.mdc` | `rules\ref_enterprise-patterns.mdc` | Enterprise Architecture Patterns - hợp nhất từ Monolith, Microservices, Core Architecture, Enterprise Architecture |
-| `ref_frontend-frameworks.mdc` | `rules\ref_frontend-frameworks.mdc` | Frontend Frameworks - hợp nhất từ Next.js, Nuxt.js, Vue.js, Frontend Architecture trong Cursor Enterprise Framework |
+| `ref_frontend-frameworks.mdc` | `rules\ref_frontend-frameworks.mdc` | Frontend Frameworks - hợp nhất từ Next.js, Nuxt.js, Vue.js, Frontend Architecture trong Vibe Enterprise Framework |
 | `rule_cms-architecture.mdc` | `rules\rule_cms-architecture.mdc` | Clean Architecture patterns for CMS Landing Enterprise v4 - entity design, repository pattern, service layer, and module |
 | `rule_cms-rbac.mdc` | `rules\rule_cms-rbac.mdc` | RBAC (Role-Based Access Control) patterns for CMS Landing Enterprise v4 - roles, permissions, and authorization |
 | `rule_cms-responsive.mdc` | `rules\rule_cms-responsive.mdc` | Mobile-first responsive design rules for CMS Landing Enterprise v4 - breakpoints, layouts, touch targets, and navigation |
 | `rule_cms-stack.mdc` | `rules\rule_cms-stack.mdc` | Tech stack conventions for CMS Landing Enterprise v4 - Vue 3 frontend, ASP.NET Core backend, Dapper ORM, and deployment |
 | `rule_fullstack-development.mdc` | `rules\rule_fullstack-development.mdc` | Fullstack Web Development Rule - ASP.NET Core Web API + React + TypeScript + TSX. Enforces end-to-end data flow, REST co |
 | `rule_intent-detection.mdc` | `rules\rule_intent-detection.mdc` | Intent Detection, Skill Auto-Discovery, and Clarification Flow - xác định intent, tự động phát hiện skills/rules, và cla |
-| `rule_skill-integration.mdc` | `rules\rule_skill-integration.mdc` | Hướng dẫn skill auto-discovery và execution cho Cursor Enterprise Framework. Định tuyến tự động đến skills phù hợp với p |
+| `rule_skill-integration.mdc` | `rules\rule_skill-integration.mdc` | Hướng dẫn skill auto-discovery và execution cho Vibe Enterprise Framework. Định tuyến tự động đến skills phù hợp với p |
 | `rule_skill-registry.mdc` | `rules\rule_skill-registry.mdc` | Single Source of Truth cho tất cả skill definitions, triggers, confidence thresholds, và gate mappings. Được sử dụng bởi |
 | `rule_task-analyzer.mdc` | `rules\rule_task-analyzer.mdc` | Task Analyzer & Synchronized Context System - Phân tích yêu cầu, tự động phát hiện rules/skills, sinh task manifest với  |
 | `RULES-OPTIMIZATION-REPORT.md` | `rules\RULES-OPTIMIZATION-REPORT.md` |  |
 | `security.mdc` | `rules\security.mdc` | Bảo mật cơ bản (OWASP Top 10, secrets management) |
 | `security_vbsec.mdc` | `rules\security_vbsec.mdc` | vbsec Security Scanner - 21 rule cross-language vulnerability detection for AI-written code. Reasoning-based scan with L |
 | `spec-driven-development.mdc` | `rules\spec-driven-development.mdc` | Spec-Driven Development (SDD) & GitHub Spec Kit workflow rules |
-| `supabase.mdc` | `rules\supabase.mdc` | Nguyên tắc và best practices cho Supabase trong Cursor Enterprise Framework |
-| `ui-visual-design.mdc` | `rules\ui-visual-design.mdc` | Nguyên tắc và best practices cho UI/Visual Design trong Cursor Enterprise Framework - hướng dẫn tạo giao diện đẹp mắt, c |
+| `supabase.mdc` | `rules\supabase.mdc` | Nguyên tắc và best practices cho Supabase trong Vibe Enterprise Framework |
+| `ui-visual-design.mdc` | `rules\ui-visual-design.mdc` | Nguyên tắc và best practices cho UI/Visual Design trong Vibe Enterprise Framework - hướng dẫn tạo giao diện đẹp mắt, c |
 
 ## Scripts (41)
 

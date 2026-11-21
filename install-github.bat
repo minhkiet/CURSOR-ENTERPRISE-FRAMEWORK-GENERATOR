@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 :: ============================================================
-:: Quick Install from GitHub - Cursor Enterprise Framework
+:: Quick Install from GitHub - Vibe Enterprise Framework
 :: ============================================================
 :: Usage:
 ::   install-github.bat                       - Use default repo
@@ -22,7 +22,7 @@ if "%BRANCH%"=="" set "BRANCH=%DEFAULT_BRANCH%"
 
 echo.
 echo ============================================================
-echo   Cursor Enterprise Framework - Quick GitHub Install
+echo   Vibe Enterprise Framework - Quick GitHub Install
 echo ============================================================
 echo.
 echo   Repository: %REPO_URL%

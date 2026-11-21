@@ -12,9 +12,9 @@ from pathlib import Path
 
 import pytest
 
-from cursor_framework.dashboard import Dashboard
-from cursor_framework.indexer import Indexer
-from cursor_framework.workflow import Workflow
+from vibe_framework.dashboard import Dashboard
+from vibe_framework.indexer import Indexer
+from vibe_framework.workflow import Workflow
 
 
 def _free_port() -> int:

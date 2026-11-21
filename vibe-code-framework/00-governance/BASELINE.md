@@ -8,7 +8,7 @@ The inspected scopes are the four paths declared in the master requirements:
 | Scope | Observed path | Initial classification |
 |---|---|---|
 | `SCOPE-RESOURCE-HUB` | `vibe-code-framework/` | Shared canonical source |
-| `SCOPE-CORE` | `cursor_framework/` | Core project |
+| `SCOPE-CORE` | `vibe_framework/` | Core project |
 | `SCOPE-WEB` | `vibe_framework_web/` | Web project |
 | `SCOPE-SETUP` | `vibe-setup-gui-wpf/` | Setup project |
 | Cursor boundary | `.cursor/` | Adapter/project-local boundary; migration per resource is pending |

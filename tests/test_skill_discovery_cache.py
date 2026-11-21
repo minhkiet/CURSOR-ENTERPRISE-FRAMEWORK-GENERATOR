@@ -4,7 +4,7 @@ from __future__ import annotations
 import time
 from pathlib import Path
 
-from cursor_framework.skill_discovery import SkillDiscovery
+from vibe_framework.skill_discovery import SkillDiscovery
 
 
 def test_first_load_populates_cache(sandbox_cursor: Path):

@@ -2,7 +2,7 @@
 description: Prompt chuan de review kien truc - patterns, boundaries, scalability
 trigger: architecture review, review kien truc
 category: Architecture
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

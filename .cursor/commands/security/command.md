@@ -2,7 +2,7 @@
 description: Security - Security review (OWASP, vulnerabilities, authentication, authorization)
 trigger: security, bảo mật, security review, vulnerability, penetration test, owasp, xss, sqli, csrf
 category: Security
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

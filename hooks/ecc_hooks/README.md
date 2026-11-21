@@ -1,6 +1,6 @@
 # ECC Safety & Lifecycle Hooks
 
-Ported from affaan-m/ECC into Cursor Enterprise Framework.
+Ported from affaan-m/ECC into Vibe Enterprise Framework.
 
 ## Contents
 - `hooks.json`: Claude Code & generic harness PreToolUse/PostToolUse hooks configuration.

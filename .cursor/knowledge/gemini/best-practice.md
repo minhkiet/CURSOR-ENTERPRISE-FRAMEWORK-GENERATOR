@@ -13,7 +13,7 @@ framework: "cursor-enterprise-framework"
 
 Google Gemini API cung cấp một loạt các khả năng mạnh mẽ cho việc xây dựng ứng dụng AI đa phương thức. Để tận dụng tối đa các capabilities của Gemini, developers cần nắm vững các best practices được kiểm chứng qua nhiều dự án production. Tài liệu này tổng hợp các best practices theo từng lĩnh vực cụ thể.
 
-Trong Cursor Enterprise Framework, việc tích hợp Gemini đòi hỏi không chỉ việc gọi API đúng cách mà còn phải tối ưu hóa về chi phí, hiệu suất, và trải nghiệm người dùng. Các best practices được trình bày ở đây đã được rút ra từ kinh nghiệm triển khai thực tế và được validate qua nhiều enterprise projects.
+Trong Vibe Enterprise Framework, việc tích hợp Gemini đòi hỏi không chỉ việc gọi API đúng cách mà còn phải tối ưu hóa về chi phí, hiệu suất, và trải nghiệm người dùng. Các best practices được trình bày ở đây đã được rút ra từ kinh nghiệm triển khai thực tế và được validate qua nhiều enterprise projects.
 
 Mỗi phần trong tài liệu này bao gồm lý thuyết nền tảng, code examples thực tế, và các recommendations cụ thể có thể áp dụng ngay vào dự án của bạn.
 

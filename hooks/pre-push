@@ -1,5 +1,5 @@
 #!/bin/bash
-# Pre-push hook for Cursor Framework
+# Pre-push hook for Vibe Framework
 # Validates code quality and framework compliance before push
 
 # Colors for output
@@ -10,7 +10,7 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
-echo -e "${BLUE}  Cursor Framework - Pre-Push Validation${NC}"
+echo -e "${BLUE}  Vibe Framework - Pre-Push Validation${NC}"
 echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
 echo ""
 
@@ -21,12 +21,12 @@ PYTHON_CMD="python"
 command -v python3 &> /dev/null && PYTHON_CMD="python3"
 
 run_framework() {
-    $PYTHON_CMD -m cursor_framework "$@" --root "$FRAMEWORK_ROOT" 2>/dev/null
+    $PYTHON_CMD -m vibe_framework "$@" --root "$FRAMEWORK_ROOT" 2>/dev/null
 }
 
-# Check if cursor_framework module is available
-if ! $PYTHON_CMD -c "import cursor_framework" 2>/dev/null; then
-    echo -e "${YELLOW}⚠${NC} cursor_framework not installed. Skipping framework checks."
+# Check if vibe_framework module is available
+if ! $PYTHON_CMD -c "import vibe_framework" 2>/dev/null; then
+    echo -e "${YELLOW}⚠${NC} vibe_framework not installed. Skipping framework checks."
     exit 0
 fi
 
@@ -52,7 +52,7 @@ CURSOR_TOTAL=$((CURSOR_CHANGES + CURSOR_STAGED))
 
 if [ "$CURSOR_TOTAL" -gt 0 ]; then
     echo -e "${YELLOW}⚠${NC} $CURSOR_TOTAL .cursor file(s) changed"
-    echo "  Consider running 'python -m cursor_framework warm' after push"
+    echo "  Consider running 'python -m vibe_framework warm' after push"
 fi
 
 # 3. Check INDEX.json validity
@@ -63,7 +63,7 @@ if [ -f "$FRAMEWORK_ROOT/INDEX.json" ]; then
             echo -e "${GREEN}✓${NC} INDEX.json is valid"
         else
             echo -e "${RED}✗${NC} INDEX.json is malformed"
-            echo "  Run: python -m cursor_framework index"
+            echo "  Run: python -m vibe_framework index"
             FAILED=$((FAILED + 1))
         fi
     else

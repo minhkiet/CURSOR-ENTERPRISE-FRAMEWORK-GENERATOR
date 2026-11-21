@@ -1,4 +1,4 @@
-# One-liner installation for Cursor Enterprise Framework
+# One-liner installation for Vibe Enterprise Framework
 # Usage: irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1 | iex
 # Update: & {irm https://raw.githubusercontent.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/main/install.ps1} -Update
 
@@ -12,7 +12,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 Write-Host "==================================================" -ForegroundColor Cyan
-Write-Host "  Cursor Enterprise Framework - Quick Install" -ForegroundColor Cyan
+Write-Host "  Vibe Enterprise Framework - Quick Install" -ForegroundColor Cyan
 Write-Host "==================================================" -ForegroundColor Cyan
 Write-Host ""
 

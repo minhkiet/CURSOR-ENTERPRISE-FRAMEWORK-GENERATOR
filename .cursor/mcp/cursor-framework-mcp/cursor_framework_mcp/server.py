@@ -1,4 +1,4 @@
-"""FastMCP server entry point for the Cursor Enterprise Framework.
+"""FastMCP server entry point for the Vibe Enterprise Framework.
 
 Exposes the following MCP tools:
   - get_rule / get_skill / get_agent
@@ -147,7 +147,7 @@ def create_server(workspace_root: str | None = None, cache_cfg: dict | None = No
     mcp = FastMCP(
         "cursor-framework-mcp",
         instructions=(
-            "Cursor Enterprise Framework MCP. Load rules, skills, and agents "
+            "Vibe Enterprise Framework MCP. Load rules, skills, and agents "
             "on-demand with LRU caching, analyze free-form requests, and "
             "optimize the cache. Workspace root: "
             f"{root}"

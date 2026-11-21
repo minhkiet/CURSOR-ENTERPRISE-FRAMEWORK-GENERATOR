@@ -2,7 +2,7 @@
 description: Report - Tạo report (security, performance, architecture, audit)
 trigger: report, báo cáo, tạo báo cáo, create report, security report, audit report, performance report
 category: Reporting
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

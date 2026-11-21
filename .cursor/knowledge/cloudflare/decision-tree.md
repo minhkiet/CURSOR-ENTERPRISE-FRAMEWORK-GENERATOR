@@ -2,7 +2,7 @@
 
 ## Tổng quan
 
-Document này cung cấp cây quyết định chi tiết để hướng dẫn việc lựa chọn các Cloudflare services và configurations phù hợp trong Cursor Enterprise Framework.
+Document này cung cấp cây quyết định chi tiết để hướng dẫn việc lựa chọn các Cloudflare services và configurations phù hợp trong Vibe Enterprise Framework.
 
 ## 1. SSL/TLS Mode Selection Tree
 

@@ -71,5 +71,5 @@ if (-not (Test-Path $claudeMemDir)) {
     Write-Host "Existing memory directory found: $claudeMemDir" -ForegroundColor Green
 }
 
-Write-Host "`n[DONE] claude-mem is configured for Cursor Enterprise Framework." -ForegroundColor Green
+Write-Host "`n[DONE] claude-mem is configured for Vibe Enterprise Framework." -ForegroundColor Green
 Write-Host "Web Viewer will be available at: http://localhost:37777 upon worker start." -ForegroundColor Cyan

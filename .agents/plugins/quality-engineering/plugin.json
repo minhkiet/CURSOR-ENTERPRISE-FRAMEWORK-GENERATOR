@@ -2,6 +2,6 @@
   "name": "quality-engineering",
   "version": "1.0.0",
   "description": "Test-Driven Development (TDD) and Prove-It verification engine",
-  "author": "Cursor Enterprise Framework Team",
+  "author": "Vibe Enterprise Framework Team",
   "keywords": ["tdd", "testing", "prove-it", "quality-gates", "verification"]
 }

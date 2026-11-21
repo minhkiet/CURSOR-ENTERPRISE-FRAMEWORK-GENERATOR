@@ -2,7 +2,7 @@
 description: Test - Chiến lược và implementation testing
 trigger: test, testing, viết test, unit test, integration test, e2e test, test strategy
 category: Testing
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

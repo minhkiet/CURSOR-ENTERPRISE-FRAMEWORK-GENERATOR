@@ -2,7 +2,7 @@
 description: vbsec Security Scanner - Quét lỗ hổng bảo mật 21 rule cross-language với L1-L4 data flow analysis, optional --sca (OSV.dev CVE) và --auto-fix
 trigger: vbs-scan-security, vbsec, security scan, scan bảo mật, quét bảo mật, /vbs-scan-security
 category: Security
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 integration: vbsec/tanviet12 (MIT License)
 ---

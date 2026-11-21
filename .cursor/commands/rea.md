@@ -2,7 +2,7 @@
 description: REA (Reverse Engineer Anything) — Reverse engineer native binaries, .NET assemblies, Electron/JS apps, Android APKs, WASM, EVM bytecode, and network/runtime behavior with REA MCP and CLI
 trigger: rea, reverse, reverse-engineer, decompile, disasm, disassemble, binary analysis, ghidra, hopper, ida, asar, electron inspection, apk analysis, jadx, wasm analysis, evm bytecode, reverse engineering
 category: Security
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

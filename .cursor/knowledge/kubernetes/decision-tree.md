@@ -2,7 +2,7 @@
 
 ## Tổng quan
 
-Document này cung cấp cây quyết định chi tiết để hướng dẫn việc lựa chọn các Kubernetes resources và configurations phù hợp trong Cursor Enterprise Framework.
+Document này cung cấp cây quyết định chi tiết để hướng dẫn việc lựa chọn các Kubernetes resources và configurations phù hợp trong Vibe Enterprise Framework.
 
 ## 1. Workload Type Selection Tree
 

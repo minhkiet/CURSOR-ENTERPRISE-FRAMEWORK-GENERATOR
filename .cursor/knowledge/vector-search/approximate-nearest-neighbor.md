@@ -4,7 +4,7 @@ description: "Hướng dẫn về lý thuyết ANN search: recall@k, precision@k
 tags: ["ann", "approximate-nearest-neighbor", "recall", "precision", "hamming", "binary-embedding"]
 created: "2026-06-23"
 version: "1.0.0"
-framework: "Cursor Enterprise Framework"
+framework: "Vibe Enterprise Framework"
 ---
 
 # Approximate Nearest Neighbor
@@ -1000,4 +1000,4 @@ class AdaptiveSearch:
 2. **Hamming Distance**: https://en.wikipedia.org/wiki/Hamming_distance
 3. **LSH**: https://en.wikipedia.org/wiki/Locality-sensitive_hashing
 4. **Binary Quantization**: https://arxiv.org/abs/1709.09118
-5. **Cursor Enterprise Framework - Vector Search Rules**: `.cursor/rules/vector-search.mdc`
+5. **Vibe Enterprise Framework - Vector Search Rules**: `.cursor/rules/vector-search.mdc`

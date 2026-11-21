@@ -4,7 +4,7 @@ description: "Hướng dẫn về đánh giá RAG: RAGAS metrics, context precis
 tags: ["evaluation", "ragas", "metrics", "faithfulness", "relevance", "llm-evaluation"]
 created: "2026-06-23"
 version: "1.0.0"
-framework: "Cursor Enterprise Framework"
+framework: "Vibe Enterprise Framework"
 ---
 
 # Evaluation Metrics
@@ -1278,4 +1278,4 @@ DEFAULT_THRESHOLDS = {
 2. **BLEU Score**: https://www.aclweb.org/anthology/P02-1040.pdf
 3. **ROUGE Score**: https://aclanthology.org/W04-1013.pdf
 4. **RAG Evaluation Survey**: https://arxiv.org/abs/2312.10937
-5. **Cursor Enterprise Framework - RAG Rules**: `.cursor/rules/rag.mdc`
+5. **Vibe Enterprise Framework - RAG Rules**: `.cursor/rules/rag.mdc`

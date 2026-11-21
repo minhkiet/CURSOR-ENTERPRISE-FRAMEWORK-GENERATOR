@@ -1,7 +1,7 @@
 """
-Cursor Framework MCP Server
+Vibe Framework MCP Server
 
-High-level MCP server wrapping cursor_framework utilities for Cursor IDE.
+High-level MCP server wrapping vibe_framework utilities for Cursor IDE.
 Provides tools for context management, skill discovery, memory operations, and workflow.
 
 Usage:
@@ -20,7 +20,7 @@ import sys
 from pathlib import Path
 from typing import Any, Optional
 
-# Add paths to sys.path so cursor_framework and local modules are always importable
+# Add paths to sys.path so vibe_framework and local modules are always importable
 _repo_root = Path(__file__).resolve().parent.parent
 if str(_repo_root) not in sys.path:
     sys.path.insert(0, str(_repo_root))
@@ -39,9 +39,9 @@ except Exception:
         try:
             from mcp_runtime import UniversalMcpServer as FastMCP
         except ImportError:
-            from cursor_framework.mcp_runtime import UniversalMcpServer as FastMCP
+            from vibe_framework.mcp_runtime import UniversalMcpServer as FastMCP
 
-mcp = FastMCP("cursor-framework")
+mcp = FastMCP("vibe-framework")
 HAS_FASTMCP = True
 
 # ============================================================================
@@ -50,27 +50,27 @@ HAS_FASTMCP = True
 
 def _get_workflow(root: str, memory_path: str):
     """Lazy load workflow to avoid import overhead."""
-    from cursor_framework.workflow import Workflow
+    from vibe_framework.workflow import Workflow
     return Workflow(root=root, memory_path=memory_path)
 
 def _get_indexer(root: str):
     """Lazy load indexer."""
-    from cursor_framework.indexer import Indexer
+    from vibe_framework.indexer import Indexer
     return Indexer(root)
 
 def _get_skill_discovery(root: str):
     """Lazy load skill discovery."""
-    from cursor_framework.skill_discovery import SkillDiscovery
+    from vibe_framework.skill_discovery import SkillDiscovery
     return SkillDiscovery(root=root)
 
 def _get_code_graph(root: str):
     """Lazy load code graph."""
-    from cursor_framework.code_graph import CodeGraph
+    from vibe_framework.code_graph import CodeGraph
     return CodeGraph(root=root)
 
 def _get_cursor_integration(root: str, memory_path: str):
     """Lazy load cursor integration."""
-    from cursor_framework.cursor_integration import CursorIntegration
+    from vibe_framework.cursor_integration import CursorIntegration
     return CursorIntegration(root=root, cache_path=memory_path)
 
 # ============================================================================
@@ -149,7 +149,7 @@ if HAS_FASTMCP:
         Returns:
             List of files that would/were deleted
         """
-        from cursor_framework.memory_store import MemoryStore
+        from vibe_framework.memory_store import MemoryStore
         from pathlib import Path
         
         root_path = Path(root).resolve()
@@ -236,7 +236,7 @@ if HAS_FASTMCP:
         Returns:
             Nodes and edges for skill dependencies
         """
-        from cursor_framework.skill_discovery import SkillRegistry
+        from vibe_framework.skill_discovery import SkillRegistry
         
         registry = SkillRegistry()
         skills = registry.get_all()
@@ -432,14 +432,14 @@ if HAS_FASTMCP:
     @mcp.resource("framework://stats")
     def stats_resource() -> str:
         """Framework statistics as a resource."""
-        from cursor_framework.workflow import Workflow
+        from vibe_framework.workflow import Workflow
         wf = Workflow()
         return json.dumps(wf.stats(), indent=2)
 
     @mcp.resource("framework://skills")
     def skills_resource() -> str:
         """List all available skills."""
-        from cursor_framework.skill_discovery import SkillRegistry
+        from vibe_framework.skill_discovery import SkillRegistry
         registry = SkillRegistry()
         skills = registry.get_all()
         return json.dumps([{"name": s.name, "path": s.path} for s in skills], indent=2)
@@ -449,7 +449,7 @@ if HAS_FASTMCP:
 # ============================================================================
 
 def main():
-    parser = argparse.ArgumentParser(description="Cursor Framework MCP Server")
+    parser = argparse.ArgumentParser(description="Vibe Framework MCP Server")
     parser.add_argument("--root", default=".cursor", help="Path to .cursor directory")
     parser.add_argument("--memory-path", default=".cache/memory.json", help="Memory cache path")
     parser.add_argument("--port", type=int, default=8765, help="Port for stdio mode")

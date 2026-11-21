@@ -2,7 +2,7 @@
 description: Prompt chuan de tinh Bat Tu - tu trung, ngwu hanh, cu menh
 trigger: bazi, bat tu, four pillars
 category: Domain
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

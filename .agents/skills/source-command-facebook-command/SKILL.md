@@ -442,7 +442,7 @@ def verify_facebook_webhook(request, app_secret):
     return hmac.compare_digest(f"sha256={expected}", signature)
 ```
 
-## Integration with Cursor Framework
+## Integration with Vibe Framework
 
 ### Slash Command
 

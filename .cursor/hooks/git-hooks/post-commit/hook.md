@@ -1,7 +1,7 @@
 ---
 description: Post-Commit Hook - Update session summary sau commit
 trigger: git commit (sau khi commit thanh cong)
-framework: Cursor Enterprise Framework V4
+framework: Vibe Enterprise Framework V4
 version: 1.0.0
 ---
 

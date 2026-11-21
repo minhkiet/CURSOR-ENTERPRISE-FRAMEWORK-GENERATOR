@@ -6,12 +6,12 @@ description: "Shopee API Integration Skill skill"
 # Shopee API Integration Skill
 
 **Version:** 1.0.0  
-**Author:** Cursor Enterprise Framework  
+**Author:** Vibe Enterprise Framework
 **Triggers:** shopee, shopee api, shopee seller, shopee integration, e-commerce
 
 ## Overview
 
-This skill provides Shopee API integration for Cursor Enterprise Framework. It enables product management, order processing, logistics handling, and analytics for Shopee sellers.
+This skill provides Shopee API integration for Vibe Enterprise Framework. It enables product management, order processing, logistics handling, and analytics for Shopee sellers.
 
 ## Capabilities
 
