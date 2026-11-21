@@ -72,6 +72,7 @@ cursor-setup-gui.exe
 cursor-setup-gui-publish/
 cursor-setup.spec
 cursor-setup.zip
+vibe-setup.zip
 cursor-setup-gui-publish/
 
   --- Build scripts (generated / CI output) ---

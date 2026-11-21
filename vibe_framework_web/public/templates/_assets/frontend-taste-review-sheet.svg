@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-labelledby="craft-sheet-title craft-sheet-desc">
+  <title id="craft-sheet-title">Bảng review craft frontend</title>
+  <desc id="craft-sheet-desc">Bảng phác thảo với mẫu typography, thang khoảng cách và bốn tiêu chí review.</desc>
+  <defs>
+    <pattern id="craft-grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#ddd8cd" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="760" fill="#f6f3ed"/>
+  <rect width="1200" height="760" fill="url(#craft-grid)"/>
+  <g font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" fill="#191d1a">
+    <text x="64" y="72" font-size="13" letter-spacing="3" fill="#8a5641">CRAFT REVIEW SHEET · 04</text>
+    <text x="64" y="128" font-size="40" font-family="Iowan Old Style, Palatino, Georgia, serif" font-weight="600">Review trước khi merge</text>
+    <text x="64" y="164" font-size="17" fill="#59605a">Một trang, bốn tiêu chí. Không điểm số, không lời tự nhận.</text>
+    <line x1="64" y1="196" x2="1136" y2="196" stroke="#191d1a" stroke-width="2"/>
+
+    <rect x="64" y="232" width="470" height="330" rx="2" fill="#fbfaf7" stroke="#c9c3b7"/>
+    <text x="92" y="268" font-size="12" letter-spacing="2" fill="#8a5641">TYPE SPECIMEN</text>
+    <text x="92" y="386" font-size="132" font-family="Iowan Old Style, Palatino, Georgia, serif" font-weight="600">Aa</text>
+    <line x1="92" y1="418" x2="506" y2="418" stroke="#c9c3b7"/>
+    <text x="92" y="454" font-size="16" fill="#191d1a">Display · Iowan Old Style / Palatino</text>
+    <text x="92" y="484" font-size="14" fill="#59605a">Body · system-ui · line-height 1.55</text>
+    <text x="92" y="514" font-size="13" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" fill="#8a5641">tracking: -0.02em</text>
+
+    <rect x="566" y="232" width="570" height="330" rx="2" fill="#fbfaf7" stroke="#c9c3b7"/>
+    <text x="594" y="268" font-size="12" letter-spacing="2" fill="#8a5641">SPACING RHYTHM</text>
+    <g>
+      <rect x="594" y="300" width="96" height="34" fill="#191d1a"/>
+      <text x="704" y="323" font-size="15">08 px · nhãn, khe hở nhỏ</text>
+      <rect x="594" y="352" width="192" height="34" fill="#8a5641"/>
+      <text x="800" y="375" font-size="15">16 px · padding điều khiển</text>
+      <rect x="594" y="404" width="288" height="34" fill="#c9c3b7"/>
+      <text x="896" y="427" font-size="15">24 px · khoảng cách nhóm</text>
+      <rect x="594" y="456" width="384" height="34" fill="#e4ded2"/>
+      <text x="992" y="479" font-size="15">32 px · nhịp section</text>
+    </g>
+    <line x1="594" y1="516" x2="1108" y2="516" stroke="#c9c3b7"/>
+    <text x="594" y="544" font-size="14" fill="#59605a">Một tỷ lệ dùng xuyên suốt, không trộn 5px / 7px / 13px.</text>
+
+    <line x1="64" y1="600" x2="1136" y2="600" stroke="#191d1a" stroke-width="2"/>
+    <text x="64" y="636" font-size="13" letter-spacing="2" fill="#8a5641">FOUR CHECKPOINTS</text>
+
+    <g font-size="16">
+      <text x="64" y="680">01 · Hierarchy</text>
+      <text x="348" y="680">02 · Surface</text>
+      <text x="632" y="680">03 · State</text>
+      <text x="916" y="680">04 · Motion</text>
+    </g>
+    <g font-size="14" fill="#59605a">
+      <text x="64" y="708">Một ý chính mỗi màn hình.</text>
+      <text x="348" y="708">Viền và nền có lý do.</text>
+      <text x="632" y="708">Đủ hover, focus, empty, error.</text>
+      <text x="916" y="708">Ngắn, có thể tắt, không lơ lửng.</text>
+    </g>
+    <text x="64" y="744" font-size="12" fill="#59605a">Vibe Framework · template frontend-taste · bảng review, không phải ảnh chụp sản phẩm</text>
+  </g>
+</svg>

@@ -41,7 +41,7 @@ Instead of starting every coding session from zero and falling into generic "AI 
 | **VBS Security Scanner** | 21 cross-language vulnerability rules + SCA | `.cursor/skills/sec_reverse-engineer-anything/` |
 | **Python Library** | 14 modules + 6 utility suites | `vibe_framework/` |
 | **Web Dashboard & CMS** | Vue 3 + Vite 6 + TypeScript + CMS Auth Gate | `vibe_framework_web/` |
-| **Windows GUI Installer** | `cursor-setup.exe` (~162 MB), `cursor-setup.zip` (~22 MB) | generated in `dist/` by build scripts |
+| **Windows GUI Installer** | `VibeCodeEnterpriseFramework.exe` (~162 MB), `vibe-setup.zip` (~22 MB) | generated in `dist/` by build scripts |
 
 ---
 
@@ -54,10 +54,11 @@ Framework cung cấp giải pháp **One Source — Universal Adapters**. Chỉ c
 | **Cursor IDE** | `%USERPROFILE%\.cursor\` or `~/.cursor/` | Native drop-in (`setup.bat`) | Composer (`Ctrl+I`), Chat (`Ctrl+L`), Agent Mode |
 | **Windsurf (Codeium)** | `.windsurfrules`, `.windsurf/rules/` | `sync-adapters.ps1 -Tool Windsurf` | Cascade Flow (`Ctrl+L`), Supercomplete |
 | **Claude Code** | `CLAUDE.md`, `.claude/skills/`, `.claude/rules/` | `npx ecc-universal@2.2.2 install --target claude` | Terminal pair programmer, headless CI/CD, hooks |
+| **OpenAI Codex** | `AGENTS.md`, `.codex/skills/`, `.codex/rules/`, `.codex/agents/` | `sync-adapters.ps1 -Tool Codex` | Terminal/IDE agent, workspace rules, skills |
 | **GitHub Copilot** | `.github/copilot-instructions.md`, `.github/prompts/` | `sync-adapters.ps1 -Tool Copilot` | Copilot Edits (`Ctrl+Shift+I`), Workspace agent |
 | **Roo Code & Cline** | `.roomodes`, `.clinerules`, `.roomodes.json` | Native mode files in `07-adapters/` | Custom autonomous roles (Architect, Reviewer, Coder) |
 | **Google Antigravity** | `~/.gemini/antigravity/` & `.agents/skills/` | `sync-adapters.ps1 -Tool Antigravity` | AGY CLI, Agentic workflows, sidecars, tool loops |
-| **Trae (ByteDance)** | `.trae/rules/`, `AGENTS.md` | `sync-adapters.ps1 -Tool Cursor` | Claude 3.5 Sonnet / GPT-4o builder mode |
+| **Trae (ByteDance)** | `.trae/rules/`, `AGENTS.md` | Copy `AGENTS.md` to workspace root | Claude 3.5 Sonnet / GPT-4o builder mode |
 | **Devin / OpenHands** | `AGENTS.md`, `.openhands/instructions.md` | Copy `AGENTS.md` to workspace root | Autonomous issue solver, automated PR creator |
 | **Aider** | `.aider.conf.yml`, `.cursor/rules/*.mdc` | `aider --read .cursor/rules/coding-standards.mdc` | Terminal Git pair programming, auto git-commits |
 | **Bolt.new / v0.dev** | Export templates from `public/templates/` | Copy component spec & zero-skeleton HTML/JS | Instant web sandbox scaffolding |
@@ -87,10 +88,10 @@ Bạn có thể lựa chọn 1 trong các phương thức cài đặt thuận ti
 ### Cách 1: Windows GUI Installer (Khuyến nghị cho người mới)
 
 1. Tải 2 file từ [Latest Release](https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR/releases):
-   - `cursor-setup.exe` (Self-contained, không yêu cầu cài .NET runtime)
-   - `cursor-setup.zip` (Bộ payload framework ~22 MB)
+   - `VibeCodeEnterpriseFramework.exe` (Self-contained, không yêu cầu cài .NET runtime)
+   - `vibe-setup.zip` (Bộ payload framework ~22 MB)
 2. Đặt cả 2 file vào cùng một thư mục.
-3. Chạy `cursor-setup.exe`, chọn đường dẫn đích (mặc định `%USERPROFILE%\.cursor`).
+3. Chạy `VibeCodeEnterpriseFramework.exe`, chọn đường dẫn đích (mặc định `%USERPROFILE%\.cursor`).
 4. Bấm **Install** và đợi 15 giây. Khởi động lại Vibe tool bạn dùng (Cursor, Windsurf, Claude Code, Codex...).
 
 ### Cách 2: PowerShell One-Liner (Windows Tự Động 100%)

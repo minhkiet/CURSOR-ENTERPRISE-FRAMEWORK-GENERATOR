@@ -22,7 +22,8 @@ namespace CursorSetupWpf.Services
             "rules", "scripts", "memory", "mcp"
         };
 
-        public static string EMBEDDED_ZIP_NAME = "cursor-setup.zip";
+        public static string EMBEDDED_ZIP_NAME = "vibe-setup.zip";
+        public static string LEGACY_ZIP_NAME = "cursor-setup.zip";
 
         public static Dictionary<string, List<string>> ScanCategories(string zipPath)
         {
@@ -56,20 +57,22 @@ namespace CursorSetupWpf.Services
         public static string FindZipPath()
         {
             string exeDir = AppContext.BaseDirectory;
-            string[] candidates = new[]
-            {
-                Path.Combine(exeDir, EMBEDDED_ZIP_NAME),
-                Path.Combine(Directory.GetCurrentDirectory(), EMBEDDED_ZIP_NAME)
-            };
+            var dirs = new List<string> { exeDir, Directory.GetCurrentDirectory() };
             string dir = exeDir;
             for (int i = 0; i < 3; i++)
             {
                 dir = Directory.GetParent(dir)?.FullName!;
                 if (string.IsNullOrEmpty(dir)) break;
-                candidates = candidates.Concat(new[] { Path.Combine(dir, EMBEDDED_ZIP_NAME) }).ToArray();
+                dirs.Add(dir);
             }
-            foreach (string c in candidates)
-                if (File.Exists(c)) return c;
+            foreach (string d in dirs.Distinct(StringComparer.OrdinalIgnoreCase))
+            {
+                foreach (string name in new[] { EMBEDDED_ZIP_NAME, LEGACY_ZIP_NAME })
+                {
+                    string candidate = Path.Combine(d, name);
+                    if (File.Exists(candidate)) return candidate;
+                }
+            }
             return null!;
         }
 

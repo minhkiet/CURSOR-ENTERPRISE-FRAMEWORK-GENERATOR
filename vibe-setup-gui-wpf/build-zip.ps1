@@ -1,5 +1,5 @@
 # ============================================================
-# Build cursor-setup.zip from .cursor contents and staged MCP tools
+# Build vibe-setup.zip from .cursor contents and staged MCP tools
 # ============================================================
 param(
     [string]$Config = "Debug"
@@ -12,7 +12,8 @@ $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot = Split-Path -Parent $ScriptDir
 $SourceDir = Join-Path $RepoRoot ".cursor"
 $BuildDir = Join-Path $ScriptDir "bin\$Config\net8.0-windows\win-x64\publish"
-$OutputZip = Join-Path $BuildDir "cursor-setup.zip"
+$OutputZip = Join-Path $BuildDir "vibe-setup.zip"
+$LegacyOutputZip = Join-Path $BuildDir "cursor-setup.zip"
 $TempZip = Join-Path $env:TEMP "cursor-setup-build-$([System.Guid]::NewGuid().ToString('N')).zip"
 
 Write-Host ""
@@ -96,6 +97,9 @@ Write-Host "[3/6] Creating ZIP archive..." -ForegroundColor Yellow
 if (Test-Path $OutputZip) {
     Remove-Item $OutputZip -Force
     Write-Host "  Removed existing zip" -ForegroundColor Gray
+}
+if (Test-Path $LegacyOutputZip) {
+    Remove-Item $LegacyOutputZip -Force
 }
 if (Test-Path $TempZip) { Remove-Item $TempZip -Force }
 
@@ -186,6 +190,7 @@ finally {
 }
 
 Move-Item -Path $TempZip -Destination $OutputZip -Force
+Copy-Item -LiteralPath $OutputZip -Destination $LegacyOutputZip -Force
 
 $zipSize = (Get-Item $OutputZip).Length
 $zipSizeMB = [Math]::Round($zipSize / 1MB, 2)

@@ -29,14 +29,14 @@ public class Win32 {
 }
 "@
 
-# Get handle from command line arg (or find cursor-setup window)
+# Get handle from command line arg (or find VibeCodeEnterpriseFramework window)
 $handle = [IntPtr]::Zero
 if ($args[0] -and $args[0] -match '^\d+$') {
     $handle = [IntPtr][int64]$args[0]
 } else {
     $script:windows = @()
-    $targetPid = [uint32](Get-Process cursor-setup-wpf -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Id)
-    if ($targetPid -eq 0) { Write-Error "cursor-setup-wpf not running"; exit 1 }
+    $targetPid = [uint32](Get-Process VibeCodeEnterpriseFramework -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Id)
+    if ($targetPid -eq 0) { Write-Error "VibeCodeEnterpriseFramework not running"; exit 1 }
     $enum = [Win32+EnumWindowsProc]{
         param($hWnd, $lParam)
         $procId = 0

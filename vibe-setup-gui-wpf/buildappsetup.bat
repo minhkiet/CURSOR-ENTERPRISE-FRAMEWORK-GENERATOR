@@ -7,7 +7,7 @@ REM Purpose:
 REM   1. Check prerequisites (dotnet, scripts, MCP tools)
 REM   2. Clean bin/obj (optional via /clean)
 REM   3. Publish the vibe-setup-gui-wpf project (self-contained, single-file)
-REM   4. Create cursor-setup.zip from .cursor contents and staged MCP tools
+REM   4. Create vibe-setup.zip (plus legacy cursor-setup.zip alias) from .cursor contents and staged MCP tools
 REM   5. Verify all outputs exist
 REM
 REM Usage:
@@ -19,7 +19,7 @@ REM   buildappsetup.bat /help        (show this help)
 REM
 REM Outputs (in bin\<Config>\net8.0-windows\win-x64\publish\):
 REM   - VibeCodeEnterpriseFramework.exe             (self-contained single-file WPF installer)
-REM   - cursor-setup.zip              (framework archive)
+REM   - vibe-setup.zip                (framework archive)
 REM   - Resources\vi.txt             (Vietnamese localization)
 REM   - Resources\en.txt             (English localization)
 REM   - cursor-setup-build.json      (build metadata)
@@ -175,7 +175,7 @@ echo.
 
 REM ----- Step 3: Create ZIP -----
 REM build-zip.ps1 stages MCP tools directly and never modifies host .cursor.
-echo [STEP 3] Creating cursor-setup.zip...
+echo [STEP 3] Creating vibe-setup.zip...
 echo.
 
 powershell -NoProfile -ExecutionPolicy Bypass -File "%ZIP_SCRIPT%" -Config %BUILD_CONFIG%
@@ -206,14 +206,14 @@ if exist "%OUTPUT_DIR%\VibeCodeEnterpriseFramework.exe" (
 )
 
 REM Check .zip in publish folder
-if exist "%OUTPUT_DIR%\cursor-setup.zip" (
-    for %%A in ("%OUTPUT_DIR%\cursor-setup.zip") do (
+if exist "%OUTPUT_DIR%\vibe-setup.zip" (
+    for %%A in ("%OUTPUT_DIR%\vibe-setup.zip") do (
         set "ZS=%%~zA"
         set /a "ZM=ZS / 1048576"
-        echo   [OK] cursor-setup.zip ^(!ZM! MB^)
+        echo   [OK] vibe-setup.zip ^(!ZM! MB^)
     )
 ) else (
-    echo   [MISSING] cursor-setup.zip  ^(expected in %OUTPUT_DIR%\^)
+    echo   [MISSING] vibe-setup.zip  ^(expected in %OUTPUT_DIR%\^)
     set "MISSING=1"
 )
 
@@ -269,11 +269,11 @@ if exist "%OUTPUT_DIR%\VibeCodeEnterpriseFramework.exe" (
         echo    - VibeCodeEnterpriseFramework.exe ^(!ZM! MB^) self-contained
     )
 )
-if exist "%OUTPUT_DIR%\cursor-setup.zip" (
-    for %%A in ("%OUTPUT_DIR%\cursor-setup.zip") do (
+if exist "%OUTPUT_DIR%\vibe-setup.zip" (
+    for %%A in ("%OUTPUT_DIR%\vibe-setup.zip") do (
         set "ZS=%%~zA"
         set /a "ZM=ZS / 1048576"
-        echo    - cursor-setup.zip ^(!ZM! MB^)
+        echo    - vibe-setup.zip ^(!ZM! MB^)
     )
 )
 echo    - Resources\vi.txt

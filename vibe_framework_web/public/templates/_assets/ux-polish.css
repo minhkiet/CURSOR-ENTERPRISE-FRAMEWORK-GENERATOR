@@ -1,0 +1,162 @@
+/* Hallmark · v2.0.0 · custom · editorial · page · genre: editorial · posture: restrained · hero: settled · nav: edge aligned section links · footer: wordmark over links · job: shared production polish */
+/* Shared baseline for every template: focus, reduced motion, media behaviour and per-industry accent. */
+
+html {
+  overflow-x: clip;
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
+}
+
+body {
+  overflow-x: clip;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --ux-accent: #8a5641;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+img,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+  background-color: var(--ux-sunk, #ece8df);
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+a,
+button,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--ux-accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+::selection {
+  color: #f6f3ec;
+  background: var(--ux-accent);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+[data-ux="agritech"],
+[data-ux="farm"],
+[data-ux="orchard"] {
+  --ux-accent: #2f6f4e;
+  --ux-sunk: #e4eadf;
+}
+
+[data-ux="aitech"],
+[data-ux="edu-tutor"],
+[data-ux="auto-showroom"] {
+  --ux-accent: #2563eb;
+  --ux-sunk: #e7edf7;
+}
+
+[data-ux="beauty-spa"],
+[data-ux="sale"] {
+  --ux-accent: #b5476b;
+  --ux-sunk: #f3e8ec;
+}
+
+[data-ux="blog"],
+[data-ux="portfolio"],
+[data-ux="church"] {
+  --ux-accent: #6f5a8c;
+  --ux-sunk: #ece8f2;
+}
+
+[data-ux="bazi"],
+[data-ux="numerology"] {
+  --ux-accent: #9a6b2f;
+  --ux-sunk: #f2eadc;
+}
+
+[data-ux="cms-landing-enterprise"],
+[data-ux="insurance"] {
+  --ux-accent: #0f766e;
+  --ux-sunk: #e1eeeb;
+}
+
+[data-ux="computech"],
+[data-ux="travel"],
+[data-ux="realestate"] {
+  --ux-accent: #9a6b2f;
+  --ux-sunk: #efe9df;
+}
+
+[data-ux="crm"],
+[data-ux="dashboard-ui"] {
+  --ux-accent: #4f46e5;
+  --ux-sunk: #e9eafb;
+}
+
+[data-ux="fitness"],
+[data-ux="food-delivery"] {
+  --ux-accent: #c2410c;
+  --ux-sunk: #f6e9df;
+}
+
+[data-ux="image-workflow"] {
+  --ux-accent: #be123c;
+  --ux-sunk: #f6e4e9;
+}
+
+[data-ux="preschool"] {
+  --ux-accent: #b45309;
+  --ux-sunk: #f8edda;
+}
+
+[data-ux="viet-restaurant"] {
+  --ux-accent: #92400e;
+  --ux-sunk: #f3e8d8;
+}

@@ -55,11 +55,11 @@ const methods: InstallMethod[] = [
       {
         title: 'Tải 2 file về cùng một thư mục',
         detail: 'Trong phần Assets, tải cả hai file và đặt chung một folder (ví dụ Downloads\\vibe).',
-        code: 'cursor-setup.exe    (~162 MB, self-contained, không cần .NET)\ncursor-setup.zip    (~22 MB, payload framework)',
+        code: 'VibeCodeEnterpriseFramework.exe    (~162 MB, self-contained, không cần .NET)\nvibe-setup.zip                      (~22 MB, payload framework)',
         codeLabel: 'Files'
       },
       {
-        title: 'Chạy cursor-setup.exe',
+        title: 'Chạy VibeCodeEnterpriseFramework.exe',
         detail: 'Double-click file exe. Nếu Windows SmartScreen hỏi, chọn "More info" → "Run anyway".',
         tip: 'SmartScreen cảnh báo là bình thường vì file chưa được code-sign. Bạn có thể kiểm tra checksum trên trang Release.'
       },
