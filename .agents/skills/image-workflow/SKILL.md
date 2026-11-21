@@ -114,8 +114,16 @@ PROMPT="Cinematic dark office, #0C0C0C background, #e8702a accent lights,
 minimalist workspace, professional photography, 8k"
 
 # 2. Generate via Google Flow (free)
-# Visit: labs.google/fx/tools/flow
+# Visit: https://flow.google.com/
 # Download result to public/assets/hero.png
+
+# Hoặc dùng CLI của framework (tự tạo project + tải ảnh + ghi manifest):
+python tools/google_flow_cli.py --login   # một lần
+python tools/google_flow_cli.py --prompt "$PROMPT" --count 1
+
+# Tự sinh prompt + model Nano Banana 2.1 + tỉ lệ theo prompt/chủ đề
+python tools/google_flow_cli.py --topic "hero banner" --style cinematic --ratio 16:9 --count 2
+python tools/google_flow_cli.py --prompt "poster event tỷ lệ 9:16" --dry-run
 
 # OR generate via DALL-E 3 (paid)
 curl -X POST https://api.openai.com/v1/images/generations \
@@ -187,7 +195,7 @@ TEAM_PHOTO [IMG, 4:5]:
 
 ```bash
 # Hero image - Google Flow (free)
-# Visit: labs.google/fx/tools/flow
+# Visit: https://flow.google.com/
 PROMPT="Cinematic dark office, #0C0C0C background, #e8702a accent lights,
 minimalist workspace, professional photography, 8k"
 # Download to public/assets/hero.webp

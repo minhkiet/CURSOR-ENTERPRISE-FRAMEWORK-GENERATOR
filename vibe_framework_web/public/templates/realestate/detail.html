@@ -3,23 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Grand Riverside Villa #08 — NhaTot Luxury Real Estate</title>
+  <title>Grand Riverside Villa #08, NhaTot Luxury Real Estate</title>
   <meta name="description" content="Chi tiết biệt thự đơn lập Grand Riverside Villa: 520m² ven sông Thảo Điền, hồ bơi riêng 85m², 5PN Master En-suite, garage 3 xe sang. Sổ hồng vĩnh viễn." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" />
+  <link rel="stylesheet" href="../_assets/fonts.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/regular/style.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/fill/style.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/duotone/style.css" />
+
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="../_assets/ux-polish.css" />
 </head>
-<body class="detail-page-body">
+<body data-ux="realestate" class="detail-page-body">
 
 <!-- ─── NAV ─── -->
 <nav class="nav">
   <div class="container nav-inner">
     <a href="index.html" class="logo">
-      <svg class="logo-mark" viewBox="0 0 32 32" fill="none">
+      <svg aria-hidden="true" class="logo-mark" viewBox="0 0 32 32" fill="none">
         <rect x="4" y="4" width="24" height="24" rx="7" fill="currentColor"/>
         <path d="M10 22 L16 10 L22 22 M13 17 H19" stroke="#fafbff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
@@ -72,7 +72,7 @@
         <div class="price-box">
           <span class="price-label">Giá chuyển nhượng trọn gói:</span>
           <div class="price-val">38.500.000.000 <span class="price-curr">VNĐ</span></div>
-          <div class="price-sub">Khoảng <strong>74,03 triệu/m²</strong> sàn · Chiết khấu thanh toán sớm <strong>11%</strong></div>
+          <div class="price-sub">Khoảng <strong>74,03 triệu/m²</strong> sàn, Chiết khấu thanh toán sớm <strong>11%</strong></div>
         </div>
         <div class="ph-actions">
           <button class="btn btn-outline btn-share" onclick="navigator.clipboard.writeText(window.location.href); alert('Đã sao chép liên kết biệt thự!')">
@@ -97,7 +97,7 @@
       <!-- Main big photo -->
       <div class="gallery-main" id="galleryMain">
         <img
-          src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1400&q=80"
+          src="../_assets/media/ec84f7364907.jpg"
           alt="Mặt tiền Biệt thự Grand Riverside Villa và hồ bơi vô cực"
           id="mainGalleryImg"
           loading="eager"
@@ -108,20 +108,20 @@
 
       <!-- 4 secondary photos -->
       <div class="gallery-thumbs">
-        <div class="thumb-item active" onclick="swapGallery(this, 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1400&q=80', 'Mặt tiền kiến trúc đương đại & hồ bơi điện phân muối 85m² hướng sông')">
-          <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=600&q=80" alt="Mặt tiền biệt thự" />
+        <div class="thumb-item active" onclick="swapGallery(this, '../_assets/media/ec84f7364907.jpg', 'Mặt tiền kiến trúc đương đại & hồ bơi điện phân muối 85m² hướng sông')">
+          <img loading="lazy" decoding="async" src="../_assets/media/ca9bc8fdb51e.jpg" alt="Mặt tiền biệt thự" />
           <span class="thumb-label">Mặt tiền & Hồ bơi</span>
         </div>
-        <div class="thumb-item" onclick="swapGallery(this, 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1400&q=80', 'Phòng khách thông tầng 7.2m với vách đá cẩm thạch Calacatta')">
-          <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=600&q=80" alt="Phòng khách" />
+        <div class="thumb-item" onclick="swapGallery(this, '../_assets/media/2d5a3476b27f.jpg', 'Phòng khách thông tầng 7.2m với vách đá cẩm thạch Calacatta')">
+          <img loading="lazy" decoding="async" src="../_assets/media/642aa4fbb30a.jpg" alt="Phòng khách" />
           <span class="thumb-label">Phòng khách 7.2m</span>
         </div>
-        <div class="thumb-item" onclick="swapGallery(this, 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1400&q=80', 'Phòng ngủ Master Tổng thống 72m² view trực diện hoàng hôn')">
-          <img src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=600&q=80" alt="Phòng ngủ Master" />
+        <div class="thumb-item" onclick="swapGallery(this, '../_assets/media/9dfcb1737c0f.jpg', 'Phòng ngủ Master Tổng thống 72m² view trực diện hoàng hôn')">
+          <img loading="lazy" decoding="async" src="../_assets/media/87f99bc71ebd.jpg" alt="Phòng ngủ Master" />
           <span class="thumb-label">Phòng ngủ Master</span>
         </div>
-        <div class="thumb-item" onclick="swapGallery(this, 'https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?auto=format&fit=crop&w=1400&q=80', 'Bếp đảo đá tự nhiên & Hầm rượu vang điều hòa nhiệt độ')">
-          <img src="https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?auto=format&fit=crop&w=600&q=80" alt="Bếp & Hầm rượu" />
+        <div class="thumb-item" onclick="swapGallery(this, '../_assets/media/6c434b89edad.jpg', 'Bếp đảo đá tự nhiên & Hầm rượu vang điều hòa nhiệt độ')">
+          <img loading="lazy" decoding="async" src="../_assets/media/f14fe3b73b0e.jpg" alt="Bếp & Hầm rượu" />
           <span class="thumb-label">Bếp & Hầm rượu</span>
         </div>
       </div>
@@ -226,7 +226,7 @@
         <div class="floorplan-display" id="floorPlanBox">
           <div class="fp-svg-wrapper">
             <!-- Architectural visual schema -->
-            <svg viewBox="0 0 800 450" class="fp-svg" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg aria-hidden="true" viewBox="0 0 800 450" class="fp-svg" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="20" y="20" width="760" height="410" rx="12" fill="#fffdfa" stroke="#d97706" stroke-width="2"/>
               <!-- Grid background -->
               <defs>
@@ -379,28 +379,28 @@
             <div class="am-icon"><i class="ph-fill ph-boat"></i></div>
             <div class="am-text">
               <strong>Bến Du Thuyền Thảo Điền</strong>
-              <span>Cách 200m · 2 phút đi bộ</span>
+              <span>Cách 200m, 2 phút đi bộ</span>
             </div>
           </div>
           <div class="amenity-card">
             <div class="am-icon"><i class="ph-fill ph-graduation-cap"></i></div>
             <div class="am-text">
               <strong>Trường Quốc Tế BIS / ISHCMC</strong>
-              <span>Cách 800m · 3 phút di chuyển</span>
+              <span>Cách 800m, 3 phút di chuyển</span>
             </div>
           </div>
           <div class="amenity-card">
             <div class="am-icon"><i class="ph-fill ph-fork-knife"></i></div>
             <div class="am-text">
               <strong>Chuỗi Ẩm Thực Fine Dining Thảo Điền</strong>
-              <span>Cách 500m · Tuyến phố ẩm thực sang trọng</span>
+              <span>Cách 500m, Tuyến phố ẩm thực sang trọng</span>
             </div>
           </div>
           <div class="amenity-card">
             <div class="am-icon"><i class="ph-fill ph-first-aid"></i></div>
             <div class="am-text">
               <strong>Bệnh Viện Quốc Tế Vinmec Central Park</strong>
-              <span>Cách 2.5km · 7 phút qua cầu Sài Gòn</span>
+              <span>Cách 2.5km, 7 phút qua cầu Sài Gòn</span>
             </div>
           </div>
         </div>
@@ -461,7 +461,7 @@
         <!-- Senior Agent Contact Box -->
         <div class="agent-card-box">
           <div class="ac-header">
-            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=200&q=80" alt="Nguyễn Hoàng Long" class="ac-avatar" />
+            <img loading="lazy" decoding="async" src="../_assets/media/ec5cbe0b880b.jpg" alt="Nguyễn Hoàng Long" class="ac-avatar" />
             <div class="ac-info">
               <h4 class="ac-name">Nguyễn Hoàng Long</h4>
               <span class="ac-role">Giám Đốc Khối BĐS Hạng Sang</span>
@@ -473,7 +473,7 @@
               <i class="ph-fill ph-phone-call"></i> 0938 123 456
             </a>
             <a href="https://zalo.me" target="_blank" class="btn btn-outline btn-sm">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.03 2 11c0 2.87 1.5 5.43 3.86 7.02l-.96 3.58a.75.75 0 00.98.9l3.86-1.55c.73.19 1.49.29 2.26.29 5.52 0 10-4.03 10-9s-4.48-9-10-9zm0 16c-.7 0-1.39-.09-2.05-.26a.75.75 0 00-.54.06l-2.6 1.04.64-2.4a.75.75 0 00-.18-.73C5.55 14.33 4.25 12.28 4.25 11c0-3.72 3.48-6.75 7.75-6.75s7.75 3.03 7.75 6.75-3.48 6.75-7.75 6.75z"/></svg>
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.03 2 11c0 2.87 1.5 5.43 3.86 7.02l-.96 3.58a.75.75 0 00.98.9l3.86-1.55c.73.19 1.49.29 2.26.29 5.52 0 10-4.03 10-9s-4.48-9-10-9zm0 16c-.7 0-1.39-.09-2.05-.26a.75.75 0 00-.54.06l-2.6 1.04.64-2.4a.75.75 0 00-.18-.73C5.55 14.33 4.25 12.28 4.25 11c0-3.72 3.48-6.75 7.75-6.75s7.75 3.03 7.75 6.75-3.48 6.75-7.75 6.75z"/></svg>
               Chat Zalo VIP
             </a>
           </div>
@@ -509,7 +509,7 @@
   <div class="container footer-grid">
     <div class="footer-brand">
       <div class="logo">
-        <svg class="logo-mark" viewBox="0 0 32 32" fill="none">
+        <svg aria-hidden="true" class="logo-mark" viewBox="0 0 32 32" fill="none">
           <rect x="4" y="4" width="24" height="24" rx="7" fill="currentColor"/>
           <path d="M10 22 L16 10 L22 22 M13 17 H19" stroke="#fafbff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>

@@ -32,30 +32,30 @@ export const templates: Template[] = [
     slug: 'ui-ux',
     name: 'UI/UX Enterprise System',
     category: 'Enterprise UI/UX & Design Tokens',
-    tagline: 'Hệ thống UI/UX & Design Tokens chuẩn Enterprise',
+    tagline: 'Field guide thiết kế UI/UX thực chiến',
     description:
-      'Mẫu thiết kế UI/UX theo chuẩn Evondev & Enterprise guidelines: Design tokens (Tailwind v4 / CSS variables), wireframe 3 phương án với dữ liệu thật, ma trận trạng thái (empty, loading, error, success), bảng điều khiển tương tác, hierarchy typography và form controls chống AI-slop.',
+      'Trang hướng dẫn theo thứ tự brief, nội dung, bố cục, token và trạng thái. Bao gồm sơ đồ quyết định tự host, ba phương án phân vùng, ma trận bốn trạng thái và checklist bàn giao năm trục.',
     industry: 'UI/UX SYSTEM',
-    accent: '#3b82f6',
-    accentSecondary: '#60a5fa',
-    bgGradient: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #2563eb 100%)',
+    accent: '#8a5641',
+    accentSecondary: '#d5cfc3',
+    bgGradient: 'linear-gradient(135deg, #ece8df 0%, #d5cfc3 50%, #8a5641 100%)',
     icon: 'layout',
     features: [
-      'Hệ thống Design Tokens (Tailwind v4 & CSS variables)',
-      'Wireframe switch: Chuyển đổi Low-Fi sang High-Fi tương tác',
-      'Ma trận trạng thái chuẩn: Empty, Loading, Error, Active',
-      'Form controls & Table dữ liệu chống AI-slop',
-      'Audit 5 trục: Correctness, Hierarchy, A11y, Contrast, Rhythm'
+      'Sơ đồ quyết định từ brief đến component dạng SVG tự host',
+      'Bảng token ngữ nghĩa với swatch và giá trị đang dùng',
+      'Ba sơ đồ phân vùng: master/detail, bento lệch, bảng mật độ cao',
+      'Ma trận bốn trạng thái với nội dung có ngữ cảnh',
+      'Checklist bàn giao năm trục, không metric tự nhận'
     ],
     highlights: [
-      { label: 'Chuẩn Design', value: 'WCAG 2.1 AA' },
-      { label: 'Token Variables', value: '140+' },
-      { label: 'Khảo sát người dùng', value: '98.6%' }
+      { label: 'Quyết định', value: '5 bước' },
+      { label: 'Bố cục', value: '3 phương án' },
+      { label: 'Trạng thái', value: '4 ca' }
     ],
     tags: ['UI-UX', 'Design System', 'Tokens', 'Wireframe', 'Anti-Slop', 'Enterprise'],
-    fileSize: '275 KB',
-    pages: 6,
-    techStack: ['HTML5', 'CSS Tokens', 'Vanilla JS', 'Phosphor Icons']
+    fileSize: '27 KB',
+    pages: 5,
+    techStack: ['HTML5', 'CSS Tokens', 'Vanilla JS', 'Self-hosted SVG']
   },
   {
     id: 'dashboard-ui',
@@ -83,7 +83,7 @@ export const templates: Template[] = [
       { label: 'Data density', value: 'Tối ưu Cockpit' }
     ],
     tags: ['Dashboard', 'Data Table', 'Kanban', 'KPI Stats', 'Phosphor', 'Analytics'],
-    fileSize: '290 KB',
+    fileSize: '38 KB',
     pages: 7,
     techStack: ['HTML5', 'CSS3 Grid/Flex', 'Vanilla JS', 'Chart.js']
   },
@@ -92,30 +92,30 @@ export const templates: Template[] = [
     slug: 'frontend-taste',
     name: 'Frontend Taste & Craft',
     category: 'High-End Craft & Anti-Slop',
-    tagline: 'Giao diện đỉnh cao, chống AI-slop, phong cách Linear/Apple',
+    tagline: 'Review craft frontend bằng ba dials thực chiến',
     description:
-      'Mẫu giao diện thể hiện đẳng cấp thiết kế Frontend Taste. Tuân thủ Hallmark v2.0.0 (floor/reflex/finish), cân chỉnh 3 dials (Variance: 8, Motion: 6, Density: 4), typography Geist tinh xảo, nhịp điệu khoảng trắng tự nhiên, loại bỏ hoàn toàn các vệt tím AI sáo rỗng.',
+      'Trang review frontend với ba dials điều khiển trực tiếp độ lệch bố cục, thời lượng chuyển động và mật độ hiển thị. Kèm bảng review ba cột, field notes có ngữ cảnh và bảng typography tự host.',
     industry: 'FRONTEND TASTE',
-    accent: '#8b5cf6',
-    accentSecondary: '#c084fc',
-    bgGradient: 'linear-gradient(135deg, #18181b 0%, #3b0764 50%, #6b21a8 100%)',
+    accent: '#d08a5b',
+    accentSecondary: '#343a34',
+    bgGradient: 'linear-gradient(135deg, #101210 0%, #343a34 50%, #d08a5b 100%)',
     icon: 'sparkles',
     features: [
-      'Triết lý 3 Dials: Variance, Motion và Visual Density',
-      'Hallmark v2.0.0: Floor/Reflex/Finish chống AI cliché và generic cards',
-      'Typography phối hợp Geist Display & Geist Mono chuẩn mực',
-      'Micro-interactions và hiệu ứng ánh sáng bề mặt tinh tế',
-      'Bố cục đa dạng: Hero lệch trục, Bento Grid tương tác, Testimonial ticker'
+      'Ba dials đổi CSS variables thật trên vùng preview',
+      'Bảng review ba cột: tiêu chí, dấu hiệu lỗi, cách sửa',
+      'Field notes mô tả lỗi thường gặp và cách sửa cụ thể',
+      'Review sheet SVG tự host, không stock URL hay CDN icon',
+      'Bố cục lệch có chủ đích, motion tiết chế và tôn trọng reduced-motion'
     ],
     highlights: [
-      { label: 'Hallmark Sweep', value: 'Floor 0 FAIL' },
-      { label: 'Lighthouse Perf', value: '100/100' },
-      { label: 'Aesthetic Tier', value: 'Awwwards SOTD' }
+      { label: 'Dials', value: '3' },
+      { label: 'Review gates', value: '4' },
+      { label: 'Field notes', value: '4' }
     ],
-    tags: ['Anti-Slop', 'Linear Style', 'Craft', 'Hallmark v2', 'Micro-Motion', 'Typography'],
-    fileSize: '260 KB',
-    pages: 6,
-    techStack: ['HTML5', 'CSS3 Modern', 'Vanilla JS', 'Spring Motion']
+    tags: ['Anti-Slop', 'Craft', 'Review', 'Dials', 'Typography', 'Self-hosted'],
+    fileSize: '26 KB',
+    pages: 4,
+    techStack: ['HTML5', 'CSS Variables', 'Vanilla JS', 'Self-hosted SVG']
   },
   {
     id: 'cms-landing-enterprise',
@@ -143,7 +143,7 @@ export const templates: Template[] = [
       { label: 'Hoa hồng Affiliate', value: 'Đa tầng F0-F3' }
     ],
     tags: ['SaaS CMS', 'CRM Pipeline', 'Affiliate F0-F3', 'Wallet', 'SePay', 'Landing Builder'],
-    fileSize: '360 KB',
+    fileSize: '28 KB',
     pages: 8,
     techStack: ['Vue 3', 'ASP.NET Core 9', 'Dapper', 'SQLite/Postgres']
   },
@@ -154,7 +154,7 @@ export const templates: Template[] = [
     category: 'AI Image & Asset Pipeline',
     tagline: 'Pipeline tạo ảnh AI chuẩn phong cách & bóc tách asset web',
     description:
-      'Workflow tự động hóa hình ảnh từ Screenshot/URL sang Asset thực tế. Kết hợp Web Cloner, Image Finder (Unsplash, Pexels) và Image Generator (Google Flow, DALL-E 3, Flux). Bao gồm kho Prompt blueprints, Negative prompts và công cụ định dạng tỷ lệ 16:9, 1:1, 9:16.',
+      'Workflow tự động hóa hình ảnh từ Screenshot/URL sang Asset thực tế. Kết hợp Web Cloner, Image Finder (Unsplash, Pexels) và Google Flow CLI: tự sinh prompt từ chủ đề, model mặc định Nano Banana 2.1, tự nhận tỉ lệ từ prompt, tạo project, tải ảnh về public/assets/generated/google-flow/ và ghi manifest.',
     industry: 'IMAGE WORKFLOW',
     accent: '#f43f5e',
     accentSecondary: '#fb7185',
@@ -163,6 +163,7 @@ export const templates: Template[] = [
     features: [
       'Phân tích asset từ Screenshot & URL (bóc tách kích thước, màu, style)',
       'Cây quyết định Asset: Giữ URL -> Tìm Stock -> Tạo ảnh AI Custom',
+      'Google Flow CLI: auto prompt, Nano Banana 2.1, tỉ lệ theo prompt, tải ảnh và ghi manifest',
       'Kho Prompt Blueprints chuẩn studio: Ánh sáng, bối cảnh, tỷ lệ',
       'Bộ lọc Negative Prompt chống dị tật AI, chữ méo, bố cục hỏng',
       'Asset Manifest Generator xuất file tải về cho dự án web'
@@ -173,7 +174,7 @@ export const templates: Template[] = [
       { label: 'Asset Tối ưu', value: 'WebP / AVIF' }
     ],
     tags: ['Image Workflow', 'AI Generator', 'Web Cloner', 'Prompt Blueprint', 'Asset Pipeline'],
-    fileSize: '280 KB',
+    fileSize: '22 KB',
     pages: 6,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Canvas API']
   },
@@ -203,7 +204,7 @@ export const templates: Template[] = [
       { label: 'Avg Deal Size', value: '$8.4K' }
     ],
     tags: ['Dashboard', 'Pipeline', 'Analytics', 'Automation'],
-    fileSize: '248 KB',
+    fileSize: '70 KB',
     pages: 6,
     pagesList: [
       { id: 'index', name: 'Trang Chủ & CRM Platform', file: 'index.html', desc: 'Pipeline trực quan, quản lý lead & tự động hóa' },
@@ -237,7 +238,7 @@ export const templates: Template[] = [
       { label: 'Page Load', value: '0.8s' }
     ],
     tags: ['E-commerce', 'High-converting', 'Mobile-first'],
-    fileSize: '215 KB',
+    fileSize: '80 KB',
     pages: 5,
     pagesList: [
       { id: 'index', name: 'Trang Bán Hàng & Flash Sale', file: 'index.html', desc: 'Trang chi tiết tai nghe flagship AURA Pro, countdown timer & reviews' },
@@ -271,7 +272,7 @@ export const templates: Template[] = [
       { label: 'Thời gian giao', value: '24h' }
     ],
     tags: ['Tử Vi', 'Phong Thủy', 'Tâm Linh'],
-    fileSize: '289 KB',
+    fileSize: '132 KB',
     pages: 7,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'SVG Animations']
   },
@@ -301,7 +302,7 @@ export const templates: Template[] = [
       { label: 'Languages', value: '3 (VI/EN)' }
     ],
     tags: ['Thần Số Học', 'Pythagoras', 'Self-discovery'],
-    fileSize: '267 KB',
+    fileSize: '89 KB',
     pages: 6,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Canvas API']
   },
@@ -331,7 +332,7 @@ export const templates: Template[] = [
       { label: 'Bounce Rate', value: '12%' }
     ],
     tags: ['Blog', 'Magazine', 'SEO-ready', 'Accessibility'],
-    fileSize: '192 KB',
+    fileSize: '40 KB',
     pages: 8,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS']
   },
@@ -361,7 +362,7 @@ export const templates: Template[] = [
       { label: 'Load Time', value: '< 1s' }
     ],
     tags: ['Portfolio', 'Designer', 'Creative', 'Minimal'],
-    fileSize: '234 KB',
+    fileSize: '43 KB',
     pages: 5,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'GSAP']
   },
@@ -391,7 +392,7 @@ export const templates: Template[] = [
       { label: 'Nhà hàng', value: '2,400+' }
     ],
     tags: ['Food', 'Delivery', 'Mobile-first', 'Realtime'],
-    fileSize: '256 KB',
+    fileSize: '77 KB',
     pages: 6,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Mapbox GL']
   },
@@ -421,7 +422,7 @@ export const templates: Template[] = [
       { label: 'Đậu ĐH', value: '92%' }
     ],
     tags: ['Education', '1-on-1', 'AI-matching', 'Parent-dashboard'],
-    fileSize: '273 KB',
+    fileSize: '56 KB',
     pages: 7,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Chart.js']
   },
@@ -451,7 +452,7 @@ export const templates: Template[] = [
       { label: 'Đánh giá', value: '4.9★' }
     ],
     tags: ['Spa', 'Booking', 'Membership', 'Wellness'],
-    fileSize: '241 KB',
+    fileSize: '53 KB',
     pages: 5,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS']
   },
@@ -481,7 +482,7 @@ export const templates: Template[] = [
       { label: 'Coach', value: '120' }
     ],
     tags: ['Gym', 'Yoga', 'Booking', 'Tracking'],
-    fileSize: '228 KB',
+    fileSize: '56 KB',
     pages: 6,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'GSAP']
   },
@@ -511,7 +512,7 @@ export const templates: Template[] = [
       { label: 'Verified', value: '100%' }
     ],
     tags: ['Real Estate', 'Map', 'AI-match', 'Virtual Tour'],
-    fileSize: '298 KB',
+    fileSize: '128 KB',
     pages: 7,
     pagesList: [
       { id: 'index', name: 'Trang Chủ & Danh Mục Dự Án', file: 'index.html', desc: '124K tin đăng, bộ lọc thông minh & bản đồ giá' },
@@ -546,7 +547,7 @@ export const templates: Template[] = [
       { label: 'Quay lại', value: '64%' }
     ],
     tags: ['Travel', 'Tour', 'Booking', 'Southeast Asia'],
-    fileSize: '262 KB',
+    fileSize: '141 KB',
     pages: 6,
     pagesList: [
       { id: 'index', name: 'Trang Chủ & Điểm Đến', file: 'index.html', desc: 'Khu nghỉ dưỡng sang trọng, tour đảo & review thực tế' },
@@ -581,7 +582,7 @@ export const templates: Template[] = [
       { label: 'Giao hang', value: '2h' }
     ],
     tags: ['Nong trai', 'Organic', 'Farm-to-table', 'Giao hang'],
-    fileSize: '245 KB',
+    fileSize: '45 KB',
     pages: 6,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS']
   },
@@ -611,7 +612,7 @@ export const templates: Template[] = [
       { label: 'Nam thanh lap', value: '1985' }
     ],
     tags: ['Vuon trai cay', 'Mien Dong', 'Du lich', 'Trai nghiem'],
-    fileSize: '238 KB',
+    fileSize: '46 KB',
     pages: 5,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS']
   },
@@ -641,7 +642,7 @@ export const templates: Template[] = [
       { label: 'Bao hanh', value: '2 nam' }
     ],
     tags: ['Thiet bi nong nghiep', 'Drone', 'IoT', 'Co khi'],
-    fileSize: '256 KB',
+    fileSize: '55 KB',
     pages: 6,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'IoT']
   },
@@ -671,7 +672,7 @@ export const templates: Template[] = [
       { label: 'API calls', value: '1M+/thang' }
     ],
     tags: ['AI', 'Chatbot', 'Machine Learning', 'SaaS'],
-    fileSize: '278 KB',
+    fileSize: '44 KB',
     pages: 7,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'AI APIs']
   },
@@ -701,7 +702,7 @@ export const templates: Template[] = [
       { label: 'Trả góp', value: '0%' }
     ],
     tags: ['Laptop', 'Gaming PC', 'Linh kiện', 'Công nghệ'],
-    fileSize: '264 KB',
+    fileSize: '52 KB',
     pages: 6,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS']
   },
@@ -731,7 +732,7 @@ export const templates: Template[] = [
       { label: 'Năm kinh nghiệm', value: '15' }
     ],
     tags: ['Mầm non', 'STEAM', 'Giáo dục sớm', 'Trẻ em'],
-    fileSize: '229 KB',
+    fileSize: '45 KB',
     pages: 5,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS']
   },
@@ -761,7 +762,7 @@ export const templates: Template[] = [
       { label: 'Linh mục', value: '2' }
     ],
     tags: ['Công giáo', 'Giáo xứ', 'Thánh lễ', 'Tôn giáo'],
-    fileSize: '198 KB',
+    fileSize: '97 KB',
     pages: 4,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS']
   },
@@ -791,7 +792,7 @@ export const templates: Template[] = [
       { label: 'Bệnh viện liên kết', value: '680+' }
     ],
     tags: ['Bảo Hiểm', 'Sức Khỏe', 'Nhân Thọ', 'Ô Tô', 'E-Claim', 'Tài Chính'],
-    fileSize: '312 KB',
+    fileSize: '117 KB',
     pages: 6,
     techStack: ['HTML5', 'CSS3', 'Vanilla JS', 'Phosphor Icons']
   },
@@ -821,7 +822,7 @@ export const templates: Template[] = [
       { label: 'Showroom toàn quốc', value: '5' }
     ],
     tags: ['Ô tô', 'Showroom', 'Xe lướt', 'Xe điện', 'Trả góp', 'Lái thử'],
-    fileSize: '340 KB',
+    fileSize: '131 KB',
     pages: 6,
     pagesList: [
       { id: 'index', name: 'Trang Chủ & Kho Xe Sẵn Có', file: 'index.html', desc: 'Siêu thị ô tô đa thương hiệu, bộ lọc thông minh & chính sách bảo hành' },
@@ -856,7 +857,7 @@ export const templates: Template[] = [
       { label: 'Thực khách đánh giá', value: '4.9 ★' }
     ],
     tags: ['Nhà Hàng', 'Cơm Niêu', 'Ẩm Thực Việt', 'Michelin Selected', 'Voucher', 'Đặt Bàn'],
-    fileSize: '325 KB',
+    fileSize: '120 KB',
     pages: 5,
     pagesList: [
       { id: 'index', name: 'Trang Chủ & Không Gian', file: 'index.html', desc: 'Câu chuyện ẩm thực di sản Michelin Selected, văn hóa nhà cổ & ưu đãi' },

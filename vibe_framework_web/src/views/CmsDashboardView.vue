@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { templates as defaultTemplates, type Template } from '../data/templates'
-import TemplatePreviewSvg from '../components/TemplatePreviewSvg.vue'
+import TemplateThumbnail from '../components/TemplateThumbnail.vue'
 import { useCmsAuth } from '../composables/useCmsAuth'
 
 const router = useRouter()
@@ -855,7 +855,7 @@ function viewFullPreview(id: string) {
           >
             <!-- Card Header Preview -->
             <div class="cms-card-preview">
-              <TemplatePreviewSvg :slug="t.slug" />
+              <TemplateThumbnail :slug="t.slug" />
               <div class="preview-hover-overlay">
                 <button class="overlay-action" @click="openQuickPreview(t)" title="Xem demo nhanh trong modal">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>

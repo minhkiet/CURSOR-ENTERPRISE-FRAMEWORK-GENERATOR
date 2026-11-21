@@ -20,19 +20,19 @@ Tạo ảnh theo yêu cầu cho website clone và web design.
 
 ## Các nền tảng AI Image & Video
 
-### 1. Google Flow (labs.google/fx/tools/flow)
+### 1. Google Flow (flow.google.com)
 
 **Flow** by Google AI - miễn phí, tạo ảnh và video từ prompt. Tích hợp tốt với browser.
 
 ```bash
-# Flow tại labs.google/fx/tools/flow
+# Flow tại https://flow.google.com/
 # - Miễn phí sử dụng
 # - Tạo ảnh từ text prompt
 # - Tạo video ngắn từ ảnh hoặc prompt
 # - Style: photorealistic, illustrative, cinematic
 
 # Cách sử dụng:
-1. Truy cập: https://labs.google/fx/tools/flow
+1. Truy cập: https://flow.google.com/
 2. Nhập prompt mô tả ảnh/video
 3. Chọn style (Image, Video, or Flow Mode)
 4. Download kết quả
@@ -56,6 +56,15 @@ npx playwright screenshot https://flow.google.com/generate \
   --prompt "modern workspace with dark theme" \
   --download-path ./assets/flow-output.png
 ```
+
+**Framework CLI (khuyến dùng):**
+```bash
+python tools/google_flow_cli.py --login
+python tools/google_flow_cli.py --prompt "modern workspace with dark theme" --count 2
+```
+
+Tự tạo project, tải ảnh về `public/assets/generated/google-flow/<project>/`,
+ghi `asset-manifest.json` và cập nhật `public/assets/generated/manifest.json`.
 
 **Prompt cho Flow:**
 ```bash

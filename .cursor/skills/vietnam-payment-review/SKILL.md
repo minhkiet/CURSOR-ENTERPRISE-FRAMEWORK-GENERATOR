@@ -1,6 +1,6 @@
 ---
 name: vietnam-payment-review
-description: "Review skill cho Vietnamese online payment integrations (MoMo, SePay, PayOS, ZaloPay, VNPay, VietQR). Đánh giá API integration, webhook handling, security, compliance, và best practices cho thanh toán nội địa Việt Nam."
+description: Review Vietnamese payment integrations including MoMo, SePay, PayOS, ZaloPay, VNPay, and VietQR.
 ---
 
 # Alias: vietnam-payment-review

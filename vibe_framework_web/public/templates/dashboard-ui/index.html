@@ -3,16 +3,17 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Dashboard UI Pro — SaaS Cockpit & Analytics Platform</title>
+<title>Dashboard UI Pro, SaaS Cockpit & Analytics Platform</title>
 <meta name="description" content="Dashboard quản trị chuyên nghiệp chuẩn SaaS với KPI cards, bộ lọc đa điều kiện, bảng dữ liệu phân trang và đồng bộ Phosphor Icons." />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
-<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+  <link rel="stylesheet" href="../_assets/fonts.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/regular/style.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/fill/style.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/duotone/style.css" />
+
 <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="../_assets/ux-polish.css" />
 </head>
-<body class="dashboard-body">
+<body data-ux="dashboard-ui" class="dashboard-body">
 
 <div class="dash-layout">
   <!-- ─── SIDEBAR BACKDROP ─── -->
@@ -65,7 +66,7 @@
 
     <div class="sidebar-user">
       <div class="user-avatar">
-        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80" alt="Avatar" />
+        <img loading="lazy" decoding="async" src="../_assets/media/f291b48fbdac.jpg" alt="Avatar" />
         <span class="online-dot"></span>
       </div>
       <div class="user-details">
@@ -111,7 +112,7 @@
 
     <div class="dash-scrollable">
       <!-- ─── KPI CARDS ─── -->
-      <section class="kpi-grid">
+      <section class="kpi-grid" id="dashboard">
         <div class="kpi-card">
           <div class="kpi-top">
             <span class="kpi-title">TỔNG DOANH THU THỰC</span>
@@ -166,7 +167,7 @@
       </section>
 
       <!-- ─── CHARTS & WORKFLOW ─── -->
-      <section class="visual-grid">
+      <section class="visual-grid" id="analytics">
         <div class="chart-card">
           <div class="card-head">
             <div>
@@ -180,7 +181,7 @@
           </div>
           <!-- SVG Area Chart -->
           <div class="chart-stage">
-            <svg viewBox="0 0 700 240" class="line-svg">
+            <svg aria-hidden="true" viewBox="0 0 700 240" class="line-svg">
               <defs>
                 <linearGradient id="area-grad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.35"/>
@@ -384,6 +385,123 @@
             <button class="page-btn">2</button>
             <button class="page-btn">3</button>
             <button class="page-btn"><i class="ph ph-caret-right"></i></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── CUSTOMER HEALTH ─── -->
+      <section class="table-section" id="customers">
+        <div class="table-header-bar">
+          <div>
+            <h3>Khách hàng trọng điểm & sức khỏe hợp đồng</h3>
+            <p>Xếp hạng theo giá trị hợp đồng, hạn gia hạn và mức sử dụng trong 30 ngày gần nhất</p>
+          </div>
+          <div class="table-actions">
+            <button class="btn btn-secondary btn-sm"><i class="ph ph-user-plus"></i> Thêm khách hàng</button>
+          </div>
+        </div>
+
+        <div class="dash-table-wrap">
+          <table class="dash-table">
+            <thead>
+              <tr>
+                <th>KHÁCH HÀNG</th>
+                <th>GÓI ĐANG DÙNG</th>
+                <th>GIÁ TRỊ 12 THÁNG</th>
+                <th>GIA HẠN</th>
+                <th>TRẠNG THÁI</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="table-client">
+                    <strong>Tập Đoàn BĐS An Thịnh</strong>
+                    <span>anthinh@corp.vn</span>
+                  </div>
+                </td>
+                <td>Enterprise SaaS Pro</td>
+                <td class="table-val">$142,800.00</td>
+                <td>18/12/2026</td>
+                <td><span class="status-tag status-paid">ĐANG HOẠT ĐỘNG</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="table-client">
+                    <strong>F&B Sài Gòn Chuỗi 24 Quán</strong>
+                    <span>ketoan@fbsaigon.com</span>
+                  </div>
+                </td>
+                <td>CMS Landing Fullstack</td>
+                <td class="table-val">$84,500.00</td>
+                <td>02/02/2027</td>
+                <td><span class="status-tag status-pending">CHỜ GIA HẠN</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="table-client">
+                    <strong>Logistics Vận Tải Đông Dương</strong>
+                    <span>ops@dongduonglog.com</span>
+                  </div>
+                </td>
+                <td>Cockpit Fleet Tracking</td>
+                <td class="table-val">$228,000.00</td>
+                <td>30/11/2026</td>
+                <td><span class="status-tag status-paid">ĐANG HOẠT ĐỘNG</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ─── SYSTEM SETTINGS ─── -->
+      <section class="table-section" id="settings">
+        <div class="table-header-bar">
+          <div>
+            <h3>Cài đặt hệ thống</h3>
+            <p>Các cấu hình vận hành đang áp dụng cho toàn bộ workspace</p>
+          </div>
+          <div class="table-actions">
+            <button class="btn btn-primary btn-sm"><i class="ph ph-floppy-disk"></i> Lưu thay đổi</button>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-title">THANH TOÁN</span>
+              <span class="kpi-icon icon-emerald"><i class="ph ph-shield-check"></i></span>
+            </div>
+            <h3>SePay webhook</h3>
+            <p>Xác thực HMAC và chống lặp sự kiện theo mã giao dịch.</p>
+            <span class="badge-pill">Đang bật</span>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-title">BẢO MẬT</span>
+              <span class="kpi-icon icon-blue"><i class="ph ph-key"></i></span>
+            </div>
+            <h3>Refresh token</h3>
+            <p>Xoay vòng khóa mỗi 24 giờ, bắt buộc đăng nhập lại sau 7 ngày.</p>
+            <span class="badge-pill">Bắt buộc</span>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-title">DỮ LIỆU</span>
+              <span class="kpi-icon icon-amber"><i class="ph ph-clock-counter-clockwise"></i></span>
+            </div>
+            <h3>Sao lưu tự động</h3>
+            <p>Ảnh chụp PostgreSQL lúc 02:00 mỗi ngày, lưu giữ 14 bản.</p>
+            <span class="badge-pill">02:00 UTC+7</span>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-title">THÔNG BÁO</span>
+              <span class="kpi-icon icon-sky"><i class="ph ph-bell-ringing"></i></span>
+            </div>
+            <h3>Kênh cảnh báo</h3>
+            <p>Gửi sự kiện thanh toán thất bại tới Slack và email vận hành.</p>
+            <span class="badge-pill">Slack + Email</span>
           </div>
         </div>
       </section>

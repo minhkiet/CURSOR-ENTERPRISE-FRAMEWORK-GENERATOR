@@ -94,6 +94,9 @@ cursor-setup-gui-publish/
 test-cases/*.pdf
 test-cases/batcuclinhso.pdf
 
+# --- Local automation profiles / temp ---
+.cache/
+
 # --- Cursor IDE settings (local-only) ---
 .DS_Store
 Thumbs.db

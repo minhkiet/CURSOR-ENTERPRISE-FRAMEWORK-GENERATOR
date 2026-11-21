@@ -3,23 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Thực Đơn Di Sản 3 Miền — Vị Xưa Quán (Michelin Selected)</title>
+  <title>Thực Đơn Di Sản 3 Miền, Vị Xưa Quán (Michelin Selected)</title>
   <meta name="description" content="Thực đơn di sản 120+ món ăn truyền thống 3 miền Bắc - Trung - Nam: Cơm niêu cháy giòn 2 mặt, cá bống kho tộ, bún chả than hoa, canh cua đồng. Michelin Selected." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" />
+  <link rel="stylesheet" href="../_assets/fonts.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/regular/style.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/fill/style.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/duotone/style.css" />
+
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="../_assets/ux-polish.css" />
 </head>
-<body class="menu-page-body">
+<body data-ux="viet-restaurant" class="menu-page-body">
 
   <!-- ─── TOP NOTICE BAR ─── -->
   <aside class="top-bar">
     <div class="container top-bar-inner">
       <div class="top-left">
-        <span class="badge-status"><span class="pulse-dot"></span> Bếp Đang Phục Vụ (10:00 – 22:30)</span>
+        <span class="badge-status"><span class="pulse-dot"></span> Bếp Đang Phục Vụ (10:00 - 22:30)</span>
         <span class="sep"></span>
         <a href="tel:19008899" class="hotline-link">
           <i class="ph-fill ph-phone-call"></i> Hotline Đặt Bàn: <strong>1900 8899</strong>
@@ -38,7 +38,7 @@
     <div class="container nav-inner">
       <a href="index.html" class="brand-logo" aria-label="Vị Xưa Quán">
         <div class="brand-pot-icon">
-          <svg viewBox="0 0 40 40" fill="none">
+          <svg aria-hidden="true" viewBox="0 0 40 40" fill="none">
             <circle cx="20" cy="20" r="18" fill="#451a03" stroke="#b45309" stroke-width="1.5"/>
             <path d="M12 22C12 26 15.5 29 20 29C24.5 29 28 26 28 22H12Z" fill="#d97706"/>
             <ellipse cx="20" cy="20" rx="9" ry="2.5" fill="#fef3c7"/>
@@ -74,7 +74,7 @@
     <div class="container text-center">
       <div class="hero-award-badge" style="margin: 0 auto 16px;">
         <i class="ph-fill ph-trophy"></i>
-        <span>Michelin Selected 2024 – 2026 • 120+ Món Ăn Di Sản</span>
+        <span>Michelin Selected 2024 - 2026 • 120+ Món Ăn Di Sản</span>
       </div>
       <h1 class="menu-hero-title">
         Thực Đơn Di Sản 3 Miền <br />
@@ -119,7 +119,7 @@
         <!-- Item 1: Mâm Cơm Sum Vầy (Signature) -->
         <article class="dish-card" data-category="mam-com">
           <div class="dish-thumb-wrap">
-            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80" alt="Mâm Cơm Sum Vầy" loading="eager" />
+            <img src="../_assets/media/21e38ac215ad.jpg" alt="Mâm Cơm Sum Vầy" loading="eager" />
             <span class="dish-badge gold"><i class="ph-fill ph-crown"></i> Signature Michelin</span>
           </div>
           <div class="dish-body">
@@ -131,7 +131,7 @@
               Gồm 2 thố cơm niêu cháy giòn 2 mặt, cá bống sông Trà kho tộ, thịt ba chỉ cháy cạnh ram sả, canh cua đồng mồng tơi cà pháo và đĩa rau luộc chấm kho quẹt tôm thịt.
             </p>
             <div class="dish-meta">
-              <span class="dish-tag">Khẩu phần: 4–6 khách</span>
+              <span class="dish-tag">Khẩu phần: 4 - 6 khách</span>
               <span class="dish-tag green">100% Nguyên liệu đồng quê</span>
             </div>
             <button class="btn btn-add-dish" onclick="addToTray('Đại Mâm Cơm Di Sản Sum Vầy', 890000)">
@@ -143,7 +143,7 @@
         <!-- Item 2: Cơm Niêu Cháy Giòn 2 Mặt -->
         <article class="dish-card" data-category="com-nieu">
           <div class="dish-thumb-wrap">
-            <img src="https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=600&q=80" alt="Cơm Niêu Cháy Giòn" loading="eager" />
+            <img src="../_assets/media/4ef2e8b64ed9.jpg" alt="Cơm Niêu Cháy Giòn" loading="eager" />
             <span class="dish-badge"><i class="ph-fill ph-fire"></i> Món Tinh Hoa</span>
           </div>
           <div class="dish-body">
@@ -167,7 +167,7 @@
         <!-- Item 3: Cá Bống Sông Trà Kho Tộ -->
         <article class="dish-card" data-category="com-nieu">
           <div class="dish-thumb-wrap">
-            <img src="https://images.unsplash.com/photo-1559847844-5315695dadae?auto=format&fit=crop&w=600&q=80" alt="Cá Bống Kho Tộ" loading="lazy" />
+            <img decoding="async" src="../_assets/media/5fd5ba332be4.jpg" alt="Cá Bống Kho Tộ" loading="lazy" />
             <span class="dish-badge orange">Đặc sản Quảng Ngãi</span>
           </div>
           <div class="dish-body">
@@ -191,7 +191,7 @@
         <!-- Item 4: Canh Cua Đồng Rau Đay Cà Pháo -->
         <article class="dish-card" data-category="canh-rau">
           <div class="dish-thumb-wrap">
-            <img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80" alt="Canh Cua Đồng" loading="lazy" />
+            <img decoding="async" src="../_assets/media/98edd3f28cc2.jpg" alt="Canh Cua Đồng" loading="lazy" />
             <span class="dish-badge green">Vị Bắc Cổ Truyền</span>
           </div>
           <div class="dish-body">
@@ -215,7 +215,7 @@
         <!-- Item 5: Gỏi Củ Hũ Dừa Tôm Sông -->
         <article class="dish-card" data-category="khai-vi">
           <div class="dish-thumb-wrap">
-            <img src="https://images.unsplash.com/photo-1546069901-d70a30b7c7e6?auto=format&fit=crop&w=600&q=80" alt="Gỏi Củ Hũ Dừa" loading="lazy" />
+            <img decoding="async" src="../_assets/media/69cbd19e30db.svg" alt="Gỏi Củ Hũ Dừa" loading="lazy" />
             <span class="dish-badge">Đặc sản Bến Tre</span>
           </div>
           <div class="dish-body">
@@ -239,7 +239,7 @@
         <!-- Item 6: Cá Lăng Nướng Muối Ớt Rừng -->
         <article class="dish-card" data-category="hai-san">
           <div class="dish-thumb-wrap">
-            <img src="https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80" alt="Cá Lăng Nướng" loading="lazy" />
+            <img decoding="async" src="../_assets/media/cf537aaaacfa.jpg" alt="Cá Lăng Nướng" loading="lazy" />
             <span class="dish-badge gold">Đặc Sản Sông Đà</span>
           </div>
           <div class="dish-body">
@@ -263,7 +263,7 @@
         <!-- Item 7: Bánh Xèo Miền Tây Bông Điên Điển -->
         <article class="dish-card" data-category="khai-vi">
           <div class="dish-thumb-wrap">
-            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80" alt="Bánh Xèo Miền Tây" loading="lazy" />
+            <img decoding="async" src="../_assets/media/3353a5912dd8.jpg" alt="Bánh Xèo Miền Tây" loading="lazy" />
             <span class="dish-badge orange">Giòn rụm chuẩn vị</span>
           </div>
           <div class="dish-body">
@@ -287,7 +287,7 @@
         <!-- Item 8: Chè Hạt Sen Long Nhãn -->
         <article class="dish-card" data-category="trang-mieng">
           <div class="dish-thumb-wrap">
-            <img src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=600&q=80" alt="Chè Hạt Sen Long Nhãn" loading="lazy" />
+            <img decoding="async" src="../_assets/media/d659058a36aa.jpg" alt="Chè Hạt Sen Long Nhãn" loading="lazy" />
             <span class="dish-badge green">Tráng Miệng Cung Đình</span>
           </div>
           <div class="dish-body">
@@ -345,7 +345,7 @@
           <span class="brand-title" style="font-size:22px; color:var(--text-main);">Vị Xưa <span class="brand-accent">Quán</span></span>
         </div>
         <p style="color:var(--text-muted); font-size:14px; line-height:1.6;">
-          Gìn giữ mâm cơm di sản 3 miền đạt giải thưởng Michelin Selected 2024–2026.
+          Gìn giữ mâm cơm di sản 3 miền đạt giải thưởng Michelin Selected 2024 - 2026.
         </p>
       </div>
       <div class="footer-col">

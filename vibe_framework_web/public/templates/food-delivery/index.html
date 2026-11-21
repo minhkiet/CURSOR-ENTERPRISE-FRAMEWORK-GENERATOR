@@ -3,23 +3,22 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>FoodNhanh — Đặt món ngon, giao tận nơi trong 30 phút</title>
+<title>FoodNhanh, Đặt món ngon, giao tận nơi trong 30 phút</title>
 <meta name="description" content="FoodNhanh giao đồ ăn nóng hổi trong 30 phút. Hơn 500 nhà hàng, 50K+ khách hàng, 4.9★ đánh giá. Đặt món ngay qua app." />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
-<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
-<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" />
+  <link rel="stylesheet" href="../_assets/fonts.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/regular/style.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/fill/style.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/duotone/style.css" />
 <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="../_assets/ux-polish.css" />
 </head>
-<body>
+<body data-ux="food-delivery">
 
 <!-- ─── NAV ─── -->
 <nav class="nav" id="nav">
   <div class="container nav-inner">
     <a href="#" class="logo">
-      <svg class="logo-mark" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg aria-hidden="true" class="logo-mark" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="16" cy="16" r="12" fill="currentColor"/>
         <path d="M11 13 Q16 9 21 13 Q26 17 21 21 Q16 25 11 21 Q6 17 11 13Z" fill="#7c2d12"/>
         <circle cx="16" cy="16" r="3" fill="#fff"/>
@@ -51,17 +50,14 @@
   <div class="hero-glow hero-glow-2"></div>
   <div class="container hero-grid">
     <div class="hero-text">
-      <div class="eyebrow">
-        <span class="eyebrow-dot"></span>
-        v3.2 · 500+ nhà hàng đang hoạt động
-      </div>
+
       <h1 class="hero-title">
         Đặt món ngon,<br/>
         giao tận nơi<br/>
         <span class="hl">trong 30 phút.</span>
       </h1>
       <p class="hero-desc">
-        Từ lẩu Thái thanh,mỳ Quảng đậm đà đến pizza giòn rụm — giao tận cửa
+        Từ lẩu Thái thanh,mỳ Quảng đậm đà đến pizza giòn rụm, giao tận cửa
         trong 30 phút. Hơn 500 nhà hàng, 50K+ khách hàng, 4.9★ đánh giá.
       </p>
       <div class="hero-cta">
@@ -142,7 +138,7 @@
           </div>
 
           <!-- Restaurant list -->
-          <div class="am-section-label">Gần bạn</div>
+
           <div class="am-restaurants">
             <div class="ar-card ar-featured">
               <div class="arc-img" style="background:linear-gradient(135deg,#dc2626,#ef4444)">
@@ -150,10 +146,10 @@
               </div>
               <div class="arc-info">
                 <div class="arc-name">Lẩu Thái 69</div>
-                <div class="arc-rating"><i class="ph-fill ph-star"></i> 4.8 · 2.1K đánh giá</div>
+                <div class="arc-rating"><i class="ph-fill ph-star"></i> 4.8, 2.1K đánh giá</div>
                 <div class="arc-delivery">
                   <span class="badge-green">Miễn phí giao</span>
-                  <span class="arc-time">15–25 ph</span>
+                  <span class="arc-time">15 - 25 ph</span>
                 </div>
               </div>
             </div>
@@ -163,17 +159,17 @@
               </div>
               <div class="arc-info">
                 <div class="arc-name">Pizza Bến Thành</div>
-                <div class="arc-rating"><i class="ph-fill ph-star"></i> 4.7 · 3.4K đánh giá</div>
+                <div class="arc-rating"><i class="ph-fill ph-star"></i> 4.7, 3.4K đánh giá</div>
                 <div class="arc-delivery">
                   <span class="badge-orange">15K giao</span>
-                  <span class="arc-time">20–30 ph</span>
+                  <span class="arc-time">20 - 30 ph</span>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Popular dishes strip -->
-          <div class="am-section-label">Món phổ biến</div>
+
           <div class="am-dishes">
             <div class="ad-item">
               <div class="adi-thumb" style="background:#fef3c7">
@@ -275,7 +271,7 @@
             </div>
             <div class="at-eta">
               <i class="ph ph-clock"></i>
-              <span>Còn <strong>8 phút</strong> — dự kiến 18:42</span>
+              <span>Còn <strong>8 phút</strong>, dự kiến 18:42</span>
             </div>
           </div>
         </div>
@@ -286,14 +282,14 @@
         <div class="fa-icon"><i class="ph-fill ph-lightning"></i></div>
         <div>
           <div class="fa-title">Đơn đã xác nhận!</div>
-          <div class="fa-meta">Sau 30 giây · Lẩu Thái 69</div>
+          <div class="fa-meta">Sau 30 giây, Lẩu Thái 69</div>
         </div>
       </div>
       <div class="float float-b">
         <div class="fa-icon" style="background:#dcfce7;color:#16a34a"><i class="ph-fill ph-seal-check"></i></div>
         <div>
           <div class="fa-title">Giao thành công</div>
-          <div class="fa-meta">96% đúng giờ · tuần này</div>
+          <div class="fa-meta">96% đúng giờ, tuần này</div>
         </div>
       </div>
     </div>
@@ -333,9 +329,9 @@
 <section class="features" id="menu">
   <div class="container">
     <div class="section-head">
-      <div class="eyebrow">Tính năng</div>
+
       <h2 class="section-title">5 lý do chọn FoodNhanh.</h2>
-      <p class="section-desc">Không chỉ giao đồ ăn. FoodNhanh xây hệ sinh thái giúp đặt món — theo dõi — thanh toán trong một app.</p>
+      <p class="section-desc">Không chỉ giao đồ ăn. FoodNhanh xây hệ sinh thái giúp đặt món, theo dõi, thanh toán trong một app.</p>
     </div>
 
     <div class="bento">
@@ -390,7 +386,7 @@
       <!-- Easy payment -->
       <article class="bento-card">
         <div class="bc-tag"><i class="ph ph-wallet"></i> Thanh toán</div>
-        <h3>MoMo, ZaloPay, thẻ — không tiền mặt.</h3>
+        <h3>MoMo, ZaloPay, thẻ, không tiền mặt.</h3>
         <p>Tích hợp thanh toán điện tử phổ biến nhất Việt Nam. Quét QR, lưu thẻ, split bill tự động.</p>
         <div class="bc-payment-icons">
           <div class="bpi-chip">QR</div>
@@ -404,7 +400,7 @@
       <article class="bento-card">
         <div class="bc-tag"><i class="ph ph-map-trifold"></i> Theo dõi</div>
         <h3>Theo dõi đơn hàng realtime.</h3>
-        <p>Từ lúc đặt đến lúc nhận — mỗi bước đều hiển thị. Cảnh báo khi shipper sắp đến.</p>
+        <p>Từ lúc đặt đến lúc nhận, mỗi bước đều hiển thị. Cảnh báo khi shipper sắp đến.</p>
         <div class="bc-track-preview">
           <div class="btp-dot btp-done"><i class="ph-fill ph-check-circle"></i></div>
           <div class="btp-line btp-done"></div>
@@ -437,7 +433,7 @@
 <section class="how-it-works" id="how-it-works">
   <div class="container">
     <div class="section-head">
-      <div class="eyebrow">Cách hoạt động</div>
+
       <h2 class="section-title">4 bước từ đói bụng đến nóng hổi.</h2>
     </div>
     <div class="flow">
@@ -476,7 +472,7 @@
 <section class="pricing" id="pricing">
   <div class="container">
     <div class="section-head">
-      <div class="eyebrow">Bảng giá</div>
+
       <h2 class="section-title">Giao hàng cho mọi nhu cầu.</h2>
       <p class="section-desc">Không phí đăng ký. Không cam kết. Chỉ trả tiền khi đặt thật.</p>
     </div>
@@ -536,7 +532,7 @@
 <section class="reviews" id="reviews">
   <div class="container">
     <div class="section-head">
-      <div class="eyebrow">Khách hàng</div>
+
       <h2 class="section-title">Hơn 50.000 người đặt món mỗi tháng trên FoodNhanh.</h2>
     </div>
 
@@ -551,13 +547,13 @@
           <i class="ph-fill ph-star"></i>
         </div>
         <div class="ti-quote">
-          "FoodNhanh giúp tôi tiết kiệm 2 tiếng mỗi tuần. Thay vì ra ngoài, tôi đặt lẩu, pizza, salad — tất cả qua app, giao trong 25 phút. Món ăn luôn nóng và đúng như hình."
+          "FoodNhanh giúp tôi tiết kiệm 2 tiếng mỗi tuần. Thay vì ra ngoài, tôi đặt lẩu, pizza, salad, tất cả qua app, giao trong 25 phút. Món ăn luôn nóng và đúng như hình."
         </div>
         <div class="ti-author">
-          <img src="https://i.pravatar.cc/100?img=11" alt="Trần Minh Đức" loading="lazy" />
+          <img decoding="async" src="../_assets/media/0333230b3746.jpg" alt="Trần Minh Đức" loading="lazy" />
           <div>
             <div class="ti-name">Trần Minh Đức</div>
-            <div class="ti-role">Product Manager · Gojek Vietnam</div>
+            <div class="ti-role">Product Manager, Gojek Vietnam</div>
           </div>
         </div>
         <div class="ti-stat">
@@ -575,13 +571,13 @@
           <i class="ph-fill ph-star"></i>
         </div>
         <div class="ti-quote">
-          "Tôi đặt cơm văn phòng mỗi ngày qua FoodNhanh. Gói Pro free ship 5 đơn — rất đáng. Shipper Thảo rất thân thiện, luôn nhắn trước khi đến."
+          "Tôi đặt cơm văn phòng mỗi ngày qua FoodNhanh. Gói Pro free ship 5 đơn, rất đáng. Shipper Thảo rất thân thiện, luôn nhắn trước khi đến."
         </div>
         <div class="ti-author">
-          <img src="https://i.pravatar.cc/100?img=12" alt="Nguyễn Thu Hà" loading="lazy" />
+          <img decoding="async" src="../_assets/media/697e736f10b2.jpg" alt="Nguyễn Thu Hà" loading="lazy" />
           <div>
             <div class="ti-name">Nguyễn Thu Hà</div>
-            <div class="ti-role">Nhân viên văn phòng · Q3, HCM</div>
+            <div class="ti-role">Nhân viên văn phòng, Q3, HCM</div>
           </div>
         </div>
       </article>
@@ -598,10 +594,10 @@
           "Shipper của FoodNhanh chuyên nghiệp. Gọi điện trước khi đến, gửi ảnh khi đặt đến cửa, và luôn lễ phép. Đây là app giao đồ ăn tốt nhất tôi từng dùng."
         </div>
         <div class="ti-author">
-          <img src="https://i.pravatar.cc/100?img=13" alt="Lê Hoàng Nam" loading="lazy" />
+          <img decoding="async" src="../_assets/media/06ba0bcd581a.jpg" alt="Lê Hoàng Nam" loading="lazy" />
           <div>
             <div class="ti-name">Lê Hoàng Nam</div>
-            <div class="ti-role">Freelancer · Đà Nẵng</div>
+            <div class="ti-role">Freelancer, Đà Nẵng</div>
           </div>
         </div>
       </article>
@@ -618,10 +614,10 @@
           "Thanh toán ZaloPay trên FoodNhanh nhanh chóng. Chỉ 2 giây là thanh toán xong, không cần nhập mật khẩu. Tiện lợi hơn rất nhiều so với tiền mặt."
         </div>
         <div class="ti-author">
-          <img src="https://i.pravatar.cc/100?img=14" alt="Phạm Quỳnh Anh" loading="lazy" />
+          <img decoding="async" src="../_assets/media/8f1104897cfc.jpg" alt="Phạm Quỳnh Anh" loading="lazy" />
           <div>
             <div class="ti-name">Phạm Quỳnh Anh</div>
-            <div class="ti-role">Sinh viên · ĐH RMIT, HCM</div>
+            <div class="ti-role">Sinh viên, ĐH RMIT, HCM</div>
           </div>
         </div>
       </article>
@@ -633,7 +629,7 @@
 <section class="faq" id="faq">
   <div class="container">
     <div class="section-head">
-      <div class="eyebrow">FAQ</div>
+
       <h2 class="section-title">Câu hỏi thường gặp.</h2>
     </div>
     <div class="faq-list">
@@ -643,7 +639,7 @@
           <span class="faq-icon"><i class="ph ph-plus"></i></span>
         </summary>
         <div class="faq-answer">
-          Trung bình 25–35 phút tùy khoảng cách và thời gian cao điểm. Bạn có thể theo dõi đơn hàng realtime trên app. Nếu giao chậm hơn 15 phút so với dự kiến, bạn sẽ được hoàn phí giao hàng tự động.
+          Trung bình 25 - 35 phút tùy khoảng cách và thời gian cao điểm. Bạn có thể theo dõi đơn hàng realtime trên app. Nếu giao chậm hơn 15 phút so với dự kiến, bạn sẽ được hoàn phí giao hàng tự động.
         </div>
       </details>
       <details class="faq-item">
@@ -721,7 +717,7 @@
     <div class="footer-top">
       <div class="footer-brand">
         <div class="logo">
-          <svg class="logo-mark" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg aria-hidden="true" class="logo-mark" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="16" cy="16" r="12" fill="currentColor"/>
             <path d="M11 13 Q16 9 21 13 Q26 17 21 21 Q16 25 11 21 Q6 17 11 13Z" fill="#7c2d12"/>
             <circle cx="16" cy="16" r="3" fill="#fff"/>
@@ -783,13 +779,13 @@
 <div class="floating-contact">
   <a href="tel:0901234567" class="floating-btn floating-btn_hotline" aria-label="Gọi hotline: 0901 234 567">
     <span class="floating-tooltip">Hotline: 0901 234 567</span>
-    <svg viewBox="0 0 24 24" fill="white" width="22" height="22">
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="white" width="22" height="22">
       <path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.4-.1-.8 0-1.1.3l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1.1-.4-1.1-.6-2.3-.6-3.5 0-.6-.4-1-1-1H4c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"/>
     </svg>
   </a>
   <a href="https://zalo.me" target="_blank" rel="noopener" class="floating-btn floating-btn_zalo" aria-label="Chat Zalo 24/7">
     <span class="floating-tooltip">Chat Zalo 24/7</span>
-    <svg viewBox="0 0 32 32" fill="none" width="26" height="26">
+    <svg aria-hidden="true" viewBox="0 0 32 32" fill="none" width="26" height="26">
       <path d="M16 4C9.4 4 4 8.7 4 14.5c0 3.3 1.8 6.3 4.5 8.2l-1.2 4.4c-.1.5.4.9.9.6l5-2.8c.9.3 1.8.4 2.8.4 6.6 0 12-4.7 12-10.5S22.6 4 16 4Z" fill="white"/>
       <text x="16" y="17.8" fill="#0068FF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="8.5" text-anchor="middle" letter-spacing="-0.3">Zalo</text>
     </svg>

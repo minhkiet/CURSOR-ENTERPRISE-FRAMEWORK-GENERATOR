@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, ref, watch, onUnmounted } from 'vue'
+import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getTemplateById, templates, type TemplateSubPage } from '../data/templates'
 import DownloadModal from '../components/DownloadModal.vue'
-import TemplatePreviewSvg from '../components/TemplatePreviewSvg.vue'
+import TemplateThumbnail from '../components/TemplateThumbnail.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -22,11 +22,13 @@ const showInfo = ref(true)
 const showDownloadModal = ref(false)
 
 const isAutoScrolling = ref(false)
+const reduceMotion = ref(false)
 const scrollSpeed = ref<1 | 2 | 3>(1)
 let scrollInterval: ReturnType<typeof setInterval> | null = null
 let scrollDirection = 1
 
 function toggleAutoScroll() {
+  if (reduceMotion.value) return
   isAutoScrolling.value = !isAutoScrolling.value
   if (isAutoScrolling.value) {
     startAutoScroll()
@@ -84,6 +86,10 @@ function stopAutoScroll() {
 
 onUnmounted(() => {
   stopAutoScroll()
+})
+
+onMounted(() => {
+  reduceMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 })
 
 const activePage = ref<string>('index.html')
@@ -176,7 +182,7 @@ function refreshFrame() {
         <div class="preview-topbar-inner">
           <button class="back-btn" @click="backToGallery">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-            <span>Back to gallery</span>
+            <span>Về kho templates</span>
           </button>
 
           <div class="preview-meta">
@@ -195,11 +201,11 @@ function refreshFrame() {
             </button>
             <button class="action-btn" @click="viewSource">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-              <span>Source</span>
+              <span>Mã nguồn</span>
             </button>
-            <button class="action-btn" @click="showInfo = !showInfo" :aria-label="showInfo ? 'Hide info' : 'Show info'">
+            <button class="action-btn" @click="showInfo = !showInfo" :aria-label="showInfo ? 'Ẩn thông tin' : 'Hiện thông tin'">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-              <span>{{ showInfo ? 'Hide info' : 'Info' }}</span>
+              <span>{{ showInfo ? 'Ẩn thông tin' : 'Thông tin' }}</span>
             </button>
             <button class="btn btn-primary dl-btn" @click="openDownloadModal">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
@@ -213,13 +219,13 @@ function refreshFrame() {
     <div class="preview-layout" :class="{ 'info-hidden': !showInfo }">
       <aside class="preview-sidebar">
         <div class="sidebar-section">
-          <span class="sidebar-label">About</span>
+          <span class="sidebar-label">Giới thiệu</span>
           <p class="sidebar-tagline">{{ template.tagline }}</p>
           <p class="sidebar-desc">{{ template.description }}</p>
         </div>
 
         <div class="sidebar-section">
-          <span class="sidebar-label">Highlights</span>
+          <span class="sidebar-label">Điểm nổi bật</span>
           <div class="sidebar-stats">
             <div v-for="h in template.highlights" :key="h.label" class="sidebar-stat">
               <div class="sidebar-stat-value">{{ h.value }}</div>
@@ -229,7 +235,7 @@ function refreshFrame() {
         </div>
 
         <div class="sidebar-section">
-          <span class="sidebar-label">Features</span>
+          <span class="sidebar-label">Tính năng</span>
           <ul class="sidebar-features">
             <li v-for="f in template.features" :key="f">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
@@ -239,25 +245,25 @@ function refreshFrame() {
         </div>
 
         <div class="sidebar-section">
-          <span class="sidebar-label">Tech Stack</span>
+          <span class="sidebar-label">Công nghệ</span>
           <div class="sidebar-tech">
             <span v-for="tech in template.techStack" :key="tech" class="tech-pill">{{ tech }}</span>
           </div>
         </div>
 
         <div class="sidebar-section">
-          <span class="sidebar-label">File Info</span>
+          <span class="sidebar-label">Thông tin file</span>
           <div class="sidebar-file">
             <div class="file-row">
               <span>Trang thiết kế</span>
               <strong>{{ subPages.length > 1 ? `${subPages.length} trang hoàn chỉnh` : `${template.pages} sections` }}</strong>
             </div>
             <div class="file-row">
-              <span>Size</span>
+              <span>Dung lượng</span>
               <strong>{{ template.fileSize }}</strong>
             </div>
             <div class="file-row">
-              <span>Format</span>
+              <span>Định dạng</span>
               <strong>HTML/CSS/JS</strong>
             </div>
           </div>
@@ -352,7 +358,7 @@ function refreshFrame() {
           </div>
 
           <div class="device-action">
-            <button class="device-refresh" @click="refreshFrame" :aria-label="'Refresh preview'">
+            <button class="device-refresh" @click="refreshFrame" aria-label="Tải lại preview">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
             </button>
           </div>
@@ -373,8 +379,8 @@ function refreshFrame() {
     <section class="preview-related">
       <div class="container">
         <div class="section-header">
-          <div class="section-label">More templates</div>
-          <h2 class="section-title">Other landing pages in the library.</h2>
+            <div class="section-label">Khám phá thêm</div>
+            <h2 class="section-title">Template khác trong thư viện.</h2>
         </div>
         <div class="related-grid">
           <article
@@ -384,7 +390,7 @@ function refreshFrame() {
             @click="previewTemplate(t.id)"
           >
             <div class="related-thumb">
-              <TemplatePreviewSvg :slug="t.slug" />
+              <TemplateThumbnail :slug="t.slug" />
             </div>
             <div class="related-body">
               <span class="related-cat">{{ t.industry }}</span>
@@ -401,7 +407,7 @@ function refreshFrame() {
     <div class="container">
       <h2>Template not found</h2>
       <p>The template you requested does not exist or was removed.</p>
-      <button class="btn btn-primary" @click="backToGallery">Back to gallery</button>
+      <button class="btn btn-primary" @click="backToGallery">Về kho templates</button>
     </div>
   </div>
 

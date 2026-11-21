@@ -23,7 +23,7 @@ const linkGroups: FooterGroup[] = [
     ]
   },
   {
-    label: 'Resources',
+    label: 'Tài nguyên',
     links: [
       { label: 'Templates', href: '/templates' },
       { label: 'Prompts', href: '/prompts' },
@@ -32,12 +32,12 @@ const linkGroups: FooterGroup[] = [
     ]
   },
   {
-    label: 'Stack',
+    label: 'Hệ sinh thái',
     links: [
       { label: 'File explorer', href: '#explorer' },
       { label: 'Getting started', href: '#getting-started' },
       { label: 'Karpathy guidelines', href: 'https://github.com/multica-ai/andrej-karpathy-skills', external: true },
-      { label: 'GitHub repo', href: 'https://github.com', external: true }
+      { label: 'GitHub repo', href: 'https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR', external: true }
     ]
   }
 ]
@@ -74,7 +74,7 @@ function smoothScroll(e: MouseEvent, href: string): void {
 
           <div class="footer-status">
             <span class="footer-status-dot"></span>
-            <span class="footer-status-text">All systems operational</span>
+            <span class="footer-status-text">Mã nguồn mở · MIT</span>
           </div>
         </div>
 
@@ -120,21 +120,21 @@ function smoothScroll(e: MouseEvent, href: string): void {
         <div class="footer-meta">
           <span>{{ currentYear }} Vibe Framework</span>
           <span class="footer-sep" aria-hidden="true">·</span>
-          <span class="footer-mono">build {{ new Date().toISOString().slice(0, 10) }}</span>
+          <span class="footer-mono">local-first · repo-driven</span>
         </div>
         <div class="footer-legal">
-          <a href="https://github.com" class="footer-link" target="_blank" rel="noopener noreferrer">
+          <a href="https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR" class="footer-link" target="_blank" rel="noopener noreferrer">
             Documentation
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="footer-link-icon" aria-hidden="true">
               <path d="M7 17L17 7M17 7H8M17 7V16"/>
             </svg>
           </a>
           <span class="footer-sep" aria-hidden="true">·</span>
-          <a href="https://github.com" class="footer-link" target="_blank" rel="noopener noreferrer">
+          <a href="https://github.com/minhkiet/CURSOR-ENTERPRISE-FRAMEWORK-GENERATOR" class="footer-link" target="_blank" rel="noopener noreferrer">
             MIT License
           </a>
           <span class="footer-sep" aria-hidden="true">·</span>
-          <router-link to="/" class="footer-link">
+          <router-link to="/learn" class="footer-link">
             Changelog
           </router-link>
         </div>

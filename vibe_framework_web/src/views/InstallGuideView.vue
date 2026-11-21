@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useIntersectionObserver } from '../composables/useIntersectionObserver'
+import { templates } from '../data/templates'
 
 const sectionRef = ref<HTMLElement | null>(null)
 const isVisible = ref(false)
@@ -41,7 +42,7 @@ const methods: InstallMethod[] = [
     title: 'Windows GUI installer',
     oneLiner: 'Tải 2 file, double-click, bấm Install. Dành cho người mới trên Windows.',
     forWho: 'Người mới, không quen PowerShell, dùng Windows 10/11.',
-    duration: '3 phút',
+    duration: '~3 phút',
     difficulty: 'Easy',
     os: ['Windows 10', 'Windows 11'],
     steps: [
@@ -109,7 +110,7 @@ const methods: InstallMethod[] = [
     title: 'PowerShell one-liner',
     oneLiner: 'Một lệnh duy nhất, tự động tải và cài. Dành cho người dùng PowerShell.',
     forWho: 'Dev quen terminal, Windows / PowerShell 5.1+ / PowerShell 7.',
-    duration: '2 phút',
+    duration: '~2 phút',
     difficulty: 'Easy',
     os: ['Windows 10', 'Windows 11', 'PowerShell 7'],
     steps: [
@@ -165,7 +166,7 @@ const methods: InstallMethod[] = [
     title: 'Python package (cursor_framework)',
     oneLiner: 'Cài pip package, chạy Dashboard, scan & index. Cho dev muốn inspect / customize',
     forWho: 'Dev Python, muốn dùng CLI, dashboard, indexer, hoặc TDAM.',
-    duration: '4 phút',
+    duration: '~4 phút',
     difficulty: 'Medium',
     os: ['Windows', 'macOS', 'Linux'],
     steps: [
@@ -252,7 +253,7 @@ const methods: InstallMethod[] = [
     title: 'Cài thủ công từ source',
     oneLiner: 'Clone repo, tự build hoặc copy file. Cho dev muốn kiểm soát hoàn toàn.',
     forWho: 'Dev muốn inspect trước khi dùng, muốn modify, hoặc không dùng Windows.',
-    duration: '5 phút',
+    duration: '~5 phút',
     difficulty: 'Medium',
     os: ['Windows', 'macOS', 'Linux'],
     steps: [
@@ -323,7 +324,7 @@ const methods: InstallMethod[] = [
     title: 'Tool Vibe Code Phổ Biến',
     oneLiner: 'Cursor, Windsurf, Claude Code, GitHub Copilot, Roo Code, Cline, Antigravity, Trae, Devin, Aider.',
     forWho: 'Dev dùng nhiều công cụ AI coding, cần chuẩn hóa rules, skills, agents và SQLite memory.',
-    duration: '2 phút',
+    duration: '~2 phút',
     difficulty: 'Easy',
     os: ['Windows', 'macOS', 'Linux'],
     steps: [
@@ -536,14 +537,14 @@ async function handleCopy(code: string, key: string) {
             <span class="ins-title-accent">Ba cách, tùy bạn chọn.</span>
           </h1>
           <p class="ins-subtitle">
-            Hướng dẫn đầy đủ cho cả người mới và dev có kinh nghiệm.     Mỗi bước đều có screenshot mô tả,
-    lệnh copy được, và mục kiểm tra xác minh. Không cần dò code cũng làm được.
+            Hướng dẫn đầy đủ cho cả người mới và dev có kinh nghiệm. Mỗi bước kèm lệnh copy được
+            và tiêu chí kiểm tra xác minh. Không cần dò code cũng làm được.
           </p>
 
           <div class="ins-quickstats">
             <div class="ins-quickstat">
-              <div class="ins-quickstat-value">3 phút</div>
-              <div class="ins-quickstat-label">Thời gian trung bình</div>
+              <div class="ins-quickstat-value">~3 phút</div>
+              <div class="ins-quickstat-label">Thời gian ước lượng</div>
             </div>
           <div class="ins-quickstat">
             <div class="ins-quickstat-value">4</div>
@@ -891,11 +892,11 @@ async function handleCopy(code: string, key: string) {
                     <span class="ins-vibecode-status ready">Template Export</span>
                   </div>
                   <p class="ins-vibecode-desc">
-                    Mẫu prompt chuẩn mực và 22 bộ template HTML5/Vue 3 độc lập giúp dựng nhanh UI/UX mà không sợ AI bịa đặt layout.
+                    Mẫu prompt chuẩn mực và {{ templates.length }} bộ template HTML5/Vue 3 độc lập giúp dựng nhanh UI/UX mà không sợ AI bịa đặt layout.
                   </p>
                   <div class="ins-vibecode-path">
                     <span class="path-label">Templates:</span>
-                    <code>public/templates/ [22 templates]</code>
+                    <code>public/templates/ [{{ templates.length }} templates]</code>
                   </div>
                   <div class="ins-vibecode-cmd">
                     <code>aider --read .cursor/rules/coding-standards.mdc</code>
@@ -947,16 +948,16 @@ async function handleCopy(code: string, key: string) {
                   <p class="ins-guide-wf-desc">
                     Mở Cursor IDE, nhấn <code>Ctrl + I</code> (Composer) hoặc <code>Ctrl + L</code> (Chat). Gõ lệnh slash (ví dụ: <code>/ui-ux</code>, <code>/frontend-taste</code>) và dán yêu cầu cụ thể của bạn.
                   </p>
-                  <div class="ins-guide-wf-tip">⚡ Mẹo: AI sẽ tự nạp bộ Rules & Skills tương ứng mà bạn không cần cấu hình thêm.</div>
+                  <div class="ins-guide-wf-tip">Mẹo: AI sẽ tự nạp bộ Rules & Skills tương ứng mà bạn không cần cấu hình thêm.</div>
                 </div>
 
                 <div class="ins-guide-wf-card">
                   <div class="ins-guide-wf-num">03</div>
                   <div class="ins-guide-wf-title">Thẩm Định & Tự Cuộn</div>
                   <p class="ins-guide-wf-desc">
-                    Mã nguồn sinh ra đã được thẩm định theo Hallmark v2.0.0 (floor/reflex/finish) chống AI slop. Bật tính năng <strong>⚡ Tự Cuộn (Auto-Scroll)</strong> để xem trang web chuyển động tự nhiên như đang được lướt thực tế.
+                    Mã nguồn sinh ra đã được thẩm định theo Hallmark v2.0.0 (floor/reflex/finish) chống AI slop. Bật tính năng <strong>Tự Cuộn (Auto-Scroll)</strong> để xem trang web chuyển động tự nhiên như đang được lướt thực tế.
                   </p>
-                  <div class="ins-guide-wf-tip">🎯 Kết quả: Sản phẩm mang chất thủ công (Crafted Feel), sẵn sàng bàn giao khách hàng.</div>
+                  <div class="ins-guide-wf-tip">Kết quả: Sản phẩm mang chất thủ công (Crafted Feel), sẵn sàng bàn giao khách hàng.</div>
                 </div>
               </div>
 
@@ -1134,7 +1135,7 @@ async function handleCopy(code: string, key: string) {
 
               <!-- AUTO-SCROLL WEB INSPECTION GUIDE -->
               <div class="ins-guide-block">
-                <h3 class="ins-guide-block-title">Hướng Dẫn Tính Năng: ⚡ Tự Động Cuộn Lướt Web (Auto-Scroll)</h3>
+                <h3 class="ins-guide-block-title">Hướng Dẫn Tính Năng: Tự Động Cuộn Lướt Web (Auto-Scroll)</h3>
                 <p class="ins-guide-block-desc">
                   Tính năng độc quyền giúp bạn và khách hàng có thể chiêm ngưỡng toàn bộ website một cách tự động, mượt mà mà không cần chạm tay vào chuột.
                 </p>
@@ -1144,7 +1145,7 @@ async function handleCopy(code: string, key: string) {
                     <div class="ins-scroll-badge">Cách 1</div>
                     <div class="ins-scroll-title">Bật trong Thư Viện Templates</div>
                     <p class="ins-scroll-desc">
-                      Tại trang <router-link to="/templates">Mẫu Giao Diện</router-link>, bạn chỉ cần bật công tắc <strong>⚡ Tự Động Cuộn Lướt Web (Showcase Mode)</strong> ở góc trên bên phải. Khi rê chuột vào bất kỳ thẻ mẫu nào, website bên trong sẽ tự động lướt từ trên xuống dưới.
+                      Tại trang <router-link to="/templates">Mẫu Giao Diện</router-link>, bạn chỉ cần bật công tắc <strong>Tự Động Cuộn Lướt Web (Showcase Mode)</strong> ở góc trên bên phải. Khi rê chuột vào bất kỳ thẻ mẫu nào, website bên trong sẽ tự động lướt từ trên xuống dưới.
                     </p>
                   </div>
 

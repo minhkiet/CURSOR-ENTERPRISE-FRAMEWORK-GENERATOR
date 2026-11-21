@@ -3,23 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Oceanfront Pool Villa 3N2Đ — VietTravel Luxury Retreats</title>
+  <title>Oceanfront Pool Villa 3N2Đ, VietTravel Luxury Retreats</title>
   <meta name="description" content="Khu nghỉ dưỡng 6 sao Vịnh Vĩnh Hy. Biệt thự hồ bơi vô cực view biển 280m², quản gia riêng 24/7, du thuyền ngắm hoàng hôn và ẩm thực Michelin." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" />
+  <link rel="stylesheet" href="../_assets/fonts.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/regular/style.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/fill/style.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/duotone/style.css" />
+
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="../_assets/ux-polish.css" />
 </head>
-<body class="travel-detail-body">
+<body data-ux="travel" class="travel-detail-body">
 
 <!-- ─── NAV ─── -->
 <nav class="nav">
   <div class="container nav-inner">
     <a href="index.html" class="logo">
-      <svg class="logo-mark" viewBox="0 0 32 32" fill="none">
+      <svg aria-hidden="true" class="logo-mark" viewBox="0 0 32 32" fill="none">
         <rect x="4" y="4" width="24" height="24" rx="7" fill="currentColor"/>
         <path d="M11 11 L21 16 L11 21 Z" fill="#fafbff"/>
       </svg>
@@ -59,7 +59,7 @@
         </div>
         <h1 class="detail-heading">Oceanfront Sanctuary Pool Villa (3N2Đ)</h1>
         <p class="detail-location">
-          <i class="ph-fill ph-map-pin"></i> Vịnh Vĩnh Hy, Vườn Quốc Gia Núi Chúa, Ninh Thuận · 45 phút đưa đón Maybach từ Sân bay Cam Ranh
+          <i class="ph-fill ph-map-pin"></i> Vịnh Vĩnh Hy, Vườn Quốc Gia Núi Chúa, Ninh Thuận, 45 phút đưa đón Maybach từ Sân bay Cam Ranh
         </p>
       </div>
       <div class="detail-price-box">
@@ -72,24 +72,24 @@
     <!-- Interactive 5-Photo Gallery -->
     <div class="gallery-wrapper">
       <div class="gallery-main">
-        <img id="mainGalleryImg" src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1600&q=85" alt="Oceanfront Infinity Pool Villa" />
+        <img loading="lazy" decoding="async" id="mainGalleryImg" src="../_assets/media/a60114861e42.jpg" alt="Oceanfront Infinity Pool Villa" />
         <div class="gallery-caption" id="galleryCaption">Hồ bơi vô cực nước mặn 65m² hướng thẳng vịnh biển Vĩnh Hy ngút ngàn</div>
       </div>
       <div class="gallery-thumbs">
-        <button class="thumb-btn active" onclick="switchGallery('https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1600&q=85', 'Hồ bơi vô cực nước mặn 65m² hướng thẳng vịnh biển Vĩnh Hy ngút ngàn', this)">
-          <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=400&q=70" alt="Hồ bơi vô cực" />
+        <button class="thumb-btn active" onclick="switchGallery('../_assets/media/a60114861e42.jpg', 'Hồ bơi vô cực nước mặn 65m² hướng thẳng vịnh biển Vĩnh Hy ngút ngàn', this)">
+          <img loading="lazy" decoding="async" src="../_assets/media/89e561bbe4c8.jpg" alt="Hồ bơi vô cực" />
           <span>Hồ bơi vô cực</span>
         </button>
-        <button class="thumb-btn" onclick="switchGallery('https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1600&q=85', 'Master Bedroom với giường King-size nhìn trọn vẹn bình minh trên biển', this)">
-          <img src="https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=400&q=70" alt="Master Bedroom" />
+        <button class="thumb-btn" onclick="switchGallery('../_assets/media/2a8350f05dee.jpg', 'Master Bedroom với giường King-size nhìn trọn vẹn bình minh trên biển', this)">
+          <img loading="lazy" decoding="async" src="../_assets/media/3e3076e5344b.jpg" alt="Master Bedroom" />
           <span>Phòng ngủ King</span>
         </button>
-        <button class="thumb-btn" onclick="switchGallery('https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1600&q=85', 'Du thuyền Catamaran riêng đón hoàng hôn và tiệc Champagne trên vịnh', this)">
-          <img src="https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=400&q=70" alt="Du thuyền riêng" />
+        <button class="thumb-btn" onclick="switchGallery('../_assets/media/44f86c51150a.jpg', 'Du thuyền Catamaran riêng đón hoàng hôn và tiệc Champagne trên vịnh', this)">
+          <img loading="lazy" decoding="async" src="../_assets/media/5b912697b113.jpg" alt="Du thuyền riêng" />
           <span>Du thuyền riêng</span>
         </button>
-        <button class="thumb-btn" onclick="switchGallery('https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1600&q=85', 'Bữa sáng nổi hồ bơi Floating Breakfast & đầu bếp ẩm thực theo yêu cầu', this)">
-          <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=400&q=70" alt="Floating Breakfast" />
+        <button class="thumb-btn" onclick="switchGallery('../_assets/media/d5148bca7d6a.jpg', 'Bữa sáng nổi hồ bơi Floating Breakfast & đầu bếp ẩm thực theo yêu cầu', this)">
+          <img loading="lazy" decoding="async" src="../_assets/media/599570bb6250.jpg" alt="Floating Breakfast" />
           <span>Bữa sáng nổi</span>
         </button>
       </div>
@@ -151,7 +151,7 @@
     <!-- Day-by-Day Interactive Itinerary -->
     <section class="itinerary-section">
       <div class="section-title-wrap">
-        <div class="eyebrow"><i class="ph-fill ph-calendar-check"></i> Trải Nghiệm Thượng Lưu</div>
+
         <h2>Lịch Trình Chi Tiết 3 Ngày 2 Đêm Tuyệt Tác</h2>
         <p>Từng khoảnh khắc được quản gia và chuyên gia trải nghiệm chăm sóc riêng biệt, không gò bó thời gian.</p>
       </div>
@@ -277,7 +277,7 @@
     <!-- Villa Amenities Bento Grid -->
     <section class="amenities-section">
       <div class="section-title-wrap">
-        <div class="eyebrow"><i class="ph-fill ph-sparkle"></i> Tiện Ích Đẳng Cấp</div>
+
         <h2>Tiện Nghi Đặc Quyền Dành Cho Biệt Thự</h2>
       </div>
 
@@ -318,17 +318,17 @@
     <!-- Verified Guest Reviews -->
     <section class="guest-reviews-section">
       <div class="section-title-wrap">
-        <div class="eyebrow"><i class="ph-fill ph-star"></i> Cảm Nhận Thực Tế</div>
+
         <h2>Đánh Giá Của Các Khách Nghỉ Dưỡng Thượng Lưu</h2>
       </div>
 
       <div class="reviews-list">
         <article class="guest-review-card">
           <div class="gr-header">
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Doanh nhân Hoàng Thu Thủy" class="gr-avatar" />
+            <img loading="lazy" decoding="async" src="../_assets/media/600aed9a543c.jpg" alt="Doanh nhân Hoàng Thu Thủy" class="gr-avatar" />
             <div>
               <h4 class="gr-name">Chị Hoàng Thu Thủy</h4>
-              <p class="gr-title">Phó Chủ Tịch Tập Đoàn BĐS An Khang · Kỳ nghỉ kỷ niệm 10 năm ngày cưới</p>
+              <p class="gr-title">Phó Chủ Tịch Tập Đoàn BĐS An Khang, Kỳ nghỉ kỷ niệm 10 năm ngày cưới</p>
             </div>
             <div class="gr-stars">
               <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
@@ -341,10 +341,10 @@
 
         <article class="guest-review-card">
           <div class="gr-header">
-            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80" alt="Anh Trần Quốc Tuấn" class="gr-avatar" />
+            <img loading="lazy" decoding="async" src="../_assets/media/9a3295a79dd3.jpg" alt="Anh Trần Quốc Tuấn" class="gr-avatar" />
             <div>
               <h4 class="gr-name">Anh Trần Quốc Tuấn</h4>
-              <p class="gr-title">Founder TechVenture Vietnam · Đi cùng gia đình 4 người</p>
+              <p class="gr-title">Founder TechVenture Vietnam, Đi cùng gia đình 4 người</p>
             </div>
             <div class="gr-stars">
               <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
@@ -463,13 +463,13 @@
 <div class="floating-contact">
   <a href="tel:19006868" class="floating-btn floating-btn_hotline" aria-label="Gọi hotline VIP">
     <span class="floating-tooltip">Hotline VIP: 1900 6868</span>
-    <svg viewBox="0 0 24 24" fill="white" width="22" height="22">
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="white" width="22" height="22">
       <path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.4-.1-.8 0-1.1.3l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1.1-.4-1.1-.6-2.3-.6-3.5 0-.6-.4-1-1-1H4c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"/>
     </svg>
   </a>
   <a href="https://zalo.me" target="_blank" rel="noopener" class="floating-btn floating-btn_zalo" aria-label="Chat Zalo hỗ trợ kỳ nghỉ">
     <span class="floating-tooltip">Chat Zalo Chuyên Viên</span>
-    <svg viewBox="0 0 32 32" fill="none" width="26" height="26">
+    <svg aria-hidden="true" viewBox="0 0 32 32" fill="none" width="26" height="26">
       <path d="M16 4C9.4 4 4 8.7 4 14.5c0 3.3 1.8 6.3 4.5 8.2l-1.2 4.4c-.1.5.4.9.9.6l5-2.8c.9.3 1.8.4 2.8.4 6.6 0 12-4.7 12-10.5S22.6 4 16 4Z" fill="white"/>
       <text x="16" y="17.8" fill="#0068FF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="8.5" text-anchor="middle" letter-spacing="-0.3">Zalo</text>
     </svg>
@@ -517,7 +517,7 @@ function calculateStayCost() {
   const pkgSelect = document.getElementById('packageSelect');
   if (!pkgSelect) return;
   const basePrice = parseInt(pkgSelect.value) || 48000000;
-  
+
   // Extra guest surcharge: 8,000,000 / guest
   const extraGuests = Math.max(0, guestCount - 2);
   const extraGuestCost = extraGuests * 8000000;

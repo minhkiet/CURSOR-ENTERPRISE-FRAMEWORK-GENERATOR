@@ -114,8 +114,12 @@ PROMPT="Cinematic dark office, #0C0C0C background, #e8702a accent lights,
 minimalist workspace, professional photography, 8k"
 
 # 2. Generate via Google Flow (free)
-# Visit: labs.google/fx/tools/flow
+# Visit: https://flow.google.com/
 # Download result to public/assets/hero.png
+
+# Hoặc dùng CLI của framework (tự tạo project + tải ảnh + ghi manifest):
+python tools/google_flow_cli.py --login   # một lần
+python tools/google_flow_cli.py --prompt "$PROMPT" --count 1
 
 # OR generate via DALL-E 3 (paid)
 curl -X POST https://api.openai.com/v1/images/generations \

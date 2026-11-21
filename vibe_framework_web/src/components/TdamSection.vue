@@ -113,12 +113,12 @@ const layers = [
   <section class="tdam-section" id="tdam" ref="sectionRef">
     <div class="container">
       <div class="section-header">
-        <div class="section-label">New · TencentDB Agent Memory</div>
-        <h2 class="section-title">TDAM integrated. 92% tokens saved.</h2>
+        <div class="section-label">Tích hợp · TencentDB Agent Memory</div>
+        <h2 class="section-title">Bộ nhớ dài hạn cho agent, token có kiểm soát.</h2>
         <p class="section-desc">
-          We wired <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory" target="_blank" rel="noopener" class="ext-link">TencentCloud/TencentDB-Agent-Memory</a>
-          into <code class="inline-code">cursor_framework</code>. Layered memory (L0→L3) +
-          symbolic Mermaid Canvas compression gives agents long-term memory without exploding the token bill.
+          <a href="https://github.com/TencentCloud/TencentDB-Agent-Memory" target="_blank" rel="noopener" class="ext-link">TencentCloud/TencentDB-Agent-Memory</a>
+          được tích hợp vào <code class="inline-code">cursor_framework</code> theo hướng local-first. Bộ nhớ L0→L3
+          và nén Mermaid Canvas giúp giữ ngữ cảnh dài hạn mà vẫn kiểm soát được chi phí token.
         </p>
       </div>
 
@@ -164,27 +164,31 @@ const layers = [
         </div>
       </div>
 
+      <p class="tdam-note">
+        Output terminal ở trên là ví dụ minh họa. Số liệu thực tế lấy từ workspace của bạn khi chạy CLI.
+      </p>
+
       <!-- METRICS -->
       <div class="tdam-metrics">
         <div class="tdam-metric">
-          <div class="tdam-metric-value">92%</div>
-          <div class="tdam-metric-label">Token savings</div>
-          <div class="tdam-metric-desc">on long sessions with Mermaid Canvas</div>
+          <div class="tdam-metric-value">L0 → L3</div>
+          <div class="tdam-metric-label">Bốn lớp nhớ</div>
+          <div class="tdam-metric-desc">Hội thoại, fact, scenario, persona</div>
         </div>
         <div class="tdam-metric">
-          <div class="tdam-metric-value">+47%</div>
-          <div class="tdam-metric-label">Task success</div>
-          <div class="tdam-metric-desc">agents with persistent persona</div>
+          <div class="tdam-metric-value">Mermaid</div>
+          <div class="tdam-metric-label">Nén biểu tượng</div>
+          <div class="tdam-metric-desc">Giữ ngữ cảnh khi compact</div>
         </div>
         <div class="tdam-metric">
-          <div class="tdam-metric-value">&lt;50ms</div>
-          <div class="tdam-metric-label">Recall latency</div>
-          <div class="tdam-metric-desc">P50 across all 4 layers</div>
+          <div class="tdam-metric-value">Local</div>
+          <div class="tdam-metric-label">Lưu trong repo</div>
+          <div class="tdam-metric-desc">Không phụ thuộc dịch vụ ngoài</div>
         </div>
         <div class="tdam-metric">
-          <div class="tdam-metric-value">4</div>
-          <div class="tdam-metric-label">Memory layers</div>
-          <div class="tdam-metric-desc">L0 conversation → L3 persona</div>
+          <div class="tdam-metric-value">CLI</div>
+          <div class="tdam-metric-label">Kiểm tra được</div>
+          <div class="tdam-metric-desc">status · recall · compact · persona</div>
         </div>
       </div>
     </div>
@@ -245,6 +249,12 @@ const layers = [
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   color: var(--accent);
+}
+
+.tdam-note {
+  margin: -32px 0 36px;
+  font-size: 12px;
+  color: var(--text-tertiary);
 }
 
 /* LAYERS */

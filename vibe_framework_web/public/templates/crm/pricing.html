@@ -3,23 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bảng Giá & Gói Dịch Vụ — Helix CRM Enterprise</title>
+  <title>Bảng Giá & Gói Dịch Vụ, Helix CRM Enterprise</title>
   <meta name="description" content="Bảng giá phần mềm quản lý quan hệ khách hàng Helix CRM: Gói Starter, Professional, Enterprise. Miễn phí dùng thử 14 ngày, chiết khấu 20% khi thanh toán năm." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" />
+  <link rel="stylesheet" href="../_assets/fonts.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/regular/style.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/fill/style.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/duotone/style.css" />
+
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="../_assets/ux-polish.css" />
 </head>
-<body class="crm-pricing-body">
+<body data-ux="crm" class="crm-pricing-body">
 
 <!-- ─── NAV ─── -->
 <nav class="nav">
   <div class="container nav-inner">
     <a href="index.html" class="logo">
-      <svg class="logo-mark" viewBox="0 0 32 32" fill="none">
+      <svg aria-hidden="true" class="logo-mark" viewBox="0 0 32 32" fill="none">
         <rect x="4" y="4" width="24" height="24" rx="7" fill="currentColor"/>
         <path d="M11 11 L21 21 M21 11 L11 21" stroke="#fafbff" stroke-width="2.5" stroke-linecap="round"/>
       </svg>
@@ -45,10 +45,7 @@
 <!-- ─── PRICING HERO ─── -->
 <header class="pricing-hero-section">
   <div class="container text-center">
-    <div class="eyebrow" style="justify-content:center; margin-bottom:14px;">
-      <span class="eyebrow-dot"></span>
-      Minh bạch 100% · Không phí ẩn · Nâng hoặc hạ gói bất kỳ lúc nào
-    </div>
+
     <h1 class="section-title">
       Đầu Tư Cho Tăng Trưởng Doanh Số. <br />
       <span class="hl">Chọn Gói Cước Phù Hợp Đội Ngũ Của Bạn.</span>
@@ -80,7 +77,7 @@
         <div class="cpc-header">
           <span class="cpc-tier-badge">KHỞI ĐỘNG</span>
           <h3 class="cpc-tier-title">Starter</h3>
-          <p class="cpc-tier-desc">Dành cho startup, agency nhỏ và nhóm 1–5 nhân sự bán hàng cần quản lý lead cơ bản.</p>
+          <p class="cpc-tier-desc">Dành cho startup, agency nhỏ và nhóm 1 - 5 nhân sự bán hàng cần quản lý lead cơ bản.</p>
           <div class="cpc-price-box">
             <span class="cpc-curr">$</span>
             <span class="cpc-val" id="priceStarter">23</span>
@@ -107,13 +104,13 @@
         <div class="cpc-header">
           <span class="cpc-tier-badge gold">TĂNG TRƯỞNG NHANH</span>
           <h3 class="cpc-tier-title">Professional</h3>
-          <p class="cpc-tier-desc">Dành cho doanh nghiệp vừa từ 5–25 nhân sự cần tự động hóa quy trình & dự báo doanh số.</p>
+          <p class="cpc-tier-desc">Dành cho doanh nghiệp vừa từ 5 - 25 nhân sự cần tự động hóa quy trình & dự báo doanh số.</p>
           <div class="cpc-price-box">
             <span class="cpc-curr">$</span>
             <span class="cpc-val hl" id="pricePro">63</span>
             <span class="cpc-cycle">/ user / tháng</span>
           </div>
-          <span class="cpc-bill-note" id="billNotePro">Thanh toán theo năm ($756/user/năm) · Tiết kiệm $192</span>
+          <span class="cpc-bill-note" id="billNotePro">Thanh toán theo năm ($756/user/năm), Tiết kiệm $192</span>
         </div>
 
         <a href="#trial" class="btn btn-primary btn-block">Dùng Thử Pro Miễn Phí</a>
@@ -164,7 +161,7 @@
   <div class="container">
     <div class="roi-card-wrapper">
       <div class="roi-left">
-        <span class="eyebrow"><span class="eyebrow-dot"></span> TÍNH HIỆU QUẢ ĐẦU TƯ (ROI)</span>
+         TÍNH HIỆU QUẢ ĐẦU TƯ (ROI)</span>
         <h2 class="roi-title">Doanh Nghiệp Của Bạn Sẽ Tiết Kiệm & Thu Lời Bao Nhiêu?</h2>
         <p class="roi-desc">
           Điều chỉnh quy mô đội ngũ bán hàng và giá trị đơn hàng trung bình để xem con số hoàn vốn thực tế dựa trên số liệu khảo sát từ 500+ khách hàng Helix.
@@ -220,7 +217,7 @@
 <section class="matrix-section">
   <div class="container">
     <div class="section-head text-center">
-      <div class="eyebrow"><span class="eyebrow-dot"></span> SO SÁNH TÍNH NĂNG CHI TIẾT</div>
+
       <h2 class="section-title">Ma Trận Tính Năng Giữa Các Gói Cước</h2>
     </div>
 
@@ -261,7 +258,7 @@
 <section class="final" id="trial">
   <div class="container">
     <div class="final-box text-center">
-      <div class="eyebrow" style="color:var(--accent);"><span class="eyebrow-dot"></span> KHÔNG CẦN THẺ TÍN DỤNG</div>
+
       <h2>Sẵn Sàng Nâng Tầm Đội Ngũ Bán Hàng?</h2>
       <p style="max-width:600px; margin:0 auto 24px; color:var(--text-2);">
         Trải nghiệm toàn bộ sức mạnh của Helix CRM trong 14 ngày. Cài đặt xong trong 3 phút, nhập dữ liệu từ Excel / HubSpot / Pipedrive chỉ với 1 cú click.
@@ -279,7 +276,7 @@
   <div class="container footer-grid">
     <div class="footer-brand">
       <div class="logo">
-        <svg class="logo-mark" viewBox="0 0 32 32" fill="none">
+        <svg aria-hidden="true" class="logo-mark" viewBox="0 0 32 32" fill="none">
           <rect x="4" y="4" width="24" height="24" rx="7" fill="currentColor"/>
           <path d="M11 11 L21 21 M21 11 L11 21" stroke="#fafbff" stroke-width="2.5" stroke-linecap="round"/>
         </svg>
@@ -316,7 +313,7 @@ function toggleBilling() {
     document.getElementById('priceEnterprise').innerText = '159';
 
     document.getElementById('billNoteStarter').innerText = 'Thanh toán theo năm ($276/user/năm)';
-    document.getElementById('billNotePro').innerText = 'Thanh toán theo năm ($756/user/năm) · Tiết kiệm $192';
+    document.getElementById('billNotePro').innerText = 'Thanh toán theo năm ($756/user/năm), Tiết kiệm $192';
     document.getElementById('billNoteEnt').innerText = 'Thanh toán theo năm ($1,908/user/năm)';
   } else {
     toggleBtn.classList.remove('active');

@@ -1,245 +1,199 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { templates } from '../data/templates'
+import TemplateThumbnail from '../components/TemplateThumbnail.vue'
 
-interface Metric {
-  value: string
+interface FlowNode {
+  id: string
   label: string
-}
-
-interface Capability {
-  icon: string
+  tag: string
   title: string
   desc: string
+  checks: string[]
 }
 
-const heroRef = ref<HTMLElement | null>(null)
-const windowRef = ref<HTMLElement | null>(null)
-const isVisible = ref(false)
-const mouseX = ref(50)
-const mouseY = ref(50)
-const prefersReducedMotion = ref(false)
-
-const metrics: Metric[] = [
-  { value: '22', label: 'Mẫu Templates' },
-  { value: '43', label: 'Rules (.mdc)' },
-  { value: '50', label: 'Skills' },
-  { value: '10+', label: 'Vibe Code Tools' }
-]
-
-const capabilities: Capability[] = [
+const flowNodes: FlowNode[] = [
   {
-    icon: 'route',
-    title: 'Context Router',
-    desc: 'Routes only the domain knowledge needed for the task. Skip the rest.'
+    id: 'input',
+    label: 'Input',
+    tag: '01 / CONTEXT',
+    title: 'Bắt đầu từ yêu cầu có ngữ cảnh',
+    desc: 'Prompt, ảnh chụp màn hình hoặc asset có sẵn được đưa vào đúng workspace. Không cần đoán ý từ một câu lệnh ngắn.',
+    checks: ['prompt / screenshot / asset', 'workspace rõ ràng', 'mục tiêu đầu ra']
   },
   {
-    icon: 'memory',
-    title: 'Memory First + TDAM',
-    desc: 'Layered memory (L0–L3) with symbolic Mermaid canvas — up to 92% token savings.'
+    id: 'router',
+    label: 'Router',
+    tag: '02 / ROUTING',
+    title: 'Chỉ nạp đúng phần cần dùng',
+    desc: 'Rule, skill và domain knowledge được chọn theo tác vụ. Phần không liên quan đứng yên, giúp giảm nhiễu và giữ token cho việc quan trọng.',
+    checks: ['rule theo domain', 'skill theo intent', 'memory theo dự án']
   },
   {
-    icon: 'token',
-    title: 'Token Optimized',
-    desc: 'TDAM offloading + compression + lazy loading cuts context use by up to 47%.'
+    id: 'build',
+    label: 'Build',
+    tag: '03 / EXECUTION',
+    title: 'Thi hành theo contract, không đoán',
+    desc: 'Agent nhận đầu việc nhỏ, enum rõ ràng và tiêu chí nghiệm thu. Gate trước/sau giữ changelog, test và scope không bị trôi.',
+    checks: ['task atom', 'pre / post gate', 'diff có thể review']
+  },
+  {
+    id: 'verify',
+    label: 'Verify',
+    tag: '04 / DELIVERY',
+    title: 'Chỉ bàn giao khi có bằng chứng',
+    desc: 'Build, test và review là một phần của luồng. Kết quả bàn giao kèm lệnh đã chạy, file đã đổi và phần còn biết trước.',
+    checks: ['build / test / review', 'edge case có ghi chú', 'handoff ngắn gọn']
   }
 ]
+
+const activeNodeId = ref('router')
+const activeNode = computed(() => flowNodes.find((n) => n.id === activeNodeId.value) ?? flowNodes[0])
+
+const featuredIds = ['ui-ux', 'cms-landing-enterprise', 'dashboard-ui']
+const featured = computed(() =>
+  featuredIds
+    .map((id) => templates.find((t) => t.id === id))
+    .filter((t): t is (typeof templates)[number] => Boolean(t))
+)
+
+const facts = computed(() => [
+  { value: String(templates.length), label: 'Templates trong repo' },
+  { value: '6', label: 'Theme modes' },
+  { value: '10+', label: 'Vibe code tools' },
+  { value: 'MIT', label: 'License' }
+])
+
+const heroRef = ref<HTMLElement | null>(null)
+const isVisible = ref(false)
+let observer: IntersectionObserver | null = null
 
 function smoothScroll(href: string) {
   const target = document.querySelector(href)
-  if (target) {
-    const navbarHeight = 56
-    const targetPosition = target.getBoundingClientRect().top + window.scrollY - navbarHeight
-    window.scrollTo({ top: targetPosition, behavior: 'smooth' })
-  }
+  if (!target) return
+  const top = target.getBoundingClientRect().top + window.scrollY - 64
+  window.scrollTo({ top, behavior: 'smooth' })
 }
-
-function onIntersection(entries: IntersectionObserverEntry[]) {
-  entries.forEach((entry) => {
-    if (entry.isIntersecting) {
-      isVisible.value = true
-    }
-  })
-}
-
-function onMouseMove(e: MouseEvent) {
-  if (prefersReducedMotion.value || !windowRef.value) return
-  const rect = windowRef.value.getBoundingClientRect()
-  const x = ((e.clientX - rect.left) / rect.width) * 100
-  const y = ((e.clientY - rect.top) / rect.height) * 100
-  mouseX.value = Math.max(0, Math.min(100, x))
-  mouseY.value = Math.max(0, Math.min(100, y))
-}
-
-let observer: IntersectionObserver | null = null
 
 onMounted(() => {
-  prefersReducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-  if (heroRef.value && !prefersReducedMotion.value) {
-    observer = new IntersectionObserver(onIntersection, { threshold: 0.05 })
-    observer.observe(heroRef.value)
-  } else {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !heroRef.value) {
     isVisible.value = true
+    return
   }
-
-  if (windowRef.value) {
-    windowRef.value.addEventListener('mousemove', onMouseMove, { passive: true })
-  }
+  observer = new IntersectionObserver(
+    (entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        isVisible.value = true
+        observer?.disconnect()
+      }
+    },
+    { threshold: 0.06 }
+  )
+  observer.observe(heroRef.value)
 })
 
-onUnmounted(() => {
-  if (observer) observer.disconnect()
-  if (windowRef.value) {
-    windowRef.value.removeEventListener('mousemove', onMouseMove)
-  }
-})
-
-const titleWords1 = ['An', 'opinionated', 'framework']
-const titleWords2 = ['for', 'AI', 'coding', 'agents.']
+onUnmounted(() => observer?.disconnect())
 </script>
 
 <template>
-  <section class="hero" ref="heroRef">
+  <section ref="heroRef" class="hero" :class="{ visible: isVisible }">
     <div class="hero-bg" aria-hidden="true">
-      <div class="hero-bg-grid"></div>
-      <div class="hero-bg-glow"></div>
+      <div class="hero-gridlines"></div>
     </div>
 
-    <div class="container hero-container">
-      <div class="hero-grid" :class="{ visible: isVisible }">
-        <!-- LEFT: Headline + CTA -->
-        <div class="hero-left">
-          <div class="hero-eyebrow" :class="{ visible: isVisible }">
-            <span class="hero-pulse"></span>
-            <span>Open source · MIT License</span>
-          </div>
-
-          <h1 class="hero-title">
-            <span class="hero-line">
-              <span
-                v-for="(word, i) in titleWords1"
-                :key="`a-${word}`"
-                class="hero-word"
-                :class="{ visible: isVisible }"
-                :style="{ '--i': i }"
-              >{{ word }}</span>
-            </span>
-            <span class="hero-line hero-line-italic">
-              <span
-                v-for="(word, i) in titleWords2"
-                :key="`b-${word}`"
-                class="hero-word"
-                :class="{ visible: isVisible }"
-                :style="{ '--i': titleWords1.length + i }"
-              >{{ word }}</span>
-            </span>
-          </h1>
-
-          <p class="hero-sub" :class="{ visible: isVisible }">
-            43 rules, 50 skills, 22 templates thực tế, 18 specialist agents và 6 theme.
-            Tương thích tất cả các tool vibe code phổ biến: Cursor, Windsurf, Claude Code, Copilot, Roo, Cline, Antigravity.
-          </p>
-
-          <div class="hero-cta" :class="{ visible: isVisible }">
-            <button class="btn btn-primary hero-cta-primary" @click="smoothScroll('#getting-started')">
-              Install framework
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M5 12h14M13 6l6 6-6 6"/>
-              </svg>
-            </button>
-            <router-link to="/templates" class="btn btn-secondary">
-              Browse templates
-            </router-link>
-          </div>
-
-          <div class="hero-metrics" :class="{ visible: isVisible }">
-            <div v-for="m in metrics" :key="m.label" class="hero-metric">
-              <span class="hero-metric-value">{{ m.value }}</span>
-              <span class="hero-metric-label">{{ m.label }}</span>
-            </div>
-          </div>
+    <div class="container hero-layout">
+      <div class="hero-copy">
+        <div class="hero-eyebrow">
+          <span class="hero-signal"></span>
+          <span>OPEN SOURCE · MIT · FRAMEWORK 2026</span>
         </div>
 
-        <!-- RIGHT: Capability stack (real visual, not fake terminal) -->
-        <div class="hero-right">
-          <div
-            class="hero-window"
-            ref="windowRef"
-            :style="{
-              '--mx': `${mouseX}%`,
-              '--my': `${mouseY}%`
-            }"
-          >
-            <div class="hero-window-glow" aria-hidden="true"></div>
+        <h1 class="hero-title">
+          Vibe code có cấu trúc.<br />
+          <span>Bàn giao được production.</span>
+        </h1>
 
-            <div class="hero-window-bar">
-              <div class="hero-window-dots">
-                <span></span><span></span><span></span>
-              </div>
-              <div class="hero-window-title">.cursor/skills/ui_frontend-taste</div>
-              <div class="hero-window-action">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="16 18 22 12 16 6"/>
-                  <polyline points="8 6 2 12 8 18"/>
-                </svg>
-              </div>
-            </div>
-            <div class="hero-window-body">
-              <article
-                v-for="(cap, i) in capabilities"
-                :key="cap.title"
-                class="hero-cap"
-                :class="{ visible: isVisible }"
-                :style="{ '--delay': `${i * 100 + 200}ms` }"
-              >
-                <div class="hero-cap-icon">
-                  <svg v-if="cap.icon === 'route'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
-                    <circle cx="6" cy="19" r="3"/>
-                    <path d="M9 19h8.5a3.5 3.5 0 000-7h-11a3.5 3.5 0 010-7H15"/>
-                    <circle cx="18" cy="5" r="3"/>
-                  </svg>
-                  <svg v-else-if="cap.icon === 'memory'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
-                    <ellipse cx="12" cy="5" rx="9" ry="3"/>
-                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
-                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
-                  </svg>
-                  <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
-                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-                  </svg>
-                </div>
-                <div class="hero-cap-text">
-                  <div class="hero-cap-title">{{ cap.title }}</div>
-                  <div class="hero-cap-desc">{{ cap.desc }}</div>
-                </div>
-                <div class="hero-cap-status">
-                  <span class="hero-cap-status-dot"></span>
-                  Active
-                </div>
-              </article>
+        <p class="hero-sub">
+          Rule, skill, agent và template được xếp thành một luồng rõ ràng. Router chỉ nạp ngữ cảnh
+          cần thiết; gate kiểm tra trước khi bàn giao. Dùng được trên Cursor, Codex, Claude Code,
+          Windsurf và các tool vibe code khác.
+        </p>
 
-              <div class="hero-window-footer">
-                <div class="hero-foot-stat">
-                  <span class="hero-foot-num">40%</span>
-                  <span class="hero-foot-label">tokens saved</span>
-                </div>
-                <div class="hero-foot-bar">
-                  <div class="hero-foot-bar-fill" :class="{ visible: isVisible }"></div>
-                </div>
-                <div class="hero-foot-stat hero-foot-stat-end">
-                  <span class="hero-foot-num">2.1s</span>
-                  <span class="hero-foot-label">avg latency</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Floating tag -->
-          <div class="hero-float-tag" :class="{ visible: isVisible }">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="20 6 9 17 4 12"/>
+        <div class="hero-actions">
+          <button class="btn btn-primary" @click="smoothScroll('#getting-started')">
+            Xem hướng dẫn setup
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" />
             </svg>
-            <span>Works with Cursor, Claude Code, Codex</span>
+          </button>
+          <router-link to="/templates" class="btn btn-secondary">Kho templates</router-link>
+          <button class="hero-reel-link" @click="smoothScroll('#showcase-reel')">Xem demo reel</button>
+        </div>
+
+        <dl class="hero-facts">
+          <div v-for="fact in facts" :key="fact.label" class="hero-fact">
+            <dt>{{ fact.value }}</dt>
+            <dd>{{ fact.label }}</dd>
           </div>
+        </dl>
+      </div>
+
+      <div class="hero-board">
+        <div class="board-head">
+          <div class="board-head-left">
+            <span class="board-mark">VF</span>
+            <span class="board-title">framework / flow</span>
+          </div>
+          <span class="board-badge">local-first · repo-driven</span>
+        </div>
+
+        <div class="flow-rail" role="tablist" aria-label="Luồng thực thi framework">
+          <button
+            v-for="(node, index) in flowNodes"
+            :key="node.id"
+            class="flow-node"
+            :class="{ active: activeNodeId === node.id }"
+            role="tab"
+            :aria-selected="activeNodeId === node.id"
+            @click="activeNodeId = node.id"
+          >
+            <span class="flow-index">0{{ index + 1 }}</span>
+            <span class="flow-label">{{ node.label }}</span>
+          </button>
+        </div>
+
+        <div class="flow-detail" aria-live="polite">
+          <div class="flow-detail-copy">
+            <span class="flow-tag">{{ activeNode.tag }}</span>
+            <h2>{{ activeNode.title }}</h2>
+            <p>{{ activeNode.desc }}</p>
+          </div>
+          <ul class="flow-checks">
+            <li v-for="check in activeNode.checks" :key="check">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              {{ check }}
+            </li>
+          </ul>
+        </div>
+
+        <div class="board-previews">
+          <router-link
+            v-for="item in featured"
+            :key="item.id"
+            :to="`/templates/${item.id}`"
+            class="board-preview"
+            :title="`Mở ${item.name}`"
+          >
+            <TemplateThumbnail :slug="item.slug" />
+            <span>{{ item.name }}</span>
+          </router-link>
+        </div>
+
+        <div class="board-foot">
+          <span>Preview dựng từ template có trong repo — không phải ảnh AI.</span>
+          <span>build · test · review</span>
         </div>
       </div>
     </div>
@@ -249,572 +203,421 @@ const titleWords2 = ['for', 'AI', 'coding', 'agents.']
 <style scoped>
 .hero {
   position: relative;
-  padding: 112px 0 80px;
-  overflow: hidden;
-  min-height: calc(100vh - 56px);
+  min-height: calc(100vh - 60px);
   display: flex;
   align-items: center;
+  padding: 104px 0 72px;
+  overflow: hidden;
 }
 
 .hero-bg {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 0;
-  overflow: hidden;
-}
-
-.hero-bg-grid {
-  position: absolute;
-  inset: -20% -10% -20% -10%;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
-  background-size: 56px 56px;
-  mask-image: radial-gradient(ellipse 60% 80% at 50% 0%, black 30%, transparent 75%);
-  -webkit-mask-image: radial-gradient(ellipse 60% 80% at 50% 0%, black 30%, transparent 75%);
-  animation: grid-drift 60s linear infinite;
-}
-
-.hero-bg-glow {
-  position: absolute;
-  inset: 0;
   background: var(--gradient-hero);
 }
 
-@keyframes grid-drift {
-  from { transform: translate3d(0, 0, 0); }
-  to { transform: translate3d(56px, 56px, 0); }
+.hero-gridlines {
+  position: absolute;
+  inset: -15% -10%;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.024) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.024) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 62% 74% at 70% 22%, #000 15%, transparent 76%);
+  -webkit-mask-image: radial-gradient(ellipse 62% 74% at 70% 22%, #000 15%, transparent 76%);
 }
 
-.hero-container {
+.hero-layout {
   position: relative;
-  z-index: 1;
-}
-
-.hero-grid {
   display: grid;
-  grid-template-columns: 1.05fr 1fr;
-  gap: 80px;
+  grid-template-columns: minmax(0, 0.92fr) minmax(480px, 1.08fr);
+  gap: clamp(36px, 5vw, 76px);
   align-items: center;
 }
 
-/* ─── LEFT COLUMN ─────────────────────────────────────────────────── */
+.hero-copy > * {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 600ms var(--ease-out-quart), transform 600ms var(--ease-out-quart);
+}
+
+.hero.visible .hero-copy > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hero.visible .hero-copy > :nth-child(2) { transition-delay: 60ms; }
+.hero.visible .hero-copy > :nth-child(3) { transition-delay: 120ms; }
+.hero.visible .hero-copy > :nth-child(4) { transition-delay: 180ms; }
+.hero.visible .hero-copy > :nth-child(5) { transition-delay: 240ms; }
+
 .hero-eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 5px 12px 5px 8px;
-  background: var(--bg-surface);
+  width: fit-content;
+  padding: 5px 11px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-pill);
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin-bottom: 28px;
-  font-family: var(--font-mono);
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 500ms var(--ease-out-quart), transform 500ms var(--ease-out-quart);
-}
-
-.hero-eyebrow.visible {
-  opacity: 1;
-  transform: translateY(0);
-  transition-delay: 0ms;
-}
-
-.hero-pulse {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent);
-  animation: pulse-soft 2.4s ease-in-out infinite;
-  box-shadow: 0 0 8px var(--accent-glow);
-}
-
-@keyframes pulse-soft {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(0.85); }
-}
-
-.hero-title {
-  font-size: clamp(36px, 5.6vw, 64px);
-  font-weight: 600;
-  line-height: 1.04;
-  letter-spacing: -0.04em;
-  color: var(--text-primary);
-  margin-bottom: 24px;
-}
-
-.hero-line {
-  display: block;
-  overflow: hidden;
-}
-
-.hero-word {
-  display: inline-block;
-  opacity: 0;
-  transform: translateY(110%);
-  transition: opacity 600ms var(--ease-out-quart), transform 600ms var(--ease-out-quart);
-  transition-delay: calc(var(--i) * 60ms + 100ms);
-}
-
-.hero-word.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.hero-line-italic {
-  color: var(--text-tertiary);
-  font-style: italic;
-  font-weight: 500;
-}
-
-.hero-sub {
-  font-size: 16px;
-  color: var(--text-secondary);
-  line-height: 1.65;
-  max-width: 52ch;
-  margin-bottom: 36px;
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 600ms var(--ease-out-quart), transform 600ms var(--ease-out-quart);
-  transition-delay: 700ms;
-}
-
-.hero-sub.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.hero-code {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-subtle);
-  padding: 2px 6px;
-  border-radius: var(--radius-sm);
-  color: var(--accent);
-  margin: 0 2px;
-}
-
-.hero-cta {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 56px;
-  flex-wrap: wrap;
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 600ms var(--ease-out-quart), transform 600ms var(--ease-out-quart);
-  transition-delay: 800ms;
-}
-
-.hero-cta.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.hero-cta-primary {
-  padding: 11px 20px;
-  font-size: 14px;
-  font-weight: 500;
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-cta-primary::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.15) 50%, transparent 70%);
-  transform: translateX(-100%);
-  transition: transform 700ms var(--ease-out-quart);
-  pointer-events: none;
-}
-
-.hero-cta-primary:hover::after {
-  transform: translateX(100%);
-}
-
-.hero-metrics {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0;
-  padding-top: 28px;
-  border-top: 1px solid var(--border-hairline);
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 600ms var(--ease-out-quart), transform 600ms var(--ease-out-quart);
-  transition-delay: 900ms;
-}
-
-.hero-metrics.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.hero-metric {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.hero-metric-value {
-  font-size: 24px;
-  font-weight: 600;
-  font-family: var(--font-mono);
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
-  line-height: 1;
-}
-
-.hero-metric-label {
-  font-size: 11px;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-weight: 500;
-}
-
-/* ─── RIGHT COLUMN (real window visual) ───────────────────────────── */
-.hero-right {
-  position: relative;
-}
-
-.hero-window {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xl);
-  overflow: hidden;
-  box-shadow: var(--shadow-lg);
-  position: relative;
-}
-
-.hero-window-glow {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  border-radius: var(--radius-xl);
-  opacity: 0;
-  background: radial-gradient(
-    circle 320px at var(--mx, 50%) var(--my, 50%),
-    rgba(16, 185, 129, 0.12) 0%,
-    transparent 70%
-  );
-  transition: opacity 400ms var(--ease-out-quart);
-  z-index: 1;
-}
-
-.hero-window:hover .hero-window-glow {
-  opacity: 1;
-}
-
-.hero-window-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border-hairline);
   background: var(--bg-surface);
-  position: relative;
-  z-index: 2;
-}
-
-.hero-window-dots {
-  display: flex;
-  gap: 6px;
-}
-
-.hero-window-dots span {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--border-default);
-}
-
-.hero-window-dots span:nth-child(1) { background: rgba(248, 113, 113, 0.5); }
-.hero-window-dots span:nth-child(2) { background: rgba(251, 191, 36, 0.5); }
-.hero-window-dots span:nth-child(3) { background: rgba(52, 211, 153, 0.5); }
-
-.hero-window-title {
-  flex: 1;
-  text-align: center;
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  color: var(--text-tertiary);
-  letter-spacing: 0.02em;
-}
-
-.hero-window-action {
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-tertiary);
-}
-
-.hero-window-action svg {
-  width: 12px;
-  height: 12px;
-}
-
-.hero-window-body {
-  padding: 8px;
-  position: relative;
-  z-index: 2;
-}
-
-.hero-cap {
-  display: grid;
-  grid-template-columns: 36px 1fr auto;
-  gap: 14px;
-  align-items: center;
-  padding: 14px 12px;
-  border-radius: var(--radius-md);
-  transition: background var(--t-fast), transform var(--t-fast);
-  opacity: 0;
-  transform: translateX(12px);
-}
-
-.hero-cap.visible {
-  opacity: 1;
-  transform: translateX(0);
-  transition: opacity 600ms var(--ease-out-quart), transform 600ms var(--ease-out-quart);
-  transition-delay: var(--delay);
-}
-
-.hero-cap:hover {
-  background: rgba(255, 255, 255, 0.02);
-  transform: translateX(4px);
-}
-
-.hero-cap-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--accent-dim);
-  color: var(--accent);
-  border: 1px solid var(--accent-line);
-  transition: transform var(--t-base);
-}
-
-.hero-cap:hover .hero-cap-icon {
-  transform: rotate(-6deg) scale(1.05);
-}
-
-.hero-cap-icon svg {
-  width: 18px;
-  height: 18px;
-}
-
-.hero-cap-text {
-  min-width: 0;
-}
-
-.hero-cap-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 2px;
-  letter-spacing: -0.005em;
-}
-
-.hero-cap-desc {
-  font-size: 11.5px;
-  color: var(--text-tertiary);
-  line-height: 1.45;
-}
-
-.hero-cap-status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 10.5px;
-  color: var(--text-tertiary);
-  font-family: var(--font-mono);
-  text-transform: uppercase;
+  color: var(--text-secondary);
+  font: 500 11px/1 var(--font-mono);
   letter-spacing: 0.04em;
 }
 
-.hero-cap-status-dot {
+.hero-signal {
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 6px var(--accent-glow);
-  animation: pulse-soft 2.4s ease-in-out infinite;
+  box-shadow: 0 0 8px var(--accent-glow);
 }
 
-.hero-window-footer {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 16px;
-  align-items: center;
-  padding: 14px 16px;
-  margin-top: 6px;
-  border-top: 1px solid var(--border-hairline);
-  background: var(--bg-surface);
-}
-
-.hero-foot-stat {
-  display: flex;
-  flex-direction: column;
-}
-
-.hero-foot-stat-end {
-  text-align: right;
-}
-
-.hero-foot-num {
-  font-size: 14px;
-  font-weight: 600;
-  font-family: var(--font-mono);
+.hero-title {
+  margin: 22px 0 20px;
+  font-size: clamp(38px, 4.6vw, 64px);
+  line-height: 1.06;
+  letter-spacing: -0.045em;
+  font-weight: 650;
   color: var(--text-primary);
-  letter-spacing: -0.01em;
 }
 
-.hero-foot-label {
-  font-size: 10px;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+.hero-title span {
+  color: var(--accent);
 }
 
-.hero-foot-bar {
-  height: 6px;
-  border-radius: var(--radius-pill);
-  background: var(--bg-base);
-  overflow: hidden;
-}
-
-.hero-foot-bar-fill {
-  height: 100%;
-  width: 0;
-  background: linear-gradient(90deg, var(--accent), var(--accent-bright));
-  border-radius: var(--radius-pill);
-  transition: width 1.4s var(--ease-out-quart) 1s;
-}
-
-.hero-foot-bar-fill.visible {
-  width: 60%;
-}
-
-/* Floating tag below the window */
-.hero-float-tag {
-  position: absolute;
-  bottom: -22px;
-  left: 24px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-pill);
-  font-size: 12px;
+.hero-sub {
+  max-width: 55ch;
+  margin: 0 0 30px;
   color: var(--text-secondary);
-  box-shadow: var(--shadow-md);
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 600ms var(--ease-out-quart), transform 600ms var(--ease-out-quart);
-  transition-delay: 1100ms;
+  font-size: 15.5px;
+  line-height: 1.7;
 }
 
-.hero-float-tag.visible {
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 38px;
+}
+
+.hero-actions .btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+.hero-reel-link {
+  padding: 8px 4px;
+  background: none;
+  border: 0;
+  color: var(--text-secondary);
+  font: 500 13px/1.4 inherit;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--border-default);
+  cursor: pointer;
+}
+
+.hero-reel-link:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent-line);
+}
+
+.hero-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-hairline);
+}
+
+.hero-fact dt {
+  font: 600 21px/1 var(--font-mono);
+  color: var(--text-primary);
+}
+
+.hero-fact dd {
+  margin: 7px 0 0;
+  color: var(--text-tertiary);
+  font-size: 10.5px;
+  line-height: 1.35;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.hero-board {
+  position: relative;
+  padding: 18px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 700ms var(--ease-out-quart) 180ms, transform 700ms var(--ease-out-quart) 180ms;
+}
+
+.hero.visible .hero-board {
   opacity: 1;
   transform: translateY(0);
 }
 
-.hero-float-tag svg {
-  width: 12px;
-  height: 12px;
+.hero-board::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(125deg, var(--accent-line), transparent 38%);
+  pointer-events: none;
+}
+
+.board-head,
+.board-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.board-head {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.board-head-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.board-mark {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--bg-base);
+  font: 800 11px/1 var(--font-mono);
+}
+
+.board-title,
+.board-badge,
+.board-foot {
+  font: 500 10.5px/1.4 var(--font-mono);
+  color: var(--text-tertiary);
+}
+
+.board-badge {
+  padding: 4px 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+}
+
+.flow-rail {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin: 16px 0 12px;
+}
+
+.flow-node {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font: 600 12px/1 inherit;
+  cursor: pointer;
+  transition: transform 180ms var(--ease-out-quart), border-color 180ms, color 180ms, background 180ms;
+}
+
+.flow-node:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-default);
+  color: var(--text-primary);
+}
+
+.flow-node.active {
+  border-color: var(--accent-line);
+  background: var(--accent-dim);
   color: var(--accent);
-  stroke-width: 2.5;
 }
 
-/* ─── RESPONSIVE ──────────────────────────────────────────────────── */
-@media (max-width: 1024px) {
-  .hero-grid {
-    grid-template-columns: 1fr;
-    gap: 56px;
-  }
-
-  .hero-right {
-    max-width: 540px;
-    margin: 0 auto;
-    width: 100%;
-  }
-
-  .hero-metrics {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-  }
+.flow-index {
+  font: 600 9.5px/1 var(--font-mono);
+  color: var(--text-faint);
 }
 
-@media (max-width: 640px) {
+.flow-node.active .flow-index {
+  color: var(--accent);
+}
+
+.flow-detail {
+  display: grid;
+  grid-template-columns: 1.35fr 0.9fr;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+}
+
+.flow-tag {
+  font: 600 10px/1 var(--font-mono);
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+.flow-detail h2 {
+  margin: 9px 0 8px;
+  color: var(--text-primary);
+  font-size: 16px;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+}
+
+.flow-detail p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.flow-checks {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.flow-checks li {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  color: var(--text-secondary);
+  font: 500 11px/1.45 var(--font-mono);
+}
+
+.flow-checks svg {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 auto;
+  color: var(--accent);
+}
+
+.board-previews {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.board-preview {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: #09090b;
+}
+
+.board-preview :deep(.thumbnail-inner) {
+  transition: transform 420ms var(--ease-out-quart);
+}
+
+.board-preview:hover :deep(.thumbnail-inner) {
+  transform: scale(1.04);
+}
+
+.board-preview span {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 16px 8px 7px;
+  background: linear-gradient(transparent, rgba(4, 6, 10, 0.92));
+  color: #e8f5ef;
+  font: 600 10px/1.2 var(--font-mono);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.board-foot {
+  padding-top: 12px;
+}
+
+.board-foot span:last-child {
+  color: var(--accent);
+}
+
+@media (max-width: 1080px) {
   .hero {
-    padding: 96px 0 56px;
+    min-height: auto;
   }
 
-  .hero-cta {
-    flex-direction: column;
-    align-items: stretch;
-    width: 100%;
+  .hero-layout {
+    grid-template-columns: 1fr;
   }
 
-  .hero-cta .btn {
+  .hero-board {
+    max-width: 680px;
     width: 100%;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 680px) {
+  .hero {
+    padding: 92px 0 56px;
+  }
+
+  .hero-actions .btn {
+    flex: 1 1 180px;
     justify-content: center;
   }
 
-  .hero-metrics {
+  .hero-facts {
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px 24px;
+    row-gap: 20px;
   }
 
-  .hero-float-tag {
-    position: static;
-    margin-top: 24px;
-    justify-content: center;
-    width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
+  .flow-rail {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .flow-detail {
+    grid-template-columns: 1fr;
+  }
+
+  .board-previews {
+    grid-template-columns: 1fr;
+  }
+
+  .board-foot {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-bg-grid,
-  .hero-pulse,
-  .hero-cap-status-dot {
-    animation: none !important;
-  }
-
-  .hero-word,
-  .hero-sub,
-  .hero-cta,
-  .hero-metrics,
-  .hero-eyebrow,
-  .hero-float-tag,
-  .hero-cap,
-  .hero-window-glow {
+  .hero-copy > *,
+  .hero-board,
+  .flow-node,
+  .board-preview :deep(.thumbnail-inner) {
     transition: none !important;
     transform: none !important;
     opacity: 1 !important;
-  }
-
-  .hero-foot-bar-fill.visible {
-    width: 60% !important;
-    transition: none !important;
-  }
-
-  .hero-cta-primary::after {
-    display: none;
   }
 }
 </style>

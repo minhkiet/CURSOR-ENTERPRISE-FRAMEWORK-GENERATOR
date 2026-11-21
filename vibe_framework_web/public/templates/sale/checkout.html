@@ -3,16 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Thanh Toán An Toàn · AURA Earbuds Pro</title>
+  <title>Thanh Toán An Toàn, AURA Earbuds Pro</title>
   <meta name="description" content="Thanh toán 1-click cho tai nghe flagship AURA Earbuds Pro. Miễn phí giao 2h, bảo hành 24 tháng, hỗ trợ COD & VietQR." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+  <link rel="stylesheet" href="../_assets/fonts.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/regular/style.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/fill/style.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/duotone/style.css" />
+
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="../_assets/ux-polish.css" />
 </head>
-<body class="checkout-page-body">
+<body data-ux="sale" class="checkout-page-body">
 
 <!-- ─── HEADER ─── -->
 <header class="checkout-header">
@@ -191,7 +192,7 @@
       <!-- Item Preview -->
       <div class="sum-item">
         <div class="item-visual-wrap">
-          <svg viewBox="0 0 100 100" width="60" height="60" class="mini-svg-item">
+          <svg aria-hidden="true" viewBox="0 0 100 100" width="60" height="60" class="mini-svg-item">
             <ellipse cx="35" cy="55" rx="20" ry="24" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
             <ellipse cx="65" cy="55" rx="20" ry="24" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
             <path d="M 20 40 Q 50 15 80 40" stroke="#1a1a1a" stroke-width="4" fill="none"/>
@@ -200,7 +201,7 @@
         </div>
         <div class="item-meta">
           <div class="item-name">AURA Earbuds Pro Flagship</div>
-          <div class="item-variant" id="selectedColorLabel">Màu: Onyx Black · Bảo hành 24 tháng</div>
+          <div class="item-variant" id="selectedColorLabel">Màu: Onyx Black, Bảo hành 24 tháng</div>
           <div class="color-picker-mini">
             <button class="c-dot active" style="background:#1a1a1a" onclick="changeColor('Onyx Black', this)"></button>
             <button class="c-dot" style="background:#f5f5f4" onclick="changeColor('Polar White', this)"></button>
@@ -259,7 +260,7 @@
 
       <!-- Submit Button -->
       <button type="button" class="btn btn-primary btn-full submit-order-btn" onclick="submitOrder()">
-        <i class="ph-fill ph-lock-key"></i> ĐẶT HÀNG NGAY · GIAO TẬN TAY
+        <i class="ph-fill ph-lock-key"></i> ĐẶT HÀNG NGAY, GIAO TẬN TAY
       </button>
 
       <!-- Trust Features -->
@@ -331,13 +332,13 @@
 <div class="floating-contact">
   <a href="tel:19006868" class="floating-btn floating-btn_hotline" aria-label="Gọi hotline: 1900 6868">
     <span class="floating-tooltip">Hotline tư vấn: 1900 6868</span>
-    <svg viewBox="0 0 24 24" fill="white" width="22" height="22">
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="white" width="22" height="22">
       <path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.4-.1-.8 0-1.1.3l-2.2 2.2c-.3-.3.4-.7.2-1.1-.4-1.1-.6-2.3-.6-3.5 0-.6-.4-1-1-1H4c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"/>
     </svg>
   </a>
   <a href="https://zalo.me" target="_blank" rel="noopener" class="floating-btn floating-btn_zalo" aria-label="Chat Zalo 24/7">
     <span class="floating-tooltip">Chat Zalo Chuyên Viên</span>
-    <svg viewBox="0 0 32 32" fill="none" width="26" height="26">
+    <svg aria-hidden="true" viewBox="0 0 32 32" fill="none" width="26" height="26">
       <path d="M16 4C9.4 4 4 8.7 4 14.5c0 3.3 1.8 6.3 4.5 8.2l-1.2 4.4c-.1.5.4.9.9.6l5-2.8c.9.3 1.8.4 2.8.4 6.6 0 12-4.7 12-10.5S22.6 4 16 4Z" fill="white"/>
       <text x="16" y="17.8" fill="#0068FF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="8.5" text-anchor="middle" letter-spacing="-0.3">Zalo</text>
     </svg>
@@ -356,7 +357,7 @@ function changeColor(colorName, btn) {
   currentColor = colorName;
   document.querySelectorAll('.c-dot').forEach(d => d.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('selectedColorLabel').textContent = `Màu: ${colorName} · Bảo hành 24 tháng`;
+  document.getElementById('selectedColorLabel').textContent = `Màu: ${colorName}, Bảo hành 24 tháng`;
 }
 
 function adjustQty(delta) {

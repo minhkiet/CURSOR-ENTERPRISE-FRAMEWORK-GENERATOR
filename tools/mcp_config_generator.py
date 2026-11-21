@@ -9,6 +9,7 @@ Usage:
     python mcp_config_generator.py --output mcp.json
     python mcp_config_generator.py --workspace /path/to/project --output mcp.json
     python mcp_config_generator.py --add vercel --add browser --output mcp.json
+    python mcp_config_generator.py --add pinterest --output mcp.json
 """
 
 import argparse
@@ -248,6 +249,22 @@ class McpConfigGenerator:
                 description="Shopee API integration for seller operations"
             ).to_dict()
 
+    def add_pinterest(self):
+        """Add Pinterest image/video search MCP server."""
+        mcp_dir = self.workspace_root / "mcp"
+        server_script = mcp_dir / "pinterest_server.py"
+        if not server_script.exists():
+            return
+
+        workspace = self._to_target_path(self.workspace_root)
+        self.config.mcpServers["pinterest"] = McpServer(
+            command=self.python_cmd,
+            args=[self._to_target_path(server_script)],
+            cwd=workspace,
+            env={"PYTHONPATH": workspace},
+            description="Pinterest MCP - search, browse and download high-resolution images and videos",
+        ).to_dict()
+
     def add_rea(self):
         """Add REA (Reverse Engineer Anything) MCP server."""
         rea_dir = self.workspace_root / "tools" / "rea"
@@ -352,6 +369,7 @@ def main():
         print("  google   - Google APIs")
         print("  shopee   - Shopee Seller API")
         print("  rea      - REA Reverse Engineer Anything")
+        print("  pinterest - Pinterest image/video search and download")
         return 0
     
     # Generate config
@@ -376,6 +394,8 @@ def main():
                 generator.add_shopee()
             elif server == "rea":
                 generator.add_rea()
+            elif server == "pinterest":
+                generator.add_pinterest()
     
     # Print summary
     generator.print_summary()

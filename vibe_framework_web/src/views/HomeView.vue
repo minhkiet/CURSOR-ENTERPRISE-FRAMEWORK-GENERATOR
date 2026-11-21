@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import HeroSection from '../components/HeroSection.vue'
+import ShowcaseReel from '../components/ShowcaseReel.vue'
 import StatsBar from '../components/StatsBar.vue'
 import ExplorerSection from '../components/ExplorerSection.vue'
 import TdamSection from '../components/TdamSection.vue'
@@ -16,6 +17,7 @@ import GettingStartedSection from '../components/GettingStartedSection.vue'
 <template>
   <div class="home-view">
     <HeroSection />
+    <ShowcaseReel />
     <StatsBar />
     <ExplorerSection />
     <TdamSection />

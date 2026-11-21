@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "prebuild": "node scripts/generate-previews.js",
-    "build": "node scripts/generate-previews.js && vue-tsc -b && vite build",
+    "build": "vue-tsc -b && vite build",
+    "capture:previews": "pwsh -NoProfile -File scripts/capture-real-previews.ps1",
     "preview": "vite preview",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
     "start": "npm run dev",

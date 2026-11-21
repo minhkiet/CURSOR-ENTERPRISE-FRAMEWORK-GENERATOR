@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AutoPrime Motors — Siêu Thị Ô Tô Đa Thương Hiệu & Hệ Sinh Thái Mua Bán Xe Toàn Diện</title>
+  <title>AutoPrime Motors, Siêu Thị Ô Tô Đa Thương Hiệu & Hệ Sinh Thái Mua Bán Xe Toàn Diện</title>
   <meta name="description" content="AutoPrime phân phối ô tô chính hãng & xe lướt chuẩn 176 hạng mục kiểm định: Toyota, Mercedes-Benz, BMW, Porsche, Ford, Hyundai, VinFast. Hỗ trợ trả góp 85%, lái thử tại nhà, giao xe 24h." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" />
+  <link rel="stylesheet" href="../_assets/fonts.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/regular/style.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/fill/style.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/duotone/style.css" />
+
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="../_assets/ux-polish.css" />
 </head>
-<body>
+<body data-ux="auto-showroom">
 
   <!-- ─── TOP NOTIFICATION & HOTLINE BAR ─── -->
   <aside class="top-bar">
@@ -38,7 +38,7 @@
     <div class="container nav-inner">
       <a href="#" class="brand-logo" aria-label="AutoPrime Motors Trang Chủ">
         <div class="brand-icon">
-          <svg viewBox="0 0 36 36" fill="none">
+          <svg aria-hidden="true" viewBox="0 0 36 36" fill="none">
             <rect width="36" height="36" rx="8" fill="url(#apGrad)"/>
             <path d="M7 23L18 8L29 23H22L18 16L14 23H7Z" fill="#ffffff"/>
             <path d="M12 26H24V28H12V26Z" fill="#f59e0b"/>
@@ -175,8 +175,8 @@
             <select id="heroPriceSelect" class="form-select">
               <option value="all">Tất cả mức giá</option>
               <option value="under800">Dưới 800 Triệu</option>
-              <option value="800-1500">800 Triệu – 1.5 Tỷ</option>
-              <option value="1500-3000">1.5 Tỷ – 3.0 Tỷ</option>
+              <option value="800-1500">800 Triệu, 1.5 Tỷ</option>
+              <option value="1500-3000">1.5 Tỷ, 3.0 Tỷ</option>
               <option value="over3000">Trên 3.0 Tỷ (Xe Siêu Sang)</option>
             </select>
           </div>
@@ -209,7 +209,7 @@
   <section class="brands-section" id="brands">
     <div class="container">
       <div class="brands-header">
-        <span class="sub-label">ĐỐI TÁC PHÂN PHỐI CHÍNH HÃNG & XE LƯỚT CHỨNG NHẬN</span>
+
         <h2>Hội Tụ Các Thương Hiệu Ô Tô Hàng Đầu Thế Giới</h2>
       </div>
       <div class="brands-grid">
@@ -230,7 +230,7 @@
     <div class="container">
       <div class="section-top">
         <div>
-          <span class="sub-label">DANH MỤC XE NỔI BẬT ĐANG CÓ MẶT TẠI SHOWROOM</span>
+
           <h2 class="section-title">Kho Xe Sẵn Sàng Giao Ngay Trong 24 Giờ</h2>
           <p class="section-desc">Mọi xe đều có hồ sơ kiểm định 176 hạng mục độc lập, cam kết pháp lý minh bạch và chế độ bảo hành vàng tới 3 năm.</p>
         </div>
@@ -248,7 +248,7 @@
         <article class="car-card" data-category="luxury certified" data-brand="mercedes" data-body="sedan" data-price="1500-3000">
           <div class="car-media">
             <span class="car-badge highlight">Xe Lướt 8.500 km</span>
-            <img src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=700&q=80" alt="Mercedes-Benz C300 AMG" class="car-img" loading="lazy" />
+            <img decoding="async" src="../_assets/media/b1e957579b85.jpg" alt="Mercedes-Benz C300 AMG" class="car-img" loading="lazy" />
             <button class="car-fav" aria-label="Lưu xe"><i class="ph ph-heart"></i></button>
           </div>
           <div class="car-body">
@@ -258,7 +258,7 @@
             </div>
             <h3 class="car-name">Mercedes-Benz C300 AMG</h3>
             <p class="car-tagline">Sedan thể thao đẳng cấp, động cơ Mild-Hybrid EQ Boost 258HP</p>
-            
+
             <div class="car-specs-grid">
               <div class="spec-cell"><i class="ph-duotone ph-engine"></i> 2.0L Turbo</div>
               <div class="spec-cell"><i class="ph-duotone ph-gear-six"></i> Tự động 9 cấp</div>
@@ -292,7 +292,7 @@
         <article class="car-card" data-category="luxury" data-brand="porsche" data-body="suv" data-price="over3000">
           <div class="car-media">
             <span class="car-badge gold">Full Option Độc Bản</span>
-            <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=700&q=80" alt="Porsche Macan GTS" class="car-img" loading="lazy" />
+            <img decoding="async" src="../_assets/media/645c848253c1.jpg" alt="Porsche Macan GTS" class="car-img" loading="lazy" />
             <button class="car-fav" aria-label="Lưu xe"><i class="ph ph-heart"></i></button>
           </div>
           <div class="car-body">
@@ -302,7 +302,7 @@
             </div>
             <h3 class="car-name">Porsche Macan GTS 2.9L Twin-Turbo</h3>
             <p class="car-tagline">Cỗ máy hiệu năng cao 434 mã lực, dẫn động 4 bánh toàn thời gian AWD</p>
-            
+
             <div class="car-specs-grid">
               <div class="spec-cell"><i class="ph-duotone ph-engine"></i> 2.9L V6 Twin-Turbo</div>
               <div class="spec-cell"><i class="ph-duotone ph-gear-six"></i> 7 Cấp PDK</div>
@@ -336,7 +336,7 @@
         <article class="car-card" data-category="ev certified" data-brand="toyota" data-body="sedan" data-price="800-1500">
           <div class="car-media">
             <span class="car-badge green">Hybrid Tiết Kiệm 4.4L</span>
-            <img src="https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?auto=format&fit=crop&w=700&q=80" alt="Toyota Camry 2.5Q HEV" class="car-img" loading="lazy" />
+            <img decoding="async" src="../_assets/media/e4895442c1e4.jpg" alt="Toyota Camry 2.5Q HEV" class="car-img" loading="lazy" />
             <button class="car-fav" aria-label="Lưu xe"><i class="ph ph-heart"></i></button>
           </div>
           <div class="car-body">
@@ -346,7 +346,7 @@
             </div>
             <h3 class="car-name">Toyota Camry 2.5Q Hybrid (HEV)</h3>
             <p class="car-tagline">Sedan thương gia êm ái, gói công nghệ an toàn Toyota Safety Sense 2.5+</p>
-            
+
             <div class="car-specs-grid">
               <div class="spec-cell"><i class="ph-duotone ph-leaf"></i> Xăng lai Điện</div>
               <div class="spec-cell"><i class="ph-duotone ph-gear-six"></i> Vô cấp E-CVT</div>
@@ -380,7 +380,7 @@
         <article class="car-card" data-category="ev suv" data-brand="vinfast" data-body="ev" data-price="800-1500">
           <div class="car-media">
             <span class="car-badge blue">Xe Điện Thông Minh ADAS</span>
-            <img src="https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=700&q=80" alt="VinFast VF8 Plus" class="car-img" loading="lazy" />
+            <img decoding="async" src="../_assets/media/44b97a0fd236.jpg" alt="VinFast VF8 Plus" class="car-img" loading="lazy" />
             <button class="car-fav" aria-label="Lưu xe"><i class="ph ph-heart"></i></button>
           </div>
           <div class="car-body">
@@ -390,7 +390,7 @@
             </div>
             <h3 class="car-name">VinFast VF8 Plus (Thuần Điện)</h3>
             <p class="car-tagline">Công suất 402 mã lực, quãng đường 471 km/lần sạc, trợ lý ảo thông minh tiếng Việt</p>
-            
+
             <div class="car-specs-grid">
               <div class="spec-cell"><i class="ph-duotone ph-lightning"></i> 402 HP Điện</div>
               <div class="spec-cell"><i class="ph-duotone ph-battery-charging"></i> 471 km / Sạc</div>
@@ -424,7 +424,7 @@
         <article class="car-card" data-category="suv certified" data-brand="ford" data-body="suv" data-price="800-1500">
           <div class="car-media">
             <span class="car-badge highlight">Khung Gầm Siêu Bền</span>
-            <img src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=700&q=80" alt="Ford Everest Titanium+" class="car-img" loading="lazy" />
+            <img decoding="async" src="../_assets/media/a28229b3c17a.jpg" alt="Ford Everest Titanium+" class="car-img" loading="lazy" />
             <button class="car-fav" aria-label="Lưu xe"><i class="ph ph-heart"></i></button>
           </div>
           <div class="car-body">
@@ -434,7 +434,7 @@
             </div>
             <h3 class="car-name">Ford Everest Titanium+ 2.0L Bi-Turbo 4x4</h3>
             <p class="car-tagline">SUV 7 chỗ địa hình vượt trội, hệ thống quản lý địa hình 6 chế độ lái</p>
-            
+
             <div class="car-specs-grid">
               <div class="spec-cell"><i class="ph-duotone ph-engine"></i> 2.0L Bi-Turbo Dầu</div>
               <div class="spec-cell"><i class="ph-duotone ph-gear-six"></i> Tự động 10 cấp</div>
@@ -468,7 +468,7 @@
         <article class="car-card" data-category="luxury certified" data-brand="bmw" data-body="sedan" data-price="1500-3000">
           <div class="car-media">
             <span class="car-badge gold">Cảm Giác Lái Tuyệt Đối</span>
-            <img src="https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=700&q=80" alt="BMW 330i M Sport" class="car-img" loading="lazy" />
+            <img decoding="async" src="../_assets/media/4ca61b4f91fe.jpg" alt="BMW 330i M Sport" class="car-img" loading="lazy" />
             <button class="car-fav" aria-label="Lưu xe"><i class="ph ph-heart"></i></button>
           </div>
           <div class="car-body">
@@ -478,7 +478,7 @@
             </div>
             <h3 class="car-name">BMW 330i M Sport LCI</h3>
             <p class="car-tagline">Khung gầm phân bổ trọng lượng 50:50 hoàn hảo, màn hình cong Curved Display 14.9 inch</p>
-            
+
             <div class="car-specs-grid">
               <div class="spec-cell"><i class="ph-duotone ph-engine"></i> 2.0L TwinPower</div>
               <div class="spec-cell"><i class="ph-duotone ph-gear-six"></i> Steptronic 8 Cấp</div>
@@ -512,7 +512,7 @@
         <article class="car-card" data-category="suv" data-brand="hyundai" data-body="suv" data-price="800-1500">
           <div class="car-media">
             <span class="car-badge highlight">Thế Hệ Mới All-New</span>
-            <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=700&q=80" alt="Hyundai Santa Fe Calligraphy" class="car-img" loading="lazy" />
+            <img decoding="async" src="../_assets/media/1a3f08542274.jpg" alt="Hyundai Santa Fe Calligraphy" class="car-img" loading="lazy" />
             <button class="car-fav" aria-label="Lưu xe"><i class="ph ph-heart"></i></button>
           </div>
           <div class="car-body">
@@ -522,7 +522,7 @@
             </div>
             <h3 class="car-name">Hyundai Santa Fe Calligraphy 2.5 Turbo</h3>
             <p class="car-tagline">Thiết kế vuông vức phong cách việt dã, gói an toàn chủ động SmartSense thế hệ 3</p>
-            
+
             <div class="car-specs-grid">
               <div class="spec-cell"><i class="ph-duotone ph-engine"></i> 2.5L Turbo Smartstream</div>
               <div class="spec-cell"><i class="ph-duotone ph-gear-six"></i> Ly hợp kép 8DCT</div>
@@ -556,7 +556,7 @@
         <article class="car-card" data-category="suv luxury" data-brand="kia" data-body="mpv" data-price="1500-3000">
           <div class="car-media">
             <span class="car-badge gold">Chuyên Cơ Mặt Đất 4 Chỗ</span>
-            <img src="https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=700&q=80" alt="Kia Carnival Royal" class="car-img" loading="lazy" />
+            <img decoding="async" src="../_assets/media/97b4e1e24104.jpg" alt="Kia Carnival Royal" class="car-img" loading="lazy" />
             <button class="car-fav" aria-label="Lưu xe"><i class="ph ph-heart"></i></button>
           </div>
           <div class="car-body">
@@ -566,7 +566,7 @@
             </div>
             <h3 class="car-name">Kia Carnival Royal Thương Gia</h3>
             <p class="car-tagline">Khoang sau chuẩn limousine siêu VIP, vách ngăn riêng tư, màn hình 32 inch, ghế massage sưởi ấm</p>
-            
+
             <div class="car-specs-grid">
               <div class="spec-cell"><i class="ph-duotone ph-engine"></i> 2.2L Diesel CRDi</div>
               <div class="spec-cell"><i class="ph-duotone ph-gear-six"></i> Tự động 8 Cấp</div>
@@ -604,7 +604,7 @@
     <div class="container">
       <div class="calc-wrapper">
         <div class="calc-intro">
-          <span class="sub-label">CÔNG CỤ TÀI CHÍNH THÔNG MINH</span>
+
           <h2 class="section-title">Dự Toán Chi Phí Lăn Bánh & Bảng Tính Trả Góp Ngân Hàng</h2>
           <p>
             AutoPrime liên kết cùng 12 ngân hàng lớn (Vietcombank, Techcombank, MBBank, Shinhan Bank...) mang đến gói vay ưu đãi tới 85% giá trị xe, lãi suất chỉ từ 6.8%/năm, thẩm định hồ sơ online trong 15 phút.
@@ -729,7 +729,7 @@
   <section class="services-section" id="services">
     <div class="container">
       <div class="text-center">
-        <span class="sub-label">HỆ SINH THÁI DỊCH VỤ 5 SAO</span>
+
         <h2 class="section-title">Trải Nghiệm Mua Sắm Toàn Diện Hướng Tới Khách Hàng</h2>
         <p class="section-desc">Mỗi trải nghiệm tại AutoPrime đều được cá nhân hóa để mang lại sự hài lòng và an tâm tuyệt đối.</p>
       </div>
@@ -748,7 +748,7 @@
         <div class="service-card">
           <div class="service-icon"><i class="ph-duotone ph-arrows-clockwise"></i></div>
           <h3>Thu Cũ Đổi Mới (Trade-In Hỗ Trợ 100%)</h3>
-          <p>Định giá xe cũ tận nơi minh bạch, thu mua cao hơn thị trường 10 – 30 triệu đồng, bù trừ trực tiếp vào xe mới mà không gián đoạn phương tiện đi lại.</p>
+          <p>Định giá xe cũ tận nơi minh bạch, thu mua cao hơn thị trường 10 - 30 triệu đồng, bù trừ trực tiếp vào xe mới mà không gián đoạn phương tiện đi lại.</p>
           <ul class="service-bullets">
             <li><i class="ph-fill ph-check"></i> Định giá độc lập 176 hạng mục</li>
             <li><i class="ph-fill ph-check"></i> Hoàn tất thủ tục sang tên trong ngày</li>
@@ -782,7 +782,7 @@
   <section class="process-section" id="process">
     <div class="container">
       <div class="text-center">
-        <span class="sub-label">QUY TRÌNH MUA XE ĐƠN GIẢN & CHUYÊN NGHIỆP</span>
+
         <h2 class="section-title">4 Bước Sở Hữu Ô Tô Dễ Dàng Cùng AutoPrime</h2>
         <p class="section-desc">Chúng tôi đồng hành giải quyết mọi thủ tục giấy tờ, ngân hàng và đăng ký biển số để bạn chỉ việc nhận xe.</p>
       </div>
@@ -823,7 +823,7 @@
   <section class="testimonials-section" id="testimonials">
     <div class="container">
       <div class="text-center">
-        <span class="sub-label">NIỀM VUI BÀN GIAO & PHẢN HỒI THỰC TẾ</span>
+
         <h2 class="section-title">Hơn 5.800+ Khách Hàng Đã Đặt Trọn Niềm Tin</h2>
         <p class="section-desc">Sự hài lòng và hạnh phúc của khách hàng khi nhận bàn giao chiếc xe mơ ước là thước đo thành công lớn nhất của chúng tôi.</p>
       </div>
@@ -838,11 +838,11 @@
           </p>
           <div class="reviewer-meta">
             <div class="reviewer-avatar">
-              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80" alt="Anh Hoàng Minh" />
+              <img loading="lazy" decoding="async" src="../_assets/media/9a3295a79dd3.jpg" alt="Anh Hoàng Minh" />
             </div>
             <div>
               <strong>Anh Hoàng Minh</strong>
-              <span>CEO Công ty Công Nghệ TechX (Hà Nội) — Sở hữu Mercedes C300</span>
+              <span>CEO Công ty Công Nghệ TechX (Hà Nội), Sở hữu Mercedes C300</span>
             </div>
           </div>
         </div>
@@ -856,11 +856,11 @@
           </p>
           <div class="reviewer-meta">
             <div class="reviewer-avatar">
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Chị Phương Thảo" />
+              <img loading="lazy" decoding="async" src="../_assets/media/600aed9a543c.jpg" alt="Chị Phương Thảo" />
             </div>
             <div>
               <strong>Chị Phương Thảo</strong>
-              <span>Bác sĩ Bệnh viện Đại học Y Dược (TP.HCM) — Sở hữu Ford Everest</span>
+              <span>Bác sĩ Bệnh viện Đại học Y Dược (TP.HCM), Sở hữu Ford Everest</span>
             </div>
           </div>
         </div>
@@ -874,11 +874,11 @@
           </p>
           <div class="reviewer-meta">
             <div class="reviewer-avatar">
-              <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80" alt="Anh Quốc Bảo" />
+              <img loading="lazy" decoding="async" src="../_assets/media/0eb63fe01f69.jpg" alt="Anh Quốc Bảo" />
             </div>
             <div>
               <strong>Anh Quốc Bảo</strong>
-              <span>Kiến Trúc Sư Đô Thị (Đà Nẵng) — Sở hữu VinFast VF8 Plus</span>
+              <span>Kiến Trúc Sư Đô Thị (Đà Nẵng), Sở hữu VinFast VF8 Plus</span>
             </div>
           </div>
         </div>
@@ -951,35 +951,35 @@
         <!-- Showrooms List -->
         <div class="showrooms-info" id="showrooms">
           <div class="sr-header">
-            <span class="sub-label">MẠNG LƯỚI SHOWROOM & XƯỞNG DỊCH VỤ</span>
+
             <h3>Đón Tiếp Quý Khách Tại 5 Đại Lý Tiêu Chuẩn Quốc Tế</h3>
             <p>Mở cửa đón khách từ 08:00 đến 20:00 tất cả các ngày trong tuần (kể cả Thứ 7 và Chủ Nhật).</p>
           </div>
 
           <div class="showrooms-list">
             <div class="sr-card">
-              <div class="sr-city">HÀ NỘI — HEADQUARTER</div>
+              <div class="sr-city">HÀ NỘI, HEADQUARTER</div>
               <h4>AutoPrime Flagship Mỹ Đình</h4>
               <p><i class="ph ph-map-pin"></i> Số 18 Lê Quang Đạo, P. Phú Đô, Q. Nam Từ Liêm, Hà Nội</p>
               <p><i class="ph ph-phone"></i> Hotline Showroom: (024) 3888 6969</p>
             </div>
 
             <div class="sr-card">
-              <div class="sr-city">TP. HỒ CHÍ MINH — MEGA CENTER</div>
+              <div class="sr-city">TP. HỒ CHÍ MINH, MEGA CENTER</div>
               <h4>AutoPrime Tân Bình & Xưởng Kỹ Thuật 5 Sao</h4>
               <p><i class="ph ph-map-pin"></i> Số 202 Hoàng Văn Thụ, Phường 9, Q. Phú Nhuận / Tân Bình, TP.HCM</p>
               <p><i class="ph ph-phone"></i> Hotline Showroom: (028) 3999 6969</p>
             </div>
 
             <div class="sr-card">
-              <div class="sr-city">TP. HỒ CHÍ MINH — SOUTH CENTER</div>
+              <div class="sr-city">TP. HỒ CHÍ MINH, SOUTH CENTER</div>
               <h4>AutoPrime Luxury Quận 7</h4>
               <p><i class="ph ph-map-pin"></i> Số 801 Nguyễn Văn Linh, P. Tân Phong, Quận 7, TP.HCM</p>
               <p><i class="ph ph-phone"></i> Hotline Showroom: (028) 3777 6969</p>
             </div>
 
             <div class="sr-card">
-              <div class="sr-city">ĐÀ NẴNG — CENTRAL CENTER</div>
+              <div class="sr-city">ĐÀ NẴNG, CENTRAL CENTER</div>
               <h4>AutoPrime Miền Trung</h4>
               <p><i class="ph ph-map-pin"></i> Số 356 đường 2 Tháng 9, P. Hòa Cường Bắc, Q. Hải Châu, Đà Nẵng</p>
               <p><i class="ph ph-phone"></i> Hotline Showroom: (0236) 3666 6969</p>

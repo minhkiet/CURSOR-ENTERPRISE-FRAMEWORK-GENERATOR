@@ -72,11 +72,11 @@ onMounted(() => {
 
 const getFileIcon = (kind: string) => {
   switch (kind) {
-    case 'rule': return '📘'
-    case 'skill': return '⚡'
+    case 'rule': return 'R'
+    case 'skill': return 'S'
     case 'agent': return '◆'
-    case 'kb': return '◆'
-    case 'package': return '◆'
+    case 'kb': return 'K'
+    case 'package': return 'P'
     default: return '◆'
   }
 }

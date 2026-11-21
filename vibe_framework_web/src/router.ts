@@ -1,11 +1,13 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+import { defineAsyncComponent } from 'vue'
 import HomeView from './views/HomeView.vue'
-import TemplatesGallery from './views/TemplatesGallery.vue'
-import TemplatePreview from './views/TemplatePreview.vue'
-import LearnView from './views/LearnView.vue'
-import PromptsView from './views/PromptsView.vue'
-import InstallGuideView from './views/InstallGuideView.vue'
-import CmsDashboardView from './views/CmsDashboardView.vue'
+
+const TemplatesGallery = defineAsyncComponent(() => import('./views/TemplatesGallery.vue'))
+const TemplatePreview = defineAsyncComponent(() => import('./views/TemplatePreview.vue'))
+const LearnView = defineAsyncComponent(() => import('./views/LearnView.vue'))
+const PromptsView = defineAsyncComponent(() => import('./views/PromptsView.vue'))
+const InstallGuideView = defineAsyncComponent(() => import('./views/InstallGuideView.vue'))
+const CmsDashboardView = defineAsyncComponent(() => import('./views/CmsDashboardView.vue'))
 
 const router = createRouter({
   history: createWebHashHistory(),

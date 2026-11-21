@@ -1,3 +1,4 @@
+/* Hallmark · v2.0.0 · custom · editorial · page · genre: editorial · posture: restrained · hero: settled · nav: local · footer: local · job: production template */
 /* ═══════════════════════════════════════════════════════════════
    GIÁO XỨ THÁNH QUANG - REDESIGN 2026
    Premium Modern Editorial | Vietnamese Catholic Aesthetic
@@ -11,31 +12,31 @@
   --primary-dark: #6B1D2A;
   --primary-light: #A83244;
   --primary-rgb: 139, 38, 53;
-  
+
   --accent: #D4A853;
   --accent-light: #E8C97A;
   --accent-dark: #B8923D;
-  
+
   /* Neutrals - Zinc/Slate family */
   --bg-canvas: #FAFAF9;
-  --bg-surface: #FFFFFF;
+  --bg-surface: #f6f3ec;
   --bg-warm: #F5F3F0;
   --bg-dark: #18181B;
   --bg-darker: #09090B;
-  
+
   --text-primary: #18181B;
   --text-secondary: #52525B;
   --text-muted: #A1A1AA;
   --text-inverse: #FAFAF9;
-  
+
   --border: #E4E4E7;
   --border-light: #F4F4F5;
-  
+
   /* Glassmorphism */
   --glass-bg: rgba(255, 255, 255, 0.7);
   --glass-border: rgba(255, 255, 255, 0.2);
   --glass-shadow: rgba(0, 0, 0, 0.1);
-  
+
   /* Radii - Consistent system */
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -43,34 +44,93 @@
   --radius-xl: 24px;
   --radius-2xl: 32px;
   --radius-full: 9999px;
-  
+
   /* Shadows - Elevated system */
   --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
   --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
   --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
   --shadow-xl: 0 24px 64px rgba(0,0,0,0.16);
   --shadow-glow: 0 0 60px rgba(212, 168, 83, 0.15);
-  
+
   /* Transitions */
   --t-fast: 150ms cubic-bezier(0.23, 1, 0.32, 1);
   --t-base: 300ms cubic-bezier(0.23, 1, 0.32, 1);
   --t-slow: 500ms cubic-bezier(0.23, 1, 0.32, 1);
   --t-spring: 600ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  
+
   /* Typography Scale */
   --font-display: 'Playfair Display', Georgia, serif;
   --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
   --font-serif: 'Source Serif 4', Georgia, serif;
+
+/* ux-tokenized */
+  --ux-c1: rgba(212, 168, 83, 0.1);
+  --ux-c2: rgba(212, 168, 83, 0.05);
+  --ux-c3: rgba(212, 168, 83, 0.2);
+  --ux-c4: rgba(255,255,255,0.75);
+  --ux-c5: rgba(255,255,255,0.1);
+  --ux-c6: #f6f3ec;
+  --ux-c7: rgba(139, 38, 53, 0.3);
+  --ux-c8: rgba(139, 38, 53, 0.4);
+  --ux-c9: rgba(255,255,255,0.08);
+  --ux-c10: rgba(255,255,255,0.2);
+  --ux-c11: rgba(255,255,255,0.15);
+  --ux-c12: rgba(255,255,255,0.35);
+  --ux-c13: rgba(139, 38, 53, 0.03);
+  --ux-c14: rgba(255,255,255,0.3);
+  --ux-c15: rgba(255,255,255,0.5);
+  --ux-c16: rgba(250, 250, 249, 0.78);
+  --ux-c17: rgba(228, 228, 231, 0.4);
+  --ux-c18: rgba(255, 255, 255, 0.96);
+  --ux-c19: rgba(0,0,0,0.06);
+  --ux-c20: rgba(139, 38, 53, 0.2);
+  --ux-c21: rgba(139, 38, 53, 0.06);
+  --ux-c22: rgba(139, 38, 53, 0.25);
+  --ux-c23: rgba(139, 38, 53, 0.35);
+  --ux-c24: rgba(24, 24, 27, 0.5);
+  --ux-c25: rgba(24, 24, 27, 0.85);
+  --ux-c26: rgba(139, 38, 53, 0.7);
+  --ux-c27: rgba(139, 38, 53, 0.5);
+  --ux-c28: rgba(212, 168, 83, 0.15);
+  --ux-c29: rgba(212, 168, 83, 0.3);
+  --ux-c30: rgba(0,0,0,0.3);
+  --ux-c31: rgba(255,255,255,0.9);
+  --ux-c32: rgba(212, 168, 83, 0.35);
+  --ux-c33: rgba(212, 168, 83, 0.12);
+  --ux-c34: rgba(212, 168, 83, 0.5);
+  --ux-c35: rgba(255,255,255,0.7);
+  --ux-c36: rgba(212, 168, 83, 0.08);
+  --ux-c37: rgba(24, 24, 27, 0.7);
+  --ux-c38: rgba(255,255,255,0.06);
+  --ux-c39: rgba(255,255,255,0.12);
+  --ux-c40: rgba(255,255,255,0.05);
+  --ux-c41: rgba(212, 168, 83, 0.25);
+  --ux-c42: rgba(255,255,255,0.04);
+  --ux-c43: rgba(212, 168, 83, 0.02);
+  --ux-c44: rgba(255,255,255,0.6);
+  --ux-c45: rgba(255,255,255,0.03);
+  --ux-c46: rgba(255,255,255,0.8);
+  --ux-c47: rgba(255,255,255,0.4);
+  --ux-c48: rgba(24, 24, 27, 0.8);
+  --ux-c49: rgba(0,0,0,0.95);
+  --ux-c50: rgba(139, 38, 53, 0.9);
+  --ux-c51: rgba(37, 99, 235, 0.9);
+  --ux-c52: rgba(5, 150, 105, 0.9);
+  --ux-c53: rgba(217, 119, 6, 0.9);
+  --ux-c54: rgba(139, 38, 53, 0.08);
+  --ux-c55: rgba(0,0,0,0.08);
+  --ux-c56: #8a5641;
+  --ux-f1: inherit;
 }
 
 /* ─── RESET & BASE ─── */
-*, *::before, *::after { 
-  box-sizing: border-box; 
-  margin: 0; 
-  padding: 0; 
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-html { 
+html {
   scroll-behavior: smooth;
   font-size: 16px;
 }
@@ -85,36 +145,36 @@ body {
   overflow-x: hidden;
 }
 
-img { 
-  max-width: 100%; 
+img {
+  max-width: 100%;
   display: block;
 }
 
-a { 
-  color: inherit; 
-  text-decoration: none; 
+a {
+  color: inherit;
+  text-decoration: none;
   transition: color var(--t-fast);
 }
 
-button { 
-  font-family: inherit; 
-  cursor: pointer; 
-  border: none; 
+button {
+  font-family: var(--ux-f1);
+  cursor: pointer;
+  border: none;
   background: none;
 }
 
 ul { list-style: none; }
 
-input, select, textarea { 
-  font-family: inherit;
+input, select, textarea {
+  font-family: var(--ux-f1);
   font-size: inherit;
 }
 
 /* ─── UTILITIES ─── */
-.container { 
-  max-width: 1280px; 
-  margin: 0 auto; 
-  padding: 0 32px; 
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 32px;
 }
 
 .hl { color: var(--accent); }
@@ -137,9 +197,9 @@ input, select, textarea {
   color: var(--accent);
   margin-bottom: 20px;
   padding: 8px 16px;
-  background: linear-gradient(135deg, rgba(212, 168, 83, 0.1) 0%, rgba(212, 168, 83, 0.05) 100%);
+  background: linear-gradient(135deg, var(--ux-c1) 0%, var(--ux-c2) 100%);
   border-radius: var(--radius-full);
-  border: 1px solid rgba(212, 168, 83, 0.2);
+  border: 1px solid var(--ux-c3);
 }
 
 .eyebrow-dot {
@@ -178,7 +238,7 @@ input, select, textarea {
 }
 
 .section-desc.light {
-  color: rgba(255,255,255,0.75);
+  color: var(--ux-c4);
 }
 
 /* ─── BUTTONS ─── */
@@ -192,7 +252,7 @@ input, select, textarea {
   font-weight: 600;
   font-size: 0.9375rem;
   letter-spacing: 0.01em;
-  transition: all var(--t-base);
+  transition: color var(--t-base), background-color var(--t-base), border-color var(--t-base), opacity var(--t-base);
   cursor: pointer;
   border: none;
   text-decoration: none;
@@ -204,7 +264,7 @@ input, select, textarea {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+  background: linear-gradient(135deg, var(--ux-c5) 0%, transparent 50%);
   opacity: 0;
   transition: opacity var(--t-fast);
 }
@@ -223,24 +283,24 @@ input, select, textarea {
 
 .btn-primary {
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-  color: #fff;
-  box-shadow: 0 8px 24px rgba(139, 38, 53, 0.3);
+  color: var(--ux-c6);
+  box-shadow: 0 8px 24px var(--ux-c7);
 }
 
 .btn-primary:hover {
-  box-shadow: 0 12px 32px rgba(139, 38, 53, 0.4);
+  box-shadow: 0 12px 32px var(--ux-c8);
 }
 
 .btn-ghost {
-  background: rgba(255,255,255,0.08);
-  color: #fff;
-  border: 1.5px solid rgba(255,255,255,0.2);
+  background: var(--ux-c9);
+  color: var(--ux-c6);
+  border: 1.5px solid var(--ux-c10);
   backdrop-filter: blur(12px);
 }
 
 .btn-ghost:hover {
-  background: rgba(255,255,255,0.15);
-  border-color: rgba(255,255,255,0.35);
+  background: var(--ux-c11);
+  border-color: var(--ux-c12);
 }
 
 .btn-outline {
@@ -252,18 +312,18 @@ input, select, textarea {
 .btn-outline:hover {
   border-color: var(--primary);
   color: var(--primary);
-  background: rgba(139, 38, 53, 0.03);
+  background: var(--ux-c13);
 }
 
 .btn-outline-light {
   background: transparent;
-  color: #fff;
-  border: 1.5px solid rgba(255,255,255,0.3);
+  color: var(--ux-c6);
+  border: 1.5px solid var(--ux-c14);
 }
 
 .btn-outline-light:hover {
-  background: rgba(255,255,255,0.1);
-  border-color: rgba(255,255,255,0.5);
+  background: var(--ux-c5);
+  border-color: var(--ux-c15);
 }
 
 .btn-lg {
@@ -282,16 +342,16 @@ input, select, textarea {
   left: 0;
   right: 0;
   z-index: 1000;
-  background: rgba(250, 250, 249, 0.78);
+  background: var(--ux-c16);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid rgba(228, 228, 231, 0.4);
+  border-bottom: 1px solid var(--ux-c17);
   transition: background var(--t-base), box-shadow var(--t-base), border-color var(--t-base);
 }
 
 .nav.scrolled {
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 4px 30px rgba(0,0,0,0.06);
+  background: var(--ux-c18);
+  box-shadow: 0 4px 30px var(--ux-c19);
   border-bottom-color: transparent;
 }
 
@@ -317,7 +377,7 @@ input, select, textarea {
 .logo-mark {
   width: 42px;
   height: 42px;
-  filter: drop-shadow(0 4px 12px rgba(139, 38, 53, 0.2));
+  filter: drop-shadow(0 4px 12px var(--ux-c20));
 }
 
 .logo-accent {
@@ -343,14 +403,14 @@ input, select, textarea {
   font-weight: 500;
   color: var(--text-secondary);
   border-radius: var(--radius-md);
-  transition: all var(--t-fast);
+  transition: color var(--t-fast), background-color var(--t-fast), border-color var(--t-fast), opacity var(--t-fast);
   position: relative;
   white-space: nowrap;
 }
 
 .nav-link:hover {
   color: var(--primary);
-  background: rgba(139, 38, 53, 0.06);
+  background: var(--ux-c21);
 }
 
 .nav-link.active {
@@ -383,18 +443,18 @@ input, select, textarea {
   gap: 8px;
   padding: 11px 20px;
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-  color: #fff;
+  color: var(--ux-c6);
   font-size: 0.875rem;
   font-weight: 600;
   border-radius: var(--radius-lg);
-  transition: all var(--t-fast);
-  box-shadow: 0 4px 16px rgba(139, 38, 53, 0.25);
+  transition: color var(--t-fast), background-color var(--t-fast), border-color var(--t-fast), opacity var(--t-fast);
+  box-shadow: 0 4px 16px var(--ux-c22);
   white-space: nowrap;
 }
 
 .nav-cta:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(139, 38, 53, 0.35);
+  box-shadow: 0 8px 24px var(--ux-c23);
 }
 
 .nav-cta i {
@@ -416,7 +476,7 @@ input, select, textarea {
 }
 
 .nav-toggle:hover {
-  background: rgba(139, 38, 53, 0.06);
+  background: var(--ux-c21);
 }
 
 .nav-toggle-bar {
@@ -444,7 +504,7 @@ input, select, textarea {
 .nav-overlay {
   position: fixed;
   inset: 72px 0 0 0;
-  background: rgba(24, 24, 27, 0.5);
+  background: var(--ux-c24);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   opacity: 0;
@@ -493,9 +553,9 @@ input, select, textarea {
   inset: 0;
   background: linear-gradient(
     160deg,
-    rgba(24, 24, 27, 0.85) 0%,
-    rgba(139, 38, 53, 0.7) 40%,
-    rgba(139, 38, 53, 0.5) 100%
+    var(--ux-c25) 0%,
+    var(--ux-c26) 40%,
+    var(--ux-c27) 100%
   );
 }
 
@@ -503,7 +563,7 @@ input, select, textarea {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at 30% 20%, rgba(212, 168, 83, 0.15) 0%, transparent 50%);
+  background: radial-gradient(ellipse at 30% 20%, var(--ux-c28) 0%, transparent 50%);
 }
 
 .hero-content {
@@ -523,8 +583,8 @@ input, select, textarea {
   align-items: center;
   gap: 10px;
   padding: 10px 20px;
-  background: rgba(212, 168, 83, 0.15);
-  border: 1px solid rgba(212, 168, 83, 0.3);
+  background: var(--ux-c28);
+  border: 1px solid var(--ux-c29);
   border-radius: var(--radius-full);
   color: var(--accent);
   font-size: 0.8125rem;
@@ -544,17 +604,17 @@ input, select, textarea {
   font-size: clamp(3.5rem, 10vw, 6rem);
   font-weight: 700;
   line-height: 1;
-  color: #fff;
+  color: var(--ux-c6);
   margin-bottom: 28px;
   letter-spacing: -0.03em;
-  text-shadow: 0 4px 30px rgba(0,0,0,0.3);
+  text-shadow: 0 4px 30px var(--ux-c30);
 }
 
 .hero-desc {
   font-family: var(--font-serif);
   font-size: clamp(1.25rem, 2.5vw, 1.5rem);
   line-height: 1.7;
-  color: rgba(255,255,255,0.9);
+  color: var(--ux-c31);
   max-width: 700px;
   margin: 0 auto 20px;
   font-style: italic;
@@ -585,7 +645,7 @@ input, select, textarea {
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  color: rgba(255,255,255,0.5);
+  color: var(--ux-c15);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.15em;
@@ -673,7 +733,7 @@ input, select, textarea {
 
 .about-grid {
   display: grid;
-  grid-template-columns: 1fr 1.1fr;
+  grid-template-columns: minmax(0, 1fr) 1.minmax(0, 1fr);
   gap: 100px;
   align-items: center;
 }
@@ -693,7 +753,7 @@ input, select, textarea {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(212, 168, 83, 0.1) 0%, transparent 50%);
+  background: linear-gradient(135deg, var(--ux-c1) 0%, transparent 50%);
   z-index: 1;
   pointer-events: none;
 }
@@ -732,11 +792,11 @@ input, select, textarea {
   top: 32px;
   left: -32px;
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-  color: #fff;
+  color: var(--ux-c6);
   padding: 20px 24px;
   border-radius: var(--radius-lg);
   text-align: center;
-  box-shadow: 0 8px 32px rgba(212, 168, 83, 0.35);
+  box-shadow: 0 8px 32px var(--ux-c32);
 }
 
 .decade-num {
@@ -788,12 +848,12 @@ input, select, textarea {
   background: var(--bg-surface);
   border-radius: var(--radius-xl);
   border: 1px solid var(--border-light);
-  transition: all var(--t-base);
+  transition: color var(--t-base), background-color var(--t-base), border-color var(--t-base), opacity var(--t-base);
 }
 
 .value-item:hover {
   transform: translateX(12px);
-  border-color: rgba(212, 168, 83, 0.3);
+  border-color: var(--ux-c29);
   box-shadow: var(--shadow-md);
 }
 
@@ -802,13 +862,13 @@ input, select, textarea {
   height: 56px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-  color: #fff;
+  color: var(--ux-c6);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
   flex-shrink: 0;
-  box-shadow: 0 4px 16px rgba(139, 38, 53, 0.25);
+  box-shadow: 0 4px 16px var(--ux-c22);
 }
 
 .value-item h4 {
@@ -847,7 +907,7 @@ input, select, textarea {
   right: -30%;
   width: 800px;
   height: 800px;
-  background: radial-gradient(circle, rgba(212, 168, 83, 0.12) 0%, transparent 60%);
+  background: radial-gradient(circle, var(--ux-c33) 0%, transparent 60%);
   pointer-events: none;
 }
 
@@ -879,7 +939,7 @@ input, select, textarea {
   top: 56px;
   bottom: 0;
   width: 2px;
-  background: linear-gradient(180deg, rgba(212, 168, 83, 0.5) 0%, rgba(212, 168, 83, 0.1) 100%);
+  background: linear-gradient(180deg, var(--ux-c34) 0%, var(--ux-c1) 100%);
 }
 
 .timeline-item:last-child::before {
@@ -891,7 +951,7 @@ input, select, textarea {
   height: 96px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-  color: #fff;
+  color: var(--ux-c6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -901,7 +961,7 @@ input, select, textarea {
   flex-shrink: 0;
   position: relative;
   z-index: 1;
-  box-shadow: 0 8px 32px rgba(212, 168, 83, 0.3);
+  box-shadow: 0 8px 32px var(--ux-c29);
 }
 
 .tl-content {
@@ -912,13 +972,13 @@ input, select, textarea {
   font-family: var(--font-display);
   font-size: 1.375rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--ux-c6);
   margin-bottom: 10px;
 }
 
 .tl-content p {
   font-size: 1rem;
-  color: rgba(255,255,255,0.7);
+  color: var(--ux-c35);
   line-height: 1.7;
 }
 
@@ -930,7 +990,7 @@ input, select, textarea {
 
 .priest-grid {
   display: grid;
-  grid-template-columns: 1.6fr repeat(3, 1fr);
+  grid-template-columns: 1.6fr repeat(3, minmax(0, 1fr));
   gap: 28px;
 }
 
@@ -939,7 +999,7 @@ input, select, textarea {
   border-radius: var(--radius-2xl);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
-  transition: all var(--t-base);
+  transition: color var(--t-base), background-color var(--t-base), border-color var(--t-base), opacity var(--t-base);
   position: relative;
 }
 
@@ -947,7 +1007,7 @@ input, select, textarea {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(212, 168, 83, 0.08) 0%, transparent 50%);
+  background: linear-gradient(135deg, var(--ux-c36) 0%, transparent 50%);
   opacity: 0;
   transition: opacity var(--t-base);
 }
@@ -991,7 +1051,7 @@ input, select, textarea {
 .priest-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(24, 24, 27, 0.7) 0%, transparent 50%);
+  background: linear-gradient(to top, var(--ux-c37) 0%, transparent 50%);
   opacity: 0;
   transition: opacity var(--t-base);
   display: flex;
@@ -1012,13 +1072,13 @@ input, select, textarea {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.15);
+  background: var(--ux-c11);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  transition: all var(--t-fast);
+  color: var(--ux-c6);
+  transition: color var(--t-fast), background-color var(--t-fast), border-color var(--t-fast), opacity var(--t-fast);
 }
 
 .priest-social a:hover {
@@ -1037,7 +1097,7 @@ input, select, textarea {
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--accent);
-  background: linear-gradient(135deg, rgba(212, 168, 83, 0.1) 0%, rgba(212, 168, 83, 0.05) 100%);
+  background: linear-gradient(135deg, var(--ux-c1) 0%, var(--ux-c2) 100%);
   padding: 6px 14px;
   border-radius: var(--radius-full);
   margin-bottom: 14px;
@@ -1089,7 +1149,7 @@ input, select, textarea {
   right: -15%;
   width: 700px;
   height: 700px;
-  background: radial-gradient(circle, rgba(212, 168, 83, 0.15) 0%, transparent 60%);
+  background: radial-gradient(circle, var(--ux-c28) 0%, transparent 60%);
   pointer-events: none;
 }
 
@@ -1100,13 +1160,13 @@ input, select, textarea {
   left: -10%;
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(139, 38, 53, 0.5) 0%, transparent 60%);
+  background: radial-gradient(circle, var(--ux-c27) 0%, transparent 60%);
   pointer-events: none;
 }
 
 .mass-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 28px;
   margin-bottom: 40px;
   position: relative;
@@ -1114,18 +1174,18 @@ input, select, textarea {
 }
 
 .mass-card {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--ux-c38);
+  border: 1px solid var(--ux-c5);
   border-radius: var(--radius-2xl);
   padding: 36px;
   backdrop-filter: blur(16px);
-  transition: all var(--t-base);
+  transition: color var(--t-base), background-color var(--t-base), border-color var(--t-base), opacity var(--t-base);
 }
 
 .mass-card:hover {
-  background: rgba(255,255,255,0.1);
+  background: var(--ux-c5);
   transform: translateY(-6px);
-  border-color: rgba(212, 168, 83, 0.3);
+  border-color: var(--ux-c29);
 }
 
 .mass-card-header {
@@ -1134,14 +1194,14 @@ input, select, textarea {
   gap: 18px;
   margin-bottom: 28px;
   padding-bottom: 24px;
-  border-bottom: 1px solid rgba(255,255,255,0.12);
+  border-bottom: 1px solid var(--ux-c39);
 }
 
 .mass-icon {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: rgba(212, 168, 83, 0.2);
+  background: var(--ux-c3);
   color: var(--accent);
   display: flex;
   align-items: center;
@@ -1153,7 +1213,7 @@ input, select, textarea {
   font-family: var(--font-display);
   font-size: 1.625rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--ux-c6);
 }
 
 .mass-times {
@@ -1167,30 +1227,30 @@ input, select, textarea {
   justify-content: space-between;
   align-items: center;
   padding: 14px 18px;
-  background: rgba(255,255,255,0.05);
+  background: var(--ux-c40);
   border-radius: var(--radius-lg);
-  transition: all var(--t-fast);
+  transition: color var(--t-fast), background-color var(--t-fast), border-color var(--t-fast), opacity var(--t-fast);
 }
 
 .mass-time:hover {
-  background: rgba(255,255,255,0.1);
+  background: var(--ux-c5);
 }
 
 .mass-time.featured {
-  background: rgba(212, 168, 83, 0.2);
-  border: 1px solid rgba(212, 168, 83, 0.25);
+  background: var(--ux-c3);
+  border: 1px solid var(--ux-c41);
 }
 
 .time-hour {
   font-family: var(--font-display);
   font-size: 1.5rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--ux-c6);
 }
 
 .time-label {
   font-size: 0.9375rem;
-  color: rgba(255,255,255,0.7);
+  color: var(--ux-c35);
 }
 
 .mass-note {
@@ -1198,9 +1258,9 @@ input, select, textarea {
   align-items: flex-start;
   gap: 14px;
   padding: 20px 24px;
-  background: rgba(255,255,255,0.05);
+  background: var(--ux-c40);
   border-radius: var(--radius-lg);
-  color: rgba(255,255,255,0.7);
+  color: var(--ux-c35);
   font-size: 0.9375rem;
   position: relative;
   z-index: 1;
@@ -1221,7 +1281,7 @@ input, select, textarea {
 
 .sacrament-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 28px;
 }
 
@@ -1231,7 +1291,7 @@ input, select, textarea {
   padding: 40px;
   text-align: center;
   border: 1px solid var(--border-light);
-  transition: all var(--t-base);
+  transition: color var(--t-base), background-color var(--t-base), border-color var(--t-base), opacity var(--t-base);
   position: relative;
   overflow: hidden;
 }
@@ -1252,7 +1312,7 @@ input, select, textarea {
 .sacrament-card:hover {
   transform: translateY(-8px);
   box-shadow: var(--shadow-xl);
-  border-color: rgba(212, 168, 83, 0.2);
+  border-color: var(--ux-c3);
 }
 
 .sacrament-card:hover::before {
@@ -1265,12 +1325,12 @@ input, select, textarea {
   margin: 0 auto 24px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-  color: #fff;
+  color: var(--ux-c6);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 2rem;
-  box-shadow: 0 8px 32px rgba(139, 38, 53, 0.25);
+  box-shadow: 0 8px 32px var(--ux-c22);
 }
 
 .sacrament-card h3 {
@@ -1294,7 +1354,7 @@ input, select, textarea {
   color: var(--accent);
   font-weight: 600;
   padding: 8px 16px;
-  background: rgba(212, 168, 83, 0.08);
+  background: var(--ux-c36);
   border-radius: var(--radius-full);
 }
 
@@ -1313,7 +1373,7 @@ input, select, textarea {
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(ellipse at 50% 0%, rgba(212, 168, 83, 0.08) 0%, transparent 60%);
+  background: radial-gradient(ellipse at 50% 0%, var(--ux-c36) 0%, transparent 60%);
   pointer-events: none;
 }
 
@@ -1324,13 +1384,13 @@ input, select, textarea {
 
 .word-grid {
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
+  grid-template-columns: 1.4fr minmax(0, 1fr);
   gap: 36px;
 }
 
 .word-card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: var(--ux-c42);
+  border: 1px solid var(--ux-c9);
   border-radius: var(--radius-2xl);
   padding: 48px;
   position: relative;
@@ -1338,8 +1398,8 @@ input, select, textarea {
 }
 
 .word-featured {
-  background: linear-gradient(135deg, rgba(212, 168, 83, 0.1) 0%, rgba(212, 168, 83, 0.02) 100%);
-  border-color: rgba(212, 168, 83, 0.2);
+  background: linear-gradient(135deg, var(--ux-c1) 0%, var(--ux-c43) 100%);
+  border-color: var(--ux-c3);
 }
 
 .word-featured::before {
@@ -1349,7 +1409,7 @@ input, select, textarea {
   right: 32px;
   font-family: var(--font-display);
   font-size: 8rem;
-  color: rgba(212, 168, 83, 0.1);
+  color: var(--ux-c1);
   line-height: 1;
 }
 
@@ -1365,7 +1425,7 @@ input, select, textarea {
   height: 48px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-  color: #fff;
+  color: var(--ux-c6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1375,13 +1435,13 @@ input, select, textarea {
 
 .wd-num {
   font-weight: 600;
-  color: #fff;
+  color: var(--ux-c6);
   font-size: 1.0625rem;
 }
 
 .wd-season {
   font-size: 0.8125rem;
-  color: rgba(255,255,255,0.5);
+  color: var(--ux-c15);
 }
 
 .word-quote {
@@ -1389,7 +1449,7 @@ input, select, textarea {
   font-size: 1.875rem;
   font-weight: 500;
   font-style: italic;
-  color: #fff;
+  color: var(--ux-c6);
   line-height: 1.5;
   margin-bottom: 14px;
   padding-left: 24px;
@@ -1407,7 +1467,7 @@ input, select, textarea {
 
 .word-reflection {
   font-size: 1rem;
-  color: rgba(255,255,255,0.75);
+  color: var(--ux-c4);
   line-height: 1.8;
   margin-bottom: 28px;
 }
@@ -1423,12 +1483,12 @@ input, select, textarea {
   height: 48px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(212, 168, 83, 0.3);
+  border: 2px solid var(--ux-c29);
 }
 
 .word-author span {
   font-size: 0.9375rem;
-  color: rgba(255,255,255,0.6);
+  color: var(--ux-c44);
 }
 
 .word-sidebar {
@@ -1438,16 +1498,16 @@ input, select, textarea {
 }
 
 .word-mini {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: var(--ux-c45);
+  border: 1px solid var(--ux-c38);
   border-radius: var(--radius-xl);
   padding: 24px;
-  transition: all var(--t-base);
+  transition: color var(--t-base), background-color var(--t-base), border-color var(--t-base), opacity var(--t-base);
 }
 
 .word-mini:hover {
-  background: rgba(255,255,255,0.06);
-  border-color: rgba(212, 168, 83, 0.2);
+  background: var(--ux-c38);
+  border-color: var(--ux-c3);
 }
 
 .wm-date {
@@ -1463,14 +1523,14 @@ input, select, textarea {
 .wm-quote {
   font-size: 0.9375rem;
   font-style: italic;
-  color: rgba(255,255,255,0.8);
+  color: var(--ux-c46);
   line-height: 1.6;
   margin-bottom: 10px;
 }
 
 .wm-ref {
   font-size: 0.75rem;
-  color: rgba(255,255,255,0.4);
+  color: var(--ux-c47);
 }
 
 .word-cta {
@@ -1499,7 +1559,7 @@ input, select, textarea {
 
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   grid-template-rows: repeat(2, 280px);
   gap: 20px;
 }
@@ -1509,14 +1569,14 @@ input, select, textarea {
   border-radius: var(--radius-xl);
   overflow: hidden;
   cursor: pointer;
-  transition: all var(--t-base);
+  transition: color var(--t-base), background-color var(--t-base), border-color var(--t-base), opacity var(--t-base);
 }
 
 .gallery-item::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(24, 24, 27, 0.8) 0%, transparent 60%);
+  background: linear-gradient(to top, var(--ux-c48) 0%, transparent 60%);
   opacity: 0;
   transition: opacity var(--t-base);
   z-index: 1;
@@ -1551,7 +1611,7 @@ input, select, textarea {
   z-index: 2;
   transform: translateY(20px);
   opacity: 0;
-  transition: all var(--t-base);
+  transition: color var(--t-base), background-color var(--t-base), border-color var(--t-base), opacity var(--t-base);
 }
 
 .gallery-item:hover .gallery-overlay {
@@ -1563,13 +1623,13 @@ input, select, textarea {
   font-family: var(--font-display);
   font-size: 1.125rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--ux-c6);
   margin-bottom: 4px;
 }
 
 .gallery-overlay span {
   font-size: 0.8125rem;
-  color: rgba(255,255,255,0.7);
+  color: var(--ux-c35);
 }
 
 .gallery-zoom {
@@ -1579,17 +1639,17 @@ input, select, textarea {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.15);
+  background: var(--ux-c11);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: var(--ux-c6);
   font-size: 1.25rem;
   z-index: 2;
   opacity: 0;
   transform: scale(0.8);
-  transition: all var(--t-base);
+  transition: color var(--t-base), background-color var(--t-base), border-color var(--t-base), opacity var(--t-base);
 }
 
 .gallery-item:hover .gallery-zoom {
@@ -1606,13 +1666,13 @@ input, select, textarea {
   position: fixed;
   inset: 0;
   z-index: 2000;
-  background: rgba(0,0,0,0.95);
+  background: var(--ux-c49);
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
   visibility: hidden;
-  transition: all var(--t-base);
+  transition: color var(--t-base), background-color var(--t-base), border-color var(--t-base), opacity var(--t-base);
 }
 
 .lightbox.active {
@@ -1640,13 +1700,13 @@ input, select, textarea {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.1);
-  color: #fff;
+  background: var(--ux-c5);
+  color: var(--ux-c6);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
-  transition: all var(--t-fast);
+  transition: color var(--t-fast), background-color var(--t-fast), border-color var(--t-fast), opacity var(--t-fast);
 }
 
 .lightbox-close:hover {
@@ -1675,7 +1735,7 @@ input, select, textarea {
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
-  transition: all var(--t-fast);
+  transition: color var(--t-fast), background-color var(--t-fast), border-color var(--t-fast), opacity var(--t-fast);
 }
 
 .act-tab:hover {
@@ -1686,13 +1746,13 @@ input, select, textarea {
 .act-tab.active {
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
   border-color: var(--primary);
-  color: #fff;
-  box-shadow: 0 4px 16px rgba(139, 38, 53, 0.3);
+  color: var(--ux-c6);
+  box-shadow: 0 4px 16px var(--ux-c7);
 }
 
 .activity-grid {
   display: grid;
-  grid-template-columns: 1.4fr repeat(2, 1fr);
+  grid-template-columns: 1.4fr repeat(2, minmax(0, 1fr));
   gap: 28px;
 }
 
@@ -1705,7 +1765,7 @@ input, select, textarea {
   border-radius: var(--radius-2xl);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
-  transition: all var(--t-base);
+  transition: color var(--t-base), background-color var(--t-base), border-color var(--t-base), opacity var(--t-base);
 }
 
 .activity-card:hover {
@@ -1743,14 +1803,14 @@ input, select, textarea {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #fff;
+  color: var(--ux-c6);
   backdrop-filter: blur(8px);
 }
 
-.ac-category.youth { background: rgba(139, 38, 53, 0.9); }
-.ac-category.education { background: rgba(37, 99, 235, 0.9); }
-.ac-category.charity { background: rgba(5, 150, 105, 0.9); }
-.ac-category.family { background: rgba(217, 119, 6, 0.9); }
+.ac-category.youth { background: var(--ux-c50); }
+.ac-category.education { background: var(--ux-c51); }
+.ac-category.charity { background: var(--ux-c52); }
+.ac-category.family { background: var(--ux-c53); }
 
 .ac-content {
   padding: 28px;
@@ -1795,7 +1855,7 @@ input, select, textarea {
 
 .news-grid {
   display: grid;
-  grid-template-columns: 1.5fr repeat(3, 1fr);
+  grid-template-columns: 1.5fr repeat(3, minmax(0, 1fr));
   gap: 28px;
 }
 
@@ -1804,7 +1864,7 @@ input, select, textarea {
   border-radius: var(--radius-2xl);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
-  transition: all var(--t-base);
+  transition: color var(--t-base), background-color var(--t-base), border-color var(--t-base), opacity var(--t-base);
 }
 
 .news-card:hover {
@@ -1867,7 +1927,7 @@ input, select, textarea {
   font-size: 0.875rem;
   font-weight: 700;
   color: var(--primary);
-  transition: all var(--t-fast);
+  transition: color var(--t-fast), background-color var(--t-fast), border-color var(--t-fast), opacity var(--t-fast);
 }
 
 .nc-read:hover {
@@ -1888,13 +1948,13 @@ input, select, textarea {
 
 .contact-grid {
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
+  grid-template-columns: minmax(0, 1fr) 1.2fr;
   gap: 72px;
 }
 
 .contact-cards {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
   margin-bottom: 40px;
 }
@@ -1904,11 +1964,11 @@ input, select, textarea {
   border-radius: var(--radius-xl);
   padding: 24px;
   border: 1px solid var(--border-light);
-  transition: all var(--t-base);
+  transition: color var(--t-base), background-color var(--t-base), border-color var(--t-base), opacity var(--t-base);
 }
 
 .contact-card:hover {
-  border-color: rgba(212, 168, 83, 0.3);
+  border-color: var(--ux-c29);
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
 }
@@ -1917,7 +1977,7 @@ input, select, textarea {
   width: 48px;
   height: 48px;
   border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, rgba(212, 168, 83, 0.15) 0%, rgba(212, 168, 83, 0.05) 100%);
+  background: linear-gradient(135deg, var(--ux-c28) 0%, var(--ux-c2) 100%);
   color: var(--primary);
   display: flex;
   align-items: center;
@@ -1956,19 +2016,19 @@ input, select, textarea {
   height: 48px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-  color: #fff;
+  color: var(--ux-c6);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.25rem;
-  transition: all var(--t-fast);
-  box-shadow: 0 4px 16px rgba(139, 38, 53, 0.25);
+  transition: color var(--t-fast), background-color var(--t-fast), border-color var(--t-fast), opacity var(--t-fast);
+  box-shadow: 0 4px 16px var(--ux-c22);
 }
 
 .social-btn:hover {
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(212, 168, 83, 0.35);
+  box-shadow: 0 8px 24px var(--ux-c32);
 }
 
 .contact-form {
@@ -1995,7 +2055,7 @@ input, select, textarea {
 
 .form-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 18px;
 }
 
@@ -2021,7 +2081,7 @@ input, select, textarea {
   font-size: 1rem;
   background: var(--bg-canvas);
   color: var(--text-primary);
-  transition: all var(--t-fast);
+  transition: color var(--t-fast), background-color var(--t-fast), border-color var(--t-fast), opacity var(--t-fast);
 }
 
 .form-group input:focus,
@@ -2029,7 +2089,7 @@ input, select, textarea {
 .form-group textarea:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(139, 38, 53, 0.08);
+  box-shadow: 0 0 0 4px var(--ux-c54);
 }
 
 .form-group input::placeholder {
@@ -2044,7 +2104,7 @@ input, select, textarea {
 /* ─── FOOTER ─── */
 .footer {
   background: var(--bg-dark);
-  color: #fff;
+  color: var(--ux-c6);
   position: relative;
   overflow: hidden;
 }
@@ -2066,18 +2126,18 @@ input, select, textarea {
 
 .footer-grid {
   display: grid;
-  grid-template-columns: 1.6fr repeat(3, 1fr);
+  grid-template-columns: 1.6fr repeat(3, minmax(0, 1fr));
   gap: 56px;
 }
 
 .footer-brand .logo {
-  color: #fff;
+  color: var(--ux-c6);
   margin-bottom: 20px;
 }
 
 .footer-brand p {
   font-size: 0.9375rem;
-  color: rgba(255,255,255,0.6);
+  color: var(--ux-c44);
   line-height: 1.8;
   margin-bottom: 28px;
   max-width: 320px;
@@ -2092,13 +2152,13 @@ input, select, textarea {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.08);
+  background: var(--ux-c9);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: var(--ux-c6);
   font-size: 1.125rem;
-  transition: all var(--t-fast);
+  transition: color var(--t-fast), background-color var(--t-fast), border-color var(--t-fast), opacity var(--t-fast);
 }
 
 .footer-social a:hover {
@@ -2121,18 +2181,18 @@ input, select, textarea {
 
 .footer-links a {
   font-size: 0.9375rem;
-  color: rgba(255,255,255,0.6);
-  transition: all var(--t-fast);
+  color: var(--ux-c44);
+  transition: color var(--t-fast), background-color var(--t-fast), border-color var(--t-fast), opacity var(--t-fast);
 }
 
 .footer-links a:hover {
-  color: #fff;
+  color: var(--ux-c6);
   padding-left: 6px;
 }
 
 .footer-bottom {
   padding: 28px 0;
-  border-top: 1px solid rgba(255,255,255,0.08);
+  border-top: 1px solid var(--ux-c9);
 }
 
 .footer-bottom-inner {
@@ -2143,7 +2203,7 @@ input, select, textarea {
 
 .footer-bottom p {
   font-size: 0.875rem;
-  color: rgba(255,255,255,0.4);
+  color: var(--ux-c47);
 }
 
 .footer-legal {
@@ -2153,12 +2213,12 @@ input, select, textarea {
 
 .footer-legal a {
   font-size: 0.8125rem;
-  color: rgba(255,255,255,0.4);
+  color: var(--ux-c47);
   transition: color var(--t-fast);
 }
 
 .footer-legal a:hover {
-  color: rgba(255,255,255,0.8);
+  color: var(--ux-c46);
 }
 
 /* ─── ANIMATIONS ─── */
@@ -2204,43 +2264,43 @@ input, select, textarea {
     padding: 9px 11px;
     font-size: 0.85rem;
   }
-  
+
   .nav-cta {
     padding: 10px 16px;
     font-size: 0.8125rem;
   }
-  
+
   .priest-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
-  
+
   .priest-lead {
     grid-column: span 2;
     grid-row: span 1;
   }
-  
+
   .activity-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
-  
+
   .activity-featured {
     grid-column: span 2;
     grid-row: span 1;
   }
-  
+
   .news-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
-  
+
   .news-featured {
     grid-column: span 2;
   }
-  
+
   .gallery-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-rows: repeat(3, 240px);
   }
-  
+
   .gallery-item:nth-child(1) {
     grid-column: span 2;
     grid-row: span 1;
@@ -2252,7 +2312,7 @@ input, select, textarea {
   .nav-toggle {
     display: flex;
   }
-  
+
   .nav-menu {
     position: fixed;
     top: 72px;
@@ -2266,34 +2326,34 @@ input, select, textarea {
     align-items: stretch;
     transform: translateX(100%);
     transition: transform var(--t-base);
-    box-shadow: -8px 0 40px rgba(0,0,0,0.08);
+    box-shadow: -8px 0 40px var(--ux-c55);
     z-index: 999;
     overflow-y: auto;
   }
-  
+
   .nav-menu.active {
     transform: translateX(0);
   }
-  
+
   .nav-menu li {
     width: 100%;
   }
-  
+
   .nav-link {
     width: 100%;
     padding: 14px 18px;
     font-size: 0.9375rem;
     border-radius: var(--radius-md);
   }
-  
+
   .nav-link.active {
-    background: rgba(139, 38, 53, 0.08);
+    background: var(--ux-c54);
   }
-  
+
   .nav-link.active::after {
     display: none;
   }
-  
+
   .nav-link.active::before {
     content: '';
     position: absolute;
@@ -2305,48 +2365,48 @@ input, select, textarea {
     background: linear-gradient(180deg, var(--primary), var(--accent));
     border-radius: 0 3px 3px 0;
   }
-  
+
   .nav-cta {
     padding: 11px 18px;
   }
-  
+
   .nav-cta span {
     display: none;
   }
-  
+
   .nav-cta i {
     font-size: 1.25rem;
   }
-  
+
   /* Sections */
   .about-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 56px;
   }
-  
+
   .about-visual {
     max-width: 560px;
     margin: 0 auto;
   }
-  
+
   .mass-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     max-width: 500px;
     margin-left: auto;
     margin-right: auto;
   }
-  
+
   .word-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
-  
+
   .contact-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 48px;
   }
-  
+
   .footer-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -2354,20 +2414,20 @@ input, select, textarea {
   .container {
     padding: 0 20px;
   }
-  
+
   .nav-inner {
     gap: 12px;
   }
-  
+
   .logo {
     font-size: 1.125rem;
   }
-  
+
   .logo-mark {
     width: 36px;
     height: 36px;
   }
-  
+
   .nav-cta {
     width: 42px;
     height: 42px;
@@ -2375,76 +2435,76 @@ input, select, textarea {
     justify-content: center;
     border-radius: 50%;
   }
-  
+
   .nav-cta:hover {
     transform: translateY(-2px) scale(1.05);
   }
-  
+
   .stats-row {
     flex-wrap: wrap;
     gap: 36px;
   }
-  
+
   .stat-divider {
     display: none;
   }
-  
+
   .sacrament-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     max-width: 400px;
     margin: 0 auto;
   }
-  
+
   .priest-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
-  
+
   .priest-lead {
     grid-column: span 1;
   }
-  
+
   .activity-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
-  
+
   .activity-featured {
     grid-column: span 1;
   }
-  
+
   .news-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
-  
+
   .news-featured {
     grid-column: span 1;
   }
-  
+
   .gallery-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto;
   }
-  
+
   .gallery-item:nth-child(1) {
     grid-column: span 1;
   }
-  
+
   .gallery-item {
     height: 240px;
   }
-  
+
   .contact-cards {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
-  
+
   .form-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
-  
+
   .footer-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 40px;
   }
-  
+
   .footer-bottom-inner {
     flex-direction: column;
     gap: 18px;
@@ -2459,5 +2519,53 @@ input, select, textarea {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* ux-polish-baseline */
+html,
+body {
+  overflow-x: clip;
+}
+
+h1,
+h2 {
+  text-wrap: balance;
+}
+
+[class*="price"],
+[class*="stat"],
+[class*="num"] {
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 3px solid var(--ux-accent, var(--ux-c56));
+  outline-offset: 3px;
+}
+
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled,
+[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+a:active,
+button:active {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

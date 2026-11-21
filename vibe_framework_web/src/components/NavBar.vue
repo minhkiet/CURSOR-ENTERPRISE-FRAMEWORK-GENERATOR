@@ -3,6 +3,7 @@ import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useTheme, type ThemeName } from '../composables/useTheme'
+import { templates } from '../data/templates'
 
 const route = useRoute()
 const router = useRouter()
@@ -21,9 +22,19 @@ const navLinks = [
   { href: '#explorer', label: 'Explorer', kind: 'anchor' },
   { href: '#architecture', label: 'Kiến Trúc', kind: 'anchor' },
   { to: '/prompts', label: 'Prompts', kind: 'route', badge: 'Hot' },
-  { to: '/templates', label: 'Templates', kind: 'route', badge: '27+' },
+  { to: '/templates', label: 'Templates', kind: 'route', badge: `${templates.length}+` },
   { to: '/cms', label: 'CMS Quản Trị', kind: 'route' }
 ] as const
+
+const drawerIcons = {
+  home: 'M3 11.2 12 4l9 7.2v8.3a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
+  templates: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
+  cms: 'M4 5h16v14H4zM4 9h16M9 9v10',
+  prompts: 'M13 2 4 14h7l-1 8 9-12h-7z',
+  library: 'M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5zM4 5.5V21.5',
+  explorer: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM15 9l-2 4-4 2 2-4z',
+  architecture: 'M12 3 3 8l9 5 9-5zM3 13l9 5 9-5M3 18l9 5 9-5'
+} as const
 
 const quickCommands = [
   { cmd: '/ui-ux', title: 'UI/UX System', desc: 'Design Tokens & Wireframe' },
@@ -187,7 +198,7 @@ onUnmounted(() => {
               </div>
               <div class="theme-option-info">
                 <div class="theme-option-name">
-                  <span>{{ t.icon }} {{ t.name }}</span>
+                <span>{{ t.name }}</span>
                   <span v-if="currentTheme === t.id" class="theme-active-tag">Active</span>
                 </div>
                 <div class="theme-option-desc">{{ t.labelVi }} · {{ t.vibe }}</div>
@@ -284,43 +295,57 @@ onUnmounted(() => {
       <div class="mobile-drawer-scroll">
         <!-- Section: Menu Chính -->
         <div class="drawer-section">
-          <div class="drawer-section-title">ĐIỀU HƯỚNG CHÍNH</div>
+            <div class="drawer-section-title">ĐIỀU HƯỚNG CHÍNH</div>
           <div class="drawer-nav-list">
             <router-link to="/" class="drawer-nav-item" @click="closeMobileMenu">
-              <span class="drawer-nav-icon">🏠</span>
+                <svg class="drawer-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                  <path :d="drawerIcons.home" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
               <span>Trang Chủ</span>
             </router-link>
 
             <router-link to="/templates" class="drawer-nav-item" @click="closeMobileMenu">
-              <span class="drawer-nav-icon">📦</span>
+                <svg class="drawer-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                  <path :d="drawerIcons.templates" stroke-linejoin="round" />
+                </svg>
               <span>Kho Templates</span>
-              <span class="drawer-pill-badge accent">27+ Mẫu Mới</span>
+                <span class="drawer-pill-badge accent">{{ templates.length }} mẫu</span>
             </router-link>
 
             <router-link to="/cms" class="drawer-nav-item" @click="closeMobileMenu">
-              <span class="drawer-nav-icon">🗂️</span>
+                <svg class="drawer-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                  <path :d="drawerIcons.cms" stroke-linejoin="round" />
+                </svg>
               <span>CMS Dashboard v4</span>
               <span class="drawer-pill-badge">SaaS CRM</span>
             </router-link>
 
             <router-link to="/prompts" class="drawer-nav-item" @click="closeMobileMenu">
-              <span class="drawer-nav-icon">⚡</span>
+                <svg class="drawer-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                  <path :d="drawerIcons.prompts" stroke-linejoin="round" />
+                </svg>
               <span>Kho Prompts Thực Chiến</span>
               <span class="drawer-pill-badge hot">Hot</span>
             </router-link>
 
             <router-link to="/learn" class="drawer-nav-item" @click="closeMobileMenu">
-              <span class="drawer-nav-icon">📚</span>
+                <svg class="drawer-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                  <path :d="drawerIcons.library" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
               <span>Thư Viện Framework & Rules</span>
             </router-link>
 
             <a href="#explorer" class="drawer-nav-item" @click="smoothScroll($event, '#explorer')">
-              <span class="drawer-nav-icon">🧭</span>
+                <svg class="drawer-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                  <path :d="drawerIcons.explorer" stroke-linejoin="round" />
+                </svg>
               <span>Cây Thư Mục Explorer</span>
             </a>
 
             <a href="#architecture" class="drawer-nav-item" @click="smoothScroll($event, '#architecture')">
-              <span class="drawer-nav-icon">🏛️</span>
+                <svg class="drawer-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                  <path :d="drawerIcons.architecture" stroke-linejoin="round" />
+                </svg>
               <span>Kiến Trúc Enterprise</span>
             </a>
           </div>
@@ -329,7 +354,7 @@ onUnmounted(() => {
         <!-- Section: Lệnh Nhanh Cursor (Interactive One-Tap Copy) -->
         <div class="drawer-section">
           <div class="drawer-section-title">
-            <span>⚡ LỆNH NHANH CURSOR (CHẠM ĐỂ CHÉP)</span>
+            <span>LỆNH NHANH CURSOR · CHẠM ĐỂ CHÉP</span>
           </div>
           <div class="quick-commands-grid">
             <button
@@ -347,7 +372,7 @@ onUnmounted(() => {
         <!-- Section: Theme Giao Diện -->
         <div class="drawer-section">
           <div class="drawer-section-title">
-            <span>🎨 CHỌN THEME GIAO DIỆN ({{ themes.length }})</span>
+            <span>CHỌN THEME GIAO DIỆN · {{ themes.length }}</span>
           </div>
           <div class="mobile-theme-grid">
             <button
@@ -715,7 +740,15 @@ onUnmounted(() => {
 }
 
 .drawer-nav-icon {
-  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  color: var(--text-tertiary);
+}
+
+.drawer-nav-item:hover .drawer-nav-icon,
+.drawer-nav-item.router-link-active .drawer-nav-icon {
+  color: var(--accent);
 }
 
 .drawer-pill-badge {

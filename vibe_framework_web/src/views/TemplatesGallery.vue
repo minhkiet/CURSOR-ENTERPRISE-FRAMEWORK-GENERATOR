@@ -2,7 +2,7 @@
 import { ref, computed, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { templates, type Template } from '../data/templates'
-import TemplatePreviewSvg from '../components/TemplatePreviewSvg.vue'
+import TemplateThumbnail from '../components/TemplateThumbnail.vue'
 
 const router = useRouter()
 const selectedCategory = ref<string>('all')
@@ -124,7 +124,7 @@ onUnmounted(() => {
         <div class="gallery-hero-content">
           <div class="section-label">Kho Templates Thực Chiến 2026</div>
           <h1 class="gallery-title">
-            {{ templates.length }} Production-Ready Templates.<br />
+            {{ templates.length }} template sẵn sàng production.<br />
             <span class="gallery-title-accent">Chuẩn Craft, Không Thuần AI.</span>
           </h1>
           <p class="gallery-subtitle">
@@ -149,7 +149,7 @@ onUnmounted(() => {
                 <polygon v-if="!isShowcaseScrollAll" points="5 3 19 12 5 21 5 3"/>
                 <rect v-else x="6" y="4" width="4" height="16"/>
               </svg>
-              <span>{{ isShowcaseScrollAll ? 'Dừng Tự Động Lướt' : 'Bật Tự Động Lướt Xem Web (Showcase)' }}</span>
+              <span>{{ isShowcaseScrollAll ? 'Dừng lướt tự động' : 'Bật lướt tự động' }}</span>
             </button>
           </div>
 
@@ -160,11 +160,11 @@ onUnmounted(() => {
             </div>
             <div class="gallery-stat">
               <div class="gallery-stat-value">5/5</div>
-              <div class="gallery-stat-label">Chuyên Sâu Mới</div>
+              <div class="gallery-stat-label">Bộ chuyên sâu</div>
             </div>
             <div class="gallery-stat">
-              <div class="gallery-stat-value">100%</div>
-              <div class="gallery-stat-label">Responsive Mobile</div>
+              <div class="gallery-stat-value">Responsive</div>
+              <div class="gallery-stat-label">Mobile-first</div>
             </div>
             <div class="gallery-stat">
               <div class="gallery-stat-value">Auto-Scroll</div>
@@ -208,7 +208,7 @@ onUnmounted(() => {
             title="Tự động cuộn lướt web trên toàn bộ thẻ"
           >
             <span class="showcase-dot"></span>
-            <span>{{ isShowcaseScrollAll ? 'Dừng Tự Cuộn' : '⚡ Tự Động Cuộn Lướt Web' }}</span>
+            <span>{{ isShowcaseScrollAll ? 'Dừng tự cuộn' : 'Tự động lướt web' }}</span>
           </button>
         </div>
       </div>
@@ -227,7 +227,7 @@ onUnmounted(() => {
               class="template-card-preview"
               :class="{ 'auto-scrolling': isShowcaseScrollAll || activeAutoScroll[t.id] }"
             >
-              <TemplatePreviewSvg :slug="t.slug" />
+              <TemplateThumbnail :slug="t.slug" />
 
               <!-- Quick scroll pill on card top-right -->
               <button
@@ -322,7 +322,12 @@ onUnmounted(() => {
               @click="toggleQuickAutoScroll"
               :title="isQuickAutoScrolling ? 'Tạm dừng cuộn' : 'Bật tự động lướt xem web'"
             >
-              <span>{{ isQuickAutoScrolling ? '⏸ Dừng Tự Cuộn' : '▶ Bật Tự Động Lướt' }}</span>
+              <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12" aria-hidden="true">
+                <rect v-if="isQuickAutoScrolling" x="7" y="5" width="3.5" height="14" rx="1" />
+                <rect v-if="isQuickAutoScrolling" x="13.5" y="5" width="3.5" height="14" rx="1" />
+                <path v-else d="M8 5v14l11-7z" />
+              </svg>
+              <span>{{ isQuickAutoScrolling ? 'Dừng tự cuộn' : 'Bật tự động lướt' }}</span>
             </button>
             <button class="btn btn-primary btn-sm" @click="viewTemplate(quickPreviewTemplate)">
               Trang Chi Tiết
@@ -354,7 +359,7 @@ onUnmounted(() => {
             <div class="section-label">Tự Động Hóa Với Cursor</div>
             <h2 class="cta-title">Cần xây dựng website chuyên nghiệp riêng?</h2>
             <p class="cta-desc">
-              Sử dụng các lệnh <code>/ui-ux</code>, <code>/dashboard-ui</code>, <code>/frontend-taste</code>, <code>/cms-landing-enterprise</code> hoặc <code>/image-workflow</code> trong Cursor IDE để tạo ngay giao diện chuẩn Enterprise trong 3 phút.
+              Sử dụng các lệnh <code>/ui-ux</code>, <code>/dashboard-ui</code>, <code>/frontend-taste</code>, <code>/cms-landing-enterprise</code> hoặc <code>/image-workflow</code> trong Cursor IDE để khởi tạo giao diện theo contract có sẵn.
             </p>
           </div>
           <router-link to="/prompts" class="btn btn-primary">
@@ -604,9 +609,9 @@ onUnmounted(() => {
 }
 
 .template-card:hover {
-  border-color: var(--border-default);
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  border-color: var(--accent-line);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(3, 18, 14, 0.38);
 }
 
 .template-card-preview {
@@ -618,9 +623,20 @@ onUnmounted(() => {
 }
 
 /* Smooth Auto-Scroll Mockup Effect */
-.template-card:hover :deep(.thumbnail-inner),
 .template-card-preview.auto-scrolling :deep(.thumbnail-inner) {
   animation: smoothScrollMockup 7s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+}
+
+.template-card:hover :deep(.thumbnail-inner) {
+  transform: scale(1.02);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .template-card:hover :deep(.thumbnail-inner),
+  .template-card-preview.auto-scrolling :deep(.thumbnail-inner) {
+    animation: none !important;
+    transform: none !important;
+  }
 }
 
 @keyframes smoothScrollMockup {

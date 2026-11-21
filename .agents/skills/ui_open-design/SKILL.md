@@ -1,6 +1,6 @@
 ---
 name: ui_open-design
-description: "Open Design Integration skill"
+description: Integrate Open Design MCP for UI generation, design systems, prototypes, decks, and image workflows.
 ---
 
 # Open Design Integration

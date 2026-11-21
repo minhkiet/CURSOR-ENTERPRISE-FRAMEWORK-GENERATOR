@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import { templates } from '../data/templates'
 
 interface Stat {
   target: number
@@ -9,7 +10,7 @@ interface Stat {
 }
 
 const stats: Stat[] = [
-  { target: 22, label: 'Templates' },
+  { target: templates.length, label: 'Templates' },
   { target: 43, label: 'Rules (.mdc)' },
   { target: 50, label: 'Skills' },
   { target: 10, label: 'Vibe Code Tools' },

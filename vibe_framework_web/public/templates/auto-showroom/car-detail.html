@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Porsche Taycan 4S Electric — AutoPrime Motors (Chính Hãng)</title>
+  <title>Porsche Taycan 4S Electric, AutoPrime Motors (Chính Hãng)</title>
   <meta name="description" content="Chi tiết siêu xe thể thao thuần điện Porsche Taycan 4S: 530 mã lực, 0-100 km/h 4.0s, pin 512 km. Bộ cấu hình đổi màu 360 độ, bảng tính trả góp ngân hàng 85%." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" />
+  <link rel="stylesheet" href="../_assets/fonts.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/regular/style.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/fill/style.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/duotone/style.css" />
+
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="../_assets/ux-polish.css" />
 </head>
-<body class="car-detail-page-body">
+<body data-ux="auto-showroom" class="car-detail-page-body">
 
   <!-- ─── TOP NOTIFICATION & HOTLINE BAR ─── -->
   <aside class="top-bar">
@@ -38,7 +38,7 @@
     <div class="container nav-inner">
       <a href="index.html" class="brand-logo" aria-label="AutoPrime Motors">
         <div class="brand-icon">
-          <svg viewBox="0 0 36 36" fill="none">
+          <svg aria-hidden="true" viewBox="0 0 36 36" fill="none">
             <rect width="36" height="36" rx="8" fill="url(#apGrad)"/>
             <path d="M7 23L18 8L29 23H22L18 16L14 23H7Z" fill="#ffffff"/>
             <path d="M12 26H24V28H12V26Z" fill="#f59e0b"/>
@@ -124,9 +124,9 @@
     <div class="container">
       <div class="configurator-card">
         <div class="stage-view-box">
-          <img
+          <img loading="lazy" decoding="async"
             id="carStageImg"
-            src="https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1400&q=80"
+            src="../_assets/media/614cb51c9c96.jpg"
             alt="Porsche Taycan 4S"
             class="car-stage-image"
           />
@@ -146,25 +146,25 @@
               <button
                 class="swatch-btn active"
                 style="background:#cbd5e1"
-                onclick="changeCarColor(this, 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1400&q=80', 'Bạc Ánh Kim (Dolomite Silver Metallic)')"
+                onclick="changeCarColor(this, '../_assets/media/614cb51c9c96.jpg', 'Bạc Ánh Kim (Dolomite Silver Metallic)')"
                 title="Bạc Ánh Kim"
               ></button>
               <button
                 class="swatch-btn"
                 style="background:#09090b"
-                onclick="changeCarColor(this, 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=1400&q=80', 'Đen Huyền Bí (Obsidian Black Metallic)')"
+                onclick="changeCarColor(this, '../_assets/media/e68bd34c4084.jpg', 'Đen Huyền Bí (Obsidian Black Metallic)')"
                 title="Đen Huyền Bí"
               ></button>
               <button
                 class="swatch-btn"
                 style="background:#0284c7"
-                onclick="changeCarColor(this, 'https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=1400&q=80', 'Xanh Biển Sâu (Gentian Blue Metallic)')"
+                onclick="changeCarColor(this, '../_assets/media/c91b4e526a2e.jpg', 'Xanh Biển Sâu (Gentian Blue Metallic)')"
                 title="Xanh Biển Sâu"
               ></button>
               <button
                 class="swatch-btn"
                 style="background:#b91c1c"
-                onclick="changeCarColor(this, 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1400&q=80', 'Đỏ Rực Lửa (Carmine Red Special)')"
+                onclick="changeCarColor(this, '../_assets/media/e03046678aee.jpg', 'Đỏ Rực Lửa (Carmine Red Special)')"
                 title="Đỏ Rực Lửa"
               ></button>
             </div>
@@ -205,7 +205,7 @@
 
         <div class="spec-bento-card highlight">
           <div class="sb-icon"><i class="ph-fill ph-timer"></i></div>
-          <span class="sb-label">Tăng Tốc 0–100 km/h</span>
+          <span class="sb-label">Tăng Tốc 0 - 100 km/h</span>
           <strong class="sb-val">4.0 Giây</strong>
           <span class="sb-sub">Lực đẩy dính lưng tức thì</span>
         </div>

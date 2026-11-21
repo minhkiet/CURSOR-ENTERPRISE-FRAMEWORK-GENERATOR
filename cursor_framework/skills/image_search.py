@@ -17,6 +17,7 @@ Usage:
 
 import asyncio
 import hashlib
+import re
 import time
 from collections import deque
 from dataclasses import dataclass, field
@@ -236,15 +237,20 @@ class ImageSearchSkill:
         )
     
     def _deduplicate(self, images: list[ImageResult]) -> list[ImageResult]:
-        """Remove duplicate images based on URL similarity."""
+        """Remove duplicate images by normalized source URL."""
         seen_hashes: set[str] = set()
         unique_images: list[ImageResult] = []
         
         for img in images:
-            # Create a hash based on image dimensions and approximate URL
-            # This handles cases where same image appears with different URLs
+            identity = (img.url or img.source_url or img.thumbnail_url or "").strip()
+            if not identity:
+                identity = f"{img.provider}|{img.title}|{img.width}x{img.height}"
+            else:
+                # Pinterest serves the same pin under /originals/, /736x/, etc.
+                identity = re.sub(r"/(?:originals|\d+x)/", "/", identity, flags=re.IGNORECASE)
+                identity = identity.split("?", 1)[0].rstrip("/")
             url_hash = hashlib.md5(
-                f"{img.width}x{img.height}|{img.source}".encode()
+                f"{img.provider}|{identity.lower()}".encode()
             ).hexdigest()[:16]
             
             if url_hash not in seen_hashes:

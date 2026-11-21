@@ -118,7 +118,7 @@ comparison = skill.generate_comparison(
 | Nguồn | Loại | URL Pattern | Lưu ý |
 |--------|------|-------------|--------|
 | **Pinterest** | Photos / Ideas / UI / Mockups | `i.pinimg.com/originals/` | **Miễn phí** qua Pinterest MCP (search, board, pin details, download) |
-| **Google Flow** | Image + Video (4s) | `labs.google/fx/tools/flow` | **Miễn phí** - AI tạo ảnh/video |
+| **Google Flow** | Image + Video (4s) | `flow.google.com` | **Miễn phí** - AI tạo ảnh/video, có automation CLI |
 | **Unsplash** | Photos | `images.unsplash.com/photo-{ID}` | Free, no attribution |
 | **Pexels** | Photos + Videos | `images.pexels.com/photos/` | Free commercial use |
 | **Pixabay** | Photos + Videos | `pixabay.com/photos/` | Free, attribution appreciated |
@@ -134,7 +134,7 @@ comparison = skill.generate_comparison(
 
 ### Truy cập
 ```
-https://labs.google/fx/tools/flow
+https://flow.google.com/
 ```
 
 ### Features
@@ -165,9 +165,26 @@ professional photography, 8k"
 
 npx playwright screenshot \
   --browser chromium \
-  "https://labs.google/fx/tools/flow" \
+  "https://flow.google.com/" \
   --output ./assets/flow-result.png
 ```
+
+### Automated Flow CLI (framework)
+
+```bash
+# 1. Đăng nhập Google một lần vào profile cố định (không lưu credential vào repo)
+python tools/google_flow_cli.py --login
+
+# 2. Kiểm tra UI/selector nếu Flow thay đổi
+python tools/google_flow_cli.py --probe
+
+# 3. Tự tạo project, generate ảnh, tải về và gán vào hệ thống
+python tools/google_flow_cli.py --prompt "bat tu ngu hanh thap than chart" --count 2
+```
+
+Output chuẩn: `public/assets/generated/google-flow/<project>/asset-manifest.json`,
+index tổng: `public/assets/generated/manifest.json`. Tên project tự sinh là
+`flow-<slug>-<YYYYMMDD-HHMMSS>`; có thể đặt tên cố định bằng `--project`.
 
 ---
 

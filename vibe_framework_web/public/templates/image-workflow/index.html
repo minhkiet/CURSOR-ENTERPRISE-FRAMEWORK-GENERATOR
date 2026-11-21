@@ -3,16 +3,17 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Image Workflow Studio — Pipeline Tạo Ảnh AI & Bóc Tách Asset</title>
+<title>Image Workflow Studio, Pipeline Tạo Ảnh AI & Bóc Tách Asset</title>
 <meta name="description" content="Quy trình tự động hóa hình ảnh từ Screenshot/URL sang Asset thực tế. Kết hợp Web Cloner, Image Finder (Unsplash, Pexels) và Image Generator (Google Flow, DALL-E 3)." />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
-<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+  <link rel="stylesheet" href="../_assets/fonts.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/regular/style.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/fill/style.css" />
+  <link rel="stylesheet" href="../_assets/vendor/phosphor/duotone/style.css" />
+
 <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="../_assets/ux-polish.css" />
 </head>
-<body class="img-theme">
+<body data-ux="image-workflow" class="img-theme">
 
 <!-- ─── HEADER ─── -->
 <header class="img-header">
@@ -101,8 +102,8 @@
       <div class="p-card active-p-card">
         <div class="p-num">03</div>
         <h3>Tạo Ảnh Bằng Prompt Blueprint</h3>
-        <p>Áp dụng bộ công thức prompt: Bối cảnh + Tone màu + Ánh sáng + Độ sắc nét + Bộ lọc Negative Prompt chống dị tật AI.</p>
-        <div class="p-tag accent">Engine: Google Flow / DALL-E</div>
+        <p>Dùng <code>--topic</code> để tự sinh prompt, mặc định model <code>Nano Banana 2.1</code>, tự nhận tỉ lệ từ prompt (<code>--ar</code>, <code>tỷ lệ</code>, <code>1920x1080</code>) hoặc override bằng <code>--ratio</code>/<code>--size</code>. CLI tạo project, tải ảnh về <code>public/assets/generated/google-flow/</code> và ghi asset manifest.</p>
+        <div class="p-tag accent">Engine: Google Flow CLI</div>
       </div>
 
       <div class="p-card">
@@ -200,7 +201,7 @@
         </div>
         <div class="ratio-preview-box">
           <div class="ratio-inner-frame" id="ratio-frame">
-            <div class="ratio-info-tag">1920 x 1080 · WebP · 135 KB</div>
+            <div class="ratio-info-tag">1920 x 1080, WebP, 135 KB</div>
             <div class="ratio-visual-center">
               <i class="ph ph-image-square"></i>
               <span>High-Res Studio Preview Frame</span>
@@ -243,7 +244,7 @@
 <footer class="img-footer">
   <div class="img-container footer-inner">
     <div>
-      <strong>Image Workflow Studio</strong> · Enterprise Asset Generation Framework
+      <strong>Image Workflow Studio</strong>, Enterprise Asset Generation Framework
     </div>
     <div class="footer-links">
       <a href="#pipeline">Quy Trình</a>
@@ -273,13 +274,13 @@
       const ratio = tab.getAttribute('data-ratio');
       if (ratio === '16:9') {
         frame.style.aspectRatio = '16 / 9';
-        frame.querySelector('.ratio-info-tag').textContent = '1920 x 1080 · WebP · 135 KB';
+        frame.querySelector('.ratio-info-tag').textContent = '1920 x 1080, WebP, 135 KB';
       } else if (ratio === '1:1') {
         frame.style.aspectRatio = '1 / 1';
-        frame.querySelector('.ratio-info-tag').textContent = '1080 x 1080 · WebP · 98 KB';
+        frame.querySelector('.ratio-info-tag').textContent = '1080 x 1080, WebP, 98 KB';
       } else if (ratio === '9:16') {
         frame.style.aspectRatio = '9 / 16';
-        frame.querySelector('.ratio-info-tag').textContent = '1080 x 1920 · WebP · 160 KB';
+        frame.querySelector('.ratio-info-tag').textContent = '1080 x 1920, WebP, 160 KB';
       }
     });
   });

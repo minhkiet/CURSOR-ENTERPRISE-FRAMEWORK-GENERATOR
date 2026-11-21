@@ -1,3 +1,4 @@
+/* Hallmark · v2.0.0 · custom · editorial · page · genre: editorial · posture: restrained · hero: settled · nav: local · footer: local · job: production template */
 /* ─────────────────────────────────────────────────────────
    THE EDITORIAL — Magazine
    VARIANCE 7 · MOTION 4 · DENSITY 4
@@ -24,19 +25,49 @@
   --font-mono:  'JetBrains Mono', monospace;
 
   --container:  1280px;
+
+/* ux-tokenized */
+  --ux-c1: #0f0e0c;
+  --ux-c2: #1a1815;
+  --ux-c3: #f5f1ea;
+  --ux-c4: #c5bfb4;
+  --ux-c5: #8a8478;
+  --ux-c6: #2a2620;
+  --ux-c7: #1f1c18;
+  --ux-c8: #ff6b54;
+  --ux-c9: #4ca8af;
+  --ux-c10: #a02313;
+  --ux-c11: rgba(255,255,255,.15);
+  --ux-c12: rgba(255,255,255,.1);
+  --ux-c13: rgba(255,255,255,.05);
+  --ux-c14: rgba(255, 255, 255, 0.95);
+  --ux-c15: rgba(0, 0, 0, 0.16);
+  --ux-c16: rgba(0, 0, 0, 0.08);
+  --ux-c17: #10b981;
+  --ux-c18: #059669;
+  --ux-c19: #f6f3ec;
+  --ux-c20: #0084ff;
+  --ux-c21: #0062e0;
+  --ux-c22: rgba(0, 0, 0, 0.24);
+  --ux-c23: rgba(0, 0, 0, 0.12);
+  --ux-c24: rgba(15, 23, 42, 0.92);
+  --ux-c25: rgba(0, 0, 0, 0.18);
+  --ux-c26: rgba(255, 255, 255, 0.08);
+  --ux-c27: #8a5641;
+  --ux-f1: inherit;
 }
 
 /* Dark mode tokens */
 [data-theme="dark"] {
-  --paper:      #0f0e0c;
-  --paper-2:   #1a1815;
-  --ink:        #f5f1ea;
-  --ink-2:      #c5bfb4;
-  --ink-3:      #8a8478;
-  --rule:       #2a2620;
-  --rule-soft:  #1f1c18;
-  --highlight:  #ff6b54;
-  --accent:     #4ca8af;
+  --paper:      var(--ux-c1);
+  --paper-2:   var(--ux-c2);
+  --ink:        var(--ux-c3);
+  --ink-2:      var(--ux-c4);
+  --ink-3:      var(--ux-c5);
+  --rule:       var(--ux-c6);
+  --rule-soft:  var(--ux-c7);
+  --highlight:  var(--ux-c8);
+  --accent:     var(--ux-c9);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -104,7 +135,7 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
   place-items: center;
   font-size: 14px;
   color: var(--ink-2);
-  transition: all .15s;
+  transition: color .15s, background-color .15s, border-color .15s, opacity .15s;
 }
 .theme-toggle:hover { background: var(--paper-2); color: var(--ink); }
 .sub-btn {
@@ -117,9 +148,9 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
   border-radius: 4px;
   font-weight: 500;
   font-size: 12px;
-  transition: all .15s;
+  transition: color .15s, background-color .15s, border-color .15s, opacity .15s;
 }
-.sub-btn:hover { background: #a02313; }
+.sub-btn:hover { background: var(--ux-c10); }
 .sub-btn i { font-size: 11px; }
 
 /* Brand */
@@ -196,7 +227,7 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
 .featured { padding: 48px 0 64px; }
 .feat-grid {
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
+  grid-template-columns: 1.4fr minmax(0, 1fr);
   gap: 40px;
 }
 
@@ -299,11 +330,11 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
 }
 .side-card {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
   padding-bottom: 28px;
   border-bottom: 1px solid var(--rule-soft);
-  transition: all .2s;
+  transition: color .2s, background-color .2s, border-color .2s, opacity .2s;
 }
 .side-card:last-child { border-bottom: 0; padding-bottom: 0; }
 .side-card:hover .sc-image img { transform: scale(1.04); }
@@ -365,7 +396,7 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
 
 .latest-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: 2fr minmax(0, 1fr) minmax(0, 1fr);
   grid-template-rows: auto auto;
   gap: 40px 24px;
 }
@@ -376,7 +407,7 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
 .post-card {
   display: flex;
   flex-direction: column;
-  transition: all .25s;
+  transition: color .25s, background-color .25s, border-color .25s, opacity .25s;
 }
 .pc-image {
   overflow: hidden;
@@ -442,7 +473,7 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
   color: var(--ink);
   padding: 6px 4px;
   border-bottom: 1px solid transparent;
-  transition: all .2s;
+  transition: color .2s, background-color .2s, border-color .2s, opacity .2s;
 }
 .topic:hover {
   color: var(--highlight);
@@ -461,7 +492,7 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
 .editors-note .post-cat { color: var(--highlight); margin-bottom: 12px; display: block; }
 .note-grid {
   display: grid;
-  grid-template-columns: 1fr 1.4fr;
+  grid-template-columns: minmax(0, 1fr) 1.4fr;
   gap: 80px;
   align-items: start;
 }
@@ -494,7 +525,7 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
   gap: 12px;
   margin-top: 40px;
   padding-top: 24px;
-  border-top: 1px solid rgba(255,255,255,.15);
+  border-top: 1px solid var(--ux-c11);
 }
 .note-sig img {
   width: 56px; height: 56px;
@@ -566,7 +597,7 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
   font-weight: 500;
   font-size: 14px;
   border-radius: 4px;
-  transition: all .15s;
+  transition: color .15s, background-color .15s, border-color .15s, opacity .15s;
 }
 .nl-form button:hover { background: var(--highlight); }
 
@@ -592,10 +623,10 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
 }
 .footer-top {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-columns: 2fr minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
   gap: 48px;
   padding-bottom: 48px;
-  border-bottom: 1px solid rgba(255,255,255,.1);
+  border-bottom: 1px solid var(--ux-c12);
 }
 .footer-brand {
   font-family: var(--font-serif);
@@ -623,10 +654,10 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: rgba(255,255,255,.05);
+  background: var(--ux-c13);
   font-size: 16px;
   color: var(--paper);
-  transition: all .15s;
+  transition: color .15s, background-color .15s, border-color .15s, opacity .15s;
 }
 .footer-socials a:hover {
   background: var(--highlight);
@@ -674,24 +705,24 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
 
 /* ─── RESPONSIVE ─── */
 @media (max-width: 1024px) {
-  .feat-grid { grid-template-columns: 1fr; gap: 40px; }
-  .feat-side { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .feat-grid { grid-template-columns: minmax(0, 1fr); gap: 40px; }
+  .feat-side { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
   .side-card { border-bottom: 0; padding-bottom: 0; }
-  .latest-grid { grid-template-columns: 1fr 1fr; }
+  .latest-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .pc-big { grid-column: span 2; grid-row: auto; }
-  .note-grid { grid-template-columns: 1fr; gap: 32px; }
-  .footer-top { grid-template-columns: 1fr 1fr; }
+  .note-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .footer-top { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 }
 
 @media (max-width: 768px) {
   .prim-nav ul { gap: 18px; overflow-x: auto; justify-content: flex-start; padding-left: 24px; }
   .brand-display { font-size: 40px; }
   .brand-serif { font-size: 32px; }
-  .feat-side { grid-template-columns: 1fr; }
-  .latest-grid { grid-template-columns: 1fr; }
+  .feat-side { grid-template-columns: minmax(0, 1fr); }
+  .latest-grid { grid-template-columns: minmax(0, 1fr); }
   .pc-big { grid-column: auto; }
   .nl-form { flex-direction: column; }
-  .footer-top { grid-template-columns: 1fr; gap: 32px; }
+  .footer-top { grid-template-columns: minmax(0, 1fr); gap: 32px; }
   .footer-bot { flex-direction: column; align-items: flex-start; }
 }
 
@@ -715,25 +746,25 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
   justify-content: center;
   position: relative;
   text-decoration: none;
-  border: 2px solid rgba(255, 255, 255, 0.95);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16), 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 2px solid var(--ux-c14);
+  box-shadow: 0 4px 16px var(--ux-c15), 0 1px 3px var(--ux-c16);
   transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease;
   cursor: pointer;
 }
 
 .floating-btn_hotline {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: #ffffff;
+  background: linear-gradient(135deg, var(--ux-c17) 0%, var(--ux-c18) 100%);
+  color: var(--ux-c19);
 }
 
 .floating-btn_zalo {
-  background: linear-gradient(135deg, #0084ff 0%, #0062e0 100%);
-  color: #ffffff;
+  background: linear-gradient(135deg, var(--ux-c20) 0%, var(--ux-c21) 100%);
+  color: var(--ux-c19);
 }
 
 .floating-btn:hover {
   transform: translateY(-2px) scale(1.08);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24), 0 2px 6px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 24px var(--ux-c22), 0 2px 6px var(--ux-c23);
 }
 
 .floating-btn:active {
@@ -750,10 +781,10 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
   right: calc(100% + 10px);
   top: 50%;
   transform: translateY(-50%) translateX(6px);
-  background: rgba(15, 23, 42, 0.92);
+  background: var(--ux-c24);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  color: #ffffff;
+  color: var(--ux-c19);
   font-size: 11.5px;
   font-weight: 600;
   padding: 5px 10px;
@@ -763,9 +794,9 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  font-family: inherit;
+  box-shadow: 0 4px 14px var(--ux-c25);
+  border: 1px solid var(--ux-c26);
+  font-family: var(--ux-f1);
 }
 
 .floating-btn:hover .floating-tooltip {
@@ -794,4 +825,52 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
   .masthead-top { font-size: 11px; padding: 10px 20px; }
   .featured { padding: 32px 0; }
   .latest, .topics, .editors-note, .newsletter { padding: 48px 0; }
+}
+
+
+/* ux-polish-baseline */
+html,
+body {
+  overflow-x: clip;
+}
+
+h1,
+h2 {
+  text-wrap: balance;
+}
+
+[class*="price"],
+[class*="stat"],
+[class*="num"] {
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 3px solid var(--ux-accent, var(--ux-c27));
+  outline-offset: 3px;
+}
+
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled,
+[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+a:active,
+button:active {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
